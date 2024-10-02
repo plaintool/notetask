@@ -8,9 +8,10 @@
       <Unit>
         <Filename Value="notetask.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
         <CursorPos X="43" Y="19"/>
         <UsageCount Value="29"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="mainform.pas"/>
@@ -18,7 +19,6 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="41"/>
         <CursorPos X="27" Y="41"/>
@@ -87,11 +87,10 @@
       </Modes>
     </RunParams>
     <HistoryLists>
-      <List Name="WorkingDirectory" Type="File" Count="1"/>
       <List Name="LaunchingApplication" Type="File" Count="1">
         <Item1 Value="C:\Windows\system32\cmd.exe /C ${TargetCmdLine}"/>
       </List>
-      <List Name="CommandLineParameters" Count="4">
+      <List Name="CommandLineParameters" Count="3">
         <Item1 Value="--lang ru"/>
         <Item2 Value="--lang=ru"/>
         <Item3 Value="ru"/>

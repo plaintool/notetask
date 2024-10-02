@@ -11,7 +11,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.5\n"
 
-#: mainform.rows
+#: mainform.rrows
+#, fuzzy
+#| msgid " rows"
+msgctxt "mainform.rrows"
 msgid " rows"
 msgstr " строк"
 
