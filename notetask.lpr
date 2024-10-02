@@ -10,17 +10,23 @@ uses
   athreads,
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, mainform, printer4lazarus, lineending, filemanager, task
-  { you can add units after this };
+  Forms,
+  LCLTranslator,
+  DefaultTranslator,
+  printer4lazarus,
+  mainform,
+  lineending,
+  filemanager,
+  task { you can add units after this };
 
-{$R *.res}
+  {$R *.res}
 
 begin
-  RequireDerivedFormResource:=True;
+  RequireDerivedFormResource := True;
+  SetDefaultLang('ru');
   Application.Title:='Notetask';
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
   Application.Run;
 end.
-

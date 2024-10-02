@@ -1,0 +1,64 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: mainform.rrows
+msgctxt "mainform.rrows"
+msgid " rows"
+msgstr ""
+
+#: tformnotetask.aexit.caption
+msgid "Exit"
+msgstr ""
+
+#: tformnotetask.anew.caption
+msgid "New"
+msgstr ""
+
+#: tformnotetask.anewwindow.caption
+msgid "New window"
+msgstr ""
+
+#: tformnotetask.aopen.caption
+msgid "Open..."
+msgstr ""
+
+#: tformnotetask.apageproperties.caption
+msgid "Page properties..."
+msgstr ""
+
+#: tformnotetask.aprint.caption
+msgid "Print..."
+msgstr ""
+
+#: tformnotetask.aprintersetup.caption
+msgid "Printer setup..."
+msgstr ""
+
+#: tformnotetask.asave.caption
+msgid "Save"
+msgstr ""
+
+#: tformnotetask.asaveas.caption
+msgid "Save as..."
+msgstr ""
+
+#: tformnotetask.caption
+msgid "Notetask"
+msgstr ""
+
+#: tformnotetask.menufile.caption
+msgid "File"
+msgstr ""
+
+#: tformnotetask.statusbar.panels[1].text
+msgid "Windows (LRLF)"
+msgstr ""
+
+#: tformnotetask.statusbar.panels[2].text
+msgid "UTF-8"
+msgstr ""
+
+#: tformnotetask.statusbar.panels[3].text
+msgid "0 rows"
+msgstr ""
+

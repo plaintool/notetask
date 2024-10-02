@@ -55,6 +55,9 @@ type
 var
   formNotetask: TformNotetask;
 
+resourcestring
+  rrows = ' rows';
+
 implementation
 
 uses filemanager, lineending, task;
@@ -98,7 +101,7 @@ begin
 
     statusBar.Panels[1].Text := UpperCase(FileEncoding.EncodingName);
     statusBar.Panels[2].Text := LineEnding.ToString;
-    statusBar.Panels[3].Text := LineCount.ToString + ' rows';
+    statusBar.Panels[3].Text := LineCount.ToString + rrows;
 
     Tasks := TextToStringList(Content);
 

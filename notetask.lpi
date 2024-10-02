@@ -16,6 +16,10 @@
       </XPManifest>
       <Icon Value="0"/>
     </General>
+    <i18n>
+      <EnableI18N Value="True"/>
+      <OutDir Value="languages"/>
+    </i18n>
     <BuildModes>
       <Item Name="Default" Default="True"/>
     </BuildModes>

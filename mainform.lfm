@@ -23,12 +23,10 @@ object formNotetask: TformNotetask
         Width = 64
       end    
       item
-        Title.Color = clBtnFace
         Title.Caption = ''
         Width = 469
       end    
       item
-        Title.Color = clBtnFace
         Title.Caption = ''
         Width = 277
       end    
@@ -43,7 +41,7 @@ object formNotetask: TformNotetask
     Font.Height = -16
     Font.Pitch = fpVariable
     Font.Quality = fqDraft
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAutoAddRows, goSmoothScroll, goFixedRowNumbering, goRowHighlight]
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goEditing, goAutoAddRows, goSmoothScroll, goFixedRowNumbering, goRowHighlight]
     ParentFont = False
     RangeSelectMode = rsmMulti
     RowCount = 1
