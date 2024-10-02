@@ -1,0 +1,173 @@
+object formNotetask: TformNotetask
+  Left = 357
+  Height = 467
+  Top = 154
+  Width = 761
+  Caption = 'Notetask'
+  ClientHeight = 467
+  ClientWidth = 761
+  Color = clWindow
+  Menu = MainMenu
+  object task: TStringGrid
+    Left = 0
+    Height = 444
+    Top = 0
+    Width = 761
+    Align = alClient
+    BorderStyle = bsNone
+    ColCount = 3
+    Columns = <    
+      item
+        Alignment = taCenter
+        ButtonStyle = cbsCheckboxColumn
+        Title.Caption = ''
+        Width = 64
+      end    
+      item
+        Title.Caption = ''
+        Width = 378
+      end>
+    FixedColor = clDefault
+    FixedRows = 0
+    Flat = True
+    Font.CharSet = RUSSIAN_CHARSET
+    Font.Height = -16
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAutoAddRows, goSmoothScroll, goFixedRowNumbering, goRowHighlight]
+    ParentFont = False
+    RangeSelectMode = rsmMulti
+    RowCount = 1
+    TabOrder = 0
+    ColWidths = (
+      42
+      64
+      378
+    )
+    RowHeights = (
+      27
+    )
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 444
+    Width = 761
+    Panels = <    
+      item
+        Alignment = taRightJustify
+        Text = 'UTF-8'
+        Width = 200
+      end>
+    SimplePanel = False
+  end
+  object MainMenu: TMainMenu
+    Left = 160
+    Top = 112
+    object menuFile: TMenuItem
+      Caption = 'File'
+      ShortCut = 16454
+      object menuNew: TMenuItem
+        Action = aNew
+      end
+      object menuNewWindow: TMenuItem
+        Action = aNewWindow
+      end
+      object menuOpen: TMenuItem
+        Action = aOpen
+      end
+      object menuSave: TMenuItem
+        Action = aSave
+      end
+      object menuSaveAs: TMenuItem
+        Action = aSaveAs
+      end
+      object Separator1: TMenuItem
+        Caption = '-'
+      end
+      object menuPrinterSetup: TMenuItem
+        Action = aPrinterSetup
+      end
+      object menuPageProperties: TMenuItem
+        Action = aPageProperties
+      end
+      object menuPrint: TMenuItem
+        Action = aPrint
+      end
+      object Separator3: TMenuItem
+        Caption = '-'
+      end
+      object menuExit: TMenuItem
+        Action = aExit
+      end
+    end
+  end
+  object ActionList: TActionList
+    Left = 232
+    Top = 112
+    object aNew: TAction
+      Category = 'File'
+      Caption = 'New'
+      ShortCut = 16462
+    end
+    object aNewWindow: TAction
+      Category = 'File'
+      Caption = 'New window'
+      ShortCut = 49230
+    end
+    object aOpen: TAction
+      Category = 'File'
+      Caption = 'Open...'
+      ShortCut = 16463
+    end
+    object aSave: TAction
+      Category = 'File'
+      Caption = 'Save'
+      ShortCut = 16467
+    end
+    object aSaveAs: TAction
+      Category = 'File'
+      Caption = 'Save as...'
+      ShortCut = 49235
+    end
+    object aPrinterSetup: TAction
+      Category = 'File'
+      Caption = 'Printer setup...'
+    end
+    object aPageProperties: TAction
+      Category = 'File'
+      Caption = 'Page properties...'
+      ShortCut = 49232
+    end
+    object aPrint: TAction
+      Category = 'File'
+      Caption = 'Print...'
+      ShortCut = 16464
+    end
+    object aExit: TAction
+      Category = 'File'
+      Caption = 'Exit'
+      OnExecute = aExitExecute
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    Left = 320
+    Top = 112
+  end
+  object SaveDialog1: TSaveDialog
+    Left = 400
+    Top = 112
+  end
+  object PageSetupDialog1: TPageSetupDialog
+    Left = 488
+    Top = 112
+  end
+  object PrintDialog1: TPrintDialog
+    Left = 576
+    Top = 112
+  end
+  object PrinterSetupDialog1: TPrinterSetupDialog
+    Left = 496
+    Top = 56
+  end
+end
