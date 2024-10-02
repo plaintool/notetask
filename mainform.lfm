@@ -1,21 +1,20 @@
 object formNotetask: TformNotetask
   Left = 357
-  Height = 467
+  Height = 506
   Top = 154
-  Width = 761
+  Width = 1061
   Caption = 'Notetask'
-  ClientHeight = 467
-  ClientWidth = 761
+  ClientHeight = 506
+  ClientWidth = 1061
   Color = clWindow
   Menu = MainMenu
-  object task: TStringGrid
+  object taskGrid: TStringGrid
     Left = 0
-    Height = 444
+    Height = 483
     Top = 0
-    Width = 761
+    Width = 1061
     Align = alClient
     BorderStyle = bsNone
-    ColCount = 3
     Columns = <    
       item
         Alignment = taCenter
@@ -24,8 +23,18 @@ object formNotetask: TformNotetask
         Width = 64
       end    
       item
+        Title.Color = clBtnFace
         Title.Caption = ''
-        Width = 378
+        Width = 469
+      end    
+      item
+        Title.Color = clBtnFace
+        Title.Caption = ''
+        Width = 277
+      end    
+      item
+        Title.Caption = ''
+        Width = 140
       end>
     FixedColor = clDefault
     FixedRows = 0
@@ -42,22 +51,35 @@ object formNotetask: TformNotetask
     ColWidths = (
       42
       64
-      378
+      469
+      277
+      140
     )
     RowHeights = (
       27
     )
   end
-  object StatusBar1: TStatusBar
+  object statusBar: TStatusBar
     Left = 0
     Height = 23
-    Top = 444
-    Width = 761
+    Top = 483
+    Width = 1061
     Panels = <    
       item
-        Alignment = taRightJustify
+        Width = 50
+      end    
+      item
+        Text = 'Windows (LRLF)'
+        Width = 150
+      end    
+      item
+        Bevel = pbNone
         Text = 'UTF-8'
-        Width = 200
+        Width = 150
+      end    
+      item
+        Text = '0 rows'
+        Width = 50
       end>
     SimplePanel = False
   end
@@ -108,6 +130,7 @@ object formNotetask: TformNotetask
     object aNew: TAction
       Category = 'File'
       Caption = 'New'
+      OnExecute = aNewExecute
       ShortCut = 16462
     end
     object aNewWindow: TAction
@@ -118,6 +141,7 @@ object formNotetask: TformNotetask
     object aOpen: TAction
       Category = 'File'
       Caption = 'Open...'
+      OnExecute = aOpenExecute
       ShortCut = 16463
     end
     object aSave: TAction
@@ -150,24 +174,24 @@ object formNotetask: TformNotetask
       OnExecute = aExitExecute
     end
   end
-  object OpenDialog1: TOpenDialog
+  object openDialog: TOpenDialog
     Left = 320
     Top = 112
   end
-  object SaveDialog1: TSaveDialog
+  object saveDialog: TSaveDialog
     Left = 400
     Top = 112
   end
-  object PageSetupDialog1: TPageSetupDialog
+  object pageSetupDialog: TPageSetupDialog
     Left = 488
     Top = 112
   end
-  object PrintDialog1: TPrintDialog
-    Left = 576
-    Top = 112
+  object printDialog: TPrintDialog
+    Left = 488
+    Top = 264
   end
-  object PrinterSetupDialog1: TPrinterSetupDialog
-    Left = 496
-    Top = 56
+  object printerSetupDialog: TPrinterSetupDialog
+    Left = 488
+    Top = 184
   end
 end
