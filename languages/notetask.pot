@@ -14,6 +14,10 @@ msgstr ""
 msgid "Exit"
 msgstr ""
 
+#: tformnotetask.afont.caption
+msgid "Font..."
+msgstr ""
+
 #: tformnotetask.anew.caption
 msgid "New"
 msgstr ""
@@ -62,8 +66,16 @@ msgstr ""
 msgid "Notetask"
 msgstr ""
 
+#: tformnotetask.fontdialog.title
+msgid "Font select"
+msgstr ""
+
 #: tformnotetask.menufile.caption
 msgid "File"
+msgstr ""
+
+#: tformnotetask.menuformat.caption
+msgid "Format"
 msgstr ""
 
 #: tformnotetask.taskgrid.columns[1].title.caption

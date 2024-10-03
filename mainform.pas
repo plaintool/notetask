@@ -7,12 +7,13 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Types, CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs,
-  LCLIntf, LCLType, ExtDlgs, LMessages, task, stringgridex;
+  LCLIntf, LCLType, ExtDlgs, LMessages, task;
 
 type
 
   { TformNotetask }
   TformNotetask = class(TForm)
+    aFont: TAction;
     aPrinterSetup: TAction;
     aExit: TAction;
     aPrint: TAction;
@@ -24,8 +25,11 @@ type
     aOpen: TAction;
     ActionList: TActionList;
     calendarDialog: TCalendarDialog;
+    fontDialog: TFontDialog;
     MainMenu: TMainMenu;
     menuFile: TMenuItem;
+    menuFormat: TMenuItem;
+    menuFont: TMenuItem;
     menuNewWindow: TMenuItem;
     menuOpen: TMenuItem;
     menuSave: TMenuItem;
@@ -45,6 +49,7 @@ type
     statusBar: TStatusBar;
     taskGrid: TStringGrid;
     procedure aExitExecute(Sender: TObject);
+    procedure aFontExecute(Sender: TObject);
     procedure aNewExecute(Sender: TObject);
     procedure aOpenExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -109,7 +114,7 @@ var
   Row: integer;
   ConfirmDelete: integer;
 begin
-  if Key = 46 then // #46 соответствует клавише Del
+  if (Key = 46) and (not taskGrid.EditorMode) then // #46 соответствует клавише Del
   begin
     Row := taskGrid.Row; // Получаем текущую выбранную строку
     if (Row > 0) and (Row <= Tasks.Count) then
@@ -130,6 +135,16 @@ end;
 procedure TformNotetask.aExitExecute(Sender: TObject);
 begin
   Application.Terminate;
+end;
+
+procedure TformNotetask.aFontExecute(Sender: TObject);
+begin
+  fontDialog.Font := Font;
+  if fontDialog.Execute then  // Открыть диалоговое окно шрифта
+  begin
+    // Применить выбранный шрифт к форме
+    Self.Font := fontDialog.Font;
+  end;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
@@ -287,10 +302,8 @@ end;
 
 procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
 begin
-  if (aState = cbChecked) then
-    taskGrid.Cells[4, aRow] := FormatDateTime('DD.MM.YYYY', Now)
-  else
-    taskGrid.Cells[4, aRow] := string.Empty;
+  if (aState = cbChecked) and (taskGrid.Cells[4, aRow] = '') then
+    taskGrid.Cells[4, aRow] := FormatDateTime('dd.mm.yyyy hh:nn:ss', Now);
   Tasks.SetTask(taskGrid, aRow, aCol);
 end;
 

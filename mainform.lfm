@@ -7,7 +7,6 @@ object formNotetask: TformNotetask
   ClientHeight = 513
   ClientWidth = 851
   Color = clWindow
-  Font.Height = -16
   KeyPreview = True
   Menu = MainMenu
   OnCreate = FormCreate
@@ -45,7 +44,8 @@ object formNotetask: TformNotetask
     FixedColor = clDefault
     Flat = True
     MouseWheelOption = mwGrid
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goAutoAddRows, goRowSelect, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goHeaderPushedLook]
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goAutoAddRows, goRowSelect, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking]
+    Options2 = [goEditorParentFont]
     RowCount = 2
     TabOrder = 0
     UseXORFeatures = True
@@ -75,6 +75,7 @@ object formNotetask: TformNotetask
     Height = 23
     Top = 490
     Width = 851
+    Font.Height = -12
     Panels = <    
       item
         Width = 50
@@ -89,6 +90,7 @@ object formNotetask: TformNotetask
       item
         Width = 50
       end>
+    ParentFont = False
     SimplePanel = False
   end
   object MainMenu: TMainMenu
@@ -129,6 +131,13 @@ object formNotetask: TformNotetask
       end
       object menuExit: TMenuItem
         Action = aExit
+      end
+    end
+    object menuFormat: TMenuItem
+      Caption = 'Format'
+      object menuFont: TMenuItem
+        Action = aFont
+        ShortCut = 16454
       end
     end
   end
@@ -181,6 +190,11 @@ object formNotetask: TformNotetask
       Caption = 'Exit'
       OnExecute = aExitExecute
     end
+    object aFont: TAction
+      Category = 'Format'
+      Caption = 'Font...'
+      OnExecute = aFontExecute
+    end
   end
   object openDialog: TOpenDialog
     Left = 320
@@ -210,6 +224,13 @@ object formNotetask: TformNotetask
     OKCaption = '&ОК'
     CancelCaption = 'Cancel'
     Left = 584
+    Top = 112
+  end
+  object fontDialog: TFontDialog
+    Title = 'Font select'
+    MinFontSize = 0
+    MaxFontSize = 0
+    Left = 680
     Top = 112
   end
 end

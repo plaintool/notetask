@@ -17,7 +17,7 @@ uses
   mainform,
   lineending,
   filemanager,
-  task, settings, stringgridex { you can add units after this };
+  task, settings;
 
   {$R *.res}
 

@@ -13,7 +13,7 @@ msgstr ""
 
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить эту задачу?"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"
@@ -23,6 +23,10 @@ msgstr " строк"
 #: tformnotetask.aexit.caption
 msgid "Exit"
 msgstr "Выход"
+
+#: tformnotetask.afont.caption
+msgid "Font..."
+msgstr "Шрифт (&F)..."
 
 #: tformnotetask.anew.caption
 msgid "New"
@@ -72,9 +76,17 @@ msgstr "Выберите дату"
 msgid "Notetask"
 msgstr "Notetask"
 
+#: tformnotetask.fontdialog.title
+msgid "Font select"
+msgstr "Выбор шрифта"
+
 #: tformnotetask.menufile.caption
 msgid "File"
 msgstr "Файл"
+
+#: tformnotetask.menuformat.caption
+msgid "Format"
+msgstr "Формат"
 
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgid "Task"

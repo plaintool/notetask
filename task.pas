@@ -52,26 +52,30 @@ implementation
 
 function TryDateTime(const S: string; out DateTime: TDateTime): boolean;
 const
-  Formats: array[0..4] of string = (
-    'dd.mm.yyyy', 'yyyy-mm-dd', 'dd/mm/yyyy', 'yyyy/mm/dd', 'mm/dd/yyyy'
+  Formats: array[0..14] of string = (
+    'dd.mm.yyyy', 'yyyy-mm-dd', 'dd/mm/yyyy', 'yyyy/mm/dd', 'mm/dd/yyyy',
+    'dd.mm.yyyy hh:nn', 'yyyy-mm-dd hh:nn', 'dd/mm/yyyy hh:nn', 'yyyy/mm/dd hh:nn', 'mm/dd/yyyy hh:nn',
+    'dd.mm.yyyy hh:nn:ss', 'yyyy-mm-dd hh:nn:ss', 'dd/mm/yyyy hh:nn:ss', 'yyyy/mm/dd hh:nn:ss', 'mm/dd/yyyy hh:nn:ss'
     );
 var
   I: integer;
   FormatSettings: TFormatSettings;
 begin
-  Result := False;
-  for I := Low(Formats) to High(Formats) do
-  begin
-    FormatSettings.ShortDateFormat := Formats[I];
-    FormatSettings.DateSeparator := Formats[I][3];
-    // Предполагаем, что в 3-й позиции находится разделитель
-    if TryStrToDateTime(S, DateTime, FormatSettings) then
-    begin
-      Result := True;
-      Exit;
-    end;
-  end;
+  //Result := False;
+  //for I := Low(Formats) to High(Formats) do
+  //begin
+  //  FormatSettings.LongDateFormat := Formats[I];
+  //  // Пробуем преобразовать строку в дату/время
+  //  if TryStrToDateTime(S, DateTime) then
+  //  begin
+  //    Result := True;
+  //    Exit;
+  //  end;
+  //end;
+  Result := TryStrToDateTime(S, DateTime);
 end;
+
+
 
 function RemoveBrackets(const S: string): string;
 const

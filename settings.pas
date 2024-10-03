@@ -5,7 +5,7 @@ unit settings;
 interface
 
 uses
-  Forms, Classes, SysUtils, FileUtil, fpjson, jsonparser, Grids;
+  Forms, Classes, SysUtils, FileUtil, fpjson, jsonparser, Grids, Graphics;
 
 type
   TGridSettings = record
@@ -44,6 +44,11 @@ begin
     JSONObj.Add('Width', Form.Width);
     JSONObj.Add('Height', Form.Height);
 
+    // Сохранение шрифта
+    JSONObj.Add('FontName', Form.Font.Name);
+    JSONObj.Add('FontSize', Form.Font.Size);
+    JSONObj.Add('FontStyle', Integer(Form.Font.Style));  // Преобразуем стиль шрифта в число
+
     // Запись в файл
     with TStringList.Create do
     try
@@ -66,10 +71,10 @@ var
   FileContent: string;
 begin
   Result := False;
-  FileName := GetSettingsDirectory('form_settings.json'); // Получаем имя файла настроек
-  if not FileExists(FileName) then Exit;
+  FileName := GetSettingsDirectory('form_settings.json'); // Get the settings file name
+  if not FileExists(FileName) then Exit; // Exit if the file does not exist
 
-  // Чтение из файла
+  // Read from file
   FileStream := TFileStream.Create(FileName, fmOpenRead);
   try
     SetLength(FileContent, FileStream.Size);
@@ -78,11 +83,23 @@ begin
     try
       JSONObj := JSONData as TJSONObject;
 
-      // Установка положения и размера формы
-      Form.Left := JSONObj.FindPath('Left').AsInteger;
-      Form.Top := JSONObj.FindPath('Top').AsInteger;
-      Form.Width := JSONObj.FindPath('Width').AsInteger;
-      Form.Height := JSONObj.FindPath('Height').AsInteger;
+      // Check and load form's position and size
+      if JSONObj.FindPath('Left') <> nil then
+        Form.Left := JSONObj.FindPath('Left').AsInteger;
+      if JSONObj.FindPath('Top') <> nil then
+        Form.Top := JSONObj.FindPath('Top').AsInteger;
+      if JSONObj.FindPath('Width') <> nil then
+        Form.Width := JSONObj.FindPath('Width').AsInteger;
+      if JSONObj.FindPath('Height') <> nil then
+        Form.Height := JSONObj.FindPath('Height').AsInteger;
+
+      // Check and load font properties
+      if JSONObj.FindPath('FontName') <> nil then
+        Form.Font.Name := JSONObj.FindPath('FontName').AsString;
+      if JSONObj.FindPath('FontSize') <> nil then
+        Form.Font.Size := JSONObj.FindPath('FontSize').AsInteger;
+      if JSONObj.FindPath('FontStyle') <> nil then
+        Form.Font.Style := TFontStyles(JSONObj.FindPath('FontStyle').AsInteger); // Convert integer back to TFontStyles
 
       Result := True;
     finally
