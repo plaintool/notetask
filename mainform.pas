@@ -94,6 +94,7 @@ type
 var
   formNotetask: TformNotetask;
   Tasks: TTasks; // Коллекция задач
+  clRowHighlight: TColor;
 
 resourcestring
   rrows = ' rows';
@@ -118,6 +119,7 @@ begin
   LoadGridSettings(taskGrid);
 
   aWordWrap.Checked := FWordWrap;
+  clRowHighlight := RGBToColor(224, 224, 224);
 
   // Проверяем, передан ли аргумент командной строки
   if ParamCount > 0 then
@@ -282,7 +284,7 @@ end;
 
 procedure TformNotetask.SetChanged(aChanged: boolean = True);
 begin
-  FChanged := aChanged;
+  FChanged := aChanged or taskGrid.Modified;
   aSave.Enabled := FChanged;
   if (FChanged) and (Caption <> '') and (Caption[1] <> '*') then
     Caption := '*' + Caption
@@ -301,63 +303,6 @@ begin
     MyTextStyle.Wordbreak := True;
     taskGrid.Canvas.TextStyle := MyTextStyle;
   end;
-end;
-
-procedure TformNotetask.taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
-var
-  grid: TStringGrid;
-  S: string;
-  drawrect: TRect;
-  bgFill: TColor;
-  flags: cardinal;
-begin
-  if (aCol in [0, 1]) or (aRow = 0) then exit;
-  grid := Sender as TStringGrid;
-
-  // Determine background color
-  if gdSelected in aState then
-  begin
-    bgFill := clHighlight;
-    grid.Canvas.Font.Color := clWhite; // Set font color to white when selected
-  end
-  else
-  begin
-    bgFill := clWhite;
-    grid.Canvas.Font.Color := clBlack; // Set font color to black when not selected
-  end;
-
-  // Fill the cell background
-  grid.Canvas.Brush.Color := bgFill;
-  grid.canvas.Brush.Style := bsSolid;
-  grid.canvas.fillrect(aRect);
-
-  S := grid.Cells[ACol, ARow];
-  if Length(S) > 0 then
-  begin
-    drawrect := aRect;
-    drawrect.Inflate(-4, 0);
-    if (FWordWrap) then
-      flags := dt_calcrect or dt_wordbreak or dt_left
-    else
-      flags := dt_calcrect or dt_left;
-    DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
-    if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
-      grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2)
-    // changing the row height fires the event again!
-    else
-    begin
-      drawrect.Right := aRect.Right;
-      // grid.canvas.fillrect(drawrect);
-      if (FWordWrap) then
-        flags := dt_wordbreak or dt_left
-      else
-        flags := dt_left;
-      DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, dt_wordbreak or dt_left);
-    end;
-  end;
-
-  if gdFocused in aState then
-    grid.Canvas.DrawFocusRect(aRect);
 end;
 
 procedure TformNotetask.taskGridEditButtonClick(Sender: TObject);
@@ -467,9 +412,7 @@ begin
 
   // Update the size and position of the Memo
   if Assigned(taskGrid.Editor) and (taskGrid.Editor is TMemo) then
-  begin
-    TMemo(taskGrid.Editor).SetBounds(Rect.Left + 4, Rect.Top, Rect.Right - Rect.Left - 5, Rect.Bottom - Rect.Top - 1);
-  end;
+    TMemo(taskGrid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
 end;
 
 procedure TformNotetask.MemoChange(Sender: TObject);
@@ -480,6 +423,63 @@ begin
   SetChanged;
 end;
 
+procedure TformNotetask.taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
+var
+  grid: TStringGrid;
+  S: string;
+  drawrect: TRect;
+  bgFill: TColor;
+  flags: cardinal;
+begin
+  if (aCol in [0, 1]) or (aRow = 0) then exit;
+  grid := Sender as TStringGrid;
+
+  // Determine background color
+  if gdRowHighlight in aState then
+  begin
+    bgFill := clRowHighlight;
+    grid.Canvas.Font.Color := clBlack; // Set font color to white when selected
+  end
+  else
+  begin
+    bgFill := clWhite;
+    grid.Canvas.Font.Color := clBlack; // Set font color to black when not selected
+  end;
+
+  // Fill the cell background
+  grid.Canvas.Brush.Color := bgFill;
+  grid.canvas.Brush.Style := bsSolid;
+  grid.canvas.fillrect(aRect);
+
+  S := grid.Cells[ACol, ARow];
+  if Length(S) > 0 then
+  begin
+    drawrect := aRect;
+    drawrect.Inflate(-4, 0);
+    if (FWordWrap) then
+      flags := dt_calcrect or dt_wordbreak or dt_left
+    else
+      flags := dt_calcrect or dt_left;
+    DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
+
+    if gdFocused in aState then
+      DrawFocusRect(grid.canvas.handle, drawrect);
+
+    if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
+      grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2) // changing the row height fires the event again!
+    else
+    begin
+      drawrect.Right := aRect.Right;
+      // grid.canvas.fillrect(drawrect);
+      if (FWordWrap) then
+        flags := dt_wordbreak or dt_left
+      else
+        flags := dt_left;
+      DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, dt_wordbreak or dt_left);
+    end;
+  end;
+end;
+
 procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
 var
   Memo: TMemo;
@@ -487,10 +487,10 @@ var
 begin
   if aCol in [1, 4] then exit;
   Memo := TMemo.Create(Self);
-  Memo.Color := clHighlight;
+  Memo.Color := clRowHighlight;
   Memo.Font.Name := taskGrid.Font.Name;
   Memo.Font.Size := taskGrid.Font.Size;
-  Memo.Font.Color := clWhite;
+  Memo.Font.Color := clBlack;
 
   Memo.Visible := False;
   Memo.Parent := taskGrid;
@@ -498,7 +498,7 @@ begin
   Memo.OnChange := @MemoChange; // Event
 
   Rect := taskGrid.CellRect(aCol, aRow);
-  Memo.SetBounds(Rect.Left + 4, Rect.Top, Rect.Right - Rect.Left - 5, Rect.Bottom - Rect.Top - 1);
+  Memo.SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
 
   Memo.Text := taskGrid.Cells[aCol, aRow];
   Memo.WordWrap := FWordWrap; // WordWrap setting

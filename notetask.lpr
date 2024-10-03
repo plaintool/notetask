@@ -17,15 +17,16 @@ uses
   mainform,
   lineending,
   filemanager,
-  task, settings;
+  task,
+  settings;
 
   {$R *.res}
 
 begin
   RequireDerivedFormResource := True;
   SetDefaultLang('ru');
-  Application.Title:='Notetask';
-  Application.Scaled:=True;
+  Application.Title := 'Notetask';
+  Application.Scaled := True;
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
   Application.Run;

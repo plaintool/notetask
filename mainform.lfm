@@ -45,7 +45,7 @@ object formNotetask: TformNotetask
     FixedColor = clDefault
     Flat = True
     MouseWheelOption = mwGrid
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goAutoAddRows, goRowSelect, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking]
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goAutoAddRows, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goRowHighlight]
     Options2 = [goEditorParentFont]
     RowCount = 2
     TabOrder = 0
