@@ -7,11 +7,13 @@ object formNotetask: TformNotetask
   ClientHeight = 513
   ClientWidth = 851
   Color = clWindow
+  Font.Height = -16
+  KeyPreview = True
   Menu = MainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
   OnResize = FormResize
-  OnWindowStateChange = FormWindowStateChange
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -19,6 +21,7 @@ object formNotetask: TformNotetask
     Width = 851
     Align = alClient
     BorderStyle = bsNone
+    ColumnClickSorts = True
     Columns = <    
       item
         Alignment = taCenter
@@ -35,27 +38,26 @@ object formNotetask: TformNotetask
         Width = 205
       end    
       item
-        ReadOnly = True
+        ButtonStyle = cbsEllipsis
         Title.Caption = 'Date'
         Width = 140
       end>
     FixedColor = clDefault
     Flat = True
-    Font.CharSet = RUSSIAN_CHARSET
-    Font.Height = -16
-    Font.Pitch = fpVariable
-    Font.Quality = fqDraft
     MouseWheelOption = mwGrid
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goEditing, goAutoAddRows, goColSpanning, goSmoothScroll, goFixedRowNumbering]
-    ParentFont = False
-    RangeSelectMode = rsmMulti
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goAutoAddRows, goRowSelect, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goHeaderPushedLook]
     RowCount = 2
     TabOrder = 0
     UseXORFeatures = True
+    OnCheckboxToggled = taskGridCheckboxToggled
     OnDrawCell = taskGridDrawCell
+    OnEditButtonClick = taskGridEditButtonClick
+    OnHeaderClick = taskGridHeaderClick
     OnHeaderSized = taskGridHeaderSized
+    OnMouseWheel = taskGridMouseWheel
     OnResize = taskGridResize
     OnSelectEditor = taskGridSelectEditor
+    OnValidateEntry = taskGridValidateEntry
     ColWidths = (
       42
       64
@@ -199,5 +201,15 @@ object formNotetask: TformNotetask
   object printerSetupDialog: TPrinterSetupDialog
     Left = 488
     Top = 184
+  end
+  object calendarDialog: TCalendarDialog
+    Title = 'Select date'
+    DialogPosition = poDesigned
+    Date = 45568
+    DisplaySettings = [dsShowDayNames]
+    OKCaption = '&ОК'
+    CancelCaption = 'Cancel'
+    Left = 584
+    Top = 112
   end
 end

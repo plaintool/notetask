@@ -11,9 +11,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.5\n"
 
+#: mainform.rdeleteconfirm
+msgid "Are you sure you want to delete this task?"
+msgstr ""
+
 #: mainform.rrows
-#, fuzzy
-#| msgid " rows"
 msgctxt "mainform.rrows"
 msgid " rows"
 msgstr " строк"
@@ -53,6 +55,18 @@ msgstr "Сохранить"
 #: tformnotetask.asaveas.caption
 msgid "Save as..."
 msgstr "Сохранить как..."
+
+#: tformnotetask.calendardialog.cancelcaption
+msgid "Cancel"
+msgstr "Отмена"
+
+#: tformnotetask.calendardialog.okcaption
+msgid "&ОК"
+msgstr "&ОК"
+
+#: tformnotetask.calendardialog.title
+msgid "Select date"
+msgstr "Выберите дату"
 
 #: tformnotetask.caption
 msgid "Notetask"

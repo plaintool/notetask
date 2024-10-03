@@ -1,6 +1,10 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
+#: mainform.rdeleteconfirm
+msgid "Are you sure you want to delete this task?"
+msgstr ""
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " rows"
@@ -40,6 +44,18 @@ msgstr ""
 
 #: tformnotetask.asaveas.caption
 msgid "Save as..."
+msgstr ""
+
+#: tformnotetask.calendardialog.cancelcaption
+msgid "Cancel"
+msgstr ""
+
+#: tformnotetask.calendardialog.okcaption
+msgid "&ОК"
+msgstr ""
+
+#: tformnotetask.calendardialog.title
+msgid "Select date"
 msgstr ""
 
 #: tformnotetask.caption

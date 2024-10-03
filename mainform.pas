@@ -6,12 +6,12 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs, LCLIntf, LCLType, task, Types;
+  Types, CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs,
+  LCLIntf, LCLType, ExtDlgs, LMessages, task, stringgridex;
 
 type
 
   { TformNotetask }
-
   TformNotetask = class(TForm)
     aPrinterSetup: TAction;
     aExit: TAction;
@@ -23,6 +23,7 @@ type
     aNewWindow: TAction;
     aOpen: TAction;
     ActionList: TActionList;
+    calendarDialog: TCalendarDialog;
     MainMenu: TMainMenu;
     menuFile: TMenuItem;
     menuNewWindow: TMenuItem;
@@ -48,13 +49,18 @@ type
     procedure aOpenExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
-    procedure FormWindowStateChange(Sender: TObject);
+    procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
     procedure taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
+    procedure taskGridEditButtonClick(Sender: TObject);
+    procedure taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
+    procedure taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
     procedure taskGridPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure taskGridResize(Sender: TObject);
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
+    procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
   private
     procedure MemoChange(Sender: TObject);
   public
@@ -67,6 +73,7 @@ var
 
 resourcestring
   rrows = ' rows';
+  rdeleteconfirm = 'Are you sure you want to delete this task?';
 
 implementation
 
@@ -97,24 +104,39 @@ begin
   SaveFormSettings(self);
 end;
 
+procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  Row: integer;
+  ConfirmDelete: integer;
+begin
+  if Key = 46 then // #46 соответствует клавише Del
+  begin
+    Row := taskGrid.Row; // Получаем текущую выбранную строку
+    if (Row > 0) and (Row <= Tasks.Count) then
+    begin
+      // Показываем диалог для подтверждения удаления
+      ConfirmDelete := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+      if ConfirmDelete = mrYes then
+      begin
+        Tasks.RemoveTask(Row - 1); // Удаляем задачу из коллекции
+        taskGrid.DeleteRow(Row); // Удаляем строку из грида
+        Abort;
+      end;
+    end;
+  end;
+end;
+
 procedure TformNotetask.aExitExecute(Sender: TObject);
 begin
   Application.Terminate;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
-var
-  TaskStrings: TStringList; // Список строк для хранения задач
 begin
-  TaskStrings := TStringList.Create;
-  TaskStrings.Add('[ ] - 01.01.2024, Comment 1, Task 1');
-  TaskStrings.Add('[x] - 02.02.2024, Comment 2, Task 2');
-  TaskStrings.Add('[ ] - 03.03.2024, Comment 3, Task 3');
-
   // Создаем экземпляр TTasks с переданным списком строк
-  Tasks := TTasks.Create(TaskStrings);
-
-  Tasks.FillGrid(taskGrid);
+  Tasks := TTasks.Create();
+  taskGrid.Clean;
 end;
 
 procedure TformNotetask.aOpenExecute(Sender: TObject);
@@ -165,11 +187,19 @@ begin
   if (aCol in [0, 1]) or (aRow = 0) then exit;
   grid := Sender as TStringGrid;
 
-  //if gdSelected in aState then
-  //  bgFill := $FFF0D0
-  //else
-  bgFill := clWhite;
+  // Determine background color
+  if gdSelected in aState then
+  begin
+    bgFill := clHighlight;
+    grid.Canvas.Font.Color := clWhite; // Set font color to white when selected
+  end
+  else
+  begin
+    bgFill := clWhite;
+    grid.Canvas.Font.Color := clBlack; // Set font color to black when not selected
+  end;
 
+  // Fill the cell background
   grid.Canvas.Brush.Color := bgFill;
   grid.canvas.Brush.Style := bsSolid;
   grid.canvas.fillrect(aRect);
@@ -197,14 +227,71 @@ begin
     grid.Canvas.DrawFocusRect(aRect);
 end;
 
+procedure TformNotetask.taskGridEditButtonClick(Sender: TObject);
+var
+  Col, Row: integer;
+  CellRect: TRect;
+  CalendarX, CalendarY: integer;
+begin
+  // Get the current column and row
+  Col := taskGrid.Col;
+  Row := taskGrid.Row;
+
+  // Get the rectangle of the cell
+  CellRect := taskGrid.CellRect(Col, Row);
+
+  // Calculate the position for the calendar dialog
+  CalendarX := CellRect.CenterPoint.X; // Position to the left of the cell
+  CalendarY := CellRect.CenterPoint.Y; // Position below the cell
+
+  // Set the position of the calendar dialog
+  calendarDialog.Left := CalendarX + Left;
+  calendarDialog.Top := CalendarY + Top;
+
+  if calendarDialog.Execute then
+  begin
+    // Set the selected date in the corresponding cell
+    taskGrid.Cells[Col, Row] := DateToStr(calendarDialog.Date);
+  end;
+end;
+
+procedure TformNotetask.taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
+var
+  DateTime: TDateTime;
+begin
+  if (aCol = 4) then
+  begin
+    if (NewValue <> '') and (not TryDateTime(NewValue, DateTime)) then
+      abort;
+  end;
+end;
+
+procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
+begin
+  taskGrid.EditorMode := False;
+  if IsColumn then
+  begin
+    if Index = 0 then
+      Tasks.FillGrid(taskGrid, taskGrid.SortOrder);
+  end
+  else
+  begin
+    taskGrid.Row := index;
+  end;
+end;
+
 procedure TformNotetask.FormResize(Sender: TObject);
 begin
   taskGridResize(Sender);
 end;
 
-procedure TformNotetask.FormWindowStateChange(Sender: TObject);
+procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
 begin
-
+  if (aState = cbChecked) then
+    taskGrid.Cells[4, aRow] := FormatDateTime('DD.MM.YYYY', Now)
+  else
+    taskGrid.Cells[4, aRow] := string.Empty;
+  Tasks.SetTask(taskGrid, aRow, aCol);
 end;
 
 procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
@@ -213,14 +300,20 @@ begin
   SaveGridSettings(taskGrid);
 end;
 
+procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
+  MousePos: TPoint; var Handled: boolean);
+begin
+  taskGrid.EditorMode := False;
+end;
+
 procedure TformNotetask.taskGridResize(Sender: TObject);
 var
   Rect: TRect;
 begin
-  // Получаем размеры ячейки
+  // Get the cell dimensions
   Rect := taskGrid.CellRect(taskGrid.Col, taskGrid.Row);
 
-  // Обновляем размер и позицию Memo
+  // Update the size and position of the Memo
   if Assigned(taskGrid.Editor) and (taskGrid.Editor is TMemo) then
   begin
     TMemo(taskGrid.Editor).SetBounds(Rect.Left + 4, Rect.Top, Rect.Right - Rect.Left - 5, Rect.Bottom - Rect.Top - 1);
@@ -230,27 +323,34 @@ end;
 procedure TformNotetask.MemoChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
+
+  Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
 end;
 
 procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
 var
-  EditorControl: TMemo;
+  Memo: TMemo;
   Rect: TRect;
 begin
-  if aCol = 1 then exit;
-  EditorControl := TMemo.Create(Self);
-  EditorControl.Visible := False;
-  EditorControl.Parent := taskGrid;
-  EditorControl.BorderStyle := bsNone;
-  EditorControl.OnChange := @MemoChange; // Привязываем событие
+  if aCol in [1, 4] then exit;
+  Memo := TMemo.Create(Self);
+  Memo.Color := clHighlight;
+  Memo.Font.Name := taskGrid.Font.Name;
+  Memo.Font.Size := taskGrid.Font.Size;
+  Memo.Font.Color := clWhite;
+
+  Memo.Visible := False;
+  Memo.Parent := taskGrid;
+  Memo.BorderStyle := bsNone;
+  Memo.OnChange := @MemoChange; // Привязываем событие
 
   Rect := taskGrid.CellRect(aCol, aRow);
-  EditorControl.SetBounds(Rect.Left + 4, Rect.Top, Rect.Right - Rect.Left - 5, Rect.Bottom - Rect.Top - 1);
+  Memo.SetBounds(Rect.Left + 4, Rect.Top, Rect.Right - Rect.Left - 5, Rect.Bottom - Rect.Top - 1);
 
-  EditorControl.Text := taskGrid.Cells[aCol, aRow];
-  EditorControl.WordWrap := True; // Включение многострочного режима
-  Editor := EditorControl;
-  EditorControl.Visible := True;
+  Memo.Text := taskGrid.Cells[aCol, aRow];
+  Memo.WordWrap := True; // Включение многострочного режима
+  Editor := Memo;
+  Memo.Visible := True;
 end;
 
 end.

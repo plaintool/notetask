@@ -13,5 +13,8 @@
 {"hash":152383390,"name":"tformnotetask.aprintersetup.caption","sourcebytes":[80,114,105,110,116,101,114,32,115,101,116,117,112,46,46,46],"value":"Printer setup..."},
 {"hash":135134446,"name":"tformnotetask.apageproperties.caption","sourcebytes":[80,97,103,101,32,112,114,111,112,101,114,116,105,101,115,46,46,46],"value":"Page properties..."},
 {"hash":151352958,"name":"tformnotetask.aprint.caption","sourcebytes":[80,114,105,110,116,46,46,46],"value":"Print..."},
-{"hash":315140,"name":"tformnotetask.aexit.caption","sourcebytes":[69,120,105,116],"value":"Exit"}
+{"hash":315140,"name":"tformnotetask.aexit.caption","sourcebytes":[69,120,105,116],"value":"Exit"},
+{"hash":171928085,"name":"tformnotetask.calendardialog.title","sourcebytes":[83,101,108,101,99,116,32,100,97,116,101],"value":"Select date"},
+{"hash":3386266,"name":"tformnotetask.calendardialog.okcaption","sourcebytes":[38,208,158,208,154],"value":"&\u041E\u041A"},
+{"hash":77089212,"name":"tformnotetask.calendardialog.cancelcaption","sourcebytes":[67,97,110,99,101,108],"value":"Cancel"}
 ]}

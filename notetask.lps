@@ -10,7 +10,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="43" Y="19"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="40"/>
       </Unit>
       <Unit>
         <Filename Value="mainform.pas"/>
@@ -18,10 +18,11 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="68"/>
-        <CursorPos X="26" Y="97"/>
-        <UsageCount Value="33"/>
+        <TopLine Value="27"/>
+        <CursorPos X="10" Y="124"/>
+        <UsageCount Value="40"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="lineending.pas"/>
@@ -29,7 +30,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="7"/>
         <CursorPos X="5" Y="41"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="36"/>
       </Unit>
       <Unit>
         <Filename Value="filemanager.pas"/>
@@ -37,29 +38,47 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="57"/>
         <CursorPos X="26" Y="65"/>
-        <UsageCount Value="28"/>
+        <UsageCount Value="35"/>
       </Unit>
       <Unit>
         <Filename Value="task.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="25"/>
-        <CursorPos X="15" Y="41"/>
-        <UsageCount Value="27"/>
+        <TopLine Value="203"/>
+        <CursorPos X="28" Y="206"/>
+        <UsageCount Value="34"/>
+      </Unit>
+      <Unit>
+        <Filename Value="settings.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="63"/>
+        <CursorPos X="5" Y="94"/>
+        <UsageCount Value="28"/>
+      </Unit>
+      <Unit>
+        <Filename Value="stringgridex.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="10"/>
+        <CursorPos X="52" Y="24"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="editor.pas"/>
         <UnitName Value="filemanager"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="31" Y="17"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="20"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\lcl\forms.pp"/>
         <UnitName Value="Forms"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1973"/>
-        <CursorPos X="3" Y="1988"/>
+        <TopLine Value="664"/>
+        <CursorPos X="15" Y="677"/>
         <UsageCount Value="10"/>
       </Unit>
       <Unit>
@@ -75,26 +94,30 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="10438"/>
         <CursorPos Y="10334"/>
-        <UsageCount Value="10"/>
-      </Unit>
-      <Unit>
-        <Filename Value="settings.pas"/>
-        <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="63"/>
-        <CursorPos X="5" Y="94"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="9"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\fgl.pp"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="913"/>
         <CursorPos Y="929"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus\lcl\lmessages.pp"/>
+        <UnitName Value="LMessages"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="188"/>
+        <CursorPos X="3" Y="204"/>
         <UsageCount Value="10"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="46" Column="26" TopLine="20"/>
+      </Position>
+    </JumpHistory>
     <CustomSessionData Count="2">
       <Item0 Name="SVN active" Value="-1"/>
       <Item1 Name="SVN repository" Value="D:\OneDrive\Repositories\Lazarus"/>
@@ -119,7 +142,6 @@
         <Item3 Value="--lang=ru"/>
         <Item4 Value="ru"/>
       </List>
-      <List Name="WorkingDirectory" Type="File" Count="1"/>
     </HistoryLists>
   </ProjectSession>
 </CONFIG>
