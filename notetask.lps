@@ -8,10 +8,9 @@
       <Unit>
         <Filename Value="notetask.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="43" Y="19"/>
-        <UsageCount Value="29"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="31"/>
       </Unit>
       <Unit>
         <Filename Value="mainform.pas"/>
@@ -19,10 +18,11 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="41"/>
-        <CursorPos X="27" Y="41"/>
-        <UsageCount Value="29"/>
+        <TopLine Value="56"/>
+        <CursorPos X="36" Y="20"/>
+        <UsageCount Value="31"/>
       </Unit>
       <Unit>
         <Filename Value="lineending.pas"/>
@@ -30,7 +30,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="7"/>
         <CursorPos X="5" Y="41"/>
-        <UsageCount Value="25"/>
+        <UsageCount Value="27"/>
       </Unit>
       <Unit>
         <Filename Value="filemanager.pas"/>
@@ -38,15 +38,15 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="57"/>
         <CursorPos X="26" Y="65"/>
-        <UsageCount Value="24"/>
+        <UsageCount Value="26"/>
       </Unit>
       <Unit>
         <Filename Value="task.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="115"/>
-        <CursorPos X="70" Y="136"/>
-        <UsageCount Value="23"/>
+        <TopLine Value="152"/>
+        <CursorPos X="29" Y="179"/>
+        <UsageCount Value="25"/>
       </Unit>
       <Unit>
         <Filename Value="editor.pas"/>
@@ -68,6 +68,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="190"/>
         <CursorPos X="23" Y="206"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus\lcl\grids.pas"/>
+        <UnitName Value="Grids"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="10438"/>
+        <CursorPos Y="10334"/>
         <UsageCount Value="10"/>
       </Unit>
     </Units>

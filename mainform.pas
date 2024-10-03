@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs;
+  CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs, task;
 
 type
 
@@ -54,13 +54,14 @@ type
 
 var
   formNotetask: TformNotetask;
+  Tasks: TTasks; // Коллекция задач
 
 resourcestring
   rrows = ' rows';
 
 implementation
 
-uses filemanager, lineending, task;
+uses filemanager, lineending;
 
   {$R *.lfm}
 
@@ -74,7 +75,6 @@ end;
 procedure TformNotetask.aNewExecute(Sender: TObject);
 var
   TaskStrings: TStringList; // Список строк для хранения задач
-  Tasks: TTasks; // Коллекция задач
 begin
   TaskStrings := TStringList.Create;
   TaskStrings.Add('[ ] - 01.01.2024, Comment 1, Task 1');
@@ -93,7 +93,6 @@ var
   FileEncoding: TEncoding;
   LineEnding: TLineEnding;
   LineCount: integer;
-  Tasks: TStringList;
 begin
   if openDialog.Execute then
   begin
@@ -103,8 +102,8 @@ begin
     statusBar.Panels[2].Text := LineEnding.ToString;
     statusBar.Panels[3].Text := LineCount.ToString + rrows;
 
-    Tasks := TextToStringList(Content);
-
+    Tasks := TTasks.Create(TextToStringList(Content));
+    Tasks.FillGrid(taskGrid);
   end;
 end;
 

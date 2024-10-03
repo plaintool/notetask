@@ -62,14 +62,23 @@ msgstr "Notetask"
 msgid "File"
 msgstr "Файл"
 
-#: tformnotetask.statusbar.panels[1].text
-msgid "Windows (LRLF)"
-msgstr "Windows (LRLF)"
+#: tformnotetask.taskgrid.columns[1].title.caption
+msgid "Task"
+msgstr "Задача"
 
-#: tformnotetask.statusbar.panels[2].text
-msgid "UTF-8"
-msgstr "UTF-8"
+#: tformnotetask.taskgrid.columns[2].title.caption
+msgid "Comment"
+msgstr "Комментарии"
 
-#: tformnotetask.statusbar.panels[3].text
-msgid "0 rows"
-msgstr "0 строк"
+#: tformnotetask.taskgrid.columns[3].title.caption
+msgid "Date"
+msgstr "Дата"
+
+#~ msgid "Windows (LRLF)"
+#~ msgstr "Windows (LRLF)"
+
+#~ msgid "UTF-8"
+#~ msgstr "UTF-8"
+
+#~ msgid "0 rows"
+#~ msgstr "0 строк"

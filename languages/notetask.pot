@@ -50,15 +50,15 @@ msgstr ""
 msgid "File"
 msgstr ""
 
-#: tformnotetask.statusbar.panels[1].text
-msgid "Windows (LRLF)"
+#: tformnotetask.taskgrid.columns[1].title.caption
+msgid "Task"
 msgstr ""
 
-#: tformnotetask.statusbar.panels[2].text
-msgid "UTF-8"
+#: tformnotetask.taskgrid.columns[2].title.caption
+msgid "Comment"
 msgstr ""
 
-#: tformnotetask.statusbar.panels[3].text
-msgid "0 rows"
+#: tformnotetask.taskgrid.columns[3].title.caption
+msgid "Date"
 msgstr ""
 
