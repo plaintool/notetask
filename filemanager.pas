@@ -11,8 +11,10 @@ function DetectEncoding(const FileName: string): TEncoding;
 
 function TextToStringList(const TextContent: string): TStringList;
 
-procedure ReadTextFile(const FileName: string; out Content: string;
-  out FileEncoding: TEncoding; out LineEnding: TLineEnding; out LineCount: integer);
+procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
+  out LineEnding: TLineEnding; out LineCount: integer);
+
+procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
 
 implementation
 
@@ -77,8 +79,8 @@ begin
   end;
 end;
 
-procedure ReadTextFile(const FileName: string; out Content: string;
-  out FileEncoding: TEncoding; out LineEnding: TLineEnding; out LineCount: integer);
+procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
+  out LineEnding: TLineEnding; out LineCount: integer);
 var
   StringList: TStringList;
 begin
@@ -106,6 +108,38 @@ begin
 
   finally
     StringList.Free;
+  end;
+end;
+
+procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
+var
+  LineEndingStr: string;
+  ModifiedList: TStringList;
+  i:integer;
+begin
+  // Устанавливаем тип переноса строк в зависимости от заданного LineEnding
+  if LineEnding = TLineEnding.WindowsCRLF then
+    LineEndingStr := sLineBreak // CRLF
+  else if LineEnding = TLineEnding.UnixLF then
+    LineEndingStr := #10 // LF
+  else if LineEnding = TLineEnding.MacintoshCR then
+    LineEndingStr := #13 // CR
+  else
+    LineEndingStr := sLineBreak; // По умолчанию используем стандартный перенос
+
+  // Создаем новый TStringList для замены переносов строк
+  ModifiedList := TStringList.Create;
+  try
+    for i := 0 to StringList.Count - 1 do
+    begin
+      // Заменяем переносы строк в каждой строке на заданный формат
+      ModifiedList.Add(StringReplace(StringList[i], sLineBreak, LineEndingStr, [rfReplaceAll]));
+    end;
+
+    // Сохраняем измененный TStringList в файл с указанной кодировкой
+    ModifiedList.SaveToFile(FileName, FileEncoding);
+  finally
+    ModifiedList.Free; // Освобождаем ресурсы
   end;
 end;
 

@@ -5,7 +5,7 @@ unit settings;
 interface
 
 uses
-  Forms, Classes, SysUtils, FileUtil, fpjson, jsonparser, Grids, Graphics;
+  Forms, Classes, SysUtils, FileUtil, fpjson, jsonparser, Grids, Graphics, mainform;
 
 type
   TGridSettings = record
@@ -13,8 +13,8 @@ type
     RowHeights: array of integer;
   end;
 
-procedure SaveFormSettings(Form: TForm);
-function LoadFormSettings(Form: TForm): boolean;
+procedure SaveFormSettings(Form: TformNotetask);
+function LoadFormSettings(Form: TformNotetask): boolean;
 procedure SaveGridSettings(Grid: TStringGrid);
 function LoadGridSettings(Grid: TStringGrid): boolean;
 
@@ -29,7 +29,7 @@ begin
   {$ENDIF}
 end;
 
-procedure SaveFormSettings(Form: TForm);
+procedure SaveFormSettings(Form: TformNotetask);
 var
   JSONObj: TJSONObject;
   FileName: string;
@@ -43,6 +43,7 @@ begin
     JSONObj.Add('Top', Form.Top);
     JSONObj.Add('Width', Form.Width);
     JSONObj.Add('Height', Form.Height);
+    JSonObj.Add('WordWrap', Form.WordWrap);
 
     // Сохранение шрифта
     JSONObj.Add('FontName', Form.Font.Name);
@@ -62,7 +63,7 @@ begin
   end;
 end;
 
-function LoadFormSettings(Form: TForm): boolean;
+function LoadFormSettings(Form: TformNotetask): boolean;
 var
   JSONData: TJSONData;
   JSONObj: TJSONObject;
@@ -92,6 +93,8 @@ begin
         Form.Width := JSONObj.FindPath('Width').AsInteger;
       if JSONObj.FindPath('Height') <> nil then
         Form.Height := JSONObj.FindPath('Height').AsInteger;
+      if JSONObj.FindPath('WordWrap') <> nil then
+        Form.WordWrap := JSONObj.FindPath('WordWrap').AsBoolean;
 
       // Check and load font properties
       if JSONObj.FindPath('FontName') <> nil then

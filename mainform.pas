@@ -7,12 +7,13 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Types, CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs,
-  LCLIntf, LCLType, ExtDlgs, LMessages, task;
+  LCLIntf, LCLType, ExtDlgs, LMessages, task, lineending;
 
 type
 
   { TformNotetask }
   TformNotetask = class(TForm)
+    aWordWrap: TAction;
     aFont: TAction;
     aPrinterSetup: TAction;
     aExit: TAction;
@@ -30,6 +31,9 @@ type
     menuFile: TMenuItem;
     menuFormat: TMenuItem;
     menuFont: TMenuItem;
+    MenuItem1: TMenuItem;
+    menuWordWrap: TMenuItem;
+    menuTask: TMenuItem;
     menuNewWindow: TMenuItem;
     menuOpen: TMenuItem;
     menuSave: TMenuItem;
@@ -52,11 +56,16 @@ type
     procedure aFontExecute(Sender: TObject);
     procedure aNewExecute(Sender: TObject);
     procedure aOpenExecute(Sender: TObject);
+    procedure aSaveExecute(Sender: TObject);
+    procedure aWordWrapExecute(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
     procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
+    procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+    procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
     procedure taskGridEditButtonClick(Sender: TObject);
     procedure taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
@@ -65,11 +74,21 @@ type
     procedure taskGridPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure taskGridResize(Sender: TObject);
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
+    procedure taskGridSetEditText(Sender: TObject; ACol, ARow: integer; const Value: string);
     procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
   private
+    FChanged: boolean;
+    FFileName: string;
+    FEncoding: TEncoding;
+    FLineEnding: TLineEnding;
+    FWordWrap: boolean;
     procedure MemoChange(Sender: TObject);
   public
     procedure OpenFile(fileName: string);
+    procedure SaveFile(fileName: string);
+    procedure SetChanged(aChanged: boolean = True);
+    function CheckCanClose: boolean;
+    property WordWrap: boolean read FWordWrap write FWordWrap;
   end;
 
 var
@@ -79,10 +98,11 @@ var
 resourcestring
   rrows = ' rows';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
+  rsavechanges = 'Do you want to save the changes?';
 
 implementation
 
-uses filemanager, lineending, settings;
+uses filemanager, settings;
 
   {$R *.lfm}
 
@@ -92,8 +112,12 @@ procedure TformNotetask.FormCreate(Sender: TObject);
 var
   FilePath: string;
 begin
+  FWordWrap := True;
+
   LoadFormSettings(self);
   LoadGridSettings(taskGrid);
+
+  aWordWrap.Checked := FWordWrap;
 
   // Проверяем, передан ли аргумент командной строки
   if ParamCount > 0 then
@@ -151,7 +175,15 @@ procedure TformNotetask.aNewExecute(Sender: TObject);
 begin
   // Создаем экземпляр TTasks с переданным списком строк
   Tasks := TTasks.Create();
-  taskGrid.Clean;
+  if CheckCanClose then
+  begin
+    SetChanged(False);
+    FFileName := string.Empty;
+    taskGrid.Clean;
+    taskGrid.RowCount := 2;
+    Tasks.AddTask('[ ]');
+    taskGrid.Cells[1, 1] := '0';
+  end;
 end;
 
 procedure TformNotetask.aOpenExecute(Sender: TObject);
@@ -162,21 +194,100 @@ begin
   end;
 end;
 
+procedure TformNotetask.aSaveExecute(Sender: TObject);
+begin
+  SaveFile(FFileName);
+end;
+
+procedure TformNotetask.aWordWrapExecute(Sender: TObject);
+var
+  i: integer;
+begin
+  taskGrid.EditorMode := False;
+  FWordWrap := aWordWrap.Checked;
+  for i := 0 to taskGrid.RowCount - 1 do
+  begin
+    taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight; // Установить нужное значение высоты
+  end;
+  Invalidate;
+end;
+
+function TformNotetask.CheckCanClose: boolean;
+var
+  UserResponse: integer;
+begin
+  if FChanged then
+  begin
+    // Show message with Yes, No, and Cancel options
+    UserResponse := MessageDlg(rsavechanges, mtConfirmation, [mbYes, mbNo, mbCancel], 0);
+
+    case UserResponse of
+      mrYes:
+      begin
+        // Call save method and allow form to close
+        aSave.Execute;
+        Result := True;
+      end;
+      mrNo:
+      begin
+        // Do not save, but allow form to close
+        Result := True;
+      end;
+      mrCancel:
+      begin
+        // Cancel the form closing
+        Result := False;
+      end;
+    end;
+  end
+  else
+    Result := True; // No changes, just close the form
+end;
+
+procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+begin
+  CanClose := CheckCanClose;
+end;
+
 procedure TformNotetask.OpenFile(fileName: string);
 var
   Content: string;
-  FileEncoding: TEncoding;
-  LineEnding: TLineEnding;
   LineCount: integer;
 begin
-  ReadTextFile(fileName, Content, FileEncoding, LineEnding, LineCount);
+  FFileName := fileName;
 
-  statusBar.Panels[1].Text := UpperCase(FileEncoding.EncodingName);
-  statusBar.Panels[2].Text := LineEnding.ToString;
+  ReadTextFile(FFileName, Content, FEncoding, FLineEnding, LineCount);
+  statusBar.Panels[1].Text := UpperCase(FEncoding.EncodingName);
+  statusBar.Panels[2].Text := FLineEnding.ToString;
   statusBar.Panels[3].Text := LineCount.ToString + rrows;
 
   Tasks := TTasks.Create(TextToStringList(Content));
   Tasks.FillGrid(taskGrid);
+end;
+
+procedure TformNotetask.SaveFile(fileName: string);
+begin
+  if (fileName = string.Empty) and (saveDialog.Execute) then
+  begin
+    FFileName := saveDialog.FileName;
+    fileName := FFileName;
+  end;
+
+  if (fileName <> string.Empty) then
+  begin
+    SaveTextFile(fileName, Tasks.ToStringList, FEncoding, FLineEnding);
+    SetChanged(False);
+  end;
+end;
+
+procedure TformNotetask.SetChanged(aChanged: boolean = True);
+begin
+  FChanged := aChanged;
+  aSave.Enabled := FChanged;
+  if (FChanged) and (Caption <> '') and (Caption[1] <> '*') then
+    Caption := '*' + Caption
+  else if not FChanged and (Caption <> '') and (Caption[1] = '*') then
+    Caption := Copy(Caption, 2, Length(Caption) - 1);
 end;
 
 procedure TformNotetask.taskGridPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -198,6 +309,7 @@ var
   S: string;
   drawrect: TRect;
   bgFill: TColor;
+  flags: cardinal;
 begin
   if (aCol in [0, 1]) or (aRow = 0) then exit;
   grid := Sender as TStringGrid;
@@ -224,8 +336,11 @@ begin
   begin
     drawrect := aRect;
     drawrect.Inflate(-4, 0);
-    DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect,
-      dt_calcrect or dt_wordbreak or dt_left);
+    if (FWordWrap) then
+      flags := dt_calcrect or dt_wordbreak or dt_left
+    else
+      flags := dt_calcrect or dt_left;
+    DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
     if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
       grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2)
     // changing the row height fires the event again!
@@ -233,8 +348,11 @@ begin
     begin
       drawrect.Right := aRect.Right;
       // grid.canvas.fillrect(drawrect);
-      DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect,
-        dt_wordbreak or dt_left);
+      if (FWordWrap) then
+        flags := dt_wordbreak or dt_left
+      else
+        flags := dt_left;
+      DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, dt_wordbreak or dt_left);
     end;
   end;
 
@@ -276,8 +394,11 @@ var
 begin
   if (aCol = 4) then
   begin
-    if (NewValue <> '') and (not TryDateTime(NewValue, DateTime)) then
+    if (NewValue <> '') and (not TryStrToDateTime(NewValue, DateTime)) then
       abort;
+
+    if (OldValue <> NewValue) then
+      SetChanged;
   end;
 end;
 
@@ -302,9 +423,27 @@ end;
 
 procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
 begin
+  SetChanged;
   if (aState = cbChecked) and (taskGrid.Cells[4, aRow] = '') then
-    taskGrid.Cells[4, aRow] := FormatDateTime('dd.mm.yyyy hh:nn:ss', Now);
+    taskGrid.Cells[4, aRow] := FormatDateTime('dd.mm.yyyy hh:nn:ss', Now)
+  else
+    taskGrid.Cells[4, aRow] := string.Empty;
   Tasks.SetTask(taskGrid, aRow, aCol);
+end;
+
+procedure TformNotetask.taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+begin
+  if (not IsColumn) then
+  begin
+    Tasks.AddTask('[ ]');
+    taskGrid.Cells[1, tIndex] := '0';
+  end;
+end;
+
+procedure TformNotetask.taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+begin
+  if (not IsColumn) then
+    Tasks.RemoveTask(tIndex);
 end;
 
 procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
@@ -338,6 +477,7 @@ begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
 
   Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
+  SetChanged;
 end;
 
 procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
@@ -355,15 +495,21 @@ begin
   Memo.Visible := False;
   Memo.Parent := taskGrid;
   Memo.BorderStyle := bsNone;
-  Memo.OnChange := @MemoChange; // Привязываем событие
+  Memo.OnChange := @MemoChange; // Event
 
   Rect := taskGrid.CellRect(aCol, aRow);
   Memo.SetBounds(Rect.Left + 4, Rect.Top, Rect.Right - Rect.Left - 5, Rect.Bottom - Rect.Top - 1);
 
   Memo.Text := taskGrid.Cells[aCol, aRow];
-  Memo.WordWrap := True; // Включение многострочного режима
+  Memo.WordWrap := FWordWrap; // WordWrap setting
+  Memo.WantReturns := FWordWrap;
   Editor := Memo;
   Memo.Visible := True;
+end;
+
+procedure TformNotetask.taskGridSetEditText(Sender: TObject; ACol, ARow: integer; const Value: string);
+begin
+
 end;
 
 end.

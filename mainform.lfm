@@ -9,6 +9,7 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
@@ -50,6 +51,8 @@ object formNotetask: TformNotetask
     TabOrder = 0
     UseXORFeatures = True
     OnCheckboxToggled = taskGridCheckboxToggled
+    OnColRowDeleted = taskGridColRowDeleted
+    OnColRowInserted = taskGridColRowInserted
     OnDrawCell = taskGridDrawCell
     OnEditButtonClick = taskGridEditButtonClick
     OnHeaderClick = taskGridHeaderClick
@@ -57,6 +60,7 @@ object formNotetask: TformNotetask
     OnMouseWheel = taskGridMouseWheel
     OnResize = taskGridResize
     OnSelectEditor = taskGridSelectEditor
+    OnSetEditText = taskGridSetEditText
     OnValidateEntry = taskGridValidateEntry
     ColWidths = (
       42
@@ -135,9 +139,19 @@ object formNotetask: TformNotetask
     end
     object menuFormat: TMenuItem
       Caption = 'Format'
+      object menuWordWrap: TMenuItem
+        Action = aWordWrap
+        AutoCheck = True
+      end
       object menuFont: TMenuItem
         Action = aFont
         ShortCut = 16454
+      end
+    end
+    object menuTask: TMenuItem
+      Caption = 'Task'
+      object MenuItem1: TMenuItem
+        Caption = 'MenuItem1'
       end
     end
   end
@@ -164,6 +178,8 @@ object formNotetask: TformNotetask
     object aSave: TAction
       Category = 'File'
       Caption = 'Save'
+      Enabled = False
+      OnExecute = aSaveExecute
       ShortCut = 16467
     end
     object aSaveAs: TAction
@@ -194,6 +210,13 @@ object formNotetask: TformNotetask
       Category = 'Format'
       Caption = 'Font...'
       OnExecute = aFontExecute
+    end
+    object aWordWrap: TAction
+      Category = 'Format'
+      AutoCheck = True
+      Caption = 'Word wrap'
+      Checked = True
+      OnExecute = aWordWrapExecute
     end
   end
   object openDialog: TOpenDialog

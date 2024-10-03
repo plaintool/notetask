@@ -41,45 +41,16 @@ type
     procedure RemoveTask(Index: integer);
     function Count: integer; // Method to get the number of tasks
     procedure FillGrid(Grid: TStringGrid; SortOrder: TSortOrder = soAscending);
+    function ToStringList: TStringList;
   end;
-
-function TryDateTime(const S: string; out DateTime: TDateTime): boolean;
-function RemoveBrackets(const S: string): string;
 
 implementation
 
 { TTask }
 
-function TryDateTime(const S: string; out DateTime: TDateTime): boolean;
-const
-  Formats: array[0..14] of string = (
-    'dd.mm.yyyy', 'yyyy-mm-dd', 'dd/mm/yyyy', 'yyyy/mm/dd', 'mm/dd/yyyy',
-    'dd.mm.yyyy hh:nn', 'yyyy-mm-dd hh:nn', 'dd/mm/yyyy hh:nn', 'yyyy/mm/dd hh:nn', 'mm/dd/yyyy hh:nn',
-    'dd.mm.yyyy hh:nn:ss', 'yyyy-mm-dd hh:nn:ss', 'dd/mm/yyyy hh:nn:ss', 'yyyy/mm/dd hh:nn:ss', 'mm/dd/yyyy hh:nn:ss'
-    );
-var
-  I: integer;
-  FormatSettings: TFormatSettings;
-begin
-  //Result := False;
-  //for I := Low(Formats) to High(Formats) do
-  //begin
-  //  FormatSettings.LongDateFormat := Formats[I];
-  //  // Пробуем преобразовать строку в дату/время
-  //  if TryStrToDateTime(S, DateTime) then
-  //  begin
-  //    Result := True;
-  //    Exit;
-  //  end;
-  //end;
-  Result := TryStrToDateTime(S, DateTime);
-end;
-
-
-
 function RemoveBrackets(const S: string): string;
 const
-  Brackets: array[0..3] of string = ('[x]', '[X]', '[ ]', '[]');
+  Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
 var
   I: integer;
 begin
@@ -99,36 +70,42 @@ constructor TTask.Create(const TaskString: string);
 var
   Parts, PartsSub: TStringArray; // Use TStringArray for compatibility
   CompletedStr: string;
-  FormatSettings: TFormatSettings;
 begin
+  // Format [x] 01.01.2000, Task *// Comment*
   // Split the task string into parts
-  Parts := TaskString.Split(['|']);
+  Parts := TaskString.Split(['*//']);
   if Length(Parts) = 2 then
   begin
-    CompletedStr := Parts[0];
-    FComment := Parts[1];
+    CompletedStr := Parts[0].Trim;
+    FComment := Parts[1].Trim;
+    if FComment.EndsWith('*') then
+      Delete(FComment, Length(FComment), 1);
   end
   else
     CompletedStr := Parts[0];
 
   PartsSub := CompletedStr.Split([',']);
   // Check completion status based on the first character in the string
-  FIsCompleted := PartsSub[0].Trim.StartsWith('[x]') or PartsSub[0].Trim.StartsWith('[X]'); // Checks if the task is completed
+  FIsCompleted := PartsSub[0].Trim.ToLower.StartsWith('- [x]') or PartsSub[0].Trim.ToLower.StartsWith('-[x]') or
+    PartsSub[0].Trim.ToLower.StartsWith('[x]');
+
+  // Checks if the task is completed
+  PartsSub[0] := RemoveBrackets(PartsSub[0]);
   CompletedStr := RemoveBrackets(CompletedStr);
 
   if Length(PartsSub) > 1 then
   begin
     // Extract and trim the date string
-    if (TryDateTime(PartsSub[1].Trim, FCompletionDate)) and (Length(PartsSub) > 2) then
+    if (TryStrToDateTime(PartsSub[1].Trim, FCompletionDate)) and (Length(PartsSub) > 2) then
       FTaskDescription := PartsSub[2].Trim
     else
-    if (TryDateTime(PartsSub[0].Trim, FCompletionDate)) and (Length(PartsSub) > 1) then
+    if (TryStrToDateTime(PartsSub[0].Trim, FCompletionDate)) and (Length(PartsSub) > 1) then
       FTaskDescription := PartsSub[1].Trim
     else
-      FTaskDescription := CompletedStr;
+      FTaskDescription := CompletedStr.Trim;
   end
   else
-    FTaskDescription := CompletedStr;
+    FTaskDescription := CompletedStr.Trim;
 end;
 
 { TTasks }
@@ -191,7 +168,7 @@ begin
     IsCompleted := StrToBoolDef(Grid.Cells[1, Row], False); // Convert to boolean
     TaskDescription := Grid.Cells[2, Row];
     Comment := Grid.Cells[3, Row];
-    if not TryDateTime(Grid.Cells[4, Row], CompletionDate) then
+    if not TryStrToDateTime(Grid.Cells[4, Row], CompletionDate) then
     begin
       CompletionDate := 0; // If parsing the date failed, set to 0
       Grid.Cells[4, Row] := '';
@@ -212,7 +189,7 @@ var
   i: integer;
 begin
   if (Index < 0) or (Index >= FCount) then
-    raise Exception.Create('Index out of bounds'); // Error handling for invalid index
+    exit;
 
   // Free the task that is being removed
   FTaskList[Index].Free;
@@ -236,9 +213,13 @@ end;
 procedure TTasks.FillGrid(Grid: TStringGrid; SortOrder: TSortOrder = soAscending);
 var
   I, RowIndex: integer;
+  event: TGridOperationEvent;
 begin
   try
     Grid.BeginUpdate;
+
+    event := Grid.OnColRowInserted;
+    Grid.OnColRowInserted := nil;
 
     Grid.RowCount := Count + 1; // Set the row count to the number of tasks
 
@@ -259,9 +240,50 @@ begin
     end;
 
   finally
+    if (Assigned(event)) then
+      Grid.OnColRowInserted := event;
     Grid.EndUpdate;
   end;
 end;
 
+function TTasks.ToStringList: TStringList;
+var
+  TaskString: string;
+  CompletionStatus: string;
+  CommentPart: string;
+  i: integer;
+begin
+  Result := TStringList.Create; // Создаем новый TStringList
+  try
+    for i := 0 to FCount - 1 do
+    begin
+      // Удаляем переносы строк из описания задачи
+      TaskString := StringReplace(FTaskList[i].TaskDescription, sLineBreak, ' ', [rfReplaceAll]);
+
+      // Определяем статус завершенности
+      if FTaskList[i].IsCompleted then
+        CompletionStatus := '- [x]'
+      else
+        CompletionStatus := '- [ ]';
+
+      // Проверяем, есть ли комментарий
+      if FTaskList[i].Comment <> '' then
+        CommentPart := ' *// ' + FTaskList[i].Comment + '*'
+      else
+        CommentPart := '';
+
+      // Формируем строку задачи с учетом даты завершения и комментария
+      if FTaskList[i].CompletionDate > 0 then
+        TaskString := Format('%s %s, %s%s', [CompletionStatus, DateTimeToStr(FTaskList[i].CompletionDate), TaskString, CommentPart])
+      else
+        TaskString := Format('%s %s%s', [CompletionStatus, TaskString, CommentPart]);
+
+      Result.Add(TaskString); // Добавляем строку задачи в TStringList
+    end;
+  except
+    Result.Free; // Освобождаем ресурсы в случае ошибки
+    raise; // Повторно генерируем исключение
+  end;
+end;
 
 end.
