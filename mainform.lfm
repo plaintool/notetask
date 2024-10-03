@@ -8,6 +8,10 @@ object formNotetask: TformNotetask
   ClientWidth = 851
   Color = clWindow
   Menu = MainMenu
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnResize = FormResize
+  OnWindowStateChange = FormWindowStateChange
   object taskGrid: TStringGrid
     Left = 0
     Height = 490

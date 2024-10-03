@@ -17,7 +17,7 @@ uses
   mainform,
   lineending,
   filemanager,
-  task { you can add units after this };
+  task, settings { you can add units after this };
 
   {$R *.res}
 

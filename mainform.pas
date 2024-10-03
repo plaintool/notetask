@@ -46,6 +46,10 @@ type
     procedure aExitExecute(Sender: TObject);
     procedure aNewExecute(Sender: TObject);
     procedure aOpenExecute(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure FormWindowStateChange(Sender: TObject);
     procedure taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
     procedure taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure taskGridPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -54,7 +58,7 @@ type
   private
     procedure MemoChange(Sender: TObject);
   public
-
+    procedure OpenFile(fileName: string);
   end;
 
 var
@@ -66,11 +70,32 @@ resourcestring
 
 implementation
 
-uses filemanager, lineending;
+uses filemanager, lineending, settings;
 
   {$R *.lfm}
 
   { TformNotetask }
+
+procedure TformNotetask.FormCreate(Sender: TObject);
+var
+  FilePath: string;
+begin
+  LoadFormSettings(self);
+  LoadGridSettings(taskGrid);
+
+  // Проверяем, передан ли аргумент командной строки
+  if ParamCount > 0 then
+  begin
+    FilePath := ParamStr(1); // Получаем путь к файлу
+    if (not FilePath.StartsWith('--')) then
+      OpenFile(FilePath); // Ваша функция для загрузки задачи из файла
+  end;
+end;
+
+procedure TformNotetask.FormDestroy(Sender: TObject);
+begin
+  SaveFormSettings(self);
+end;
 
 procedure TformNotetask.aExitExecute(Sender: TObject);
 begin
@@ -93,23 +118,28 @@ begin
 end;
 
 procedure TformNotetask.aOpenExecute(Sender: TObject);
+begin
+  if openDialog.Execute then
+  begin
+    OpenFile(openDialog.FileName);
+  end;
+end;
+
+procedure TformNotetask.OpenFile(fileName: string);
 var
   Content: string;
   FileEncoding: TEncoding;
   LineEnding: TLineEnding;
   LineCount: integer;
 begin
-  if openDialog.Execute then
-  begin
-    ReadTextFile(openDialog.FileName, Content, FileEncoding, LineEnding, LineCount);
+  ReadTextFile(fileName, Content, FileEncoding, LineEnding, LineCount);
 
-    statusBar.Panels[1].Text := UpperCase(FileEncoding.EncodingName);
-    statusBar.Panels[2].Text := LineEnding.ToString;
-    statusBar.Panels[3].Text := LineCount.ToString + rrows;
+  statusBar.Panels[1].Text := UpperCase(FileEncoding.EncodingName);
+  statusBar.Panels[2].Text := LineEnding.ToString;
+  statusBar.Panels[3].Text := LineCount.ToString + rrows;
 
-    Tasks := TTasks.Create(TextToStringList(Content));
-    Tasks.FillGrid(taskGrid);
-  end;
+  Tasks := TTasks.Create(TextToStringList(Content));
+  Tasks.FillGrid(taskGrid);
 end;
 
 procedure TformNotetask.taskGridPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -132,7 +162,7 @@ var
   drawrect: TRect;
   bgFill: TColor;
 begin
-  if (aCol = 1) or (aRow = 0) then exit;
+  if (aCol in [0, 1]) or (aRow = 0) then exit;
   grid := Sender as TStringGrid;
 
   //if gdSelected in aState then
@@ -167,9 +197,20 @@ begin
     grid.Canvas.DrawFocusRect(aRect);
 end;
 
+procedure TformNotetask.FormResize(Sender: TObject);
+begin
+  taskGridResize(Sender);
+end;
+
+procedure TformNotetask.FormWindowStateChange(Sender: TObject);
+begin
+
+end;
+
 procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
 begin
   taskGridResize(Sender);
+  SaveGridSettings(taskGrid);
 end;
 
 procedure TformNotetask.taskGridResize(Sender: TObject);
