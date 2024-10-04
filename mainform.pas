@@ -130,13 +130,15 @@ var
   FilePath: string;
 begin
   FWordWrap := True;
-  aWordWrap.Checked := FWordWrap;
   clRowHighlight := RGBToColor(224, 224, 224);
 
   Caption := runtitled + ' - ' + rapp;
 
   LoadFormSettings(self);
   LoadGridSettings(taskGrid);
+
+  // After load wordwrap setting
+  aWordWrap.Checked := FWordWrap;
 
   // Check if a command line argument is passed
   if ParamCount > 0 then
@@ -327,11 +329,11 @@ procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: intege
 var
   MyTextStyle: TTextStyle;
 begin
-  if (aCol in [2, 3]) and (FWordWrap) then;
+  if (aCol in [2, 3]) then;
   begin
     MyTextStyle := TGridPrinter(Sender).Canvas.TextStyle;
-    MyTextStyle.SingleLine := False;
-    MyTextStyle.Wordbreak := True;
+    MyTextStyle.SingleLine := not FWordWrap;
+    MyTextStyle.Wordbreak := WordWrap;
     TGridPrinter(Sender).Canvas.TextStyle := MyTextStyle;
   end;
 end;

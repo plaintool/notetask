@@ -8,10 +8,12 @@
       <Unit>
         <Filename Value="notetask.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="4"/>
-        <CursorPos X="11" Y="21"/>
+        <CursorPos X="66" Y="18"/>
         <UsageCount Value="71"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="mainform.pas"/>
@@ -19,9 +21,8 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="318"/>
-        <CursorPos X="28" Y="330"/>
+        <TopLine Value="123"/>
+        <CursorPos X="3" Y="139"/>
         <UsageCount Value="71"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -61,7 +62,7 @@
         <Filename Value="gridprn.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="GridPrn"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="2"/>
         <TopLine Value="144"/>
         <CursorPos X="68" Y="157"/>
         <UsageCount Value="22"/>
@@ -150,14 +151,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="301" Column="14" TopLine="277"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="326" Column="7" TopLine="311"/>
-      </Position>
       <Position>
         <Filename Value="mainform.pas"/>
         <Caret Line="95" Column="15" TopLine="81"/>
@@ -269,6 +262,14 @@
       <Position>
         <Filename Value="gridprn.pas"/>
         <Caret Line="38" Column="19" TopLine="36"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="139" Column="3" TopLine="123"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="24" Column="25" TopLine="4"/>
       </Position>
     </JumpHistory>
     <CustomSessionData Count="2">
