@@ -10,7 +10,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="17" Y="14"/>
-        <UsageCount Value="66"/>
+        <UsageCount Value="68"/>
       </Unit>
       <Unit>
         <Filename Value="mainform.pas"/>
@@ -18,12 +18,10 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="114"/>
-        <CursorPos X="35" Y="133"/>
-        <UsageCount Value="66"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="54"/>
+        <CursorPos Y="67"/>
+        <UsageCount Value="68"/>
       </Unit>
       <Unit>
         <Filename Value="lineending.pas"/>
@@ -31,7 +29,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="7"/>
         <CursorPos X="5" Y="41"/>
-        <UsageCount Value="62"/>
+        <UsageCount Value="64"/>
       </Unit>
       <Unit>
         <Filename Value="filemanager.pas"/>
@@ -39,22 +37,24 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="105"/>
         <CursorPos X="14" Y="135"/>
-        <UsageCount Value="61"/>
+        <UsageCount Value="63"/>
       </Unit>
       <Unit>
         <Filename Value="task.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="274"/>
-        <CursorPos X="13" Y="288"/>
-        <UsageCount Value="60"/>
+        <TopLine Value="63"/>
+        <CursorPos X="42" Y="74"/>
+        <UsageCount Value="62"/>
       </Unit>
       <Unit>
         <Filename Value="settings.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="71" Y="18"/>
-        <UsageCount Value="54"/>
+        <TopLine Value="34"/>
+        <CursorPos Y="45"/>
+        <UsageCount Value="56"/>
       </Unit>
       <Unit>
         <Filename Value="stringgridex.pas"/>

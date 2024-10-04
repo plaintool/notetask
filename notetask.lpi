@@ -11,6 +11,7 @@
       <UseXPManifest Value="True"/>
       <XPManifest>
         <DpiAware Value="True"/>
+        <ExecutionLevel Value="highestAvailable"/>
         <TextName Value="Tverskoy.Alexander"/>
         <TextDesc Value="Notetask Editor: A simple solution for task text files"/>
       </XPManifest>

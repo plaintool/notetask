@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Types, CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs,
-  LCLIntf, LCLType, ExtDlgs, LMessages, Clipbrd, task, lineending;
+  LCLIntf, LCLType, ExtDlgs, LMessages, Clipbrd, Process, task, lineending;
 
 type
 
@@ -55,6 +55,7 @@ type
     procedure aExitExecute(Sender: TObject);
     procedure aFontExecute(Sender: TObject);
     procedure aNewExecute(Sender: TObject);
+    procedure aNewWindowExecute(Sender: TObject);
     procedure aOpenExecute(Sender: TObject);
     procedure aSaveExecute(Sender: TObject);
     procedure aWordWrapExecute(Sender: TObject);
@@ -107,6 +108,8 @@ var
   clRowHighlight: TColor;
 
 resourcestring
+  rapp = 'Notetask';
+  runtitled = 'Untitled';
   rrows = ' rows';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rsavechanges = 'Do you want to save the changes?';
@@ -125,12 +128,13 @@ var
   FilePath: string;
 begin
   FWordWrap := True;
+  aWordWrap.Checked := FWordWrap;
+  clRowHighlight := RGBToColor(224, 224, 224);
+
+  Caption := runtitled + ' - ' + rapp;
 
   LoadFormSettings(self);
   LoadGridSettings(taskGrid);
-
-  aWordWrap.Checked := FWordWrap;
-  clRowHighlight := RGBToColor(224, 224, 224);
 
   // Проверяем, передан ли аргумент командной строки
   if ParamCount > 0 then
@@ -251,10 +255,25 @@ begin
   begin
     SetChanged(False);
     FFileName := string.Empty;
+    Caption := runtitled + ' - ' + rapp;
     taskGrid.Clean;
     taskGrid.RowCount := 2;
     Tasks.AddTask('[ ]');
     taskGrid.Cells[1, 1] := '0';
+  end;
+end;
+
+procedure TformNotetask.aNewWindowExecute(Sender: TObject);
+var
+  Process: TProcess;
+begin
+  Process := TProcess.Create(nil); // Create a new process
+  try
+    Process.Executable := ParamStr(0); // Set the executable to the current application
+    Process.Options := []; // No wait, open and forget
+    Process.Execute; // Execute the new instance
+  finally
+    Process.Free; // Free the process object
   end;
 end;
 
@@ -325,6 +344,7 @@ var
 begin
   FFileName := fileName;
 
+  Caption := ExtractFileName(FFileName) + ' - ' + rapp;
   ReadTextFile(FFileName, Content, FEncoding, FLineEnding, LineCount);
   statusBar.Panels[1].Text := UpperCase(FEncoding.EncodingName);
   statusBar.Panels[2].Text := FLineEnding.ToString;

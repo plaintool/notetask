@@ -1,6 +1,11 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
+#: mainform.rapp
+msgctxt "mainform.rapp"
+msgid "Notetask"
+msgstr ""
+
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear this section?"
 msgstr ""
@@ -16,6 +21,10 @@ msgstr ""
 
 #: mainform.rsavechanges
 msgid "Do you want to save the changes?"
+msgstr ""
+
+#: mainform.runtitled
+msgid "Untitled"
 msgstr ""
 
 #: tformnotetask.aexit.caption
@@ -75,6 +84,7 @@ msgid "Select date"
 msgstr ""
 
 #: tformnotetask.caption
+msgctxt "tformnotetask.caption"
 msgid "Notetask"
 msgstr ""
 

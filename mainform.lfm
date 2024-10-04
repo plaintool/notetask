@@ -14,7 +14,6 @@ object formNotetask: TformNotetask
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnResize = FormResize
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -43,8 +42,10 @@ object formNotetask: TformNotetask
         Title.Caption = 'Date'
         Width = 140
       end>
-    FixedColor = clDefault
+    FixedColor = clWindow
     Flat = True
+    GridLineColor = 13290186
+    GridLineStyle = psDot
     MouseWheelOption = mwGrid
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goEditing, goAutoAddRows, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goRowHighlight]
     Options2 = [goEditorParentFont]
@@ -170,6 +171,7 @@ object formNotetask: TformNotetask
     object aNewWindow: TAction
       Category = 'File'
       Caption = 'New window'
+      OnExecute = aNewWindowExecute
       ShortCut = 49230
     end
     object aOpen: TAction

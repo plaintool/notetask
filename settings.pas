@@ -39,16 +39,18 @@ begin
   JSONObj := TJSONObject.Create;
   try
     // Сохранение положения и размера формы
-    JSONObj.Add('Left', Form.Left);
-    JSONObj.Add('Top', Form.Top);
-    JSONObj.Add('Width', Form.Width);
-    JSONObj.Add('Height', Form.Height);
+
     JSonObj.Add('WordWrap', Form.WordWrap);
+    JSonObj.Add('WindowState', Ord(Form.WindowState));
+    JSONObj.Add('Left', Form.RestoredLeft);
+    JSONObj.Add('Top', Form.RestoredTop);
+    JSONObj.Add('Width', Form.RestoredWidth);
+    JSONObj.Add('Height', Form.RestoredHeight);
 
     // Сохранение шрифта
     JSONObj.Add('FontName', Form.Font.Name);
     JSONObj.Add('FontSize', Form.Font.Size);
-    JSONObj.Add('FontStyle', Integer(Form.Font.Style));  // Преобразуем стиль шрифта в число
+    JSONObj.Add('FontStyle', integer(Form.Font.Style));  // Преобразуем стиль шрифта в число
 
     // Запись в файл
     with TStringList.Create do
@@ -85,6 +87,10 @@ begin
       JSONObj := JSONData as TJSONObject;
 
       // Check and load form's position and size
+      if JSONObj.FindPath('WordWrap') <> nil then
+        Form.WordWrap := JSONObj.FindPath('WordWrap').AsBoolean;
+      if JSONObj.FindPath('WindowState') <> nil then
+        Form.WindowState := TWindowState(JSONObj.FindPath('WindowState').AsInteger);
       if JSONObj.FindPath('Left') <> nil then
         Form.Left := JSONObj.FindPath('Left').AsInteger;
       if JSONObj.FindPath('Top') <> nil then
@@ -93,8 +99,6 @@ begin
         Form.Width := JSONObj.FindPath('Width').AsInteger;
       if JSONObj.FindPath('Height') <> nil then
         Form.Height := JSONObj.FindPath('Height').AsInteger;
-      if JSONObj.FindPath('WordWrap') <> nil then
-        Form.WordWrap := JSONObj.FindPath('WordWrap').AsBoolean;
 
       // Check and load font properties
       if JSONObj.FindPath('FontName') <> nil then
