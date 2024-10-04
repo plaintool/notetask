@@ -19,8 +19,8 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="289"/>
-        <CursorPos X="13" Y="305"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="75" Y="9"/>
         <UsageCount Value="69"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -28,38 +28,33 @@
       <Unit>
         <Filename Value="lineending.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="12"/>
         <CursorPos X="5" Y="41"/>
         <UsageCount Value="65"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="filemanager.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="106"/>
         <CursorPos X="14" Y="135"/>
         <UsageCount Value="64"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="task.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="74" Y="13"/>
         <UsageCount Value="63"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="settings.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos Y="45"/>
         <UsageCount Value="57"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="stringgridex.pas"/>
@@ -153,8 +148,8 @@
         <Caret Line="9" Column="84"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="74" Column="42" TopLine="63"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="304" Column="3" TopLine="289"/>
       </Position>
     </JumpHistory>
     <CustomSessionData Count="2">

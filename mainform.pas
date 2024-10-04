@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Types, CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs, GridPrn,
+  Types, CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs,
   LCLIntf, LCLType, ExtDlgs, LMessages, Clipbrd, Process, task, lineending;
 
 type

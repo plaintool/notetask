@@ -14,6 +14,7 @@ object formNotetask: TformNotetask
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnResize = FormResize
+  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
