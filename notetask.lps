@@ -20,8 +20,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="294"/>
-        <CursorPos X="61" Y="308"/>
+        <TopLine Value="318"/>
+        <CursorPos X="28" Y="330"/>
         <UsageCount Value="71"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -56,6 +56,16 @@
         <TopLine Value="34"/>
         <CursorPos Y="45"/>
         <UsageCount Value="59"/>
+      </Unit>
+      <Unit>
+        <Filename Value="gridprn.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="GridPrn"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="144"/>
+        <CursorPos X="68" Y="157"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="stringgridex.pas"/>
@@ -129,16 +139,6 @@
         <TopLine Value="1943"/>
         <CursorPos X="3" Y="1946"/>
         <UsageCount Value="9"/>
-      </Unit>
-      <Unit>
-        <Filename Value="gridprn.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="GridPrn"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="144"/>
-        <CursorPos X="68" Y="157"/>
-        <UsageCount Value="22"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\lcl\printers.pas"/>

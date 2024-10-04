@@ -327,7 +327,7 @@ procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: intege
 var
   MyTextStyle: TTextStyle;
 begin
-  if (aCol in [2, 3]) then
+  if (aCol in [2, 3]) and (FWordWrap) then;
   begin
     MyTextStyle := TGridPrinter(Sender).Canvas.TextStyle;
     MyTextStyle.SingleLine := False;
