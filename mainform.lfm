@@ -14,7 +14,6 @@ object formNotetask: TformNotetask
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnResize = FormResize
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -46,7 +45,7 @@ object formNotetask: TformNotetask
     FixedColor = clDefault
     Flat = True
     MouseWheelOption = mwGrid
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goAutoAddRows, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goRowHighlight]
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goAutoAddRows, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goRowHighlight]
     Options2 = [goEditorParentFont]
     RowCount = 2
     TabOrder = 0
@@ -56,6 +55,7 @@ object formNotetask: TformNotetask
     OnColRowInserted = taskGridColRowInserted
     OnDrawCell = taskGridDrawCell
     OnEditButtonClick = taskGridEditButtonClick
+    OnEditingDone = taskGridEditingDone
     OnHeaderClick = taskGridHeaderClick
     OnHeaderSized = taskGridHeaderSized
     OnMouseWheel = taskGridMouseWheel

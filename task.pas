@@ -172,7 +172,9 @@ begin
     begin
       CompletionDate := 0; // If parsing the date failed, set to 0
       Grid.Cells[4, Row] := '';
-    end;
+    end
+    else
+      Grid.Cells[4, Row] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, CompletionDate);
 
     // Update task properties
     Task.IsCompleted := IsCompleted;
@@ -274,7 +276,8 @@ begin
 
       // Формируем строку задачи с учетом даты завершения и комментария
       if FTaskList[i].CompletionDate > 0 then
-        TaskString := Format('%s %s, %s%s', [CompletionStatus, DateTimeToStr(FTaskList[i].CompletionDate), TaskString, CommentPart])
+        TaskString := Format('%s %s, %s%s', [CompletionStatus, FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, FTaskList[i].CompletionDate),
+          TaskString, CommentPart])
       else
         TaskString := Format('%s %s%s', [CompletionStatus, TaskString, CommentPart]);
 

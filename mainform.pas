@@ -68,6 +68,7 @@ type
     procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
     procedure taskGridEditButtonClick(Sender: TObject);
+    procedure taskGridEditingDone(Sender: TObject);
     procedure taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
@@ -396,7 +397,7 @@ procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: int
 begin
   SetChanged;
   if (aState = cbChecked) and (taskGrid.Cells[4, aRow] = '') then
-    taskGrid.Cells[4, aRow] := FormatDateTime('dd.mm.yyyy hh:nn:ss', Now)
+    taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now)
   else
     taskGrid.Cells[4, aRow] := string.Empty;
   Tasks.SetTask(taskGrid, aRow, aCol);
@@ -535,6 +536,7 @@ begin
   IsEditing := True;
   if (NeedFocusMemo) then
   begin
+    Memo.SelectAll;
     Memo.SetFocus;
     NeedFocusMemo := False;
   end;
@@ -542,7 +544,7 @@ end;
 
 procedure TformNotetask.MemoExit(Sender: TObject);
 begin
-//  IsEditing := False; // Reset editing flag when exiting
+  //  IsEditing := False; // Reset editing flag when exiting
 end;
 
 procedure TformNotetask.EditCell(aCol, aRow: integer);
@@ -558,6 +560,16 @@ procedure TformNotetask.EditComplite;
 begin
   taskGrid.EditorMode := False;
   IsEditing := False; // Reset editing flag when exiting
+  NeedFocusMemo := False;
+end;
+
+procedure TformNotetask.taskGridEditingDone(Sender: TObject);
+begin
+  if (taskGrid.Col = 4) then
+  begin
+    Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
+    EditComplite;
+  end;
 end;
 
 end.
