@@ -62,7 +62,6 @@ object formNotetask: TformNotetask
     OnMouseDown = taskGridMouseDown
     OnMouseLeave = taskGridMouseLeave
     OnMouseWheel = taskGridMouseWheel
-    OnPrepareCanvas = taskGridPrepareCanvas
     OnResize = taskGridResize
     OnSelectEditor = taskGridSelectEditor
     OnSelectCell = taskGridSelectCell
@@ -230,6 +229,10 @@ object formNotetask: TformNotetask
     Top = 112
   end
   object pageSetupDialog: TPageSetupDialog
+    MarginLeft = 500
+    MarginTop = 500
+    MarginRight = 500
+    MarginBottom = 500
     Left = 488
     Top = 184
   end

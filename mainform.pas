@@ -74,7 +74,6 @@ type
     procedure taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure taskGridMouseLeave(Sender: TObject);
     procedure taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
-    procedure taskGridPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure taskGridResize(Sender: TObject);
     procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
@@ -92,6 +91,7 @@ type
     procedure MemoChange(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
+    procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol, aRow: integer);
     procedure EditComplite;
@@ -305,15 +305,34 @@ begin
     gridPrinter := TGridPrinter.Create(self);
     gridPrinter.Grid := taskGrid;
     gridPrinter.OnGetCellText := @PrinterGetCellText;
+    gridPrinter.OnPrepareCanvas := @PrinterPrepareCanvas;
     gridPrinter.Orientation := Printer.Orientation;
+    gridPrinter.Margins.LeftMargin := pageSetupDialog.MarginLeft / 100;
+    gridPrinter.Margins.RightMargin := pageSetupDialog.MarginRight / 100;
+    gridPrinter.Margins.TopMargin := pageSetupDialog.MarginTop / 100;
+    gridPrinter.Margins.BottomMargin := pageSetupDialog.MarginBottom / 100;
 
     gridPrinter.FixedLineColor := clSilver;
     gridPrinter.BorderLineColor := clSilver;
     gridPrinter.FooterLineColor := clSilver;
     gridPrinter.GridLineColor := clSilver;
     gridPrinter.HeaderLineColor := clSilver;
+
     gridPrinter.Print;
     gridPrinter.Free;
+  end;
+end;
+
+procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
+var
+  MyTextStyle: TTextStyle;
+begin
+  if (aCol in [2, 3]) then
+  begin
+    MyTextStyle := TGridPrinter(Sender).Canvas.TextStyle;
+    MyTextStyle.SingleLine := False;
+    MyTextStyle.Wordbreak := True;
+    TGridPrinter(Sender).Canvas.TextStyle := MyTextStyle;
   end;
 end;
 
@@ -436,19 +455,6 @@ begin
     Caption := '*' + Caption
   else if not FChanged and (Caption <> '') and (Caption[1] = '*') then
     Caption := Copy(Caption, 2, Length(Caption) - 1);
-end;
-
-procedure TformNotetask.taskGridPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
-//var
-//  MyTextStyle: TTextStyle;
-begin
-  //if (aCol in [2, 3]) then
-  //begin
-  //  MyTextStyle := taskGrid.Canvas.TextStyle;
-  //  MyTextStyle.SingleLine := False;
-  //  MyTextStyle.Wordbreak := True;
-  //  taskGrid.Canvas.TextStyle := MyTextStyle;
-  //end;
 end;
 
 procedure TformNotetask.taskGridEditButtonClick(Sender: TObject);
