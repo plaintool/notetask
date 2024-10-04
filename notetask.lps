@@ -9,7 +9,8 @@
         <Filename Value="notetask.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="17" Y="14"/>
+        <TopLine Value="4"/>
+        <CursorPos X="11" Y="21"/>
         <UsageCount Value="68"/>
       </Unit>
       <Unit>
@@ -18,10 +19,12 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="54"/>
-        <CursorPos Y="67"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="621"/>
+        <CursorPos X="25" Y="635"/>
         <UsageCount Value="68"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="lineending.pas"/>
@@ -50,7 +53,6 @@
       <Unit>
         <Filename Value="settings.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos Y="45"/>
@@ -130,7 +132,28 @@
         <UsageCount Value="9"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory HistoryIndex="4">
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="87" TopLine="74"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="642" Column="3" TopLine="637"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="536" TopLine="519"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="92" Column="15" TopLine="78"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="678" TopLine="653"/>
+      </Position>
+    </JumpHistory>
     <CustomSessionData Count="2">
       <Item0 Name="SVN active" Value="-1"/>
       <Item1 Name="SVN repository" Value="D:\OneDrive\Repositories\Lazarus"/>

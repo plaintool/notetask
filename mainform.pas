@@ -84,7 +84,6 @@ type
     FChanged: boolean;
     IsEditing: boolean;
     IsSelecting: boolean;
-    NeedFocusMemo: boolean;
     FFileName: string;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
@@ -136,13 +135,18 @@ begin
   LoadFormSettings(self);
   LoadGridSettings(taskGrid);
 
-  // Проверяем, передан ли аргумент командной строки
+  // Check if a command line argument is passed
   if ParamCount > 0 then
   begin
-    FilePath := ParamStr(1); // Получаем путь к файлу
+    FilePath := ParamStr(1); // Get the file path
     if (not FilePath.StartsWith('--')) then
-      OpenFile(FilePath); // Ваша функция для загрузки задачи из файла
+    begin
+      OpenFile(FilePath); // Your function to load a task from the file
+      exit;
+    end;
   end;
+
+  aNew.Execute;
 end;
 
 procedure TformNotetask.FormDestroy(Sender: TObject);
@@ -240,16 +244,15 @@ end;
 procedure TformNotetask.aFontExecute(Sender: TObject);
 begin
   fontDialog.Font := Font;
-  if fontDialog.Execute then  // Открыть диалоговое окно шрифта
+  if fontDialog.Execute then  // Open the font dialog
   begin
-    // Применить выбранный шрифт к форме
+    // Apply the selected font to the form
     Self.Font := fontDialog.Font;
   end;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
 begin
-  // Создаем экземпляр TTasks с переданным списком строк
   Tasks := TTasks.Create();
   if IsCanClose then
   begin
@@ -298,7 +301,7 @@ begin
   FWordWrap := aWordWrap.Checked;
   for i := 0 to taskGrid.RowCount - 1 do
   begin
-    taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight; // Установить нужное значение высоты
+    taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight;
   end;
   Invalidate;
 end;
@@ -629,22 +632,17 @@ begin
   Memo.Font.Size := taskGrid.Font.Size;
   Memo.HideSelection := True;
   Memo.TabStop := False;
+  Memo.WantTabs := True;
   Memo.BorderStyle := bsNone;
   Memo.WordWrap := FWordWrap;
   Memo.WantReturns := FWordWrap;
+  Memo.ScrollBars := ssAutoVertical;
 
   MemoSetBounds(aCol, aRow);
   Memo.Parent := taskGrid;
   Memo.OnChange := @MemoChange; // Event
   Memo.Text := taskGrid.Cells[aCol, aRow];
   Memo.CaretPos := Point(Length(Memo.Text), 0);
-
-  if (NeedFocusMemo) then
-  begin
-    Memo.SelectAll;
-    Memo.SetFocus;
-    NeedFocusMemo := False;
-  end;
 
   Editor := Memo;
 
@@ -666,7 +664,6 @@ begin
   taskGrid.Row := aRow;
   taskGrid.Col := aCol;
   IsEditing := True;
-  //  NeedFocusMemo := True;
   taskGrid.EditorMode := True; //Set editing mode
 
   if (Assigned(Memo)) and (Memo.Visible) then
@@ -674,15 +671,12 @@ begin
     Memo.SelectAll;
     Memo.SetFocus;
   end;
-
 end;
 
 procedure TformNotetask.EditComplite;
 begin
   taskGrid.EditorMode := False;
   IsEditing := False; // Reset editing flag when exiting
-  //  NeedFocusMemo := False;
 end;
-
 
 end.
