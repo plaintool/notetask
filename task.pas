@@ -262,7 +262,7 @@ var
   SelectedText: TStringList;
   Rect: TGridRect;
   CompletionState, TaskDescription, Comment, CompletionDate: string;
-  RowText: string;
+  Row1, Row2, RowText: string;
   i, j: integer;
 begin
   SelectedText := TStringList.Create;
@@ -279,7 +279,14 @@ begin
         if (j = 3) then Comment := GetTask(i - 1).ToString(j).Trim;
         if (j = 4) then CompletionDate := GetTask(i - 1).ToString(j).Trim;
       end;
-      RowText := (CompletionState + ' ' + CompletionDate).Trim + ' ' + (TaskDescription + ' ' + Comment).Trim;
+      Row1 := (CompletionState + ' ' + CompletionDate).Trim;
+      Row2 := (TaskDescription + ' ' + Comment).Trim;
+      if (CompletionDate <> string.Empty) and (Row2 <> string.Empty) then
+        Row1 += ', '
+      else
+      if (Row1 <> string.Empty) and (Row2 <> string.Empty) then
+        Row1 += ' ';
+      RowText := Row1 + Row2;
       SelectedText.Add(RowText.Trim);
     end;
 

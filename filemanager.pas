@@ -114,8 +114,10 @@ end;
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
 var
   LineEndingStr: string;
-  ModifiedList: TStringList;
-  i:integer;
+  FileStream: TFileStream;
+  i: Integer;
+  LineWithEnding: string;
+  Bytes: TBytes;
 begin
   // Устанавливаем тип переноса строк в зависимости от заданного LineEnding
   if LineEnding = TLineEnding.WindowsCRLF then
@@ -127,19 +129,23 @@ begin
   else
     LineEndingStr := sLineBreak; // По умолчанию используем стандартный перенос
 
-  // Создаем новый TStringList для замены переносов строк
-  ModifiedList := TStringList.Create;
+  // Открываем файл для записи
+  FileStream := TFileStream.Create(FileName, fmCreate);
   try
     for i := 0 to StringList.Count - 1 do
     begin
-      // Заменяем переносы строк в каждой строке на заданный формат
-      ModifiedList.Add(StringReplace(StringList[i], sLineBreak, LineEndingStr, [rfReplaceAll]));
-    end;
+      // Для каждой строки, кроме последней, добавляем LineEndingStr
+      if i < StringList.Count - 1 then
+        LineWithEnding := StringList[i] + LineEndingStr
+      else
+        LineWithEnding := StringList[i];
 
-    // Сохраняем измененный TStringList в файл с указанной кодировкой
-    ModifiedList.SaveToFile(FileName, FileEncoding);
+      // Конвертируем строку в байты с учетом кодировки
+      Bytes := FileEncoding.GetBytes(LineWithEnding);
+      FileStream.WriteBuffer(Bytes[0], Length(Bytes)); // Записываем байты в файл
+    end;
   finally
-    ModifiedList.Free; // Освобождаем ресурсы
+    FileStream.Free; // Освобождаем ресурсы
   end;
 end;
 
