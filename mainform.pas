@@ -74,15 +74,16 @@ type
     procedure taskGridPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure taskGridResize(Sender: TObject);
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
-    procedure taskGridSetEditText(Sender: TObject; ACol, ARow: integer; const Value: string);
     procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
   private
     FChanged: boolean;
+    IsEditing: boolean;
     FFileName: string;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
     FWordWrap: boolean;
     procedure MemoChange(Sender: TObject);
+    procedure MemoExit(Sender: TObject);
   public
     procedure OpenFile(fileName: string);
     procedure SaveFile(fileName: string);
@@ -93,7 +94,7 @@ type
 
 var
   formNotetask: TformNotetask;
-  Tasks: TTasks; // Коллекция задач
+  Tasks: TTasks; // Tasks collection
   clRowHighlight: TColor;
 
 resourcestring
@@ -140,21 +141,33 @@ var
   Row: integer;
   ConfirmDelete: integer;
 begin
-  if (Key = 46) and (not taskGrid.EditorMode) then // #46 соответствует клавише Del
+  if (Key = 46) then // #46 соответствует клавише Del
   begin
-    Row := taskGrid.Row; // Получаем текущую выбранную строку
-    if (Row > 0) and (Row <= Tasks.Count) then
+    if (not taskGrid.EditorMode) and (not IsEditing) then
     begin
-      // Показываем диалог для подтверждения удаления
-      ConfirmDelete := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
-
-      if ConfirmDelete = mrYes then
+      Row := taskGrid.Row; // Получаем текущую выбранную строку
+      if (Row > 0) and (Row <= Tasks.Count) then
       begin
-        Tasks.RemoveTask(Row - 1); // Удаляем задачу из коллекции
-        taskGrid.DeleteRow(Row); // Удаляем строку из грида
-        Abort;
+        // Показываем диалог для подтверждения удаления
+        ConfirmDelete := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+        if ConfirmDelete = mrYes then
+        begin
+          Tasks.RemoveTask(Row - 1); // Удаляем задачу из коллекции
+          taskGrid.DeleteRow(Row); // Удаляем строку из грида
+          Abort;
+        end;
       end;
-    end;
+    end
+    else
+      Abort;
+  end
+  else
+  if (Key = 27) then
+  begin
+    if (taskGrid.EditorMode) or (IsEditing) then
+      taskGrid.EditorMode := False;
+    Abort;
   end;
 end;
 
@@ -284,7 +297,10 @@ end;
 
 procedure TformNotetask.SetChanged(aChanged: boolean = True);
 begin
-  FChanged := aChanged or taskGrid.Modified;
+  if (aChanged = False) then
+    taskGrid.Modified := False;
+
+  FChanged := taskGrid.Modified;
   aSave.Enabled := FChanged;
   if (FChanged) and (Caption <> '') and (Caption[1] <> '*') then
     Caption := '*' + Caption
@@ -496,6 +512,7 @@ begin
   Memo.Parent := taskGrid;
   Memo.BorderStyle := bsNone;
   Memo.OnChange := @MemoChange; // Event
+  Memo.OnExit := @MemoExit; // Set OnExit event
 
   Rect := taskGrid.CellRect(aCol, aRow);
   Memo.SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
@@ -505,11 +522,12 @@ begin
   Memo.WantReturns := FWordWrap;
   Editor := Memo;
   Memo.Visible := True;
+  IsEditing := True;
 end;
 
-procedure TformNotetask.taskGridSetEditText(Sender: TObject; ACol, ARow: integer; const Value: string);
+procedure TformNotetask.MemoExit(Sender: TObject);
 begin
-
+  IsEditing := False; // Reset editing flag when exiting
 end;
 
 end.

@@ -60,7 +60,6 @@ object formNotetask: TformNotetask
     OnMouseWheel = taskGridMouseWheel
     OnResize = taskGridResize
     OnSelectEditor = taskGridSelectEditor
-    OnSetEditText = taskGridSetEditText
     OnValidateEntry = taskGridValidateEntry
     ColWidths = (
       42
