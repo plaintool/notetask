@@ -70,6 +70,11 @@
         <Filename Value="settings.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="gridprn.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="GridPrn"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -55,10 +55,6 @@ msgstr ""
 msgid "Print..."
 msgstr ""
 
-#: tformnotetask.aprintersetup.caption
-msgid "Printer setup..."
-msgstr ""
-
 #: tformnotetask.asave.caption
 msgid "Save"
 msgstr ""

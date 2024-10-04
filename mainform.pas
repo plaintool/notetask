@@ -5,9 +5,9 @@ unit mainform;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Types, CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs,
-  LCLIntf, LCLType, ExtDlgs, LMessages, Clipbrd, Process, task, lineending;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls, ActnList, ComCtrls,
+  Types, CheckLst, ValEdit, Grids, Menus, PrintersDlgs, Printers, GridPrn, LCLIntf, LCLType,
+  ExtDlgs, LMessages, Clipbrd, Process, task, lineending;
 
 type
 
@@ -15,7 +15,6 @@ type
   TformNotetask = class(TForm)
     aWordWrap: TAction;
     aFont: TAction;
-    aPrinterSetup: TAction;
     aExit: TAction;
     aPrint: TAction;
     aPageProperties: TAction;
@@ -38,14 +37,12 @@ type
     menuOpen: TMenuItem;
     menuSave: TMenuItem;
     menuSaveAs: TMenuItem;
-    menuPrinterSetup: TMenuItem;
     menuPageProperties: TMenuItem;
     menuPrint: TMenuItem;
     menuNew: TMenuItem;
     openDialog: TOpenDialog;
     pageSetupDialog: TPageSetupDialog;
     printDialog: TPrintDialog;
-    printerSetupDialog: TPrinterSetupDialog;
     saveDialog: TSaveDialog;
     Separator1: TMenuItem;
     menuExit: TMenuItem;
@@ -58,7 +55,6 @@ type
     procedure aNewWindowExecute(Sender: TObject);
     procedure aOpenExecute(Sender: TObject);
     procedure aPagePropertiesExecute(Sender: TObject);
-    procedure aPrinterSetupExecute(Sender: TObject);
     procedure aPrintExecute(Sender: TObject);
     procedure aSaveAsExecute(Sender: TObject);
     procedure aSaveExecute(Sender: TObject);
@@ -95,6 +91,7 @@ type
     FWordWrap: boolean;
     procedure MemoChange(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
+    procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
     procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol, aRow: integer);
     procedure EditComplite;
@@ -296,17 +293,34 @@ end;
 
 procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
 begin
-  printerSetupDialog.Execute;
-end;
-
-procedure TformNotetask.aPrinterSetupExecute(Sender: TObject);
-begin
-
+  pageSetupDialog.Execute;
 end;
 
 procedure TformNotetask.aPrintExecute(Sender: TObject);
+var
+  gridPrinter: TGridPrinter;
 begin
+  if printDialog.Execute then
+  begin
+    gridPrinter := TGridPrinter.Create(self);
+    gridPrinter.Grid := taskGrid;
+    gridPrinter.OnGetCellText := @PrinterGetCellText;
+    gridPrinter.Orientation := Printer.Orientation;
 
+    gridPrinter.FixedLineColor := clSilver;
+    gridPrinter.BorderLineColor := clSilver;
+    gridPrinter.FooterLineColor := clSilver;
+    gridPrinter.GridLineColor := clSilver;
+    gridPrinter.HeaderLineColor := clSilver;
+    gridPrinter.Print;
+    gridPrinter.Free;
+  end;
+end;
+
+procedure TformNotetask.PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
+begin
+  if AGrid is TStringGrid then
+    AText := TStringGrid(AGrid).Cells[ACol, ARow];
 end;
 
 procedure TformNotetask.aSaveAsExecute(Sender: TObject);
@@ -425,16 +439,16 @@ begin
 end;
 
 procedure TformNotetask.taskGridPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
-var
-  MyTextStyle: TTextStyle;
+//var
+//  MyTextStyle: TTextStyle;
 begin
-  if (aCol in [2, 3]) then
-  begin
-    MyTextStyle := taskGrid.Canvas.TextStyle;
-    MyTextStyle.SingleLine := False;
-    MyTextStyle.Wordbreak := True;
-    taskGrid.Canvas.TextStyle := MyTextStyle;
-  end;
+  //if (aCol in [2, 3]) then
+  //begin
+  //  MyTextStyle := taskGrid.Canvas.TextStyle;
+  //  MyTextStyle.SingleLine := False;
+  //  MyTextStyle.Wordbreak := True;
+  //  taskGrid.Canvas.TextStyle := MyTextStyle;
+  //end;
 end;
 
 procedure TformNotetask.taskGridEditButtonClick(Sender: TObject);

@@ -18,7 +18,7 @@ uses
   lineending,
   filemanager,
   task,
-  settings;
+  settings, GridPrn;
 
   {$R *.res}
 
