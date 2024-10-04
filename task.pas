@@ -5,7 +5,7 @@ unit task;
 interface
 
 uses
-  Classes, SysUtils, Grids;
+  Classes, SysUtils, Grids, Clipbrd;
 
 type
   // Class representing a single task
@@ -21,7 +21,7 @@ type
     property CompletionDate: TDateTime read FCompletionDate write FCompletionDate;
     property Comment: string read FComment write FComment;
     property TaskDescription: string read FTaskDescription write FTaskDescription;
-    function ToString(Index: integer = 0): string;
+    function ToString(Index: integer = 0; AddEmptyCompletion: boolean = True): string;
   end;
 
   // Class representing a collection of tasks
@@ -38,6 +38,7 @@ type
     procedure SetTask(Grid: TStringGrid; Row, Col: integer);
     procedure RemoveTask(Index: integer);
     function Count: integer; // Method to get the number of tasks
+    procedure CopyToClipboard(Grid: TStringGrid);
     procedure FillGrid(Grid: TStringGrid; SortOrder: TSortOrder = soAscending);
     function ToStringList: TStringList;
   end;
@@ -104,28 +105,33 @@ begin
   end
   else
     FTaskDescription := CompletedStr.Trim;
+
+  FTaskDescription := StringReplace(FTaskDescription, '<br>', sLineBreak, [rfReplaceAll]);
+  FComment := StringReplace(FComment, '<br>', sLineBreak, [rfReplaceAll]);
 end;
 
-function TTask.ToString(Index: integer = 0): string;
+function TTask.ToString(Index: integer = 0; AddEmptyCompletion: boolean = True): string;
 var
   TaskString: string;
   CompletionStatus: string;
   CommentPart: string;
 begin
-  // Удаляем переносы строк из описания задачи
-  TaskString := StringReplace(TaskDescription, sLineBreak, ' ', [rfReplaceAll]);
+  // Replace line breaks from task desctioption and comment
+  TaskString := StringReplace(TaskDescription, sLineBreak, '<br>', [rfReplaceAll]);
+  Comment := StringReplace(Comment, sLineBreak, '<br>', [rfReplaceAll]);
 
-  // Определяем статус завершенности
+  // Check completion
   if IsCompleted then
     CompletionStatus := '- [x]'
   else
+  if AddEmptyCompletion then
     CompletionStatus := '- [ ]';
 
-  // Проверяем, есть ли комментарий
-  if Comment <> '' then
+  // Check comments
+  if Comment <> string.Empty then
     CommentPart := ' *// ' + Comment + '*'
   else
-    CommentPart := '';
+    CommentPart := string.Empty;
 
   // Формируем строку задачи в зависимости от переданного индекса
   case Index of
@@ -134,16 +140,16 @@ begin
     3: Result := CommentPart; // Возвращаем только комментарий
     4:
       if CompletionDate > 0 then
-        Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, CompletionDate)
+        Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, CompletionDate).Trim
       else
-        Result := ''; // Если даты завершения нет, возвращаем пустую строку
+        Result := string.Empty; // Если даты завершения нет, возвращаем пустую строку
     else
       // Формируем строку задачи с учетом даты завершения и комментария
       if CompletionDate > 0 then
         Result := Format('%s %s, %s%s', [CompletionStatus, FormatDateTime(FormatSettings.ShortDateFormat +
-          ' ' + FormatSettings.LongTimeFormat, CompletionDate), TaskString, CommentPart])
+          ' ' + FormatSettings.LongTimeFormat, CompletionDate), TaskString, CommentPart]).Trim
       else
-        Result := Format('%s %s%s', [CompletionStatus, TaskString, CommentPart]);
+        Result := Format('%s %s%s', [CompletionStatus, TaskString, CommentPart]).Trim;
   end;
 end;
 
@@ -251,6 +257,42 @@ begin
   Result := FCount; // Return the number of tasks
 end;
 
+procedure TTasks.CopyToClipboard(Grid: TStringGrid);
+var
+  SelectedText: TStringList;
+  Rect: TGridRect;
+  CompletionState, TaskDescription, Comment, CompletionDate: string;
+  RowText: string;
+  i, j: integer;
+begin
+  SelectedText := TStringList.Create;
+  try
+    // Get grid selection rect
+    Rect := Grid.Selection;
+
+    for i := Rect.Top to Rect.Bottom do
+    begin
+      for j := Rect.Left to Rect.Right do
+      begin
+        if (j = 1) then CompletionState := GetTask(i - 1).ToString(j).Trim;
+        if (j = 2) then TaskDescription := GetTask(i - 1).ToString(j).Trim;
+        if (j = 3) then Comment := GetTask(i - 1).ToString(j).Trim;
+        if (j = 4) then CompletionDate := GetTask(i - 1).ToString(j).Trim;
+      end;
+      RowText := (CompletionState + ' ' + CompletionDate).Trim + ' ' + (TaskDescription + ' ' + Comment).Trim;
+      SelectedText.Add(RowText.Trim);
+    end;
+
+    // Copy to clipboard
+    if SelectedText.Count > 0 then
+    begin
+      Clipboard.AsText := SelectedText.Text;
+    end;
+  finally
+    SelectedText.Free;
+  end;
+end;
+
 procedure TTasks.FillGrid(Grid: TStringGrid; SortOrder: TSortOrder = soAscending);
 var
   I, RowIndex: integer;
@@ -290,12 +332,17 @@ end;
 function TTasks.ToStringList: TStringList;
 var
   i: integer;
+  isCompleted: boolean;
 begin
   Result := TStringList.Create;
   try
+    isCompleted := False;
+    for i := 0 to FCount - 1 do
+      if FTaskList[i].IsCompleted then isCompleted := True;
+
     for i := 0 to FCount - 1 do
     begin
-      Result.Add(FTaskList[i].ToString); // Add task string to TStringList
+      Result.Add(FTaskList[i].ToString(0, isCompleted)); // Add task string to TStringList
     end;
   except
     Result.Free;

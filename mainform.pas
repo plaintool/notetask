@@ -97,7 +97,6 @@ type
   public
     procedure OpenFile(fileName: string);
     procedure SaveFile(fileName: string);
-    procedure CopyToClipboard;
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
   end;
@@ -111,6 +110,7 @@ resourcestring
   rrows = ' rows';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rsavechanges = 'Do you want to save the changes?';
+  rclearconfirm = 'Are you sure you want to clear this section?';
 
 implementation
 
@@ -149,25 +149,58 @@ end;
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   Row: integer;
-  ConfirmDelete: integer;
+  Confirm: integer;
+  i, j: integer;
+  Rect: TRect;
 begin
   if (Key = VK_DELETE) then
   begin
     if (not taskGrid.EditorMode) and (not IsEditing) then
     begin
-      Row := taskGrid.Row; // Get current row selected
-      if (Row > 0) and (Row <= Tasks.Count) then
+      if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
       begin
         // Show confirm delete dialog
-        ConfirmDelete := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
+        Confirm := MessageDlg(rclearconfirm, mtConfirmation, [mbYes, mbNo], 0);
 
-        if ConfirmDelete = mrYes then
+        if Confirm = mrYes then
         begin
-          // RemoveTask from collection
-          Tasks.RemoveTask(Row - 1);
-          taskGrid.DeleteRow(Row);
+          Rect := taskGrid.Selection;
+          for i := Rect.Top to Rect.Bottom do
+          begin
+            for j := Rect.Left to Rect.Right do
+            begin
+              if (j = 1) then Tasks.GetTask(i - 1).IsCompleted := False;
+              if (j = 2) then Tasks.GetTask(i - 1).TaskDescription := '';
+              if (j = 3) then Tasks.GetTask(i - 1).Comment := '';
+              if (j = 4) then Tasks.GetTask(i - 1).CompletionDate := 0;
+              if (j = 1) then
+                taskGrid.Cells[j, i] := '0'
+              else
+                taskGrid.Cells[j, i] := string.Empty;
+            end;
+          end;
+          SetChanged;
         end;
         Abort;
+      end
+      else
+      begin
+        // Get current row selected
+        Row := taskGrid.Row;
+        if (Row > 0) and (Row <= Tasks.Count) then
+        begin
+          // Show confirm delete dialog
+          Confirm := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+          if Confirm = mrYes then
+          begin
+            // RemoveTask from collection
+            Tasks.RemoveTask(Row - 1);
+            taskGrid.DeleteRow(Row);
+            SetChanged;
+          end;
+          Abort;
+        end;
       end;
     end
     else
@@ -190,7 +223,7 @@ begin
   else
   if (ssCtrl in Shift) and (Key = VK_C) then
   begin
-    CopyToClipboard;
+    Tasks.CopyToClipboard(taskGrid);
     Abort;
   end;
 end;
@@ -586,7 +619,6 @@ begin
   Memo.Text := taskGrid.Cells[aCol, aRow];
   Memo.CaretPos := Point(Length(Memo.Text), 0);
 
-  IsEditing := True;
   if (NeedFocusMemo) then
   begin
     Memo.SelectAll;
@@ -600,9 +632,13 @@ begin
   begin
     IsSelecting := False;
     Memo.Visible := False;
+    IsEditing := False;
   end
   else
+  begin
     Memo.Visible := True;
+    IsEditing := True;
+  end;
 end;
 
 procedure TformNotetask.EditCell(aCol, aRow: integer);
@@ -626,43 +662,6 @@ begin
   taskGrid.EditorMode := False;
   IsEditing := False; // Reset editing flag when exiting
   //  NeedFocusMemo := False;
-end;
-
-procedure TformNotetask.CopyToClipboard;
-var
-  SelectedText: TStringList;
-  Rect: TGridRect;
-  CompletionState, TaskDescription, Comment, CompletionDate: string;
-  RowText: string;
-  i, j: integer;
-begin
-  SelectedText := TStringList.Create;
-  try
-    // Получаем выделенный прямоугольник
-    Rect := taskGrid.Selection;
-
-    // Проходим по всем выделенным ячейкам
-    for i := Rect.Top to Rect.Bottom do
-    begin
-      for j := Rect.Left to Rect.Right do
-      begin
-        if (j = 1) then CompletionState := Tasks.GetTask(i - 1).ToString(j).Trim;
-        if (j = 2) then TaskDescription := Tasks.GetTask(i - 1).ToString(j).Trim;
-        if (j = 3) then Comment := Tasks.GetTask(i - 1).ToString(j).Trim;
-        if (j = 4) then CompletionDate := Tasks.GetTask(i - 1).ToString(j).Trim;
-      end;
-      RowText := (CompletionState + ' ' + CompletionDate).Trim + ' ' + (TaskDescription + ' ' + Comment).Trim;
-      SelectedText.Add(RowText.Trim);
-    end;
-
-    // Копируем полученные тексты в буфер обмена
-    if SelectedText.Count > 0 then
-    begin
-      Clipboard.AsText := SelectedText.Text; // Копируем текст в буфер обмена
-    end;
-  finally
-    SelectedText.Free;
-  end;
 end;
 
 
