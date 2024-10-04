@@ -18,12 +18,10 @@ type
   public
     constructor Create(const TaskString: string); // Constructor that takes a task string
     property IsCompleted: boolean read FIsCompleted write FIsCompleted;
-    // Property for completion status
     property CompletionDate: TDateTime read FCompletionDate write FCompletionDate;
-    // Property for completion date
-    property Comment: string read FComment write FComment; // Property for comment
+    property Comment: string read FComment write FComment;
     property TaskDescription: string read FTaskDescription write FTaskDescription;
-    // Property for task description
+    function ToString(Index: integer = 0): string;
   end;
 
   // Class representing a collection of tasks
@@ -63,7 +61,7 @@ begin
       Break;
     end;
   end;
-  Result := TrimLeft(Result); // Удаление лишних пробелов в начале строки
+  Result := TrimLeft(Result); // Remove spaces from begining of string
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -106,6 +104,47 @@ begin
   end
   else
     FTaskDescription := CompletedStr.Trim;
+end;
+
+function TTask.ToString(Index: integer = 0): string;
+var
+  TaskString: string;
+  CompletionStatus: string;
+  CommentPart: string;
+begin
+  // Удаляем переносы строк из описания задачи
+  TaskString := StringReplace(TaskDescription, sLineBreak, ' ', [rfReplaceAll]);
+
+  // Определяем статус завершенности
+  if IsCompleted then
+    CompletionStatus := '- [x]'
+  else
+    CompletionStatus := '- [ ]';
+
+  // Проверяем, есть ли комментарий
+  if Comment <> '' then
+    CommentPart := ' *// ' + Comment + '*'
+  else
+    CommentPart := '';
+
+  // Формируем строку задачи в зависимости от переданного индекса
+  case Index of
+    1: Result := CompletionStatus; // Возвращаем только статус завершенности
+    2: Result := TaskString; // Возвращаем только строку задачи
+    3: Result := CommentPart; // Возвращаем только комментарий
+    4:
+      if CompletionDate > 0 then
+        Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, CompletionDate)
+      else
+        Result := ''; // Если даты завершения нет, возвращаем пустую строку
+    else
+      // Формируем строку задачи с учетом даты завершения и комментария
+      if CompletionDate > 0 then
+        Result := Format('%s %s, %s%s', [CompletionStatus, FormatDateTime(FormatSettings.ShortDateFormat +
+          ' ' + FormatSettings.LongTimeFormat, CompletionDate), TaskString, CommentPart])
+      else
+        Result := Format('%s %s%s', [CompletionStatus, TaskString, CommentPart]);
+  end;
 end;
 
 { TTasks }
@@ -250,42 +289,17 @@ end;
 
 function TTasks.ToStringList: TStringList;
 var
-  TaskString: string;
-  CompletionStatus: string;
-  CommentPart: string;
   i: integer;
 begin
-  Result := TStringList.Create; // Создаем новый TStringList
+  Result := TStringList.Create;
   try
     for i := 0 to FCount - 1 do
     begin
-      // Удаляем переносы строк из описания задачи
-      TaskString := StringReplace(FTaskList[i].TaskDescription, sLineBreak, ' ', [rfReplaceAll]);
-
-      // Определяем статус завершенности
-      if FTaskList[i].IsCompleted then
-        CompletionStatus := '- [x]'
-      else
-        CompletionStatus := '- [ ]';
-
-      // Проверяем, есть ли комментарий
-      if FTaskList[i].Comment <> '' then
-        CommentPart := ' *// ' + FTaskList[i].Comment + '*'
-      else
-        CommentPart := '';
-
-      // Формируем строку задачи с учетом даты завершения и комментария
-      if FTaskList[i].CompletionDate > 0 then
-        TaskString := Format('%s %s, %s%s', [CompletionStatus, FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, FTaskList[i].CompletionDate),
-          TaskString, CommentPart])
-      else
-        TaskString := Format('%s %s%s', [CompletionStatus, TaskString, CommentPart]);
-
-      Result.Add(TaskString); // Добавляем строку задачи в TStringList
+      Result.Add(FTaskList[i].ToString); // Add task string to TStringList
     end;
   except
-    Result.Free; // Освобождаем ресурсы в случае ошибки
-    raise; // Повторно генерируем исключение
+    Result.Free;
+    raise;
   end;
 end;
 

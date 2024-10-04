@@ -20,6 +20,10 @@ msgctxt "mainform.rrows"
 msgid " rows"
 msgstr " строк"
 
+#: mainform.rsavechanges
+msgid "Do you want to save the changes?"
+msgstr "Сохранить изменения?"
+
 #: tformnotetask.aexit.caption
 msgid "Exit"
 msgstr "Выход"
@@ -60,6 +64,10 @@ msgstr "Сохранить"
 msgid "Save as..."
 msgstr "Сохранить как..."
 
+#: tformnotetask.awordwrap.caption
+msgid "Word wrap"
+msgstr "Перенос по словам"
+
 #: tformnotetask.calendardialog.cancelcaption
 msgid "Cancel"
 msgstr "Отмена"
@@ -88,7 +96,21 @@ msgstr "Файл"
 msgid "Format"
 msgstr "Формат"
 
+#: tformnotetask.menuitem1.caption
+msgid "MenuItem1"
+msgstr ""
+
+#: tformnotetask.menutask.caption
+#, fuzzy
+#| msgid "Task"
+msgctxt "tformnotetask.menutask.caption"
+msgid "Task"
+msgstr "Задача"
+
 #: tformnotetask.taskgrid.columns[1].title.caption
+#, fuzzy
+#| msgid "Task"
+msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
 msgid "Task"
 msgstr "Задача"
 

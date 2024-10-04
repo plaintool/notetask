@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Types, CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs,
-  LCLIntf, LCLType, ExtDlgs, LMessages, task, lineending;
+  LCLIntf, LCLType, ExtDlgs, LMessages, Clipbrd, task, lineending;
 
 type
 
@@ -68,32 +68,37 @@ type
     procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
     procedure taskGridEditButtonClick(Sender: TObject);
-    procedure taskGridEditingDone(Sender: TObject);
     procedure taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
+    procedure taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure taskGridMouseLeave(Sender: TObject);
     procedure taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
     procedure taskGridPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure taskGridResize(Sender: TObject);
+    procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
     procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
   private
     Memo: TMemo;
     FChanged: boolean;
     IsEditing: boolean;
+    IsSelecting: boolean;
     NeedFocusMemo: boolean;
     FFileName: string;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
     FWordWrap: boolean;
     procedure MemoChange(Sender: TObject);
-    procedure MemoExit(Sender: TObject);
+    procedure MemoSetBounds(aCol: integer; aRow: integer);
+    procedure SetChanged(aChanged: boolean = True);
+    procedure EditCell(aCol, aRow: integer);
+    procedure EditComplite;
+    function IsCanClose: boolean;
   public
     procedure OpenFile(fileName: string);
     procedure SaveFile(fileName: string);
-    procedure SetChanged(aChanged: boolean = True);
-    function CheckCanClose: boolean;
-    procedure EditCell(aCol, aRow: integer);
-    procedure EditComplite;
+    procedure CopyToClipboard;
+
     property WordWrap: boolean read FWordWrap write FWordWrap;
   end;
 
@@ -176,9 +181,17 @@ begin
     Abort;
   end
   else
-  if (Key = VK_RETURN) or (Key = VK_F2) then
+  if (Key = VK_F2) then
   begin
+    EditComplite;
     EditCell(taskGrid.Col, taskGrid.Row);
+    Abort;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_C) then
+  begin
+    CopyToClipboard;
+    Abort;
   end;
 end;
 
@@ -201,7 +214,7 @@ procedure TformNotetask.aNewExecute(Sender: TObject);
 begin
   // Создаем экземпляр TTasks с переданным списком строк
   Tasks := TTasks.Create();
-  if CheckCanClose then
+  if IsCanClose then
   begin
     SetChanged(False);
     FFileName := string.Empty;
@@ -238,7 +251,7 @@ begin
   Invalidate;
 end;
 
-function TformNotetask.CheckCanClose: boolean;
+function TformNotetask.IsCanClose: boolean;
 var
   UserResponse: integer;
 begin
@@ -259,11 +272,8 @@ begin
         // Do not save, but allow form to close
         Result := True;
       end;
-      mrCancel:
-      begin
-        // Cancel the form closing
+      else
         Result := False;
-      end;
     end;
   end
   else
@@ -272,7 +282,7 @@ end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
-  CanClose := CheckCanClose;
+  CanClose := IsCanClose;
 end;
 
 procedure TformNotetask.OpenFile(fileName: string);
@@ -370,7 +380,12 @@ begin
       abort;
 
     if (OldValue <> NewValue) then
+    begin
       SetChanged;
+
+      Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
+      EditComplite;
+    end;
   end;
 end;
 
@@ -424,6 +439,21 @@ begin
   SaveGridSettings(taskGrid);
 end;
 
+procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
+begin
+  IsSelecting := True;
+end;
+
+procedure TformNotetask.taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  IsSelecting := False;
+end;
+
+procedure TformNotetask.taskGridMouseLeave(Sender: TObject);
+begin
+  IsSelecting := False;
+end;
+
 procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint; var Handled: boolean);
 begin
@@ -445,9 +475,17 @@ end;
 procedure TformNotetask.MemoChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-
+  MemoSetBounds(taskGrid.Col, taskGrid.Row);
   Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
   SetChanged;
+end;
+
+procedure TformNotetask.MemoSetBounds(aCol: integer; aRow: integer);
+var
+  Rect: TRect;
+begin
+  Rect := taskGrid.CellRect(aCol, aRow);
+  Memo.SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
 end;
 
 procedure TformNotetask.taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
@@ -462,15 +500,21 @@ begin
   grid := Sender as TStringGrid;
 
   // Determine background color
+  if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+  begin
+    bgFill := clHighlight;
+    grid.Canvas.Font.Color := clWhite; // Set font color to white when selected
+  end
+  else
   if gdRowHighlight in aState then
   begin
     bgFill := clRowHighlight;
-    grid.Canvas.Font.Color := clBlack; // Set font color to white when selected
+    grid.Canvas.Font.Color := clBlack;
   end
   else
   begin
     bgFill := clWhite;
-    grid.Canvas.Font.Color := clBlack; // Set font color to black when not selected
+    grid.Canvas.Font.Color := clBlack;
   end;
 
   // Fill the cell background
@@ -489,8 +533,8 @@ begin
       flags := dt_calcrect or dt_left;
     DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
 
-    if gdFocused in aState then
-      DrawFocusRect(grid.canvas.handle, drawrect);
+    //if gdFocused in aState then
+    //  DrawFocusRect(grid.canvas.handle, drawrect);
 
     if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
       grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2) // changing the row height fires the event again!
@@ -509,30 +553,39 @@ end;
 
 procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
 var
-  Rect: TRect;
+  h, w: integer;
 begin
-  if aCol in [1, 4] then exit;
+  if (aCol in [1, 4]) then exit;
+  if (Assigned(Memo)) then Memo.Free;
+
   Memo := TMemo.Create(Self);
-  Memo.Color := clRowHighlight;
+  Memo.Visible := False;
+  w := taskGrid.Selection.Width;
+  h := taskGrid.Selection.Height;
+  if (taskGrid.IsCellSelected[aCol, aRow]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+  begin
+    Memo.Color := clHighlight;
+    Memo.Font.Color := clWhite;
+  end
+  else
+  begin
+    Memo.Color := clRowHighlight;
+    Memo.Font.Color := clBlack;
+  end;
   Memo.Font.Name := taskGrid.Font.Name;
   Memo.Font.Size := taskGrid.Font.Size;
-  Memo.Font.Color := clBlack;
-
-  Memo.Visible := False;
-  Memo.Parent := taskGrid;
+  Memo.HideSelection := True;
+  Memo.TabStop := False;
   Memo.BorderStyle := bsNone;
-  Memo.OnChange := @MemoChange; // Event
-  Memo.OnExit := @MemoExit; // Set OnExit event
-
-  Rect := taskGrid.CellRect(aCol, aRow);
-  Memo.SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
-
-  Memo.Text := taskGrid.Cells[aCol, aRow];
-  Memo.WordWrap := FWordWrap; // WordWrap setting
+  Memo.WordWrap := FWordWrap;
   Memo.WantReturns := FWordWrap;
-  Editor := Memo;
+
+  MemoSetBounds(aCol, aRow);
+  Memo.Parent := taskGrid;
+  Memo.OnChange := @MemoChange; // Event
+  Memo.Text := taskGrid.Cells[aCol, aRow];
   Memo.CaretPos := Point(Length(Memo.Text), 0);
-  Memo.Visible := True;
+
   IsEditing := True;
   if (NeedFocusMemo) then
   begin
@@ -540,36 +593,77 @@ begin
     Memo.SetFocus;
     NeedFocusMemo := False;
   end;
-end;
 
-procedure TformNotetask.MemoExit(Sender: TObject);
-begin
-  //  IsEditing := False; // Reset editing flag when exiting
+  Editor := Memo;
+
+  if (IsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
+  begin
+    IsSelecting := False;
+    Memo.Visible := False;
+  end
+  else
+    Memo.Visible := True;
 end;
 
 procedure TformNotetask.EditCell(aCol, aRow: integer);
 begin
   taskGrid.Row := aRow;
   taskGrid.Col := aCol;
-  taskGrid.EditorMode := True; //Set editing mode
   IsEditing := True;
-  NeedFocusMemo := True;
+  //  NeedFocusMemo := True;
+  taskGrid.EditorMode := True; //Set editing mode
+
+  if (Assigned(Memo)) and (Memo.Visible) then
+  begin
+    Memo.SelectAll;
+    Memo.SetFocus;
+  end;
+
 end;
 
 procedure TformNotetask.EditComplite;
 begin
   taskGrid.EditorMode := False;
   IsEditing := False; // Reset editing flag when exiting
-  NeedFocusMemo := False;
+  //  NeedFocusMemo := False;
 end;
 
-procedure TformNotetask.taskGridEditingDone(Sender: TObject);
+procedure TformNotetask.CopyToClipboard;
+var
+  SelectedText: TStringList;
+  Rect: TGridRect;
+  CompletionState, TaskDescription, Comment, CompletionDate: string;
+  RowText: string;
+  i, j: integer;
 begin
-  if (taskGrid.Col = 4) then
-  begin
-    Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
-    EditComplite;
+  SelectedText := TStringList.Create;
+  try
+    // Получаем выделенный прямоугольник
+    Rect := taskGrid.Selection;
+
+    // Проходим по всем выделенным ячейкам
+    for i := Rect.Top to Rect.Bottom do
+    begin
+      for j := Rect.Left to Rect.Right do
+      begin
+        if (j = 1) then CompletionState := Tasks.GetTask(i - 1).ToString(j).Trim;
+        if (j = 2) then TaskDescription := Tasks.GetTask(i - 1).ToString(j).Trim;
+        if (j = 3) then Comment := Tasks.GetTask(i - 1).ToString(j).Trim;
+        if (j = 4) then CompletionDate := Tasks.GetTask(i - 1).ToString(j).Trim;
+      end;
+      RowText := (CompletionState + ' ' + CompletionDate).Trim + ' ' + (TaskDescription + ' ' + Comment).Trim;
+      SelectedText.Add(RowText.Trim);
+    end;
+
+    // Копируем полученные тексты в буфер обмена
+    if SelectedText.Count > 0 then
+    begin
+      Clipboard.AsText := SelectedText.Text; // Копируем текст в буфер обмена
+    end;
+  finally
+    SelectedText.Free;
   end;
 end;
+
 
 end.
