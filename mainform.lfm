@@ -14,7 +14,6 @@ object formNotetask: TformNotetask
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnResize = FormResize
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -191,20 +190,24 @@ object formNotetask: TformNotetask
     object aSaveAs: TAction
       Category = 'File'
       Caption = 'Save as...'
+      OnExecute = aSaveAsExecute
       ShortCut = 49235
     end
     object aPrinterSetup: TAction
       Category = 'File'
       Caption = 'Printer setup...'
+      OnExecute = aPrinterSetupExecute
     end
     object aPageProperties: TAction
       Category = 'File'
       Caption = 'Page properties...'
+      OnExecute = aPagePropertiesExecute
       ShortCut = 49232
     end
     object aPrint: TAction
       Category = 'File'
       Caption = 'Print...'
+      OnExecute = aPrintExecute
       ShortCut = 16464
     end
     object aExit: TAction

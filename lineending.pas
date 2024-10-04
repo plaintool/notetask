@@ -10,10 +10,10 @@ uses
 type
   TLineEnding = class
   public
-    class var WindowsCRLF: TLineEnding;
-    class var UnixLF: TLineEnding;
-    class var MacintoshCR: TLineEnding;
-    class var Unknown: TLineEnding;
+  class var WindowsCRLF: TLineEnding;
+  class var UnixLF: TLineEnding;
+  class var MacintoshCR: TLineEnding;
+  class var Unknown: TLineEnding;
     class constructor Create;
     function ToString: string; override;
   end;
@@ -41,4 +41,3 @@ begin
 end;
 
 end.
-

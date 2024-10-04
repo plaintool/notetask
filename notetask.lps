@@ -11,7 +11,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="4"/>
         <CursorPos X="11" Y="21"/>
-        <UsageCount Value="68"/>
+        <UsageCount Value="69"/>
       </Unit>
       <Unit>
         <Filename Value="mainform.pas"/>
@@ -19,44 +19,47 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="621"/>
-        <CursorPos X="25" Y="635"/>
-        <UsageCount Value="68"/>
+        <TopLine Value="289"/>
+        <CursorPos X="13" Y="305"/>
+        <UsageCount Value="69"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="lineending.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="7"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="12"/>
         <CursorPos X="5" Y="41"/>
-        <UsageCount Value="64"/>
+        <UsageCount Value="65"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="filemanager.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="105"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="106"/>
         <CursorPos X="14" Y="135"/>
-        <UsageCount Value="63"/>
+        <UsageCount Value="64"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="task.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="63"/>
-        <CursorPos X="42" Y="74"/>
-        <UsageCount Value="62"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="74" Y="13"/>
+        <UsageCount Value="63"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="settings.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="34"/>
         <CursorPos Y="45"/>
-        <UsageCount Value="56"/>
+        <UsageCount Value="57"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="stringgridex.pas"/>
@@ -135,23 +138,23 @@
     <JumpHistory HistoryIndex="4">
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="87" TopLine="74"/>
+        <Caret Line="364" Column="21" TopLine="360"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="642" Column="3" TopLine="637"/>
+        <Caret Line="303" Column="3" TopLine="301"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="536" TopLine="519"/>
+        <Caret Line="299" Column="3" TopLine="297"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="92" Column="15" TopLine="78"/>
+        <Caret Line="9" Column="84"/>
       </Position>
       <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="678" TopLine="653"/>
+        <Filename Value="task.pas"/>
+        <Caret Line="74" Column="42" TopLine="63"/>
       </Position>
     </JumpHistory>
     <CustomSessionData Count="2">

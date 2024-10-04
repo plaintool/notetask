@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Types, CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs,
+  Types, CheckLst, ValEdit, Grids, Menus, ActnList, ComCtrls, PrintersDlgs, GridPrn,
   LCLIntf, LCLType, ExtDlgs, LMessages, Clipbrd, Process, task, lineending;
 
 type
@@ -57,6 +57,10 @@ type
     procedure aNewExecute(Sender: TObject);
     procedure aNewWindowExecute(Sender: TObject);
     procedure aOpenExecute(Sender: TObject);
+    procedure aPagePropertiesExecute(Sender: TObject);
+    procedure aPrinterSetupExecute(Sender: TObject);
+    procedure aPrintExecute(Sender: TObject);
+    procedure aSaveAsExecute(Sender: TObject);
     procedure aSaveExecute(Sender: TObject);
     procedure aWordWrapExecute(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -87,6 +91,7 @@ type
     FFileName: string;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
+    FLineCount: integer;
     FWordWrap: boolean;
     procedure MemoChange(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
@@ -96,7 +101,8 @@ type
     function IsCanClose: boolean;
   public
     procedure OpenFile(fileName: string);
-    procedure SaveFile(fileName: string);
+    procedure SaveFile(fileName: string = string.Empty);
+    procedure InfoFile();
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
   end;
@@ -288,6 +294,29 @@ begin
   end;
 end;
 
+procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
+begin
+  printerSetupDialog.Execute;
+end;
+
+procedure TformNotetask.aPrinterSetupExecute(Sender: TObject);
+begin
+
+end;
+
+procedure TformNotetask.aPrintExecute(Sender: TObject);
+begin
+
+end;
+
+procedure TformNotetask.aSaveAsExecute(Sender: TObject);
+begin
+  if (saveDialog.Execute) then
+  begin
+    SaveFile(saveDialog.FileName);
+  end;
+end;
+
 procedure TformNotetask.aSaveExecute(Sender: TObject);
 begin
   SaveFile(FFileName);
@@ -343,33 +372,43 @@ end;
 procedure TformNotetask.OpenFile(fileName: string);
 var
   Content: string;
-  LineCount: integer;
+  i: integer;
 begin
   FFileName := fileName;
-
-  Caption := ExtractFileName(FFileName) + ' - ' + rapp;
-  ReadTextFile(FFileName, Content, FEncoding, FLineEnding, LineCount);
-  statusBar.Panels[1].Text := UpperCase(FEncoding.EncodingName);
-  statusBar.Panels[2].Text := FLineEnding.ToString;
-  statusBar.Panels[3].Text := LineCount.ToString + rrows;
+  ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
+  InfoFile;
 
   Tasks := TTasks.Create(TextToStringList(Content));
   Tasks.FillGrid(taskGrid);
+
+  for i := 0 to taskGrid.RowCount - 1 do
+  begin
+    taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight;
+  end;
 end;
 
-procedure TformNotetask.SaveFile(fileName: string);
+procedure TformNotetask.SaveFile(fileName: string = string.Empty);
 begin
-  if (fileName = string.Empty) and (saveDialog.Execute) then
-  begin
-    FFileName := saveDialog.FileName;
-    fileName := FFileName;
-  end;
+  if (fileName = string.Empty) then
+    fileName := FFileName
+  else
+    FFileName := fileName;
 
   if (fileName <> string.Empty) then
   begin
     SaveTextFile(fileName, Tasks.ToStringList, FEncoding, FLineEnding);
     SetChanged(False);
   end;
+
+  InfoFile;
+end;
+
+procedure TformNotetask.InfoFile();
+begin
+  Caption := ExtractFileName(FFileName) + ' - ' + rapp;
+  statusBar.Panels[1].Text := UpperCase(FEncoding.EncodingName);
+  statusBar.Panels[2].Text := FLineEnding.ToString;
+  statusBar.Panels[3].Text := FLineCount.ToString + rrows;
 end;
 
 procedure TformNotetask.SetChanged(aChanged: boolean = True);

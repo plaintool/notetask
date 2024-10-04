@@ -115,7 +115,7 @@ procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEnco
 var
   LineEndingStr: string;
   FileStream: TFileStream;
-  i: Integer;
+  i: integer;
   LineWithEnding: string;
   Bytes: TBytes;
 begin
