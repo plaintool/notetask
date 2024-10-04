@@ -76,8 +76,10 @@ type
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
     procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
   private
+    Memo: TMemo;
     FChanged: boolean;
     IsEditing: boolean;
+    NeedFocusMemo: boolean;
     FFileName: string;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
@@ -89,6 +91,8 @@ type
     procedure SaveFile(fileName: string);
     procedure SetChanged(aChanged: boolean = True);
     function CheckCanClose: boolean;
+    procedure EditCell(aCol, aRow: integer);
+    procedure EditComplite;
     property WordWrap: boolean read FWordWrap write FWordWrap;
   end;
 
@@ -141,33 +145,39 @@ var
   Row: integer;
   ConfirmDelete: integer;
 begin
-  if (Key = 46) then // #46 соответствует клавише Del
+  if (Key = VK_DELETE) then
   begin
     if (not taskGrid.EditorMode) and (not IsEditing) then
     begin
-      Row := taskGrid.Row; // Получаем текущую выбранную строку
+      Row := taskGrid.Row; // Get current row selected
       if (Row > 0) and (Row <= Tasks.Count) then
       begin
-        // Показываем диалог для подтверждения удаления
+        // Show confirm delete dialog
         ConfirmDelete := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
 
         if ConfirmDelete = mrYes then
         begin
-          Tasks.RemoveTask(Row - 1); // Удаляем задачу из коллекции
-          taskGrid.DeleteRow(Row); // Удаляем строку из грида
-          Abort;
+          // RemoveTask from collection
+          Tasks.RemoveTask(Row - 1);
+          taskGrid.DeleteRow(Row);
         end;
+        Abort;
       end;
     end
     else
       Abort;
   end
   else
-  if (Key = 27) then
+  if (Key = VK_ESCAPE) then
   begin
     if (taskGrid.EditorMode) or (IsEditing) then
-      taskGrid.EditorMode := False;
+      EditComplite;
     Abort;
+  end
+  else
+  if (Key = VK_RETURN) or (Key = VK_F2) then
+  begin
+    EditCell(taskGrid.Col, taskGrid.Row);
   end;
 end;
 
@@ -218,7 +228,7 @@ procedure TformNotetask.aWordWrapExecute(Sender: TObject);
 var
   i: integer;
 begin
-  taskGrid.EditorMode := False;
+  EditComplite;
   FWordWrap := aWordWrap.Checked;
   for i := 0 to taskGrid.RowCount - 1 do
   begin
@@ -365,7 +375,7 @@ end;
 
 procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
 begin
-  taskGrid.EditorMode := False;
+  EditComplite;
   if IsColumn then
   begin
     if Index = 0 then
@@ -416,7 +426,7 @@ end;
 procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint; var Handled: boolean);
 begin
-  taskGrid.EditorMode := False;
+  EditComplite;
 end;
 
 procedure TformNotetask.taskGridResize(Sender: TObject);
@@ -498,7 +508,6 @@ end;
 
 procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
 var
-  Memo: TMemo;
   Rect: TRect;
 begin
   if aCol in [1, 4] then exit;
@@ -521,12 +530,33 @@ begin
   Memo.WordWrap := FWordWrap; // WordWrap setting
   Memo.WantReturns := FWordWrap;
   Editor := Memo;
+  Memo.CaretPos := Point(Length(Memo.Text), 0);
   Memo.Visible := True;
   IsEditing := True;
+  if (NeedFocusMemo) then
+  begin
+    Memo.SetFocus;
+    NeedFocusMemo := False;
+  end;
 end;
 
 procedure TformNotetask.MemoExit(Sender: TObject);
 begin
+//  IsEditing := False; // Reset editing flag when exiting
+end;
+
+procedure TformNotetask.EditCell(aCol, aRow: integer);
+begin
+  taskGrid.Row := aRow;
+  taskGrid.Col := aCol;
+  taskGrid.EditorMode := True; //Set editing mode
+  IsEditing := True;
+  NeedFocusMemo := True;
+end;
+
+procedure TformNotetask.EditComplite;
+begin
+  taskGrid.EditorMode := False;
   IsEditing := False; // Reset editing flag when exiting
 end;
 
