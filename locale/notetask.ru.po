@@ -101,7 +101,7 @@ msgstr "Открыть..."
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."
-msgstr "Свойства страницы..."
+msgstr "Параметры страницы..."
 
 #: tformnotetask.aprint.caption
 msgid "Print..."
