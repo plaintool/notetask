@@ -36,7 +36,13 @@ type
     procedure AddTask(const TaskString: string); // Method to add a task
     function GetTask(Index: integer): TTask; // Method to get a task by index
     procedure SetTask(Grid: TStringGrid; Row, Col: integer);
+    procedure InsertTask(const TaskString: string; Index: integer);
     procedure RemoveTask(Index: integer);
+    procedure ClearTasksInRect(Rect: TGridRect);
+    procedure MoveTaskUp(Index: integer);
+    procedure MoveTaskDown(Index: integer);
+    procedure MoveTaskToTop(Index: integer);
+    procedure MoveTaskToBottom(Index: integer);
     function Count: integer; // Method to get the number of tasks
     procedure CopyToClipboard(Grid: TStringGrid);
     procedure FillGrid(Grid: TStringGrid; SortOrder: TSortOrder = soAscending);
@@ -231,6 +237,27 @@ begin
     raise Exception.Create('Invalid row or task index');
 end;
 
+procedure TTasks.InsertTask(const TaskString: string; Index: integer);
+var
+  Task: TTask;
+  i: integer;
+begin
+  if (Index < 0) or (Index > FCount) then
+    raise Exception.Create('Index out of bounds'); // Error handling for invalid index
+
+  Task := TTask.Create(TaskString); // Create a new task
+  SetLength(FTaskList, FCount + 1); // Resize the array
+
+  // Shift tasks to the right to make space for the new task
+  for i := FCount downto Index do
+  begin
+    FTaskList[i] := FTaskList[i - 1]; // Move tasks one position to the right
+  end;
+
+  FTaskList[Index] := Task; // Insert the new task at the specified index
+  Inc(FCount); // Increment the task count
+end;
+
 procedure TTasks.RemoveTask(Index: integer);
 var
   i: integer;
@@ -239,7 +266,8 @@ begin
     exit;
 
   // Free the task that is being removed
-  FTaskList[Index].Free;
+  if (Assigned(FTaskList[Index])) then
+    FTaskList[Index].Free;
 
   // Shift tasks down to fill the gap
   for i := Index to FCount - 2 do
@@ -250,6 +278,102 @@ begin
   // Resize the array to remove the last (now duplicate) element
   SetLength(FTaskList, FCount - 1);
   Dec(FCount); // Decrease the task count
+end;
+
+procedure TTasks.ClearTasksInRect(Rect: TGridRect);
+var
+  i, j: integer;
+begin
+  for i := Rect.Top to Rect.Bottom do
+  begin
+    for j := Rect.Left to Rect.Right do
+    begin
+      // Clearing task fields based on the column
+      if (j = 1) then
+        GetTask(i - 1).IsCompleted := False; // Reset completion status
+      if (j = 2) then
+        GetTask(i - 1).TaskDescription := ''; // Clear task description
+      if (j = 3) then
+        GetTask(i - 1).Comment := ''; // Clear comment
+      if (j = 4) then
+        GetTask(i - 1).CompletionDate := 0; // Reset completion date
+    end;
+  end;
+end;
+
+procedure TTasks.MoveTaskUp(Index: integer);
+var
+  TempTask: TTask;   // Temporary variable for swapping tasks
+begin
+  if (Index > 0) and (Index < FCount) then
+  begin
+    // Save the task in the temporary variable
+    TempTask := FTaskList[Index];
+
+    // Shift the task at Index - 1 to Index
+    FTaskList[Index] := FTaskList[Index - 1];
+
+    // Place the temporary task in Index - 1
+    FTaskList[Index - 1] := TempTask;
+  end;
+end;
+
+procedure TTasks.MoveTaskDown(Index: integer);
+var
+  TempTask: TTask;
+begin
+  // Check if the index is valid and not the last task
+  if (Index >= 0) and (Index < FCount - 1) then
+  begin
+    // Temporarily store the task at the current index
+    TempTask := FTaskList[Index];
+
+    // Move the task below to the current index
+    FTaskList[Index] := FTaskList[Index + 1];
+
+    // Place the stored task below
+    FTaskList[Index + 1] := TempTask;
+  end;
+end;
+
+procedure TTasks.MoveTaskToTop(Index: integer);
+var
+  i: integer;
+  TempTask: TTask; // Declare the temporary variable here
+begin
+  // Check if the index is valid and not already at the top
+  if (Index > 0) and (Index < FCount) then
+  begin
+    // Store the task at the given index
+    TempTask := FTaskList[Index];
+
+    // Shift tasks down to make room at the top
+    for i := Index downto 1 do
+      FTaskList[i] := FTaskList[i - 1];
+
+    // Place the stored task at the top
+    FTaskList[0] := TempTask;
+  end;
+end;
+
+procedure TTasks.MoveTaskToBottom(Index: integer);
+var
+  i: integer;
+  TempTask: TTask; // Declare the temporary variable here
+begin
+  // Check if the index is valid and not already at the bottom
+  if (Index >= 0) and (Index < FCount - 1) then
+  begin
+    // Store the task at the given index
+    TempTask := FTaskList[Index];
+
+    // Shift all tasks down to fill the gap
+    for i := Index to FCount - 2 do
+      FTaskList[i] := FTaskList[i + 1];
+
+    // Place the stored task at the end
+    FTaskList[FCount - 1] := TempTask;
+  end;
 end;
 
 function TTasks.Count: integer;

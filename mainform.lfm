@@ -153,13 +153,31 @@ object formNotetask: TformNotetask
     end
     object menuTask: TMenuItem
       Caption = 'Task'
-      object MenuItem1: TMenuItem
-        Caption = 'MenuItem1'
+      object menuInsertTask: TMenuItem
+        Action = aInsertTask
+      end
+      object menuDeleteTask: TMenuItem
+        Action = ADeleteTask
+      end
+      object Separator2: TMenuItem
+        Caption = '-'
+      end
+      object menuMoveTaskTop: TMenuItem
+        Action = aMoveTaskTop
+      end
+      object menuMoveTaskUp: TMenuItem
+        Action = aMoveTaskUp
+      end
+      object menuMoveTaskDown: TMenuItem
+        Action = aMoveTaskDown
+      end
+      object menuMoveTaskBottom: TMenuItem
+        Action = aMoveTaskBottom
       end
     end
   end
   object ActionList: TActionList
-    Left = 232
+    Left = 240
     Top = 112
     object aNew: TAction
       Category = 'File'
@@ -220,6 +238,41 @@ object formNotetask: TformNotetask
       Caption = 'Word wrap'
       Checked = True
       OnExecute = aWordWrapExecute
+    end
+    object aInsertTask: TAction
+      Category = 'Task'
+      Caption = 'Insert task'
+      OnExecute = aInsertTaskExecute
+    end
+    object ADeleteTask: TAction
+      Category = 'Task'
+      Caption = 'Delete task'
+      OnExecute = ADeleteTaskExecute
+      ShortCut = 46
+    end
+    object aMoveTaskTop: TAction
+      Category = 'Task'
+      Caption = 'Move task to top'
+      OnExecute = aMoveTaskTopExecute
+      ShortCut = 16417
+    end
+    object aMoveTaskUp: TAction
+      Category = 'Task'
+      Caption = 'Move task up'
+      OnExecute = aMoveTaskUpExecute
+      ShortCut = 16422
+    end
+    object aMoveTaskDown: TAction
+      Category = 'Task'
+      Caption = 'Move task down'
+      OnExecute = aMoveTaskDownExecute
+      ShortCut = 16424
+    end
+    object aMoveTaskBottom: TAction
+      Category = 'Task'
+      Caption = 'Move task to bottom'
+      OnExecute = aMoveTaskBottomExecute
+      ShortCut = 16418
     end
   end
   object openDialog: TOpenDialog

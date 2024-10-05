@@ -37,12 +37,36 @@ msgstr ""
 msgid "Untitled"
 msgstr ""
 
+#: tformnotetask.adeletetask.caption
+msgid "Delete task"
+msgstr ""
+
 #: tformnotetask.aexit.caption
 msgid "Exit"
 msgstr ""
 
 #: tformnotetask.afont.caption
 msgid "Font..."
+msgstr ""
+
+#: tformnotetask.ainserttask.caption
+msgid "Insert task"
+msgstr ""
+
+#: tformnotetask.amovetaskbottom.caption
+msgid "Move task to bottom"
+msgstr ""
+
+#: tformnotetask.amovetaskdown.caption
+msgid "Move task down"
+msgstr ""
+
+#: tformnotetask.amovetasktop.caption
+msgid "Move task to top"
+msgstr ""
+
+#: tformnotetask.amovetaskup.caption
+msgid "Move task up"
 msgstr ""
 
 #: tformnotetask.anew.caption
@@ -104,10 +128,6 @@ msgstr ""
 
 #: tformnotetask.menuformat.caption
 msgid "Format"
-msgstr ""
-
-#: tformnotetask.menuitem1.caption
-msgid "MenuItem1"
 msgstr ""
 
 #: tformnotetask.menutask.caption

@@ -55,6 +55,10 @@ msgstr ""
 msgid "Untitled"
 msgstr "Безымянный"
 
+#: tformnotetask.adeletetask.caption
+msgid "Delete task"
+msgstr "Удалить задачу"
+
 #: tformnotetask.aexit.caption
 msgid "Exit"
 msgstr "Выход"
@@ -62,6 +66,26 @@ msgstr "Выход"
 #: tformnotetask.afont.caption
 msgid "Font..."
 msgstr "Шрифт..."
+
+#: tformnotetask.ainserttask.caption
+msgid "Insert task"
+msgstr "Вставить задачу"
+
+#: tformnotetask.amovetaskbottom.caption
+msgid "Move task to bottom"
+msgstr "Переместить задачу в конец"
+
+#: tformnotetask.amovetaskdown.caption
+msgid "Move task down"
+msgstr "Переместить задачу вниз"
+
+#: tformnotetask.amovetasktop.caption
+msgid "Move task to top"
+msgstr "Переместить задачу в начало"
+
+#: tformnotetask.amovetaskup.caption
+msgid "Move task up"
+msgstr "Переместить задачу вверх"
 
 #: tformnotetask.anew.caption
 msgid "New"
@@ -123,10 +147,6 @@ msgstr "Файл"
 #: tformnotetask.menuformat.caption
 msgid "Format"
 msgstr "Формат"
-
-#: tformnotetask.menuitem1.caption
-msgid "MenuItem1"
-msgstr ""
 
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"

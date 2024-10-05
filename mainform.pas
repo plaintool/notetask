@@ -13,6 +13,12 @@ type
 
   { TformNotetask }
   TformNotetask = class(TForm)
+    aMoveTaskBottom: TAction;
+    aMoveTaskDown: TAction;
+    aMoveTaskUp: TAction;
+    aInsertTask: TAction;
+    aMoveTaskTop: TAction;
+    ADeleteTask: TAction;
     aWordWrap: TAction;
     aFont: TAction;
     aExit: TAction;
@@ -30,7 +36,12 @@ type
     menuFile: TMenuItem;
     menuFormat: TMenuItem;
     menuFont: TMenuItem;
-    MenuItem1: TMenuItem;
+    menuInsertTask: TMenuItem;
+    menuDeleteTask: TMenuItem;
+    menuMoveTaskTop: TMenuItem;
+    menuMoveTaskUp: TMenuItem;
+    menuMoveTaskDown: TMenuItem;
+    menuMoveTaskBottom: TMenuItem;
     menuWordWrap: TMenuItem;
     menuTask: TMenuItem;
     menuNewWindow: TMenuItem;
@@ -46,11 +57,18 @@ type
     saveDialog: TSaveDialog;
     Separator1: TMenuItem;
     menuExit: TMenuItem;
+    Separator2: TMenuItem;
     Separator3: TMenuItem;
     statusBar: TStatusBar;
     taskGrid: TStringGrid;
+    procedure ADeleteTaskExecute(Sender: TObject);
     procedure aExitExecute(Sender: TObject);
     procedure aFontExecute(Sender: TObject);
+    procedure aInsertTaskExecute(Sender: TObject);
+    procedure aMoveTaskBottomExecute(Sender: TObject);
+    procedure aMoveTaskDownExecute(Sender: TObject);
+    procedure aMoveTaskTopExecute(Sender: TObject);
+    procedure aMoveTaskUpExecute(Sender: TObject);
     procedure aNewExecute(Sender: TObject);
     procedure aNewWindowExecute(Sender: TObject);
     procedure aOpenExecute(Sender: TObject);
@@ -98,12 +116,14 @@ type
     procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol, aRow: integer);
     procedure EditComplite;
+    procedure SetInfo;
+    procedure SetCaption;
+    procedure ClearSelected;
+    procedure DeleteTask(aRow: integer = 0);
     function IsCanClose: boolean;
   public
     procedure OpenFile(fileName: string);
     procedure SaveFile(fileName: string = string.Empty);
-    procedure SetInfo();
-    procedure SetCaption();
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
   end;
@@ -138,7 +158,7 @@ var
   FilePath: string;
 begin
   FWordWrap := True;
-  clRowHighlight := RGBToColor(224, 224, 224);
+  clRowHighlight := RGBToColor(210, 230, 255);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
@@ -179,12 +199,67 @@ begin
   ResourceBitmapUncheck.Free;
 end;
 
-procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+procedure TformNotetask.ClearSelected;
 var
-  Row: integer;
   Confirm: integer;
   i, j: integer;
   Rect: TRect;
+begin
+  if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+  begin
+    // Show confirm delete dialog
+    Confirm := MessageDlg(rclearconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+    if Confirm = mrYes then
+    begin
+      Rect := taskGrid.Selection;
+      for i := Rect.Top to Rect.Bottom do
+      begin
+        for j := Rect.Left to Rect.Right do
+        begin
+          if (j = 1) then Tasks.GetTask(i - 1).IsCompleted := False;
+          if (j = 2) then Tasks.GetTask(i - 1).TaskDescription := '';
+          if (j = 3) then Tasks.GetTask(i - 1).Comment := '';
+          if (j = 4) then Tasks.GetTask(i - 1).CompletionDate := 0;
+          if (j = 1) then
+            taskGrid.Cells[j, i] := '0'
+          else
+            taskGrid.Cells[j, i] := string.Empty;
+        end;
+      end;
+      SetChanged;
+      FLineCount := Tasks.Count;
+      SetInfo;
+    end;
+  end;
+end;
+
+procedure TformNotetask.DeleteTask(aRow: integer = 0);
+var
+  Row: integer;
+  Confirm: integer;
+begin
+  // Get current row selected
+  if (aRow = 0) then
+    Row := taskGrid.Row
+  else
+    Row := aRow;
+  if (Row > 0) and (Row <= Tasks.Count) then
+  begin
+    // Show confirm delete dialog
+    Confirm := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+    if Confirm = mrYes then
+    begin
+      // RemoveTask from collection
+      Tasks.RemoveTask(Row - 1);
+      taskGrid.DeleteRow(Row);
+      SetChanged;
+    end;
+  end;
+end;
+
+procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if (Key = VK_DELETE) then
   begin
@@ -192,52 +267,13 @@ begin
     begin
       if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
       begin
-        // Show confirm delete dialog
-        Confirm := MessageDlg(rclearconfirm, mtConfirmation, [mbYes, mbNo], 0);
-
-        if Confirm = mrYes then
-        begin
-          Rect := taskGrid.Selection;
-          for i := Rect.Top to Rect.Bottom do
-          begin
-            for j := Rect.Left to Rect.Right do
-            begin
-              if (j = 1) then Tasks.GetTask(i - 1).IsCompleted := False;
-              if (j = 2) then Tasks.GetTask(i - 1).TaskDescription := '';
-              if (j = 3) then Tasks.GetTask(i - 1).Comment := '';
-              if (j = 4) then Tasks.GetTask(i - 1).CompletionDate := 0;
-              if (j = 1) then
-                taskGrid.Cells[j, i] := '0'
-              else
-                taskGrid.Cells[j, i] := string.Empty;
-            end;
-          end;
-          SetChanged;
-          FLineCount := Tasks.Count;
-          SetInfo;
-        end;
+        ClearSelected;
         Abort;
       end
       else
       begin
-        // Get current row selected
-        Row := taskGrid.Row;
-        if (Row > 0) and (Row <= Tasks.Count) then
-        begin
-          // Show confirm delete dialog
-          Confirm := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
-
-          if Confirm = mrYes then
-          begin
-            // RemoveTask from collection
-            Tasks.RemoveTask(Row - 1);
-            taskGrid.DeleteRow(Row);
-            SetChanged;
-            FLineCount -= 1;
-            SetInfo;
-          end;
-          Abort;
-        end;
+        DeleteTask;
+        Abort;
       end;
     end
     else
@@ -262,6 +298,30 @@ begin
   begin
     Tasks.CopyToClipboard(taskGrid);
     Abort;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_PRIOR) then // Ctrl + Page Up
+  begin
+    aMoveTaskTop.Execute;
+    Abort;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_NEXT) then // Ctrl + Page Down
+  begin
+    aMoveTaskBottom.Execute;
+    Abort;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_UP) then // Ctrl + Up
+  begin
+    aMoveTaskUp.Execute;
+    Abort;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_DOWN) then // Ctrl + Down
+  begin
+    aMoveTaskDown.Execute;
+    Abort;
   end;
 end;
 
@@ -278,6 +338,60 @@ begin
     // Apply the selected font to the form
     Self.Font := fontDialog.Font;
   end;
+end;
+
+procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
+begin
+  Tasks.InsertTask('[ ]', taskGrid.Row);
+  Tasks.FillGrid(taskGrid);
+  FLineCount += 1;
+  SetInfo;
+  SetChanged;
+end;
+
+procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
+begin
+  Tasks.MoveTaskToTop(taskGrid.Row - 1);
+  Tasks.FillGrid(taskGrid);
+  taskGrid.Row := 1;
+  SetChanged;
+  Invalidate;
+  Application.ProcessMessages;
+end;
+
+procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
+begin
+  Tasks.MoveTaskUp(taskGrid.Row - 1);
+  Tasks.FillGrid(taskGrid);
+  if taskGrid.Row > 1 then taskGrid.Row := taskGrid.Row - 1;
+  SetChanged;
+  Invalidate;
+  Application.ProcessMessages;
+end;
+
+procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
+begin
+  Tasks.MoveTaskDown(taskGrid.Row - 1);
+  Tasks.FillGrid(taskGrid);
+  if taskGrid.Row < taskGrid.RowCount - 1 then taskGrid.Row := taskGrid.Row + 1;
+  SetChanged;
+  Invalidate;
+  Application.ProcessMessages;
+end;
+
+procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
+begin
+  Tasks.MoveTaskToBottom(taskGrid.Row - 1);
+  Tasks.FillGrid(taskGrid);
+  taskGrid.Row := taskGrid.RowCount - 1;
+  SetChanged;
+  Invalidate;
+  Application.ProcessMessages;
+end;
+
+procedure TformNotetask.ADeleteTaskExecute(Sender: TObject);
+begin
+  DeleteTask;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
@@ -683,10 +797,6 @@ begin
     // Drawing only data cells
     //if (aCol in [0]) or (aRow = 0) then exit;
 
-    if (aCol = 1) then
-      exit;
-    //      Grid.DefaultDrawCell(aCol, aRow, aRect, aState);
-
     // Determine background color
     if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
     begin
@@ -709,6 +819,12 @@ begin
     grid.Canvas.Brush.Color := bgFill;
     grid.canvas.Brush.Style := bsSolid;
     grid.canvas.fillrect(aRect);
+
+    if (aCol = 1) then
+    begin
+      Grid.DefaultDrawCell(aCol, aRow, aRect, aState);
+      exit;
+    end;
 
     S := grid.Cells[ACol, ARow];
     if Length(S) > 0 then
