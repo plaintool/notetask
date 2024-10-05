@@ -613,8 +613,20 @@ var
   bgFill: TColor;
   flags: cardinal;
 begin
-  if (aCol in [0, 1]) or (aRow = 0) then exit;
   grid := Sender as TStringGrid;
+
+  // Border for fixed cells
+  if (aRow < grid.FixedRows) or (aCol < grid.FixedCols) then
+  begin
+    grid.Canvas.Pen.Color := clSilver;
+    grid.Canvas.Pen.Style := psSolid;
+    grid.Canvas.Pen.Width := 1;
+    grid.Canvas.Brush.Style := bsClear;
+    grid.Canvas.Rectangle(aRect.Left-1, aRect.Top-1, aRect.Right, aRect.Bottom);
+  end;
+
+  // Drawing only data cells
+  if (aCol in [0, 1]) or (aRow = 0) then exit;
 
   // Determine background color
   if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
