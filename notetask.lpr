@@ -13,12 +13,13 @@ uses
   Forms,
   LCLTranslator,
   DefaultTranslator,
+  GridPrn,
   printer4lazarus,
   mainform,
   lineending,
   filemanager,
   task,
-  settings, GridPrn;
+  settings;
 
   {$R *.res}
 

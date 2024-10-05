@@ -22,7 +22,7 @@
     </General>
     <i18n>
       <EnableI18N Value="True"/>
-      <OutDir Value="languages"/>
+      <OutDir Value="locale"/>
     </i18n>
     <BuildModes>
       <Item Name="Default" Default="True"/>
