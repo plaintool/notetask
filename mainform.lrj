@@ -18,6 +18,8 @@
 {"hash":315140,"name":"tformnotetask.aexit.caption","sourcebytes":[69,120,105,116],"value":"Exit"},
 {"hash":224751950,"name":"tformnotetask.afont.caption","sourcebytes":[70,111,110,116,46,46,46],"value":"Font..."},
 {"hash":141014752,"name":"tformnotetask.awordwrap.caption","sourcebytes":[87,111,114,100,32,119,114,97,112],"value":"Word wrap"},
+{"hash":107761687,"name":"tformnotetask.opendialog.title","sourcebytes":[79,112,101,110,105,110,103],"value":"Opening"},
+{"hash":93900871,"name":"tformnotetask.savedialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
 {"hash":171928085,"name":"tformnotetask.calendardialog.title","sourcebytes":[83,101,108,101,99,116,32,100,97,116,101],"value":"Select date"},
 {"hash":3386266,"name":"tformnotetask.calendardialog.okcaption","sourcebytes":[38,208,158,208,154],"value":"&\u041E\u041A"},
 {"hash":77089212,"name":"tformnotetask.calendardialog.cancelcaption","sourcebytes":[67,97,110,99,101,108],"value":"Cancel"},

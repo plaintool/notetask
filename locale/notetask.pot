@@ -105,6 +105,14 @@ msgctxt "tformnotetask.menutask.caption"
 msgid "Task"
 msgstr ""
 
+#: tformnotetask.opendialog.title
+msgid "Opening"
+msgstr ""
+
+#: tformnotetask.savedialog.title
+msgid "Saving"
+msgstr ""
+
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
 msgid "Task"

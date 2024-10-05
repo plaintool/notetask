@@ -8,7 +8,6 @@
       <Unit>
         <Filename Value="notetask.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="5"/>
         <CursorPos X="14" Y="22"/>
@@ -20,10 +19,11 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="123"/>
-        <CursorPos Y="125"/>
+        <TopLine Value="426"/>
+        <CursorPos Y="442"/>
         <UsageCount Value="82"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="lineending.pas"/>
@@ -36,17 +36,21 @@
       <Unit>
         <Filename Value="filemanager.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="121"/>
-        <CursorPos X="52" Y="127"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="108"/>
+        <CursorPos Y="123"/>
         <UsageCount Value="77"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="task.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="74" Y="13"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="334"/>
+        <CursorPos X="29" Y="351"/>
         <UsageCount Value="76"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="settings.pas"/>
@@ -107,9 +111,9 @@
         <Filename Value="C:\lazarus\lcl\grids.pas"/>
         <UnitName Value="Grids"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="8994"/>
-        <CursorPos Y="9008"/>
-        <UsageCount Value="8"/>
+        <TopLine Value="8852"/>
+        <CursorPos Y="8867"/>
+        <UsageCount Value="10"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\fgl.pp"/>
@@ -163,8 +167,144 @@
         <CursorPos Y="494"/>
         <UsageCount Value="13"/>
       </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus\lcl\include\control.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="604"/>
+        <CursorPos X="3" Y="616"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus\lcl\include\customaction.inc"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="240"/>
+        <CursorPos X="3" Y="242"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory HistoryIndex="29">
+      <Position>
+        <Filename Value="filemanager.pas"/>
+        <Caret Line="127" TopLine="118"/>
+      </Position>
+      <Position>
+        <Filename Value="filemanager.pas"/>
+        <Caret Line="114" Column="16" TopLine="111"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="736" Column="31" TopLine="732"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="434" Column="52" TopLine="424"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="438" Column="70" TopLine="424"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="449" Column="42" TopLine="384"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="268" Column="18" TopLine="259"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="271" Column="29" TopLine="259"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="361" Column="3" TopLine="359"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="436" Column="49" TopLine="129"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="246" Column="3" TopLine="244"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="273" TopLine="250"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="360" Column="6" TopLine="359"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="442" TopLine="426"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="343" TopLine="328"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="344" TopLine="328"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="345" TopLine="328"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="346" TopLine="328"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="347" TopLine="328"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="348" TopLine="328"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="347" TopLine="328"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="350" TopLine="328"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="352" TopLine="328"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="118" TopLine="103"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="113" Column="28" TopLine="112"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="121" TopLine="112"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="130" Column="68" TopLine="112"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="127" TopLine="112"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="350" Column="51" TopLine="331"/>
+      </Position>
+      <Position>
+        <Filename Value="task.pas"/>
+        <Caret Line="351" Column="9" TopLine="334"/>
+      </Position>
+    </JumpHistory>
     <CustomSessionData Count="2">
       <Item0 Name="SVN active" Value="-1"/>
       <Item1 Name="SVN repository" Value="D:\OneDrive\Repositories\Lazarus"/>
@@ -189,6 +329,15 @@
     </HistoryLists>
   </ProjectSession>
   <Debugging>
+    <BreakPoints>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="mainform.pas"/>
+        <Line Value="442"/>
+      </Item>
+    </BreakPoints>
     <Watches>
       <Item>
         <Expression Value="FormatSettings.LongDateFormat "/>

@@ -262,10 +262,14 @@ begin
   if IsCanClose then
   begin
     SetChanged(False);
+    EditComplite;
     FFileName := string.Empty;
+    FEncoding := TEncoding.UTF8;
+    FLineEnding := FLineEnding.WindowsCRLF;
     Caption := runtitled + ' - ' + rapp;
     taskGrid.Clean;
     taskGrid.RowCount := 2;
+
     Tasks.AddTask('[ ]');
     taskGrid.Cells[1, 1] := '0';
   end;
@@ -434,6 +438,7 @@ begin
 
   if (fileName <> string.Empty) then
   begin
+    EditComplite;
     SaveTextFile(fileName, Tasks.ToStringList, FEncoding, FLineEnding);
     SetChanged(False);
   end;

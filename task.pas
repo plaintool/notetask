@@ -133,18 +133,18 @@ begin
   else
     CommentPart := string.Empty;
 
-  // Формируем строку задачи в зависимости от переданного индекса
+  // Form the task string based on the provided index
   case Index of
-    1: Result := CompletionStatus; // Возвращаем только статус завершенности
-    2: Result := TaskString; // Возвращаем только строку задачи
-    3: Result := CommentPart; // Возвращаем только комментарий
+    1: Result := CompletionStatus; // Returning only the completion status
+    2: Result := TaskString; // Returning only the task string
+    3: Result := CommentPart; // Returning only the comment
     4:
       if CompletionDate > 0 then
         Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, CompletionDate).Trim
       else
-        Result := string.Empty; // Если даты завершения нет, возвращаем пустую строку
+        Result := string.Empty; // If the completion date is missing, return an empty string
     else
-      // Формируем строку задачи с учетом даты завершения и комментария
+      // Forming the task string considering the completion date and comment
       if CompletionDate > 0 then
         Result := Format('%s %s, %s%s', [CompletionStatus, FormatDateTime(FormatSettings.ShortDateFormat +
           ' ' + FormatSettings.LongTimeFormat, CompletionDate), TaskString, CommentPart]).Trim
@@ -339,17 +339,20 @@ end;
 function TTasks.ToStringList: TStringList;
 var
   i: integer;
-  isCompleted: boolean;
+  addCompleted: boolean;
 begin
   Result := TStringList.Create;
   try
-    isCompleted := False;
+    addCompleted := False;
     for i := 0 to FCount - 1 do
-      if FTaskList[i].IsCompleted then isCompleted := True;
+      if FTaskList[i].IsCompleted then addCompleted := True;
+    if (FCount = 1) and (FTaskList[0].TaskDescription = string.Empty) and (FTaskList[0].Comment = string.Empty) and
+      (FTaskList[0].CompletionDate = 0) then
+      addCompleted := True;
 
     for i := 0 to FCount - 1 do
     begin
-      Result.Add(FTaskList[i].ToString(0, isCompleted)); // Add task string to TStringList
+      Result.Add(FTaskList[i].ToString(0, addCompleted)); // Add task string to TStringList
     end;
   except
     Result.Free;

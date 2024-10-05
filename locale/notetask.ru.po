@@ -115,6 +115,14 @@ msgctxt "tformnotetask.menutask.caption"
 msgid "Task"
 msgstr "Задача"
 
+#: tformnotetask.opendialog.title
+msgid "Opening"
+msgstr ""
+
+#: tformnotetask.savedialog.title
+msgid "Saving"
+msgstr ""
+
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
 msgid "Task"
@@ -128,14 +136,3 @@ msgstr "Комментарии"
 msgid "Date"
 msgstr "Дата"
 
-#~ msgid "Printer setup..."
-#~ msgstr "Настройка принтера..."
-
-#~ msgid "Windows (LRLF)"
-#~ msgstr "Windows (LRLF)"
-
-#~ msgid "UTF-8"
-#~ msgstr "UTF-8"
-
-#~ msgid "0 rows"
-#~ msgstr "0 строк"

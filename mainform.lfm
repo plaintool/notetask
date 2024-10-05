@@ -14,7 +14,6 @@ object formNotetask: TformNotetask
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnResize = FormResize
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -222,10 +221,16 @@ object formNotetask: TformNotetask
     end
   end
   object openDialog: TOpenDialog
+    Title = 'Opening'
+    DefaultExt = '.*.tsk'
+    Filter = 'Task files (*.tsk)|*.tsk|All files (*.*)|*.*'
     Left = 320
     Top = 112
   end
   object saveDialog: TSaveDialog
+    Title = 'Saving'
+    DefaultExt = '.*.tsk'
+    Filter = 'Task files (*.tsk)|*.tsk|All files (*.*)|*.*'
     Left = 400
     Top = 112
   end
