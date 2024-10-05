@@ -17,8 +17,8 @@
       </XPManifest>
       <Icon Value="0"/>
       <Resources Count="2">
-        <Resource_0 FileName="doctask.ico" Type="ICON" ResourceName="DOCTASK"/>
-        <Resource_1 FileName="locale\notetask.ru.po" Type="RCDATA" ResourceName="NOTETASK.RU"/>
+        <Resource_0 FileName="locale\notetask.ru.po" Type="RCDATA" ResourceName="NOTETASK.RU"/>
+        <Resource_1 FileName="doctask.ico" Type="ICON" ResourceName="DOCTASK"/>
       </Resources>
     </General>
     <i18n>

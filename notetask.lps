@@ -8,11 +8,11 @@
       <Unit>
         <Filename Value="notetask.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="6"/>
-        <CursorPos Y="17"/>
-        <UsageCount Value="80"/>
-        <Loaded Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="5"/>
+        <CursorPos X="14" Y="22"/>
+        <UsageCount Value="82"/>
       </Unit>
       <Unit>
         <Filename Value="mainform.pas"/>
@@ -20,11 +20,10 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="123"/>
         <CursorPos Y="125"/>
-        <UsageCount Value="80"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
+        <UsageCount Value="82"/>
       </Unit>
       <Unit>
         <Filename Value="lineending.pas"/>
@@ -32,7 +31,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="12"/>
         <CursorPos X="5" Y="41"/>
-        <UsageCount Value="76"/>
+        <UsageCount Value="78"/>
       </Unit>
       <Unit>
         <Filename Value="filemanager.pas"/>
@@ -40,14 +39,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="121"/>
         <CursorPos X="52" Y="127"/>
-        <UsageCount Value="75"/>
+        <UsageCount Value="77"/>
       </Unit>
       <Unit>
         <Filename Value="task.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="74" Y="13"/>
-        <UsageCount Value="74"/>
+        <UsageCount Value="76"/>
       </Unit>
       <Unit>
         <Filename Value="settings.pas"/>
@@ -55,7 +54,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos Y="45"/>
-        <UsageCount Value="68"/>
+        <UsageCount Value="70"/>
       </Unit>
       <Unit>
         <Filename Value="gridprn.pas"/>
@@ -64,7 +63,16 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="144"/>
         <CursorPos X="68" Y="157"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="33"/>
+      </Unit>
+      <Unit>
+        <Filename Value="systemtool.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="114"/>
+        <CursorPos Y="142"/>
+        <FoldState Value=" T3V0Y0"/>
+        <UsageCount Value="26"/>
       </Unit>
       <Unit>
         <Filename Value="stringgridex.pas"/>
@@ -150,146 +158,13 @@
       <Unit>
         <Filename Value="C:\lazarus\lcl\lcltranslator.pas"/>
         <UnitName Value="LCLTranslator"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="479"/>
         <CursorPos Y="494"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="systemtool.pas"/>
-        <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="114"/>
-        <CursorPos Y="142"/>
-        <FoldState Value=" T3V0Y0"/>
-        <UsageCount Value="25"/>
-        <Loaded Value="True"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="62" Column="143" TopLine="48"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="58" TopLine="48"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="46" Column="64" TopLine="29"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="36" Column="55" TopLine="29"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="35" Column="27" TopLine="23"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="52" Column="5" TopLine="35"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="54" Column="36" TopLine="33"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="16" Column="17" TopLine="31"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="18" Column="14"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="52" Column="9" TopLine="37"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="37" Column="15" TopLine="27"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="49" Column="42" TopLine="38"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="48" TopLine="38"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="50" TopLine="38"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="51" TopLine="38"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="52" TopLine="38"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="53" TopLine="38"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="54" TopLine="38"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="55" TopLine="38"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="56" TopLine="38"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="27" Column="3" TopLine="11"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="65" Column="25" TopLine="43"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="60" TopLine="44"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="55" Column="35" TopLine="41"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="38" Column="4" TopLine="11"/>
-      </Position>
-      <Position>
-        <Filename Value="systemtool.pas"/>
-        <Caret Line="20" Column="3"/>
-      </Position>
-      <Position>
-        <Filename Value="systemtool.pas"/>
-        <Caret Line="8" Column="9"/>
-      </Position>
-      <Position>
-        <Filename Value="systemtool.pas"/>
-        <Caret Line="28" Column="30" TopLine="13"/>
-      </Position>
-      <Position>
-        <Filename Value="systemtool.pas"/>
-        <Caret Line="12"/>
-      </Position>
-      <Position>
-        <Filename Value="notetask.lpr"/>
-        <Caret Line="17" TopLine="6"/>
-      </Position>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <CustomSessionData Count="2">
       <Item0 Name="SVN active" Value="-1"/>
       <Item1 Name="SVN repository" Value="D:\OneDrive\Repositories\Lazarus"/>

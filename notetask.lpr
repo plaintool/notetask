@@ -12,9 +12,6 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms,
   Classes,
-  //LCLTranslator,
-  //DefaultTranslator,
-  //Translations,
   GridPrn,
   printer4lazarus,
   mainform,
@@ -28,8 +25,8 @@ uses
 
 begin
   RequireDerivedFormResource := True;
-  Application.Title := 'Notetask';
-  Application.Scaled := True;
+  Application.Title:='Notetask';
+  Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
   ApplicationTranslate(GetOSLanguage);
