@@ -16,8 +16,9 @@
         <TextDesc Value="Notetask Editor: A simple solution for task text files"/>
       </XPManifest>
       <Icon Value="0"/>
-      <Resources Count="1">
+      <Resources Count="2">
         <Resource_0 FileName="doctask.ico" Type="ICON" ResourceName="DOCTASK"/>
+        <Resource_1 FileName="locale\notetask.ru.po" Type="RCDATA" ResourceName="NOTETASK.RU"/>
       </Resources>
     </General>
     <i18n>

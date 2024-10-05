@@ -8,10 +8,12 @@
       <Unit>
         <Filename Value="notetask.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="4"/>
-        <CursorPos X="66" Y="18"/>
-        <UsageCount Value="72"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="25"/>
+        <CursorPos X="5" Y="71"/>
+        <UsageCount Value="73"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="mainform.pas"/>
@@ -19,10 +21,9 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="111"/>
-        <CursorPos X="81" Y="118"/>
-        <UsageCount Value="72"/>
+        <TopLine Value="138"/>
+        <CursorPos X="9" Y="127"/>
+        <UsageCount Value="73"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -32,23 +33,22 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="12"/>
         <CursorPos X="5" Y="41"/>
-        <UsageCount Value="68"/>
+        <UsageCount Value="69"/>
       </Unit>
       <Unit>
         <Filename Value="filemanager.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="121"/>
-        <CursorPos X="68" Y="127"/>
-        <UsageCount Value="67"/>
-        <Loaded Value="True"/>
+        <CursorPos X="52" Y="127"/>
+        <UsageCount Value="68"/>
       </Unit>
       <Unit>
         <Filename Value="task.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="74" Y="13"/>
-        <UsageCount Value="66"/>
+        <UsageCount Value="67"/>
       </Unit>
       <Unit>
         <Filename Value="settings.pas"/>
@@ -56,7 +56,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos Y="45"/>
-        <UsageCount Value="60"/>
+        <UsageCount Value="61"/>
       </Unit>
       <Unit>
         <Filename Value="gridprn.pas"/>
@@ -65,7 +65,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="144"/>
         <CursorPos X="68" Y="157"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="24"/>
       </Unit>
       <Unit>
         <Filename Value="stringgridex.pas"/>
@@ -149,55 +149,7 @@
         <UsageCount Value="10"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="24">
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="94" Column="22" TopLine="71"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="95" Column="22" TopLine="72"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="328" TopLine="308"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="77" TopLine="64"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="315" Column="5" TopLine="288"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="139" Column="3" TopLine="123"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="52" Column="15" TopLine="39"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="53" Column="15" TopLine="39"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="70" Column="15" TopLine="60"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="625" Column="34" TopLine="613"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="626" Column="28" TopLine="611"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="623" Column="72" TopLine="615"/>
-      </Position>
+    <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="mainform.pas"/>
         <Caret Line="597" Column="77" TopLine="586"/>
@@ -250,6 +202,74 @@
         <Filename Value="mainform.pas"/>
         <Caret Line="428" Column="29" TopLine="414"/>
       </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="45" Column="5" TopLine="16"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="16" Column="20" TopLine="2"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="17" Column="11" TopLine="3"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="50" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="34" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="35" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="36" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="37" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="38" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="40" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="41" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="42" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="40" Column="30" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="45" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="34" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="46" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="notetask.lpr"/>
+        <Caret Line="50" Column="16" TopLine="27"/>
+      </Position>
     </JumpHistory>
     <CustomSessionData Count="2">
       <Item0 Name="SVN active" Value="-1"/>
@@ -258,24 +278,21 @@
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode="default">
-        <Mode Name="default">
-          <local>
-            <CommandLineParams Value="--lang ru"/>
-          </local>
-        </Mode>
+        <Mode Name="default"/>
       </Modes>
     </RunParams>
     <HistoryLists>
       <List Name="LaunchingApplication" Type="File" Count="1">
         <Item1 Value="C:\Windows\system32\cmd.exe /C ${TargetCmdLine}"/>
       </List>
-      <List Name="CommandLineParameters" Count="5">
-        <Item1 Value="--lang ru"/>
-        <Item2 Value="d:\задачи.tsk --lang ru"/>
-        <Item3 Value="d:\задачи.txt --lang ru"/>
-        <Item4 Value="--lang=ru"/>
-        <Item5 Value="ru"/>
+      <List Name="CommandLineParameters" Count="6">
+        <Item2 Value="--lang ru"/>
+        <Item3 Value="d:\задачи.tsk --lang ru"/>
+        <Item4 Value="d:\задачи.txt --lang ru"/>
+        <Item5 Value="--lang=ru"/>
+        <Item6 Value="ru"/>
       </List>
+      <List Name="WorkingDirectory" Type="File" Count="1"/>
     </HistoryLists>
   </ProjectSession>
   <Debugging>
