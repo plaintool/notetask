@@ -76,6 +76,10 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="GridPrn"/>
       </Unit>
+      <Unit>
+        <Filename Value="systemtool.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

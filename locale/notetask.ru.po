@@ -12,8 +12,6 @@ msgstr ""
 "X-Generator: Poedit 3.5\n"
 
 #: mainform.rapp
-#, fuzzy
-#| msgid "Notetask"
 msgctxt "mainform.rapp"
 msgid "Notetask"
 msgstr "Notetask"
@@ -45,7 +43,7 @@ msgstr "Выход"
 
 #: tformnotetask.afont.caption
 msgid "Font..."
-msgstr "Шрифт (&F)..."
+msgstr "Шрифт..."
 
 #: tformnotetask.anew.caption
 msgid "New"
@@ -92,8 +90,6 @@ msgid "Select date"
 msgstr "Выберите дату"
 
 #: tformnotetask.caption
-#, fuzzy
-#| msgid "Notetask"
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
 msgstr "Notetask"
@@ -115,15 +111,11 @@ msgid "MenuItem1"
 msgstr ""
 
 #: tformnotetask.menutask.caption
-#, fuzzy
-#| msgid "Task"
 msgctxt "tformnotetask.menutask.caption"
 msgid "Task"
 msgstr "Задача"
 
 #: tformnotetask.taskgrid.columns[1].title.caption
-#, fuzzy
-#| msgid "Task"
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
 msgid "Task"
 msgstr "Задача"
