@@ -261,7 +261,7 @@ end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
-  if (Key = VK_DELETE) then
+  if (Key = VK_DELETE) then // Del
   begin
     if (not taskGrid.EditorMode) and (not IsEditing) then
     begin
@@ -280,21 +280,21 @@ begin
       Abort;
   end
   else
-  if (Key = VK_ESCAPE) then
+  if (Key = VK_ESCAPE) then // Escape
   begin
     if (taskGrid.EditorMode) or (IsEditing) then
       EditComplite;
     Abort;
   end
   else
-  if (Key = VK_F2) then
+  if (Key = VK_F2) then // F2
   begin
     EditComplite;
     EditCell(taskGrid.Col, taskGrid.Row);
     Abort;
   end
   else
-  if (ssCtrl in Shift) and (Key = VK_C) then
+  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
   begin
     Tasks.CopyToClipboard(taskGrid);
     Abort;
