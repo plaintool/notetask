@@ -20,8 +20,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="613"/>
-        <CursorPos X="28" Y="618"/>
+        <TopLine Value="111"/>
+        <CursorPos X="81" Y="118"/>
         <UsageCount Value="72"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -37,10 +37,11 @@
       <Unit>
         <Filename Value="filemanager.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="106"/>
-        <CursorPos X="14" Y="135"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="121"/>
+        <CursorPos X="68" Y="127"/>
         <UsageCount Value="67"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="task.pas"/>
@@ -148,7 +149,7 @@
         <UsageCount Value="10"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="13">
+    <JumpHistory HistoryIndex="24">
       <Position>
         <Filename Value="mainform.pas"/>
         <Caret Line="94" Column="22" TopLine="71"/>
@@ -175,19 +176,11 @@
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="139" Column="3" TopLine="301"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
         <Caret Line="52" Column="15" TopLine="39"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
         <Caret Line="53" Column="15" TopLine="39"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
-        <Caret Line="15" Column="5" TopLine="209"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
@@ -205,6 +198,58 @@
         <Filename Value="mainform.pas"/>
         <Caret Line="623" Column="72" TopLine="615"/>
       </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="597" Column="77" TopLine="586"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="21" Column="10" TopLine="7"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="22" Column="10" TopLine="7"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="38" Column="13" TopLine="14"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="39" Column="13" TopLine="15"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="46" Column="22" TopLine="23"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="59" Column="20" TopLine="36"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="60" Column="20" TopLine="37"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="101" Column="19" TopLine="78"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="117" Column="38" TopLine="93"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="159" Column="7" TopLine="138"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="347" Column="30" TopLine="341"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="428" Column="29" TopLine="414"/>
+      </Position>
     </JumpHistory>
     <CustomSessionData Count="2">
       <Item0 Name="SVN active" Value="-1"/>
@@ -215,7 +260,7 @@
       <Modes ActiveMode="default">
         <Mode Name="default">
           <local>
-            <CommandLineParams Value="d:\задачи.tsk --lang ru"/>
+            <CommandLineParams Value="--lang ru"/>
           </local>
         </Mode>
       </Modes>
@@ -225,9 +270,9 @@
         <Item1 Value="C:\Windows\system32\cmd.exe /C ${TargetCmdLine}"/>
       </List>
       <List Name="CommandLineParameters" Count="5">
-        <Item1 Value="d:\задачи.tsk --lang ru"/>
-        <Item2 Value="d:\задачи.txt --lang ru"/>
-        <Item3 Value="--lang ru"/>
+        <Item1 Value="--lang ru"/>
+        <Item2 Value="d:\задачи.tsk --lang ru"/>
+        <Item3 Value="d:\задачи.txt --lang ru"/>
         <Item4 Value="--lang=ru"/>
         <Item5 Value="ru"/>
       </List>

@@ -115,7 +115,7 @@ resourcestring
   rrows = ' rows';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rsavechanges = 'Do you want to save the changes?';
-  rclearconfirm = 'Are you sure you want to clear this section?';
+  rclearconfirm = 'Are you sure you want to clear the data in the selected area?';
 
 implementation
 
@@ -424,6 +424,9 @@ end;
 
 procedure TformNotetask.SaveFile(fileName: string = string.Empty);
 begin
+  if (fileName = string.Empty) and (FFileName = string.Empty) then
+    aSaveAs.Execute;
+
   if (fileName = string.Empty) then
     fileName := FFileName
   else
@@ -622,7 +625,7 @@ begin
     grid.Canvas.Pen.Style := psSolid;
     grid.Canvas.Pen.Width := 1;
     grid.Canvas.Brush.Style := bsClear;
-    grid.Canvas.Rectangle(aRect.Left-1, aRect.Top-1, aRect.Right, aRect.Bottom);
+    grid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
   end;
 
   // Drawing only data cells

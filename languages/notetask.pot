@@ -7,7 +7,7 @@ msgid "Notetask"
 msgstr ""
 
 #: mainform.rclearconfirm
-msgid "Are you sure you want to clear this section?"
+msgid "Are you sure you want to clear the data in the selected area?"
 msgstr ""
 
 #: mainform.rdeleteconfirm
