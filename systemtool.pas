@@ -75,7 +75,7 @@ var
 begin
   Result := False;
 
-  // Оборачиваем в try-finally, чтобы гарантировать освобождение ресурсов
+  // Wrap in try-finally to ensure resources are freed
   Res := nil;
   PoStringStream := nil;
   PoFile := nil;
@@ -83,31 +83,31 @@ begin
 
   try
     try
-      // Загружаем ресурсный файл
+      // Load the resource file
       Res := TResourceStream.Create(HInstance, 'notetask.' + Language, RT_RCDATA);
       PoStringStream := TStringStream.Create('');
 
-      // Сохраняем ресурс в строковый поток
+      // Save the resource to the string stream
       Res.SaveToStream(PoStringStream);
 
-      // Читаем строки из файла
+      // Read strings from the file
       PoFile := TPOFile.Create(False);
       PoFile.ReadPOText(PoStringStream.DataString);
 
-      // Переводим строки ресурсов (это сработает для messagestring и resourcestring)
+      // Translate resource strings (this works for messagestring and resourcestring)
       Result := TranslateResourceStrings(PoFile);
 
       if Result then
       begin
-        // Создаем локального переводчика для формы
+        // Create a local translator for the form
         LocalTranslator := TPOTranslator.Create(PoFile);
         LRSTranslator := LocalTranslator;
 
-        // Обновляем перевод для всех форм
+        // Update the translation for all forms
         for i := 0 to Screen.CustomFormCount - 1 do
           LocalTranslator.UpdateTranslation(Screen.CustomForms[i]);
 
-        // Обновляем перевод для всех модулей данных
+        // Update the translation for all data modules
         for i := 0 to Screen.DataModuleCount - 1 do
           LocalTranslator.UpdateTranslation(Screen.DataModules[i]);
       end;
@@ -115,14 +115,14 @@ begin
     except
       on E: Exception do
       begin
-        // Обрабатываем ошибку перевода и выводим сообщение
+        // Handle translation error and display message
         WriteLn('Error during translation: ', E.Message);
-        Result := False; // Возвращаем False в случае ошибки
+        Result := False; // Return False in case of error
       end;
     end;
 
   finally
-    // Освобождаем все используемые ресурсы
+    // Free all used resources
     if Assigned(LocalTranslator) then
     begin
       LRSTranslator := nil;
