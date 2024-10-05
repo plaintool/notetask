@@ -11,7 +11,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="5"/>
         <CursorPos X="14" Y="22"/>
-        <UsageCount Value="82"/>
+        <UsageCount Value="84"/>
       </Unit>
       <Unit>
         <Filename Value="mainform.pas"/>
@@ -19,9 +19,10 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="426"/>
-        <CursorPos Y="442"/>
-        <UsageCount Value="82"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="436"/>
+        <CursorPos Y="444"/>
+        <UsageCount Value="84"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -31,26 +32,23 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="12"/>
         <CursorPos X="5" Y="41"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="80"/>
       </Unit>
       <Unit>
         <Filename Value="filemanager.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="108"/>
         <CursorPos Y="123"/>
-        <UsageCount Value="77"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="79"/>
       </Unit>
       <Unit>
         <Filename Value="task.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="334"/>
         <CursorPos X="29" Y="351"/>
-        <UsageCount Value="76"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="78"/>
       </Unit>
       <Unit>
         <Filename Value="settings.pas"/>
@@ -58,7 +56,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos Y="45"/>
-        <UsageCount Value="70"/>
+        <UsageCount Value="72"/>
       </Unit>
       <Unit>
         <Filename Value="gridprn.pas"/>
@@ -67,7 +65,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="144"/>
         <CursorPos X="68" Y="157"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="35"/>
       </Unit>
       <Unit>
         <Filename Value="systemtool.pas"/>
@@ -76,7 +74,7 @@
         <TopLine Value="114"/>
         <CursorPos Y="142"/>
         <FoldState Value=" T3V0Y0"/>
-        <UsageCount Value="26"/>
+        <UsageCount Value="28"/>
       </Unit>
       <Unit>
         <Filename Value="stringgridex.pas"/>
@@ -176,133 +174,139 @@
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\lcl\include\customaction.inc"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="240"/>
         <CursorPos X="3" Y="242"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus\lcl\include\containedaction.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="80"/>
+        <CursorPos Y="95"/>
+        <UsageCount Value="10"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="filemanager.pas"/>
-        <Caret Line="127" TopLine="118"/>
-      </Position>
-      <Position>
-        <Filename Value="filemanager.pas"/>
-        <Caret Line="114" Column="16" TopLine="111"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="456" Column="3" TopLine="448"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="736" Column="31" TopLine="732"/>
+        <Caret Line="133" Column="45" TopLine="115"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="434" Column="52" TopLine="424"/>
+        <Caret Line="149" Column="111" TopLine="128"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="438" Column="70" TopLine="424"/>
+        <Caret Line="177" Column="30" TopLine="171"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="449" Column="42" TopLine="384"/>
+        <Caret Line="148" Column="19" TopLine="143"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="268" Column="18" TopLine="259"/>
+        <Caret Line="686" TopLine="674"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="271" Column="29" TopLine="259"/>
+        <Caret Line="147" TopLine="134"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="361" Column="3" TopLine="359"/>
+        <Caret Line="146" TopLine="134"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="436" Column="49" TopLine="129"/>
+        <Caret Line="147" TopLine="134"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="246" Column="3" TopLine="244"/>
+        <Caret Line="150" TopLine="134"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="273" TopLine="250"/>
+        <Caret Line="151" TopLine="134"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="360" Column="6" TopLine="359"/>
+        <Caret Line="147" Column="27" TopLine="134"/>
       </Position>
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="442" TopLine="426"/>
+        <Caret Line="806" Column="48" TopLine="788"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="343" TopLine="328"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="146" TopLine="132"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="344" TopLine="328"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="800" Column="35" TopLine="784"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="345" TopLine="328"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="799" Column="54" TopLine="788"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="346" TopLine="328"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="686" Column="40" TopLine="676"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="347" TopLine="328"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="319" Column="3" TopLine="316"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="348" TopLine="328"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="453" Column="19" TopLine="424"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="347" TopLine="328"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="291" Column="10" TopLine="280"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="350" TopLine="328"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="320" Column="6" TopLine="317"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="352" TopLine="328"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="456" TopLine="436"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="118" TopLine="103"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="286" Column="12" TopLine="277"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="113" Column="28" TopLine="112"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="319" Column="3" TopLine="317"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="121" TopLine="112"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="441" TopLine="436"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="130" Column="68" TopLine="112"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="322" Column="19" TopLine="317"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="127" TopLine="112"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="441" Column="3" TopLine="436"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="350" Column="51" TopLine="331"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="386" Column="3" TopLine="384"/>
       </Position>
       <Position>
-        <Filename Value="task.pas"/>
-        <Caret Line="351" Column="9" TopLine="334"/>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="468" Column="25" TopLine="456"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="319" Column="3" TopLine="317"/>
       </Position>
     </JumpHistory>
     <CustomSessionData Count="2">
@@ -329,15 +333,6 @@
     </HistoryLists>
   </ProjectSession>
   <Debugging>
-    <BreakPoints>
-      <Item>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="mainform.pas"/>
-        <Line Value="442"/>
-      </Item>
-    </BreakPoints>
     <Watches>
       <Item>
         <Expression Value="FormatSettings.LongDateFormat "/>

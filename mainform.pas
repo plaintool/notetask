@@ -64,6 +64,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
     procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
@@ -77,6 +78,8 @@ type
     procedure taskGridResize(Sender: TObject);
     procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
+    procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState;
+      var ABitmap: TBitmap);
     procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
   private
     Memo: TMemo;
@@ -99,7 +102,8 @@ type
   public
     procedure OpenFile(fileName: string);
     procedure SaveFile(fileName: string = string.Empty);
-    procedure InfoFile();
+    procedure SetInfo();
+    procedure SetCaption();
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
   end;
@@ -108,14 +112,18 @@ var
   formNotetask: TformNotetask;
   Tasks: TTasks; // Tasks collection
   clRowHighlight: TColor;
+  ResourceBitmapCheck: TBitmap;
+  ResourceBitmapUncheck: TBitmap;
 
 resourcestring
   rapp = 'Notetask';
   runtitled = 'Untitled';
-  rrows = ' rows';
+  rrows = ' tasks';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rsavechanges = 'Do you want to save the changes?';
   rclearconfirm = 'Are you sure you want to clear the data in the selected area?';
+  ropendialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
+  rsavedialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
 
 implementation
 
@@ -131,8 +139,16 @@ var
 begin
   FWordWrap := True;
   clRowHighlight := RGBToColor(224, 224, 224);
+  openDialog.Filter := ropendialogfilter;
+  saveDialog.Filter := rsavedialogfilter;
 
-  Caption := runtitled + ' - ' + rapp;
+  // Create TBitmap objects
+  ResourceBitmapCheck := TBitmap.Create;
+  ResourceBitmapUncheck := TBitmap.Create;
+
+  // Load bitmaps from resources
+  ResourceBitmapCheck.LoadFromResourceName(HInstance, 'CHECK');
+  ResourceBitmapUncheck.LoadFromResourceName(HInstance, 'UNCHECK');
 
   LoadFormSettings(self);
   LoadGridSettings(taskGrid);
@@ -157,6 +173,10 @@ end;
 procedure TformNotetask.FormDestroy(Sender: TObject);
 begin
   SaveFormSettings(self);
+
+  // Free allocated resources
+  ResourceBitmapCheck.Free;
+  ResourceBitmapUncheck.Free;
 end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -193,6 +213,8 @@ begin
             end;
           end;
           SetChanged;
+          FLineCount := Tasks.Count;
+          SetInfo;
         end;
         Abort;
       end
@@ -211,6 +233,8 @@ begin
             Tasks.RemoveTask(Row - 1);
             taskGrid.DeleteRow(Row);
             SetChanged;
+            FLineCount -= 1;
+            SetInfo;
           end;
           Abort;
         end;
@@ -258,20 +282,21 @@ end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
 begin
-  Tasks := TTasks.Create();
   if IsCanClose then
   begin
+    Tasks := TTasks.Create();
     SetChanged(False);
     EditComplite;
     FFileName := string.Empty;
     FEncoding := TEncoding.UTF8;
     FLineEnding := FLineEnding.WindowsCRLF;
-    Caption := runtitled + ' - ' + rapp;
     taskGrid.Clean;
     taskGrid.RowCount := 2;
+    FLineCount := 1;
 
     Tasks.AddTask('[ ]');
     taskGrid.Cells[1, 1] := '0';
+    SetInfo;
   end;
 end;
 
@@ -291,7 +316,7 @@ end;
 
 procedure TformNotetask.aOpenExecute(Sender: TObject);
 begin
-  if openDialog.Execute then
+  if (IsCanClose) and (openDialog.Execute) then
   begin
     OpenFile(openDialog.FileName);
   end;
@@ -414,8 +439,9 @@ var
   i: integer;
 begin
   FFileName := fileName;
+  EditComplite;
   ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
-  InfoFile;
+  SetInfo;
 
   Tasks := TTasks.Create(TextToStringList(Content));
   Tasks.FillGrid(taskGrid);
@@ -424,6 +450,7 @@ begin
   begin
     taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight;
   end;
+  SetChanged(False);
 end;
 
 procedure TformNotetask.SaveFile(fileName: string = string.Empty);
@@ -443,15 +470,26 @@ begin
     SetChanged(False);
   end;
 
-  InfoFile;
+  SetInfo;
 end;
 
-procedure TformNotetask.InfoFile();
+procedure TformNotetask.SetInfo;
 begin
-  Caption := ExtractFileName(FFileName) + ' - ' + rapp;
   statusBar.Panels[1].Text := UpperCase(FEncoding.EncodingName);
   statusBar.Panels[2].Text := FLineEnding.ToString;
   statusBar.Panels[3].Text := FLineCount.ToString + rrows;
+  SetCaption;
+end;
+
+procedure TformNotetask.SetCaption;
+begin
+  if (FFileName <> string.Empty) then
+    Caption := ExtractFileName(FFileName) + ' - ' + rapp
+  else
+    Caption := runtitled + ' - ' + rapp;
+
+  if (FChanged) then
+    Caption := '*' + Caption;
 end;
 
 procedure TformNotetask.SetChanged(aChanged: boolean = True);
@@ -461,10 +499,7 @@ begin
 
   FChanged := taskGrid.Modified;
   aSave.Enabled := FChanged;
-  if (FChanged) and (Caption <> '') and (Caption[1] <> '*') then
-    Caption := '*' + Caption
-  else if not FChanged and (Caption <> '') and (Caption[1] = '*') then
-    Caption := Copy(Caption, 2, Length(Caption) - 1);
+  SetCaption;
 end;
 
 procedure TformNotetask.taskGridEditButtonClick(Sender: TObject);
@@ -533,6 +568,11 @@ begin
   taskGridResize(Sender);
 end;
 
+procedure TformNotetask.FormShow(Sender: TObject);
+begin
+  SetCaption;
+end;
+
 procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
 begin
   SetChanged;
@@ -549,13 +589,19 @@ begin
   begin
     Tasks.AddTask('[ ]');
     taskGrid.Cells[1, tIndex] := '0';
+    FLineCount += 1;
+    SetInfo;
   end;
 end;
 
 procedure TformNotetask.taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
 begin
   if (not IsColumn) then
+  begin
     Tasks.RemoveTask(tIndex);
+    FLineCount -= 1;
+    SetInfo;
+  end;
 end;
 
 procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
@@ -631,59 +677,65 @@ begin
     grid.Canvas.Pen.Width := 1;
     grid.Canvas.Brush.Style := bsClear;
     grid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
-  end;
-
-  // Drawing only data cells
-  if (aCol in [0, 1]) or (aRow = 0) then exit;
-
-  // Determine background color
-  if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
-  begin
-    bgFill := clHighlight;
-    grid.Canvas.Font.Color := clWhite; // Set font color to white when selected
-  end
-  else
-  if gdRowHighlight in aState then
-  begin
-    bgFill := clRowHighlight;
-    grid.Canvas.Font.Color := clBlack;
   end
   else
   begin
-    bgFill := clWhite;
-    grid.Canvas.Font.Color := clBlack;
-  end;
+    // Drawing only data cells
+    //if (aCol in [0]) or (aRow = 0) then exit;
 
-  // Fill the cell background
-  grid.Canvas.Brush.Color := bgFill;
-  grid.canvas.Brush.Style := bsSolid;
-  grid.canvas.fillrect(aRect);
+    if (aCol = 1) then
+      exit;
+    //      Grid.DefaultDrawCell(aCol, aRow, aRect, aState);
 
-  S := grid.Cells[ACol, ARow];
-  if Length(S) > 0 then
-  begin
-    drawrect := aRect;
-    drawrect.Inflate(-4, 0);
-    if (FWordWrap) then
-      flags := dt_calcrect or dt_wordbreak or dt_left
+    // Determine background color
+    if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+    begin
+      bgFill := clHighlight;
+      grid.Canvas.Font.Color := clWhite; // Set font color to white when selected
+    end
     else
-      flags := dt_calcrect or dt_left;
-    DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
-
-    //if gdFocused in aState then
-    //  DrawFocusRect(grid.canvas.handle, drawrect);
-
-    if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
-      grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2) // changing the row height fires the event again!
+    if gdRowHighlight in aState then
+    begin
+      bgFill := clRowHighlight;
+      grid.Canvas.Font.Color := clBlack;
+    end
     else
     begin
-      drawrect.Right := aRect.Right;
-      // grid.canvas.fillrect(drawrect);
+      bgFill := clWhite;
+      grid.Canvas.Font.Color := clBlack;
+    end;
+
+    // Fill the cell background
+    grid.Canvas.Brush.Color := bgFill;
+    grid.canvas.Brush.Style := bsSolid;
+    grid.canvas.fillrect(aRect);
+
+    S := grid.Cells[ACol, ARow];
+    if Length(S) > 0 then
+    begin
+      drawrect := aRect;
+      drawrect.Inflate(-4, 0);
       if (FWordWrap) then
-        flags := dt_wordbreak or dt_left
+        flags := dt_calcrect or dt_wordbreak or dt_left
       else
-        flags := dt_left;
-      DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, dt_wordbreak or dt_left);
+        flags := dt_calcrect or dt_left;
+      DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
+
+      //if gdFocused in aState then
+      //  DrawFocusRect(grid.canvas.handle, drawrect);
+
+      if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
+        grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2) // changing the row height fires the event again!
+      else
+      begin
+        drawrect.Right := aRect.Right;
+        // grid.canvas.fillrect(drawrect);
+        if (FWordWrap) then
+          flags := dt_wordbreak or dt_left
+        else
+          flags := dt_left;
+        DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, dt_wordbreak or dt_left);
+      end;
     end;
   end;
 end;
@@ -737,6 +789,21 @@ begin
   begin
     Memo.Visible := True;
     IsEditing := True;
+  end;
+end;
+
+procedure TformNotetask.taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer;
+  const CheckedState: TCheckboxState; var ABitmap: TBitmap);
+begin
+  // Check if we're in the correct column
+  if aCol = 1 then
+  begin
+    // Assign the appropriate bitmap based on the CheckedState
+    ABitmap := TBitmap.Create;
+    if CheckedState = cbChecked then
+      ABitmap.Assign(ResourceBitmapCheck) // Use check bitmap
+    else
+      ABitmap.Assign(ResourceBitmapUncheck); // Use uncheck bitmap
   end;
 end;
 
