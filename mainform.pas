@@ -611,7 +611,7 @@ begin
   if (aChanged = False) then
     taskGrid.Modified := False;
 
-  FChanged := taskGrid.Modified;
+  FChanged := taskGrid.Modified or aChanged;
   aSave.Enabled := FChanged;
   SetCaption;
 end;
@@ -712,7 +712,7 @@ procedure TformNotetask.taskGridColRowDeleted(Sender: TObject; IsColumn: boolean
 begin
   if (not IsColumn) then
   begin
-    Tasks.RemoveTask(tIndex);
+    Tasks.RemoveTask(tIndex - 1);
     FLineCount -= 1;
     SetInfo;
   end;
