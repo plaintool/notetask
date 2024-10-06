@@ -69,18 +69,50 @@ msgstr "О программе..."
 msgid "Archive / unarchive tasks"
 msgstr "Архивировать / деархивировать задачи"
 
+#: tformnotetask.acopy.caption
+msgid "Copy"
+msgstr "Копировать"
+
+#: tformnotetask.acut.caption
+msgid "Cut"
+msgstr "Вырезать"
+
+#: tformnotetask.adatetime.caption
+msgid "Date time"
+msgstr "Дата и время"
+
+#: tformnotetask.adelete.caption
+msgid "Delete"
+msgstr "Удалить"
+
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
-msgid "Delete selected tasks"
-msgstr "Удалить выбранные задачи"
+msgid "Delete tasks"
+msgstr "Удалить задачи"
 
 #: tformnotetask.aexit.caption
 msgid "Exit"
 msgstr "Выход"
 
+#: tformnotetask.afind.caption
+msgid "Find..."
+msgstr "Найти..."
+
+#: tformnotetask.afindnext.caption
+msgid "Find next"
+msgstr "Найти далее"
+
+#: tformnotetask.afindprev.caption
+msgid "Find previous"
+msgstr "Найти ранее"
+
 #: tformnotetask.afont.caption
 msgid "Font..."
 msgstr "Шрифт..."
+
+#: tformnotetask.agoto.caption
+msgid "Go to..."
+msgstr "Перейти..."
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
@@ -118,9 +150,17 @@ msgstr "Открыть..."
 msgid "Page properties..."
 msgstr "Параметры страницы..."
 
+#: tformnotetask.apaste.caption
+msgid "Paste"
+msgstr "Вставить"
+
 #: tformnotetask.aprint.caption
 msgid "Print..."
 msgstr "Печать..."
+
+#: tformnotetask.areplace.caption
+msgid "Replace..."
+msgstr "Заменить..."
 
 #: tformnotetask.asave.caption
 msgid "Save"
@@ -130,6 +170,10 @@ msgstr "Сохранить"
 msgid "Save as..."
 msgstr "Сохранить как..."
 
+#: tformnotetask.aselectall.caption
+msgid "Select all"
+msgstr "Выделить все"
+
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "Архивные задачи"
@@ -137,6 +181,10 @@ msgstr "Архивные задачи"
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "Строка состояния"
+
+#: tformnotetask.aundo.caption
+msgid "Undo changes"
+msgstr "Отменить изменения"
 
 #: tformnotetask.awordwrap.caption
 msgid "Word wrap"
@@ -162,6 +210,10 @@ msgstr "Notetask"
 #: tformnotetask.fontdialog.title
 msgid "Font select"
 msgstr "Выбор шрифта"
+
+#: tformnotetask.menuedit.caption
+msgid "Edit"
+msgstr "Правка"
 
 #: tformnotetask.menufile.caption
 msgid "File"

@@ -59,17 +59,49 @@ msgstr ""
 msgid "Archive / unarchive tasks"
 msgstr ""
 
+#: tformnotetask.acopy.caption
+msgid "Copy"
+msgstr ""
+
+#: tformnotetask.acut.caption
+msgid "Cut"
+msgstr ""
+
+#: tformnotetask.adatetime.caption
+msgid "Date time"
+msgstr ""
+
+#: tformnotetask.adelete.caption
+msgid "Delete"
+msgstr ""
+
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
-msgid "Delete selected tasks"
+msgid "Delete tasks"
 msgstr ""
 
 #: tformnotetask.aexit.caption
 msgid "Exit"
 msgstr ""
 
+#: tformnotetask.afind.caption
+msgid "Find..."
+msgstr ""
+
+#: tformnotetask.afindnext.caption
+msgid "Find next"
+msgstr ""
+
+#: tformnotetask.afindprev.caption
+msgid "Find previous"
+msgstr ""
+
 #: tformnotetask.afont.caption
 msgid "Font..."
+msgstr ""
+
+#: tformnotetask.agoto.caption
+msgid "Go to..."
 msgstr ""
 
 #: tformnotetask.ainserttask.caption
@@ -108,8 +140,16 @@ msgstr ""
 msgid "Page properties..."
 msgstr ""
 
+#: tformnotetask.apaste.caption
+msgid "Paste"
+msgstr ""
+
 #: tformnotetask.aprint.caption
 msgid "Print..."
+msgstr ""
+
+#: tformnotetask.areplace.caption
+msgid "Replace..."
 msgstr ""
 
 #: tformnotetask.asave.caption
@@ -120,12 +160,20 @@ msgstr ""
 msgid "Save as..."
 msgstr ""
 
+#: tformnotetask.aselectall.caption
+msgid "Select all"
+msgstr ""
+
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr ""
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
+msgstr ""
+
+#: tformnotetask.aundo.caption
+msgid "Undo changes"
 msgstr ""
 
 #: tformnotetask.awordwrap.caption
@@ -151,6 +199,10 @@ msgstr ""
 
 #: tformnotetask.fontdialog.title
 msgid "Font select"
+msgstr ""
+
+#: tformnotetask.menuedit.caption
+msgid "Edit"
 msgstr ""
 
 #: tformnotetask.menufile.caption

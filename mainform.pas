@@ -14,7 +14,19 @@ type
   { TformNotetask }
   TformNotetask = class(TForm)
     aArchiveTasks: TAction;
-    AAbout: TAction;
+    aAbout: TAction;
+    aCopy: TAction;
+    aDelete: TAction;
+    aDateTime: TAction;
+    aSelectAll: TAction;
+    aGoTo: TAction;
+    aReplace: TAction;
+    aFindPrev: TAction;
+    aFindNext: TAction;
+    aFind: TAction;
+    aPaste: TAction;
+    aCut: TAction;
+    aUndo: TAction;
     AShowArchived: TAction;
     aShowStatusBar: TAction;
     aMoveTaskBottom: TAction;
@@ -45,8 +57,26 @@ type
     menuArchiveTasks: TMenuItem;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
-    menuHelp: TMenuItem;
     MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
+    MenuItem5: TMenuItem;
+    menuPaste: TMenuItem;
+    menuCopy: TMenuItem;
+    menuCut: TMenuItem;
+    MenuItem9: TMenuItem;
+    menuShowArchived: TMenuItem;
+    menuFindNext: TMenuItem;
+    menuFindPrev: TMenuItem;
+    menuReplace: TMenuItem;
+    menuGoTo: TMenuItem;
+    menuDateTime: TMenuItem;
+    menuShowStatusBar: TMenuItem;
+    menuHelp: TMenuItem;
+    menuAbout: TMenuItem;
+    menuEdit: TMenuItem;
+    menuUndo: TMenuItem;
+    menuDelete: TMenuItem;
+    menuFind: TMenuItem;
     menuView: TMenuItem;
     menuMoveTaskTop: TMenuItem;
     menuMoveTaskUp: TMenuItem;
@@ -63,12 +93,19 @@ type
     menuNew: TMenuItem;
     openDialog: TOpenDialog;
     pageSetupDialog: TPageSetupDialog;
+    Popup: TPopupMenu;
     printDialog: TPrintDialog;
     saveDialog: TSaveDialog;
     Separator1: TMenuItem;
     menuExit: TMenuItem;
     Separator2: TMenuItem;
     Separator3: TMenuItem;
+    Separator4: TMenuItem;
+    Separator5: TMenuItem;
+    menuSelectAll: TMenuItem;
+    Separator6: TMenuItem;
+    Separator7: TMenuItem;
+    Separator8: TMenuItem;
     statusBar: TStatusBar;
     taskGrid: TStringGrid;
     procedure aArchiveTasksExecute(Sender: TObject);
@@ -105,6 +142,7 @@ type
     procedure taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure taskGridMouseLeave(Sender: TObject);
+    procedure taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
     procedure taskGridResize(Sender: TObject);
     procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
@@ -561,7 +599,11 @@ begin
   else
   if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
   begin
-    taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount);
+    if (not taskGrid.EditorMode) and (not IsEditing) then
+    begin
+      taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount);
+      Key := 0;
+    end;
   end;
 end;
 
@@ -1052,6 +1094,12 @@ begin
   IsSelecting := False;
 end;
 
+procedure TformNotetask.taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  if (Button = mbRight) and (not taskGrid.EditorMode) and (not IsEditing) then
+    Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
+end;
+
 procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint; var Handled: boolean);
 begin
@@ -1204,7 +1252,7 @@ begin
   Memo.BorderStyle := bsNone;
   Memo.WordWrap := FWordWrap;
   Memo.WantReturns := FWordWrap;
-  Memo.ScrollBars := ssAutoVertical;
+  Memo.ScrollBars := ssNone;
 
   MemoSetBounds(aCol, aRow);
   Memo.Parent := taskGrid;

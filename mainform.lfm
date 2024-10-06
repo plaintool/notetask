@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -63,6 +62,7 @@ object formNotetask: TformNotetask
     OnHeaderSized = taskGridHeaderSized
     OnMouseDown = taskGridMouseDown
     OnMouseLeave = taskGridMouseLeave
+    OnMouseUp = taskGridMouseUp
     OnMouseWheel = taskGridMouseWheel
     OnResize = taskGridResize
     OnSelectEditor = taskGridSelectEditor
@@ -141,14 +141,52 @@ object formNotetask: TformNotetask
         Action = aExit
       end
     end
-    object menuFormat: TMenuItem
-      Caption = 'Format'
-      object menuWordWrap: TMenuItem
-        Action = aWordWrap
-        AutoCheck = True
+    object menuEdit: TMenuItem
+      Caption = 'Edit'
+      object menuUndo: TMenuItem
+        Action = aUndo
       end
-      object menuFont: TMenuItem
-        Action = aFont
+      object Separator4: TMenuItem
+        Caption = '-'
+      end
+      object menuCut: TMenuItem
+        Action = aCut
+      end
+      object menuCopy: TMenuItem
+        Action = aCopy
+      end
+      object menuPaste: TMenuItem
+        Action = aPaste
+      end
+      object menuDelete: TMenuItem
+        Action = aDelete
+      end
+      object Separator5: TMenuItem
+        Caption = '-'
+      end
+      object menuFind: TMenuItem
+        Action = aFind
+      end
+      object menuFindNext: TMenuItem
+        Action = aFindNext
+      end
+      object menuFindPrev: TMenuItem
+        Action = aFindPrev
+      end
+      object menuReplace: TMenuItem
+        Action = aReplace
+      end
+      object menuGoTo: TMenuItem
+        Action = aGoTo
+      end
+      object Separator7: TMenuItem
+        Caption = '-'
+      end
+      object menuSelectAll: TMenuItem
+        Action = aSelectAll
+      end
+      object menuDateTime: TMenuItem
+        Action = aDateTime
       end
     end
     object menuTask: TMenuItem
@@ -178,21 +216,31 @@ object formNotetask: TformNotetask
         Action = aMoveTaskBottom
       end
     end
+    object menuFormat: TMenuItem
+      Caption = 'Format'
+      object menuWordWrap: TMenuItem
+        Action = aWordWrap
+        AutoCheck = True
+      end
+      object menuFont: TMenuItem
+        Action = aFont
+      end
+    end
     object menuView: TMenuItem
       Caption = 'View'
-      object MenuItem1: TMenuItem
+      object menuShowArchived: TMenuItem
         Action = AShowArchived
         AutoCheck = True
       end
-      object MenuItem2: TMenuItem
+      object menuShowStatusBar: TMenuItem
         Action = aShowStatusBar
         AutoCheck = True
       end
     end
     object menuHelp: TMenuItem
       Caption = 'Help'
-      object MenuItem3: TMenuItem
-        Action = AAbout
+      object menuAbout: TMenuItem
+        Action = aAbout
       end
     end
   end
@@ -260,6 +308,26 @@ object formNotetask: TformNotetask
       Checked = True
       OnExecute = aWordWrapExecute
     end
+    object aUndo: TAction
+      Category = 'Edit'
+      Caption = 'Undo changes'
+      ShortCut = 16474
+    end
+    object aCut: TAction
+      Category = 'Edit'
+      Caption = 'Cut'
+      ShortCut = 16472
+    end
+    object aCopy: TAction
+      Category = 'Edit'
+      Caption = 'Copy'
+      ShortCut = 16451
+    end
+    object aPaste: TAction
+      Category = 'Edit'
+      Caption = 'Paste'
+      ShortCut = 16470
+    end
     object aInsertTask: TAction
       Category = 'Task'
       Caption = 'Insert task'
@@ -267,7 +335,7 @@ object formNotetask: TformNotetask
     end
     object ADeleteTasks: TAction
       Category = 'Task'
-      Caption = 'Delete selected tasks'
+      Caption = 'Delete tasks'
       OnExecute = ADeleteTasksExecute
       ShortCut = 16430
     end
@@ -314,9 +382,48 @@ object formNotetask: TformNotetask
       Caption = 'Show archived tasks'
       OnExecute = AShowArchivedExecute
     end
-    object AAbout: TAction
+    object aAbout: TAction
       Category = 'Help'
       Caption = 'About...'
+    end
+    object aDelete: TAction
+      Category = 'Edit'
+      Caption = 'Delete'
+    end
+    object aFind: TAction
+      Category = 'Edit'
+      Caption = 'Find...'
+      ShortCut = 16454
+    end
+    object aFindNext: TAction
+      Category = 'Edit'
+      Caption = 'Find next'
+      ShortCut = 114
+    end
+    object aFindPrev: TAction
+      Category = 'Edit'
+      Caption = 'Find previous'
+      ShortCut = 8306
+    end
+    object aReplace: TAction
+      Category = 'Edit'
+      Caption = 'Replace...'
+      ShortCut = 16456
+    end
+    object aGoTo: TAction
+      Category = 'Edit'
+      Caption = 'Go to...'
+      ShortCut = 16455
+    end
+    object aSelectAll: TAction
+      Category = 'Edit'
+      Caption = 'Select all'
+      ShortCut = 16449
+    end
+    object aDateTime: TAction
+      Category = 'Edit'
+      Caption = 'Date time'
+      ShortCut = 116
     end
   end
   object openDialog: TOpenDialog
@@ -361,5 +468,33 @@ object formNotetask: TformNotetask
     MaxFontSize = 0
     Left = 680
     Top = 112
+  end
+  object Popup: TPopupMenu
+    Left = 160
+    Top = 184
+    object MenuItem1: TMenuItem
+      Action = aUndo
+    end
+    object Separator8: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem2: TMenuItem
+      Action = aCut
+    end
+    object MenuItem3: TMenuItem
+      Action = aCopy
+    end
+    object MenuItem4: TMenuItem
+      Action = aPaste
+    end
+    object MenuItem5: TMenuItem
+      Action = aDelete
+    end
+    object Separator6: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem9: TMenuItem
+      Action = aSelectAll
+    end
   end
 end
