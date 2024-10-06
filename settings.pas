@@ -41,6 +41,8 @@ begin
     // Сохранение положения и размера формы
 
     JSonObj.Add('WordWrap', Form.WordWrap);
+    JSonObj.Add('ShowArchived', Form.ShowArchived);
+    JSonObj.Add('ShowStatusBar', Form.ShowStatusBar);
     JSonObj.Add('WindowState', Ord(Form.WindowState));
     JSONObj.Add('Left', Form.RestoredLeft);
     JSONObj.Add('Top', Form.RestoredTop);
@@ -89,6 +91,10 @@ begin
       // Check and load form's position and size
       if JSONObj.FindPath('WordWrap') <> nil then
         Form.WordWrap := JSONObj.FindPath('WordWrap').AsBoolean;
+      if JSONObj.FindPath('ShowArchived') <> nil then
+        Form.WordWrap := JSONObj.FindPath('ShowArchived').AsBoolean;
+      if JSONObj.FindPath('ShowStatusBar') <> nil then
+        Form.WordWrap := JSONObj.FindPath('ShowStatusBar').AsBoolean;
       if JSONObj.FindPath('WindowState') <> nil then
         Form.WindowState := TWindowState(JSONObj.FindPath('WindowState').AsInteger);
       if JSONObj.FindPath('Left') <> nil then

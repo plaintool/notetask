@@ -177,6 +177,23 @@ object formNotetask: TformNotetask
         Action = aMoveTaskBottom
       end
     end
+    object menuView: TMenuItem
+      Caption = 'View'
+      object MenuItem1: TMenuItem
+        Action = AShowArchived
+        AutoCheck = True
+      end
+      object MenuItem2: TMenuItem
+        Action = aShowStatusBar
+        AutoCheck = True
+      end
+    end
+    object menuHelp: TMenuItem
+      Caption = 'Help'
+      object MenuItem3: TMenuItem
+        Action = AAbout
+      end
+    end
   end
   object ActionList: TActionList
     Left = 240
@@ -282,6 +299,23 @@ object formNotetask: TformNotetask
       Caption = 'Move task to bottom'
       OnExecute = aMoveTaskBottomExecute
       ShortCut = 16418
+    end
+    object aShowStatusBar: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Show status bar'
+      Checked = True
+      OnExecute = aShowStatusBarExecute
+    end
+    object AShowArchived: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Show archived tasks'
+      OnExecute = AShowArchivedExecute
+    end
+    object AAbout: TAction
+      Category = 'Help'
+      Caption = 'About...'
     end
   end
   object openDialog: TOpenDialog

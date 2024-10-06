@@ -51,6 +51,10 @@ msgstr ""
 msgid "Untitled"
 msgstr ""
 
+#: tformnotetask.aabout.caption
+msgid "About..."
+msgstr ""
+
 #: tformnotetask.aarchivetasks.caption
 msgid "Archive / unarchive tasks"
 msgstr ""
@@ -116,6 +120,14 @@ msgstr ""
 msgid "Save as..."
 msgstr ""
 
+#: tformnotetask.ashowarchived.caption
+msgid "Show archived tasks"
+msgstr ""
+
+#: tformnotetask.ashowstatusbar.caption
+msgid "Show status bar"
+msgstr ""
+
 #: tformnotetask.awordwrap.caption
 msgid "Word wrap"
 msgstr ""
@@ -149,9 +161,17 @@ msgstr ""
 msgid "Format"
 msgstr ""
 
+#: tformnotetask.menuhelp.caption
+msgid "Help"
+msgstr ""
+
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"
 msgid "Task"
+msgstr ""
+
+#: tformnotetask.menuview.caption
+msgid "View"
 msgstr ""
 
 #: tformnotetask.opendialog.title

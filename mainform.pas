@@ -14,6 +14,9 @@ type
   { TformNotetask }
   TformNotetask = class(TForm)
     aArchiveTasks: TAction;
+    AAbout: TAction;
+    AShowArchived: TAction;
+    aShowStatusBar: TAction;
     aMoveTaskBottom: TAction;
     aMoveTaskDown: TAction;
     aMoveTaskUp: TAction;
@@ -40,6 +43,11 @@ type
     menuInsertTask: TMenuItem;
     menuDeleteTasks: TMenuItem;
     menuArchiveTasks: TMenuItem;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    menuHelp: TMenuItem;
+    MenuItem3: TMenuItem;
+    menuView: TMenuItem;
     menuMoveTaskTop: TMenuItem;
     menuMoveTaskUp: TMenuItem;
     menuMoveTaskDown: TMenuItem;
@@ -79,6 +87,8 @@ type
     procedure aPrintExecute(Sender: TObject);
     procedure aSaveAsExecute(Sender: TObject);
     procedure aSaveExecute(Sender: TObject);
+    procedure AShowArchivedExecute(Sender: TObject);
+    procedure aShowStatusBarExecute(Sender: TObject);
     procedure aWordWrapExecute(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
@@ -112,6 +122,8 @@ type
     FLineEnding: TLineEnding;
     FLineCount: integer;
     FWordWrap: boolean;
+    FShowStatusBar: boolean;
+    FShowArchived: boolean;
     procedure MemoChange(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
@@ -126,6 +138,8 @@ type
     procedure DeleteTasks;
     procedure ArchiveTask(aRow: integer = 0);
     procedure ArchiveTasks;
+    procedure SetShowStatusBar(Value: boolean);
+    procedure SetShowArchived(Value: boolean);
     procedure CompleteTasks(aRow: integer = 0);
     function IsCanClose: boolean;
   public
@@ -133,6 +147,8 @@ type
     procedure SaveFile(fileName: string = string.Empty);
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
+    property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
+    property ShowArchived: boolean read FShowArchived write SetShowArchived;
   end;
 
 var
@@ -168,6 +184,7 @@ var
   FilePath: string;
 begin
   FWordWrap := True;
+  FShowStatusBar := True;
   clRowHighlight := RGBToColor(210, 230, 255);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
@@ -185,6 +202,8 @@ begin
 
   // After load wordwrap setting
   aWordWrap.Checked := FWordWrap;
+  aShowStatusBar.Checked := FShowStatusBar;
+  aShowArchived.Checked := FShowArchived;
 
   // Check if a command line argument is passed
   if ParamCount > 0 then
@@ -500,8 +519,16 @@ begin
       CompleteTasks;
       Key := 0;
     end;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_RETURN) then // Ctrl +Enter
+  begin
+    if (taskGrid.EditorMode) or (IsEditing) then
+    begin
+      EditComplite;
+      Key := 0;
+    end;
   end;
-
 end;
 
 procedure TformNotetask.aExitExecute(Sender: TObject);
@@ -682,6 +709,28 @@ end;
 procedure TformNotetask.aSaveExecute(Sender: TObject);
 begin
   SaveFile(FFileName);
+end;
+
+procedure TformNotetask.AShowArchivedExecute(Sender: TObject);
+begin
+  ShowArchived := aShowArchived.Checked;
+end;
+
+procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
+begin
+  ShowStatusBar := aShowStatusBar.Checked;
+end;
+
+procedure TformNotetask.SetShowStatusBar(Value: boolean);
+begin
+  FShowStatusBar := Value;
+  StatusBar.Visible := FShowStatusBar;
+end;
+
+procedure TformNotetask.SetShowArchived(Value: boolean);
+begin
+  FShowArchived := Value;
+  Tasks.FillGrid(taskGrid);
 end;
 
 procedure TformNotetask.aWordWrapExecute(Sender: TObject);
@@ -999,7 +1048,7 @@ begin
       grid.Canvas.Font.Color := clBlack;
     end;
 
-    if (Tasks.HasTask(ARow - 1) and Tasks.GetTask(ARow - 1).IsArchive) then
+    if (aCol = 2) and (Tasks.HasTask(ARow - 1) and Tasks.GetTask(ARow - 1).IsArchive) then
       grid.Canvas.Font.Style := [fsStrikeOut];
 
     // Fill the cell background

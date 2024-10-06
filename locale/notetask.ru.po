@@ -61,6 +61,10 @@ msgstr "Файлы задач (*.tsk)|*.tsk|Текстовые файлы (*.txt
 msgid "Untitled"
 msgstr "Безымянный"
 
+#: tformnotetask.aabout.caption
+msgid "About..."
+msgstr "О программе..."
+
 #: tformnotetask.aarchivetasks.caption
 msgid "Archive / unarchive tasks"
 msgstr "Архивировать / деархивировать задачи"
@@ -126,6 +130,14 @@ msgstr "Сохранить"
 msgid "Save as..."
 msgstr "Сохранить как..."
 
+#: tformnotetask.ashowarchived.caption
+msgid "Show archived tasks"
+msgstr "Архивные задачи"
+
+#: tformnotetask.ashowstatusbar.caption
+msgid "Show status bar"
+msgstr "Строка состояния"
+
 #: tformnotetask.awordwrap.caption
 msgid "Word wrap"
 msgstr "Перенос по словам"
@@ -159,10 +171,18 @@ msgstr "Файл"
 msgid "Format"
 msgstr "Формат"
 
+#: tformnotetask.menuhelp.caption
+msgid "Help"
+msgstr "Справка"
+
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"
 msgid "Task"
 msgstr "Задача"
+
+#: tformnotetask.menuview.caption
+msgid "View"
+msgstr "Вид"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"
