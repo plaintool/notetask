@@ -52,7 +52,7 @@ msgid "Untitled"
 msgstr ""
 
 #: tformnotetask.aarchivetasks.caption
-msgid "Archive selected tasks"
+msgid "Archive / unarchive tasks"
 msgstr ""
 
 #: tformnotetask.adeletetasks.caption

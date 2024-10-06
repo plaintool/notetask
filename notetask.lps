@@ -20,8 +20,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="233"/>
-        <CursorPos X="3" Y="249"/>
+        <TopLine Value="460"/>
+        <CursorPos X="23" Y="471"/>
         <UsageCount Value="90"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -189,10 +189,6 @@
     <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="mainform.pas"/>
-        <Caret Line="394" Column="14" TopLine="369"/>
-      </Position>
-      <Position>
-        <Filename Value="mainform.pas"/>
         <Caret Line="400" Column="14" TopLine="375"/>
       </Position>
       <Position>
@@ -306,6 +302,10 @@
       <Position>
         <Filename Value="mainform.pas"/>
         <Caret Line="249" Column="11" TopLine="233"/>
+      </Position>
+      <Position>
+        <Filename Value="mainform.pas"/>
+        <Caret Line="252" Column="42" TopLine="215"/>
       </Position>
     </JumpHistory>
     <CustomSessionData Count="2">

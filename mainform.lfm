@@ -255,7 +255,7 @@ object formNotetask: TformNotetask
     end
     object aArchiveTasks: TAction
       Category = 'Task'
-      Caption = 'Archive selected tasks'
+      Caption = 'Archive / unarchive tasks'
       OnExecute = aArchiveTasksExecute
       ShortCut = 24641
     end

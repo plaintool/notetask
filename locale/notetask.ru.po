@@ -40,12 +40,8 @@ msgstr "Вы уверены, что хотите удалить выбранны
 
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
-msgid ""
-"Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|"
-"All files (*.*)|*.*"
-msgstr ""
-"Файлы задач (*.tsk)|*.tsk|Текстовые файлы (*.txt)|*.txt|Файлы разметки "
-"Markdown (*.md)|*.md|Все файлы (*.*)|*.*"
+msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
+msgstr "Файлы задач (*.tsk)|*.tsk|Текстовые файлы (*.txt)|*.txt|Файлы разметки Markdown (*.md)|*.md|Все файлы (*.*)|*.*"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"
@@ -58,20 +54,16 @@ msgstr "Сохранить изменения?"
 
 #: mainform.rsavedialogfilter
 msgctxt "mainform.rsavedialogfilter"
-msgid ""
-"Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|"
-"All files (*.*)|*.*"
-msgstr ""
-"Файлы задач (*.tsk)|*.tsk|Текстовые файлы (*.txt)|*.txt|Файлы разметки "
-"Markdown (*.md)|*.md|Все файлы (*.*)|*.*"
+msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
+msgstr "Файлы задач (*.tsk)|*.tsk|Текстовые файлы (*.txt)|*.txt|Файлы разметки Markdown (*.md)|*.md|Все файлы (*.*)|*.*"
 
 #: mainform.runtitled
 msgid "Untitled"
 msgstr "Безымянный"
 
 #: tformnotetask.aarchivetasks.caption
-msgid "Archive selected tasks"
-msgstr "Архивировать выбранные ызадачи"
+msgid "Archive / unarchive tasks"
+msgstr "Архивировать / деархивировать задачи"
 
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"

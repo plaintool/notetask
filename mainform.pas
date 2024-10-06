@@ -471,7 +471,7 @@ begin
     Key := 0;
   end
   else
-  if (Key = VK_UP) then // Up
+  if (Shift = [ssShift]) and (Key = VK_UP) then // Shift + Up
   begin
     if (taskGrid.EditorMode) or (IsEditing) then
     begin
@@ -482,7 +482,7 @@ begin
     end;
   end
   else
-  if (Key = VK_DOWN) then // Down
+  if (Shift = [ssShift]) and (Key = VK_DOWN) then // Shift + Down
   begin
     if (taskGrid.EditorMode) or (IsEditing) then
     begin
