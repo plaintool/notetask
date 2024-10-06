@@ -557,6 +557,11 @@ begin
       EditComplite;
       Key := 0;
     end;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
+  begin
+    taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount);
   end;
 end;
 
