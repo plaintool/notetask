@@ -9,6 +9,8 @@ uses
 
 function DetectEncoding(const FileName: string): TEncoding;
 
+function GetEncodingName(Encoding: TEncoding): string;
+
 function TextToStringList(const TextContent: string): TStringList;
 
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
@@ -22,46 +24,80 @@ function DetectEncoding(const FileName: string): TEncoding;
 var
   FileStream: TFileStream;
   Buffer: array[0..3] of byte;
-  ContentBuffer: array of byte; // Динамический массив
+  ContentBuffer: array of byte; // Dynamic array
   BytesRead: integer;
+  i: Integer;
+  Utf8Candidate: Boolean;
 begin
   Result := TEncoding.UTF8;
-  // Предполагаем, что файл в UTF-8 по умолчанию
+  // Assume UTF-8 by default
   FileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
   try
-    // Читаем первые 4 байта для анализа BOM
+    // Read the first 4 bytes to check for BOM
     BytesRead := FileStream.Read(Buffer, SizeOf(Buffer));
 
     if BytesRead >= 3 then
     begin
-      // Проверяем на UTF-8 BOM
+      // Check for UTF-8 BOM
       if (Buffer[0] = $EF) and (Buffer[1] = $BB) and (Buffer[2] = $BF) then
         Result := TEncoding.UTF8
-      // Проверяем на UTF-16 LE BOM
+      // Check for UTF-16 LE BOM
       else if (Buffer[0] = $FF) and (Buffer[1] = $FE) then
         Result := TEncoding.Unicode
-      // Проверяем на UTF-16 BE BOM
+      // Check for UTF-16 BE BOM
       else if (Buffer[0] = $FE) and (Buffer[1] = $FF) then
         Result := TEncoding.BigEndianUnicode;
     end
     else
     begin
-      // Если BOM не найден, проверяем содержимое на наличие текстовых символов
+      // If no BOM is found, check the content for text patterns
       FileStream.Position := 0;
-      // Сбросить позицию на начало файла
+      // Reset position to the beginning of the file
       SetLength(ContentBuffer, 1024);
-      // Создаем динамический массив для первых 1024 байт
+      // Create a dynamic array for the first 1024 bytes
       BytesRead := FileStream.Read(ContentBuffer[0], Length(ContentBuffer));
 
-      // Проверка на наличие символов UTF-8
-      if (BytesRead > 0) and (Pos(#0, string(pansichar(@ContentBuffer[0]))) = 0) then
+      // Check if the file content could be UTF-8
+      Utf8Candidate := True;
+      for i := 0 to BytesRead - 1 do
       begin
-        Result := TEncoding.UTF8; // Предполагаем, что это UTF-8
+        // If any byte does not match UTF-8 structure, assume ANSI
+        if (ContentBuffer[i] >= $80) and (ContentBuffer[i] <= $BF) then
+        begin
+          Utf8Candidate := False;
+          Break;
+        end;
       end;
+
+      // If no invalid UTF-8 bytes were found, assume UTF-8, otherwise ANSI
+      if Utf8Candidate then
+        Result := TEncoding.UTF8
+      else
+        Result := TEncoding.ANSI;
     end;
   finally
     FileStream.Free;
   end;
+end;
+
+function GetEncodingName(Encoding: TEncoding): string;
+begin
+  if Encoding = TEncoding.UTF8 then
+    Result := 'UTF-8'
+  else if Encoding = TEncoding.Unicode then
+    Result := 'UTF-16 LE'
+  else if Encoding = TEncoding.BigEndianUnicode then
+    Result := 'UTF-16 BE'
+  else if Encoding = TEncoding.ANSI then
+    Result := 'ANSI'
+  else if Encoding = TEncoding.ASCII then
+    Result := 'ASCII'
+  else if Encoding = TEncoding.UTF7 then
+    Result := 'UTF-7'
+  else if Encoding = TEncoding.Default then
+    Result := 'Default'
+  else
+    Result := 'Unknown';
 end;
 
 function TextToStringList(const TextContent: string): TStringList;

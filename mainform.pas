@@ -123,7 +123,7 @@ type
     FLineCount: integer;
     FWordWrap: boolean;
     FShowStatusBar: boolean;
-    FShowArchived: boolean;
+    FSortOrder: TSortOrder;
     procedure MemoChange(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
@@ -141,14 +141,19 @@ type
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowArchived(Value: boolean);
     procedure CompleteTasks(aRow: integer = 0);
+    procedure ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
+    procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     function IsCanClose: boolean;
   public
+    FShowArchived: boolean;
+
     procedure OpenFile(fileName: string);
     procedure SaveFile(fileName: string = string.Empty);
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
     property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
+    property SortOrder: TSortOrder read FSortOrder write FSortOrder;
   end;
 
 var
@@ -185,6 +190,7 @@ var
 begin
   FWordWrap := True;
   FShowStatusBar := True;
+  FSortOrder := soAscending;
   clRowHighlight := RGBToColor(210, 230, 255);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
@@ -246,10 +252,10 @@ begin
       begin
         for j := Rect.Left to Rect.Right do
         begin
-          if (j = 1) then Tasks.GetTask(i - 1).IsCompleted := False;
-          if (j = 2) then Tasks.GetTask(i - 1).TaskDescription := '';
-          if (j = 3) then Tasks.GetTask(i - 1).Comment := '';
-          if (j = 4) then Tasks.GetTask(i - 1).CompletionDate := 0;
+          if (j = 1) then Tasks.GetTask(i).IsCompleted := False;
+          if (j = 2) then Tasks.GetTask(i).TaskDescription := '';
+          if (j = 3) then Tasks.GetTask(i).Comment := '';
+          if (j = 4) then Tasks.GetTask(i).CompletionDate := 0;
           if (j = 1) then
             taskGrid.Cells[j, i] := '0'
           else
@@ -281,7 +287,7 @@ begin
     if Confirm = mrYes then
     begin
       // RemoveTask from collection
-      Tasks.DeleteTask(RowIndex - 1);
+      //Tasks.DeleteTask(RowIndex);
       taskGrid.DeleteRow(RowIndex);
       SetChanged;
     end;
@@ -307,7 +313,7 @@ begin
         if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
         begin
           // Remove the task from the collection
-          Tasks.DeleteTask(RowIndex - 1);
+          //Tasks.DeleteTask(RowIndex);
           taskGrid.DeleteRow(RowIndex);
         end;
       end;
@@ -336,7 +342,8 @@ begin
     if Confirm = mrYes then
     begin
       // RemoveTask from collection
-      Tasks.ArchiveTask(RowIndex - 1);
+      Tasks.ArchiveTask(RowIndex);
+      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
       SetChanged;
     end;
   end;
@@ -361,9 +368,10 @@ begin
         if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
         begin
           // Archive the task from the collection
-          Tasks.ArchiveTask(RowIndex - 1);
+          Tasks.ArchiveTask(RowIndex);
         end;
       end;
+      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
       SetChanged; // Mark that data has changed
     end;
   end
@@ -387,8 +395,8 @@ begin
       if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
       begin
         // Mark the task as completed in the collection
-        Tasks.CompleteTask(RowIndex - 1);
-        if Tasks.GetTask(RowIndex - 1).IsCompleted then
+        Tasks.CompleteTask(RowIndex);
+        if Tasks.GetTask(RowIndex).IsCompleted then
           taskGrid.Cells[1, RowIndex] := '1'
         else
           taskGrid.Cells[1, RowIndex] := '0';
@@ -407,8 +415,8 @@ begin
     if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
     begin
       // Mark the task as completed in the collection
-      Tasks.CompleteTask(RowIndex - 1);
-      if Tasks.GetTask(RowIndex - 1).IsCompleted then
+      Tasks.CompleteTask(RowIndex);
+      if Tasks.GetTask(RowIndex).IsCompleted then
         taskGrid.Cells[1, RowIndex] := '1'
       else
         taskGrid.Cells[1, RowIndex] := '0';
@@ -416,6 +424,29 @@ begin
     end;
   end;
   Invalidate;
+end;
+
+procedure TformNotetask.ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
+var
+  i: integer;
+begin
+  if (aRow = 0) then
+  begin
+    for i := 0 to taskGrid.RowCount - 1 do
+    begin
+      if aHeight = 0 then
+        taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight
+      else
+        taskGrid.RowHeights[i] := aHeight;
+    end;
+  end
+  else
+  begin
+    if aHeight = 0 then
+      taskGrid.RowHeights[aRow] := taskGrid.DefaultRowHeight
+    else
+      taskGrid.RowHeights[aRow] := aHeight;
+  end;
 end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -441,9 +472,7 @@ begin
         DeleteTask;
         Key := 0;
       end;
-    end
-    else
-      Key := 0;
+    end;
   end
   else
   if (Key = VK_ESCAPE) then // Escape
@@ -490,7 +519,7 @@ begin
     Key := 0;
   end
   else
-  if (Shift = [ssShift]) and (Key = VK_UP) then // Shift + Up
+  if (Shift = [ssCtrl, ssShift]) and (Key = VK_UP) then // Ctrl + Shift + Up
   begin
     if (taskGrid.EditorMode) or (IsEditing) then
     begin
@@ -501,7 +530,7 @@ begin
     end;
   end
   else
-  if (Shift = [ssShift]) and (Key = VK_DOWN) then // Shift + Down
+  if (Shift = [ssCtrl, ssShift]) and (Key = VK_DOWN) then // Ctrl + Shift + Down
   begin
     if (taskGrid.EditorMode) or (IsEditing) then
     begin
@@ -549,47 +578,91 @@ end;
 procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
 begin
   Tasks.InsertTask('[ ]', taskGrid.Row);
-  Tasks.FillGrid(taskGrid);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
   FLineCount += 1;
   SetInfo;
   SetChanged;
 end;
 
-procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
+procedure TformNotetask.SwapRowHeights(RowIndex1, RowIndex2: integer);
+var
+  TempHeight: integer;
 begin
-  Tasks.MoveTaskToTop(taskGrid.Row - 1);
-  Tasks.FillGrid(taskGrid);
-  taskGrid.Row := 1;
+  // Check if the row indices are valid
+  if (RowIndex1 < 0) or (RowIndex1 >= taskGrid.RowCount) or
+     (RowIndex2 < 0) or (RowIndex2 >= taskGrid.RowCount) then
+    Exit; // Exit if the indices are invalid
+
+  // Store the height of the first row
+  TempHeight := taskGrid.RowHeights[RowIndex1];
+
+  // Swap the heights of the two rows
+  taskGrid.RowHeights[RowIndex1] := taskGrid.RowHeights[RowIndex2];
+  taskGrid.RowHeights[RowIndex2] := TempHeight;
+end;
+
+procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
+var
+  newRow: integer;
+begin
+  newRow := Tasks.MoveTaskToTop(taskGrid.Row);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  if (newRow > -1) then
+  begin
+    SwapRowHeights(taskGrid.Row, newRow);
+    taskGrid.Row := newRow;
+  end;
   SetChanged;
   Invalidate;
   Application.ProcessMessages;
 end;
 
 procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
+var
+  newRow: integer;
 begin
-  Tasks.MoveTaskUp(taskGrid.Row - 1);
-  Tasks.FillGrid(taskGrid);
-  if taskGrid.Row > 1 then taskGrid.Row := taskGrid.Row - 1;
+  newRow := Tasks.MoveTaskUp(taskGrid.Row);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  if (newRow > -1) then
+  begin
+    SwapRowHeights(taskGrid.Row, newRow);
+    taskGrid.Row := newRow;
+  end;
+  //  if taskGrid.Row > 1 then taskGrid.Row := taskGrid.Row - 1;
   SetChanged;
   Invalidate;
   Application.ProcessMessages;
 end;
 
 procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
+var
+  newRow: integer;
 begin
-  Tasks.MoveTaskDown(taskGrid.Row - 1);
-  Tasks.FillGrid(taskGrid);
-  if taskGrid.Row < taskGrid.RowCount - 1 then taskGrid.Row := taskGrid.Row + 1;
+  newRow := Tasks.MoveTaskDown(taskGrid.Row);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  if (newRow > -1) then
+  begin
+    SwapRowHeights(taskGrid.Row, newRow);
+    taskGrid.Row := newRow;
+  end;
+  //  if taskGrid.Row < taskGrid.RowCount - 1 then taskGrid.Row := taskGrid.Row + 1;
   SetChanged;
   Invalidate;
   Application.ProcessMessages;
 end;
 
 procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
+var
+  newRow: integer;
 begin
-  Tasks.MoveTaskToBottom(taskGrid.Row - 1);
-  Tasks.FillGrid(taskGrid);
-  taskGrid.Row := taskGrid.RowCount - 1;
+  newRow := Tasks.MoveTaskToBottom(taskGrid.Row);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  if (newRow > -1) then
+  begin
+    SwapRowHeights(taskGrid.Row, newRow);
+    taskGrid.Row := newRow;
+  end;
+  //  taskGrid.Row := taskGrid.RowCount - 1;
   SetChanged;
   Invalidate;
   Application.ProcessMessages;
@@ -730,7 +803,7 @@ end;
 procedure TformNotetask.SetShowArchived(Value: boolean);
 begin
   FShowArchived := Value;
-  Tasks.FillGrid(taskGrid);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
 end;
 
 procedure TformNotetask.aWordWrapExecute(Sender: TObject);
@@ -739,10 +812,7 @@ var
 begin
   EditComplite;
   FWordWrap := aWordWrap.Checked;
-  for i := 0 to taskGrid.RowCount - 1 do
-  begin
-    taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight;
-  end;
+  ResetRowHeight;
   Invalidate;
 end;
 
@@ -791,12 +861,9 @@ begin
   SetInfo;
 
   Tasks := TTasks.Create(TextToStringList(Content));
-  Tasks.FillGrid(taskGrid);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
 
-  for i := 0 to taskGrid.RowCount - 1 do
-  begin
-    taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight;
-  end;
+  ResetRowHeight;
   SetChanged(False);
 end;
 
@@ -822,7 +889,7 @@ end;
 
 procedure TformNotetask.SetInfo;
 begin
-  statusBar.Panels[1].Text := UpperCase(FEncoding.EncodingName);
+  statusBar.Panels[1].Text := UpperCase(GetEncodingName(FEncoding));
   statusBar.Panels[2].Text := FLineEnding.ToString;
   statusBar.Panels[3].Text := FLineCount.ToString + rrows;
   SetCaption;
@@ -902,10 +969,18 @@ begin
   if IsColumn then
   begin
     if Index = 0 then
-      Tasks.FillGrid(taskGrid, taskGrid.SortOrder);
+    begin
+      if SortOrder = soAscending then
+        SortOrder := soDescending
+      else
+        SortOrder := soAscending;
+
+      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+    end;
   end
   else
   begin
+    // Set row when clicked on begining of row
     taskGrid.Row := index;
   end;
 end;
@@ -945,7 +1020,7 @@ procedure TformNotetask.taskGridColRowDeleted(Sender: TObject; IsColumn: boolean
 begin
   if (not IsColumn) then
   begin
-    Tasks.DeleteTask(tIndex - 1);
+    Tasks.DeleteTask(tIndex);
     FLineCount -= 1;
     SetInfo;
   end;
@@ -990,22 +1065,6 @@ begin
     TMemo(taskGrid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
 end;
 
-procedure TformNotetask.MemoChange(Sender: TObject);
-begin
-  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-  MemoSetBounds(taskGrid.Col, taskGrid.Row);
-  Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
-  SetChanged;
-end;
-
-procedure TformNotetask.MemoSetBounds(aCol: integer; aRow: integer);
-var
-  Rect: TRect;
-begin
-  Rect := taskGrid.CellRect(aCol, aRow);
-  Memo.SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
-end;
-
 procedure TformNotetask.taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
 var
   grid: TStringGrid;
@@ -1048,7 +1107,7 @@ begin
       grid.Canvas.Font.Color := clBlack;
     end;
 
-    if (aCol = 2) and (Tasks.HasTask(ARow - 1) and Tasks.GetTask(ARow - 1).IsArchive) then
+    if (aCol = 2) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).IsArchive) then
       grid.Canvas.Font.Style := [fsStrikeOut];
 
     // Fill the cell background
@@ -1090,6 +1149,25 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TformNotetask.MemoChange(Sender: TObject);
+var
+  Rect: TRect;
+begin
+  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
+  Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
+  SetChanged;
+  MemoSetBounds(taskGrid.Col, taskGrid.Row);
+end;
+
+procedure TformNotetask.MemoSetBounds(aCol: integer; aRow: integer);
+var
+  Rect: TRect;
+begin
+  Application.ProcessMessages;
+  Rect := taskGrid.CellRect(aCol, aRow);
+  Memo.SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 2);
 end;
 
 procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);

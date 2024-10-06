@@ -8,6 +8,8 @@ uses
   Classes, SysUtils, Grids, Clipbrd;
 
 type
+  TIntegerArray = array of integer;
+
   // Class representing a single task
   TTask = class
   private
@@ -31,10 +33,13 @@ type
   private
     FTaskList: array of TTask; // Array of tasks
     FCount: integer; // Current count of tasks
+    FMapGrid: TIntegerArray;
   public
-    constructor Create(const TaskStrings: TStringList = nil);
     // Constructor that takes a StringList
+    constructor Create(const TaskStrings: TStringList = nil);
     destructor Destroy; override; // Destructor
+    function Map(Index: integer): integer;
+    function ReverseMap(Value: integer): integer;
     procedure AddTask(const TaskString: string); // Method to add a task
     function GetTask(Index: integer): TTask; // Method to get a task by index
     function HasTask(Index: integer): boolean;
@@ -44,14 +49,16 @@ type
     procedure ArchiveTask(Index: integer);
     procedure CompleteTask(Index: integer);
     procedure ClearTasksInRect(Rect: TGridRect);
-    procedure MoveTaskUp(Index: integer);
-    procedure MoveTaskDown(Index: integer);
-    procedure MoveTaskToTop(Index: integer);
-    procedure MoveTaskToBottom(Index: integer);
-    function Count: integer; // Method to get the number of tasks
+    function MoveTaskUp(Index: integer): integer;
+    function MoveTaskDown(Index: integer): integer;
+    function MoveTaskToTop(Index: integer): integer;
+    function MoveTaskToBottom(Index: integer): integer;
     procedure CopyToClipboard(Grid: TStringGrid);
-    procedure FillGrid(Grid: TStringGrid; SortOrder: TSortOrder = soAscending);
+    procedure FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder);
     function ToStringList: TStringList;
+
+    property Count: integer read FCount;
+    property MapGrid: TIntegerArray read FMapGrid;
   end;
 
 implementation
@@ -203,6 +210,29 @@ begin
   inherited;
 end;
 
+function TTasks.Map(Index: integer): integer;
+begin
+  if (Index >= 0) and (Index < Length(FMapGrid)) then
+    Result := FMapGrid[Index]
+  else
+    Result := -1;
+end;
+
+function TTasks.ReverseMap(Value: integer): integer;
+var
+  i: integer;
+begin
+  Result := -1; // Default value if not found
+  for i := 0 to Length(FMapGrid) - 1 do
+  begin
+    if FMapGrid[i] = Value then
+    begin
+      Result := i;
+      Exit; // Exit the loop as soon as the value is found
+    end;
+  end;
+end;
+
 procedure TTasks.AddTask(const TaskString: string);
 var
   Task: TTask;
@@ -214,15 +244,21 @@ begin
 end;
 
 function TTasks.GetTask(Index: integer): TTask;
+var
+  Ind: integer;
 begin
-  if (Index < 0) or (Index >= FCount) then
+  Ind := Map(Index);
+  if (Ind < 0) or (Ind >= FCount) then
     raise Exception.Create('Index out of bounds'); // Error handling for invalid index
-  Result := FTaskList[Index]; // Return the task by index
+  Result := FTaskList[Ind]; // Return the task by index
 end;
 
 function TTasks.HasTask(Index: integer): boolean;
+var
+  Ind: integer;
 begin
-  Result := (Index >= 0) and (Index < FCount);
+  Ind := Map(Index);
+  Result := (Ind >= 0) and (Ind < FCount);
 end;
 
 procedure TTasks.SetTask(Grid: TStringGrid; Row, Col: integer);
@@ -234,7 +270,7 @@ var
 begin
   if (Row > 0) and (Row <= FCount) then
   begin
-    Task := GetTask(Row - 1);
+    Task := GetTask(Row);
     // Get the task by the row index (minus one, as rows start from 1)
 
     // Reading data from the grid
@@ -282,17 +318,19 @@ end;
 
 procedure TTasks.DeleteTask(Index: integer);
 var
-  i: integer;
+  i, Ind: integer;
 begin
-  if (Index < 0) or (Index >= FCount) then
+  Ind := Map(Index);
+
+  if (Ind < 0) or (Ind >= FCount) then
     exit;
 
   // Free the task that is being removed
-  if (Assigned(FTaskList[Index])) then
-    FTaskList[Index].Free;
+  if (Assigned(FTaskList[Ind])) then
+    FTaskList[Ind].Free;
 
   // Shift tasks down to fill the gap
-  for i := Index to FCount - 2 do
+  for i := Ind to FCount - 2 do
   begin
     FTaskList[i] := FTaskList[i + 1]; // Move the next task to the current position
   end;
@@ -304,22 +342,24 @@ end;
 
 procedure TTasks.ArchiveTask(Index: integer);
 var
-  i: integer;
+  i, Ind: integer;
 begin
-  if (Index < 0) or (Index >= FCount) then
+  Ind := Map(Index);
+  if (Ind < 0) or (Ind >= FCount) then
     exit;
 
-  FTaskList[Index].IsArchive := not FTaskList[Index].IsArchive;
+  FTaskList[Ind].IsArchive := not FTaskList[Ind].IsArchive;
 end;
 
 procedure TTasks.CompleteTask(Index: integer);
 var
-  i: integer;
+  i, Ind: integer;
 begin
-  if (Index < 0) or (Index >= FCount) then
+  Ind := Map(Index);
+  if (Ind < 0) or (Ind >= FCount) then
     exit;
 
-  FTaskList[Index].IsCompleted := not FTaskList[Index].IsCompleted;
+  FTaskList[Ind].IsCompleted := not FTaskList[Ind].IsCompleted;
 end;
 
 procedure TTasks.ClearTasksInRect(Rect: TGridRect);
@@ -332,95 +372,108 @@ begin
     begin
       // Clearing task fields based on the column
       if (j = 1) then
-        GetTask(i - 1).IsCompleted := False; // Reset completion status
+        GetTask(i).IsCompleted := False; // Reset completion status
       if (j = 2) then
-        GetTask(i - 1).TaskDescription := ''; // Clear task description
+        GetTask(i).TaskDescription := ''; // Clear task description
       if (j = 3) then
-        GetTask(i - 1).Comment := ''; // Clear comment
+        GetTask(i).Comment := ''; // Clear comment
       if (j = 4) then
-        GetTask(i - 1).CompletionDate := 0; // Reset completion date
+        GetTask(i).CompletionDate := 0; // Reset completion date
     end;
   end;
 end;
 
-procedure TTasks.MoveTaskUp(Index: integer);
+function TTasks.MoveTaskUp(Index: integer): integer;
 var
   TempTask: TTask;   // Temporary variable for swapping tasks
+  Ind: integer;
 begin
-  if (Index > 0) and (Index < FCount) then
+  Ind := Map(Index);
+  Result := -1;
+  if (Ind > 0) and (Ind < FCount) then
   begin
     // Save the task in the temporary variable
-    TempTask := FTaskList[Index];
+    TempTask := FTaskList[Ind];
 
     // Shift the task at Index - 1 to Index
-    FTaskList[Index] := FTaskList[Index - 1];
+    FTaskList[Ind] := FTaskList[Ind - 1];
 
     // Place the temporary task in Index - 1
-    FTaskList[Index - 1] := TempTask;
+    FTaskList[Ind - 1] := TempTask;
+
+    Result := ReverseMap(Ind - 1);
   end;
 end;
 
-procedure TTasks.MoveTaskDown(Index: integer);
+function TTasks.MoveTaskDown(Index: integer): integer;
 var
   TempTask: TTask;
+  Ind: integer;
 begin
+  Ind := Map(Index);
+  Result := -1;
   // Check if the index is valid and not the last task
-  if (Index >= 0) and (Index < FCount - 1) then
+  if (Ind >= 0) and (Ind < FCount - 1) then
   begin
     // Temporarily store the task at the current index
-    TempTask := FTaskList[Index];
+    TempTask := FTaskList[Ind];
 
     // Move the task below to the current index
-    FTaskList[Index] := FTaskList[Index + 1];
+    FTaskList[Ind] := FTaskList[Ind + 1];
 
     // Place the stored task below
-    FTaskList[Index + 1] := TempTask;
+    FTaskList[Ind + 1] := TempTask;
+
+    Result := ReverseMap(Ind + 1);
   end;
 end;
 
-procedure TTasks.MoveTaskToTop(Index: integer);
+function TTasks.MoveTaskToTop(Index: integer): integer;
 var
-  i: integer;
   TempTask: TTask; // Declare the temporary variable here
+  i, Ind: integer;
 begin
+  Ind := Map(Index);
+  Result := -1;
   // Check if the index is valid and not already at the top
-  if (Index > 0) and (Index < FCount) then
+  if (Ind > 0) and (Ind < FCount) then
   begin
     // Store the task at the given index
-    TempTask := FTaskList[Index];
+    TempTask := FTaskList[Ind];
 
     // Shift tasks down to make room at the top
-    for i := Index downto 1 do
+    for i := Ind downto 1 do
       FTaskList[i] := FTaskList[i - 1];
 
     // Place the stored task at the top
     FTaskList[0] := TempTask;
+
+    Result := ReverseMap(0);
   end;
 end;
 
-procedure TTasks.MoveTaskToBottom(Index: integer);
+function TTasks.MoveTaskToBottom(Index: integer): integer;
 var
-  i: integer;
   TempTask: TTask; // Declare the temporary variable here
+  i, Ind: integer;
 begin
+  Ind := Map(Index);
+  Result := -1;
   // Check if the index is valid and not already at the bottom
-  if (Index >= 0) and (Index < FCount - 1) then
+  if (Ind >= 0) and (Ind < FCount - 1) then
   begin
     // Store the task at the given index
-    TempTask := FTaskList[Index];
+    TempTask := FTaskList[Ind];
 
     // Shift all tasks down to fill the gap
-    for i := Index to FCount - 2 do
+    for i := Ind to FCount - 2 do
       FTaskList[i] := FTaskList[i + 1];
 
     // Place the stored task at the end
     FTaskList[FCount - 1] := TempTask;
-  end;
-end;
 
-function TTasks.Count: integer;
-begin
-  Result := FCount; // Return the number of tasks
+    Result := ReverseMap(FCount - 1);
+  end;
 end;
 
 procedure TTasks.CopyToClipboard(Grid: TStringGrid);
@@ -440,10 +493,10 @@ begin
     begin
       for j := Rect.Left to Rect.Right do
       begin
-        if (j = 1) then CompletionState := GetTask(i - 1).ToString(j).Trim;
-        if (j = 2) then TaskDescription := GetTask(i - 1).ToString(j).Trim;
-        if (j = 3) then Comment := GetTask(i - 1).ToString(j).Trim;
-        if (j = 4) then CompletionDate := GetTask(i - 1).ToString(j).Trim;
+        if (j = 1) then CompletionState := GetTask(i).ToString(j).Trim;
+        if (j = 2) then TaskDescription := GetTask(i).ToString(j).Trim;
+        if (j = 3) then Comment := GetTask(i).ToString(j).Trim;
+        if (j = 4) then CompletionDate := GetTask(i).ToString(j).Trim;
       end;
       Row1 := (CompletionState + ' ' + CompletionDate).Trim;
       Row2 := (TaskDescription + ' ' + Comment).Trim;
@@ -466,38 +519,65 @@ begin
   end;
 end;
 
-procedure TTasks.FillGrid(Grid: TStringGrid; SortOrder: TSortOrder = soAscending);
+procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder);
 var
-  I, RowIndex: integer;
-  event: TGridOperationEvent;
+  I, ArhCount, RowIndex: integer;
+  eventOnColRowInserted: TGridOperationEvent;
+  eventOnColRowDeleted: TGridOperationEvent;
 begin
   try
     Grid.BeginUpdate;
-
-    event := Grid.OnColRowInserted;
+    eventOnColRowInserted := Grid.OnColRowInserted;
+    eventOnColRowDeleted := Grid.OnColRowDeleted;
     Grid.OnColRowInserted := nil;
+    Grid.OnColRowDeleted := nil;
 
-    Grid.RowCount := Count + 1; // Set the row count to the number of tasks
+    ArhCount := 0;
+    for I := 0 to Count - 1 do
+      if FTaskList[I].IsArchive then ArhCount += 1;
+
+    if (ShowArchive) then
+      Grid.RowCount := Count + 1 // Set the row count to the number of tasks
+    else
+      Grid.RowCount := Count - ArhCount + 1; // Set the row count to the number of tasks
+
+    // Determine row index based on sort order
+    if SortOrder = soAscending then
+      RowIndex := 1
+    else
+      RowIndex := Grid.RowCount - 1;
+
+    SetLength(FMapGrid, Grid.RowCount);
+    FMapGrid[0] := -1;
 
     for I := 0 to Count - 1 do
     begin
-      // Determine row index based on sort order
-      if SortOrder = soAscending then
-        RowIndex := I + 1
-      else
-        RowIndex := Count - I;
+      if (ShowArchive = True) or (FTaskList[I].IsArchive = False) then
+      begin
+        Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].IsCompleted)); // Convert Boolean to 1 or 0
+        Grid.Cells[2, RowIndex] := FTaskList[I].TaskDescription; // Set task description
+        Grid.Cells[3, RowIndex] := FTaskList[I].Comment; // Set comment
 
-      Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].IsCompleted)); // Convert Boolean to 1 or 0
-      Grid.Cells[2, RowIndex] := FTaskList[I].TaskDescription; // Set task description
-      Grid.Cells[3, RowIndex] := FTaskList[I].Comment; // Set comment
+        if FTaskList[I].CompletionDate > 0 then
+          Grid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
+            FormatSettings.LongTimeFormat, FTaskList[I].CompletionDate) // Set completion date
+        else
+          Grid.Cells[4, RowIndex] := string.Empty;
 
-      if FTaskList[I].CompletionDate > 0 then
-        Grid.Cells[4, RowIndex] := DateTimeToStr(FTaskList[I].CompletionDate); // Set completion date
+        FMapGrid[RowIndex] := I;
+
+        if SortOrder = soAscending then
+          RowIndex += 1
+        else
+          RowIndex -= 1;
+      end;
     end;
 
   finally
-    if (Assigned(event)) then
-      Grid.OnColRowInserted := event;
+    if (Assigned(eventOnColRowInserted)) then
+      Grid.OnColRowInserted := eventOnColRowInserted;
+    if (Assigned(eventOnColRowDeleted)) then
+      Grid.OnColRowDeleted := eventOnColRowDeleted;
     Grid.EndUpdate;
   end;
 end;

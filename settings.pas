@@ -91,18 +91,25 @@ begin
       // Check and load form's position and size
       if JSONObj.FindPath('WordWrap') <> nil then
         Form.WordWrap := JSONObj.FindPath('WordWrap').AsBoolean;
+
       if JSONObj.FindPath('ShowArchived') <> nil then
-        Form.WordWrap := JSONObj.FindPath('ShowArchived').AsBoolean;
+        Form.FShowArchived := JSONObj.FindPath('ShowArchived').AsBoolean;
+
       if JSONObj.FindPath('ShowStatusBar') <> nil then
-        Form.WordWrap := JSONObj.FindPath('ShowStatusBar').AsBoolean;
+        Form.ShowStatusBar := JSONObj.FindPath('ShowStatusBar').AsBoolean;
+
       if JSONObj.FindPath('WindowState') <> nil then
         Form.WindowState := TWindowState(JSONObj.FindPath('WindowState').AsInteger);
+
       if JSONObj.FindPath('Left') <> nil then
         Form.Left := JSONObj.FindPath('Left').AsInteger;
+
       if JSONObj.FindPath('Top') <> nil then
         Form.Top := JSONObj.FindPath('Top').AsInteger;
+
       if JSONObj.FindPath('Width') <> nil then
         Form.Width := JSONObj.FindPath('Width').AsInteger;
+
       if JSONObj.FindPath('Height') <> nil then
         Form.Height := JSONObj.FindPath('Height').AsInteger;
 
