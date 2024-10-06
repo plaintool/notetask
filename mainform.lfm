@@ -155,8 +155,11 @@ object formNotetask: TformNotetask
       object menuInsertTask: TMenuItem
         Action = aInsertTask
       end
-      object menuDeleteTask: TMenuItem
-        Action = ADeleteTask
+      object menuDeleteTasks: TMenuItem
+        Action = ADeleteTasks
+      end
+      object menuArchiveTasks: TMenuItem
+        Action = aArchiveTasks
       end
       object Separator2: TMenuItem
         Caption = '-'
@@ -244,11 +247,17 @@ object formNotetask: TformNotetask
       Caption = 'Insert task'
       OnExecute = aInsertTaskExecute
     end
-    object ADeleteTask: TAction
+    object ADeleteTasks: TAction
       Category = 'Task'
-      Caption = 'Delete tasks'
-      OnExecute = ADeleteTaskExecute
-      ShortCut = 46
+      Caption = 'Delete selected tasks'
+      OnExecute = ADeleteTasksExecute
+      ShortCut = 16430
+    end
+    object aArchiveTasks: TAction
+      Category = 'Task'
+      Caption = 'Archive selected tasks'
+      OnExecute = aArchiveTasksExecute
+      ShortCut = 24641
     end
     object aMoveTaskTop: TAction
       Category = 'Task'

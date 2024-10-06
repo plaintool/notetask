@@ -40,7 +40,8 @@ type
     function HasTask(Index: integer): boolean;
     procedure SetTask(Grid: TStringGrid; Row, Col: integer);
     procedure InsertTask(const TaskString: string; Index: integer);
-    procedure RemoveTask(Index: integer);
+    procedure DeleteTask(Index: integer);
+    procedure ArchiveTask(Index: integer);
     procedure ClearTasksInRect(Rect: TGridRect);
     procedure MoveTaskUp(Index: integer);
     procedure MoveTaskDown(Index: integer);
@@ -278,7 +279,7 @@ begin
   Inc(FCount); // Increment the task count
 end;
 
-procedure TTasks.RemoveTask(Index: integer);
+procedure TTasks.DeleteTask(Index: integer);
 var
   i: integer;
 begin
@@ -298,6 +299,16 @@ begin
   // Resize the array to remove the last (now duplicate) element
   SetLength(FTaskList, FCount - 1);
   Dec(FCount); // Decrease the task count
+end;
+
+procedure TTasks.ArchiveTask(Index: integer);
+var
+  i: integer;
+begin
+  if (Index < 0) or (Index >= FCount) then
+    exit;
+
+  FTaskList[Index].IsArchive := not FTaskList[Index].IsArchive;
 end;
 
 procedure TTasks.ClearTasksInRect(Rect: TGridRect);

@@ -13,12 +13,13 @@ type
 
   { TformNotetask }
   TformNotetask = class(TForm)
+    aArchiveTasks: TAction;
     aMoveTaskBottom: TAction;
     aMoveTaskDown: TAction;
     aMoveTaskUp: TAction;
     aInsertTask: TAction;
     aMoveTaskTop: TAction;
-    ADeleteTask: TAction;
+    ADeleteTasks: TAction;
     aWordWrap: TAction;
     aFont: TAction;
     aExit: TAction;
@@ -37,7 +38,8 @@ type
     menuFormat: TMenuItem;
     menuFont: TMenuItem;
     menuInsertTask: TMenuItem;
-    menuDeleteTask: TMenuItem;
+    menuDeleteTasks: TMenuItem;
+    menuArchiveTasks: TMenuItem;
     menuMoveTaskTop: TMenuItem;
     menuMoveTaskUp: TMenuItem;
     menuMoveTaskDown: TMenuItem;
@@ -61,7 +63,8 @@ type
     Separator3: TMenuItem;
     statusBar: TStatusBar;
     taskGrid: TStringGrid;
-    procedure ADeleteTaskExecute(Sender: TObject);
+    procedure aArchiveTasksExecute(Sender: TObject);
+    procedure ADeleteTasksExecute(Sender: TObject);
     procedure aExitExecute(Sender: TObject);
     procedure aFontExecute(Sender: TObject);
     procedure aInsertTaskExecute(Sender: TObject);
@@ -121,6 +124,8 @@ type
     procedure ClearSelected;
     procedure DeleteTask(aRow: integer = 0);
     procedure DeleteTasks;
+    procedure ArchiveTask(aRow: integer = 0);
+    procedure ArchiveTasks;
     function IsCanClose: boolean;
   public
     procedure OpenFile(fileName: string);
@@ -142,6 +147,8 @@ resourcestring
   rrows = ' tasks';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rdeletesconfirm = 'Are you sure you want to delete selected tasks?';
+  rarchiveconfirm = 'Are you sure you want to archive / unarchive this task?';
+  rarchivesconfirm = 'Are you sure you want to archive / unarchive selected tasks?';
   rsavechanges = 'Do you want to save the changes?';
   rclearconfirm = 'Are you sure you want to clear the data in the selected area?';
   ropendialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
@@ -254,7 +261,7 @@ begin
     if Confirm = mrYes then
     begin
       // RemoveTask from collection
-      Tasks.RemoveTask(Row - 1);
+      Tasks.DeleteTask(Row - 1);
       taskGrid.DeleteRow(Row);
       SetChanged;
     end;
@@ -265,34 +272,95 @@ procedure TformNotetask.DeleteTasks;
 var
   i, RowIndex, Confirm: integer;
 begin
-  // Если выделено несколько строк
+  // If multiple rows are selected
   if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
   begin
-    // Запрашиваем подтверждение на удаление
-    Confirm := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
+    // Request confirmation for deletion
+    Confirm := MessageDlg(rdeletesconfirm, mtConfirmation, [mbYes, mbNo], 0);
 
     if Confirm = mrYes then
     begin
-      // Удаляем строки с конца, чтобы избежать сдвига индексов
+      // Delete rows from the end to avoid index shifting
       for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
       begin
         RowIndex := i;
         if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
         begin
-          // Удаляем задачу из коллекции
-          Tasks.RemoveTask(RowIndex - 1);
+          // Remove the task from the collection
+          Tasks.DeleteTask(RowIndex - 1);
           taskGrid.DeleteRow(RowIndex);
         end;
       end;
-      SetChanged; // Обозначаем, что данные изменились
+      SetChanged; // Mark that data has changed
     end;
   end
   else
     DeleteTask;
 end;
 
+procedure TformNotetask.ArchiveTask(aRow: integer = 0);
+var
+  Row: integer;
+  Confirm: integer;
+begin
+  // Get current row selected
+  if (aRow = 0) then
+    Row := taskGrid.Row
+  else
+    Row := aRow;
+  if (Row > 0) and (Row <= Tasks.Count) then
+  begin
+    // Show confirm delete dialog
+    Confirm := MessageDlg(rarchiveconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+    if Confirm = mrYes then
+    begin
+      // RemoveTask from collection
+      Tasks.ArchiveTask(Row - 1);
+      SetChanged;
+    end;
+  end;
+end;
+
+procedure TformNotetask.ArchiveTasks;
+var
+  i, RowIndex, Confirm: integer;
+begin
+  // If multiple rows are selected
+  if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+  begin
+    // Request confirmation for archiving
+    Confirm := MessageDlg(rarchivesconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+    if Confirm = mrYes then
+    begin
+      // Archive rows from the end to avoid index shifting
+      for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
+      begin
+        RowIndex := i;
+        if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+        begin
+          // Archive the task from the collection
+          Tasks.ArchiveTask(RowIndex - 1);
+        end;
+      end;
+      SetChanged; // Mark that data has changed
+    end;
+  end
+  else
+    ArchiveTask;
+  Invalidate;
+end;
+
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
+  if (ssCtrl in Shift) and (Key = VK_DELETE) then // Ctrl + Del
+  begin
+    if (not taskGrid.EditorMode) and (not IsEditing) then
+      DeleteTasks;
+    Abort;
+  end
+  else
   if (Key = VK_DELETE) then // Del
   begin
     if (not taskGrid.EditorMode) and (not IsEditing) then
@@ -421,9 +489,14 @@ begin
   Application.ProcessMessages;
 end;
 
-procedure TformNotetask.ADeleteTaskExecute(Sender: TObject);
+procedure TformNotetask.ADeleteTasksExecute(Sender: TObject);
 begin
   DeleteTasks;
+end;
+
+procedure TformNotetask.aArchiveTasksExecute(Sender: TObject);
+begin
+  ArchiveTasks;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
@@ -744,7 +817,7 @@ procedure TformNotetask.taskGridColRowDeleted(Sender: TObject; IsColumn: boolean
 begin
   if (not IsColumn) then
   begin
-    Tasks.RemoveTask(tIndex - 1);
+    Tasks.DeleteTask(tIndex - 1);
     FLineCount -= 1;
     SetInfo;
   end;

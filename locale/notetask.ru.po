@@ -16,6 +16,16 @@ msgctxt "mainform.rapp"
 msgid "Notetask"
 msgstr "Notetask"
 
+#: mainform.rarchiveconfirm
+msgctxt "mainform.rarchiveconfirm"
+msgid "Are you sure you want to archive / unarchive this task?"
+msgstr "Вы уверены, что хотите архивировать / деархивировать эту задачу?"
+
+#: mainform.rarchivesconfirm
+msgctxt "mainform.rarchivesconfirm"
+msgid "Are you sure you want to archive / unarchive selected tasks?"
+msgstr "Вы уверены, что хотите архивировать / деархивировать выбранные задачи?"
+
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
 msgstr "Вы уверены, что хотите очистить данные в выделенной области?"
@@ -59,8 +69,13 @@ msgstr ""
 msgid "Untitled"
 msgstr "Безымянный"
 
-#: tformnotetask.adeletetask.caption
-msgid "Delete tasks"
+#: tformnotetask.aarchivetasks.caption
+msgid "Archive selected tasks"
+msgstr "Архивировать выбранные ызадачи"
+
+#: tformnotetask.adeletetasks.caption
+msgctxt "tformnotetask.adeletetasks.caption"
+msgid "Delete selected tasks"
 msgstr "Удалить выбранные задачи"
 
 #: tformnotetask.aexit.caption

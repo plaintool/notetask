@@ -6,6 +6,16 @@ msgctxt "mainform.rapp"
 msgid "Notetask"
 msgstr ""
 
+#: mainform.rarchiveconfirm
+msgctxt "mainform.rarchiveconfirm"
+msgid "Are you sure you want to archive / unarchive this task?"
+msgstr ""
+
+#: mainform.rarchivesconfirm
+msgctxt "mainform.rarchivesconfirm"
+msgid "Are you sure you want to archive / unarchive selected tasks?"
+msgstr ""
+
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
 msgstr ""
@@ -41,8 +51,13 @@ msgstr ""
 msgid "Untitled"
 msgstr ""
 
-#: tformnotetask.adeletetask.caption
-msgid "Delete tasks"
+#: tformnotetask.aarchivetasks.caption
+msgid "Archive selected tasks"
+msgstr ""
+
+#: tformnotetask.adeletetasks.caption
+msgctxt "tformnotetask.adeletetasks.caption"
+msgid "Delete selected tasks"
 msgstr ""
 
 #: tformnotetask.aexit.caption
