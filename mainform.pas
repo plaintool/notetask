@@ -358,7 +358,7 @@ begin
   begin
     if (not taskGrid.EditorMode) and (not IsEditing) then
       DeleteTasks;
-    Abort;
+    Key := 0;
   end
   else
   if (Key = VK_DELETE) then // Del
@@ -368,60 +368,82 @@ begin
       if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
       begin
         ClearSelected;
-        Abort;
+        Key := 0;
       end
       else
       begin
         DeleteTask;
-        Abort;
+        Key := 0;
       end;
     end
     else
-      Abort;
+      Key := 0;
   end
   else
   if (Key = VK_ESCAPE) then // Escape
   begin
     if (taskGrid.EditorMode) or (IsEditing) then
       EditComplite;
-    Abort;
+    Key := 0;
   end
   else
   if (Key = VK_F2) then // F2
   begin
     EditComplite;
     EditCell(taskGrid.Col, taskGrid.Row);
-    Abort;
+    Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
   begin
     Tasks.CopyToClipboard(taskGrid);
-    Abort;
+    Key := 0;
   end
   else
   if (Shift = [ssCtrl]) and (Key = VK_PRIOR) then // Ctrl + Page Up
   begin
     aMoveTaskTop.Execute;
-    Abort;
+    Key := 0;
   end
   else
   if (Shift = [ssCtrl]) and (Key = VK_NEXT) then // Ctrl + Page Down
   begin
     aMoveTaskBottom.Execute;
-    Abort;
+    Key := 0;
   end
   else
   if (Shift = [ssCtrl]) and (Key = VK_UP) then // Ctrl + Up
   begin
     aMoveTaskUp.Execute;
-    Abort;
+    Key := 0;
   end
   else
   if (Shift = [ssCtrl]) and (Key = VK_DOWN) then // Ctrl + Down
   begin
     aMoveTaskDown.Execute;
-    Abort;
+    Key := 0;
+  end
+  else
+  if (Key = VK_UP) then // Up
+  begin
+    if (taskGrid.EditorMode) or (IsEditing) then
+    begin
+      EditComplite;
+      if taskGrid.Row > 0 then
+        taskGrid.Row := taskGrid.Row - 1;
+      Key := 0;
+    end;
+  end
+  else
+  if (Key = VK_DOWN) then // Down
+  begin
+    if (taskGrid.EditorMode) or (IsEditing) then
+    begin
+      EditComplite;
+      if (taskGrid.Row < taskGrid.RowCount - 1) then
+        taskGrid.Row := taskGrid.Row + 1;
+      Key := 0;
+    end;
   end;
 end;
 
@@ -756,7 +778,7 @@ begin
   if (aCol = 4) then
   begin
     if (NewValue <> '') and (not TryStrToDateTime(NewValue, DateTime)) then
-      abort;
+      Abort;
 
     if (OldValue <> NewValue) then
     begin
