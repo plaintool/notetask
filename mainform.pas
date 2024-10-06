@@ -126,6 +126,7 @@ type
     procedure DeleteTasks;
     procedure ArchiveTask(aRow: integer = 0);
     procedure ArchiveTasks;
+    procedure CompleteTasks(aRow: integer = 0);
     function IsCanClose: boolean;
   public
     procedure OpenFile(fileName: string);
@@ -245,15 +246,15 @@ end;
 
 procedure TformNotetask.DeleteTask(aRow: integer = 0);
 var
-  Row: integer;
+  RowIndex: integer;
   Confirm: integer;
 begin
-  // Get current row selected
+  // Get current RowIndex selected
   if (aRow = 0) then
-    Row := taskGrid.Row
+    RowIndex := taskGrid.Row
   else
-    Row := aRow;
-  if (Row > 0) and (Row <= Tasks.Count) then
+    RowIndex := aRow;
+  if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
   begin
     // Show confirm delete dialog
     Confirm := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
@@ -261,8 +262,8 @@ begin
     if Confirm = mrYes then
     begin
       // RemoveTask from collection
-      Tasks.DeleteTask(Row - 1);
-      taskGrid.DeleteRow(Row);
+      Tasks.DeleteTask(RowIndex - 1);
+      taskGrid.DeleteRow(RowIndex);
       SetChanged;
     end;
   end;
@@ -300,15 +301,15 @@ end;
 
 procedure TformNotetask.ArchiveTask(aRow: integer = 0);
 var
-  Row: integer;
+  RowIndex: integer;
   Confirm: integer;
 begin
-  // Get current row selected
+  // Get current RowIndex selected
   if (aRow = 0) then
-    Row := taskGrid.Row
+    RowIndex := taskGrid.Row
   else
-    Row := aRow;
-  if (Row > 0) and (Row <= Tasks.Count) then
+    RowIndex := aRow;
+  if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
   begin
     // Show confirm delete dialog
     Confirm := MessageDlg(rarchiveconfirm, mtConfirmation, [mbYes, mbNo], 0);
@@ -316,7 +317,7 @@ begin
     if Confirm = mrYes then
     begin
       // RemoveTask from collection
-      Tasks.ArchiveTask(Row - 1);
+      Tasks.ArchiveTask(RowIndex - 1);
       SetChanged;
     end;
   end;
@@ -349,6 +350,52 @@ begin
   end
   else
     ArchiveTask;
+  Invalidate;
+end;
+
+procedure TformNotetask.CompleteTasks(aRow: integer = 0);
+var
+  RowIndex, Confirm: integer;
+  i: integer;
+begin
+  // If multiple rows are selected
+  if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+  begin
+    // Mark tasks as completed from the end to avoid index shifting
+    for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
+    begin
+      RowIndex := i;
+      if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+      begin
+        // Mark the task as completed in the collection
+        Tasks.CompleteTask(RowIndex - 1);
+        if Tasks.GetTask(RowIndex - 1).IsCompleted then
+          taskGrid.Cells[1, RowIndex] := '1'
+        else
+          taskGrid.Cells[1, RowIndex] := '0';
+      end;
+    end;
+    SetChanged; // Mark that data has changed
+  end
+  else
+  begin
+    // Get current RowIndex selected if no multiple selection
+    if (aRow = 0) then
+      RowIndex := taskGrid.Row
+    else
+      RowIndex := aRow;
+
+    if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+    begin
+      // Mark the task as completed in the collection
+      Tasks.CompleteTask(RowIndex - 1);
+      if Tasks.GetTask(RowIndex - 1).IsCompleted then
+        taskGrid.Cells[1, RowIndex] := '1'
+      else
+        taskGrid.Cells[1, RowIndex] := '0';
+      SetChanged; // Mark that data has changed
+    end;
+  end;
   Invalidate;
 end;
 
@@ -444,7 +491,17 @@ begin
         taskGrid.Row := taskGrid.Row + 1;
       Key := 0;
     end;
+  end
+  else
+  if (Key = VK_SPACE) then // Space
+  begin
+    if (not taskGrid.EditorMode) and (not IsEditing) then
+    begin
+      CompleteTasks;
+      Key := 0;
+    end;
   end;
+
 end;
 
 procedure TformNotetask.aExitExecute(Sender: TObject);

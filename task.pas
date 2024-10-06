@@ -42,6 +42,7 @@ type
     procedure InsertTask(const TaskString: string; Index: integer);
     procedure DeleteTask(Index: integer);
     procedure ArchiveTask(Index: integer);
+    procedure CompleteTask(Index: integer);
     procedure ClearTasksInRect(Rect: TGridRect);
     procedure MoveTaskUp(Index: integer);
     procedure MoveTaskDown(Index: integer);
@@ -309,6 +310,16 @@ begin
     exit;
 
   FTaskList[Index].IsArchive := not FTaskList[Index].IsArchive;
+end;
+
+procedure TTasks.CompleteTask(Index: integer);
+var
+  i: integer;
+begin
+  if (Index < 0) or (Index >= FCount) then
+    exit;
+
+  FTaskList[Index].IsCompleted := not FTaskList[Index].IsCompleted;
 end;
 
 procedure TTasks.ClearTasksInRect(Rect: TGridRect);
