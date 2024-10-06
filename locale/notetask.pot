@@ -14,6 +14,10 @@ msgstr ""
 msgid "Are you sure you want to delete this task?"
 msgstr ""
 
+#: mainform.rdeletesconfirm
+msgid "Are you sure you want to delete selected tasks?"
+msgstr ""
+
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
@@ -38,7 +42,7 @@ msgid "Untitled"
 msgstr ""
 
 #: tformnotetask.adeletetask.caption
-msgid "Delete task"
+msgid "Delete tasks"
 msgstr ""
 
 #: tformnotetask.aexit.caption

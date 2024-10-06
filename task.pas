@@ -12,12 +12,14 @@ type
   TTask = class
   private
     FIsCompleted: boolean; // Status of task completion
+    FIsArchive: boolean; // Archive task
     FCompletionDate: TDateTime; // Date of task completion
     FComment: string; // Comment for the task
     FTaskDescription: string; // Description of the task
   public
     constructor Create(const TaskString: string); // Constructor that takes a task string
     property IsCompleted: boolean read FIsCompleted write FIsCompleted;
+    property IsArchive: boolean read FIsArchive write FIsArchive;
     property CompletionDate: TDateTime read FCompletionDate write FCompletionDate;
     property Comment: string read FComment write FComment;
     property TaskDescription: string read FTaskDescription write FTaskDescription;
@@ -35,6 +37,7 @@ type
     destructor Destroy; override; // Destructor
     procedure AddTask(const TaskString: string); // Method to add a task
     function GetTask(Index: integer): TTask; // Method to get a task by index
+    function HasTask(Index: integer): boolean;
     procedure SetTask(Grid: TStringGrid; Row, Col: integer);
     procedure InsertTask(const TaskString: string; Index: integer);
     procedure RemoveTask(Index: integer);
@@ -114,6 +117,14 @@ begin
 
   FTaskDescription := StringReplace(FTaskDescription, '<br>', sLineBreak, [rfReplaceAll]);
   FComment := StringReplace(FComment, '<br>', sLineBreak, [rfReplaceAll]);
+
+  // Check if TaskDescription starts and ends with '~~'
+  if FTaskDescription.StartsWith('~~') and FTaskDescription.EndsWith('~~') then
+  begin
+    FIsArchive := True;
+    // Remove '~~' from the start and end of the TaskDescription
+    FTaskDescription := FTaskDescription.Substring(2, Length(FTaskDescription) - 4);
+  end;
 end;
 
 function TTask.ToString(Index: integer = 0; AddEmptyCompletion: boolean = True): string;
@@ -125,6 +136,10 @@ begin
   // Replace line breaks from task desctioption and comment
   TaskString := StringReplace(TaskDescription, sLineBreak, '<br>', [rfReplaceAll]);
   Comment := StringReplace(Comment, sLineBreak, '<br>', [rfReplaceAll]);
+
+  // Add '~~' for archived tasks
+  if (FIsArchive) then
+    TaskString := '~~' + TaskString + '~~';
 
   // Check completion
   if IsCompleted then
@@ -201,6 +216,11 @@ begin
   if (Index < 0) or (Index >= FCount) then
     raise Exception.Create('Index out of bounds'); // Error handling for invalid index
   Result := FTaskList[Index]; // Return the task by index
+end;
+
+function TTasks.HasTask(Index: integer): boolean;
+begin
+  Result := (Index >= 0) and (Index < FCount);
 end;
 
 procedure TTasks.SetTask(Grid: TStringGrid; Row, Col: integer);

@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -247,7 +246,7 @@ object formNotetask: TformNotetask
     end
     object ADeleteTask: TAction
       Category = 'Task'
-      Caption = 'Delete task'
+      Caption = 'Delete tasks'
       OnExecute = ADeleteTaskExecute
       ShortCut = 46
     end

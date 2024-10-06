@@ -120,6 +120,7 @@ type
     procedure SetCaption;
     procedure ClearSelected;
     procedure DeleteTask(aRow: integer = 0);
+    procedure DeleteTasks;
     function IsCanClose: boolean;
   public
     procedure OpenFile(fileName: string);
@@ -140,6 +141,7 @@ resourcestring
   runtitled = 'Untitled';
   rrows = ' tasks';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
+  rdeletesconfirm = 'Are you sure you want to delete selected tasks?';
   rsavechanges = 'Do you want to save the changes?';
   rclearconfirm = 'Are you sure you want to clear the data in the selected area?';
   ropendialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
@@ -257,6 +259,36 @@ begin
       SetChanged;
     end;
   end;
+end;
+
+procedure TformNotetask.DeleteTasks;
+var
+  i, RowIndex, Confirm: integer;
+begin
+  // Если выделено несколько строк
+  if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+  begin
+    // Запрашиваем подтверждение на удаление
+    Confirm := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+    if Confirm = mrYes then
+    begin
+      // Удаляем строки с конца, чтобы избежать сдвига индексов
+      for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
+      begin
+        RowIndex := i;
+        if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+        begin
+          // Удаляем задачу из коллекции
+          Tasks.RemoveTask(RowIndex - 1);
+          taskGrid.DeleteRow(RowIndex);
+        end;
+      end;
+      SetChanged; // Обозначаем, что данные изменились
+    end;
+  end
+  else
+    DeleteTask;
 end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -391,7 +423,7 @@ end;
 
 procedure TformNotetask.ADeleteTaskExecute(Sender: TObject);
 begin
-  DeleteTask;
+  DeleteTasks;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
@@ -815,6 +847,9 @@ begin
       grid.Canvas.Font.Color := clBlack;
     end;
 
+    if (Tasks.HasTask(ARow - 1) and Tasks.GetTask(ARow - 1).IsArchive) then
+      grid.Canvas.Font.Style := [fsStrikeOut];
+
     // Fill the cell background
     grid.Canvas.Brush.Color := bgFill;
     grid.canvas.Brush.Style := bsSolid;
@@ -822,7 +857,7 @@ begin
 
     if (aCol = 1) then
     begin
-      Grid.DefaultDrawCell(aCol, aRow, aRect, aState);
+      grid.DefaultDrawCell(aCol, aRow, aRect, aState);
       exit;
     end;
 

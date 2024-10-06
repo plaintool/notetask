@@ -24,6 +24,10 @@ msgstr "Вы уверены, что хотите очистить данные �
 msgid "Are you sure you want to delete this task?"
 msgstr "Вы уверены, что хотите удалить эту задачу?"
 
+#: mainform.rdeletesconfirm
+msgid "Are you sure you want to delete selected tasks?"
+msgstr "Вы уверены, что хотите удалить выбранные задачи?"
+
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
 msgid ""
@@ -56,8 +60,8 @@ msgid "Untitled"
 msgstr "Безымянный"
 
 #: tformnotetask.adeletetask.caption
-msgid "Delete task"
-msgstr "Удалить задачу"
+msgid "Delete tasks"
+msgstr "Удалить выбранные задачи"
 
 #: tformnotetask.aexit.caption
 msgid "Exit"
