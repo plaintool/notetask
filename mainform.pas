@@ -589,8 +589,7 @@ var
   TempHeight: integer;
 begin
   // Check if the row indices are valid
-  if (RowIndex1 < 0) or (RowIndex1 >= taskGrid.RowCount) or
-     (RowIndex2 < 0) or (RowIndex2 >= taskGrid.RowCount) then
+  if (RowIndex1 < 0) or (RowIndex1 >= taskGrid.RowCount) or (RowIndex2 < 0) or (RowIndex2 >= taskGrid.RowCount) then
     Exit; // Exit if the indices are invalid
 
   // Store the height of the first row
@@ -692,7 +691,8 @@ begin
     taskGrid.RowCount := 2;
     FLineCount := 1;
 
-    Tasks.AddTask('[ ]');
+    Tasks.InitMap(1);
+    Tasks.AddMap(Tasks.AddTask('[ ]'));
     taskGrid.Cells[1, 1] := '0';
     SetInfo;
   end;
@@ -1009,7 +1009,7 @@ procedure TformNotetask.taskGridColRowInserted(Sender: TObject; IsColumn: boolea
 begin
   if (not IsColumn) then
   begin
-    Tasks.AddTask('[ ]');
+    Tasks.AddMap(Tasks.AddTask('[ ]'));
     taskGrid.Cells[1, tIndex] := '0';
     FLineCount += 1;
     SetInfo;

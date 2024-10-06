@@ -38,9 +38,11 @@ type
     // Constructor that takes a StringList
     constructor Create(const TaskStrings: TStringList = nil);
     destructor Destroy; override; // Destructor
+    procedure InitMap(Length: integer);
     function Map(Index: integer): integer;
     function ReverseMap(Value: integer): integer;
-    procedure AddTask(const TaskString: string); // Method to add a task
+    procedure AddMap(Value: integer);
+    function AddTask(const TaskString: string): integer; // Method to add a task
     function GetTask(Index: integer): TTask; // Method to get a task by index
     function HasTask(Index: integer): boolean;
     procedure SetTask(Grid: TStringGrid; Row, Col: integer);
@@ -210,6 +212,13 @@ begin
   inherited;
 end;
 
+procedure TTasks.InitMap(Length: integer);
+begin
+  SetLength(FMapGrid, Length);
+  if Length > 0 then
+    FMapGrid[0] := -1;
+end;
+
 function TTasks.Map(Index: integer): integer;
 begin
   if (Index >= 0) and (Index < Length(FMapGrid)) then
@@ -233,13 +242,20 @@ begin
   end;
 end;
 
-procedure TTasks.AddTask(const TaskString: string);
+procedure TTasks.AddMap(Value: integer);
+begin
+  SetLength(FMapGrid, Length(FMapGrid) + 1);
+  FMapGrid[High(FMapGrid)] := Value;
+end;
+
+function TTasks.AddTask(const TaskString: string): integer;
 var
   Task: TTask;
 begin
   Task := TTask.Create(TaskString); // Create a new task
   SetLength(FTaskList, FCount + 1); // Resize the array
   FTaskList[FCount] := Task; // Add the task to the list
+  Result := FCount;
   Inc(FCount); // Increment the task count
 end;
 
@@ -547,8 +563,7 @@ begin
     else
       RowIndex := Grid.RowCount - 1;
 
-    SetLength(FMapGrid, Grid.RowCount);
-    FMapGrid[0] := -1;
+    InitMap(Grid.RowCount);
 
     for I := 0 to Count - 1 do
     begin
