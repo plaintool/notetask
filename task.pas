@@ -56,7 +56,7 @@ type
     function MoveTaskUp(Index: integer): integer;
     function MoveTaskDown(Index: integer): integer;
     procedure CopyToClipboard(Grid: TStringGrid);
-    procedure FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder);
+    procedure FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder; SortColumn: integer);
     function ToStringList: TStringList;
 
     property Count: integer read FCount;
@@ -451,7 +451,9 @@ function TTasks.MoveTaskUp(Index: integer): integer;
 var
   TempTask: TTask;   // Temporary variable for swapping tasks
   Ind: integer;
+  l: integer;
 begin
+  l := length(MapGrid);
   Ind := Map(Index);
   Result := -1;
   if (Index > 1) and (Ind >= 0) and (Ind < FCount) then
@@ -535,11 +537,103 @@ begin
   end;
 end;
 
-procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder);
+procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder; SortColumn: integer);
 var
-  I, ArhCount, RowIndex: integer;
+  I, J, ArhCount, RowIndex: integer;
   eventOnColRowInserted: TGridOperationEvent;
   eventOnColRowDeleted: TGridOperationEvent;
+
+  function CompareTasks(Index1, Index2: integer): integer;
+  var
+    Task1, Task2: TTask;
+    Value1, Value2: string;
+    DateTime1, DateTime2: TDateTime;
+  begin
+    Task1 := FTaskList[FMapGrid[Index1]];
+    Task2 := FTaskList[FMapGrid[Index2]];
+
+    case SortColumn of
+      1: begin
+        // Completed status (IsCompleted)
+        Value1 := IntToStr(Ord(Task1.IsCompleted));
+        Value2 := IntToStr(Ord(Task2.IsCompleted));
+      end;
+      2: begin
+        // Task description
+        Value1 := Task1.TaskDescription;
+        Value2 := Task2.TaskDescription;
+      end;
+      3: begin
+        // Comment
+        Value1 := Task1.Comment;
+        Value2 := Task2.Comment;
+      end;
+      4: begin
+        // Completion date (compare as DateTime)
+        DateTime1 := Task1.CompletionDate;
+        DateTime2 := Task2.CompletionDate;
+
+        if DateTime1 = DateTime2 then
+          Result := 0
+        else if SortOrder = soAscending then
+        begin
+          if DateTime1 < DateTime2 then
+            Result := -1
+          else
+            Result := 1;
+        end
+        else
+        begin
+          if DateTime1 > DateTime2 then
+            Result := -1
+          else
+            Result := 1;
+        end;
+
+        Exit;
+      end;
+      else
+        // Default comparison (index comparison)
+        Result := FMapGrid[Index1] - FMapGrid[Index2];
+        Exit;
+    end;
+
+    // Compare as strings for all columns except the date
+    if SortOrder = soAscending then
+      Result := CompareStr(Value1, Value2)
+    else
+      Result := CompareStr(Value2, Value1);
+  end;
+
+  // Swap rows in the grid and update FMapGrid
+  procedure SwapRows(Row1, Row2: integer);
+  var
+    Temp: TStringList;
+    Col, TempMap: integer;
+  begin
+    Temp := TStringList.Create;
+    try
+      // Copy Row1 to Temp
+      for Col := 0 to Grid.ColCount - 1 do
+        Temp.Add(Grid.Cells[Col, Row1]);
+
+      // Move Row2 to Row1
+      for Col := 0 to Grid.ColCount - 1 do
+        Grid.Cells[Col, Row1] := Grid.Cells[Col, Row2];
+
+      // Move Temp to Row2
+      for Col := 0 to Grid.ColCount - 1 do
+        Grid.Cells[Col, Row2] := Temp[Col];
+
+      // Swap the corresponding values in FMapGrid
+      TempMap := FMapGrid[Row1];
+      FMapGrid[Row1] := FMapGrid[Row2];
+      FMapGrid[Row2] := TempMap;
+    finally
+      Temp.Free;
+    end;
+  end;
+
 begin
   try
     Grid.BeginUpdate;
@@ -553,11 +647,11 @@ begin
       if FTaskList[I].IsArchive then ArhCount += 1;
 
     if (ShowArchive) then
-      Grid.RowCount := Count + 1 // Set the row count to the number of tasks
+      Grid.RowCount := Count + 1
     else
-      Grid.RowCount := Count - ArhCount + 1; // Set the row count to the number of tasks
+      Grid.RowCount := Count - ArhCount + 1;
 
-    // Determine row index based on sort order
+    // Default row indexing based on sort order
     if SortOrder = soAscending then
       RowIndex := 1
     else
@@ -565,17 +659,17 @@ begin
 
     InitMap(Grid.RowCount);
 
+    // Fill the grid with tasks
     for I := 0 to Count - 1 do
     begin
       if (ShowArchive = True) or (FTaskList[I].IsArchive = False) then
       begin
-        Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].IsCompleted)); // Convert Boolean to 1 or 0
-        Grid.Cells[2, RowIndex] := FTaskList[I].TaskDescription; // Set task description
-        Grid.Cells[3, RowIndex] := FTaskList[I].Comment; // Set comment
-
+        Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].IsCompleted));
+        Grid.Cells[2, RowIndex] := FTaskList[I].TaskDescription;
+        Grid.Cells[3, RowIndex] := FTaskList[I].Comment;
         if FTaskList[I].CompletionDate > 0 then
           Grid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
-            FormatSettings.LongTimeFormat, FTaskList[I].CompletionDate) // Set completion date
+            FormatSettings.LongTimeFormat, FTaskList[I].CompletionDate)
         else
           Grid.Cells[4, RowIndex] := string.Empty;
 
@@ -586,6 +680,16 @@ begin
         else
           RowIndex -= 1;
       end;
+    end;
+
+    // Perform sorting if SortColumn is between 1 and 4
+    if (SortColumn >= 1) and (SortColumn <= 4) then
+    begin
+      // Bubble Sort logic to sort rows based on CompareTasks function
+      for I := 1 to Grid.RowCount - 2 do
+        for J := I + 1 to Grid.RowCount - 1 do
+          if CompareTasks(I, J) > 0 then
+            SwapRows(I, J);
     end;
 
   finally

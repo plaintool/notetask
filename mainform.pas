@@ -193,6 +193,7 @@ type
     property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property SortOrder: TSortOrder read FSortOrder write FSortOrder;
+    property SortColumn: integer read FSortColumn write FSortColumn;
   end;
 
 var
@@ -382,7 +383,7 @@ begin
     begin
       // RemoveTask from collection
       Tasks.ArchiveTask(RowIndex);
-      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
       SetChanged;
     end;
   end;
@@ -410,7 +411,7 @@ begin
           Tasks.ArchiveTask(RowIndex);
         end;
       end;
-      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
       SetChanged; // Mark that data has changed
     end;
   end
@@ -626,7 +627,7 @@ end;
 procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
 begin
   Tasks.InsertTask('[ ]', taskGrid.Row);
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
   FLineCount += 1;
   SetInfo;
   SetChanged;
@@ -653,7 +654,7 @@ var
   newRow: integer;
 begin
   newRow := Tasks.MoveTaskTop(taskGrid.Row);
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
   if (newRow > -1) then
   begin
     SwapRowHeights(taskGrid.Row, newRow);
@@ -667,7 +668,7 @@ var
   newRow: integer;
 begin
   newRow := Tasks.MoveTaskBottom(taskGrid.Row);
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
   if (newRow > -1) then
   begin
     SwapRowHeights(taskGrid.Row, newRow);
@@ -681,7 +682,7 @@ var
   newRow: integer;
 begin
   newRow := Tasks.MoveTaskUp(taskGrid.Row);
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
   if (newRow > -1) then
   begin
     SwapRowHeights(taskGrid.Row, newRow);
@@ -695,7 +696,7 @@ var
   newRow: integer;
 begin
   newRow := Tasks.MoveTaskDown(taskGrid.Row);
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
   if (newRow > -1) then
   begin
     SwapRowHeights(taskGrid.Row, newRow);
@@ -840,7 +841,7 @@ end;
 procedure TformNotetask.SetShowArchived(Value: boolean);
 begin
   FShowArchived := Value;
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
 end;
 
 procedure TformNotetask.aWordWrapExecute(Sender: TObject);
@@ -898,7 +899,7 @@ begin
   SetInfo;
 
   Tasks := TTasks.Create(TextToStringList(Content));
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
 
   ResetRowHeight;
   SetChanged(False);
@@ -1015,10 +1016,12 @@ begin
 
     FSortColumn := Index;
 
-    if Index = 0 then
-    begin
-      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
-    end;
+    Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+
+    aMoveTaskTop.Enabled := SortColumn = 0;
+    aMoveTaskBottom.Enabled := SortColumn = 0;
+    aMoveTaskUp.Enabled := SortColumn = 0;
+    aMoveTaskDown.Enabled := SortColumn = 0;
   end
   else
   begin
@@ -1040,10 +1043,13 @@ end;
 procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
 begin
   SetChanged;
-  if (aState = cbChecked) and (taskGrid.Cells[4, aRow] = '') then
-    taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now)
-  else
-    taskGrid.Cells[4, aRow] := string.Empty;
+  if (aState = cbChecked) then
+  begin
+    if (taskGrid.Cells[4, aRow] = '') then
+      taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
+  end;
+  //else
+  //  taskGrid.Cells[4, aRow] := string.Empty;
   Tasks.SetTask(taskGrid, aRow, aCol);
 end;
 

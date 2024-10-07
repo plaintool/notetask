@@ -244,6 +244,10 @@ msgstr "Открытие"
 msgid "Saving"
 msgstr "Сохранение"
 
+#: tformnotetask.taskgrid.columns[0].title.caption
+msgid "Done"
+msgstr "Готово"
+
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
 msgid "Task"

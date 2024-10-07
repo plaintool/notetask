@@ -1,6 +1,6 @@
 {"version":1,"strings":[
 {"hash":111979979,"name":"tformnotetask.caption","sourcebytes":[78,111,116,101,116,97,115,107],"value":"Notetask"},
-{"hash":4294967295,"name":"tformnotetask.taskgrid.columns[0].title.caption","sourcebytes":[],"value":""},
+{"hash":308805,"name":"tformnotetask.taskgrid.columns[0].title.caption","sourcebytes":[68,111,110,101],"value":"Done"},
 {"hash":370843,"name":"tformnotetask.taskgrid.columns[1].title.caption","sourcebytes":[84,97,115,107],"value":"Task"},
 {"hash":174341140,"name":"tformnotetask.taskgrid.columns[2].title.caption","sourcebytes":[67,111,109,109,101,110,116],"value":"Comment"},
 {"hash":305317,"name":"tformnotetask.taskgrid.columns[3].title.caption","sourcebytes":[68,97,116,101],"value":"Date"},

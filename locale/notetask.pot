@@ -234,6 +234,10 @@ msgstr ""
 msgid "Saving"
 msgstr ""
 
+#: tformnotetask.taskgrid.columns[0].title.caption
+msgid "Done"
+msgstr ""
+
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
 msgid "Task"
