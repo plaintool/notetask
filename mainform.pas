@@ -1183,6 +1183,7 @@ begin
   if (not IsColumn) then
   begin
     Tasks.DeleteTask(tIndex);
+    //Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
     FLineCount -= 1;
     SetInfo;
   end;

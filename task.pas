@@ -321,7 +321,7 @@ begin
   Ind := Map(Index);
   if (Ind < 0) and (Ind >= FCount) then
     exit;
-    Ind := Ind + 1;
+  Ind := Ind + 1;
   Task := TTask.Create(TaskString); // Create a new task
   SetLength(FTaskList, FCount + 1); // Resize the array
 
@@ -340,7 +340,6 @@ var
   i, Ind: integer;
 begin
   Ind := Map(Index);
-
   if (Ind < 0) or (Ind >= FCount) then
     exit;
 
@@ -349,14 +348,26 @@ begin
     FTaskList[Ind].Free;
 
   // Shift tasks down to fill the gap
-  for i := Index to Length(MapGrid) - 1 do
+  for i := Ind to FCount - 2 do
   begin
-    FTaskList[Map(i)] := FTaskList[Map(i + 1)]; // Move the next task to the current position
+    FTaskList[i] := FTaskList[i + 1]; // Move the next task to the current position
   end;
 
   // Resize the array to remove the last (now duplicate) element
   SetLength(FTaskList, FCount - 1);
   Dec(FCount); // Decrease the task count
+
+  // Delete record from FMapGrid
+  for i := Index to Length(FMapGrid) - 2 do
+  begin
+    FMapGrid[i] := FMapGrid[i + 1];
+  end;
+
+  for i := 0 to Length(FMapGrid) - 1 do
+    if (FMapGrid[i] > Ind) then Dec(FMapGrid[i]);
+
+  // Resize FMapGrid to remove the last element
+  SetLength(FMapGrid, Length(FMapGrid) - 1);
 end;
 
 procedure TTasks.ArchiveTask(Index: integer);
