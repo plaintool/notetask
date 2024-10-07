@@ -19,7 +19,8 @@ type
     FComment: string; // Comment for the task
     FTaskDescription: string; // Description of the task
   public
-    constructor Create(const TaskString: string = string.Empty); // Constructor that takes a task string
+    constructor Create;
+    constructor Create(const TaskString: string); // Constructor that takes a task string
     procedure Copy(Original: TTask);
     property IsCompleted: boolean read FIsCompleted write FIsCompleted;
     property IsArchive: boolean read FIsArchive write FIsArchive;
@@ -92,7 +93,16 @@ begin
   Result := TrimLeft(Result); // Remove spaces from begining of string
 end;
 
-constructor TTask.Create(const TaskString: string = string.Empty);
+constructor TTask.Create;
+begin
+  FIsCompleted := False;
+  FIsArchive := False;
+  FCompletionDate := 0;
+  FComment := string.Empty;
+  FTaskDescription := string.Empty;
+end;
+
+constructor TTask.Create(const TaskString: string);
 var
   Parts, PartsSub: TStringArray; // Use TStringArray for compatibility
   CompletedStr: string;
@@ -845,7 +855,10 @@ var
 begin
   SetLength(FTaskList, Length(FInitTaskList));
   for i := 0 to High(FInitTaskList) do
-    FTaskList[i] := FInitTaskList[i];
+  begin
+    FTaskList[i] := TTask.Create;
+    FTaskList[i].Copy(FInitTaskList[i]);
+  end;
 
   FCount := Length(FTaskList); // Restore the task count
 end;
