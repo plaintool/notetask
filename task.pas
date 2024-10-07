@@ -407,19 +407,19 @@ begin
   Ind := Map(Index);
   Result := -1;
   // Check if the index is valid and not already at the top
-  if (Ind > 0) and (Ind < FCount) then
+  if (Ind >= 0) and (Ind < FCount) then
   begin
     // Store the task at the given index
     TempTask := FTaskList[Ind];
 
     // Shift tasks down to make room at the top
-    for i := Ind downto 1 do
-      FTaskList[i] := FTaskList[i - 1];
+    for i := Index downto 1 do
+      FTaskList[Map(i)] := FTaskList[Map(i - 1)];
 
     // Place the stored task at the top
-    FTaskList[0] := TempTask;
+    FTaskList[Map(1)] := TempTask;
 
-    Result := ReverseMap(0);
+    Result := 1;// ReverseMap(0);
   end;
 end;
 
@@ -431,19 +431,19 @@ begin
   Ind := Map(Index);
   Result := -1;
   // Check if the index is valid and not already at the bottom
-  if (Ind >= 0) and (Ind < FCount - 1) then
+  if (Ind >= 0) and (Ind < FCount) then
   begin
     // Store the task at the given index
     TempTask := FTaskList[Ind];
 
     // Shift all tasks down to fill the gap
-    for i := Ind to FCount - 2 do
-      FTaskList[i] := FTaskList[i + 1];
+    for i := Index to Length(MapGrid) - 1 do
+      FTaskList[Map(i)] := FTaskList[Map(i + 1)];
 
     // Place the stored task at the end
-    FTaskList[FCount - 1] := TempTask;
+    FTaskList[Map(FCount)] := TempTask;
 
-    Result := ReverseMap(FCount - 1);
+    Result := Length(MapGrid) - 1;//ReverseMap(FCount);
   end;
 end;
 
@@ -454,18 +454,18 @@ var
 begin
   Ind := Map(Index);
   Result := -1;
-  if (Ind > 0) and (Ind < FCount) then
+  if (Index > 1) and (Ind >= 0) and (Ind < FCount) then
   begin
     // Save the task in the temporary variable
     TempTask := FTaskList[Ind];
 
     // Shift the task at Index - 1 to Index
-    FTaskList[Ind] := FTaskList[Ind - 1];
+    FTaskList[Ind] := FTaskList[Map(Index - 1)];
 
     // Place the temporary task in Index - 1
-    FTaskList[Ind - 1] := TempTask;
+    FTaskList[Map(Index - 1)] := TempTask;
 
-    Result := ReverseMap(Ind - 1);
+    Result := Index - 1;//ReverseMap(Map(Index - 1));
   end;
 end;
 
@@ -477,18 +477,18 @@ begin
   Ind := Map(Index);
   Result := -1;
   // Check if the index is valid and not the last task
-  if (Ind >= 0) and (Ind < FCount - 1) then
+  if (Index < Length(MapGrid) - 1) and (Ind >= 0) and (Ind < FCount) then
   begin
     // Temporarily store the task at the current index
     TempTask := FTaskList[Ind];
 
     // Move the task below to the current index
-    FTaskList[Ind] := FTaskList[Ind + 1];
+    FTaskList[Ind] := FTaskList[Map(Index + 1)];
 
     // Place the stored task below
-    FTaskList[Ind + 1] := TempTask;
+    FTaskList[Map(Index + 1)] := TempTask;
 
-    Result := ReverseMap(Ind + 1);
+    Result := Index + 1;//ReverseMap(Map(Index + 1));
   end;
 end;
 

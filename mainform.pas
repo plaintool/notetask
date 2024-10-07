@@ -659,8 +659,6 @@ begin
     taskGrid.Row := newRow;
   end;
   SetChanged;
-  Invalidate;
-  Application.ProcessMessages;
 end;
 
 procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
@@ -674,10 +672,7 @@ begin
     SwapRowHeights(taskGrid.Row, newRow);
     taskGrid.Row := newRow;
   end;
-  //  taskGrid.Row := taskGrid.RowCount - 1;
   SetChanged;
-  Invalidate;
-  Application.ProcessMessages;
 end;
 
 procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
@@ -691,10 +686,7 @@ begin
     SwapRowHeights(taskGrid.Row, newRow);
     taskGrid.Row := newRow;
   end;
-  //  if taskGrid.Row > 1 then taskGrid.Row := taskGrid.Row - 1;
   SetChanged;
-  Invalidate;
-  Application.ProcessMessages;
 end;
 
 procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
@@ -708,10 +700,7 @@ begin
     SwapRowHeights(taskGrid.Row, newRow);
     taskGrid.Row := newRow;
   end;
-  //  if taskGrid.Row < taskGrid.RowCount - 1 then taskGrid.Row := taskGrid.Row + 1;
   SetChanged;
-  Invalidate;
-  Application.ProcessMessages;
 end;
 
 procedure TformNotetask.ADeleteTasksExecute(Sender: TObject);
