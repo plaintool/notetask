@@ -190,7 +190,11 @@ msgid "Show status bar"
 msgstr ""
 
 #: tformnotetask.aundo.caption
-msgid "Undo changes"
+msgid "Undo"
+msgstr ""
+
+#: tformnotetask.aundoall.caption
+msgid "Undo all changes"
 msgstr ""
 
 #: tformnotetask.awordwrap.caption

@@ -16,6 +16,7 @@ type
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
+    aUndoAll: TAction;
     aDelete: TAction;
     aDateTime: TAction;
     aSelectAll: TAction;
@@ -60,6 +61,7 @@ type
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
+    menuUndoAll: TMenuItem;
     menuPaste: TMenuItem;
     menuCopy: TMenuItem;
     menuCut: TMenuItem;
@@ -130,6 +132,8 @@ type
     procedure aSelectAllExecute(Sender: TObject);
     procedure AShowArchivedExecute(Sender: TObject);
     procedure aShowStatusBarExecute(Sender: TObject);
+    procedure aUndoAllExecute(Sender: TObject);
+    procedure aUndoExecute(Sender: TObject);
     procedure aWordWrapExecute(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
@@ -293,21 +297,22 @@ begin
 
     if Confirm = mrYes then
     begin
-      Rect := taskGrid.Selection;
-      for i := Rect.Top to Rect.Bottom do
-      begin
-        for j := Rect.Left to Rect.Right do
-        begin
-          if (j = 1) then Tasks.GetTask(i).IsCompleted := False;
-          if (j = 2) then Tasks.GetTask(i).TaskDescription := '';
-          if (j = 3) then Tasks.GetTask(i).Comment := '';
-          if (j = 4) then Tasks.GetTask(i).CompletionDate := 0;
-          if (j = 1) then
-            taskGrid.Cells[j, i] := '0'
-          else
-            taskGrid.Cells[j, i] := string.Empty;
-        end;
-      end;
+      Tasks.ClearTasksInRect(taskGrid, taskGrid.Selection);
+      //Rect := taskGrid.Selection;
+      //for i := Rect.Top to Rect.Bottom do
+      //begin
+      //  for j := Rect.Left to Rect.Right do
+      //  begin
+      //    if (j = 1) then Tasks.GetTask(i).IsCompleted := False;
+      //    if (j = 2) then Tasks.GetTask(i).TaskDescription := '';
+      //    if (j = 3) then Tasks.GetTask(i).Comment := '';
+      //    if (j = 4) then Tasks.GetTask(i).CompletionDate := 0;
+      //    if (j = 1) then
+      //      taskGrid.Cells[j, i] := '0'
+      //    else
+      //      taskGrid.Cells[j, i] := string.Empty;
+      //  end;
+      //end;
       SetChanged;
       FLineCount := Tasks.Count;
       SetInfo;
@@ -332,6 +337,8 @@ begin
 
     if Confirm = mrYes then
     begin
+      Tasks.CreateBackup;
+
       // RemoveTask from collection
       //Tasks.DeleteTask(RowIndex);
       taskGrid.DeleteRow(RowIndex);
@@ -352,6 +359,8 @@ begin
 
     if Confirm = mrYes then
     begin
+      Tasks.CreateBackup;
+
       // Delete rows from the end to avoid index shifting
       for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
       begin
@@ -387,7 +396,9 @@ begin
 
     if Confirm = mrYes then
     begin
-      // RemoveTask from collection
+      Tasks.CreateBackup;
+
+      // Archivate task
       Tasks.ArchiveTask(RowIndex);
       Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
       SetChanged;
@@ -407,7 +418,9 @@ begin
 
     if Confirm = mrYes then
     begin
-      // Archive rows from the end to avoid index shifting
+      Tasks.CreateBackup;
+
+      // Archive tasks from the end to avoid index shifting
       for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
       begin
         RowIndex := i;
@@ -941,6 +954,20 @@ begin
   ShowStatusBar := aShowStatusBar.Checked;
 end;
 
+procedure TformNotetask.aUndoExecute(Sender: TObject);
+begin
+  Tasks.UndoBackup;
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+end;
+
+procedure TformNotetask.aUndoAllExecute(Sender: TObject);
+begin
+  Tasks.UndoBackupInit;
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+  ResetRowHeight;
+  SetChanged(False);
+end;
+
 procedure TformNotetask.SetShowStatusBar(Value: boolean);
 begin
   FShowStatusBar := Value;
@@ -1034,6 +1061,7 @@ begin
     EditComplite;
     SaveTextFile(fileName, Tasks.ToStringList, FEncoding, FLineEnding);
     SetChanged(False);
+    Tasks.CreateBackupInit;
   end;
 
   SetInfo;
@@ -1065,6 +1093,8 @@ begin
 
   FChanged := taskGrid.Modified or aChanged;
   aSave.Enabled := FChanged;
+  aUndo.Enabled := FChanged;
+  aUndoAll.Enabled := FChanged;
   SetCaption;
 end;
 

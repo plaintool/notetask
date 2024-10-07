@@ -200,8 +200,12 @@ msgid "Show status bar"
 msgstr "Строка состояния"
 
 #: tformnotetask.aundo.caption
-msgid "Undo changes"
-msgstr "Отменить изменения"
+msgid "Undo"
+msgstr "Отменить"
+
+#: tformnotetask.aundoall.caption
+msgid "Undo all changes"
+msgstr "Отменить все изменения"
 
 #: tformnotetask.awordwrap.caption
 msgid "Word wrap"
