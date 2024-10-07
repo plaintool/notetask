@@ -51,10 +51,10 @@ type
     procedure ArchiveTask(Index: integer);
     procedure CompleteTask(Index: integer);
     procedure ClearTasksInRect(Rect: TGridRect);
+    function MoveTaskTop(Index: integer): integer;
+    function MoveTaskBottom(Index: integer): integer;
     function MoveTaskUp(Index: integer): integer;
     function MoveTaskDown(Index: integer): integer;
-    function MoveTaskToTop(Index: integer): integer;
-    function MoveTaskToBottom(Index: integer): integer;
     procedure CopyToClipboard(Grid: TStringGrid);
     procedure FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder);
     function ToStringList: TStringList;
@@ -399,6 +399,54 @@ begin
   end;
 end;
 
+function TTasks.MoveTaskTop(Index: integer): integer;
+var
+  TempTask: TTask; // Declare the temporary variable here
+  i, Ind: integer;
+begin
+  Ind := Map(Index);
+  Result := -1;
+  // Check if the index is valid and not already at the top
+  if (Ind > 0) and (Ind < FCount) then
+  begin
+    // Store the task at the given index
+    TempTask := FTaskList[Ind];
+
+    // Shift tasks down to make room at the top
+    for i := Ind downto 1 do
+      FTaskList[i] := FTaskList[i - 1];
+
+    // Place the stored task at the top
+    FTaskList[0] := TempTask;
+
+    Result := ReverseMap(0);
+  end;
+end;
+
+function TTasks.MoveTaskBottom(Index: integer): integer;
+var
+  TempTask: TTask; // Declare the temporary variable here
+  i, Ind: integer;
+begin
+  Ind := Map(Index);
+  Result := -1;
+  // Check if the index is valid and not already at the bottom
+  if (Ind >= 0) and (Ind < FCount - 1) then
+  begin
+    // Store the task at the given index
+    TempTask := FTaskList[Ind];
+
+    // Shift all tasks down to fill the gap
+    for i := Ind to FCount - 2 do
+      FTaskList[i] := FTaskList[i + 1];
+
+    // Place the stored task at the end
+    FTaskList[FCount - 1] := TempTask;
+
+    Result := ReverseMap(FCount - 1);
+  end;
+end;
+
 function TTasks.MoveTaskUp(Index: integer): integer;
 var
   TempTask: TTask;   // Temporary variable for swapping tasks
@@ -441,54 +489,6 @@ begin
     FTaskList[Ind + 1] := TempTask;
 
     Result := ReverseMap(Ind + 1);
-  end;
-end;
-
-function TTasks.MoveTaskToTop(Index: integer): integer;
-var
-  TempTask: TTask; // Declare the temporary variable here
-  i, Ind: integer;
-begin
-  Ind := Map(Index);
-  Result := -1;
-  // Check if the index is valid and not already at the top
-  if (Ind > 0) and (Ind < FCount) then
-  begin
-    // Store the task at the given index
-    TempTask := FTaskList[Ind];
-
-    // Shift tasks down to make room at the top
-    for i := Ind downto 1 do
-      FTaskList[i] := FTaskList[i - 1];
-
-    // Place the stored task at the top
-    FTaskList[0] := TempTask;
-
-    Result := ReverseMap(0);
-  end;
-end;
-
-function TTasks.MoveTaskToBottom(Index: integer): integer;
-var
-  TempTask: TTask; // Declare the temporary variable here
-  i, Ind: integer;
-begin
-  Ind := Map(Index);
-  Result := -1;
-  // Check if the index is valid and not already at the bottom
-  if (Ind >= 0) and (Ind < FCount - 1) then
-  begin
-    // Store the task at the given index
-    TempTask := FTaskList[Ind];
-
-    // Shift all tasks down to fill the gap
-    for i := Ind to FCount - 2 do
-      FTaskList[i] := FTaskList[i + 1];
-
-    // Place the stored task at the end
-    FTaskList[FCount - 1] := TempTask;
-
-    Result := ReverseMap(FCount - 1);
   end;
 end;
 

@@ -113,10 +113,10 @@ type
     procedure aExitExecute(Sender: TObject);
     procedure aFontExecute(Sender: TObject);
     procedure aInsertTaskExecute(Sender: TObject);
-    procedure aMoveTaskBottomExecute(Sender: TObject);
-    procedure aMoveTaskDownExecute(Sender: TObject);
     procedure aMoveTaskTopExecute(Sender: TObject);
+    procedure aMoveTaskBottomExecute(Sender: TObject);
     procedure aMoveTaskUpExecute(Sender: TObject);
+    procedure aMoveTaskDownExecute(Sender: TObject);
     procedure aNewExecute(Sender: TObject);
     procedure aNewWindowExecute(Sender: TObject);
     procedure aOpenExecute(Sender: TObject);
@@ -651,13 +651,30 @@ procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
 var
   newRow: integer;
 begin
-  newRow := Tasks.MoveTaskToTop(taskGrid.Row);
+  newRow := Tasks.MoveTaskTop(taskGrid.Row);
   Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
   if (newRow > -1) then
   begin
     SwapRowHeights(taskGrid.Row, newRow);
     taskGrid.Row := newRow;
   end;
+  SetChanged;
+  Invalidate;
+  Application.ProcessMessages;
+end;
+
+procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
+var
+  newRow: integer;
+begin
+  newRow := Tasks.MoveTaskBottom(taskGrid.Row);
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
+  if (newRow > -1) then
+  begin
+    SwapRowHeights(taskGrid.Row, newRow);
+    taskGrid.Row := newRow;
+  end;
+  //  taskGrid.Row := taskGrid.RowCount - 1;
   SetChanged;
   Invalidate;
   Application.ProcessMessages;
@@ -692,23 +709,6 @@ begin
     taskGrid.Row := newRow;
   end;
   //  if taskGrid.Row < taskGrid.RowCount - 1 then taskGrid.Row := taskGrid.Row + 1;
-  SetChanged;
-  Invalidate;
-  Application.ProcessMessages;
-end;
-
-procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
-var
-  newRow: integer;
-begin
-  newRow := Tasks.MoveTaskToBottom(taskGrid.Row);
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
-  if (newRow > -1) then
-  begin
-    SwapRowHeights(taskGrid.Row, newRow);
-    taskGrid.Row := newRow;
-  end;
-  //  taskGrid.Row := taskGrid.RowCount - 1;
   SetChanged;
   Invalidate;
   Application.ProcessMessages;
