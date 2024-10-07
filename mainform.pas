@@ -162,6 +162,7 @@ type
     FWordWrap: boolean;
     FShowStatusBar: boolean;
     FSortOrder: TSortOrder;
+    FSortColumn: integer;
     procedure MemoChange(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
@@ -1004,13 +1005,18 @@ begin
   EditComplite;
   if IsColumn then
   begin
+    if (FSortColumn <> Index) then
+      SortOrder := soAscending
+    else
+    if SortOrder = soAscending then
+      SortOrder := soDescending
+    else
+      SortOrder := soAscending;
+
+    FSortColumn := Index;
+
     if Index = 0 then
     begin
-      if SortOrder = soAscending then
-        SortOrder := soDescending
-      else
-        SortOrder := soAscending;
-
       Tasks.FillGrid(taskGrid, FShowArchived, SortOrder);
     end;
   end
