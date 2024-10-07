@@ -85,7 +85,7 @@
       <Unit>
         <Filename Value="forminput.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="FormInputText"/>
+        <ComponentName Value="formInputText"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
     </Units>

@@ -19,7 +19,8 @@ uses
   filemanager,
   task,
   settings,
-  systemtool, forminput;
+  systemtool,
+  forminput;
 
   {$R *.res}
 
@@ -29,7 +30,7 @@ begin
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
+  Application.CreateForm(TformInputText, formInputText);
   ApplicationTranslate(GetOSLanguage);
-  Application.CreateForm(TFormInputText, FormInputText);
   Application.Run;
 end.

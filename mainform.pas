@@ -659,12 +659,12 @@ var
   rowNum: integer;
 begin
   // Create an instance of the form
-  with TFormInputText.Create(Self) do
+  with formInputText do
   try
     Left := self.Left + 14;
     Top := self.top + 52;
-    editText.Text := '1';
-    editText.SelectAll;
+    editText.Text := IntToStr(taskGrid.Row);
+
     // Show the form as a modal dialog
     if ShowModal = mrOk then
     begin
@@ -682,7 +682,7 @@ begin
       end;
     end;
   finally
-    Free;
+    Hide;
   end;
 end;
 
