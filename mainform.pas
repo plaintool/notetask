@@ -109,6 +109,7 @@ type
     statusBar: TStatusBar;
     taskGrid: TStringGrid;
     procedure aArchiveTasksExecute(Sender: TObject);
+    procedure aDateTimeExecute(Sender: TObject);
     procedure ADeleteTasksExecute(Sender: TObject);
     procedure aExitExecute(Sender: TObject);
     procedure aFontExecute(Sender: TObject);
@@ -154,8 +155,8 @@ type
   private
     Memo: TMemo;
     FChanged: boolean;
-    IsEditing: boolean;
-    IsSelecting: boolean;
+    FIsEditing: boolean;
+    FIsSelecting: boolean;
     FFileName: string;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
@@ -180,6 +181,7 @@ type
     procedure ArchiveTasks;
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowArchived(Value: boolean);
+    function GetIsEditing: boolean;
     procedure CompleteTasks(aRow: integer = 0);
     procedure ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
@@ -195,6 +197,7 @@ type
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property SortOrder: TSortOrder read FSortOrder write FSortOrder;
     property SortColumn: integer read FSortColumn write FSortColumn;
+    property IsEditing: boolean read GetIsEditing write FIsEditing;
   end;
 
 var
@@ -494,14 +497,14 @@ procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShif
 begin
   if (ssCtrl in Shift) and (Key = VK_DELETE) then // Ctrl + Del
   begin
-    if (not taskGrid.EditorMode) and (not IsEditing) then
+    if not IsEditing then
       DeleteTasks;
     Key := 0;
   end
   else
   if (Key = VK_DELETE) then // Del
   begin
-    if (not taskGrid.EditorMode) and (not IsEditing) then
+    if not IsEditing then
     begin
       if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
       begin
@@ -518,7 +521,7 @@ begin
   else
   if (Key = VK_ESCAPE) then // Escape
   begin
-    if (taskGrid.EditorMode) or (IsEditing) then
+    if IsEditing then
       EditComplite;
     Key := 0;
   end
@@ -562,7 +565,7 @@ begin
   else
   if (Shift = [ssCtrl, ssShift]) and (Key = VK_UP) then // Ctrl + Shift + Up
   begin
-    if (taskGrid.EditorMode) or (IsEditing) then
+    if IsEditing then
     begin
       EditComplite;
       if taskGrid.Row > 0 then
@@ -573,7 +576,7 @@ begin
   else
   if (Shift = [ssCtrl, ssShift]) and (Key = VK_DOWN) then // Ctrl + Shift + Down
   begin
-    if (taskGrid.EditorMode) or (IsEditing) then
+    if IsEditing then
     begin
       EditComplite;
       if (taskGrid.Row < taskGrid.RowCount - 1) then
@@ -584,7 +587,7 @@ begin
   else
   if (Key = VK_SPACE) then // Space
   begin
-    if (not taskGrid.EditorMode) and (not IsEditing) then
+    if not IsEditing then
     begin
       CompleteTasks;
       Key := 0;
@@ -593,7 +596,7 @@ begin
   else
   if (Shift = [ssCtrl]) and (Key = VK_RETURN) then // Ctrl +Enter
   begin
-    if (taskGrid.EditorMode) or (IsEditing) then
+    if IsEditing then
     begin
       EditComplite;
       Key := 0;
@@ -602,7 +605,7 @@ begin
   else
   if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
   begin
-    if (not taskGrid.EditorMode) and (not IsEditing) then
+    if not IsEditing then
       aSelectAll.Execute
     else
     if (Assigned(Memo)) then
@@ -717,6 +720,39 @@ begin
   ArchiveTasks;
 end;
 
+procedure TformNotetask.aDateTimeExecute(Sender: TObject);
+var
+  PosStart: integer;
+  CurrentDateTime: string;
+begin
+  CurrentDateTime := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
+  if IsEditing then
+  begin
+    if (taskGrid.Col = 4) then
+    begin
+      taskGrid.Cells[4, taskGrid.Row] := CurrentDateTime;
+    end
+    else
+    begin
+      PosStart := Memo.SelStart;
+      Memo.SelText := CurrentDateTime;
+      Memo.SelStart := PosStart + Length(CurrentDateTime);
+    end;
+    SetChanged;
+  end
+  else
+  begin
+    if (taskGrid.Col > 0) then
+    begin
+      if taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim = string.Empty then
+        taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
+      else
+        taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
+      SetChanged;
+    end;
+  end;
+end;
+
 procedure TformNotetask.aNewExecute(Sender: TObject);
 begin
   if IsCanClose then
@@ -826,7 +862,7 @@ end;
 
 procedure TformNotetask.aSelectAllExecute(Sender: TObject);
 begin
-  if (not taskGrid.EditorMode) and (not IsEditing) then
+  if not IsEditing then
   begin
     taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount);
   end;
@@ -862,6 +898,11 @@ begin
   FWordWrap := aWordWrap.Checked;
   ResetRowHeight;
   Invalidate;
+end;
+
+function TformNotetask.GetIsEditing: boolean;
+begin
+  Result := (taskGrid.EditorMode) or (FIsEditing);
 end;
 
 function TformNotetask.IsCanClose: boolean;
@@ -1092,22 +1133,22 @@ end;
 
 procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
 begin
-  IsSelecting := True;
+  FIsSelecting := True;
 end;
 
 procedure TformNotetask.taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
-  IsSelecting := False;
+  FIsSelecting := False;
 end;
 
 procedure TformNotetask.taskGridMouseLeave(Sender: TObject);
 begin
-  IsSelecting := False;
+  FIsSelecting := False;
 end;
 
 procedure TformNotetask.taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
-  if (Button = mbRight) and (not taskGrid.EditorMode) and (not IsEditing) then
+  if (Button = mbRight) and (not IsEditing) then
     Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
 end;
 
@@ -1273,16 +1314,16 @@ begin
 
   Editor := Memo;
 
-  if (IsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
+  if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
   begin
-    IsSelecting := False;
+    FIsSelecting := False;
     Memo.Visible := False;
-    IsEditing := False;
+    FIsEditing := False;
   end
   else
   begin
     Memo.Visible := True;
-    IsEditing := True;
+    FIsEditing := True;
   end;
 end;
 
@@ -1305,7 +1346,7 @@ procedure TformNotetask.EditCell(aCol, aRow: integer);
 begin
   taskGrid.Row := aRow;
   taskGrid.Col := aCol;
-  IsEditing := True;
+  FIsEditing := True;
   taskGrid.EditorMode := True; //Set editing mode
 
   if (Assigned(Memo)) and (Memo.Visible) then
@@ -1318,7 +1359,7 @@ end;
 procedure TformNotetask.EditComplite;
 begin
   taskGrid.EditorMode := False;
-  IsEditing := False; // Reset editing flag when exiting
+  FIsEditing := False; // Reset editing flag when exiting
 end;
 
 end.

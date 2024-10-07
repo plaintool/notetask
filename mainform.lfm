@@ -424,6 +424,7 @@ object formNotetask: TformNotetask
     object aDateTime: TAction
       Category = 'Edit'
       Caption = 'Date time'
+      OnExecute = aDateTimeExecute
       ShortCut = 116
     end
   end
