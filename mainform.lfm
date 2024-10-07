@@ -413,6 +413,7 @@ object formNotetask: TformNotetask
     object aGoTo: TAction
       Category = 'Edit'
       Caption = 'Go to...'
+      OnExecute = aGoToExecute
       ShortCut = 16455
     end
     object aSelectAll: TAction

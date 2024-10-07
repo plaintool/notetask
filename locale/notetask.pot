@@ -51,6 +51,23 @@ msgstr ""
 msgid "Untitled"
 msgstr ""
 
+#: tforminputtext.buttoncancel.caption
+msgctxt "tforminputtext.buttoncancel.caption"
+msgid "Cancel"
+msgstr ""
+
+#: tforminputtext.buttonok.caption
+msgid "Go to"
+msgstr ""
+
+#: tforminputtext.caption
+msgid "Go to task"
+msgstr ""
+
+#: tforminputtext.labelcaption.caption
+msgid "Task number:"
+msgstr ""
+
 #: tformnotetask.aabout.caption
 msgid "About..."
 msgstr ""
@@ -181,6 +198,7 @@ msgid "Word wrap"
 msgstr ""
 
 #: tformnotetask.calendardialog.cancelcaption
+msgctxt "tformnotetask.calendardialog.cancelcaption"
 msgid "Cancel"
 msgstr ""
 

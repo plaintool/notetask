@@ -19,7 +19,7 @@ uses
   filemanager,
   task,
   settings,
-  systemtool;
+  systemtool, forminput;
 
   {$R *.res}
 
@@ -30,5 +30,6 @@ begin
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
   ApplicationTranslate(GetOSLanguage);
+  Application.CreateForm(TFormInputText, FormInputText);
   Application.Run;
 end.

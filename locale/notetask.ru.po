@@ -61,6 +61,23 @@ msgstr "Файлы задач (*.tsk)|*.tsk|Текстовые файлы (*.txt
 msgid "Untitled"
 msgstr "Безымянный"
 
+#: tforminputtext.buttoncancel.caption
+msgctxt "tforminputtext.buttoncancel.caption"
+msgid "Cancel"
+msgstr "Отмена"
+
+#: tforminputtext.buttonok.caption
+msgid "Go to"
+msgstr "Переход"
+
+#: tforminputtext.caption
+msgid "Go to task"
+msgstr "Переход к задаче"
+
+#: tforminputtext.labelcaption.caption
+msgid "Task number:"
+msgstr "Номер задачи:"
+
 #: tformnotetask.aabout.caption
 msgid "About..."
 msgstr "О программе..."
@@ -191,6 +208,7 @@ msgid "Word wrap"
 msgstr "Перенос по словам"
 
 #: tformnotetask.calendardialog.cancelcaption
+msgctxt "tformnotetask.calendardialog.cancelcaption"
 msgid "Cancel"
 msgstr "Отмена"
 

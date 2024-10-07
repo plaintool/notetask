@@ -113,6 +113,7 @@ type
     procedure ADeleteTasksExecute(Sender: TObject);
     procedure aExitExecute(Sender: TObject);
     procedure aFontExecute(Sender: TObject);
+    procedure aGoToExecute(Sender: TObject);
     procedure aInsertTaskExecute(Sender: TObject);
     procedure aMoveTaskTopExecute(Sender: TObject);
     procedure aMoveTaskBottomExecute(Sender: TObject);
@@ -222,7 +223,7 @@ resourcestring
 
 implementation
 
-uses filemanager, settings;
+uses filemanager, settings, forminput;
 
   {$R *.lfm}
 
@@ -626,6 +627,62 @@ begin
   begin
     // Apply the selected font to the form
     Self.Font := fontDialog.Font;
+  end;
+end;
+
+//procedure TformNotetask.aGoToExecute(Sender: TObject);
+//var
+//  rowNumStr: string;
+//  rowNum: Integer;
+//begin
+//  // Prompt the user to enter the row number
+//  rowNumStr := InputBox('Перейти к строке', 'Введите номер строки:', '');
+
+//  // Try to convert the input to an integer
+//  if TryStrToInt(rowNumStr, rowNum) then
+//  begin
+//    // Ensure the entered row is within the valid range
+//    if (rowNum >= 1) and (rowNum <= taskGrid.RowCount - 1) then
+//    begin
+//      // Move to the specified row
+//      taskGrid.Row := rowNum;
+//    end
+//    else
+//      ShowMessage('Номер строки выходит за пределы допустимого диапазона.');
+//  end
+//  else
+//    ShowMessage('Введите допустимое число.');
+//end;
+
+procedure TformNotetask.aGoToExecute(Sender: TObject);
+var
+  rowNum: integer;
+begin
+  // Create an instance of the form
+  with TFormInputText.Create(Self) do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    editText.Text := '1';
+    editText.SelectAll;
+    // Show the form as a modal dialog
+    if ShowModal = mrOk then
+    begin
+      // Try to convert the entered value to an integer
+      if TryStrToInt(editText.Text, rowNum) then
+      begin
+        // Ensure the entered row is within the valid range
+        if (rowNum >= 1) and (rowNum <= taskGrid.RowCount - 1) then
+        begin
+          // Move to the specified row
+          taskGrid.Row := rowNum;
+        end
+        else
+          ShowMessage('Номер строки выходит за пределы допустимого диапазона.');
+      end;
+    end;
+  finally
+    Free;
   end;
 end;
 
