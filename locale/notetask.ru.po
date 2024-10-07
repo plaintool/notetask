@@ -273,7 +273,7 @@ msgstr "Задача"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgid "Comment"
-msgstr "Комментарии"
+msgstr "Комментарий"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgid "Date"

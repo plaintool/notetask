@@ -321,6 +321,7 @@ object formNotetask: TformNotetask
     object aCopy: TAction
       Category = 'Edit'
       Caption = 'Copy'
+      OnExecute = aCopyExecute
       ShortCut = 16451
     end
     object aPaste: TAction
@@ -332,6 +333,7 @@ object formNotetask: TformNotetask
       Category = 'Task'
       Caption = 'Insert task'
       OnExecute = aInsertTaskExecute
+      ShortCut = 45
     end
     object ADeleteTasks: TAction
       Category = 'Task'

@@ -109,6 +109,7 @@ type
     statusBar: TStatusBar;
     taskGrid: TStringGrid;
     procedure aArchiveTasksExecute(Sender: TObject);
+    procedure aCopyExecute(Sender: TObject);
     procedure aDateTimeExecute(Sender: TObject);
     procedure ADeleteTasksExecute(Sender: TObject);
     procedure aExitExecute(Sender: TObject);
@@ -534,12 +535,12 @@ begin
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
-  begin
-    Tasks.CopyToClipboard(taskGrid);
-    Key := 0;
-  end
-  else
+  //if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
+  //begin
+  //  Tasks.CopyToClipboard(taskGrid);
+  //  Key := 0;
+  //end
+  //else
   if (Shift = [ssCtrl]) and (Key = VK_PRIOR) then // Ctrl + Page Up
   begin
     aMoveTaskTop.Execute;
@@ -775,6 +776,11 @@ end;
 procedure TformNotetask.aArchiveTasksExecute(Sender: TObject);
 begin
   ArchiveTasks;
+end;
+
+procedure TformNotetask.aCopyExecute(Sender: TObject);
+begin
+  Tasks.CopyToClipboard(taskGrid);
 end;
 
 procedure TformNotetask.aDateTimeExecute(Sender: TObject);
