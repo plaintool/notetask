@@ -225,6 +225,7 @@ resourcestring
   rclearconfirm = 'Are you sure you want to clear the data in the selected area?';
   ropendialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
   rsavedialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
+  rundoconfirm = 'Are you sure you want to discard all changes? This action cannot be undone.';
 
 implementation
 
@@ -534,13 +535,6 @@ begin
     end;
   end
   else
-  if (Key = VK_ESCAPE) then // Escape
-  begin
-    if IsEditing then
-      EditComplite;
-    Key := 0;
-  end
-  else
   if (Key = VK_F2) then // F2
   begin
     EditComplite;
@@ -609,7 +603,14 @@ begin
     end;
   end
   else
-  if (Shift = [ssCtrl]) and (Key = VK_RETURN) then // Ctrl +Enter
+  if (Key = VK_ESCAPE) then // Escape
+  begin
+    if IsEditing then
+      EditComplite;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_RETURN) then // Ctrl + Enter
   begin
     if IsEditing then
     begin
@@ -961,11 +962,19 @@ begin
 end;
 
 procedure TformNotetask.aUndoAllExecute(Sender: TObject);
+var
+  Confirm: TModalResult;
 begin
-  Tasks.UndoBackupInit;
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
-  ResetRowHeight;
-  SetChanged(False);
+  Confirm := MessageDlg(rundoconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+  if Confirm = mrYes then
+  begin
+    Tasks.UndoBackupInit;
+    Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+    ResetRowHeight;
+    Tasks.CreateBackup;
+    SetChanged(False);
+  end;
 end;
 
 procedure TformNotetask.SetShowStatusBar(Value: boolean);
