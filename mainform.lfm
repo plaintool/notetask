@@ -418,6 +418,7 @@ object formNotetask: TformNotetask
     object aSelectAll: TAction
       Category = 'Edit'
       Caption = 'Select all'
+      OnExecute = aSelectAllExecute
       ShortCut = 16449
     end
     object aDateTime: TAction

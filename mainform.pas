@@ -124,6 +124,7 @@ type
     procedure aPrintExecute(Sender: TObject);
     procedure aSaveAsExecute(Sender: TObject);
     procedure aSaveExecute(Sender: TObject);
+    procedure aSelectAllExecute(Sender: TObject);
     procedure AShowArchivedExecute(Sender: TObject);
     procedure aShowStatusBarExecute(Sender: TObject);
     procedure aWordWrapExecute(Sender: TObject);
@@ -602,10 +603,11 @@ begin
   if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
   begin
     if (not taskGrid.EditorMode) and (not IsEditing) then
-    begin
-      taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount);
-      Key := 0;
-    end;
+      aSelectAll.Execute
+    else
+    if (Assigned(Memo)) then
+      Memo.SelectAll;
+    Key := 0;
   end;
 end;
 
@@ -820,6 +822,14 @@ end;
 procedure TformNotetask.aSaveExecute(Sender: TObject);
 begin
   SaveFile(FFileName);
+end;
+
+procedure TformNotetask.aSelectAllExecute(Sender: TObject);
+begin
+  if (not taskGrid.EditorMode) and (not IsEditing) then
+  begin
+    taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount);
+  end;
 end;
 
 procedure TformNotetask.AShowArchivedExecute(Sender: TObject);
