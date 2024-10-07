@@ -135,7 +135,9 @@ begin
     FIsArchive := True;
     // Remove '~~' from the start and end of the TaskDescription
     FTaskDescription := FTaskDescription.Substring(2, Length(FTaskDescription) - 4);
-  end;
+  end
+  else
+    FIsArchive := False;
 end;
 
 function TTask.ToString(Index: integer = 0; AddEmptyCompletion: boolean = True): string;
@@ -314,21 +316,22 @@ end;
 procedure TTasks.InsertTask(const TaskString: string; Index: integer);
 var
   Task: TTask;
-  i: integer;
+  i, Ind: integer;
 begin
-  if (Index < 0) or (Index > FCount) then
-    raise Exception.Create('Index out of bounds'); // Error handling for invalid index
-
+  Ind := Map(Index);
+  if (Ind < 0) and (Ind >= FCount) then
+    exit;
+    Ind := Ind + 1;
   Task := TTask.Create(TaskString); // Create a new task
   SetLength(FTaskList, FCount + 1); // Resize the array
 
   // Shift tasks to the right to make space for the new task
-  for i := FCount downto Index do
+  for i := FCount downto Ind + 1 do
   begin
     FTaskList[i] := FTaskList[i - 1]; // Move tasks one position to the right
   end;
 
-  FTaskList[Index] := Task; // Insert the new task at the specified index
+  FTaskList[Ind] := Task; // Insert the new task at the specified index
   Inc(FCount); // Increment the task count
 end;
 
@@ -346,9 +349,9 @@ begin
     FTaskList[Ind].Free;
 
   // Shift tasks down to fill the gap
-  for i := Ind to FCount - 2 do
+  for i := Index to Length(MapGrid) - 1 do
   begin
-    FTaskList[i] := FTaskList[i + 1]; // Move the next task to the current position
+    FTaskList[Map(i)] := FTaskList[Map(i + 1)]; // Move the next task to the current position
   end;
 
   // Resize the array to remove the last (now duplicate) element
