@@ -514,14 +514,31 @@ begin
   end;
 end;
 
-procedure TformNotetask.aDeleteExecute(Sender: TObject);
+procedure TformNotetask.aUndoExecute(Sender: TObject);
 begin
   if not IsEditing then
   begin
-    if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
-      ClearSelected(False)
-    else
-      DeleteTask;
+    Tasks.UndoBackup;
+    Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+  end;
+end;
+
+procedure TformNotetask.aUndoAllExecute(Sender: TObject);
+var
+  Confirm: TModalResult;
+begin
+  if not IsEditing then
+  begin
+    Confirm := MessageDlg(rundoconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+    if Confirm = mrYes then
+    begin
+      Tasks.UndoBackupInit;
+      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+      ResetRowHeight;
+      Tasks.CreateBackup;
+      SetChanged(False);
+    end;
   end;
 end;
 
@@ -537,6 +554,33 @@ begin
   end;
 end;
 
+procedure TformNotetask.aCopyExecute(Sender: TObject);
+begin
+  if not IsEditing then
+  begin
+    Tasks.CopyToClipboard(taskGrid);
+  end;
+end;
+
+procedure TformNotetask.aDeleteExecute(Sender: TObject);
+begin
+  if not IsEditing then
+  begin
+    if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+      ClearSelected(False)
+    else
+      DeleteTask;
+  end;
+end;
+
+procedure TformNotetask.aSelectAllExecute(Sender: TObject);
+begin
+  if not IsEditing then
+  begin
+    taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount);
+  end;
+end;
+
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if (ssCtrl in Shift) and (Key = VK_DELETE) then // Ctrl + Del
@@ -546,15 +590,6 @@ begin
     Key := 0;
   end
   else
-  if (Key = VK_DELETE) then // Del
-  begin
-    if not IsEditing then
-    begin
-      aDelete.Execute;
-      Key := 0;
-    end;
-  end
-  else
   if (Key = VK_F2) then // F2
   begin
     EditComplite;
@@ -562,12 +597,66 @@ begin
     Key := 0;
   end
   else
-  //if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
-  //begin
-  //  Tasks.CopyToClipboard(taskGrid);
-  //  Key := 0;
-  //end
-  //else
+  if (Key = VK_DELETE) then // Del
+  begin
+    if not IsEditing then
+      aDelete.Execute
+    else
+    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+      (taskGrid.InplaceEditor as TCustomEdit).ClearSelection;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (not (ssShift in Shift)) and (Key = VK_Z) then // Ctrl + Z
+  begin
+    if not IsEditing then
+      aUndo.Execute
+    else
+    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+      (taskGrid.InplaceEditor as TCustomEdit).Undo;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
+  begin
+    if not IsEditing then
+      aCut.Execute
+    else
+    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+      (taskGrid.InplaceEditor as TCustomEdit).CutToClipboard;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
+  begin
+    if not IsEditing then
+      aCopy.Execute
+    else
+    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+      (taskGrid.InplaceEditor as TCustomEdit).CopyToClipboard;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
+  begin
+    if not IsEditing then
+      aPaste.Execute
+    else
+    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+      (taskGrid.InplaceEditor as TCustomEdit).PasteFromClipboard;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
+  begin
+    if not IsEditing then
+      aSelectAll.Execute
+    else
+    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+      (taskGrid.InplaceEditor as TCustomEdit).SelectAll;
+    Key := 0;
+  end
+  else
   if (Shift = [ssCtrl]) and (Key = VK_PRIOR) then // Ctrl + Page Up
   begin
     aMoveTaskTop.Execute;
@@ -637,16 +726,6 @@ begin
       EditComplite;
       Key := 0;
     end;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
-  begin
-    if not IsEditing then
-      aSelectAll.Execute
-    else
-    if (Assigned(Memo)) then
-      Memo.SelectAll;
-    Key := 0;
   end;
 end;
 
@@ -812,11 +891,6 @@ begin
   ArchiveTasks;
 end;
 
-procedure TformNotetask.aCopyExecute(Sender: TObject);
-begin
-  Tasks.CopyToClipboard(taskGrid);
-end;
-
 procedure TformNotetask.aDateTimeExecute(Sender: TObject);
 var
   PosStart: integer;
@@ -957,14 +1031,6 @@ begin
   SaveFile(FFileName);
 end;
 
-procedure TformNotetask.aSelectAllExecute(Sender: TObject);
-begin
-  if not IsEditing then
-  begin
-    taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount);
-  end;
-end;
-
 procedure TformNotetask.AShowArchivedExecute(Sender: TObject);
 begin
   ShowArchived := aShowArchived.Checked;
@@ -973,28 +1039,6 @@ end;
 procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
 begin
   ShowStatusBar := aShowStatusBar.Checked;
-end;
-
-procedure TformNotetask.aUndoExecute(Sender: TObject);
-begin
-  Tasks.UndoBackup;
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
-end;
-
-procedure TformNotetask.aUndoAllExecute(Sender: TObject);
-var
-  Confirm: TModalResult;
-begin
-  Confirm := MessageDlg(rundoconfirm, mtConfirmation, [mbYes, mbNo], 0);
-
-  if Confirm = mrYes then
-  begin
-    Tasks.UndoBackupInit;
-    Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
-    ResetRowHeight;
-    Tasks.CreateBackup;
-    SetChanged(False);
-  end;
 end;
 
 procedure TformNotetask.SetShowStatusBar(Value: boolean);

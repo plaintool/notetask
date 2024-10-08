@@ -302,7 +302,7 @@ object formNotetask: TformNotetask
       Category = 'Format'
       Caption = 'Font...'
       OnExecute = aFontExecute
-      ShortCut = 16454
+      ShortCut = 24646
     end
     object aWordWrap: TAction
       Category = 'Format'
