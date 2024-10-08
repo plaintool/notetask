@@ -401,6 +401,8 @@ object formNotetask: TformNotetask
     object aDelete: TAction
       Category = 'Edit'
       Caption = 'Delete'
+      OnExecute = aDeleteExecute
+      ShortCut = 46
     end
     object aFind: TAction
       Category = 'Edit'

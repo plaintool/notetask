@@ -113,6 +113,7 @@ type
     procedure aArchiveTasksExecute(Sender: TObject);
     procedure aCopyExecute(Sender: TObject);
     procedure aDateTimeExecute(Sender: TObject);
+    procedure aDeleteExecute(Sender: TObject);
     procedure ADeleteTasksExecute(Sender: TObject);
     procedure aExitExecute(Sender: TObject);
     procedure aFontExecute(Sender: TObject);
@@ -509,6 +510,17 @@ begin
   end;
 end;
 
+procedure TformNotetask.aDeleteExecute(Sender: TObject);
+begin
+  if not IsEditing then
+  begin
+    if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+      ClearSelected
+    else
+      DeleteTask;
+  end;
+end;
+
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if (ssCtrl in Shift) and (Key = VK_DELETE) then // Ctrl + Del
@@ -522,16 +534,8 @@ begin
   begin
     if not IsEditing then
     begin
-      if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
-      begin
-        ClearSelected;
-        Key := 0;
-      end
-      else
-      begin
-        DeleteTask;
-        Key := 0;
-      end;
+      aDelete.Execute;
+      Key := 0;
     end;
   end
   else
