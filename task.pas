@@ -47,7 +47,8 @@ type
     function ReverseMap(Value: integer): integer;
     procedure AddMap(Value: integer);
     function AddTask(const TaskString: string): integer; // Method to add a task
-    function GetTask(Index: integer): TTask; // Method to get a task by index
+    function GetTask(Index: integer): TTask; // Method to get a task by row index
+    function GetTaskValue(ACol, ARow: integer): string; // Method to get a task value by row col
     function HasTask(Index: integer): boolean;
     procedure SetTask(Grid: TStringGrid; Row, Col: integer);
     procedure InsertTask(const TaskString: string; Index: integer);
@@ -297,6 +298,21 @@ begin
   if (Ind < 0) or (Ind >= FCount) then
     raise Exception.Create('Index out of bounds'); // Error handling for invalid index
   Result := FTaskList[Ind]; // Return the task by index
+end;
+
+function TTasks.GetTaskValue(ACol, aRow: integer): string;
+begin
+  if ACol = 1 then
+    if GetTask(aRow).FIsCompleted then Result := '1'
+    else
+      Result := '0'
+  else
+  if ACol = 2 then Result := GetTask(aRow).TaskDescription
+  else
+  if ACol = 3 then Result := GetTask(aRow).Comment
+  else
+  if ACol = 4 then Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
+      GetTask(aRow).CompletionDate);
 end;
 
 function TTasks.HasTask(Index: integer): boolean;

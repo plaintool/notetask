@@ -177,7 +177,7 @@ type
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol, aRow: integer);
-    procedure EditComplite;
+    procedure EditComplite(Validate: boolean = True);
     procedure SetInfo;
     procedure SetCaption;
     procedure ClearSelected;
@@ -1135,25 +1135,6 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
-var
-  DateTime: TDateTime;
-begin
-  if (aCol = 4) then
-  begin
-    if (NewValue <> '') and (not TryStrToDateTime(NewValue, DateTime)) then
-      Abort;
-
-    if (OldValue <> NewValue) then
-    begin
-      SetChanged;
-
-      Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
-      EditComplite;
-    end;
-  end;
-end;
-
 procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
 begin
   EditComplite;
@@ -1459,10 +1440,40 @@ begin
   end;
 end;
 
-procedure TformNotetask.EditComplite;
+procedure TformNotetask.taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
+var
+  DateTime: TDateTime;
 begin
-  taskGrid.EditorMode := False;
-  FIsEditing := False; // Reset editing flag when exiting
+  if (aCol = 4) then
+  begin
+    if (NewValue <> '') and (not TryStrToDateTime(NewValue, DateTime)) then
+      Abort;
+
+    if (OldValue <> NewValue) then
+    begin
+      SetChanged;
+
+      Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
+      EditComplite(False);
+    end;
+  end;
+end;
+
+procedure TformNotetask.EditComplite(Validate: boolean = True);
+var
+  oldValue, newValue: string;
+begin
+  if taskGrid.EditorMode then
+  begin
+    if (Validate) then
+    begin
+      oldValue := Tasks.GetTaskValue(taskGrid.Col, taskGrid.Row);
+      newvalue := taskGrid.Cells[taskGrid.Col, taskGrid.Row];
+      taskGrid.OnValidateEntry(taskGrid, taskGrid.Col, taskGrid.Row, oldValue, newValue);
+    end;
+    taskGrid.EditorMode := False;
+    FIsEditing := False; // Reset editing flag when exiting
+  end;
 end;
 
 end.
