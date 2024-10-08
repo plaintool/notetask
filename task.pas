@@ -27,7 +27,7 @@ type
     property Date: TDateTime read FDate write FDate;
     property Comment: string read FComment write FComment;
     property Text: string read FText write FText;
-    function ToString(Index: integer = 0; AddEmptyCompletion: boolean = True): string;
+    function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string;
   end;
 
   // Class representing a collection of tasks
@@ -51,7 +51,7 @@ type
     function GetTaskValue(ACol, ARow: integer): string; // Method to get a task value by row col
     function HasTask(Index: integer): boolean;
     procedure SetTask(Grid: TStringGrid; Row, Col: integer);
-    procedure InsertTask(const TaskString: string; Index: integer);
+    function InsertTask(const TaskString: string; Index: integer; Backup: boolean = True): integer;
     procedure DeleteTask(Index: integer);
     procedure ArchiveTask(Index: integer);
     procedure CompleteTask(Index: integer);
@@ -61,7 +61,7 @@ type
     function MoveTaskUp(Index: integer): integer;
     function MoveTaskDown(Index: integer): integer;
     procedure CopyToClipboard(Grid: TStringGrid);
-    procedure PasteFromClipboard(Grid: TStringGrid);
+    function PasteFromClipboard(Grid: TStringGrid): TGridRect;
     procedure FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder; SortColumn: integer);
     function ToStringList: TStringList;
     procedure CreateBackup;
@@ -75,7 +75,9 @@ type
 
 implementation
 
-{ TTask }
+uses filemanager;
+
+  { TTask }
 
 function RemoveBrackets(const S: string): string;
 const
@@ -159,7 +161,7 @@ begin
     FArchive := False;
 end;
 
-function TTask.ToString(Index: integer = 0; AddEmptyCompletion: boolean = True): string;
+function TTask.ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string;
 var
   TaskString: string;
   CompletionStatus: string;
@@ -186,8 +188,8 @@ begin
   else
     CommentPart := string.Empty;
 
-  // Form the task string based on the provided index
-  case Index of
+  // Form the task string based on the provided Col
+  case Col of
     1: Result := CompletionStatus; // Returning only the completion status
     2: Result := TaskString; // Returning only the task string
     3: Result := CommentPart; // Returning only the comment
@@ -230,7 +232,7 @@ begin
     begin
       AddTask(TaskStrings[i]); // Create a new task from the string and add to the list
     end;
-
+  InitMap(FCount + 1);
   CreateBackupInit;
 end;
 
@@ -245,10 +247,16 @@ begin
 end;
 
 procedure TTasks.InitMap(Length: integer);
+var
+  i: integer;
 begin
   SetLength(FMapGrid, Length);
   if Length > 0 then
+  begin
     FMapGrid[0] := -1;
+    for i := 1 to Length - 1 do
+      FMapGrid[i] := i - 1;
+  end;
 end;
 
 function TTasks.Map(Index: integer): integer;
@@ -312,8 +320,7 @@ begin
   else
   if ACol = 3 then Result := GetTask(aRow).Comment
   else
-  if ACol = 4 then Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
-      GetTask(aRow).Date);
+  if ACol = 4 then Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, GetTask(aRow).Date);
 end;
 
 function TTasks.HasTask(Index: integer): boolean;
@@ -360,7 +367,7 @@ begin
     raise Exception.Create('Invalid row or task index');
 end;
 
-procedure TTasks.InsertTask(const TaskString: string; Index: integer);
+function TTasks.InsertTask(const TaskString: string; Index: integer; Backup: boolean = True): integer;
 var
   Task: TTask;
   i, Ind: integer;
@@ -369,7 +376,8 @@ begin
   if (Ind < 0) and (Ind >= FCount) then
     exit;
 
-  CreateBackup;
+  if (Backup) then
+    CreateBackup;
 
   Ind := Ind + 1;
   Task := TTask.Create(TaskString); // Create a new task
@@ -383,6 +391,8 @@ begin
 
   FTaskList[Ind] := Task; // Insert the new task at the specified index
   Inc(FCount); // Increment the task count
+
+  Result := Ind;
 end;
 
 procedure TTasks.DeleteTask(Index: integer);
@@ -586,8 +596,7 @@ var
 begin
   SelectedText := TStringList.Create;
   try
-    // Get grid selection rect
-    Rect := Grid.Selection;
+    Rect := Grid.Selection;     // Get grid selection rect
 
     for i := Rect.Top to Rect.Bottom do
     begin
@@ -619,12 +628,90 @@ begin
   end;
 end;
 
-procedure TTasks.PasteFromClipboard(Grid: TStringGrid);
+function TTasks.PasteFromClipboard(Grid: TStringGrid): TGridRect;
 var
   TempTasks: TTasks;
+  TempDate: TDateTime;
+  Rect: TGridRect;
+  Index, i, j: integer;
+  Id, Id0, Id1: integer;
 begin
-//   Tasks := TTasks.Create(TextToStringList(Content));
+  if Clipboard.AsText = string.Empty then exit;
+  CreateBackup;
 
+  TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText));
+  if (Grid.Selection.Height = 0) or ((Grid.Selection.Height = 1) and (Grid.Selection.Width > 3)) then
+  begin
+    for i := TempTasks.FCount - 1 downto 0 do
+    begin
+      Id := InsertTask(TempTasks.GetTask(i + 1).ToString(), Grid.Row, False);
+      if i = 0 then Id0 := Id;
+      if i = TempTasks.FCount - 1 then Id1 := Id;
+    end;
+    // Result := TGridRect.Create(1, ReverseMap(id0), 4, ReverseMap(id1));
+  end
+  else
+  begin
+    index := 1;
+    Rect := Grid.Selection; // Get grid selection rect
+    for i := Rect.Top to Rect.Bottom do
+    begin
+      if (index > TempTasks.FCount) then break;
+      for j := Rect.Left to Rect.Right do
+      begin
+        if j = 1 then GetTask(i).Done := TempTasks.GetTask(index).Done;
+        if j = 2 then
+        begin
+          if (TempTasks.GetTask(index).Text <> string.Empty) then
+            GetTask(i).Text := TempTasks.GetTask(index).Text
+          else
+          if Rect.Width = 0 then
+          begin
+            if (TempTasks.GetTask(index).Comment <> string.Empty) then
+              GetTask(i).Text := TempTasks.GetTask(index).Comment
+            else
+            if (TempTasks.GetTask(index).Date <> 0) then
+              GetTask(i).Text := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
+                TempTasks.GetTask(index).Date);
+          end;
+        end;
+        if j = 3 then
+        begin
+          if (TempTasks.GetTask(index).Comment <> string.Empty) then
+            GetTask(i).Comment := TempTasks.GetTask(index).Comment
+          else
+          if Rect.Width = 0 then
+          begin
+            if (TempTasks.GetTask(index).Text <> string.Empty) then
+              GetTask(i).Comment := TempTasks.GetTask(index).Text
+            else
+            if (TempTasks.GetTask(index).Date <> 0) then
+              GetTask(i).Comment := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
+                TempTasks.GetTask(index).Date);
+          end;
+        end;
+        if j = 4 then
+        begin
+          if (TempTasks.GetTask(index).Date <> 0) then
+            GetTask(i).Date := TempTasks.GetTask(index).Date
+          else
+          if Rect.Width = 0 then
+          begin
+            if (TempTasks.GetTask(index).Text <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Text, TempDate)) then
+              GetTask(i).Date := TempDate
+            else
+            if (TempTasks.GetTask(index).Comment <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Comment, TempDate)) then
+              GetTask(i).Date := TempDate;
+          end;
+        end;
+      end;
+      Inc(index);
+    end;
+    if (TempTasks.Count < Rect.Height) then
+      Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom - (Rect.Height - TempTasks.Count) - 1)
+    else
+      Result := Rect;
+  end;
 end;
 
 procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder; SortColumn: integer);
@@ -801,8 +888,7 @@ begin
     addCompleted := False;
     for i := 0 to FCount - 1 do
       if FTaskList[i].Done then addCompleted := True;
-    if (FCount = 1) and (FTaskList[0].Text = string.Empty) and (FTaskList[0].Comment = string.Empty) and
-      (FTaskList[0].Date = 0) then
+    if (FCount = 1) and (FTaskList[0].Text = string.Empty) and (FTaskList[0].Comment = string.Empty) and (FTaskList[0].Date = 0) then
       addCompleted := True;
 
     for i := 0 to FCount - 1 do

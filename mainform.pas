@@ -200,6 +200,7 @@ type
 
     procedure OpenFile(fileName: string);
     procedure SaveFile(fileName: string = string.Empty);
+    procedure FillGrid;
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
     property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
@@ -407,7 +408,7 @@ begin
 
       // Archivate task
       Tasks.ArchiveTask(RowIndex);
-      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+      FillGrid;
       SetChanged;
     end;
   end;
@@ -437,7 +438,7 @@ begin
           Tasks.ArchiveTask(RowIndex);
         end;
       end;
-      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+      FillGrid;
       SetChanged; // Mark that data has changed
     end;
   end
@@ -520,7 +521,7 @@ begin
   if not IsEditing then
   begin
     Tasks.UndoBackup;
-    Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+    FillGrid;
   end;
 end;
 
@@ -535,7 +536,7 @@ begin
     if Confirm = mrYes then
     begin
       Tasks.UndoBackupInit;
-      Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+      FillGrid;
       ResetRowHeight;
       Tasks.CreateBackup;
       SetChanged(False);
@@ -564,10 +565,16 @@ begin
 end;
 
 procedure TformNotetask.aPasteExecute(Sender: TObject);
+var
+  Sel: TGridRect;
 begin
   if not IsEditing then
   begin
-    Tasks.PasteFromClipboard(taskGrid);
+    Sel := Tasks.PasteFromClipboard(taskGrid);
+    FillGrid;
+    if (SortColumn = 0) then
+      taskGrid.Selection := Sel;
+    SetChanged;
   end;
 end;
 
@@ -812,7 +819,7 @@ end;
 procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
 begin
   Tasks.InsertTask('[ ]', taskGrid.Row);
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+  FillGrid;
   FLineCount += 1;
   SetInfo;
   SetChanged;
@@ -839,7 +846,7 @@ var
   newRow: integer;
 begin
   newRow := Tasks.MoveTaskTop(taskGrid.Row);
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+  FillGrid;
   if (newRow > -1) then
   begin
     SwapRowHeights(taskGrid.Row, newRow);
@@ -853,7 +860,7 @@ var
   newRow: integer;
 begin
   newRow := Tasks.MoveTaskBottom(taskGrid.Row);
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+  FillGrid;
   if (newRow > -1) then
   begin
     SwapRowHeights(taskGrid.Row, newRow);
@@ -867,7 +874,7 @@ var
   newRow: integer;
 begin
   newRow := Tasks.MoveTaskUp(taskGrid.Row);
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+  FillGrid;
   if (newRow > -1) then
   begin
     SwapRowHeights(taskGrid.Row, newRow);
@@ -881,7 +888,7 @@ var
   newRow: integer;
 begin
   newRow := Tasks.MoveTaskDown(taskGrid.Row);
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+  FillGrid;
   if (newRow > -1) then
   begin
     SwapRowHeights(taskGrid.Row, newRow);
@@ -1059,7 +1066,7 @@ end;
 procedure TformNotetask.SetShowArchived(Value: boolean);
 begin
   FShowArchived := Value;
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+  FillGrid;
 end;
 
 procedure TformNotetask.aWordWrapExecute(Sender: TObject);
@@ -1122,7 +1129,7 @@ begin
   SetInfo;
 
   Tasks := TTasks.Create(TextToStringList(Content));
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+  FillGrid;
 
   ResetRowHeight;
   SetChanged(False);
@@ -1147,6 +1154,11 @@ begin
   end;
 
   SetInfo;
+end;
+
+procedure TformNotetask.FillGrid;
+begin
+  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
 end;
 
 procedure TformNotetask.SetInfo;
@@ -1223,7 +1235,7 @@ begin
 
     FSortColumn := Index;
 
-    Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+    FillGrid;
 
     aMoveTaskTop.Enabled := SortColumn = 0;
     aMoveTaskBottom.Enabled := SortColumn = 0;
@@ -1276,7 +1288,6 @@ begin
   if (not IsColumn) then
   begin
     Tasks.DeleteTask(tIndex);
-    //Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
     FLineCount -= 1;
     SetInfo;
   end;
