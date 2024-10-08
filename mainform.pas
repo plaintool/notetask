@@ -112,6 +112,7 @@ type
     taskGrid: TStringGrid;
     procedure aArchiveTasksExecute(Sender: TObject);
     procedure aCopyExecute(Sender: TObject);
+    procedure aCutExecute(Sender: TObject);
     procedure aDateTimeExecute(Sender: TObject);
     procedure aDeleteExecute(Sender: TObject);
     procedure ADeleteTasksExecute(Sender: TObject);
@@ -181,9 +182,9 @@ type
     procedure EditComplite(Validate: boolean = True);
     procedure SetInfo;
     procedure SetCaption;
-    procedure ClearSelected;
-    procedure DeleteTask(aRow: integer = 0);
-    procedure DeleteTasks;
+    procedure ClearSelected(ShowConfirm: boolean = True);
+    procedure DeleteTask(aRow: integer = 0; ShowConfirm: boolean = True);
+    procedure DeleteTasks(ShowConfirm: boolean = True);
     procedure ArchiveTask(aRow: integer = 0);
     procedure ArchiveTasks;
     procedure SetShowStatusBar(Value: boolean);
@@ -286,43 +287,44 @@ begin
   ResourceBitmapUncheck.Free;
 end;
 
-procedure TformNotetask.ClearSelected;
+procedure TformNotetask.ClearSelected(ShowConfirm: boolean = True);
 var
   Confirm: integer;
   i, j: integer;
   Rect: TRect;
 begin
-  if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
-  begin
-    // Show confirm delete dialog
+  //if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+  //begin
+  // Show confirm delete dialog
+  if (ShowConfirm) then
     Confirm := MessageDlg(rclearconfirm, mtConfirmation, [mbYes, mbNo], 0);
 
-    if Confirm = mrYes then
-    begin
-      Tasks.ClearTasksInRect(taskGrid, taskGrid.Selection);
-      //Rect := taskGrid.Selection;
-      //for i := Rect.Top to Rect.Bottom do
-      //begin
-      //  for j := Rect.Left to Rect.Right do
-      //  begin
-      //    if (j = 1) then Tasks.GetTask(i).IsCompleted := False;
-      //    if (j = 2) then Tasks.GetTask(i).TaskDescription := '';
-      //    if (j = 3) then Tasks.GetTask(i).Comment := '';
-      //    if (j = 4) then Tasks.GetTask(i).CompletionDate := 0;
-      //    if (j = 1) then
-      //      taskGrid.Cells[j, i] := '0'
-      //    else
-      //      taskGrid.Cells[j, i] := string.Empty;
-      //  end;
-      //end;
-      SetChanged;
-      FLineCount := Tasks.Count;
-      SetInfo;
-    end;
+  if (Confirm = mrYes) or (not ShowConfirm) then
+  begin
+    Tasks.ClearTasksInRect(taskGrid, taskGrid.Selection);
+    //Rect := taskGrid.Selection;
+    //for i := Rect.Top to Rect.Bottom do
+    //begin
+    //  for j := Rect.Left to Rect.Right do
+    //  begin
+    //    if (j = 1) then Tasks.GetTask(i).IsCompleted := False;
+    //    if (j = 2) then Tasks.GetTask(i).TaskDescription := '';
+    //    if (j = 3) then Tasks.GetTask(i).Comment := '';
+    //    if (j = 4) then Tasks.GetTask(i).CompletionDate := 0;
+    //    if (j = 1) then
+    //      taskGrid.Cells[j, i] := '0'
+    //    else
+    //      taskGrid.Cells[j, i] := string.Empty;
+    //  end;
+    //end;
+    SetChanged;
+    FLineCount := Tasks.Count;
+    SetInfo;
   end;
+  //  end;
 end;
 
-procedure TformNotetask.DeleteTask(aRow: integer = 0);
+procedure TformNotetask.DeleteTask(aRow: integer = 0; ShowConfirm: boolean = True);
 var
   RowIndex: integer;
   Confirm: integer;
@@ -335,9 +337,10 @@ begin
   if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
   begin
     // Show confirm delete dialog
-    Confirm := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
+    if (ShowConfirm) then
+      Confirm := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
 
-    if Confirm = mrYes then
+    if (Confirm = mrYes) or (not ShowConfirm) then
     begin
       Tasks.CreateBackup;
 
@@ -349,7 +352,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.DeleteTasks;
+procedure TformNotetask.DeleteTasks(ShowConfirm: boolean = True);
 var
   i, RowIndex, Confirm: integer;
 begin
@@ -357,9 +360,10 @@ begin
   if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
   begin
     // Request confirmation for deletion
-    Confirm := MessageDlg(rdeletesconfirm, mtConfirmation, [mbYes, mbNo], 0);
+    if (ShowConfirm) then
+      Confirm := MessageDlg(rdeletesconfirm, mtConfirmation, [mbYes, mbNo], 0);
 
-    if Confirm = mrYes then
+    if (Confirm = mrYes) or (not ShowConfirm) then
     begin
       Tasks.CreateBackup;
 
@@ -378,7 +382,7 @@ begin
     end;
   end
   else
-    DeleteTask;
+    DeleteTask(0, ShowConfirm);
 end;
 
 procedure TformNotetask.ArchiveTask(aRow: integer = 0);
@@ -515,9 +519,21 @@ begin
   if not IsEditing then
   begin
     if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
-      ClearSelected
+      ClearSelected(False)
     else
       DeleteTask;
+  end;
+end;
+
+procedure TformNotetask.aCutExecute(Sender: TObject);
+begin
+  if not IsEditing then
+  begin
+    Tasks.CopyToClipboard(taskGrid);
+    if (taskGrid.Selection.Width < 3) then
+      ClearSelected(False)
+    else
+      DeleteTasks(False);
   end;
 end;
 
