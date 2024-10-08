@@ -128,6 +128,7 @@ type
     procedure aNewWindowExecute(Sender: TObject);
     procedure aOpenExecute(Sender: TObject);
     procedure aPagePropertiesExecute(Sender: TObject);
+    procedure aPasteExecute(Sender: TObject);
     procedure aPrintExecute(Sender: TObject);
     procedure aSaveAsExecute(Sender: TObject);
     procedure aSaveExecute(Sender: TObject);
@@ -307,10 +308,10 @@ begin
     //begin
     //  for j := Rect.Left to Rect.Right do
     //  begin
-    //    if (j = 1) then Tasks.GetTask(i).IsCompleted := False;
-    //    if (j = 2) then Tasks.GetTask(i).TaskDescription := '';
+    //    if (j = 1) then Tasks.GetTask(i).Done := False;
+    //    if (j = 2) then Tasks.GetTask(i).Text := '';
     //    if (j = 3) then Tasks.GetTask(i).Comment := '';
-    //    if (j = 4) then Tasks.GetTask(i).CompletionDate := 0;
+    //    if (j = 4) then Tasks.GetTask(i).Date := 0;
     //    if (j = 1) then
     //      taskGrid.Cells[j, i] := '0'
     //    else
@@ -461,7 +462,7 @@ begin
       begin
         // Mark the task as completed in the collection
         Tasks.CompleteTask(RowIndex);
-        if Tasks.GetTask(RowIndex).IsCompleted then
+        if Tasks.GetTask(RowIndex).Done then
           taskGrid.Cells[1, RowIndex] := '1'
         else
           taskGrid.Cells[1, RowIndex] := '0';
@@ -481,7 +482,7 @@ begin
     begin
       // Mark the task as completed in the collection
       Tasks.CompleteTask(RowIndex);
-      if Tasks.GetTask(RowIndex).IsCompleted then
+      if Tasks.GetTask(RowIndex).Done then
         taskGrid.Cells[1, RowIndex] := '1'
       else
         taskGrid.Cells[1, RowIndex] := '0';
@@ -559,6 +560,14 @@ begin
   if not IsEditing then
   begin
     Tasks.CopyToClipboard(taskGrid);
+  end;
+end;
+
+procedure TformNotetask.aPasteExecute(Sender: TObject);
+begin
+  if not IsEditing then
+  begin
+    Tasks.PasteFromClipboard(taskGrid);
   end;
 end;
 
@@ -1360,7 +1369,7 @@ begin
       grid.Canvas.Font.Color := clBlack;
     end;
 
-    if (aCol = 2) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).IsArchive) then
+    if (aCol = 2) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).Archive) then
       grid.Canvas.Font.Style := [fsStrikeOut];
 
     // Fill the cell background

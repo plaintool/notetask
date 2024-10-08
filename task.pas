@@ -13,20 +13,20 @@ type
   // Class representing a single task
   TTask = class
   private
-    FIsCompleted: boolean; // Status of task completion
-    FIsArchive: boolean; // Archive task
-    FCompletionDate: TDateTime; // Date of task completion
+    FDone: boolean; // Status of task completion
+    FArchive: boolean; // Archive task
+    FDate: TDateTime; // Date of task completion
     FComment: string; // Comment for the task
-    FTaskDescription: string; // Description of the task
+    FText: string; // Description of the task
   public
     constructor Create;
     constructor Create(const TaskString: string); // Constructor that takes a task string
     procedure Copy(Original: TTask);
-    property IsCompleted: boolean read FIsCompleted write FIsCompleted;
-    property IsArchive: boolean read FIsArchive write FIsArchive;
-    property CompletionDate: TDateTime read FCompletionDate write FCompletionDate;
+    property Done: boolean read FDone write FDone;
+    property Archive: boolean read FArchive write FArchive;
+    property Date: TDateTime read FDate write FDate;
     property Comment: string read FComment write FComment;
-    property TaskDescription: string read FTaskDescription write FTaskDescription;
+    property Text: string read FText write FText;
     function ToString(Index: integer = 0; AddEmptyCompletion: boolean = True): string;
   end;
 
@@ -61,6 +61,7 @@ type
     function MoveTaskUp(Index: integer): integer;
     function MoveTaskDown(Index: integer): integer;
     procedure CopyToClipboard(Grid: TStringGrid);
+    procedure PasteFromClipboard(Grid: TStringGrid);
     procedure FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder; SortColumn: integer);
     function ToStringList: TStringList;
     procedure CreateBackup;
@@ -96,11 +97,11 @@ end;
 
 constructor TTask.Create;
 begin
-  FIsCompleted := False;
-  FIsArchive := False;
-  FCompletionDate := 0;
+  FDone := False;
+  FArchive := False;
+  FDate := 0;
   FComment := string.Empty;
-  FTaskDescription := string.Empty;
+  FText := string.Empty;
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -108,7 +109,7 @@ var
   Parts, PartsSub: TStringArray; // Use TStringArray for compatibility
   CompletedStr: string;
 begin
-  // Format [x] 01.01.2000, Task *// Comment*
+  // Format: - [x] 01.01.2000, ~~Task~~ *// Comment*
   // Split the task string into parts
   Parts := TaskString.Split(['*//']);
   if Length(Parts) = 2 then
@@ -123,7 +124,7 @@ begin
 
   PartsSub := CompletedStr.Split([',']);
   // Check completion status based on the first character in the string
-  FIsCompleted := PartsSub[0].Trim.ToLower.StartsWith('- [x]') or PartsSub[0].Trim.ToLower.StartsWith('-[x]') or
+  FDone := PartsSub[0].Trim.ToLower.StartsWith('- [x]') or PartsSub[0].Trim.ToLower.StartsWith('-[x]') or
     PartsSub[0].Trim.ToLower.StartsWith('[x]');
 
   // Checks if the task is completed
@@ -133,29 +134,29 @@ begin
   if Length(PartsSub) > 1 then
   begin
     // Extract and trim the date string
-    if (TryStrToDateTime(PartsSub[1].Trim, FCompletionDate)) and (Length(PartsSub) > 2) then
-      FTaskDescription := PartsSub[2].Trim
+    if (TryStrToDateTime(PartsSub[1].Trim, FDate)) and (Length(PartsSub) > 2) then
+      FText := PartsSub[2].Trim
     else
-    if (TryStrToDateTime(PartsSub[0].Trim, FCompletionDate)) and (Length(PartsSub) > 1) then
-      FTaskDescription := PartsSub[1].Trim
+    if (TryStrToDateTime(PartsSub[0].Trim, FDate)) and (Length(PartsSub) > 1) then
+      FText := PartsSub[1].Trim
     else
-      FTaskDescription := CompletedStr.Trim;
+      FText := CompletedStr.Trim;
   end
   else
-    FTaskDescription := CompletedStr.Trim;
+    FText := CompletedStr.Trim;
 
-  FTaskDescription := StringReplace(FTaskDescription, '<br>', sLineBreak, [rfReplaceAll]);
+  FText := StringReplace(FText, '<br>', sLineBreak, [rfReplaceAll]);
   FComment := StringReplace(FComment, '<br>', sLineBreak, [rfReplaceAll]);
 
-  // Check if TaskDescription starts and ends with '~~'
-  if FTaskDescription.StartsWith('~~') and FTaskDescription.EndsWith('~~') then
+  // Check if Text starts and ends with '~~'
+  if FText.StartsWith('~~') and FText.EndsWith('~~') then
   begin
-    FIsArchive := True;
-    // Remove '~~' from the start and end of the TaskDescription
-    FTaskDescription := FTaskDescription.Substring(2, Length(FTaskDescription) - 4);
+    FArchive := True;
+    // Remove '~~' from the start and end of the Text
+    FText := FText.Substring(2, Length(FText) - 4);
   end
   else
-    FIsArchive := False;
+    FArchive := False;
 end;
 
 function TTask.ToString(Index: integer = 0; AddEmptyCompletion: boolean = True): string;
@@ -165,15 +166,15 @@ var
   CommentPart: string;
 begin
   // Replace line breaks from task desctioption and comment
-  TaskString := StringReplace(TaskDescription, sLineBreak, '<br>', [rfReplaceAll]);
+  TaskString := StringReplace(Text, sLineBreak, '<br>', [rfReplaceAll]);
   Comment := StringReplace(Comment, sLineBreak, '<br>', [rfReplaceAll]);
 
   // Add '~~' for archived tasks
-  if (FIsArchive) then
+  if (FArchive) then
     TaskString := '~~' + TaskString + '~~';
 
   // Check completion
-  if IsCompleted then
+  if Done then
     CompletionStatus := '- [x]'
   else
   if AddEmptyCompletion then
@@ -191,15 +192,15 @@ begin
     2: Result := TaskString; // Returning only the task string
     3: Result := CommentPart; // Returning only the comment
     4:
-      if CompletionDate > 0 then
-        Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, CompletionDate).Trim
+      if Date > 0 then
+        Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Date).Trim
       else
         Result := string.Empty; // If the completion date is missing, return an empty string
     else
       // Forming the task string considering the completion date and comment
-      if CompletionDate > 0 then
+      if Date > 0 then
         Result := Format('%s %s, %s%s', [CompletionStatus, FormatDateTime(FormatSettings.ShortDateFormat +
-          ' ' + FormatSettings.LongTimeFormat, CompletionDate), TaskString, CommentPart]).Trim
+          ' ' + FormatSettings.LongTimeFormat, Date), TaskString, CommentPart]).Trim
       else
         Result := Format('%s %s%s', [CompletionStatus, TaskString, CommentPart]).Trim;
   end;
@@ -207,11 +208,11 @@ end;
 
 procedure TTask.Copy(Original: TTask);
 begin
-  FIsCompleted := Original.FIsCompleted;
-  FIsArchive := Original.FIsArchive;
-  FCompletionDate := Original.FCompletionDate;
+  FDone := Original.FDone;
+  FArchive := Original.FArchive;
+  FDate := Original.FDate;
   FComment := Original.FComment;
-  FTaskDescription := Original.FTaskDescription;
+  FText := Original.FText;
 end;
 
 { TTasks }
@@ -303,16 +304,16 @@ end;
 function TTasks.GetTaskValue(ACol, aRow: integer): string;
 begin
   if ACol = 1 then
-    if GetTask(aRow).FIsCompleted then Result := '1'
+    if GetTask(aRow).FDone then Result := '1'
     else
       Result := '0'
   else
-  if ACol = 2 then Result := GetTask(aRow).TaskDescription
+  if ACol = 2 then Result := GetTask(aRow).Text
   else
   if ACol = 3 then Result := GetTask(aRow).Comment
   else
   if ACol = 4 then Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
-      GetTask(aRow).CompletionDate);
+      GetTask(aRow).Date);
 end;
 
 function TTasks.HasTask(Index: integer): boolean;
@@ -326,9 +327,9 @@ end;
 procedure TTasks.SetTask(Grid: TStringGrid; Row, Col: integer);
 var
   Task: TTask;
-  IsCompleted: boolean;
-  TaskDescription, Comment: string;
-  CompletionDate: TDateTime;
+  Done: boolean;
+  Text, Comment: string;
+  Date: TDateTime;
 begin
   if (Row > 0) and (Row <= FCount) then
   begin
@@ -338,22 +339,22 @@ begin
     // Get the task by the row index (minus one, as rows start from 1)
 
     // Reading data from the grid
-    IsCompleted := StrToBoolDef(Grid.Cells[1, Row], False); // Convert to boolean
-    TaskDescription := Grid.Cells[2, Row];
+    Done := StrToBoolDef(Grid.Cells[1, Row], False); // Convert to boolean
+    Text := Grid.Cells[2, Row];
     Comment := Grid.Cells[3, Row];
-    if not TryStrToDateTime(Grid.Cells[4, Row], CompletionDate) then
+    if not TryStrToDateTime(Grid.Cells[4, Row], Date) then
     begin
-      CompletionDate := 0; // If parsing the date failed, set to 0
+      Date := 0; // If parsing the date failed, set to 0
       Grid.Cells[4, Row] := '';
     end
     else
-      Grid.Cells[4, Row] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, CompletionDate);
+      Grid.Cells[4, Row] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Date);
 
     // Update task properties
-    Task.IsCompleted := IsCompleted;
-    Task.TaskDescription := TaskDescription;
+    Task.Done := Done;
+    Task.Text := Text;
     Task.Comment := Comment;
-    Task.CompletionDate := CompletionDate;
+    Task.Date := Date;
   end
   else
     raise Exception.Create('Invalid row or task index');
@@ -427,7 +428,7 @@ begin
   if (Ind < 0) or (Ind >= FCount) then
     exit;
 
-  FTaskList[Ind].IsArchive := not FTaskList[Ind].IsArchive;
+  FTaskList[Ind].Archive := not FTaskList[Ind].Archive;
 end;
 
 procedure TTasks.CompleteTask(Index: integer);
@@ -440,7 +441,7 @@ begin
 
   CreateBackup;
 
-  FTaskList[Ind].IsCompleted := not FTaskList[Ind].IsCompleted;
+  FTaskList[Ind].Done := not FTaskList[Ind].Done;
 end;
 
 procedure TTasks.ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
@@ -455,13 +456,13 @@ begin
     begin
       // Clearing task fields based on the column
       if (j = 1) then
-        GetTask(i).IsCompleted := False; // Reset completion status
+        GetTask(i).Done := False; // Reset completion status
       if (j = 2) then
-        GetTask(i).TaskDescription := ''; // Clear task description
+        GetTask(i).Text := ''; // Clear task description
       if (j = 3) then
         GetTask(i).Comment := ''; // Clear comment
       if (j = 4) then
-        GetTask(i).CompletionDate := 0; // Reset completion date
+        GetTask(i).Date := 0; // Reset completion date
 
       // For grid column
       if (j = 1) then
@@ -579,7 +580,7 @@ procedure TTasks.CopyToClipboard(Grid: TStringGrid);
 var
   SelectedText: TStringList;
   Rect: TGridRect;
-  CompletionState, TaskDescription, Comment, CompletionDate: string;
+  Done, Text, Comment, Date: string;
   Row1, Row2, RowText: string;
   i, j: integer;
 begin
@@ -592,14 +593,14 @@ begin
     begin
       for j := Rect.Left to Rect.Right do
       begin
-        if (j = 1) then CompletionState := GetTask(i).ToString(j).Trim;
-        if (j = 2) then TaskDescription := GetTask(i).ToString(j).Trim;
+        if (j = 1) then Done := GetTask(i).ToString(j).Trim;
+        if (j = 2) then Text := GetTask(i).ToString(j).Trim;
         if (j = 3) then Comment := GetTask(i).ToString(j).Trim;
-        if (j = 4) then CompletionDate := GetTask(i).ToString(j).Trim;
+        if (j = 4) then Date := GetTask(i).ToString(j).Trim;
       end;
-      Row1 := (CompletionState + ' ' + CompletionDate).Trim;
-      Row2 := (TaskDescription + ' ' + Comment).Trim;
-      if (CompletionDate <> string.Empty) and (Row2 <> string.Empty) then
+      Row1 := (Done + ' ' + Date).Trim;
+      Row2 := (Text + ' ' + Comment).Trim;
+      if (Date <> string.Empty) and (Row2 <> string.Empty) then
         Row1 += ', '
       else
       if (Row1 <> string.Empty) and (Row2 <> string.Empty) then
@@ -616,6 +617,14 @@ begin
   finally
     SelectedText.Free;
   end;
+end;
+
+procedure TTasks.PasteFromClipboard(Grid: TStringGrid);
+var
+  TempTasks: TTasks;
+begin
+//   Tasks := TTasks.Create(TextToStringList(Content));
+
 end;
 
 procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder; SortColumn: integer);
@@ -635,14 +644,14 @@ var
 
     case SortColumn of
       1: begin
-        // Completed status (IsCompleted)
-        Value1 := IntToStr(Ord(Task1.IsCompleted));
-        Value2 := IntToStr(Ord(Task2.IsCompleted));
+        // Completed status
+        Value1 := IntToStr(Ord(Task1.Done));
+        Value2 := IntToStr(Ord(Task2.Done));
       end;
       2: begin
         // Task description
-        Value1 := Task1.TaskDescription;
-        Value2 := Task2.TaskDescription;
+        Value1 := Task1.Text;
+        Value2 := Task2.Text;
       end;
       3: begin
         // Comment
@@ -651,8 +660,8 @@ var
       end;
       4: begin
         // Completion date (compare as DateTime)
-        DateTime1 := Task1.CompletionDate;
-        DateTime2 := Task2.CompletionDate;
+        DateTime1 := Task1.Date;
+        DateTime2 := Task2.Date;
 
         if DateTime1 = DateTime2 then
           Result := 0
@@ -725,7 +734,7 @@ begin
 
     ArhCount := 0;
     for I := 0 to Count - 1 do
-      if FTaskList[I].IsArchive then ArhCount += 1;
+      if FTaskList[I].Archive then ArhCount += 1;
 
     if (ShowArchive) then
       Grid.RowCount := Count + 1
@@ -743,14 +752,14 @@ begin
     // Fill the grid with tasks
     for I := 0 to Count - 1 do
     begin
-      if (ShowArchive = True) or (FTaskList[I].IsArchive = False) then
+      if (ShowArchive = True) or (FTaskList[I].Archive = False) then
       begin
-        Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].IsCompleted));
-        Grid.Cells[2, RowIndex] := FTaskList[I].TaskDescription;
+        Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].Done));
+        Grid.Cells[2, RowIndex] := FTaskList[I].Text;
         Grid.Cells[3, RowIndex] := FTaskList[I].Comment;
-        if FTaskList[I].CompletionDate > 0 then
+        if FTaskList[I].Date > 0 then
           Grid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
-            FormatSettings.LongTimeFormat, FTaskList[I].CompletionDate)
+            FormatSettings.LongTimeFormat, FTaskList[I].Date)
         else
           Grid.Cells[4, RowIndex] := string.Empty;
 
@@ -791,9 +800,9 @@ begin
   try
     addCompleted := False;
     for i := 0 to FCount - 1 do
-      if FTaskList[i].IsCompleted then addCompleted := True;
-    if (FCount = 1) and (FTaskList[0].TaskDescription = string.Empty) and (FTaskList[0].Comment = string.Empty) and
-      (FTaskList[0].CompletionDate = 0) then
+      if FTaskList[i].Done then addCompleted := True;
+    if (FCount = 1) and (FTaskList[0].Text = string.Empty) and (FTaskList[0].Comment = string.Empty) and
+      (FTaskList[0].Date = 0) then
       addCompleted := True;
 
     for i := 0 to FCount - 1 do

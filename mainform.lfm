@@ -397,6 +397,7 @@ object formNotetask: TformNotetask
     object aPaste: TAction
       Category = 'Edit'
       Caption = 'Paste'
+      OnExecute = aPasteExecute
       ShortCut = 16470
     end
     object aDelete: TAction
