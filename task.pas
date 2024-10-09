@@ -350,8 +350,6 @@ end;
 procedure TTasks.SetTask(Grid: TStringGrid; Row, Col: integer);
 var
   Task: TTask;
-  Done: boolean;
-  Text, Comment: string;
   Date: TDateTime;
 begin
   if (Row > 0) and (Row <= FCount) then
@@ -920,6 +918,11 @@ procedure TTasks.CreateBackup;
 var
   i: integer;
 begin
+  // Free old backup tasks if they exist
+  for i := 0 to High(FBackupTaskList) do
+    if Assigned(FBackupTaskList[i]) then
+      FBackupTaskList[i].Free;
+
   // Create a backup of the task list and map grid
   SetLength(FBackupTaskList, Length(FTaskList));
   for i := 0 to High(FTaskList) do
@@ -935,13 +938,17 @@ var
   TempTaskList: array of TTask;
 begin
   // Make an intermediate backup of the current task list
-  TempTaskList := [];
   SetLength(TempTaskList, Length(FTaskList));
   for i := 0 to High(TempTaskList) do
   begin
     TempTaskList[i] := TTask.Create;
     TempTaskList[i].Copy(FTaskList[i]);
   end;
+
+  // Free old task list before resizing and replacing
+  for i := 0 to High(FTaskList) do
+    if Assigned(FTaskList[i]) then
+      FTaskList[i].Free;
 
   // Restore task list from the original backup
   SetLength(FTaskList, Length(FBackupTaskList));
@@ -952,6 +959,11 @@ begin
   end;
 
   FCount := Length(FTaskList); // Restore the task count
+
+  // Free old backup task list before resizing and replacing
+  for i := 0 to High(FBackupTaskList) do
+    if Assigned(FBackupTaskList[i]) then
+      FBackupTaskList[i].Free;
 
   // Update the backup with the intermediate state
   SetLength(FBackupTaskList, Length(TempTaskList));

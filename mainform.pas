@@ -622,8 +622,16 @@ begin
     if not IsEditing then
       aDelete.Execute
     else
-    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-      (taskGrid.InplaceEditor as TCustomEdit).ClearSelection;
+    if (taskGrid.InplaceEditor is TCustomEdit) then
+      with taskGrid.InplaceEditor as TCustomEdit do
+      begin
+        if SelLength = 0 then
+        begin
+          SelStart := SelStart;
+          SelLength := 1;
+        end;
+        ClearSelection;
+      end;
     Key := 0;
   end
   else
