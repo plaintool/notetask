@@ -653,7 +653,7 @@ begin
   CreateBackup;
 
   TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText));
-  if (Grid.Selection.Height = 0) or ((Grid.Selection.Height = 1) and (Grid.Selection.Width > 3)) then
+  if (Grid.Selection.Height = 0) and (Grid.Selection.Width = 0) then
   begin
     for i := TempTasks.FCount - 1 downto 0 do
     begin
@@ -669,7 +669,7 @@ begin
     Rect := Grid.Selection; // Get grid selection rect
     for i := Rect.Top to Rect.Bottom do
     begin
-      if (index > TempTasks.FCount) then break;
+      if (index > TempTasks.FCount) then Index := 1;
       for j := Rect.Left to Rect.Right do
       begin
         if j = 1 then GetTask(i).Done := TempTasks.GetTask(index).Done;
@@ -685,8 +685,12 @@ begin
             else
             if (TempTasks.GetTask(index).Date <> 0) then
               GetTask(i).Text := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
-                TempTasks.GetTask(index).Date);
-          end;
+                TempTasks.GetTask(index).Date)
+            else
+              GetTask(i).Text := string.Empty;
+          end
+          else
+            GetTask(i).Text := string.Empty;
         end;
         if j = 3 then
         begin
@@ -700,8 +704,12 @@ begin
             else
             if (TempTasks.GetTask(index).Date <> 0) then
               GetTask(i).Comment := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
-                TempTasks.GetTask(index).Date);
-          end;
+                TempTasks.GetTask(index).Date)
+            else
+              GetTask(i).Comment := string.Empty;
+          end
+          else
+            GetTask(i).Comment := string.Empty;
         end;
         if j = 4 then
         begin
@@ -714,8 +722,12 @@ begin
               GetTask(i).Date := TempDate
             else
             if (TempTasks.GetTask(index).Comment <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Comment, TempDate)) then
-              GetTask(i).Date := TempDate;
-          end;
+              GetTask(i).Date := TempDate
+            else
+              GetTask(i).Date := 0;
+          end
+          else
+            GetTask(i).Date := 0;
         end;
       end;
       Inc(index);

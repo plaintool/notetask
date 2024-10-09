@@ -526,7 +526,10 @@ begin
   begin
     Tasks.UndoBackup;
     FillGrid;
-  end;
+  end
+  else
+  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+    (taskGrid.InplaceEditor as TCustomEdit).Undo;
 end;
 
 procedure TformNotetask.aUndoAllExecute(Sender: TObject);
@@ -557,15 +560,19 @@ begin
       ClearSelected(False)
     else
       DeleteTasks(False);
-  end;
+  end
+  else
+  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+    (taskGrid.InplaceEditor as TCustomEdit).CutToClipboard;
 end;
 
 procedure TformNotetask.aCopyExecute(Sender: TObject);
 begin
   if not IsEditing then
-  begin
-    Tasks.CopyToClipboard(taskGrid);
-  end;
+    Tasks.CopyToClipboard(taskGrid)
+  else
+  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+    (taskGrid.InplaceEditor as TCustomEdit).CopyToClipboard;
 end;
 
 procedure TformNotetask.aPasteExecute(Sender: TObject);
@@ -579,7 +586,10 @@ begin
     if (SortColumn = 0) then
       taskGrid.Selection := Sel;
     SetChanged;
-  end;
+  end
+  else
+  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+    (taskGrid.InplaceEditor as TCustomEdit).PasteFromClipboard;
 end;
 
 procedure TformNotetask.aDeleteExecute(Sender: TObject);
@@ -590,15 +600,27 @@ begin
     ClearSelected(False);
     //    else
     //      DeleteTask;
-  end;
+  end
+  else
+  if (taskGrid.InplaceEditor is TCustomEdit) then
+    with taskGrid.InplaceEditor as TCustomEdit do
+    begin
+      if SelLength = 0 then
+      begin
+        SelStart := SelStart;
+        SelLength := 1;
+      end;
+      ClearSelection;
+    end;
 end;
 
 procedure TformNotetask.aSelectAllExecute(Sender: TObject);
 begin
   if not IsEditing then
-  begin
-    taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount);
-  end;
+    taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount)
+  else
+  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+    (taskGrid.InplaceEditor as TCustomEdit).SelectAll;
 end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -619,69 +641,37 @@ begin
   else
   if (Key = VK_DELETE) then // Del
   begin
-    if not IsEditing then
-      aDelete.Execute
-    else
-    if (taskGrid.InplaceEditor is TCustomEdit) then
-      with taskGrid.InplaceEditor as TCustomEdit do
-      begin
-        if SelLength = 0 then
-        begin
-          SelStart := SelStart;
-          SelLength := 1;
-        end;
-        ClearSelection;
-      end;
+    aDelete.Execute;
     Key := 0;
   end
   else
   if (ssCtrl in Shift) and (not (ssShift in Shift)) and (Key = VK_Z) then // Ctrl + Z
   begin
-    if not IsEditing then
-      aUndo.Execute
-    else
-    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-      (taskGrid.InplaceEditor as TCustomEdit).Undo;
+    aUndo.Execute;
     Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
   begin
-    if not IsEditing then
-      aCut.Execute
-    else
-    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-      (taskGrid.InplaceEditor as TCustomEdit).CutToClipboard;
+    aCut.Execute;
     Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
   begin
-    if not IsEditing then
-      aCopy.Execute
-    else
-    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-      (taskGrid.InplaceEditor as TCustomEdit).CopyToClipboard;
+    aCopy.Execute;
     Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
   begin
-    if not IsEditing then
-      aPaste.Execute
-    else
-    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-      (taskGrid.InplaceEditor as TCustomEdit).PasteFromClipboard;
+    aPaste.Execute;
     Key := 0;
   end
   else
   if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
   begin
-    if not IsEditing then
-      aSelectAll.Execute
-    else
-    if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-      (taskGrid.InplaceEditor as TCustomEdit).SelectAll;
+    aSelectAll.Execute;
     Key := 0;
   end
   else
