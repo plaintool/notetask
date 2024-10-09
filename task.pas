@@ -243,8 +243,19 @@ var
   i: integer;
 begin
   // Free each task in the array
-  for i := 0 to High(FTaskList) do
-    FTaskList[i].Free;
+  if (Assigned(FTaskList)) then
+    for i := 0 to High(FTaskList) do
+      FTaskList[i].Free;
+  if (Assigned(FBackupTaskList)) then
+    for i := 0 to High(FBackupTaskList) do
+      FBackupTaskList[i].Free;
+  if (Assigned(FInitTaskList)) then
+    for i := 0 to High(FInitTaskList) do
+      FInitTaskList[i].Free;
+
+  SetLength(FMapGrid, 0);
+  FMapGrid := nil;
+
   inherited;
 end;
 

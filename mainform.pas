@@ -303,6 +303,9 @@ begin
   SaveFormSettings(self);
 
   // Free allocated resources
+
+  FLineEnding.Free;
+  Tasks.Free;
   ResourceBitmapCheck.Free;
   ResourceBitmapUncheck.Free;
 end;
