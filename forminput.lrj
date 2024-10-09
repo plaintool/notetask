@@ -1,0 +1,6 @@
+{"version":1,"strings":[
+{"hash":185813483,"name":"tforminputtext.caption","sourcebytes":[71,111,32,116,111,32,116,97,115,107],"value":"Go to task"},
+{"hash":5117871,"name":"tforminputtext.buttonok.caption","sourcebytes":[71,111,32,116,111],"value":"Go to"},
+{"hash":77089212,"name":"tforminputtext.buttoncancel.caption","sourcebytes":[67,97,110,99,101,108],"value":"Cancel"},
+{"hash":2822442,"name":"tforminputtext.labelcaption.caption","sourcebytes":[84,97,115,107,32,110,117,109,98,101,114,58],"value":"Task number:"}
+]}

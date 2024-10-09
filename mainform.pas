@@ -230,6 +230,7 @@ resourcestring
   ropendialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
   rsavedialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
   rundoconfirm = 'Are you sure you want to discard all changes? This action cannot be undone.';
+  rnumstringtoolarge = 'The line number is out of the allowed range.';
 
 implementation
 
@@ -272,7 +273,7 @@ begin
     FilePath := ParamStr(1); // Get the file path
     if (not FilePath.StartsWith('--')) then
     begin
-      OpenFile(FilePath); // Your function to load a task from the file
+      OpenFile(FilePath); // Function to load a task from the file
       exit;
     end;
   end;
@@ -304,21 +305,6 @@ begin
   if (Confirm = mrYes) or (not ShowConfirm) then
   begin
     Tasks.ClearTasksInRect(taskGrid, taskGrid.Selection);
-    //Rect := taskGrid.Selection;
-    //for i := Rect.Top to Rect.Bottom do
-    //begin
-    //  for j := Rect.Left to Rect.Right do
-    //  begin
-    //    if (j = 1) then Tasks.GetTask(i).Done := False;
-    //    if (j = 2) then Tasks.GetTask(i).Text := '';
-    //    if (j = 3) then Tasks.GetTask(i).Comment := '';
-    //    if (j = 4) then Tasks.GetTask(i).Date := 0;
-    //    if (j = 1) then
-    //      taskGrid.Cells[j, i] := '0'
-    //    else
-    //      taskGrid.Cells[j, i] := string.Empty;
-    //  end;
-    //end;
     SetChanged;
     FLineCount := Tasks.Count;
     SetInfo;
@@ -347,7 +333,6 @@ begin
       Tasks.CreateBackup;
 
       // RemoveTask from collection
-      //Tasks.DeleteTask(RowIndex);
       taskGrid.DeleteRow(RowIndex);
       SetChanged;
     end;
@@ -376,7 +361,6 @@ begin
         if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
         begin
           // Remove the task from the collection
-          //Tasks.DeleteTask(RowIndex);
           taskGrid.DeleteRow(RowIndex);
         end;
       end;
@@ -760,30 +744,6 @@ begin
   end;
 end;
 
-//procedure TformNotetask.aGoToExecute(Sender: TObject);
-//var
-//  rowNumStr: string;
-//  rowNum: Integer;
-//begin
-//  // Prompt the user to enter the row number
-//  rowNumStr := InputBox('Перейти к строке', 'Введите номер строки:', '');
-
-//  // Try to convert the input to an integer
-//  if TryStrToInt(rowNumStr, rowNum) then
-//  begin
-//    // Ensure the entered row is within the valid range
-//    if (rowNum >= 1) and (rowNum <= taskGrid.RowCount - 1) then
-//    begin
-//      // Move to the specified row
-//      taskGrid.Row := rowNum;
-//    end
-//    else
-//      ShowMessage('Номер строки выходит за пределы допустимого диапазона.');
-//  end
-//  else
-//    ShowMessage('Введите допустимое число.');
-//end;
-
 procedure TformNotetask.aGoToExecute(Sender: TObject);
 var
   rowNum: integer;
@@ -808,7 +768,7 @@ begin
           taskGrid.Row := rowNum;
         end
         else
-          ShowMessage('Номер строки выходит за пределы допустимого диапазона.');
+          ShowMessage(rnumstringtoolarge);
       end;
     end;
   finally
@@ -1267,8 +1227,6 @@ begin
     if (taskGrid.Cells[4, aRow] = '') then
       taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
   end;
-  //else
-  //  taskGrid.Cells[4, aRow] := string.Empty;
   Tasks.SetTask(taskGrid, aRow, aCol);
 end;
 
@@ -1359,9 +1317,6 @@ begin
   end
   else
   begin
-    // Drawing only data cells
-    //if (aCol in [0]) or (aRow = 0) then exit;
-
     // Determine background color
     if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
     begin
@@ -1405,15 +1360,11 @@ begin
         flags := dt_calcrect or dt_left;
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
 
-      //if gdFocused in aState then
-      //  DrawFocusRect(grid.canvas.handle, drawrect);
-
       if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
         grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2) // changing the row height fires the event again!
       else
       begin
         drawrect.Right := aRect.Right;
-        // grid.canvas.fillrect(drawrect);
         if (FWordWrap) then
           flags := dt_wordbreak or dt_left
         else

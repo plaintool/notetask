@@ -28,6 +28,10 @@ msgstr ""
 msgid "Are you sure you want to delete selected tasks?"
 msgstr ""
 
+#: mainform.rnumstringtoolarge
+msgid "The line number is out of the allowed range."
+msgstr ""
+
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"

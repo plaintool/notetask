@@ -37,7 +37,7 @@ begin
   else if Self = MacintoshCR then
     Result := 'Macintosh (CR)'
   else
-    Result := 'Неизвестный';
+    Result := 'Unknown';
 end;
 
 end.
