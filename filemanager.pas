@@ -5,7 +5,9 @@ unit filemanager;
 interface
 
 uses
-  Classes, SysUtils, lineending;
+  Classes,
+  SysUtils,
+  lineending;
 
 function DetectEncoding(const FileName: string): TEncoding;
 

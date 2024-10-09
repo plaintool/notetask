@@ -5,7 +5,10 @@ unit task;
 interface
 
 uses
-  Classes, SysUtils, Grids, Clipbrd;
+  Classes,
+  SysUtils,
+  Grids,
+  Clipbrd;
 
 type
   TIntegerArray = array of integer;

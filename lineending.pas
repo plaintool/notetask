@@ -4,9 +4,6 @@ unit lineending;
 
 interface
 
-uses
-  Classes, SysUtils;
-
 type
   TLineEnding = class
   public

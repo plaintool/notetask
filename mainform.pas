@@ -5,9 +5,26 @@ unit mainform;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls, ActnList, ComCtrls,
-  Types, CheckLst, ValEdit, Grids, Menus, PrintersDlgs, Printers, GridPrn, LCLIntf, LCLType,
-  ExtDlgs, LMessages, Clipbrd, Process, task, lineending;
+  Classes,
+  SysUtils,
+  Forms,
+  Controls,
+  Graphics,
+  Dialogs,
+  StdCtrls,
+  ActnList,
+  ComCtrls,
+  Grids,
+  Menus,
+  PrintersDlgs,
+  Printers,
+  LCLIntf,
+  LCLType,
+  ExtDlgs,
+  Process,
+  GridPrn,
+  task,
+  lineending;
 
 type
 

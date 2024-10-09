@@ -5,9 +5,15 @@ unit settings;
 interface
 
 uses
-  Forms, Classes, SysUtils, FileUtil, fpjson, jsonparser, Grids, Graphics, mainform
-  {$IF DEFINED(Win64) OR DEFINED(Win32)}
-  ,Registry
+  Forms,
+  Classes,
+  SysUtils,
+  fpjson,
+  Grids,
+  Graphics,
+  mainform,
+  {$IFDEF Windows}
+  Registry
   {$ENDIF}
   ;
 

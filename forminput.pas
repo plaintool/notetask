@@ -5,7 +5,8 @@ unit forminput;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls;
+  Forms,
+  StdCtrls;
 
 type
 

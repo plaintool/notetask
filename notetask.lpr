@@ -11,9 +11,6 @@ uses
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms,
-  Classes,
-  GridPrn,
-  printer4lazarus,
   mainform,
   lineending,
   filemanager,

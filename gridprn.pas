@@ -5,7 +5,13 @@ unit GridPrn;
 interface
 
 uses
-  Classes, SysUtils, Types, Graphics, StdCtrls, Grids, Printers;
+  Classes,
+  SysUtils,
+  Types,
+  Graphics,
+  StdCtrls,
+  Grids,
+  Printers;
 
 type
   TGridPrnGetCellTextEvent = procedure(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string) of object;

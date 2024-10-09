@@ -10,6 +10,7 @@ object formInputText: TformInputText
   ClientWidth = 250
   OnShow = FormShow
   ShowInTaskBar = stNever
+  LCLVersion = '3.6.0.0'
   object buttonOk: TButton
     Left = 85
     Height = 25

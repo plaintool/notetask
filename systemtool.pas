@@ -13,7 +13,6 @@ uses
   Translations,
   LResources,
   LCLTranslator,
-  LCLType,
   {$IFDEF Windows}
   Windows
   {$ENDIF}
