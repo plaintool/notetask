@@ -5,7 +5,7 @@ unit settings;
 interface
 
 uses
-  Forms, Classes, SysUtils, FileUtil, fpjson, jsonparser, Grids, Graphics, mainform;
+  Forms, Classes, SysUtils, FileUtil, fpjson, jsonparser, Grids, Graphics, Registry, mainform;
 
 type
   TGridSettings = record
@@ -20,6 +20,8 @@ function LoadFormSettings(Form: TformNotetask): boolean;
 procedure SaveGridSettings(Grid: TStringGrid);
 
 function LoadGridSettings(Grid: TStringGrid): boolean;
+
+function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;
 
 implementation
 
@@ -211,5 +213,52 @@ begin
     FileStream.Free;
   end;
 end;
+
+function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;
+var
+  Reg: TRegistry;
+  IconPath: string;
+  AppPath: string;
+begin
+  Result := False; // Initialize result to false
+
+  Reg := TRegistry.Create;
+  try
+    AppPath := Application.ExeName;
+    Reg.RootKey := HKEY_CLASSES_ROOT;
+
+    // Create a key for the file extension
+    if Reg.OpenKey(Ext, True) then
+    begin
+      Reg.WriteString('', 'Notetask'); // Assign the class name
+      Reg.CloseKey;
+    end;
+
+    // Create a key for Notetask
+    if Reg.OpenKey('Notetask\DefaultIcon', True) then
+    begin
+      IconPath := Format('%s,%d', [AppPath, IconIndex]);
+      Reg.WriteString('', IconPath); // Set the icon path
+      Reg.CloseKey;
+    end;
+
+    // Create a key for opening the file
+    if Reg.OpenKey('Notetask\shell\open\command', True) then
+    begin
+      Reg.WriteString('', Format('"%s" "%%1"', [AppPath])); // Command to open the file
+      Reg.CloseKey;
+    end;
+
+    Result := True; // Set result to true if all operations succeeded
+  except
+    on E: Exception do
+    begin
+      // Handle any exceptions here (optional: log the error)
+    end;
+  end;
+
+  Reg.Free; // Free the registry object
+end;
+
 
 end.

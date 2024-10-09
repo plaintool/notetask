@@ -18,9 +18,9 @@
       <Icon Value="0"/>
       <Resources Count="4">
         <Resource_0 FileName="locale\notetask.ru.po" Type="RCDATA" ResourceName="NOTETASK.RU"/>
-        <Resource_1 FileName="doctask.ico" Type="ICON" ResourceName="DOCTASK"/>
-        <Resource_2 FileName="check.bmp" Type="BITMAP" ResourceName="CHECK"/>
-        <Resource_3 FileName="uncheck.bmp" Type="BITMAP" ResourceName="UNCHECK"/>
+        <Resource_1 FileName="check.bmp" Type="BITMAP" ResourceName="CHECK"/>
+        <Resource_2 FileName="uncheck.bmp" Type="BITMAP" ResourceName="UNCHECK"/>
+        <Resource_3 FileName="doctask.ico" Type="ICON" ResourceName="DOCTASK"/>
       </Resources>
     </General>
     <i18n>
