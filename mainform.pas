@@ -1499,6 +1499,7 @@ begin
 
   if (Assigned(Memo)) and (Memo.Visible) then
   begin
+    Memo.Text := Tasks.GetTaskValue(aCol, aRow);
     Memo.SelectAll;
     Memo.SetFocus;
   end;
