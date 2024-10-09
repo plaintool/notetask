@@ -1473,11 +1473,10 @@ begin
   if aCol = 1 then
   begin
     // Assign the appropriate bitmap based on the CheckedState
-    ABitmap := TBitmap.Create;
     if CheckedState = cbChecked then
-      ABitmap.Assign(ResourceBitmapCheck) // Use check bitmap
+      ABitmap := ResourceBitmapCheck // Use check bitmap
     else
-      ABitmap.Assign(ResourceBitmapUncheck); // Use uncheck bitmap
+      ABitmap := ResourceBitmapUncheck; // Use uncheck bitmap
   end;
 end;
 

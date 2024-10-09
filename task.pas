@@ -37,10 +37,10 @@ type
   TTasks = class
   private
     FTaskList: array of TTask; // Array of tasks
-    FCount: integer; // Current count of tasks
-    FMapGrid: TIntegerArray;
     FBackupTaskList: array of TTask; // Array of tasks
     FInitTaskList: array of TTask; // Array of tasks
+    FMapGrid: TIntegerArray; // Map grid rows to tasks
+    FCount: integer; // Current count of tasks
   public
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
@@ -221,7 +221,7 @@ end;
 
 { TTasks }
 
-constructor TTasks.Create(const TaskStrings: TStringList);
+constructor TTasks.Create(const TaskStrings: TStringList = nil);
 var
   i: integer; // Index for iteration
 begin
@@ -230,10 +230,13 @@ begin
 
   // Iterate through the StringList to create tasks
   if (Assigned(TaskStrings)) then
+  begin
     for i := 0 to TaskStrings.Count - 1 do
     begin
       AddTask(TaskStrings[i]); // Create a new task from the string and add to the list
     end;
+    TaskStrings.Free;
+  end;
   InitMap(FCount + 1);
   CreateBackupInit;
 end;
