@@ -457,6 +457,7 @@ object formNotetask: TformNotetask
     Title = 'Saving'
     DefaultExt = '.*.tsk'
     Filter = 'Task files (*.tsk)|*.tsk|All files (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
     Left = 400
     Top = 112
   end

@@ -735,7 +735,7 @@ begin
     Key := 0;
   end
   else
-  if (Shift = [ssCtrl]) and (Key = VK_RETURN) then // Ctrl + Enter
+  if ((Shift = [ssCtrl]) or not FWordWrap) and (Key = VK_RETURN) then // Ctrl + Enter
   begin
     if IsEditing then
     begin
