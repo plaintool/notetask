@@ -30,7 +30,7 @@ type
     property Date: TDateTime read FDate write FDate;
     property Comment: string read FComment write FComment;
     property Text: string read FText write FText;
-    function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string;
+    function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string; reintroduce;
   end;
 
   // Class representing a collection of tasks
@@ -362,22 +362,23 @@ begin
     // Get the task by the row index (minus one, as rows start from 1)
 
     // Reading data from the grid
-    Done := StrToBoolDef(Grid.Cells[1, Row], False); // Convert to boolean
-    Text := Grid.Cells[2, Row];
-    Comment := Grid.Cells[3, Row];
-    if not TryStrToDateTime(Grid.Cells[4, Row], Date) then
+    if (Col = 1) then
+      Task.Done := StrToBoolDef(Grid.Cells[1, Row], False); // Convert to boolean
+    if (Col = 2) then
+      Task.Text := Grid.Cells[2, Row];
+    if (Col = 3) then
+      Task.Comment := Grid.Cells[3, Row];
+    if (Col = 4) then
     begin
-      Date := 0; // If parsing the date failed, set to 0
-      Grid.Cells[4, Row] := '';
-    end
-    else
-      Grid.Cells[4, Row] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Date);
-
-    // Update task properties
-    Task.Done := Done;
-    Task.Text := Text;
-    Task.Comment := Comment;
-    Task.Date := Date;
+      if not TryStrToDateTime(Grid.Cells[4, Row], Date) then
+      begin
+        Date := 0; // If parsing the date failed, set to 0
+        Grid.Cells[4, Row] := '';
+      end
+      else
+        Grid.Cells[4, Row] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Date);
+      Task.Date := Date;
+    end;
   end
   else
     raise Exception.Create('Invalid row or task index');
@@ -448,7 +449,7 @@ end;
 
 procedure TTasks.ArchiveTask(Index: integer);
 var
-  i, Ind: integer;
+  Ind: integer;
 begin
   Ind := Map(Index);
   if (Ind < 0) or (Ind >= FCount) then
@@ -459,7 +460,7 @@ end;
 
 procedure TTasks.CompleteTask(Index: integer);
 var
-  i, Ind: integer;
+  Ind: integer;
 begin
   Ind := Map(Index);
   if (Ind < 0) or (Ind >= FCount) then
@@ -555,9 +556,7 @@ function TTasks.MoveTaskUp(Index: integer): integer;
 var
   TempTask: TTask;   // Temporary variable for swapping tasks
   Ind: integer;
-  l: integer;
 begin
-  l := length(MapGrid);
   Ind := Map(Index);
   Result := -1;
   if (Index > 1) and (Ind >= 0) and (Ind < FCount) then
@@ -650,7 +649,7 @@ var
   TempDate: TDateTime;
   Rect: TGridRect;
   Index, i, j: integer;
-  Id, Id0, Id1: integer;
+  //  Id, Id0, Id1: integer;
 begin
   if Clipboard.AsText = string.Empty then exit;
   CreateBackup;
@@ -660,9 +659,9 @@ begin
   begin
     for i := TempTasks.FCount - 1 downto 0 do
     begin
-      Id := InsertTask(TempTasks.GetTask(i + 1).ToString(), Grid.Row, False);
-      if i = 0 then Id0 := Id;
-      if i = TempTasks.FCount - 1 then Id1 := Id;
+      InsertTask(TempTasks.GetTask(i + 1).ToString(), Grid.Row, False);
+      // if i = 0 then Id0 := Id;
+      // if i = TempTasks.FCount - 1 then Id1 := Id;
     end;
     // Result := TGridRect.Create(1, ReverseMap(id0), 4, ReverseMap(id1));
   end
@@ -936,8 +935,9 @@ var
   TempTaskList: array of TTask;
 begin
   // Make an intermediate backup of the current task list
+  TempTaskList := [];
   SetLength(TempTaskList, Length(FTaskList));
-  for i := 0 to High(FTaskList) do
+  for i := 0 to High(TempTaskList) do
   begin
     TempTaskList[i] := TTask.Create;
     TempTaskList[i].Copy(FTaskList[i]);
@@ -945,7 +945,7 @@ begin
 
   // Restore task list from the original backup
   SetLength(FTaskList, Length(FBackupTaskList));
-  for i := 0 to High(FBackupTaskList) do
+  for i := 0 to High(FTaskList) do
   begin
     FTaskList[i] := TTask.Create;
     FTaskList[i].Copy(FBackupTaskList[i]);
@@ -955,7 +955,7 @@ begin
 
   // Update the backup with the intermediate state
   SetLength(FBackupTaskList, Length(TempTaskList));
-  for i := 0 to High(TempTaskList) do
+  for i := 0 to High(FBackupTaskList) do
   begin
     FBackupTaskList[i] := TTask.Create;
     FBackupTaskList[i].Copy(TempTaskList[i]);
@@ -969,7 +969,7 @@ var
 begin
   // Create a backup of the task list and map grid
   SetLength(FInitTaskList, Length(FTaskList));
-  for i := 0 to High(FTaskList) do
+  for i := 0 to High(FInitTaskList) do
   begin
     FInitTaskList[i] := TTask.Create;
     FInitTaskList[i].Copy(FTaskList[i]);

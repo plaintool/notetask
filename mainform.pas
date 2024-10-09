@@ -303,7 +303,6 @@ begin
   SaveFormSettings(self);
 
   // Free allocated resources
-
   FLineEnding.Free;
   Tasks.Free;
   ResourceBitmapCheck.Free;
@@ -313,11 +312,7 @@ end;
 procedure TformNotetask.ClearSelected(ShowConfirm: boolean = True);
 var
   Confirm: integer;
-  i, j: integer;
-  Rect: TRect;
 begin
-  //if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
-  //begin
   // Show confirm delete dialog
   if (ShowConfirm) then
     Confirm := MessageDlg(rclearconfirm, mtConfirmation, [mbYes, mbNo], 0);
@@ -325,11 +320,16 @@ begin
   if (Confirm = mrYes) or (not ShowConfirm) then
   begin
     Tasks.ClearTasksInRect(taskGrid, taskGrid.Selection);
+    if (Assigned(Memo)) then
+    begin
+      Memo.OnChange := nil;
+      Memo.Clear;
+      Memo.OnChange := @MemoChange;
+    end;
     SetChanged;
     FLineCount := Tasks.Count;
     SetInfo;
   end;
-  //  end;
 end;
 
 procedure TformNotetask.DeleteTask(aRow: integer = 0; ShowConfirm: boolean = True);
@@ -586,10 +586,10 @@ procedure TformNotetask.aDeleteExecute(Sender: TObject);
 begin
   if not IsEditing then
   begin
-    if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
-      ClearSelected(False)
-    else
-      DeleteTask;
+    //    if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+    ClearSelected(False);
+    //    else
+    //      DeleteTask;
   end;
 end;
 
