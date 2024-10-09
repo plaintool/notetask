@@ -20,7 +20,7 @@
         <Resource_0 FileName="locale\notetask.ru.po" Type="RCDATA" ResourceName="NOTETASK.RU"/>
         <Resource_1 FileName="check.bmp" Type="BITMAP" ResourceName="CHECK"/>
         <Resource_2 FileName="uncheck.bmp" Type="BITMAP" ResourceName="UNCHECK"/>
-        <Resource_3 FileName="doctask.ico" Type="ICON" ResourceName="DOCTASK"/>
+        <Resource_3 FileName="taskdoc.ico" Type="ICON" ResourceName="TASKDOC"/>
       </Resources>
     </General>
     <i18n>

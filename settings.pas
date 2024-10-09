@@ -240,8 +240,8 @@ begin
   Result := False; // Initialize result to false
 
   {$IFDEF Windows}
-  Reg := TRegistry.Create;
   try
+    Reg := TRegistry.Create;
     AppPath := Application.ExeName;
     Reg.RootKey := HKEY_CLASSES_ROOT;
 
@@ -279,70 +279,62 @@ begin
   {$ENDIF}
 
   {$IFDEF Linux}
-  AppPath := Application.ExeName;
-  MimeType := 'application/x-notetask'; // Define MIME type for the file extension
-  UserHome := GetEnvironmentVariable('HOME');
-
-  // Create a .xml file for MIME type in user's home directory
-  AssignFile(MimeFile, UserHome + '/.local/share/mime/packages/notetask.xml');
   try
-    Rewrite(MimeFile);
-    Writeln(MimeFile, '<?xml version="1.0" encoding="UTF-8"?>');
-    Writeln(MimeFile, '<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">');
-    Writeln(MimeFile, '  <mime-type type="', MimeType, '">');
-    Writeln(MimeFile, '    <comment>Notetask file</comment>');
-    Writeln(MimeFile, '    <glob pattern="*.', Ext, '"/>');
-    Writeln(MimeFile, '  </mime-type>');
-    Writeln(MimeFile, '</mime-info>');
-    CloseFile(MimeFile);
-  except
-    on E: Exception do
-    begin
-      // Handle file creation error
-      Exit;
-    end;
-  end;
+    AppPath := Application.ExeName;
+    MimeType := 'application/x-notetask'; // Define MIME type for the file extension
+    UserHome := GetEnvironmentVariable('HOME');
 
-  // Create a .desktop file for the application
-  AssignFile(DesktopFile, UserHome + '/.local/share/applications/notetask.desktop');
-  try
-    Rewrite(DesktopFile);
-    Writeln(DesktopFile, '[Desktop Entry]');
-    Writeln(DesktopFile, 'Name=Notetask');
-    Writeln(DesktopFile, 'Exec=', AppPath, ' %f'); // %f passes the filename to the application
-    Writeln(DesktopFile, 'Icon=', AppPath); // Optionally specify an icon
-    Writeln(DesktopFile, 'Type=Application');
-    Writeln(DesktopFile, 'MimeType=', MimeType);
-    CloseFile(DesktopFile);
-  except
-    on E: Exception do
-    begin
-      // Handle file creation error
-      Exit;
-    end;
-  end;
+    // Create a .xml file for MIME type in user's home directory
+    AssignFile(MimeFile, UserHome + '/.local/share/mime/packages/notetask.xml');
+      Rewrite(MimeFile);
+      Writeln(MimeFile, '<?xml version="1.0" encoding="UTF-8"?>');
+      Writeln(MimeFile, '<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">');
+      Writeln(MimeFile, '  <mime-type type="', MimeType, '">');
+      Writeln(MimeFile, '    <comment>Notetask file</comment>');
+      Writeln(MimeFile, '    <glob pattern="*.', Ext, '"/>');
+      Writeln(MimeFile, '  </mime-type>');
+      Writeln(MimeFile, '</mime-info>');
+      CloseFile(MimeFile);
 
-  // Update MIME database and register the application
-  if (FpSystem('xdg-mime install --mode user ' + UserHome + '/.local/share/mime/packages/notetask.xml') = 0) and
-     (FpSystem('update-mime-database ' + UserHome + '/.local/share/mime') = 0) and
-     (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/notetask.desktop') = 0) then
+    // Create a .desktop file for the application
+    AssignFile(DesktopFile, UserHome + '/.local/share/applications/notetask.desktop');
+      Rewrite(DesktopFile);
+      Writeln(DesktopFile, '[Desktop Entry]');
+      Writeln(DesktopFile, 'Name=Notetask');
+      Writeln(DesktopFile, 'Exec=', AppPath, ' %f'); // %f passes the filename to the application
+      Writeln(DesktopFile, 'Icon=', AppPath); // Optionally specify an icon
+      Writeln(DesktopFile, 'Type=Application');
+      Writeln(DesktopFile, 'MimeType=', MimeType);
+      CloseFile(DesktopFile);
+
+    // Update MIME database and register the application
+    if (FpSystem('xdg-mime install --mode user ' + UserHome + '/.local/share/mime/packages/notetask.xml') = 0) and
+       (FpSystem('update-mime-database ' + UserHome + '/.local/share/mime') = 0) and
+       (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/notetask.desktop') = 0) then
+    begin
+      Result := True;
+    end;
+  except
+  on E: Exception do
   begin
-    Result := True;
+    // Handle file creation error
+    Exit;
   end;
+
   {$ENDIF}
 
   {$IFDEF MacOS}
-  AppPath := Application.ExeName;
-  UserHome := GetEnvironmentVariable('HOME');
-  BundlePath := UserHome + '/Library/Application Support/Notetask'; // Define a bundle path for the app
-
-  // Create directory for app support if it does not exist
-  if not DirectoryExists(BundlePath) then
-    CreateDir(BundlePath);
-
-  // Create a .plist file for the application
-  AssignFile(PlistFile, BundlePath + '/com.example.notetask.plist'); // Adjust the bundle identifier as needed
   try
+    AppPath := Application.ExeName;
+    UserHome := GetEnvironmentVariable('HOME');
+    BundlePath := UserHome + '/Library/Application Support/Notetask'; // Define a bundle path for the app
+
+    // Create directory for app support if it does not exist
+    if not DirectoryExists(BundlePath) then
+      CreateDir(BundlePath);
+
+    // Create a .plist file for the application
+    AssignFile(PlistFile, BundlePath + '/com.example.notetask.plist'); // Adjust the bundle identifier as needed
     Rewrite(PlistFile);
     Writeln(PlistFile, '<?xml version="1.0" encoding="UTF-8"?>');
     Writeln(PlistFile, '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">');
@@ -368,6 +360,12 @@ begin
     Writeln(PlistFile, '</dict>');
     Writeln(PlistFile, '</plist>');
     CloseFile(PlistFile);
+
+
+    // Associate the file extension with the application
+    FpSystem(Format('duti -s com.example.notetask .%s public.data', [Ext])); // Adjust the bundle identifier as needed
+
+    Result := True; // Set result to true if all operations succeeded
   except
     on E: Exception do
     begin
@@ -375,11 +373,6 @@ begin
       Exit;
     end;
   end;
-
-  // Associate the file extension with the application
-  FpSystem(Format('duti -s com.example.notetask .%s public.data', [Ext])); // Adjust the bundle identifier as needed
-
-  Result := True; // Set result to true if all operations succeeded
   {$ENDIF}
 end;
 
