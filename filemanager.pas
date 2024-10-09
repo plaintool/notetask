@@ -26,8 +26,8 @@ var
   Buffer: array[0..3] of byte;
   ContentBuffer: array of byte; // Dynamic array
   BytesRead: integer;
-  i: Integer;
-  Utf8Candidate: Boolean;
+  i: integer;
+  Utf8Candidate: boolean;
 begin
   Result := TEncoding.UTF8;
   // Assume UTF-8 by default
@@ -105,13 +105,13 @@ var
   StringList: TStringList;
 begin
   StringList := TStringList.Create;
-  // Создаем новый экземпляр TStringList
+  // Create a new instance of TStringList
   try
-    StringList.Text := TextContent; // Загружаем текст в TStringList
-    Result := StringList; // Возвращаем TStringList
+    StringList.Text := TextContent; // Load text into TStringList
+    Result := StringList; // Return TStringList
   except
-    StringList.Free; // Освобождаем память при ошибке
-    raise; // Пробрасываем исключение дальше
+    StringList.Free; // Free memory on error
+    raise; // Re-throw the exception
   end;
 end;
 
@@ -120,16 +120,16 @@ procedure ReadTextFile(const FileName: string; out Content: string; out FileEnco
 var
   StringList: TStringList;
 begin
-  // Определяем кодировку
+  // Determine the encoding
   FileEncoding := DetectEncoding(FileName);
 
-  // Читаем содержимое файла с использованием TStringList
+  // Read the file content using TStringList
   StringList := TStringList.Create;
   try
     StringList.LoadFromFile(FileName, FileEncoding);
     Content := StringList.Text;
 
-    // Определяем тип переноса строк
+    // Determine the line ending type
     if Pos(#13#10, Content) > 0 then
       LineEnding := TLineEnding.WindowsCRLF
     else if Pos(#10, Content) > 0 then
@@ -139,7 +139,7 @@ begin
     else
       LineEnding := TLineEnding.Unknown;
 
-    // Считаем количество строк
+    // Count the number of lines
     LineCount := StringList.Count;
 
   finally
@@ -155,7 +155,7 @@ var
   LineWithEnding: string;
   Bytes: TBytes;
 begin
-  // Устанавливаем тип переноса строк в зависимости от заданного LineEnding
+  // Set the line ending type based on the provided LineEnding
   if LineEnding = TLineEnding.WindowsCRLF then
     LineEndingStr := sLineBreak // CRLF
   else if LineEnding = TLineEnding.UnixLF then
@@ -163,25 +163,25 @@ begin
   else if LineEnding = TLineEnding.MacintoshCR then
     LineEndingStr := #13 // CR
   else
-    LineEndingStr := sLineBreak; // По умолчанию используем стандартный перенос
+    LineEndingStr := sLineBreak; // Default to standard line ending
 
-  // Открываем файл для записи
+  // Open the file for writing
   FileStream := TFileStream.Create(FileName, fmCreate);
   try
     for i := 0 to StringList.Count - 1 do
     begin
-      // Для каждой строки, кроме последней, добавляем LineEndingStr
+      // For each line except the last, add LineEndingStr
       if i < StringList.Count - 1 then
         LineWithEnding := StringList[i] + LineEndingStr
       else
         LineWithEnding := StringList[i];
 
-      // Конвертируем строку в байты с учетом кодировки
+      // Convert the string to bytes with the specified encoding
       Bytes := FileEncoding.GetBytes(LineWithEnding);
-      FileStream.WriteBuffer(Bytes[0], Length(Bytes)); // Записываем байты в файл
+      FileStream.WriteBuffer(Bytes[0], Length(Bytes)); // Write bytes to the file
     end;
   finally
-    FileStream.Free; // Освобождаем ресурсы
+    FileStream.Free; // Free resources
   end;
 end;
 

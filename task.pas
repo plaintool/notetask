@@ -39,8 +39,7 @@ type
     FBackupTaskList: array of TTask; // Array of tasks
     FInitTaskList: array of TTask; // Array of tasks
   public
-    // Constructor that takes a StringList
-    constructor Create(const TaskStrings: TStringList = nil);
+    constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
     procedure InitMap(Length: integer);
     function Map(Index: integer): integer;

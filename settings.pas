@@ -14,8 +14,11 @@ type
   end;
 
 procedure SaveFormSettings(Form: TformNotetask);
+
 function LoadFormSettings(Form: TformNotetask): boolean;
+
 procedure SaveGridSettings(Grid: TStringGrid);
+
 function LoadGridSettings(Grid: TStringGrid): boolean;
 
 implementation
