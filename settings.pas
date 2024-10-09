@@ -5,7 +5,11 @@ unit settings;
 interface
 
 uses
-  Forms, Classes, SysUtils, FileUtil, fpjson, jsonparser, Grids, Graphics, Registry, mainform;
+  Forms, Classes, SysUtils, FileUtil, fpjson, jsonparser, Grids, Graphics, mainform
+  {$IF DEFINED(Win64) OR DEFINED(Win32)}
+  ,Registry
+  {$ENDIF}
+  ;
 
 type
   TGridSettings = record
@@ -216,12 +220,26 @@ end;
 
 function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;
 var
+  AppPath: string;
+  {$IFDEF Windows}
   Reg: TRegistry;
   IconPath: string;
-  AppPath: string;
+  {$ENDIF}
+  {$IFDEF Linux}
+  MimeFile: TextFile;
+  DesktopFile: TextFile;
+  MimeType: string;
+  UserHome: string;
+  {$ENDIF}
+  {$IFDEF MacOS}
+  PlistFile: TextFile;
+  BundlePath: string;
+  UserHome: string;
+  {$ENDIF}
 begin
   Result := False; // Initialize result to false
 
+  {$IFDEF Windows}
   Reg := TRegistry.Create;
   try
     AppPath := Application.ExeName;
@@ -230,12 +248,12 @@ begin
     // Create a key for the file extension
     if Reg.OpenKey(Ext, True) then
     begin
-      Reg.WriteString('', 'Notetask'); // Assign the class name
+      Reg.WriteString('', 'notetask'); // Assign the class name
       Reg.CloseKey;
     end;
 
     // Create a key for Notetask
-    if Reg.OpenKey('Notetask\DefaultIcon', True) then
+    if Reg.OpenKey('notetask\DefaultIcon', True) then
     begin
       IconPath := Format('%s,%d', [AppPath, IconIndex]);
       Reg.WriteString('', IconPath); // Set the icon path
@@ -243,7 +261,7 @@ begin
     end;
 
     // Create a key for opening the file
-    if Reg.OpenKey('Notetask\shell\open\command', True) then
+    if Reg.OpenKey('notetask\shell\open\command', True) then
     begin
       Reg.WriteString('', Format('"%s" "%%1"', [AppPath])); // Command to open the file
       Reg.CloseKey;
@@ -258,6 +276,111 @@ begin
   end;
 
   Reg.Free; // Free the registry object
+  {$ENDIF}
+
+  {$IFDEF Linux}
+  AppPath := Application.ExeName;
+  MimeType := 'application/x-notetask'; // Define MIME type for the file extension
+  UserHome := GetEnvironmentVariable('HOME');
+
+  // Create a .xml file for MIME type in user's home directory
+  AssignFile(MimeFile, UserHome + '/.local/share/mime/packages/notetask.xml');
+  try
+    Rewrite(MimeFile);
+    Writeln(MimeFile, '<?xml version="1.0" encoding="UTF-8"?>');
+    Writeln(MimeFile, '<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">');
+    Writeln(MimeFile, '  <mime-type type="', MimeType, '">');
+    Writeln(MimeFile, '    <comment>Notetask file</comment>');
+    Writeln(MimeFile, '    <glob pattern="*.', Ext, '"/>');
+    Writeln(MimeFile, '  </mime-type>');
+    Writeln(MimeFile, '</mime-info>');
+    CloseFile(MimeFile);
+  except
+    on E: Exception do
+    begin
+      // Handle file creation error
+      Exit;
+    end;
+  end;
+
+  // Create a .desktop file for the application
+  AssignFile(DesktopFile, UserHome + '/.local/share/applications/notetask.desktop');
+  try
+    Rewrite(DesktopFile);
+    Writeln(DesktopFile, '[Desktop Entry]');
+    Writeln(DesktopFile, 'Name=Notetask');
+    Writeln(DesktopFile, 'Exec=', AppPath, ' %f'); // %f passes the filename to the application
+    Writeln(DesktopFile, 'Icon=', AppPath); // Optionally specify an icon
+    Writeln(DesktopFile, 'Type=Application');
+    Writeln(DesktopFile, 'MimeType=', MimeType);
+    CloseFile(DesktopFile);
+  except
+    on E: Exception do
+    begin
+      // Handle file creation error
+      Exit;
+    end;
+  end;
+
+  // Update MIME database and register the application
+  if (FpSystem('xdg-mime install --mode user ' + UserHome + '/.local/share/mime/packages/notetask.xml') = 0) and
+     (FpSystem('update-mime-database ' + UserHome + '/.local/share/mime') = 0) and
+     (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/notetask.desktop') = 0) then
+  begin
+    Result := True;
+  end;
+  {$ENDIF}
+
+  {$IFDEF MacOS}
+  AppPath := Application.ExeName;
+  UserHome := GetEnvironmentVariable('HOME');
+  BundlePath := UserHome + '/Library/Application Support/Notetask'; // Define a bundle path for the app
+
+  // Create directory for app support if it does not exist
+  if not DirectoryExists(BundlePath) then
+    CreateDir(BundlePath);
+
+  // Create a .plist file for the application
+  AssignFile(PlistFile, BundlePath + '/com.example.notetask.plist'); // Adjust the bundle identifier as needed
+  try
+    Rewrite(PlistFile);
+    Writeln(PlistFile, '<?xml version="1.0" encoding="UTF-8"?>');
+    Writeln(PlistFile, '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">');
+    Writeln(PlistFile, '<plist version="1.0">');
+    Writeln(PlistFile, '<dict>');
+    Writeln(PlistFile, '  <key>CFBundleTypeDeclarations</key>');
+    Writeln(PlistFile, '  <array>');
+    Writeln(PlistFile, '    <dict>');
+    Writeln(PlistFile, '      <key>CFBundleTypeName</key>');
+    Writeln(PlistFile, '      <string>Notetask file</string>');
+    Writeln(PlistFile, '      <key>CFBundleTypeRole</key>');
+    Writeln(PlistFile, '      <string>Editor</string>');
+    Writeln(PlistFile, '      <key>LSItemContentTypes</key>');
+    Writeln(PlistFile, '      <array>');
+    Writeln(PlistFile, '        <string>public.data</string>'); // Adjust the content type as needed
+    Writeln(PlistFile, '      </array>');
+    Writeln(PlistFile, '      <key>LSHandlerRank</key>');
+    Writeln(PlistFile, '      <string>Owner</string>');
+    Writeln(PlistFile, '      <key>CFBundleTypeIconFile</key>');
+    Writeln(PlistFile, '      <string>your_icon.icns</string>'); // Replace with your icon file
+    Writeln(PlistFile, '    </dict>');
+    Writeln(PlistFile, '  </array>');
+    Writeln(PlistFile, '</dict>');
+    Writeln(PlistFile, '</plist>');
+    CloseFile(PlistFile);
+  except
+    on E: Exception do
+    begin
+      // Handle file creation error
+      Exit;
+    end;
+  end;
+
+  // Associate the file extension with the application
+  FpSystem(Format('duti -s com.example.notetask .%s public.data', [Ext])); // Adjust the bundle identifier as needed
+
+  Result := True; // Set result to true if all operations succeeded
+  {$ENDIF}
 end;
 
 

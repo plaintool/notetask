@@ -14,13 +14,14 @@ uses
   LResources,
   LCLTranslator,
   LCLType,
-  {$IF DEFINED(Win64) OR DEFINED(Win32)}
+  {$IFDEF Windows}
   Windows
-  {$ELSE}
-  Unix
-  {$IFDEF LCLCarbon}
-  MacOSAll
   {$ENDIF}
+  {$IFDEF Linux}
+  Unix
+  {$ENDIF}
+  {$IFDEF MacOS}
+  MacOSAll
   {$ENDIF}
   ;
 
