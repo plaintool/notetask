@@ -42,6 +42,8 @@ var
   success: boolean;
   {$ENDIF}
 begin
+  fbl:=string.Empty;
+  l:=string.Empty;
   {$IFDEF LCLCarbon}
   theLocaleRef := CFLocaleCopyCurrent;
   locale := CFLocaleGetIdentifier(theLocaleRef);

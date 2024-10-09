@@ -975,23 +975,25 @@ begin
   if printDialog.Execute then
   begin
     gridPrinter := TGridPrinter.Create(self);
-    gridPrinter.Grid := taskGrid;
-    gridPrinter.OnGetCellText := @PrinterGetCellText;
-    gridPrinter.OnPrepareCanvas := @PrinterPrepareCanvas;
-    gridPrinter.Orientation := Printer.Orientation;
-    gridPrinter.Margins.LeftMargin := pageSetupDialog.MarginLeft / 100;
-    gridPrinter.Margins.RightMargin := pageSetupDialog.MarginRight / 100;
-    gridPrinter.Margins.TopMargin := pageSetupDialog.MarginTop / 100;
-    gridPrinter.Margins.BottomMargin := pageSetupDialog.MarginBottom / 100;
+    try
+      gridPrinter.Grid := taskGrid;
+      gridPrinter.OnGetCellText := @PrinterGetCellText;
+      gridPrinter.OnPrepareCanvas := @PrinterPrepareCanvas;
+      gridPrinter.Orientation := Printer.Orientation;
+      gridPrinter.Margins.LeftMargin := pageSetupDialog.MarginLeft / 100;
+      gridPrinter.Margins.RightMargin := pageSetupDialog.MarginRight / 100;
+      gridPrinter.Margins.TopMargin := pageSetupDialog.MarginTop / 100;
+      gridPrinter.Margins.BottomMargin := pageSetupDialog.MarginBottom / 100;
+      gridPrinter.FixedLineColor := clSilver;
+      gridPrinter.BorderLineColor := clSilver;
+      gridPrinter.FooterLineColor := clSilver;
+      gridPrinter.GridLineColor := clSilver;
+      gridPrinter.HeaderLineColor := clSilver;
 
-    gridPrinter.FixedLineColor := clSilver;
-    gridPrinter.BorderLineColor := clSilver;
-    gridPrinter.FooterLineColor := clSilver;
-    gridPrinter.GridLineColor := clSilver;
-    gridPrinter.HeaderLineColor := clSilver;
-
-    gridPrinter.Print;
-    gridPrinter.Free;
+      gridPrinter.Print;
+    finally
+      gridPrinter.Free;
+    end;
   end;
 end;
 
