@@ -34,27 +34,27 @@ var
   JSONObj: TJSONObject;
   FileName: string;
 begin
-  FileName := GetSettingsDirectory('form_settings.json'); // Получаем имя файла настроек
-  ForceDirectories(GetSettingsDirectory); // Убедитесь, что каталог существует
+  FileName := GetSettingsDirectory('form_settings.json'); // Get settings file name
+  ForceDirectories(GetSettingsDirectory); // Ensure the directory exists
   JSONObj := TJSONObject.Create;
   try
-    // Сохранение положения и размера формы
+    // Save form position and size
 
-    JSonObj.Add('WordWrap', Form.WordWrap);
-    JSonObj.Add('ShowArchived', Form.ShowArchived);
-    JSonObj.Add('ShowStatusBar', Form.ShowStatusBar);
-    JSonObj.Add('WindowState', Ord(Form.WindowState));
+    JSONObj.Add('WordWrap', Form.WordWrap);
+    JSONObj.Add('ShowArchived', Form.ShowArchived);
+    JSONObj.Add('ShowStatusBar', Form.ShowStatusBar);
+    JSONObj.Add('WindowState', Ord(Form.WindowState));
     JSONObj.Add('Left', Form.RestoredLeft);
     JSONObj.Add('Top', Form.RestoredTop);
     JSONObj.Add('Width', Form.RestoredWidth);
     JSONObj.Add('Height', Form.RestoredHeight);
 
-    // Сохранение шрифта
+    // Save font
     JSONObj.Add('FontName', Form.Font.Name);
     JSONObj.Add('FontSize', Form.Font.Size);
-    JSONObj.Add('FontStyle', integer(Form.Font.Style));  // Преобразуем стиль шрифта в число
+    JSONObj.Add('FontStyle', integer(Form.Font.Style));  // Convert font style to number
 
-    // Запись в файл
+    // Write to file
     with TStringList.Create do
     try
       Add(JSONObj.AsJSON);
@@ -137,24 +137,24 @@ var
   i: integer;
   FileName: string;
 begin
-  FileName := GetSettingsDirectory('grid_settings.json'); // Получаем имя файла настроек
+  FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
   ForceDirectories(GetSettingsDirectory);
   JSONObj := TJSONObject.Create;
   ColumnArray := TJSONArray.Create;
   RowArray := TJSONArray.Create;
 
-  // Сохранение ширины столбцов
+  // Save column widths
   for i := 0 to Grid.ColCount - 1 do
     ColumnArray.Add(Grid.ColWidths[i]);
 
-  // Сохранение высоты строк
+  // Save row heights
   //for i := 0 to Grid.RowCount - 1 do
   //  RowArray.Add(Grid.RowHeights[i]);
 
   JSONObj.Add('ColumnWidths', ColumnArray);
   //JSONObj.Add('RowHeights', RowArray);
 
-  // Запись в файл
+  // Write to file
   with TStringList.Create do
   try
     Add(JSONObj.AsJSON);
@@ -177,11 +177,11 @@ var
   FileName: string;
 begin
   Result := False;
-  FileName := GetSettingsDirectory('grid_settings.json'); // Получаем имя файла настроек
+  FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
   ForceDirectories(GetSettingsDirectory);
   if not FileExists(FileName) then Exit;
 
-  // Чтение из файла
+  // Read from file
   FileStream := TFileStream.Create(FileName, fmOpenRead);
   try
     SetLength(FileContent, FileStream.Size);
@@ -192,11 +192,11 @@ begin
       ColumnArray := JSONObj.FindPath('ColumnWidths') as TJSONArray;
       RowArray := JSONObj.FindPath('RowHeights') as TJSONArray;
 
-      // Установка ширины столбцов
+      // Set column widths
       for i := 0 to ColumnArray.Count - 1 do
         Grid.ColWidths[i] := ColumnArray.Items[i].AsInteger;
 
-      // Установка высоты строк
+      // Set row heights
       //for i := 0 to RowArray.Count - 1 do
       //  Grid.RowHeights[i] := RowArray.Items[i].AsInteger;
 
