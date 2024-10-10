@@ -660,6 +660,7 @@ procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShif
 begin
   if Screen.ActiveForm <> Self then
   begin
+    Key := 0;
     Exit;
   end;
 

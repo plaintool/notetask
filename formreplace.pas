@@ -9,7 +9,7 @@ uses
   Classes,
   Forms,
   StdCtrls,
-  LCLType;
+  LCLType, Controls;
 
 type
 
@@ -31,6 +31,7 @@ type
     procedure buttonReplaceAllClick(Sender: TObject);
     procedure buttonCancelClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure editFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
   private
 
   public
@@ -75,6 +76,54 @@ begin
 
   if Key = VK_RETURN then
     buttonFind.Click;
+end;
+
+procedure TformReplaceText.editFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  Edit: TEdit;
+begin
+  Edit := (Sender as TEdit);
+
+  if Key = VK_DELETE then // Delete
+  begin
+    if Edit.SelLength = 0 then
+    begin
+      Edit.SelStart := editFind.SelStart;
+      Edit.SelLength := 1;
+    end;
+    Edit.ClearSelection;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
+  begin
+    Edit.Undo;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
+  begin
+    Edit.CutToClipboard;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
+  begin
+    Edit.CopyToClipboard;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
+  begin
+    Edit.PasteFromClipboard;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
+  begin
+    Edit.SelectAll;
+    Key := 0;
+  end;
 end;
 
 end.

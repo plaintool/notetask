@@ -10,7 +10,7 @@ uses
   Forms,
   StdCtrls,
   ExtCtrls,
-  LCLType;
+  LCLType, Controls;
 
 type
 
@@ -29,6 +29,7 @@ type
     procedure buttonCancelClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
+    procedure editFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
   private
 
   public
@@ -58,6 +59,11 @@ begin
   radioDirection.ItemIndex := 1;
 end;
 
+procedure TformFindText.FormShow(Sender: TObject);
+begin
+  editFind.SetFocus;
+end;
+
 procedure TformFindText.buttonFindClick(Sender: TObject);
 begin
   formNotetask.Find(editFind.Text, checkMatchCase.Checked, checkWrapAround.Checked, radioDirection.ItemIndex = 1);
@@ -70,6 +76,9 @@ end;
 
 procedure TformFindText.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
+  if ActiveControl is TEdit then
+    Exit;
+
   if Key = VK_ESCAPE then
     Close;
 
@@ -78,9 +87,52 @@ begin
 
 end;
 
-procedure TformFindText.FormShow(Sender: TObject);
+procedure TformFindText.editFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  Edit: TEdit;
 begin
-  editFind.SetFocus;
+  Edit := (Sender as TEdit);
+
+  if Key = VK_DELETE then // Delete
+  begin
+    if Edit.SelLength = 0 then
+    begin
+      Edit.SelStart := editFind.SelStart;
+      Edit.SelLength := 1;
+    end;
+    Edit.ClearSelection;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
+  begin
+    Edit.Undo;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
+  begin
+    Edit.CutToClipboard;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
+  begin
+    Edit.CopyToClipboard;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
+  begin
+    Edit.PasteFromClipboard;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
+  begin
+    Edit.SelectAll;
+    Key := 0;
+  end;
 end;
 
 end.
