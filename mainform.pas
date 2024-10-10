@@ -1750,7 +1750,7 @@ begin
 
   if taskGrid.Col = 1 then taskGrid.Col := 2;
   taskGrid.EditorMode := True;
-  if (Memo.SelStart >= Length(unicodestring(Memo.Text)) - 1) then
+  if (Memo.SelStart > Length(unicodestring(Memo.Text)) - 1) then
   begin
     if (aDirectionDown) then
       Memo.SelStart := 0;
@@ -1779,7 +1779,7 @@ begin
           FLastFindCol := taskGrid.Col;
           FLastFindSelStart := Memo.SelStart;
           FLastFindSelLength := Memo.SelLength;
-          Counter:=0;
+          Counter := 0;
           Break;
         end;
       end;
