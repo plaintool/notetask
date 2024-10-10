@@ -1663,13 +1663,13 @@ begin
   SubLen := Length(SubStr); // Get length of the substring
 
   // Check if the substring is not empty and Offset is valid
-  if (SubLen > 0) and (Offset > 0) and (Offset <= cardinal(Length(S))) then
+  if (SubLen > 0) and (Offset > 0) and (Offset <= SizeUint(Length(S))) then
   begin
-    MaxLen := Length(S) - SubLen; // Calculate maximum starting index
+    MaxLen := Length(S) - SubLen + 1; // Adjust max starting index to include end of the string
     SubFirst := SubStr[1]; // Get the first character of the substring
 
-    // Search backwards, starting from Offset - 1
-    for i := Offset - 1 downto 1 do
+    // Search backwards, starting from Offset
+    for i := Offset downto 1 do
     begin
       // Ensure there is enough space left for the substring
       if (i <= MaxLen) then
@@ -1784,9 +1784,10 @@ begin
         end;
       end;
 
-      // Move to next col
+      // Move to col
       if ((aDirectionDown) and (CurCol < 3)) or ((not aDirectionDown) and (CurCol > 2)) then
       begin
+        // Move to next col
         if (aDirectionDown) then
         begin
           Inc(CurCol);
@@ -1795,18 +1796,20 @@ begin
           Memo.SelLength := 0;
         end
         else
+          // Move to prev col
         begin
           Dec(CurCol);
           taskGrid.Col := taskGrid.Col - 1;
-          Memo.SelStart := Length(unicodestring(Memo.Text)) - 1;
+          Memo.SelStart := Length(unicodestring(Memo.Text));
           Memo.SelLength := 0;
         end;
       end
       else
       begin
-        // Move to next row
+        // Move to row
         if ((aDirectionDown) and (CurRow < taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow > 0)) then
         begin
+          // Move to next row
           if (aDirectionDown) then
           begin
             Inc(CurRow);
@@ -1817,6 +1820,7 @@ begin
             Memo.SelLength := 0;
           end
           else
+            // Move to prev row
           begin
             Dec(CurRow);
             CurCol := 4;
@@ -1828,11 +1832,12 @@ begin
           Inc(Counter);
         end;
       end;
-      // Move to begin from start
+      // Move to begin
       if ((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow = 0)) then
       begin
         if (WrapAround) then
         begin
+          // Move to begin start
           if (aDirectionDown) then
           begin
             CurRow := 1;
@@ -1842,6 +1847,7 @@ begin
             Memo.SelStart := 0;
           end
           else
+            // Move to begin end
           begin
             CurRow := taskGrid.RowCount - 1;
             taskGrid.Row := taskGrid.RowCount - 1;
