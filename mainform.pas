@@ -186,6 +186,7 @@ type
   private
     Memo: TMemo;
     FChanged: boolean;
+    FBackup: boolean;
     FIsEditing: boolean;
     FIsSelecting: boolean;
     FFileName: string;
@@ -202,7 +203,6 @@ type
     FFindText: string;
     FFoundText: string;
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
-    FBackup: boolean;
     procedure MemoChange(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
