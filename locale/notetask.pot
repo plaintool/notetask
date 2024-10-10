@@ -24,6 +24,10 @@ msgctxt "mainform.rarchivesconfirm"
 msgid "Are you sure you want to archive / unarchive selected tasks?"
 msgstr ""
 
+#: mainform.rcantfind
+msgid "Can't find"
+msgstr ""
+
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
 msgstr ""

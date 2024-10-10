@@ -200,6 +200,7 @@ type
     FMatchCase: boolean;
     FWrapAround: boolean;
     FFindText: string;
+    FLastFindRow, FLastFindCol, FLastFindSelStart, FLastFindSelLength: integer;
     procedure MemoChange(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
@@ -254,6 +255,7 @@ resourcestring
   rapp = 'Notetask';
   runtitled = 'Untitled';
   rrows = ' tasks';
+  rcantfind = 'Can''t find';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rdeletesconfirm = 'Are you sure you want to delete selected tasks?';
   rarchiveconfirm = 'Are you sure you want to archive / unarchive this task?';
@@ -1619,6 +1621,7 @@ procedure TformNotetask.aFindExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 
+  formFindText.editFind.Text := FindText;
   if (formFindText.Left = 0) then
     formFindText.Left := self.Left + 80;
   if (formFindText.Top = 0) then
@@ -1630,6 +1633,7 @@ procedure TformNotetask.aReplaceExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 
+  formReplaceText.editFind.Text := FindText;
   if (formReplaceText.Left = 0) then
     formReplaceText.Left := self.Left + 80;
   if (formReplaceText.Top = 0) then
@@ -1649,28 +1653,70 @@ begin
     Find(FindText, MatchCase, WrapAround, False);
 end;
 
+function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;
+var
+  i, MaxLen, SubLen: SizeInt;
+  SubFirst: widechar;
+  pc: pwidechar;
+begin
+  PosExReverse := 0; // Initialize result to 0 (not found)
+  SubLen := Length(SubStr); // Get length of the substring
+
+  // Check if the substring is not empty and Offset is valid
+  if (SubLen > 0) and (Offset > 0) and (Offset <= cardinal(Length(S))) then
+  begin
+    MaxLen := Length(S) - SubLen; // Calculate maximum starting index
+    SubFirst := SubStr[1]; // Get the first character of the substring
+
+    // Search backwards, starting from Offset - 1
+    for i := Offset - 1 downto 1 do
+    begin
+      // Ensure there is enough space left for the substring
+      if (i <= MaxLen) then
+      begin
+        pc := @S[i]; // Pointer to the current position
+
+        // Check for a match with the substring
+        if (CompareWord(SubStr[1], pc^, SubLen) = 0) then
+        begin
+          PosExReverse := i; // Return the found position
+          Exit; // Exit the function
+        end;
+      end;
+    end;
+  end;
+end;
+
 function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean): boolean;
 var
   sValue, sText: unicodestring;
-  Start: integer;
+  Counter, CurRow, CurCol: integer;
 
   function FindMemo: boolean;
   var
-    SelEnd, SelLen, FindPos, Delta: integer;
+    SelEnd, FindPos: integer;
   begin
     // Start searching from the current cursor position
-    SelLen := Memo.SelLength;
-    SelEnd := Memo.SelStart + Memo.SelLength + 1;
-    if (SelEnd = 0) then
-      Delta := 0
-    else
-      Delta := 1;
+    if (aDirectionDown) then
+    begin
+      SelEnd := Memo.SelStart + Memo.SelLength + 1;
 
-    // Find the position of the search text, starting from SelEnd
-    if (MatchCase) then
-      FindPos := PosEx(sText, sValue, SelEnd)
+      // Find the position of the search text, starting from SelEnd
+      if (MatchCase) then
+        FindPos := PosEx(sText, sValue, SelEnd)
+      else
+        FindPos := PosEx(UnicodeLowerCase(sText), UnicodeLowerCase(sValue), SelEnd);
+    end
     else
-      FindPos := PosEx(UnicodeLowerCase(sText), UnicodeLowerCase(sValue), SelEnd);
+    begin
+      SelEnd := Memo.SelStart;
+
+      // Find the position of the search text, starting from SelEnd
+      if (MatchCase) then
+        FindPos := PosExReverse(sText, sValue, SelEnd)
+      else
+        FindPos := PosExReverse(UnicodeLowerCase(sText), UnicodeLowerCase(sValue), SelEnd);
+    end;
 
     // If the text is found
     if FindPos > 0 then
@@ -1687,6 +1733,16 @@ var
     end;
   end;
 
+  procedure NotFound;
+  begin
+    taskGrid.Row := FLastFindRow;
+    taskGrid.Col := FLastFindCol;
+    taskGrid.EditorMode := True;
+    Memo.SelStart := FLastFindSelStart;
+    Memo.SelLength := FLastFindSelLength;
+    ShowMessage(rcantfind + ' "' + sText + '"');
+  end;
+
 begin
   FindText := aText;
   MatchCase := aMatchCase;
@@ -1695,46 +1751,121 @@ begin
   if taskGrid.Col = 1 then taskGrid.Col := 2;
   taskGrid.EditorMode := True;
   if (Memo.SelStart >= Length(unicodestring(Memo.Text)) - 1) then
-    Memo.SelStart := 0
+  begin
+    if (aDirectionDown) then
+      Memo.SelStart := 0;
+  end
   else
-    Memo.SelStart := Memo.SelStart + Memo.SelLength;
+  begin
+    if (aDirectionDown) then
+      Memo.SelStart := Memo.SelStart + Memo.SelLength;
+  end;
   Memo.SelLength := 0;
 
   try
+    CurRow := taskGrid.Row;
+    CurCol := taskGrid.Col;
+    Counter := 0;
+
     repeat
       if (Assigned(Memo)) then
       begin
         sValue := unicodestring(Memo.Text);
         sText := unicodestring(aText);
         if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (FindMemo) then
+        begin
+          taskGrid.EditorMode := True;
+          FLastFindRow := taskGrid.Row;
+          FLastFindCol := taskGrid.Col;
+          FLastFindSelStart := Memo.SelStart;
+          FLastFindSelLength := Memo.SelLength;
+          Counter:=0;
           Break;
+        end;
       end;
 
-      if (taskGrid.Col < 4) then
+      // Move to next col
+      if ((aDirectionDown) and (CurCol < 3)) or ((not aDirectionDown) and (CurCol > 2)) then
       begin
-        taskGrid.Col := taskGrid.Col + 1;
-        taskGrid.EditorMode := True;
-        Memo.SelStart := 0;
-        Memo.SelLength := 0;
+        if (aDirectionDown) then
+        begin
+          Inc(CurCol);
+          taskGrid.Col := taskGrid.Col + 1;
+          Memo.SelStart := 0;
+          Memo.SelLength := 0;
+        end
+        else
+        begin
+          Dec(CurCol);
+          taskGrid.Col := taskGrid.Col - 1;
+          Memo.SelStart := Length(unicodestring(Memo.Text)) - 1;
+          Memo.SelLength := 0;
+        end;
       end
       else
       begin
-        if taskGrid.Row < taskGrid.RowCount then
+        // Move to next row
+        if ((aDirectionDown) and (CurRow < taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow > 0)) then
         begin
-          taskGrid.Row := taskGrid.Row + 1;
-          taskGrid.col := 2;
-          taskGrid.EditorMode := True;
-          Memo.SelStart := 0;
-          Memo.SelLength := 0;
+          if (aDirectionDown) then
+          begin
+            Inc(CurRow);
+            CurCol := 1;
+            taskGrid.Row := taskGrid.Row + 1;
+            taskGrid.Col := 2;
+            Memo.SelStart := 0;
+            Memo.SelLength := 0;
+          end
+          else
+          begin
+            Dec(CurRow);
+            CurCol := 4;
+            taskGrid.Row := taskGrid.Row - 1;
+            taskGrid.Col := 3;
+            Memo.SelStart := Length(unicodestring(Memo.Text)) - 1;
+            Memo.SelLength := 0;
+          end;
+          Inc(Counter);
         end;
       end;
-      if taskGrid.Row = taskGrid.RowCount - 1 then
+      // Move to begin from start
+      if ((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow = 0)) then
       begin
         if (WrapAround) then
-          taskGrid.Row := 1;
+        begin
+          if (aDirectionDown) then
+          begin
+            CurRow := 1;
+            taskGrid.Row := 1;
+            CurCol := 2;
+            taskGrid.Col := 2;
+            Memo.SelStart := 0;
+          end
+          else
+          begin
+            CurRow := taskGrid.RowCount - 1;
+            taskGrid.Row := taskGrid.RowCount - 1;
+            CurCol := 3;
+            taskGrid.Col := 3;
+          end;
+          Inc(Counter);
+        end
+        else
+        begin
+          NotFound;
+          exit;
+        end;
       end;
 
-    until taskGrid.Row = taskGrid.RowCount - 1;
+    until ((not WrapAround) and (((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow = 0)))) or
+      (WrapAround and (Counter > taskGrid.RowCount));
+
+    if (WrapAround and (Counter > taskGrid.RowCount)) then
+    begin
+      NotFound;
+      exit;
+    end;
+
   finally
   end;
 end;
