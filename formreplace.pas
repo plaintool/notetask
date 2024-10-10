@@ -72,6 +72,9 @@ procedure TformReplaceText.FormKeyDown(Sender: TObject; var Key: word; Shift: TS
 begin
   if Key = VK_ESCAPE then
     Close;
+
+  if Key = VK_RETURN then
+    buttonFind.Click;
 end;
 
 end.

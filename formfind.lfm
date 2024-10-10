@@ -13,6 +13,7 @@ object formFindText: TformFindText
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnShow = FormShow
+  ShowInTaskBar = stNever
   object labelWhat: TLabel
     Left = 8
     Height = 15
