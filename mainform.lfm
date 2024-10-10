@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -410,6 +409,7 @@ object formNotetask: TformNotetask
     object aFind: TAction
       Category = 'Edit'
       Caption = 'Find...'
+      OnExecute = aFindExecute
       ShortCut = 16454
     end
     object aFindNext: TAction
@@ -425,6 +425,7 @@ object formNotetask: TformNotetask
     object aReplace: TAction
       Category = 'Edit'
       Caption = 'Replace...'
+      OnExecute = aReplaceExecute
       ShortCut = 16456
     end
     object aGoTo: TAction

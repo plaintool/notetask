@@ -11,6 +11,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.5\n"
 
+#: formfind.rdirectiondown
+msgid "Down"
+msgstr "Вниз"
+
+#: formfind.rdirectionup
+msgid "Up"
+msgstr "Вверх"
+
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"
@@ -68,6 +76,41 @@ msgstr "Вы уверены, что хотите отменить все изм�
 #: mainform.runtitled
 msgid "Untitled"
 msgstr "Безымянный"
+
+#: tformfindtext.buttoncancel.caption
+msgctxt "tformfindtext.buttoncancel.caption"
+msgid "Cancel"
+msgstr "Отмена"
+
+#: tformfindtext.buttonsearch.caption
+msgctxt "tformfindtext.buttonsearch.caption"
+msgid "Find Next"
+msgstr "Найти далее"
+
+#: tformfindtext.caption
+msgctxt "tformfindtext.caption"
+msgid "Find"
+msgstr "Найти"
+
+#: tformfindtext.checkcase.caption
+msgctxt "tformfindtext.checkcase.caption"
+msgid "Match case"
+msgstr "С учетом регистра"
+
+#: tformfindtext.checkloop.caption
+msgctxt "tformfindtext.checkloop.caption"
+msgid "Wrap around"
+msgstr "Обтекание текстом"
+
+#: tformfindtext.labelwhat.caption
+msgctxt "tformfindtext.labelwhat.caption"
+msgid "Find what:"
+msgstr "Что:"
+
+#: tformfindtext.radiodirection.caption
+msgctxt "tformfindtext.radiodirection.caption"
+msgid "Direction"
+msgstr "Направление"
 
 #: tforminputtext.buttoncancel.caption
 msgctxt "tforminputtext.buttoncancel.caption"
@@ -290,3 +333,46 @@ msgstr "Комментарий"
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgid "Date"
 msgstr "Дата"
+
+#: tformreplacetext.buttoncancel.caption
+msgctxt "tformreplacetext.buttoncancel.caption"
+msgid "Cancel"
+msgstr "Отмена"
+
+#: tformreplacetext.buttonreplace.caption
+msgctxt "tformreplacetext.buttonreplace.caption"
+msgid "Replace"
+msgstr "Заменить"
+
+#: tformreplacetext.buttonreplaceall.caption
+msgid "Replace All"
+msgstr "Заменить все"
+
+#: tformreplacetext.buttonsearch.caption
+msgctxt "tformreplacetext.buttonsearch.caption"
+msgid "Find Next"
+msgstr "Найти далее"
+
+#: tformreplacetext.caption
+msgctxt "tformreplacetext.caption"
+msgid "Replace"
+msgstr "Заменить"
+
+#: tformreplacetext.checkcase.caption
+msgctxt "tformreplacetext.checkcase.caption"
+msgid "Match case"
+msgstr "С учетом регистра"
+
+#: tformreplacetext.checkloop.caption
+msgctxt "tformreplacetext.checkloop.caption"
+msgid "Wrap around"
+msgstr "Обтекание текстом"
+
+#: tformreplacetext.labelwhat.caption
+msgctxt "tformreplacetext.labelwhat.caption"
+msgid "Find what:"
+msgstr "Что:"
+
+#: tformreplacetext.labelwith.caption
+msgid "Replace with:"
+msgstr "Чем:"

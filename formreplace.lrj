@@ -1,0 +1,11 @@
+{"version":1,"strings":[
+{"hash":147269573,"name":"tformreplacetext.caption","sourcebytes":[82,101,112,108,97,99,101],"value":"Replace"},
+{"hash":108607546,"name":"tformreplacetext.labelwhat.caption","sourcebytes":[70,105,110,100,32,119,104,97,116,58],"value":"Find what:"},
+{"hash":73728500,"name":"tformreplacetext.buttonsearch.caption","sourcebytes":[70,105,110,100,32,78,101,120,116],"value":"Find Next"},
+{"hash":77089212,"name":"tformreplacetext.buttoncancel.caption","sourcebytes":[67,97,110,99,101,108],"value":"Cancel"},
+{"hash":161718325,"name":"tformreplacetext.checkcase.caption","sourcebytes":[77,97,116,99,104,32,99,97,115,101],"value":"Match case"},
+{"hash":114812004,"name":"tformreplacetext.checkloop.caption","sourcebytes":[87,114,97,112,32,97,114,111,117,110,100],"value":"Wrap around"},
+{"hash":263925114,"name":"tformreplacetext.labelwith.caption","sourcebytes":[82,101,112,108,97,99,101,32,119,105,116,104,58],"value":"Replace with:"},
+{"hash":147269573,"name":"tformreplacetext.buttonreplace.caption","sourcebytes":[82,101,112,108,97,99,101],"value":"Replace"},
+{"hash":131039500,"name":"tformreplacetext.buttonreplaceall.caption","sourcebytes":[82,101,112,108,97,99,101,32,65,108,108],"value":"Replace All"}
+]}

@@ -158,6 +158,20 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
+      <Unit>
+        <Filename Value="formfind.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="formFindText"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="formreplace.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="formReplaceText"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

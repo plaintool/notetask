@@ -1,6 +1,14 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
+#: formfind.rdirectiondown
+msgid "Down"
+msgstr ""
+
+#: formfind.rdirectionup
+msgid "Up"
+msgstr ""
+
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"
@@ -57,6 +65,41 @@ msgstr ""
 
 #: mainform.runtitled
 msgid "Untitled"
+msgstr ""
+
+#: tformfindtext.buttoncancel.caption
+msgctxt "tformfindtext.buttoncancel.caption"
+msgid "Cancel"
+msgstr ""
+
+#: tformfindtext.buttonsearch.caption
+msgctxt "tformfindtext.buttonsearch.caption"
+msgid "Find Next"
+msgstr ""
+
+#: tformfindtext.caption
+msgctxt "tformfindtext.caption"
+msgid "Find"
+msgstr ""
+
+#: tformfindtext.checkcase.caption
+msgctxt "tformfindtext.checkcase.caption"
+msgid "Match case"
+msgstr ""
+
+#: tformfindtext.checkloop.caption
+msgctxt "tformfindtext.checkloop.caption"
+msgid "Wrap around"
+msgstr ""
+
+#: tformfindtext.labelwhat.caption
+msgctxt "tformfindtext.labelwhat.caption"
+msgid "Find what:"
+msgstr ""
+
+#: tformfindtext.radiodirection.caption
+msgctxt "tformfindtext.radiodirection.caption"
+msgid "Direction"
 msgstr ""
 
 #: tforminputtext.buttoncancel.caption
@@ -279,5 +322,48 @@ msgstr ""
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgid "Date"
+msgstr ""
+
+#: tformreplacetext.buttoncancel.caption
+msgctxt "tformreplacetext.buttoncancel.caption"
+msgid "Cancel"
+msgstr ""
+
+#: tformreplacetext.buttonreplace.caption
+msgctxt "tformreplacetext.buttonreplace.caption"
+msgid "Replace"
+msgstr ""
+
+#: tformreplacetext.buttonreplaceall.caption
+msgid "Replace All"
+msgstr ""
+
+#: tformreplacetext.buttonsearch.caption
+msgctxt "tformreplacetext.buttonsearch.caption"
+msgid "Find Next"
+msgstr ""
+
+#: tformreplacetext.caption
+msgctxt "tformreplacetext.caption"
+msgid "Replace"
+msgstr ""
+
+#: tformreplacetext.checkcase.caption
+msgctxt "tformreplacetext.checkcase.caption"
+msgid "Match case"
+msgstr ""
+
+#: tformreplacetext.checkloop.caption
+msgctxt "tformreplacetext.checkloop.caption"
+msgid "Wrap around"
+msgstr ""
+
+#: tformreplacetext.labelwhat.caption
+msgctxt "tformreplacetext.labelwhat.caption"
+msgid "Find what:"
+msgstr ""
+
+#: tformreplacetext.labelwith.caption
+msgid "Replace with:"
 msgstr ""
 

@@ -1,0 +1,82 @@
+object formFindText: TformFindText
+  Left = 318
+  Height = 129
+  Top = 250
+  Width = 371
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsSingle
+  Caption = 'Find'
+  ClientHeight = 129
+  ClientWidth = 371
+  FormStyle = fsStayOnTop
+  OnCreate = FormCreate
+  object labelWhat: TLabel
+    Left = 8
+    Height = 15
+    Top = 11
+    Width = 55
+    Caption = 'Find what:'
+  end
+  object editSearch: TEdit
+    Left = 72
+    Height = 23
+    Top = 8
+    Width = 200
+    TabOrder = 0
+  end
+  object buttonSearch: TButton
+    Left = 280
+    Height = 23
+    Top = 8
+    Width = 84
+    Caption = 'Find Next'
+    TabOrder = 1
+  end
+  object buttonCancel: TButton
+    Left = 280
+    Height = 23
+    Top = 37
+    Width = 84
+    Caption = 'Cancel'
+    TabOrder = 2
+  end
+  object radioDirection: TRadioGroup
+    Left = 152
+    Height = 45
+    Top = 37
+    Width = 120
+    AutoFill = True
+    Caption = 'Direction'
+    ChildSizing.LeftRightSpacing = 6
+    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+    ChildSizing.EnlargeVertical = crsHomogenousChildResize
+    ChildSizing.ShrinkHorizontal = crsScaleChilds
+    ChildSizing.ShrinkVertical = crsScaleChilds
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 2
+    ClientHeight = 25
+    ClientWidth = 116
+    Columns = 2
+    Items.Strings = (
+      'Up'
+      'Down'
+    )
+    TabOrder = 3
+  end
+  object checkCase: TCheckBox
+    Left = 10
+    Height = 19
+    Top = 77
+    Width = 78
+    Caption = 'Match case'
+    TabOrder = 4
+  end
+  object checkLoop: TCheckBox
+    Left = 10
+    Height = 19
+    Top = 101
+    Width = 87
+    Caption = 'Wrap around'
+    TabOrder = 5
+  end
+end

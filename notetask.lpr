@@ -17,7 +17,9 @@ uses
   task,
   settings,
   systemtool,
-  forminput;
+  forminput,
+  formfind,
+  formreplace;
 
   {$R *.res}
 
@@ -28,6 +30,8 @@ begin
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
   Application.CreateForm(TformInputText, formInputText);
+  Application.CreateForm(TformFindText, formFindText);
+  Application.CreateForm(TformReplaceText, formReplaceText);
   ApplicationTranslate(GetOSLanguage);
   SetFileTypeIcon('.tsk', 1);
   Application.Run;

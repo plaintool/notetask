@@ -178,6 +178,8 @@ type
     procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState;
       var ABitmap: TBitmap);
     procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
+    procedure aFindExecute(Sender: TObject);
+    procedure aReplaceExecute(Sender: TObject);
   private
     Memo: TMemo;
     FChanged: boolean;
@@ -251,7 +253,7 @@ resourcestring
 
 implementation
 
-uses filemanager, settings, forminput;
+uses filemanager, settings, forminput, formfind, formreplace;
 
   {$R *.lfm}
 
@@ -1529,6 +1531,16 @@ begin
     taskGrid.EditorMode := False;
     FIsEditing := False; // Reset editing flag when exiting
   end;
+end;
+
+procedure TformNotetask.aFindExecute(Sender: TObject);
+begin
+  formFindText.Show;
+end;
+
+procedure TformNotetask.aReplaceExecute(Sender: TObject);
+begin
+  formReplaceText.Show;
 end;
 
 end.
