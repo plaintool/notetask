@@ -14,8 +14,7 @@ function DetectEncoding(const FileName: string): TEncoding;
 
 function GetEncodingName(Encoding: TEncoding): string;
 
-procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
-  out LineEnding: TLineEnding; out LineCount: integer);
+procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding; out LineCount: integer);
 
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
 
@@ -24,13 +23,14 @@ implementation
 function DetectEncoding(const FileName: string): TEncoding;
 var
   FileStream: TFileStream;
-  Buffer: array[0..3] of byte;
+  Buffer: array[0..3] of byte = (0, 0, 0, 0);
   ContentBuffer: array of byte; // Dynamic array
   BytesRead: integer;
   i: integer;
   Utf8Candidate: boolean;
 begin
   Result := TEncoding.UTF8;
+  ContentBuffer := [];
   // Assume UTF-8 by default
   FileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
   try
@@ -101,8 +101,7 @@ begin
     Result := 'Unknown';
 end;
 
-procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
-  out LineEnding: TLineEnding; out LineCount: integer);
+procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding; out LineCount: integer);
 var
   StringList: TStringList;
 begin
@@ -163,7 +162,7 @@ begin
         LineWithEnding := StringList[i];
 
       // Convert the string to bytes with the specified encoding
-      Bytes := FileEncoding.GetBytes(LineWithEnding);
+      Bytes := FileEncoding.GetBytes(unicodestring(LineWithEnding));
       FileStream.WriteBuffer(Bytes[0], Length(Bytes)); // Write bytes to the file
     end;
   finally

@@ -53,7 +53,7 @@ end;
 function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;
 var
   i, MaxLen, SubLen: SizeInt;
-  SubFirst: widechar;
+  // SubFirst: widechar;
   pc: pwidechar;
 begin
   Result := 0; // Initialize result to 0 (not found)
@@ -63,7 +63,7 @@ begin
   if (SubLen > 0) and (Offset > 0) and (Offset <= SizeUint(Length(S))) then
   begin
     MaxLen := Length(S) - SubLen + 1; // Adjust max starting index to include end of the string
-    SubFirst := SubStr[1]; // Get the first character of the substring
+    // SubFirst := SubStr[1]; // Get the first character of the substring
 
     // Search backwards, starting from Offset
     for i := Offset downto 1 do

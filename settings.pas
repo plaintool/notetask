@@ -12,9 +12,9 @@ uses
   fpjson,
   Grids,
   Graphics,
-  mainform,
+  mainform
   {$IFDEF Windows}
-  Registry
+  ,Registry
   {$ENDIF}
   ;
 
@@ -92,6 +92,7 @@ var
   FileContent: string;
 begin
   Result := False;
+  FileContent := string.Empty;
   FileName := GetSettingsDirectory('form_settings.json'); // Get the settings file name
   if not FileExists(FileName) then Exit; // Exit if the file does not exist
 
@@ -149,7 +150,8 @@ end;
 procedure SaveGridSettings(Grid: TStringGrid);
 var
   JSONObj: TJSONObject;
-  ColumnArray, RowArray: TJSONArray;
+  ColumnArray: TJSONArray;
+  // RowArray: TJSONArray;
   i: integer;
   FileName: string;
 begin
@@ -157,14 +159,14 @@ begin
   ForceDirectories(GetSettingsDirectory);
   JSONObj := TJSONObject.Create;
   ColumnArray := TJSONArray.Create;
-  RowArray := TJSONArray.Create;
+  // RowArray := TJSONArray.Create;
 
   // Save column widths
   for i := 0 to Grid.ColCount - 1 do
     ColumnArray.Add(Grid.ColWidths[i]);
 
   // Save row heights
-  //for i := 0 to Grid.RowCount - 1 do
+  //  for i := 0 to Grid.RowCount - 1 do
   //  RowArray.Add(Grid.RowHeights[i]);
 
   JSONObj.Add('ColumnWidths', ColumnArray);
@@ -186,13 +188,15 @@ function LoadGridSettings(Grid: TStringGrid): boolean;
 var
   JSONData: TJSONData;
   JSONObj: TJSONObject;
-  ColumnArray, RowArray: TJSONArray;
+  ColumnArray: TJSONArray;
+  // RowArray: TJSONArray;
   i: integer;
   FileContent: string;
   FileStream: TFileStream;
   FileName: string;
 begin
   Result := False;
+  FileContent := string.Empty;
   FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
   ForceDirectories(GetSettingsDirectory);
   if not FileExists(FileName) then Exit;
@@ -206,14 +210,14 @@ begin
     try
       JSONObj := JSONData as TJSONObject;
       ColumnArray := JSONObj.FindPath('ColumnWidths') as TJSONArray;
-      RowArray := JSONObj.FindPath('RowHeights') as TJSONArray;
+      // RowArray := JSONObj.FindPath('RowHeights') as TJSONArray;
 
       // Set column widths
       for i := 0 to ColumnArray.Count - 1 do
         Grid.ColWidths[i] := ColumnArray.Items[i].AsInteger;
 
       // Set row heights
-      //for i := 0 to RowArray.Count - 1 do
+      //  for i := 0 to RowArray.Count - 1 do
       //  Grid.RowHeights[i] := RowArray.Items[i].AsInteger;
 
       Result := True;

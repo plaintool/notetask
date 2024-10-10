@@ -6,6 +6,7 @@ unit GridPrn;
 interface
 
 uses
+  Forms,
   Classes,
   SysUtils,
   Types,
@@ -136,8 +137,8 @@ type
     function CreatePreviewBitmap(APageNo, APercentage: integer): TBitmap;
     function GetCellText(ACol, ARow: integer): string; virtual;
     procedure Print;
-    function ScaleX(AValue: integer): integer; inline;
-    function ScaleY(AValue: integer): integer; inline;
+    function ScaleX(AValue: integer): integer; //inline;
+    function ScaleY(AValue: integer): integer; //inline;
     property Canvas: TCanvas read GetCanvas;
     property FooterPart[AIndex: TGridPrnHeaderFooterPart]: string read GetFooterPart write SetFooterPart;
     property HeaderPart[AIndex: TGridPrnHeaderFooterPart]: string read GetHeaderPart write SetHeaderPart;
@@ -253,6 +254,8 @@ begin
   case AIndex of
     0..3: Result := FMargins[AIndex] <> 20.0;
     4..5: Result := FMargins[AIndex] <> 10.0;
+    else
+      Result := False;
   end;
 end;
 
@@ -341,6 +344,8 @@ begin
     case FOutputDevice of
       odPrinter: Result := Printer.Canvas;
       odPreview: Result := FPreviewBitmap.Canvas;
+      else
+        Result := nil;
     end
   else
     Result := nil;
@@ -457,9 +462,9 @@ begin
 end;
 
 procedure TGridPrinter.Prepare;
-const
-  Wmm = 210;  // A4 page size
-  Hmm = 297;
+//const
+//Wmm = 210;  // A4 page size
+//Hmm = 297;
 begin
   Printer.Orientation := FOrientation;
 
@@ -669,7 +674,7 @@ var
   P: array[0..2] of TPoint;
 begin
   details := ThemeServices.GetElementDetails(arrtb[ACheckState]);
-  cSize := ThemeServices.GetDetailSize(Details);
+  cSize := ThemeServices.GetDetailSizeForPPI(Details, Screen.PixelsPerInch);
   cSize.cx := ScaleX(cSize.cx);
   cSize.cy := ScaleY(cSize.cy);
   R.Left := (ARect.Left + ARect.Right - cSize.cx) div 2;
@@ -971,6 +976,8 @@ var
   row, col: integer;
   lastPagePrinted: boolean;
 begin
+  x2 := 0;
+  y2 := 0;
   // Print column headers
   PrintColHeaders(ACanvas, AStartCol, AEndCol);
 

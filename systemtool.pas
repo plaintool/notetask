@@ -13,15 +13,15 @@ uses
   DefaultTranslator,
   Translations,
   LResources,
-  LCLTranslator,
+  LCLTranslator
   {$IFDEF Windows}
-  Windows
+  ,Windows
   {$ENDIF}
   {$IFDEF Linux}
-  Unix
+  ,Unix
   {$ENDIF}
   {$IFDEF MacOS}
-  MacOSAll
+  ,MacOSAll
   {$ENDIF}
   ;
 
@@ -43,8 +43,8 @@ var
   success: boolean;
   {$ENDIF}
 begin
-  fbl:=string.Empty;
-  l:=string.Empty;
+  fbl := string.Empty;
+  l := string.Empty;
   {$IFDEF LCLCarbon}
   theLocaleRef := CFLocaleCopyCurrent;
   locale := CFLocaleGetIdentifier(theLocaleRef);

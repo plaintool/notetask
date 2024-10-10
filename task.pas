@@ -78,7 +78,7 @@ type
 
 implementation
 
-uses filemanager, stringtool;
+uses stringtool;
 
   { TTask }
 
@@ -147,36 +147,38 @@ end;
 
 function TTask.ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string;
 var
-  TaskString: string;
-  CompletionStatus: string;
-  CommentPart: string;
+  TextString: string;
+  DoneString: string;
+  CommentString: string;
 begin
   // Replace line breaks from task desctioption and comment
-  TaskString := StringReplace(Text, sLineBreak, '<br>', [rfReplaceAll]);
+  TextString := StringReplace(Text, sLineBreak, '<br>', [rfReplaceAll]);
   Comment := StringReplace(Comment, sLineBreak, '<br>', [rfReplaceAll]);
 
   // Add '~~' for archived tasks
   if (FArchive) then
-    TaskString := '~~' + TaskString + '~~';
+    TextString := '~~' + TextString + '~~';
 
   // Check completion
   if Done then
-    CompletionStatus := '- [x]'
+    DoneString := '- [x]'
   else
   if AddEmptyCompletion then
-    CompletionStatus := '- [ ]';
+    DoneString := '- [ ]'
+  else
+    DoneString := string.Empty;
 
   // Check comments
   if Comment <> string.Empty then
-    CommentPart := ' *// ' + Comment + '*'
+    CommentString := ' *// ' + Comment + '*'
   else
-    CommentPart := string.Empty;
+    CommentString := string.Empty;
 
   // Form the task string based on the provided Col
   case Col of
-    1: Result := CompletionStatus; // Returning only the completion status
-    2: Result := TaskString; // Returning only the task string
-    3: Result := CommentPart; // Returning only the comment
+    1: Result := DoneString; // Returning only the completion status
+    2: Result := TextString; // Returning only the task string
+    3: Result := CommentString; // Returning only the comment
     4:
       if Date > 0 then
         Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Date).Trim
@@ -185,10 +187,10 @@ begin
     else
       // Forming the task string considering the completion date and comment
       if Date > 0 then
-        Result := Format('%s %s, %s%s', [CompletionStatus, FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
-          FormatSettings.LongTimeFormat, Date), TaskString, CommentPart]).Trim
+        Result := Format('%s %s, %s%s', [DoneString, FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Date),
+          TextString, CommentString]).Trim
       else
-        Result := Format('%s %s%s', [CompletionStatus, TaskString, CommentPart]).Trim;
+        Result := Format('%s %s%s', [DoneString, TextString, CommentString]).Trim;
   end;
 end;
 
@@ -310,6 +312,7 @@ end;
 
 function TTasks.GetTaskValue(ACol, aRow: integer): string;
 begin
+  Result := string.Empty;
   if ACol = 1 then
     if GetTask(aRow).FDone then Result := '1'
     else
@@ -373,7 +376,7 @@ var
 begin
   Ind := Map(Index);
   if (Ind < 0) and (Ind >= FCount) then
-    exit;
+    exit(-1);
 
   if (Backup) then
     CreateBackup;
@@ -633,6 +636,7 @@ var
   Index, i, j: integer;
   //  Id, Id0, Id1: integer;
 begin
+  Result := Grid.Selection;
   if Clipboard.AsText = string.Empty then exit;
   CreateBackup;
 
@@ -932,6 +936,8 @@ var
   i: integer;
   TempTaskList: array of TTask;
 begin
+  TempTaskList := [];
+
   // Make an intermediate backup of the current task list
   SetLength(TempTaskList, Length(FTaskList));
   for i := 0 to High(TempTaskList) do

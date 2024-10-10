@@ -24,7 +24,6 @@ uses
   ExtDlgs,
   Process,
   StrUtils,
-  LMessages,
   GridPrn,
   task,
   lineending;
@@ -251,6 +250,7 @@ var
   formNotetask: TformNotetask;
   Tasks: TTasks; // Tasks collection
   clRowHighlight: TColor;
+  clRowExpired: TColor;
   ResourceBitmapCheck: TBitmap;
   ResourceBitmapUncheck: TBitmap;
 
@@ -287,6 +287,7 @@ begin
   FShowStatusBar := True;
   FSortOrder := soAscending;
   clRowHighlight := RGBToColor(210, 230, 255);
+  clRowExpired := RGBToColor(255, 220, 220);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
@@ -335,6 +336,7 @@ procedure TformNotetask.ClearSelected(ShowConfirm: boolean = True);
 var
   Confirm: integer;
 begin
+  Confirm := mrYes;
   // Show confirm delete dialog
   if (ShowConfirm) then
     Confirm := MessageDlg(rclearconfirm, mtConfirmation, [mbYes, mbNo], 0);
@@ -366,6 +368,8 @@ begin
     RowIndex := aRow;
   if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
   begin
+    Confirm := mrYes;
+
     // Show confirm delete dialog
     if (ShowConfirm) then
       Confirm := MessageDlg(rdeleteconfirm, mtConfirmation, [mbYes, mbNo], 0);
@@ -389,6 +393,8 @@ begin
   // If multiple rows are selected
   if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
   begin
+    Confirm := mrYes;
+
     // Request confirmation for deletion
     if (ShowConfirm) then
       Confirm := MessageDlg(rdeletesconfirm, mtConfirmation, [mbYes, mbNo], 0);
@@ -1377,6 +1383,7 @@ var
   drawrect: TRect;
   bgFill: TColor;
   flags: cardinal;
+  task: TTask;
 begin
   grid := Sender as TStringGrid;
 
@@ -1405,8 +1412,17 @@ begin
     end
     else
     begin
-      bgFill := clWhite;
-      grid.Canvas.Font.Color := clBlack;
+      task := Tasks.GetTask(ARow);
+      if (not task.Done) and (task.Date > 0) and (task.Date < Now) then
+      begin
+        bgFill := clRowExpired;
+        grid.Canvas.Font.Color := clBlack;
+      end
+      else
+      begin
+        bgFill := clWhite;
+        grid.Canvas.Font.Color := clBlack;
+      end;
     end;
 
     if (aCol = 2) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).Archive) then
