@@ -664,6 +664,7 @@ begin
   begin
     index := 1;
     Rect := Grid.Selection; // Get grid selection rect
+
     for i := Rect.Top to Rect.Bottom do
     begin
       if (index > TempTasks.FCount) then Index := 1;
@@ -729,10 +730,23 @@ begin
       end;
       Inc(index);
     end;
-    if (TempTasks.Count < Rect.Height) then
-      Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom - (Rect.Height - TempTasks.Count) - 1)
+
+    // Insert if clipboard is bigger than selection
+    if index - 1 < TempTasks.FCount then
+    begin
+      for i := TempTasks.FCount - 1 downto index - 1 do
+      begin
+        InsertTask(TempTasks.GetTask(i + 1).ToString(), Grid.Row, False);
+      end;
+      Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom + (TempTasks.Count - Index) + 1);
+    end
     else
-      Result := Rect;
+    begin
+      if (TempTasks.Count < Rect.Height) then
+        Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom - (Rect.Height - TempTasks.Count) - 1)
+      else
+        Result := Rect;
+    end;
   end;
 end;
 
