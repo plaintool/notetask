@@ -1,6 +1,7 @@
 unit formreplace;
 
 {$mode ObjFPC}{$H+}
+{$codepage utf8}
 
 interface
 

@@ -1,6 +1,7 @@
 program notetask;
 
 {$mode objfpc}{$H+}
+{$codepage utf8}
 
 uses
   {$IFDEF UNIX}

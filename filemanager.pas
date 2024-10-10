@@ -1,6 +1,7 @@
 unit filemanager;
 
 {$mode ObjFPC}{$H+}
+{$codepage utf8}
 
 interface
 

@@ -1,6 +1,7 @@
 unit settings;
 
 {$mode ObjFPC}{$H+}
+{$codepage utf8}
 
 interface
 

@@ -1,6 +1,7 @@
 unit lineending;
 
 {$mode ObjFPC}{$H+}
+{$codepage utf8}
 
 interface
 

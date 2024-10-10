@@ -11,6 +11,7 @@ object formReplaceText: TformReplaceText
   FormStyle = fsStayOnTop
   KeyPreview = True
   OnKeyDown = FormKeyDown
+  LCLVersion = '3.6.0.0'
   object labelWhat: TLabel
     Left = 10
     Height = 15

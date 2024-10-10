@@ -1,6 +1,7 @@
 unit mainform;
 
 {$mode objfpc}{$H+}
+{$codepage utf8}
 
 interface
 
@@ -22,6 +23,7 @@ uses
   LCLType,
   ExtDlgs,
   Process,
+  StrUtils,
   GridPrn,
   task,
   lineending;
@@ -1425,7 +1427,7 @@ begin
   end;
   Memo.Font.Name := taskGrid.Font.Name;
   Memo.Font.Size := taskGrid.Font.Size;
-  Memo.HideSelection := True;
+  Memo.HideSelection := False;
   Memo.TabStop := False;
   Memo.WantTabs := True;
   Memo.BorderStyle := bsNone;
@@ -1437,7 +1439,9 @@ begin
   Memo.Parent := taskGrid;
   Memo.OnChange := @MemoChange; // Event
   Memo.Text := taskGrid.Cells[aCol, aRow];
-  Memo.CaretPos := Point(Length(Memo.Text), 0);
+  Memo.SelStart := Length(Memo.Text);
+  Memo.SelLength := 0;
+  //  Memo.CaretPos := Point(Length(Memo.Text), 0);
 
   Editor := Memo;
 
@@ -1567,20 +1571,86 @@ end;
 
 procedure TformNotetask.aFindNextExecute(Sender: TObject);
 begin
-  Find(FindText, MatchCase, WrapAround, True);
+  FindText := 'меню';
+  if (FindText <> string.Empty) then
+    Find(FindText, MatchCase, WrapAround, True);
 end;
 
 procedure TformNotetask.aFindPrevExecute(Sender: TObject);
 begin
-  Find(FindText, MatchCase, WrapAround, False);
+  if (FindText <> string.Empty) then
+    Find(FindText, MatchCase, WrapAround, False);
 end;
 
 function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean): boolean;
-begin
-  FindText:=aText;
-  MatchCase:=aMatchCase;
-  WrapAround:=aWrapAround;
 
+  function FindMemo(const mText: string): boolean;
+  var
+    SelEnd, FindPos: integer;
+  begin
+    // Start searching from the current cursor position
+    SelEnd := Memo.SelStart + Memo.SelLength;
+
+    // Find the position of the search text, starting from SelEnd
+    if (MatchCase) then
+      FindPos := PosEx(unicodestring(mText), unicodestring(Memo.Text), SelEnd + 2)
+    else
+      FindPos := PosEx(LowerCase(unicodestring(mText)), LowerCase(unicodestring(Memo.Text)), SelEnd + 2);
+
+    // If the text is found
+    if FindPos > 0 then
+    begin
+      // Select the found text
+      Memo.SelStart := FindPos - 1;
+      Memo.SelLength := Length(unicodestring(mText));
+      Result := True;  // Return True, text is found
+    end
+    else
+    begin
+      // Text is not found
+      Result := False; // Return False, text is not found
+    end;
+  end;
+
+begin
+  FindText := aText;
+  MatchCase := aMatchCase;
+  WrapAround := aWrapAround;
+
+  if taskGrid.Col = 1 then taskGrid.Col := 2;
+  taskGrid.EditorMode := True;
+  Memo.SelLength := 0;
+
+  try
+    repeat
+
+      if (assigned(Memo)) and (Pos(aText, Memo.Text) > 0) then
+      begin
+        if (FindMemo(aText)) then
+          Break;
+      end;
+
+      if (taskGrid.Col < 4) then
+      begin
+        taskGrid.Col := taskGrid.Col + 1;
+        taskGrid.EditorMode := True;
+        Memo.SelStart := 0;
+        Memo.SelLength := 0;
+      end
+      else
+      begin
+        if taskGrid.Row < taskGrid.RowCount then
+        begin
+          taskGrid.Row := taskGrid.Row + 1;
+          taskGrid.col := 2;
+          taskGrid.EditorMode := True;
+          Memo.SelStart := 0;
+          Memo.SelLength := 0;
+        end;
+      end;
+    until taskGrid.Row = taskGrid.RowCount - 1;
+  finally
+  end;
 end;
 
 function TformNotetask.Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;

@@ -1,6 +1,7 @@
 unit forminput;
 
 {$mode ObjFPC}{$H+}
+{$codepage utf8}
 
 interface
 

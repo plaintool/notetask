@@ -43,6 +43,7 @@
           <Parsing>
             <SyntaxOptions>
               <IncludeAssertionCode Value="True"/>
+              <UseAnsiStrings Value="False"/>
             </SyntaxOptions>
           </Parsing>
           <CodeGeneration>
