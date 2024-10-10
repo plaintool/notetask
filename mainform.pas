@@ -47,14 +47,14 @@ type
     aPaste: TAction;
     aCut: TAction;
     aUndo: TAction;
-    AShowArchived: TAction;
+    aShowArchived: TAction;
     aShowStatusBar: TAction;
     aMoveTaskBottom: TAction;
     aMoveTaskDown: TAction;
     aMoveTaskUp: TAction;
     aInsertTask: TAction;
     aMoveTaskTop: TAction;
-    ADeleteTasks: TAction;
+    aDeleteTasks: TAction;
     aWordWrap: TAction;
     aFont: TAction;
     aExit: TAction;
@@ -129,12 +129,34 @@ type
     Separator8: TMenuItem;
     statusBar: TStatusBar;
     taskGrid: TStringGrid;
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure FormResize(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
+    procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
+    procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+    procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+    procedure taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
+    procedure taskGridEditButtonClick(Sender: TObject);
+    procedure taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
+    procedure taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
+    procedure taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure taskGridMouseLeave(Sender: TObject);
+    procedure taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
+    procedure taskGridResize(Sender: TObject);
+    procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
+    procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
+    procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState; var ABitmap: TBitmap);
+    procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
     procedure aArchiveTasksExecute(Sender: TObject);
     procedure aCopyExecute(Sender: TObject);
     procedure aCutExecute(Sender: TObject);
     procedure aDateTimeExecute(Sender: TObject);
     procedure aDeleteExecute(Sender: TObject);
-    procedure ADeleteTasksExecute(Sender: TObject);
+    procedure aDeleteTasksExecute(Sender: TObject);
     procedure aExitExecute(Sender: TObject);
     procedure aFontExecute(Sender: TObject);
     procedure aGoToExecute(Sender: TObject);
@@ -152,33 +174,11 @@ type
     procedure aSaveAsExecute(Sender: TObject);
     procedure aSaveExecute(Sender: TObject);
     procedure aSelectAllExecute(Sender: TObject);
-    procedure AShowArchivedExecute(Sender: TObject);
+    procedure aShowArchivedExecute(Sender: TObject);
     procedure aShowStatusBarExecute(Sender: TObject);
     procedure aUndoAllExecute(Sender: TObject);
     procedure aUndoExecute(Sender: TObject);
     procedure aWordWrapExecute(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure FormResize(Sender: TObject);
-    procedure FormShow(Sender: TObject);
-    procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
-    procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-    procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-    procedure taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
-    procedure taskGridEditButtonClick(Sender: TObject);
-    procedure taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
-    procedure taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
-    procedure taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure taskGridMouseLeave(Sender: TObject);
-    procedure taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
-    procedure taskGridResize(Sender: TObject);
-    procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
-    procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
-    procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState; var ABitmap: TBitmap);
-    procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
     procedure aFindExecute(Sender: TObject);
     procedure aReplaceExecute(Sender: TObject);
     procedure aFindNextExecute(Sender: TObject);
@@ -330,6 +330,957 @@ begin
   Tasks.Free;
   ResourceBitmapCheck.Free;
   ResourceBitmapUncheck.Free;
+end;
+
+procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+begin
+  if Screen.ActiveForm <> Self then
+  begin
+    Key := 0;
+    Exit;
+  end;
+
+  if (ssCtrl in Shift) and (Key = VK_DELETE) then // Ctrl + Del
+  begin
+    if not IsEditing then
+      DeleteTasks;
+    Key := 0;
+  end
+  else
+  if (Key = VK_F2) then // F2
+  begin
+    EditComplite;
+    EditCell(taskGrid.Col, taskGrid.Row);
+    Key := 0;
+  end
+  else
+  if (Key = VK_DELETE) then // Del
+  begin
+    aDelete.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (not (ssShift in Shift)) and (Key = VK_Z) then // Ctrl + Z
+  begin
+    aUndo.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
+  begin
+    aCut.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
+  begin
+    aCopy.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
+  begin
+    aPaste.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
+  begin
+    aSelectAll.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_F) then // Ctrl + F
+  begin
+    aFind.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_PRIOR) then // Ctrl + Page Up
+  begin
+    aMoveTaskTop.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_NEXT) then // Ctrl + Page Down
+  begin
+    aMoveTaskBottom.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_UP) then // Ctrl + Up
+  begin
+    aMoveTaskUp.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_DOWN) then // Ctrl + Down
+  begin
+    aMoveTaskDown.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl, ssShift]) and (Key = VK_UP) then // Ctrl + Shift + Up
+  begin
+    if IsEditing then
+    begin
+      EditComplite;
+      if taskGrid.Row > 0 then
+        taskGrid.Row := taskGrid.Row - 1;
+      Key := 0;
+    end;
+  end
+  else
+  if (Shift = [ssCtrl, ssShift]) and (Key = VK_DOWN) then // Ctrl + Shift + Down
+  begin
+    if IsEditing then
+    begin
+      EditComplite;
+      if (taskGrid.Row < taskGrid.RowCount - 1) then
+        taskGrid.Row := taskGrid.Row + 1;
+      Key := 0;
+    end;
+  end
+  else
+  if (Key = VK_SPACE) then // Space
+  begin
+    if not IsEditing then
+    begin
+      CompleteTasks;
+      Key := 0;
+    end;
+  end
+  else
+  if (Key = VK_ESCAPE) then // Escape
+  begin
+    if IsEditing then
+      EditComplite;
+    Key := 0;
+  end
+  else
+  if ((Shift = [ssCtrl]) or not FWordWrap) and (Key = VK_RETURN) then // Ctrl + Enter
+  begin
+    if IsEditing then
+    begin
+      EditComplite;
+      Key := 0;
+    end;
+  end;
+end;
+
+procedure TformNotetask.FormResize(Sender: TObject);
+begin
+  taskGridResize(Sender);
+end;
+
+procedure TformNotetask.FormShow(Sender: TObject);
+begin
+  SetCaption;
+end;
+
+procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+begin
+  CanClose := IsCanClose;
+end;
+
+procedure TformNotetask.taskGridEditButtonClick(Sender: TObject);
+var
+  Col, Row: integer;
+  CellRect: TRect;
+  CalendarX, CalendarY: integer;
+begin
+  // Get the current column and row
+  Col := taskGrid.Col;
+  Row := taskGrid.Row;
+
+  // Get the rectangle of the cell
+  CellRect := taskGrid.CellRect(Col, Row);
+
+  // Calculate the position for the calendar dialog
+  CalendarX := CellRect.CenterPoint.X; // Position to the left of the cell
+  CalendarY := CellRect.CenterPoint.Y; // Position below the cell
+
+  // Set the position of the calendar dialog
+  calendarDialog.Left := CalendarX + Left;
+  calendarDialog.Top := CalendarY + Top;
+
+  if calendarDialog.Execute then
+  begin
+    // Set the selected date in the corresponding cell
+    taskGrid.Cells[Col, Row] := DateToStr(calendarDialog.Date);
+  end;
+end;
+
+procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
+begin
+  EditComplite;
+  if IsColumn then
+  begin
+    if (FSortColumn <> Index) then
+      SortOrder := soAscending
+    else
+    if SortOrder = soAscending then
+      SortOrder := soDescending
+    else
+      SortOrder := soAscending;
+
+    FSortColumn := Index;
+
+    FillGrid;
+
+    aMoveTaskTop.Enabled := SortColumn = 0;
+    aMoveTaskBottom.Enabled := SortColumn = 0;
+    aMoveTaskUp.Enabled := SortColumn = 0;
+    aMoveTaskDown.Enabled := SortColumn = 0;
+  end
+  else
+  begin
+    // Set row when clicked on begining of row
+    taskGrid.Row := index;
+  end;
+end;
+
+procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
+begin
+  SetChanged;
+  if (aState = cbChecked) then
+  begin
+    if (taskGrid.Cells[4, aRow] = '') then
+      taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
+  end;
+  Tasks.SetTask(taskGrid, aRow, aCol);
+end;
+
+procedure TformNotetask.taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+begin
+  if (not IsColumn) then
+  begin
+    Tasks.AddMap(Tasks.AddTask('[ ]'));
+    taskGrid.Cells[1, tIndex] := '0';
+    FLineCount += 1;
+    SetInfo;
+  end;
+end;
+
+procedure TformNotetask.taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+begin
+  if (not IsColumn) then
+  begin
+    Tasks.DeleteTask(tIndex);
+    FLineCount -= 1;
+    SetInfo;
+  end;
+end;
+
+procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
+begin
+  taskGridResize(Sender);
+  SaveGridSettings(taskGrid);
+end;
+
+procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
+begin
+  FIsSelecting := True;
+end;
+
+procedure TformNotetask.taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  FIsSelecting := False;
+end;
+
+procedure TformNotetask.taskGridMouseLeave(Sender: TObject);
+begin
+  FIsSelecting := False;
+end;
+
+procedure TformNotetask.taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  if (Button = mbRight) and (not IsEditing) then
+    Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
+end;
+
+procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
+begin
+  EditComplite;
+end;
+
+procedure TformNotetask.taskGridResize(Sender: TObject);
+var
+  Rect: TRect;
+begin
+  // Get the cell dimensions
+  Rect := taskGrid.CellRect(taskGrid.Col, taskGrid.Row);
+
+  // Update the size and position of the Memo
+  if Assigned(taskGrid.Editor) and (taskGrid.Editor is TMemo) then
+    TMemo(taskGrid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
+end;
+
+procedure TformNotetask.taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
+var
+  grid: TStringGrid;
+  S: string;
+  drawrect: TRect;
+  bgFill: TColor;
+  flags: cardinal;
+  task: TTask;
+begin
+  grid := Sender as TStringGrid;
+
+  // Border for fixed cells
+  if (aRow < grid.FixedRows) or (aCol < grid.FixedCols) then
+  begin
+    grid.Canvas.Pen.Color := clSilver;
+    grid.Canvas.Pen.Style := psSolid;
+    grid.Canvas.Pen.Width := 1;
+    grid.Canvas.Brush.Style := bsClear;
+    grid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
+  end
+  else
+  begin
+    // Determine background color
+    if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+    begin
+      bgFill := clHighlight;
+      grid.Canvas.Font.Color := clWhite; // Set font color to white when selected
+    end
+    else
+    if gdRowHighlight in aState then
+    begin
+      bgFill := clRowHighlight;
+      grid.Canvas.Font.Color := clBlack;
+    end
+    else
+    begin
+      task := Tasks.GetTask(ARow);
+      if (not task.Done) and (task.Date > 0) and (task.Date < Now) then
+      begin
+        bgFill := clRowExpired;
+        grid.Canvas.Font.Color := clBlack;
+      end
+      else
+      begin
+        bgFill := clWhite;
+        grid.Canvas.Font.Color := clBlack;
+      end;
+    end;
+
+    if (aCol = 2) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).Archive) then
+      grid.Canvas.Font.Style := [fsStrikeOut];
+
+    // Fill the cell background
+    grid.Canvas.Brush.Color := bgFill;
+    grid.canvas.Brush.Style := bsSolid;
+    grid.canvas.fillrect(aRect);
+
+    if (aCol = 1) then
+    begin
+      grid.DefaultDrawCell(aCol, aRow, aRect, aState);
+      exit;
+    end;
+
+    S := grid.Cells[ACol, ARow];
+    if Length(S) > 0 then
+    begin
+      drawrect := aRect;
+      drawrect.Inflate(-4, 0);
+      if (FWordWrap) then
+        flags := dt_calcrect or dt_wordbreak or dt_left
+      else
+        flags := dt_calcrect or dt_left;
+      DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
+
+      if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
+        grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2) // changing the row height fires the event again!
+      else
+      begin
+        drawrect.Right := aRect.Right;
+        if (FWordWrap) then
+          flags := dt_wordbreak or dt_left
+        else
+          flags := dt_left;
+        DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, dt_wordbreak or dt_left);
+      end;
+    end;
+  end;
+end;
+
+procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
+begin
+  if (aCol in [1, 4]) then exit;
+  if (Assigned(Memo)) then Memo.Free;
+
+  Memo := TMemo.Create(Self);
+  Memo.Visible := False;
+  if (taskGrid.IsCellSelected[aCol, aRow]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+  begin
+    Memo.Color := clHighlight;
+    Memo.Font.Color := clWhite;
+  end
+  else
+  begin
+    Memo.Color := clRowHighlight;
+    Memo.Font.Color := clBlack;
+  end;
+  Memo.Font.Name := taskGrid.Font.Name;
+  Memo.Font.Size := taskGrid.Font.Size;
+  Memo.HideSelection := False;
+  Memo.TabStop := False;
+  Memo.WantTabs := True;
+  Memo.BorderStyle := bsNone;
+  Memo.WordWrap := FWordWrap;
+  Memo.WantReturns := FWordWrap;
+  Memo.ScrollBars := ssNone;
+
+  MemoSetBounds(aCol, aRow);
+  Memo.Parent := taskGrid;
+  Memo.OnChange := @MemoChange; // Event
+  Memo.Text := taskGrid.Cells[aCol, aRow];
+  Memo.SelStart := Length(Memo.Text);
+  Memo.SelLength := 0;
+  //  Memo.CaretPos := Point(Length(Memo.Text), 0);
+
+  Editor := Memo;
+
+  if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
+  begin
+    FIsSelecting := False;
+    Memo.Visible := False;
+    FIsEditing := False;
+  end
+  else
+  begin
+    Memo.Visible := True;
+    FIsEditing := True;
+  end;
+end;
+
+procedure TformNotetask.taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState; var ABitmap: TBitmap);
+begin
+  // Check if we're in the correct column
+  if aCol = 1 then
+  begin
+    // Assign the appropriate bitmap based on the CheckedState
+    if CheckedState = cbChecked then
+      ABitmap := ResourceBitmapCheck // Use check bitmap
+    else
+      ABitmap := ResourceBitmapUncheck; // Use uncheck bitmap
+  end;
+end;
+
+procedure TformNotetask.taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
+var
+  DateTime: TDateTime;
+begin
+  if (aCol = 4) then
+  begin
+    if (NewValue <> '') and (not TryStrToDateTime(NewValue, DateTime)) then
+      Abort;
+
+    if (OldValue <> NewValue) then
+    begin
+      SetChanged;
+
+      Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
+      EditComplite(False);
+    end;
+  end;
+end;
+
+procedure TformNotetask.aUndoExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if not IsEditing then
+  begin
+    Tasks.UndoBackup;
+    FillGrid;
+  end
+  else
+  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+    (taskGrid.InplaceEditor as TCustomEdit).Undo;
+end;
+
+procedure TformNotetask.aUndoAllExecute(Sender: TObject);
+var
+  Confirm: TModalResult;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if not IsEditing then
+  begin
+    Confirm := MessageDlg(rundoconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+    if Confirm = mrYes then
+    begin
+      Tasks.UndoBackupInit;
+      FillGrid;
+      ResetRowHeight;
+      Tasks.CreateBackup;
+      SetChanged(False);
+    end;
+  end;
+end;
+
+procedure TformNotetask.aCutExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if not IsEditing then
+  begin
+    Tasks.CopyToClipboard(taskGrid);
+    if (taskGrid.Selection.Width < 3) then
+      ClearSelected(False)
+    else
+      DeleteTasks(False);
+  end
+  else
+  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+    (taskGrid.InplaceEditor as TCustomEdit).CutToClipboard;
+end;
+
+procedure TformNotetask.aCopyExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if not IsEditing then
+    Tasks.CopyToClipboard(taskGrid)
+  else
+  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+    (taskGrid.InplaceEditor as TCustomEdit).CopyToClipboard;
+end;
+
+procedure TformNotetask.aPasteExecute(Sender: TObject);
+var
+  Sel: TGridRect;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if not IsEditing then
+  begin
+    Sel := Tasks.PasteFromClipboard(taskGrid);
+    FillGrid;
+    if (SortColumn = 0) then
+      taskGrid.Selection := Sel;
+    SetChanged;
+  end
+  else
+  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+    (taskGrid.InplaceEditor as TCustomEdit).PasteFromClipboard;
+end;
+
+procedure TformNotetask.aDeleteExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if not IsEditing then
+  begin
+    //    if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+    ClearSelected(False);
+    //    else
+    //      DeleteTask;
+  end
+  else
+  if (taskGrid.InplaceEditor is TCustomEdit) then
+    with taskGrid.InplaceEditor as TCustomEdit do
+    begin
+      if SelLength = 0 then
+      begin
+        SelStart := SelStart;
+        SelLength := 1;
+      end;
+      ClearSelection;
+    end;
+end;
+
+procedure TformNotetask.aSelectAllExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if not IsEditing then
+    taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount)
+  else
+  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+    (taskGrid.InplaceEditor as TCustomEdit).SelectAll;
+end;
+
+procedure TformNotetask.aExitExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  Application.Terminate;
+end;
+
+procedure TformNotetask.aFontExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  fontDialog.Font := Font;
+  if fontDialog.Execute then  // Open the font dialog
+  begin
+    // Apply the selected font to the form
+    Self.Font := fontDialog.Font;
+  end;
+end;
+
+procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  Tasks.InsertTask('[ ]', taskGrid.Row);
+  FillGrid;
+  FLineCount += 1;
+  SetInfo;
+  SetChanged;
+end;
+
+procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
+var
+  newRow: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  newRow := Tasks.MoveTaskTop(taskGrid.Row);
+  FillGrid;
+  if (newRow > -1) then
+  begin
+    SwapRowHeights(taskGrid.Row, newRow);
+    taskGrid.Row := newRow;
+  end;
+  SetChanged;
+end;
+
+procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
+var
+  newRow: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  newRow := Tasks.MoveTaskBottom(taskGrid.Row);
+  FillGrid;
+  if (newRow > -1) then
+  begin
+    SwapRowHeights(taskGrid.Row, newRow);
+    taskGrid.Row := newRow;
+  end;
+  SetChanged;
+end;
+
+procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
+var
+  newRow: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  newRow := Tasks.MoveTaskUp(taskGrid.Row);
+  FillGrid;
+  if (newRow > -1) then
+  begin
+    SwapRowHeights(taskGrid.Row, newRow);
+    taskGrid.Row := newRow;
+  end;
+  SetChanged;
+end;
+
+procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
+var
+  newRow: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  newRow := Tasks.MoveTaskDown(taskGrid.Row);
+  FillGrid;
+  if (newRow > -1) then
+  begin
+    SwapRowHeights(taskGrid.Row, newRow);
+    taskGrid.Row := newRow;
+  end;
+  SetChanged;
+end;
+
+procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  DeleteTasks;
+end;
+
+procedure TformNotetask.aArchiveTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ArchiveTasks;
+end;
+
+procedure TformNotetask.aDateTimeExecute(Sender: TObject);
+var
+  PosStart: integer;
+  CurrentDateTime: string;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  CurrentDateTime := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
+  if IsEditing then
+  begin
+    if (taskGrid.Col = 4) then
+    begin
+      taskGrid.Cells[4, taskGrid.Row] := CurrentDateTime;
+    end
+    else
+    begin
+      PosStart := Memo.SelStart;
+      Memo.SelText := CurrentDateTime;
+      Memo.SelStart := PosStart + Length(CurrentDateTime);
+    end;
+    SetChanged;
+  end
+  else
+  begin
+    if (taskGrid.Col > 0) then
+    begin
+      if taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim = string.Empty then
+        taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
+      else
+        taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
+      SetChanged;
+    end;
+  end;
+end;
+
+procedure TformNotetask.aNewExecute(Sender: TObject);
+begin
+  if IsCanClose then
+  begin
+    Tasks := TTasks.Create();
+    SetChanged(False);
+    EditComplite;
+    FFileName := string.Empty;
+    FEncoding := TEncoding.UTF8;
+    FLineEnding := FLineEnding.WindowsCRLF;
+    taskGrid.Clean;
+    taskGrid.RowCount := 2;
+    FLineCount := 1;
+
+    Tasks.InitMap(1);
+    Tasks.AddMap(Tasks.AddTask('[ ]'));
+    taskGrid.Cells[1, 1] := '0';
+    SetInfo;
+  end;
+end;
+
+procedure TformNotetask.aNewWindowExecute(Sender: TObject);
+var
+  Process: TProcess;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  Process := TProcess.Create(nil); // Create a new process
+  try
+    Process.Executable := ParamStr(0); // Set the executable to the current application
+    Process.Options := []; // No wait, open and forget
+    Process.Execute; // Execute the new instance
+  finally
+    Process.Free; // Free the process object
+  end;
+end;
+
+procedure TformNotetask.aOpenExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if (IsCanClose) and (openDialog.Execute) then
+  begin
+    OpenFile(openDialog.FileName);
+  end;
+end;
+
+procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  pageSetupDialog.Execute;
+end;
+
+procedure TformNotetask.aPrintExecute(Sender: TObject);
+var
+  gridPrinter: TGridPrinter;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if printDialog.Execute then
+  begin
+    gridPrinter := TGridPrinter.Create(self);
+    try
+      gridPrinter.Grid := taskGrid;
+      gridPrinter.OnGetCellText := @PrinterGetCellText;
+      gridPrinter.OnPrepareCanvas := @PrinterPrepareCanvas;
+      gridPrinter.Orientation := Printer.Orientation;
+      gridPrinter.Margins.LeftMargin := pageSetupDialog.MarginLeft / 100;
+      gridPrinter.Margins.RightMargin := pageSetupDialog.MarginRight / 100;
+      gridPrinter.Margins.TopMargin := pageSetupDialog.MarginTop / 100;
+      gridPrinter.Margins.BottomMargin := pageSetupDialog.MarginBottom / 100;
+      gridPrinter.FixedLineColor := clSilver;
+      gridPrinter.BorderLineColor := clSilver;
+      gridPrinter.FooterLineColor := clSilver;
+      gridPrinter.GridLineColor := clSilver;
+      gridPrinter.HeaderLineColor := clSilver;
+
+      gridPrinter.Print;
+    finally
+      gridPrinter.Free;
+    end;
+  end;
+end;
+
+procedure TformNotetask.aSaveAsExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if (saveDialog.Execute) then
+  begin
+    SaveFile(saveDialog.FileName);
+  end;
+end;
+
+procedure TformNotetask.aSaveExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  SaveFile(FFileName);
+end;
+
+procedure TformNotetask.aShowArchivedExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowArchived := aShowArchived.Checked;
+end;
+
+procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowStatusBar := aShowStatusBar.Checked;
+end;
+
+procedure TformNotetask.aWordWrapExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  EditComplite;
+  FWordWrap := aWordWrap.Checked;
+  ResetRowHeight;
+  Invalidate;
+end;
+
+procedure TformNotetask.aGoToExecute(Sender: TObject);
+var
+  rowNum: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  // Create an instance of the form
+  with formInputText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    editText.Text := IntToStr(taskGrid.Row);
+
+    // Show the form as a modal dialog
+    if ShowModal = mrOk then
+    begin
+      // Try to convert the entered value to an integer
+      if TryStrToInt(editText.Text, rowNum) then
+      begin
+        // Ensure the entered row is within the valid range
+        if (rowNum >= 1) and (rowNum <= taskGrid.RowCount - 1) then
+        begin
+          // Move to the specified row
+          taskGrid.Row := rowNum;
+        end
+        else
+          ShowMessage(rnumstringtoolarge);
+      end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aFindExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  formFindText.editFind.Text := FindText;
+  if (formFindText.Left = 0) then
+    formFindText.Left := self.Left + 80;
+  if (formFindText.Top = 0) then
+    formFindText.Top := self.top + 100;
+  formFindText.Show;
+end;
+
+procedure TformNotetask.aReplaceExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  formReplaceText.editFind.Text := FindText;
+  if (formReplaceText.Left = 0) then
+    formReplaceText.Left := self.Left + 80;
+  if (formReplaceText.Top = 0) then
+    formReplaceText.Top := self.top + 100;
+  formReplaceText.Show;
+end;
+
+procedure TformNotetask.aFindNextExecute(Sender: TObject);
+begin
+  if (FindText <> string.Empty) then
+    Find(FindText, MatchCase, WrapAround, True)
+  else
+    aFind.Execute;
+end;
+
+procedure TformNotetask.aFindPrevExecute(Sender: TObject);
+begin
+  if (FindText <> string.Empty) then
+    Find(FindText, MatchCase, WrapAround, False)
+  else
+    aFind.Execute;
+end;
+
+procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
+var
+  MyTextStyle: TTextStyle;
+begin
+  if (aCol in [2, 3]) then;
+  begin
+    MyTextStyle := TGridPrinter(Sender).Canvas.TextStyle;
+    MyTextStyle.SingleLine := not FWordWrap;
+    MyTextStyle.Wordbreak := WordWrap;
+    TGridPrinter(Sender).Canvas.TextStyle := MyTextStyle;
+  end;
+end;
+
+procedure TformNotetask.PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
+begin
+  if AGrid is TStringGrid then
+    AText := TStringGrid(AGrid).Cells[ACol, ARow];
+end;
+
+procedure TformNotetask.MemoChange(Sender: TObject);
+begin
+  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
+  Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col, FBackup);
+  SetChanged;
+  MemoSetBounds(taskGrid.Col, taskGrid.Row);
+end;
+
+procedure TformNotetask.MemoSetBounds(aCol: integer; aRow: integer);
+var
+  Rect: TRect;
+begin
+  Application.ProcessMessages;
+  Rect := taskGrid.CellRect(aCol, aRow);
+  Memo.SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 2);
 end;
 
 procedure TformNotetask.ClearSelected(ShowConfirm: boolean = True);
@@ -552,289 +1503,6 @@ begin
   end;
 end;
 
-procedure TformNotetask.aUndoExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if not IsEditing then
-  begin
-    Tasks.UndoBackup;
-    FillGrid;
-  end
-  else
-  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-    (taskGrid.InplaceEditor as TCustomEdit).Undo;
-end;
-
-procedure TformNotetask.aUndoAllExecute(Sender: TObject);
-var
-  Confirm: TModalResult;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if not IsEditing then
-  begin
-    Confirm := MessageDlg(rundoconfirm, mtConfirmation, [mbYes, mbNo], 0);
-
-    if Confirm = mrYes then
-    begin
-      Tasks.UndoBackupInit;
-      FillGrid;
-      ResetRowHeight;
-      Tasks.CreateBackup;
-      SetChanged(False);
-    end;
-  end;
-end;
-
-procedure TformNotetask.aCutExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if not IsEditing then
-  begin
-    Tasks.CopyToClipboard(taskGrid);
-    if (taskGrid.Selection.Width < 3) then
-      ClearSelected(False)
-    else
-      DeleteTasks(False);
-  end
-  else
-  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-    (taskGrid.InplaceEditor as TCustomEdit).CutToClipboard;
-end;
-
-procedure TformNotetask.aCopyExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if not IsEditing then
-    Tasks.CopyToClipboard(taskGrid)
-  else
-  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-    (taskGrid.InplaceEditor as TCustomEdit).CopyToClipboard;
-end;
-
-procedure TformNotetask.aPasteExecute(Sender: TObject);
-var
-  Sel: TGridRect;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if not IsEditing then
-  begin
-    Sel := Tasks.PasteFromClipboard(taskGrid);
-    FillGrid;
-    if (SortColumn = 0) then
-      taskGrid.Selection := Sel;
-    SetChanged;
-  end
-  else
-  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-    (taskGrid.InplaceEditor as TCustomEdit).PasteFromClipboard;
-end;
-
-procedure TformNotetask.aDeleteExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if not IsEditing then
-  begin
-    //    if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
-    ClearSelected(False);
-    //    else
-    //      DeleteTask;
-  end
-  else
-  if (taskGrid.InplaceEditor is TCustomEdit) then
-    with taskGrid.InplaceEditor as TCustomEdit do
-    begin
-      if SelLength = 0 then
-      begin
-        SelStart := SelStart;
-        SelLength := 1;
-      end;
-      ClearSelection;
-    end;
-end;
-
-procedure TformNotetask.aSelectAllExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if not IsEditing then
-    taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount)
-  else
-  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-    (taskGrid.InplaceEditor as TCustomEdit).SelectAll;
-end;
-
-procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-begin
-  if Screen.ActiveForm <> Self then
-  begin
-    Key := 0;
-    Exit;
-  end;
-
-  if (ssCtrl in Shift) and (Key = VK_DELETE) then // Ctrl + Del
-  begin
-    if not IsEditing then
-      DeleteTasks;
-    Key := 0;
-  end
-  else
-  if (Key = VK_F2) then // F2
-  begin
-    EditComplite;
-    EditCell(taskGrid.Col, taskGrid.Row);
-    Key := 0;
-  end
-  else
-  if (Key = VK_DELETE) then // Del
-  begin
-    aDelete.Execute;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (not (ssShift in Shift)) and (Key = VK_Z) then // Ctrl + Z
-  begin
-    aUndo.Execute;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
-  begin
-    aCut.Execute;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
-  begin
-    aCopy.Execute;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
-  begin
-    aPaste.Execute;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
-  begin
-    aSelectAll.Execute;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_F) then // Ctrl + F
-  begin
-    aFind.Execute;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_PRIOR) then // Ctrl + Page Up
-  begin
-    aMoveTaskTop.Execute;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_NEXT) then // Ctrl + Page Down
-  begin
-    aMoveTaskBottom.Execute;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_UP) then // Ctrl + Up
-  begin
-    aMoveTaskUp.Execute;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_DOWN) then // Ctrl + Down
-  begin
-    aMoveTaskDown.Execute;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl, ssShift]) and (Key = VK_UP) then // Ctrl + Shift + Up
-  begin
-    if IsEditing then
-    begin
-      EditComplite;
-      if taskGrid.Row > 0 then
-        taskGrid.Row := taskGrid.Row - 1;
-      Key := 0;
-    end;
-  end
-  else
-  if (Shift = [ssCtrl, ssShift]) and (Key = VK_DOWN) then // Ctrl + Shift + Down
-  begin
-    if IsEditing then
-    begin
-      EditComplite;
-      if (taskGrid.Row < taskGrid.RowCount - 1) then
-        taskGrid.Row := taskGrid.Row + 1;
-      Key := 0;
-    end;
-  end
-  else
-  if (Key = VK_SPACE) then // Space
-  begin
-    if not IsEditing then
-    begin
-      CompleteTasks;
-      Key := 0;
-    end;
-  end
-  else
-  if (Key = VK_ESCAPE) then // Escape
-  begin
-    if IsEditing then
-      EditComplite;
-    Key := 0;
-  end
-  else
-  if ((Shift = [ssCtrl]) or not FWordWrap) and (Key = VK_RETURN) then // Ctrl + Enter
-  begin
-    if IsEditing then
-    begin
-      EditComplite;
-      Key := 0;
-    end;
-  end;
-end;
-
-procedure TformNotetask.aExitExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  Application.Terminate;
-end;
-
-procedure TformNotetask.aFontExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  fontDialog.Font := Font;
-  if fontDialog.Execute then  // Open the font dialog
-  begin
-    // Apply the selected font to the form
-    Self.Font := fontDialog.Font;
-  end;
-end;
-
-procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  Tasks.InsertTask('[ ]', taskGrid.Row);
-  FillGrid;
-  FLineCount += 1;
-  SetInfo;
-  SetChanged;
-end;
-
 procedure TformNotetask.SwapRowHeights(RowIndex1, RowIndex2: integer);
 var
   TempHeight: integer;
@@ -851,254 +1519,6 @@ begin
   taskGrid.RowHeights[RowIndex2] := TempHeight;
 end;
 
-procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
-var
-  newRow: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  newRow := Tasks.MoveTaskTop(taskGrid.Row);
-  FillGrid;
-  if (newRow > -1) then
-  begin
-    SwapRowHeights(taskGrid.Row, newRow);
-    taskGrid.Row := newRow;
-  end;
-  SetChanged;
-end;
-
-procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
-var
-  newRow: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  newRow := Tasks.MoveTaskBottom(taskGrid.Row);
-  FillGrid;
-  if (newRow > -1) then
-  begin
-    SwapRowHeights(taskGrid.Row, newRow);
-    taskGrid.Row := newRow;
-  end;
-  SetChanged;
-end;
-
-procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
-var
-  newRow: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  newRow := Tasks.MoveTaskUp(taskGrid.Row);
-  FillGrid;
-  if (newRow > -1) then
-  begin
-    SwapRowHeights(taskGrid.Row, newRow);
-    taskGrid.Row := newRow;
-  end;
-  SetChanged;
-end;
-
-procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
-var
-  newRow: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  newRow := Tasks.MoveTaskDown(taskGrid.Row);
-  FillGrid;
-  if (newRow > -1) then
-  begin
-    SwapRowHeights(taskGrid.Row, newRow);
-    taskGrid.Row := newRow;
-  end;
-  SetChanged;
-end;
-
-procedure TformNotetask.ADeleteTasksExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  DeleteTasks;
-end;
-
-procedure TformNotetask.aArchiveTasksExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ArchiveTasks;
-end;
-
-procedure TformNotetask.aDateTimeExecute(Sender: TObject);
-var
-  PosStart: integer;
-  CurrentDateTime: string;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  CurrentDateTime := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
-  if IsEditing then
-  begin
-    if (taskGrid.Col = 4) then
-    begin
-      taskGrid.Cells[4, taskGrid.Row] := CurrentDateTime;
-    end
-    else
-    begin
-      PosStart := Memo.SelStart;
-      Memo.SelText := CurrentDateTime;
-      Memo.SelStart := PosStart + Length(CurrentDateTime);
-    end;
-    SetChanged;
-  end
-  else
-  begin
-    if (taskGrid.Col > 0) then
-    begin
-      if taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim = string.Empty then
-        taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
-      else
-        taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
-      SetChanged;
-    end;
-  end;
-end;
-
-procedure TformNotetask.aNewExecute(Sender: TObject);
-begin
-  if IsCanClose then
-  begin
-    Tasks := TTasks.Create();
-    SetChanged(False);
-    EditComplite;
-    FFileName := string.Empty;
-    FEncoding := TEncoding.UTF8;
-    FLineEnding := FLineEnding.WindowsCRLF;
-    taskGrid.Clean;
-    taskGrid.RowCount := 2;
-    FLineCount := 1;
-
-    Tasks.InitMap(1);
-    Tasks.AddMap(Tasks.AddTask('[ ]'));
-    taskGrid.Cells[1, 1] := '0';
-    SetInfo;
-  end;
-end;
-
-procedure TformNotetask.aNewWindowExecute(Sender: TObject);
-var
-  Process: TProcess;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  Process := TProcess.Create(nil); // Create a new process
-  try
-    Process.Executable := ParamStr(0); // Set the executable to the current application
-    Process.Options := []; // No wait, open and forget
-    Process.Execute; // Execute the new instance
-  finally
-    Process.Free; // Free the process object
-  end;
-end;
-
-procedure TformNotetask.aOpenExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if (IsCanClose) and (openDialog.Execute) then
-  begin
-    OpenFile(openDialog.FileName);
-  end;
-end;
-
-procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  pageSetupDialog.Execute;
-end;
-
-procedure TformNotetask.aPrintExecute(Sender: TObject);
-var
-  gridPrinter: TGridPrinter;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if printDialog.Execute then
-  begin
-    gridPrinter := TGridPrinter.Create(self);
-    try
-      gridPrinter.Grid := taskGrid;
-      gridPrinter.OnGetCellText := @PrinterGetCellText;
-      gridPrinter.OnPrepareCanvas := @PrinterPrepareCanvas;
-      gridPrinter.Orientation := Printer.Orientation;
-      gridPrinter.Margins.LeftMargin := pageSetupDialog.MarginLeft / 100;
-      gridPrinter.Margins.RightMargin := pageSetupDialog.MarginRight / 100;
-      gridPrinter.Margins.TopMargin := pageSetupDialog.MarginTop / 100;
-      gridPrinter.Margins.BottomMargin := pageSetupDialog.MarginBottom / 100;
-      gridPrinter.FixedLineColor := clSilver;
-      gridPrinter.BorderLineColor := clSilver;
-      gridPrinter.FooterLineColor := clSilver;
-      gridPrinter.GridLineColor := clSilver;
-      gridPrinter.HeaderLineColor := clSilver;
-
-      gridPrinter.Print;
-    finally
-      gridPrinter.Free;
-    end;
-  end;
-end;
-
-procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
-var
-  MyTextStyle: TTextStyle;
-begin
-  if (aCol in [2, 3]) then;
-  begin
-    MyTextStyle := TGridPrinter(Sender).Canvas.TextStyle;
-    MyTextStyle.SingleLine := not FWordWrap;
-    MyTextStyle.Wordbreak := WordWrap;
-    TGridPrinter(Sender).Canvas.TextStyle := MyTextStyle;
-  end;
-end;
-
-procedure TformNotetask.PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
-begin
-  if AGrid is TStringGrid then
-    AText := TStringGrid(AGrid).Cells[ACol, ARow];
-end;
-
-procedure TformNotetask.aSaveAsExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if (saveDialog.Execute) then
-  begin
-    SaveFile(saveDialog.FileName);
-  end;
-end;
-
-procedure TformNotetask.aSaveExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  SaveFile(FFileName);
-end;
-
-procedure TformNotetask.AShowArchivedExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowArchived := aShowArchived.Checked;
-end;
-
-procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowStatusBar := aShowStatusBar.Checked;
-end;
-
 procedure TformNotetask.SetShowStatusBar(Value: boolean);
 begin
   FShowStatusBar := Value;
@@ -1109,16 +1529,6 @@ procedure TformNotetask.SetShowArchived(Value: boolean);
 begin
   FShowArchived := Value;
   FillGrid;
-end;
-
-procedure TformNotetask.aWordWrapExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  EditComplite;
-  FWordWrap := aWordWrap.Checked;
-  ResetRowHeight;
-  Invalidate;
 end;
 
 function TformNotetask.GetIsEditing: boolean;
@@ -1153,11 +1563,6 @@ begin
   end
   else
     Result := True; // No changes, just close the form
-end;
-
-procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
-begin
-  CanClose := IsCanClose;
 end;
 
 procedure TformNotetask.OpenFile(fileName: string);
@@ -1233,318 +1638,6 @@ begin
   SetCaption;
 end;
 
-procedure TformNotetask.taskGridEditButtonClick(Sender: TObject);
-var
-  Col, Row: integer;
-  CellRect: TRect;
-  CalendarX, CalendarY: integer;
-begin
-  // Get the current column and row
-  Col := taskGrid.Col;
-  Row := taskGrid.Row;
-
-  // Get the rectangle of the cell
-  CellRect := taskGrid.CellRect(Col, Row);
-
-  // Calculate the position for the calendar dialog
-  CalendarX := CellRect.CenterPoint.X; // Position to the left of the cell
-  CalendarY := CellRect.CenterPoint.Y; // Position below the cell
-
-  // Set the position of the calendar dialog
-  calendarDialog.Left := CalendarX + Left;
-  calendarDialog.Top := CalendarY + Top;
-
-  if calendarDialog.Execute then
-  begin
-    // Set the selected date in the corresponding cell
-    taskGrid.Cells[Col, Row] := DateToStr(calendarDialog.Date);
-  end;
-end;
-
-procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
-begin
-  EditComplite;
-  if IsColumn then
-  begin
-    if (FSortColumn <> Index) then
-      SortOrder := soAscending
-    else
-    if SortOrder = soAscending then
-      SortOrder := soDescending
-    else
-      SortOrder := soAscending;
-
-    FSortColumn := Index;
-
-    FillGrid;
-
-    aMoveTaskTop.Enabled := SortColumn = 0;
-    aMoveTaskBottom.Enabled := SortColumn = 0;
-    aMoveTaskUp.Enabled := SortColumn = 0;
-    aMoveTaskDown.Enabled := SortColumn = 0;
-  end
-  else
-  begin
-    // Set row when clicked on begining of row
-    taskGrid.Row := index;
-  end;
-end;
-
-procedure TformNotetask.FormResize(Sender: TObject);
-begin
-  taskGridResize(Sender);
-end;
-
-procedure TformNotetask.FormShow(Sender: TObject);
-begin
-  SetCaption;
-end;
-
-procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
-begin
-  SetChanged;
-  if (aState = cbChecked) then
-  begin
-    if (taskGrid.Cells[4, aRow] = '') then
-      taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
-  end;
-  Tasks.SetTask(taskGrid, aRow, aCol);
-end;
-
-procedure TformNotetask.taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-begin
-  if (not IsColumn) then
-  begin
-    Tasks.AddMap(Tasks.AddTask('[ ]'));
-    taskGrid.Cells[1, tIndex] := '0';
-    FLineCount += 1;
-    SetInfo;
-  end;
-end;
-
-procedure TformNotetask.taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-begin
-  if (not IsColumn) then
-  begin
-    Tasks.DeleteTask(tIndex);
-    FLineCount -= 1;
-    SetInfo;
-  end;
-end;
-
-procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
-begin
-  taskGridResize(Sender);
-  SaveGridSettings(taskGrid);
-end;
-
-procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
-begin
-  FIsSelecting := True;
-end;
-
-procedure TformNotetask.taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-begin
-  FIsSelecting := False;
-end;
-
-procedure TformNotetask.taskGridMouseLeave(Sender: TObject);
-begin
-  FIsSelecting := False;
-end;
-
-procedure TformNotetask.taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-begin
-  if (Button = mbRight) and (not IsEditing) then
-    Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
-end;
-
-procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
-begin
-  EditComplite;
-end;
-
-procedure TformNotetask.taskGridResize(Sender: TObject);
-var
-  Rect: TRect;
-begin
-  // Get the cell dimensions
-  Rect := taskGrid.CellRect(taskGrid.Col, taskGrid.Row);
-
-  // Update the size and position of the Memo
-  if Assigned(taskGrid.Editor) and (taskGrid.Editor is TMemo) then
-    TMemo(taskGrid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
-end;
-
-procedure TformNotetask.taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
-var
-  grid: TStringGrid;
-  S: string;
-  drawrect: TRect;
-  bgFill: TColor;
-  flags: cardinal;
-  task: TTask;
-begin
-  grid := Sender as TStringGrid;
-
-  // Border for fixed cells
-  if (aRow < grid.FixedRows) or (aCol < grid.FixedCols) then
-  begin
-    grid.Canvas.Pen.Color := clSilver;
-    grid.Canvas.Pen.Style := psSolid;
-    grid.Canvas.Pen.Width := 1;
-    grid.Canvas.Brush.Style := bsClear;
-    grid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
-  end
-  else
-  begin
-    // Determine background color
-    if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
-    begin
-      bgFill := clHighlight;
-      grid.Canvas.Font.Color := clWhite; // Set font color to white when selected
-    end
-    else
-    if gdRowHighlight in aState then
-    begin
-      bgFill := clRowHighlight;
-      grid.Canvas.Font.Color := clBlack;
-    end
-    else
-    begin
-      task := Tasks.GetTask(ARow);
-      if (not task.Done) and (task.Date > 0) and (task.Date < Now) then
-      begin
-        bgFill := clRowExpired;
-        grid.Canvas.Font.Color := clBlack;
-      end
-      else
-      begin
-        bgFill := clWhite;
-        grid.Canvas.Font.Color := clBlack;
-      end;
-    end;
-
-    if (aCol = 2) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).Archive) then
-      grid.Canvas.Font.Style := [fsStrikeOut];
-
-    // Fill the cell background
-    grid.Canvas.Brush.Color := bgFill;
-    grid.canvas.Brush.Style := bsSolid;
-    grid.canvas.fillrect(aRect);
-
-    if (aCol = 1) then
-    begin
-      grid.DefaultDrawCell(aCol, aRow, aRect, aState);
-      exit;
-    end;
-
-    S := grid.Cells[ACol, ARow];
-    if Length(S) > 0 then
-    begin
-      drawrect := aRect;
-      drawrect.Inflate(-4, 0);
-      if (FWordWrap) then
-        flags := dt_calcrect or dt_wordbreak or dt_left
-      else
-        flags := dt_calcrect or dt_left;
-      DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
-
-      if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
-        grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2) // changing the row height fires the event again!
-      else
-      begin
-        drawrect.Right := aRect.Right;
-        if (FWordWrap) then
-          flags := dt_wordbreak or dt_left
-        else
-          flags := dt_left;
-        DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, dt_wordbreak or dt_left);
-      end;
-    end;
-  end;
-end;
-
-procedure TformNotetask.MemoChange(Sender: TObject);
-begin
-  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col, FBackup);
-  SetChanged;
-  MemoSetBounds(taskGrid.Col, taskGrid.Row);
-end;
-
-procedure TformNotetask.MemoSetBounds(aCol: integer; aRow: integer);
-var
-  Rect: TRect;
-begin
-  Application.ProcessMessages;
-  Rect := taskGrid.CellRect(aCol, aRow);
-  Memo.SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 2);
-end;
-
-procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
-begin
-  if (aCol in [1, 4]) then exit;
-  if (Assigned(Memo)) then Memo.Free;
-
-  Memo := TMemo.Create(Self);
-  Memo.Visible := False;
-  if (taskGrid.IsCellSelected[aCol, aRow]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
-  begin
-    Memo.Color := clHighlight;
-    Memo.Font.Color := clWhite;
-  end
-  else
-  begin
-    Memo.Color := clRowHighlight;
-    Memo.Font.Color := clBlack;
-  end;
-  Memo.Font.Name := taskGrid.Font.Name;
-  Memo.Font.Size := taskGrid.Font.Size;
-  Memo.HideSelection := False;
-  Memo.TabStop := False;
-  Memo.WantTabs := True;
-  Memo.BorderStyle := bsNone;
-  Memo.WordWrap := FWordWrap;
-  Memo.WantReturns := FWordWrap;
-  Memo.ScrollBars := ssNone;
-
-  MemoSetBounds(aCol, aRow);
-  Memo.Parent := taskGrid;
-  Memo.OnChange := @MemoChange; // Event
-  Memo.Text := taskGrid.Cells[aCol, aRow];
-  Memo.SelStart := Length(Memo.Text);
-  Memo.SelLength := 0;
-  //  Memo.CaretPos := Point(Length(Memo.Text), 0);
-
-  Editor := Memo;
-
-  if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
-  begin
-    FIsSelecting := False;
-    Memo.Visible := False;
-    FIsEditing := False;
-  end
-  else
-  begin
-    Memo.Visible := True;
-    FIsEditing := True;
-  end;
-end;
-
-procedure TformNotetask.taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState; var ABitmap: TBitmap);
-begin
-  // Check if we're in the correct column
-  if aCol = 1 then
-  begin
-    // Assign the appropriate bitmap based on the CheckedState
-    if CheckedState = cbChecked then
-      ABitmap := ResourceBitmapCheck // Use check bitmap
-    else
-      ABitmap := ResourceBitmapUncheck; // Use uncheck bitmap
-  end;
-end;
-
 procedure TformNotetask.EditCell(aCol, aRow: integer);
 begin
   taskGrid.Row := aRow;
@@ -1557,25 +1650,6 @@ begin
     Memo.Text := Tasks.GetTaskValue(aCol, aRow);
     Memo.SelectAll;
     Memo.SetFocus;
-  end;
-end;
-
-procedure TformNotetask.taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
-var
-  DateTime: TDateTime;
-begin
-  if (aCol = 4) then
-  begin
-    if (NewValue <> '') and (not TryStrToDateTime(NewValue, DateTime)) then
-      Abort;
-
-    if (OldValue <> NewValue) then
-    begin
-      SetChanged;
-
-      Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
-      EditComplite(False);
-    end;
   end;
 end;
 
@@ -1594,80 +1668,6 @@ begin
     taskGrid.EditorMode := False;
     FIsEditing := False; // Reset editing flag when exiting
   end;
-end;
-
-procedure TformNotetask.aGoToExecute(Sender: TObject);
-var
-  rowNum: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  // Create an instance of the form
-  with formInputText do
-  try
-    Left := self.Left + 14;
-    Top := self.top + 52;
-    editText.Text := IntToStr(taskGrid.Row);
-
-    // Show the form as a modal dialog
-    if ShowModal = mrOk then
-    begin
-      // Try to convert the entered value to an integer
-      if TryStrToInt(editText.Text, rowNum) then
-      begin
-        // Ensure the entered row is within the valid range
-        if (rowNum >= 1) and (rowNum <= taskGrid.RowCount - 1) then
-        begin
-          // Move to the specified row
-          taskGrid.Row := rowNum;
-        end
-        else
-          ShowMessage(rnumstringtoolarge);
-      end;
-    end;
-  finally
-    Hide;
-  end;
-end;
-
-procedure TformNotetask.aFindExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  formFindText.editFind.Text := FindText;
-  if (formFindText.Left = 0) then
-    formFindText.Left := self.Left + 80;
-  if (formFindText.Top = 0) then
-    formFindText.Top := self.top + 100;
-  formFindText.Show;
-end;
-
-procedure TformNotetask.aReplaceExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  formReplaceText.editFind.Text := FindText;
-  if (formReplaceText.Left = 0) then
-    formReplaceText.Left := self.Left + 80;
-  if (formReplaceText.Top = 0) then
-    formReplaceText.Top := self.top + 100;
-  formReplaceText.Show;
-end;
-
-procedure TformNotetask.aFindNextExecute(Sender: TObject);
-begin
-  if (FindText <> string.Empty) then
-    Find(FindText, MatchCase, WrapAround, True)
-  else
-    aFind.Execute;
-end;
-
-procedure TformNotetask.aFindPrevExecute(Sender: TObject);
-begin
-  if (FindText <> string.Empty) then
-    Find(FindText, MatchCase, WrapAround, False)
-  else
-    aFind.Execute;
 end;
 
 function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;

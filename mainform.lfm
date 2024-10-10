@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -199,7 +198,7 @@ object formNotetask: TformNotetask
         Action = aInsertTask
       end
       object menuDeleteTasks: TMenuItem
-        Action = ADeleteTasks
+        Action = aDeleteTasks
       end
       object menuArchiveTasks: TMenuItem
         Action = aArchiveTasks
@@ -233,7 +232,7 @@ object formNotetask: TformNotetask
     object menuView: TMenuItem
       Caption = 'View'
       object menuShowArchived: TMenuItem
-        Action = AShowArchived
+        Action = aShowArchived
         AutoCheck = True
       end
       object menuShowStatusBar: TMenuItem
@@ -324,10 +323,10 @@ object formNotetask: TformNotetask
       OnExecute = aInsertTaskExecute
       ShortCut = 45
     end
-    object ADeleteTasks: TAction
+    object aDeleteTasks: TAction
       Category = 'Task'
       Caption = 'Delete tasks'
-      OnExecute = ADeleteTasksExecute
+      OnExecute = aDeleteTasksExecute
       ShortCut = 16430
     end
     object aArchiveTasks: TAction
@@ -367,11 +366,11 @@ object formNotetask: TformNotetask
       Checked = True
       OnExecute = aShowStatusBarExecute
     end
-    object AShowArchived: TAction
+    object aShowArchived: TAction
       Category = 'View'
       AutoCheck = True
       Caption = 'Show archived tasks'
-      OnExecute = AShowArchivedExecute
+      OnExecute = aShowArchivedExecute
     end
     object aAbout: TAction
       Category = 'Help'
