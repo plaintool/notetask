@@ -107,7 +107,16 @@ begin
       Delete(FComment, Length(FComment), 1);
   end
   else
-    CompletedStr := Parts[0];
+  begin
+    Parts := TaskString.Split(['//']);
+    if Length(Parts) = 2 then
+    begin
+      CompletedStr := Parts[0].Trim;
+      FComment := Parts[1].Trim;
+    end
+    else
+      CompletedStr := Parts[0];
+  end;
 
   PartsSub := CompletedStr.Split([',']);
   // Check completion status based on the first character in the string
