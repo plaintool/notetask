@@ -208,6 +208,7 @@ var
   i: integer; // Index for iteration
 begin
   SetLength(FTaskList, 0); // Initialize task array
+  SetLength(FMapGrid, 0); // Initialize task map
   FCount := 0; // Initialize task count
 
   // Iterate through the StringList to create tasks

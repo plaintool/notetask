@@ -960,8 +960,6 @@ end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
 begin
-  if Screen.ActiveForm <> Self then exit;
-
   if IsCanClose then
   begin
     Tasks := TTasks.Create();
