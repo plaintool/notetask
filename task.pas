@@ -78,27 +78,9 @@ type
 
 implementation
 
-uses filemanager;
+uses filemanager, stringtool;
 
   { TTask }
-
-function RemoveBrackets(const S: string): string;
-const
-  Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
-var
-  I: integer;
-begin
-  Result := S;
-  for I := Low(Brackets) to High(Brackets) do
-  begin
-    if Pos(Brackets[I], Result) = 1 then
-    begin
-      Delete(Result, 1, Length(Brackets[I]));
-      Break;
-    end;
-  end;
-  Result := TrimLeft(Result); // Remove spaces from begining of string
-end;
 
 constructor TTask.Create;
 begin

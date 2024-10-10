@@ -43,7 +43,6 @@
           <Parsing>
             <SyntaxOptions>
               <IncludeAssertionCode Value="True"/>
-              <UseAnsiStrings Value="False"/>
             </SyntaxOptions>
           </Parsing>
           <CodeGeneration>
@@ -172,6 +171,10 @@
         <ComponentName Value="formReplaceText"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="stringtool.pas"/>
+        <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
   </ProjectOptions>

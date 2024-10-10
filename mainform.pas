@@ -199,6 +199,7 @@ type
     FSortColumn: integer;
     FMatchCase: boolean;
     FWrapAround: boolean;
+    FFindActive: boolean;
     FFindText: string;
     FLastFindRow, FLastFindCol, FLastFindSelStart, FLastFindSelLength: integer;
     procedure MemoChange(Sender: TObject);
@@ -269,7 +270,7 @@ resourcestring
 
 implementation
 
-uses filemanager, settings, forminput, formfind, formreplace;
+uses filemanager, settings, stringtool, forminput, formfind, formreplace;
 
   {$R *.lfm}
 
@@ -471,7 +472,7 @@ end;
 
 procedure TformNotetask.CompleteTasks(aRow: integer = 0);
 var
-  RowIndex, Confirm: integer;
+  RowIndex: integer;
   i: integer;
 begin
   // If multiple rows are selected
@@ -1100,8 +1101,6 @@ begin
 end;
 
 procedure TformNotetask.aWordWrapExecute(Sender: TObject);
-var
-  i: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
 
@@ -1153,7 +1152,6 @@ end;
 procedure TformNotetask.OpenFile(fileName: string);
 var
   Content: string;
-  i: integer;
 begin
   FFileName := fileName;
   EditComplite;
@@ -1447,8 +1445,6 @@ begin
 end;
 
 procedure TformNotetask.MemoChange(Sender: TObject);
-var
-  Rect: TRect;
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
   Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
@@ -1466,16 +1462,12 @@ begin
 end;
 
 procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
-var
-  h, w: integer;
 begin
   if (aCol in [1, 4]) then exit;
   if (Assigned(Memo)) then Memo.Free;
 
   Memo := TMemo.Create(Self);
   Memo.Visible := False;
-  w := taskGrid.Selection.Width;
-  h := taskGrid.Selection.Height;
   if (taskGrid.IsCellSelected[aCol, aRow]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
   begin
     Memo.Color := clHighlight;
@@ -1644,47 +1636,17 @@ end;
 procedure TformNotetask.aFindNextExecute(Sender: TObject);
 begin
   if (FindText <> string.Empty) then
-    Find(FindText, MatchCase, WrapAround, True);
+    Find(FindText, MatchCase, WrapAround, True)
+  else
+    aFind.Execute;
 end;
 
 procedure TformNotetask.aFindPrevExecute(Sender: TObject);
 begin
   if (FindText <> string.Empty) then
-    Find(FindText, MatchCase, WrapAround, False);
-end;
-
-function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;
-var
-  i, MaxLen, SubLen: SizeInt;
-  SubFirst: widechar;
-  pc: pwidechar;
-begin
-  PosExReverse := 0; // Initialize result to 0 (not found)
-  SubLen := Length(SubStr); // Get length of the substring
-
-  // Check if the substring is not empty and Offset is valid
-  if (SubLen > 0) and (Offset > 0) and (Offset <= SizeUint(Length(S))) then
-  begin
-    MaxLen := Length(S) - SubLen + 1; // Adjust max starting index to include end of the string
-    SubFirst := SubStr[1]; // Get the first character of the substring
-
-    // Search backwards, starting from Offset
-    for i := Offset downto 1 do
-    begin
-      // Ensure there is enough space left for the substring
-      if (i <= MaxLen) then
-      begin
-        pc := @S[i]; // Pointer to the current position
-
-        // Check for a match with the substring
-        if (CompareWord(SubStr[1], pc^, SubLen) = 0) then
-        begin
-          PosExReverse := i; // Return the found position
-          Exit; // Exit the function
-        end;
-      end;
-    end;
-  end;
+    Find(FindText, MatchCase, WrapAround, False)
+  else
+    aFind.Execute;
 end;
 
 function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean): boolean;
@@ -1740,29 +1702,31 @@ var
     taskGrid.EditorMode := True;
     Memo.SelStart := FLastFindSelStart;
     Memo.SelLength := FLastFindSelLength;
-    ShowMessage(rcantfind + ' "' + sText + '"');
+    ShowMessage(rcantfind + ' "' + string(sText) + '"');
   end;
 
 begin
-  FindText := aText;
-  MatchCase := aMatchCase;
-  WrapAround := aWrapAround;
-
-  if taskGrid.Col = 1 then taskGrid.Col := 2;
-  taskGrid.EditorMode := True;
-  if (Memo.SelStart > Length(unicodestring(Memo.Text)) - 1) then
-  begin
-    if (aDirectionDown) then
-      Memo.SelStart := 0;
-  end
-  else
-  begin
-    if (aDirectionDown) then
-      Memo.SelStart := Memo.SelStart + Memo.SelLength;
-  end;
-  Memo.SelLength := 0;
-
+  if (FFindActive) then exit;
+  FFindActive := True;
   try
+    FindText := aText;
+    MatchCase := aMatchCase;
+    WrapAround := aWrapAround;
+
+    if taskGrid.Col = 1 then taskGrid.Col := 2;
+    taskGrid.EditorMode := True;
+    if (Memo.SelStart > Length(unicodestring(Memo.Text)) - 1) then
+    begin
+      if (aDirectionDown) then
+        Memo.SelStart := 0;
+    end
+    else
+    begin
+      if (aDirectionDown) then
+        Memo.SelStart := Memo.SelStart + Memo.SelLength;
+    end;
+    Memo.SelLength := 0;
+
     CurRow := taskGrid.Row;
     CurCol := taskGrid.Col;
     Counter := 0;
@@ -1859,6 +1823,7 @@ begin
         else
         begin
           NotFound;
+          Result := False;
           exit;
         end;
       end;
@@ -1869,21 +1834,24 @@ begin
     if (WrapAround and (Counter > taskGrid.RowCount)) then
     begin
       NotFound;
+      Result := False;
       exit;
     end;
 
+    Result := True;
   finally
+    FFindActive := False;
   end;
 end;
 
 function TformNotetask.Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
 begin
-
+  Result := True;
 end;
 
 function TformNotetask.ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
 begin
-
+  Result := True;
 end;
 
 end.

@@ -14,8 +14,6 @@ function DetectEncoding(const FileName: string): TEncoding;
 
 function GetEncodingName(Encoding: TEncoding): string;
 
-function TextToStringList(const TextContent: string): TStringList;
-
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
   out LineEnding: TLineEnding; out LineCount: integer);
 
@@ -101,21 +99,6 @@ begin
     Result := 'Default'
   else
     Result := 'Unknown';
-end;
-
-function TextToStringList(const TextContent: string): TStringList;
-var
-  StringList: TStringList;
-begin
-  StringList := TStringList.Create;
-  // Create a new instance of TStringList
-  try
-    StringList.Text := TextContent; // Load text into TStringList
-    Result := StringList; // Return TStringList
-  except
-    StringList.Free; // Free memory on error
-    raise; // Re-throw the exception
-  end;
 end;
 
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;

@@ -20,7 +20,7 @@ uses
   systemtool,
   forminput,
   formfind,
-  formreplace;
+  formreplace, stringtool;
 
   {$R *.res}
 
