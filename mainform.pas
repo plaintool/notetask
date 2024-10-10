@@ -180,6 +180,8 @@ type
     procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
     procedure aFindExecute(Sender: TObject);
     procedure aReplaceExecute(Sender: TObject);
+    procedure aFindNextExecute(Sender: TObject);
+    procedure aFindPrevExecute(Sender: TObject);
   private
     Memo: TMemo;
     FChanged: boolean;
@@ -193,6 +195,9 @@ type
     FShowStatusBar: boolean;
     FSortOrder: TSortOrder;
     FSortColumn: integer;
+    FMatchCase: boolean;
+    FWrapAround: boolean;
+    FFindText: string;
     procedure MemoChange(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
@@ -221,12 +226,19 @@ type
     procedure SaveFile(fileName: string = string.Empty);
     procedure FillGrid;
 
+    function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean): boolean;
+    function Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
+    function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
+
     property WordWrap: boolean read FWordWrap write FWordWrap;
     property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property SortOrder: TSortOrder read FSortOrder write FSortOrder;
     property SortColumn: integer read FSortColumn write FSortColumn;
     property IsEditing: boolean read GetIsEditing write FIsEditing;
+    property FindText: string read FFindText write FFindText;
+    property MatchCase: boolean read FMatchCase write FMatchCase;
+    property WrapAround: boolean read FWrapAround write FWrapAround;
   end;
 
 var
@@ -677,6 +689,12 @@ begin
     Key := 0;
   end
   else
+  if (Shift = [ssCtrl]) and (Key = VK_F) then // Ctrl + F
+  begin
+    aFind.Execute;
+    Key := 0;
+  end
+  else
   if (Shift = [ssCtrl]) and (Key = VK_PRIOR) then // Ctrl + Page Up
   begin
     aMoveTaskTop.Execute;
@@ -761,38 +779,6 @@ begin
   begin
     // Apply the selected font to the form
     Self.Font := fontDialog.Font;
-  end;
-end;
-
-procedure TformNotetask.aGoToExecute(Sender: TObject);
-var
-  rowNum: integer;
-begin
-  // Create an instance of the form
-  with formInputText do
-  try
-    Left := self.Left + 14;
-    Top := self.top + 52;
-    editText.Text := IntToStr(taskGrid.Row);
-
-    // Show the form as a modal dialog
-    if ShowModal = mrOk then
-    begin
-      // Try to convert the entered value to an integer
-      if TryStrToInt(editText.Text, rowNum) then
-      begin
-        // Ensure the entered row is within the valid range
-        if (rowNum >= 1) and (rowNum <= taskGrid.RowCount - 1) then
-        begin
-          // Move to the specified row
-          taskGrid.Row := rowNum;
-        end
-        else
-          ShowMessage(rnumstringtoolarge);
-      end;
-    end;
-  finally
-    Hide;
   end;
 end;
 
@@ -1533,14 +1519,78 @@ begin
   end;
 end;
 
+procedure TformNotetask.aGoToExecute(Sender: TObject);
+var
+  rowNum: integer;
+begin
+  // Create an instance of the form
+  with formInputText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    editText.Text := IntToStr(taskGrid.Row);
+
+    // Show the form as a modal dialog
+    if ShowModal = mrOk then
+    begin
+      // Try to convert the entered value to an integer
+      if TryStrToInt(editText.Text, rowNum) then
+      begin
+        // Ensure the entered row is within the valid range
+        if (rowNum >= 1) and (rowNum <= taskGrid.RowCount - 1) then
+        begin
+          // Move to the specified row
+          taskGrid.Row := rowNum;
+        end
+        else
+          ShowMessage(rnumstringtoolarge);
+      end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
 procedure TformNotetask.aFindExecute(Sender: TObject);
 begin
+  formFindText.Left := self.Left + 80;
+  formFindText.Top := self.top + 100;
   formFindText.Show;
 end;
 
 procedure TformNotetask.aReplaceExecute(Sender: TObject);
 begin
+  formReplaceText.Left := self.Left + 80;
+  formReplaceText.Top := self.top + 100;
   formReplaceText.Show;
+end;
+
+procedure TformNotetask.aFindNextExecute(Sender: TObject);
+begin
+  Find(FindText, MatchCase, WrapAround, True);
+end;
+
+procedure TformNotetask.aFindPrevExecute(Sender: TObject);
+begin
+  Find(FindText, MatchCase, WrapAround, False);
+end;
+
+function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean): boolean;
+begin
+  FindText:=aText;
+  MatchCase:=aMatchCase;
+  WrapAround:=aWrapAround;
+
+end;
+
+function TformNotetask.Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
+begin
+
+end;
+
+function TformNotetask.ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
+begin
+
 end;
 
 end.

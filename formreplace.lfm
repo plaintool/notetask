@@ -9,6 +9,8 @@ object formReplaceText: TformReplaceText
   ClientHeight = 154
   ClientWidth = 359
   FormStyle = fsStayOnTop
+  KeyPreview = True
+  OnKeyDown = FormKeyDown
   object labelWhat: TLabel
     Left = 10
     Height = 15
@@ -16,30 +18,35 @@ object formReplaceText: TformReplaceText
     Width = 55
     Caption = 'Find what:'
   end
-  object editSearch: TEdit
+  object editFind: TEdit
     Left = 88
     Height = 23
     Top = 8
     Width = 170
     TabOrder = 0
   end
-  object buttonSearch: TButton
+  object buttonFind: TButton
     Left = 265
     Height = 23
     Top = 8
     Width = 84
     Caption = 'Find Next'
+    Default = True
     TabOrder = 1
+    OnClick = buttonFindClick
   end
   object buttonCancel: TButton
     Left = 265
     Height = 23
     Top = 97
     Width = 84
+    Cancel = True
     Caption = 'Cancel'
+    ModalResult = 2
     TabOrder = 2
+    OnClick = buttonCancelClick
   end
-  object checkCase: TCheckBox
+  object checkMatchCase: TCheckBox
     Left = 10
     Height = 19
     Top = 104
@@ -47,7 +54,7 @@ object formReplaceText: TformReplaceText
     Caption = 'Match case'
     TabOrder = 3
   end
-  object checkLoop: TCheckBox
+  object checkWrapAround: TCheckBox
     Left = 10
     Height = 19
     Top = 128
@@ -76,6 +83,7 @@ object formReplaceText: TformReplaceText
     Width = 84
     Caption = 'Replace'
     TabOrder = 6
+    OnClick = buttonReplaceClick
   end
   object buttonReplaceAll: TButton
     Left = 265
@@ -84,5 +92,6 @@ object formReplaceText: TformReplaceText
     Width = 84
     Caption = 'Replace All'
     TabOrder = 7
+    OnClick = buttonReplaceAllClick
   end
 end

@@ -5,7 +5,11 @@ unit formfind;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls;
+  Classes,
+  Forms,
+  StdCtrls,
+  ExtCtrls,
+  LCLType;
 
 type
 
@@ -13,13 +17,16 @@ type
 
   TformFindText = class(TForm)
     labelWhat: TLabel;
-    editSearch: TEdit;
-    buttonSearch: TButton;
+    editFind: TEdit;
+    buttonFind: TButton;
     buttonCancel: TButton;
     radioDirection: TRadioGroup;
-    checkCase: TCheckBox;
-    checkLoop: TCheckBox;
+    checkMatchCase: TCheckBox;
+    checkWrapAround: TCheckBox;
     procedure FormCreate(Sender: TObject);
+    procedure buttonFindClick(Sender: TObject);
+    procedure buttonCancelClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
   private
 
   public
@@ -35,15 +42,34 @@ resourcestring
 
 implementation
 
-{$R *.lfm}
+uses mainform;
 
-{ TformFindText }
+  {$R *.lfm}
+
+  { TformFindText }
 
 procedure TformFindText.FormCreate(Sender: TObject);
 begin
   radioDirection.Items.Clear;
   radioDirection.Items.Add(rdirectionup);
   radioDirection.Items.Add(rdirectiondown);
+  radioDirection.ItemIndex := 1;
+end;
+
+procedure TformFindText.buttonFindClick(Sender: TObject);
+begin
+  formNotetask.Find(editFind.Text, checkMatchCase.Checked, checkWrapAround.Checked, radioDirection.ItemIndex = 1);
+end;
+
+procedure TformFindText.buttonCancelClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TformFindText.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then
+    Close;
 end;
 
 end.

@@ -302,7 +302,7 @@ object formNotetask: TformNotetask
       Category = 'Format'
       Caption = 'Font...'
       OnExecute = aFontExecute
-      ShortCut = 24646
+      ShortCut = 16468
     end
     object aWordWrap: TAction
       Category = 'Format'
@@ -415,11 +415,13 @@ object formNotetask: TformNotetask
     object aFindNext: TAction
       Category = 'Edit'
       Caption = 'Find next'
+      OnExecute = aFindNextExecute
       ShortCut = 114
     end
     object aFindPrev: TAction
       Category = 'Edit'
       Caption = 'Find previous'
+      OnExecute = aFindPrevExecute
       ShortCut = 8306
     end
     object aReplace: TAction

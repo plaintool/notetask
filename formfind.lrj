@@ -1,9 +1,9 @@
 {"version":1,"strings":[
 {"hash":315460,"name":"tformfindtext.caption","sourcebytes":[70,105,110,100],"value":"Find"},
 {"hash":108607546,"name":"tformfindtext.labelwhat.caption","sourcebytes":[70,105,110,100,32,119,104,97,116,58],"value":"Find what:"},
-{"hash":73728500,"name":"tformfindtext.buttonsearch.caption","sourcebytes":[70,105,110,100,32,78,101,120,116],"value":"Find Next"},
+{"hash":73728500,"name":"tformfindtext.buttonfind.caption","sourcebytes":[70,105,110,100,32,78,101,120,116],"value":"Find Next"},
 {"hash":77089212,"name":"tformfindtext.buttoncancel.caption","sourcebytes":[67,97,110,99,101,108],"value":"Cancel"},
 {"hash":146466142,"name":"tformfindtext.radiodirection.caption","sourcebytes":[68,105,114,101,99,116,105,111,110],"value":"Direction"},
-{"hash":161718325,"name":"tformfindtext.checkcase.caption","sourcebytes":[77,97,116,99,104,32,99,97,115,101],"value":"Match case"},
-{"hash":114812004,"name":"tformfindtext.checkloop.caption","sourcebytes":[87,114,97,112,32,97,114,111,117,110,100],"value":"Wrap around"}
+{"hash":161718325,"name":"tformfindtext.checkmatchcase.caption","sourcebytes":[77,97,116,99,104,32,99,97,115,101],"value":"Match case"},
+{"hash":114812004,"name":"tformfindtext.checkwraparound.caption","sourcebytes":[87,114,97,112,32,97,114,111,117,110,100],"value":"Wrap around"}
 ]}

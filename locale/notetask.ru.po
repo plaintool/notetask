@@ -82,8 +82,8 @@ msgctxt "tformfindtext.buttoncancel.caption"
 msgid "Cancel"
 msgstr "Отмена"
 
-#: tformfindtext.buttonsearch.caption
-msgctxt "tformfindtext.buttonsearch.caption"
+#: tformfindtext.buttonfind.caption
+msgctxt "tformfindtext.buttonfind.caption"
 msgid "Find Next"
 msgstr "Найти далее"
 
@@ -92,13 +92,13 @@ msgctxt "tformfindtext.caption"
 msgid "Find"
 msgstr "Найти"
 
-#: tformfindtext.checkcase.caption
-msgctxt "tformfindtext.checkcase.caption"
+#: tformfindtext.checkmatchcase.caption
+msgctxt "tformfindtext.checkmatchcase.caption"
 msgid "Match case"
 msgstr "С учетом регистра"
 
-#: tformfindtext.checkloop.caption
-msgctxt "tformfindtext.checkloop.caption"
+#: tformfindtext.checkwraparound.caption
+msgctxt "tformfindtext.checkwraparound.caption"
 msgid "Wrap around"
 msgstr "Обтекание текстом"
 
@@ -339,6 +339,11 @@ msgctxt "tformreplacetext.buttoncancel.caption"
 msgid "Cancel"
 msgstr "Отмена"
 
+#: tformreplacetext.buttonfind.caption
+msgctxt "tformreplacetext.buttonfind.caption"
+msgid "Find Next"
+msgstr "Найти далее"
+
 #: tformreplacetext.buttonreplace.caption
 msgctxt "tformreplacetext.buttonreplace.caption"
 msgid "Replace"
@@ -348,23 +353,18 @@ msgstr "Заменить"
 msgid "Replace All"
 msgstr "Заменить все"
 
-#: tformreplacetext.buttonsearch.caption
-msgctxt "tformreplacetext.buttonsearch.caption"
-msgid "Find Next"
-msgstr "Найти далее"
-
 #: tformreplacetext.caption
 msgctxt "tformreplacetext.caption"
 msgid "Replace"
 msgstr "Заменить"
 
-#: tformreplacetext.checkcase.caption
-msgctxt "tformreplacetext.checkcase.caption"
+#: tformreplacetext.checkmatchcase.caption
+msgctxt "tformreplacetext.checkmatchcase.caption"
 msgid "Match case"
 msgstr "С учетом регистра"
 
-#: tformreplacetext.checkloop.caption
-msgctxt "tformreplacetext.checkloop.caption"
+#: tformreplacetext.checkwraparound.caption
+msgctxt "tformreplacetext.checkwraparound.caption"
 msgid "Wrap around"
 msgstr "Обтекание текстом"
 
