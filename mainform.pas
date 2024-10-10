@@ -203,6 +203,7 @@ type
     FFindText: string;
     FFoundText: string;
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
+    FBackup: boolean;
     procedure MemoChange(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
@@ -231,7 +232,7 @@ type
     procedure SaveFile(fileName: string = string.Empty);
     procedure FillGrid;
 
-    function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean): boolean;
+    function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
     function Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
 
@@ -281,6 +282,7 @@ procedure TformNotetask.FormCreate(Sender: TObject);
 var
   FilePath: string;
 begin
+  FBackup := True;
   FWordWrap := True;
   FShowStatusBar := True;
   FSortOrder := soAscending;
@@ -370,7 +372,8 @@ begin
 
     if (Confirm = mrYes) or (not ShowConfirm) then
     begin
-      Tasks.CreateBackup;
+      if (FBackup) then
+        Tasks.CreateBackup;
 
       // RemoveTask from collection
       taskGrid.DeleteRow(RowIndex);
@@ -392,7 +395,8 @@ begin
 
     if (Confirm = mrYes) or (not ShowConfirm) then
     begin
-      Tasks.CreateBackup;
+      if (FBackup) then
+        Tasks.CreateBackup;
 
       // Delete rows from the end to avoid index shifting
       for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
@@ -428,7 +432,8 @@ begin
 
     if Confirm = mrYes then
     begin
-      Tasks.CreateBackup;
+      if (FBackup) then
+        Tasks.CreateBackup;
 
       // Archivate task
       Tasks.ArchiveTask(RowIndex);
@@ -450,7 +455,8 @@ begin
 
     if Confirm = mrYes then
     begin
-      Tasks.CreateBackup;
+      if (FBackup) then
+        Tasks.CreateBackup;
 
       // Archive tasks from the end to avoid index shifting
       for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
@@ -1448,7 +1454,7 @@ end;
 procedure TformNotetask.MemoChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
+  Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col, FBackup);
   SetChanged;
   MemoSetBounds(taskGrid.Col, taskGrid.Row);
 end;
@@ -1650,7 +1656,7 @@ begin
     aFind.Execute;
 end;
 
-function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean): boolean;
+function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
 var
   sValue, sText: unicodestring;
   Counter, CurRow, CurCol: integer;
@@ -1703,7 +1709,8 @@ var
     taskGrid.EditorMode := True;
     Memo.SelStart := FLastFoundSelStart;
     Memo.SelLength := FLastFoundSelLength;
-    ShowMessage(rcantfind + ' "' + string(sText) + '"');
+    if (not Silent) then
+      ShowMessage(rcantfind + ' "' + string(sText) + '"');
   end;
 
 begin
@@ -1869,8 +1876,26 @@ begin
 end;
 
 function TformNotetask.ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
+var
+  Row, Col: integer;
 begin
-  Result := True;
+  FBackup := False;
+  Row := taskGrid.Row;
+  Col := taskGrid.Col;
+  Tasks.CreateBackup;
+  try
+    while (Find(aText, aMatchCase, aWrapAround, True, True)) do
+    begin
+      Memo.SelText := aToText;
+    end;
+
+    taskGrid.Row := Row;
+    taskGrid.Col := Col;
+    Memo.SelLength := 0;
+    Result := True;
+  finally
+    FBackup := True;
+  end;
 end;
 
 end.

@@ -53,7 +53,7 @@ type
     function GetTask(Index: integer): TTask; // Method to get a task by row index
     function GetTaskValue(ACol, ARow: integer): string; // Method to get a task value by row col
     function HasTask(Index: integer): boolean;
-    procedure SetTask(Grid: TStringGrid; Row, Col: integer);
+    procedure SetTask(Grid: TStringGrid; Row, Col: integer; Backup: boolean = True);
     function InsertTask(const TaskString: string; Index: integer; Backup: boolean = True): integer;
     procedure DeleteTask(Index: integer);
     procedure ArchiveTask(Index: integer);
@@ -111,8 +111,7 @@ begin
 
   PartsSub := CompletedStr.Split([',']);
   // Check completion status based on the first character in the string
-  FDone := PartsSub[0].Trim.ToLower.StartsWith('- [x]') or PartsSub[0].Trim.ToLower.StartsWith('-[x]') or
-    PartsSub[0].Trim.ToLower.StartsWith('[x]');
+  FDone := PartsSub[0].Trim.ToLower.StartsWith('- [x]') or PartsSub[0].Trim.ToLower.StartsWith('-[x]') or PartsSub[0].Trim.ToLower.StartsWith('[x]');
 
   // Checks if the task is completed
   PartsSub[0] := RemoveBrackets(PartsSub[0]);
@@ -186,8 +185,8 @@ begin
     else
       // Forming the task string considering the completion date and comment
       if Date > 0 then
-        Result := Format('%s %s, %s%s', [CompletionStatus, FormatDateTime(FormatSettings.ShortDateFormat +
-          ' ' + FormatSettings.LongTimeFormat, Date), TaskString, CommentPart]).Trim
+        Result := Format('%s %s, %s%s', [CompletionStatus, FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
+          FormatSettings.LongTimeFormat, Date), TaskString, CommentPart]).Trim
       else
         Result := Format('%s %s%s', [CompletionStatus, TaskString, CommentPart]).Trim;
   end;
@@ -330,14 +329,15 @@ begin
   Result := (Ind >= 0) and (Ind < FCount);
 end;
 
-procedure TTasks.SetTask(Grid: TStringGrid; Row, Col: integer);
+procedure TTasks.SetTask(Grid: TStringGrid; Row, Col: integer; Backup: boolean = True);
 var
   Task: TTask;
   Date: TDateTime;
 begin
   if (Row > 0) and (Row <= FCount) then
   begin
-    CreateBackup;
+    if (Backup) then
+      CreateBackup;
 
     Task := GetTask(Row);
     // Get the task by the row index (minus one, as rows start from 1)
@@ -853,8 +853,7 @@ begin
         Grid.Cells[2, RowIndex] := FTaskList[I].Text;
         Grid.Cells[3, RowIndex] := FTaskList[I].Comment;
         if FTaskList[I].Date > 0 then
-          Grid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
-            FormatSettings.LongTimeFormat, FTaskList[I].Date)
+          Grid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, FTaskList[I].Date)
         else
           Grid.Cells[4, RowIndex] := string.Empty;
 
