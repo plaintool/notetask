@@ -28,6 +28,7 @@ type
     procedure buttonFindClick(Sender: TObject);
     procedure buttonCancelClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
   private
 
   public
@@ -71,6 +72,15 @@ procedure TformFindText.FormKeyDown(Sender: TObject; var Key: word; Shift: TShif
 begin
   if Key = VK_ESCAPE then
     Close;
+
+  if Key = VK_RETURN then
+    buttonFind.Click;
+
+end;
+
+procedure TformFindText.FormShow(Sender: TObject);
+begin
+  editFind.SetFocus;
 end;
 
 end.

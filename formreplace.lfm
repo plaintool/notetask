@@ -1,7 +1,7 @@
 object formReplaceText: TformReplaceText
-  Left = 318
+  Left = 0
   Height = 154
-  Top = 250
+  Top = 0
   Width = 359
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
@@ -11,7 +11,6 @@ object formReplaceText: TformReplaceText
   FormStyle = fsStayOnTop
   KeyPreview = True
   OnKeyDown = FormKeyDown
-  LCLVersion = '3.6.0.0'
   object labelWhat: TLabel
     Left = 10
     Height = 15

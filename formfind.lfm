@@ -1,7 +1,7 @@
 object formFindText: TformFindText
-  Left = 318
+  Left = 0
   Height = 129
-  Top = 250
+  Top = 0
   Width = 371
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
@@ -12,7 +12,7 @@ object formFindText: TformFindText
   KeyPreview = True
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
-  LCLVersion = '3.6.0.0'
+  OnShow = FormShow
   object labelWhat: TLabel
     Left = 8
     Height = 15

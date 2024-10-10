@@ -24,6 +24,7 @@ uses
   ExtDlgs,
   Process,
   StrUtils,
+  LMessages,
   GridPrn,
   task,
   lineending;
@@ -177,8 +178,7 @@ type
     procedure taskGridResize(Sender: TObject);
     procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
-    procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState;
-      var ABitmap: TBitmap);
+    procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState; var ABitmap: TBitmap);
     procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
     procedure aFindExecute(Sender: TObject);
     procedure aReplaceExecute(Sender: TObject);
@@ -538,6 +538,8 @@ end;
 
 procedure TformNotetask.aUndoExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   if not IsEditing then
   begin
     Tasks.UndoBackup;
@@ -552,6 +554,8 @@ procedure TformNotetask.aUndoAllExecute(Sender: TObject);
 var
   Confirm: TModalResult;
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   if not IsEditing then
   begin
     Confirm := MessageDlg(rundoconfirm, mtConfirmation, [mbYes, mbNo], 0);
@@ -569,6 +573,8 @@ end;
 
 procedure TformNotetask.aCutExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   if not IsEditing then
   begin
     Tasks.CopyToClipboard(taskGrid);
@@ -584,6 +590,8 @@ end;
 
 procedure TformNotetask.aCopyExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   if not IsEditing then
     Tasks.CopyToClipboard(taskGrid)
   else
@@ -595,6 +603,8 @@ procedure TformNotetask.aPasteExecute(Sender: TObject);
 var
   Sel: TGridRect;
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   if not IsEditing then
   begin
     Sel := Tasks.PasteFromClipboard(taskGrid);
@@ -610,6 +620,8 @@ end;
 
 procedure TformNotetask.aDeleteExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   if not IsEditing then
   begin
     //    if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
@@ -632,6 +644,8 @@ end;
 
 procedure TformNotetask.aSelectAllExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   if not IsEditing then
     taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount)
   else
@@ -641,6 +655,12 @@ end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
+  if Screen.ActiveForm <> Self then
+  begin
+    Key := 0;
+    Exit;
+  end;
+
   if (ssCtrl in Shift) and (Key = VK_DELETE) then // Ctrl + Del
   begin
     if not IsEditing then
@@ -771,11 +791,15 @@ end;
 
 procedure TformNotetask.aExitExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   Application.Terminate;
 end;
 
 procedure TformNotetask.aFontExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   fontDialog.Font := Font;
   if fontDialog.Execute then  // Open the font dialog
   begin
@@ -786,6 +810,8 @@ end;
 
 procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   Tasks.InsertTask('[ ]', taskGrid.Row);
   FillGrid;
   FLineCount += 1;
@@ -813,6 +839,8 @@ procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
 var
   newRow: integer;
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   newRow := Tasks.MoveTaskTop(taskGrid.Row);
   FillGrid;
   if (newRow > -1) then
@@ -827,6 +855,8 @@ procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
 var
   newRow: integer;
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   newRow := Tasks.MoveTaskBottom(taskGrid.Row);
   FillGrid;
   if (newRow > -1) then
@@ -841,6 +871,8 @@ procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
 var
   newRow: integer;
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   newRow := Tasks.MoveTaskUp(taskGrid.Row);
   FillGrid;
   if (newRow > -1) then
@@ -855,6 +887,8 @@ procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
 var
   newRow: integer;
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   newRow := Tasks.MoveTaskDown(taskGrid.Row);
   FillGrid;
   if (newRow > -1) then
@@ -867,11 +901,15 @@ end;
 
 procedure TformNotetask.ADeleteTasksExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   DeleteTasks;
 end;
 
 procedure TformNotetask.aArchiveTasksExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   ArchiveTasks;
 end;
 
@@ -880,6 +918,8 @@ var
   PosStart: integer;
   CurrentDateTime: string;
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   CurrentDateTime := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
   if IsEditing then
   begin
@@ -910,6 +950,8 @@ end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   if IsCanClose then
   begin
     Tasks := TTasks.Create();
@@ -933,6 +975,8 @@ procedure TformNotetask.aNewWindowExecute(Sender: TObject);
 var
   Process: TProcess;
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   Process := TProcess.Create(nil); // Create a new process
   try
     Process.Executable := ParamStr(0); // Set the executable to the current application
@@ -945,6 +989,8 @@ end;
 
 procedure TformNotetask.aOpenExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   if (IsCanClose) and (openDialog.Execute) then
   begin
     OpenFile(openDialog.FileName);
@@ -953,6 +999,8 @@ end;
 
 procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   pageSetupDialog.Execute;
 end;
 
@@ -960,6 +1008,8 @@ procedure TformNotetask.aPrintExecute(Sender: TObject);
 var
   gridPrinter: TGridPrinter;
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   if printDialog.Execute then
   begin
     gridPrinter := TGridPrinter.Create(self);
@@ -1006,6 +1056,8 @@ end;
 
 procedure TformNotetask.aSaveAsExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   if (saveDialog.Execute) then
   begin
     SaveFile(saveDialog.FileName);
@@ -1014,16 +1066,22 @@ end;
 
 procedure TformNotetask.aSaveExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   SaveFile(FFileName);
 end;
 
 procedure TformNotetask.AShowArchivedExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   ShowArchived := aShowArchived.Checked;
 end;
 
 procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   ShowStatusBar := aShowStatusBar.Checked;
 end;
 
@@ -1043,6 +1101,8 @@ procedure TformNotetask.aWordWrapExecute(Sender: TObject);
 var
   i: integer;
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   EditComplite;
   FWordWrap := aWordWrap.Checked;
   ResetRowHeight;
@@ -1288,8 +1348,7 @@ begin
     Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
 end;
 
-procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
-  MousePos: TPoint; var Handled: boolean);
+procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
 begin
   EditComplite;
 end;
@@ -1458,8 +1517,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer;
-  const CheckedState: TCheckboxState; var ABitmap: TBitmap);
+procedure TformNotetask.taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState; var ABitmap: TBitmap);
 begin
   // Check if we're in the correct column
   if aCol = 1 then
@@ -1527,6 +1585,8 @@ procedure TformNotetask.aGoToExecute(Sender: TObject);
 var
   rowNum: integer;
 begin
+  if Screen.ActiveForm <> Self then exit;
+
   // Create an instance of the form
   with formInputText do
   try
@@ -1557,21 +1617,28 @@ end;
 
 procedure TformNotetask.aFindExecute(Sender: TObject);
 begin
-  formFindText.Left := self.Left + 80;
-  formFindText.Top := self.top + 100;
+  if Screen.ActiveForm <> Self then exit;
+
+  if (formFindText.Left = 0) then
+    formFindText.Left := self.Left + 80;
+  if (formFindText.Top = 0) then
+    formFindText.Top := self.top + 100;
   formFindText.Show;
 end;
 
 procedure TformNotetask.aReplaceExecute(Sender: TObject);
 begin
-  formReplaceText.Left := self.Left + 80;
-  formReplaceText.Top := self.top + 100;
+  if Screen.ActiveForm <> Self then exit;
+
+  if (formReplaceText.Left = 0) then
+    formReplaceText.Left := self.Left + 80;
+  if (formReplaceText.Top = 0) then
+    formReplaceText.Top := self.top + 100;
   formReplaceText.Show;
 end;
 
 procedure TformNotetask.aFindNextExecute(Sender: TObject);
 begin
-  FindText := 'меню';
   if (FindText <> string.Empty) then
     Find(FindText, MatchCase, WrapAround, True);
 end;
@@ -1583,26 +1650,34 @@ begin
 end;
 
 function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean): boolean;
+var
+  sValue, sText: unicodestring;
+  Start: integer;
 
-  function FindMemo(const mText: string): boolean;
+  function FindMemo: boolean;
   var
-    SelEnd, FindPos: integer;
+    SelEnd, SelLen, FindPos, Delta: integer;
   begin
     // Start searching from the current cursor position
-    SelEnd := Memo.SelStart + Memo.SelLength;
+    SelLen := Memo.SelLength;
+    SelEnd := Memo.SelStart + Memo.SelLength + 1;
+    if (SelEnd = 0) then
+      Delta := 0
+    else
+      Delta := 1;
 
     // Find the position of the search text, starting from SelEnd
     if (MatchCase) then
-      FindPos := PosEx(unicodestring(mText), unicodestring(Memo.Text), SelEnd + 2)
+      FindPos := PosEx(sText, sValue, SelEnd)
     else
-      FindPos := PosEx(LowerCase(unicodestring(mText)), LowerCase(unicodestring(Memo.Text)), SelEnd + 2);
+      FindPos := PosEx(UnicodeLowerCase(sText), UnicodeLowerCase(sValue), SelEnd);
 
     // If the text is found
     if FindPos > 0 then
     begin
       // Select the found text
       Memo.SelStart := FindPos - 1;
-      Memo.SelLength := Length(unicodestring(mText));
+      Memo.SelLength := Length(sText);
       Result := True;  // Return True, text is found
     end
     else
@@ -1619,14 +1694,19 @@ begin
 
   if taskGrid.Col = 1 then taskGrid.Col := 2;
   taskGrid.EditorMode := True;
+  if (Memo.SelStart >= Length(unicodestring(Memo.Text)) - 1) then
+    Memo.SelStart := 0
+  else
+    Memo.SelStart := Memo.SelStart + Memo.SelLength;
   Memo.SelLength := 0;
 
   try
     repeat
-
-      if (assigned(Memo)) and (Pos(aText, Memo.Text) > 0) then
+      if (Assigned(Memo)) then
       begin
-        if (FindMemo(aText)) then
+        sValue := unicodestring(Memo.Text);
+        sText := unicodestring(aText);
+        if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (FindMemo) then
           Break;
       end;
 
@@ -1648,6 +1728,12 @@ begin
           Memo.SelLength := 0;
         end;
       end;
+      if taskGrid.Row = taskGrid.RowCount - 1 then
+      begin
+        if (WrapAround) then
+          taskGrid.Row := 1;
+      end;
+
     until taskGrid.Row = taskGrid.RowCount - 1;
   finally
   end;
