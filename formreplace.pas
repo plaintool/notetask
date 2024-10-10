@@ -7,6 +7,7 @@ interface
 
 uses
   Classes,
+  SysUtils,
   Forms,
   StdCtrls,
   LCLType, Controls;
@@ -32,6 +33,8 @@ type
     procedure buttonCancelClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure editFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure editFindChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
 
   public
@@ -43,11 +46,17 @@ var
 
 implementation
 
-uses mainform;
+uses mainform, formfind;
 
   {$R *.lfm}
 
   { TformReplaceText }
+
+procedure TformReplaceText.FormShow(Sender: TObject);
+begin
+  editFind.SetFocus;
+  formFindText.Hide;
+end;
 
 procedure TformReplaceText.buttonFindClick(Sender: TObject);
 begin
@@ -124,6 +133,13 @@ begin
     Edit.SelectAll;
     Key := 0;
   end;
+end;
+
+procedure TformReplaceText.editFindChange(Sender: TObject);
+begin
+  buttonFind.Enabled := editFind.Text <> string.Empty;
+  buttonReplace.Enabled := buttonFind.Enabled;
+  buttonReplaceAll.Enabled := buttonFind.Enabled;
 end;
 
 end.

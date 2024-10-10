@@ -9,10 +9,12 @@ object formFindText: TformFindText
   ClientHeight = 129
   ClientWidth = 371
   FormStyle = fsStayOnTop
+  KeyPreview = True
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   ShowInTaskBar = stNever
+  LCLVersion = '3.6.0.0'
   object labelWhat: TLabel
     Left = 8
     Height = 15
@@ -26,6 +28,7 @@ object formFindText: TformFindText
     Top = 8
     Width = 200
     TabOrder = 0
+    OnChange = editFindChange
     OnKeyDown = editFindKeyDown
   end
   object buttonFind: TButton
@@ -34,6 +37,7 @@ object formFindText: TformFindText
     Top = 8
     Width = 84
     Caption = 'Find Next'
+    Enabled = False
     TabOrder = 1
     OnClick = buttonFindClick
   end

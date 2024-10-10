@@ -10,6 +10,7 @@ object formReplaceText: TformReplaceText
   ClientWidth = 359
   FormStyle = fsStayOnTop
   OnKeyDown = FormKeyDown
+  OnShow = FormShow
   ShowInTaskBar = stNever
   object labelWhat: TLabel
     Left = 10
@@ -24,6 +25,7 @@ object formReplaceText: TformReplaceText
     Top = 8
     Width = 170
     TabOrder = 0
+    OnChange = editFindChange
     OnKeyDown = editFindKeyDown
   end
   object buttonFind: TButton
@@ -33,6 +35,7 @@ object formReplaceText: TformReplaceText
     Width = 84
     Caption = 'Find Next'
     Default = True
+    Enabled = False
     TabOrder = 2
     OnClick = buttonFindClick
   end
@@ -84,6 +87,7 @@ object formReplaceText: TformReplaceText
     Top = 37
     Width = 84
     Caption = 'Replace'
+    Enabled = False
     TabOrder = 3
     OnClick = buttonReplaceClick
   end
@@ -93,6 +97,7 @@ object formReplaceText: TformReplaceText
     Top = 67
     Width = 84
     Caption = 'Replace All'
+    Enabled = False
     TabOrder = 4
     OnClick = buttonReplaceAllClick
   end

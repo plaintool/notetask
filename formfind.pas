@@ -7,6 +7,7 @@ interface
 
 uses
   Classes,
+  SysUtils,
   Forms,
   StdCtrls,
   ExtCtrls,
@@ -30,6 +31,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure editFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure editFindChange(Sender: TObject);
   private
 
   public
@@ -45,7 +47,7 @@ resourcestring
 
 implementation
 
-uses mainform;
+uses mainform, formreplace;
 
   {$R *.lfm}
 
@@ -62,6 +64,7 @@ end;
 procedure TformFindText.FormShow(Sender: TObject);
 begin
   editFind.SetFocus;
+  formReplaceText.Hide;
 end;
 
 procedure TformFindText.buttonFindClick(Sender: TObject);
@@ -76,15 +79,11 @@ end;
 
 procedure TformFindText.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
-  if ActiveControl is TEdit then
-    Exit;
-
   if Key = VK_ESCAPE then
     Close;
 
   if Key = VK_RETURN then
     buttonFind.Click;
-
 end;
 
 procedure TformFindText.editFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -133,6 +132,11 @@ begin
     Edit.SelectAll;
     Key := 0;
   end;
+end;
+
+procedure TformFindText.editFindChange(Sender: TObject);
+begin
+  buttonFind.Enabled := editFind.Text <> string.Empty;
 end;
 
 end.

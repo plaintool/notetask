@@ -201,7 +201,8 @@ type
     FWrapAround: boolean;
     FFindActive: boolean;
     FFindText: string;
-    FLastFindRow, FLastFindCol, FLastFindSelStart, FLastFindSelLength: integer;
+    FFoundText: string;
+    FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
     procedure MemoChange(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
@@ -1697,11 +1698,11 @@ var
 
   procedure NotFound;
   begin
-    taskGrid.Row := FLastFindRow;
-    taskGrid.Col := FLastFindCol;
+    taskGrid.Row := FLastFoundRow;
+    taskGrid.Col := FLastFoundCol;
     taskGrid.EditorMode := True;
-    Memo.SelStart := FLastFindSelStart;
-    Memo.SelLength := FLastFindSelLength;
+    Memo.SelStart := FLastFoundSelStart;
+    Memo.SelLength := FLastFoundSelLength;
     ShowMessage(rcantfind + ' "' + string(sText) + '"');
   end;
 
@@ -1739,10 +1740,11 @@ begin
         if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (FindMemo) then
         begin
           taskGrid.EditorMode := True;
-          FLastFindRow := taskGrid.Row;
-          FLastFindCol := taskGrid.Col;
-          FLastFindSelStart := Memo.SelStart;
-          FLastFindSelLength := Memo.SelLength;
+          FLastFoundRow := taskGrid.Row;
+          FLastFoundCol := taskGrid.Col;
+          FLastFoundSelStart := Memo.SelStart;
+          FLastFoundSelLength := Memo.SelLength;
+          FFoundText := aText;
           Counter := 0;
           Break;
         end;
@@ -1845,7 +1847,24 @@ begin
 end;
 
 function TformNotetask.Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
+
+  procedure FindNextExecute;
+  begin
+    FFindText := aText;
+    FMatchCase := aMatchCase;
+    FWrapAround := aWrapAround;
+    aFindNext.Execute;
+  end;
+
 begin
+  if (FFoundText = string.Empty) or (Memo.SelText <> aText) then
+    FindNextExecute
+  else
+  begin
+    Memo.SelText := aToText;
+    FindNextExecute;
+  end;
+
   Result := True;
 end;
 
