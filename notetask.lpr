@@ -12,6 +12,7 @@ uses
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms,
+  DateTimeCtrls,
   mainform,
   lineending,
   filemanager,
@@ -21,7 +22,7 @@ uses
   forminput,
   formfind,
   formreplace,
-  stringtool, datetimectrls;
+  stringtool;
 
   {$R *.res}
 
