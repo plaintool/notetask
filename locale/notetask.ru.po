@@ -84,7 +84,7 @@ msgstr "Безымянный"
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: tformaboutnotetask.caption
 msgid "About"
@@ -92,19 +92,19 @@ msgstr "О программе"
 
 #: tformaboutnotetask.labelby.caption
 msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
-msgstr ""
+msgstr "автор Александр Тверкой, лицензия CC BY-NC-SA 4.0"
 
 #: tformaboutnotetask.labellic.caption
 msgid "Full license text:"
-msgstr ""
+msgstr "Полный текст лицензии:"
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "https://creativecommons.org/licenses/by-nc-sa/4.0/"
-msgstr ""
+msgstr "https://creativecommons.org/licenses/by-nc-sa/4.0/"
 
 #: tformaboutnotetask.labelname.caption
 msgid "Notetask © 2024"
-msgstr ""
+msgstr "Notetask © 2024"
 
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"
@@ -217,15 +217,15 @@ msgstr "Вставить задачу"
 
 #: tformnotetask.alangdeutsch.caption
 msgid "Deutsch"
-msgstr ""
+msgstr "Немецкий"
 
 #: tformnotetask.alangenglish.caption
 msgid "English"
-msgstr ""
+msgstr "Английский"
 
 #: tformnotetask.alangrussian.caption
 msgid "Russian"
-msgstr ""
+msgstr "Русский"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move task to bottom"
@@ -330,7 +330,7 @@ msgstr "Справка"
 
 #: tformnotetask.menulanguage.caption
 msgid "Language"
-msgstr ""
+msgstr "Язык"
 
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"
@@ -408,4 +408,3 @@ msgstr "Что:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Чем:"
-
