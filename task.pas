@@ -53,7 +53,7 @@ type
     function GetTask(Index: integer): TTask; // Method to get a task by row index
     function GetTaskValue(ACol, ARow: integer): string; // Method to get a task value by row col
     function HasTask(Index: integer): boolean;
-    procedure SetTask(Grid: TStringGrid; Row, Col: integer; Backup: boolean = True);
+    procedure SetTask(Grid: TStringGrid; Row: integer; Backup: boolean = True);
     function InsertTask(const TaskString: string; Index: integer; Backup: boolean = True): integer;
     procedure DeleteTask(Index: integer);
     procedure ArchiveTask(Index: integer);
@@ -342,7 +342,7 @@ begin
   Result := (Ind >= 0) and (Ind < FCount);
 end;
 
-procedure TTasks.SetTask(Grid: TStringGrid; Row, Col: integer; Backup: boolean = True);
+procedure TTasks.SetTask(Grid: TStringGrid; Row: integer; Backup: boolean = True);
 var
   Task: TTask;
   Date: TDateTime;
@@ -356,23 +356,17 @@ begin
     // Get the task by the row index (minus one, as rows start from 1)
 
     // Reading data from the grid
-    if (Col = 1) then
-      Task.Done := StrToBoolDef(Grid.Cells[1, Row], False); // Convert to boolean
-    if (Col = 2) then
-      Task.Text := Grid.Cells[2, Row];
-    if (Col = 3) then
-      Task.Comment := Grid.Cells[3, Row];
-    if (Col = 4) then
+    Task.Done := StrToBoolDef(Grid.Cells[1, Row], False); // Convert to boolean
+    Task.Text := Grid.Cells[2, Row];
+    Task.Comment := Grid.Cells[3, Row];
+    if not TryStrToDateTime(Grid.Cells[4, Row], Date) then
     begin
-      if not TryStrToDateTime(Grid.Cells[4, Row], Date) then
-      begin
-        Date := 0; // If parsing the date failed, set to 0
-        Grid.Cells[4, Row] := '';
-      end
-      else
-        Grid.Cells[4, Row] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Date);
-      Task.Date := Date;
-    end;
+      Date := 0; // If parsing the date failed, set to 0
+      Grid.Cells[4, Row] := '';
+    end
+    else
+      Grid.Cells[4, Row] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Date);
+    Task.Date := Date;
   end
   else
     raise Exception.Create('Invalid row or task index');

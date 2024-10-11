@@ -548,7 +548,7 @@ begin
     if (taskGrid.Cells[4, aRow] = '') then
       taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
   end;
-  Tasks.SetTask(taskGrid, aRow, aCol);
+  Tasks.SetTask(taskGrid, aRow);
 end;
 
 procedure TformNotetask.taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
@@ -781,7 +781,7 @@ begin
     begin
       SetChanged;
 
-      Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col);
+      Tasks.SetTask(taskGrid, taskGrid.Row);
       EditComplite(False);
     end;
   end;
@@ -1269,7 +1269,7 @@ end;
 procedure TformNotetask.MemoChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, taskGrid.Col, FBackup);
+  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
   SetChanged;
   MemoSetBounds(taskGrid.Col, taskGrid.Row);
 end;
