@@ -745,8 +745,14 @@ begin
     DatePicker.Options := [dtpoFlatButton];
 
     EditControlSetBounds(DatePicker, aCol, aRow, 0, 0, 0, 0);
-    TryStrToDateTime(taskGrid.Cells[aCol, aRow], sDateTime);
-    DatePicker.DateTime := sDateTime;
+
+    if (taskGrid.Cells[aCol, aRow] = string.Empty) then
+      DatePicker.DateTime := Now
+    else
+    begin
+      TryStrToDateTime(taskGrid.Cells[aCol, aRow], sDateTime);
+      DatePicker.DateTime := sDateTime;
+    end;
 
     DatePicker.OnChange := @DatePickerChange; // Event Change
 
@@ -1475,6 +1481,7 @@ begin
   // If multiple rows are selected
   if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
   begin
+    Tasks.CreateBackup;
     // Mark tasks as completed from the end to avoid index shifting
     for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
     begin
@@ -1482,11 +1489,18 @@ begin
       if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
       begin
         // Mark the task as completed in the collection
-        Tasks.CompleteTask(RowIndex);
+         Tasks.CompleteTask(RowIndex);
+
         if Tasks.GetTask(RowIndex).Done then
-          taskGrid.Cells[1, RowIndex] := '1'
+        begin
+          taskGrid.Cells[1, RowIndex] := '1';
+          if (taskGrid.Cells[4, RowIndex] = '') then
+            taskGrid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
+        end
         else
           taskGrid.Cells[1, RowIndex] := '0';
+
+        Tasks.SetTask(taskGrid, RowIndex, False);
       end;
     end;
     SetChanged; // Mark that data has changed
@@ -1504,9 +1518,15 @@ begin
       // Mark the task as completed in the collection
       Tasks.CompleteTask(RowIndex);
       if Tasks.GetTask(RowIndex).Done then
-        taskGrid.Cells[1, RowIndex] := '1'
+      begin
+        taskGrid.Cells[1, RowIndex] := '1';
+        if (taskGrid.Cells[4, RowIndex] = '') then
+          taskGrid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
+      end
       else
         taskGrid.Cells[1, RowIndex] := '0';
+
+      Tasks.SetTask(taskGrid, RowIndex, FBackup);
       SetChanged; // Mark that data has changed
     end;
   end;
