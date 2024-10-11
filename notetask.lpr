@@ -13,16 +13,16 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms,
   DateTimeCtrls,
-  mainform,
   lineending,
   filemanager,
   task,
   settings,
   systemtool,
+  stringtool,
+  mainform,
   forminput,
   formfind,
-  formreplace,
-  stringtool;
+  formreplace;
 
   {$R *.res}
 

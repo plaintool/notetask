@@ -38,6 +38,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="forms;units"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -126,61 +127,61 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="mainform.pas"/>
+        <Filename Value="forms\mainform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="lineending.pas"/>
+        <Filename Value="units\lineending.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="filemanager.pas"/>
+        <Filename Value="units\filemanager.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="task.pas"/>
+        <Filename Value="units\task.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="settings.pas"/>
+        <Filename Value="units\settings.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="gridprn.pas"/>
+        <Filename Value="units\gridprn.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="GridPrn"/>
       </Unit>
       <Unit>
-        <Filename Value="systemtool.pas"/>
+        <Filename Value="units\systemtool.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="forminput.pas"/>
+        <Filename Value="units\stringtool.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="forms\forminput.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formInputText"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="formfind.pas"/>
+        <Filename Value="forms\formfind.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formFindText"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="formreplace.pas"/>
+        <Filename Value="forms\formreplace.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formReplaceText"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit>
-      <Unit>
-        <Filename Value="stringtool.pas"/>
-        <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
   </ProjectOptions>
