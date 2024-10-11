@@ -81,6 +81,10 @@ msgstr "Вы уверены, что хотите отменить все изм�
 msgid "Untitled"
 msgstr "Безымянный"
 
+#: tformaboutnotetask.caption
+msgid "About"
+msgstr "О программе"
+
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"
 msgid "Cancel"
@@ -367,4 +371,3 @@ msgstr "Что:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Чем:"
-

@@ -1,3 +1,9 @@
+//----------------------------------------------------------------------
+//  Notetask © 2024 by Alexander Tverskoy
+//  Licensed under CC BY-NC-SA 4.0
+//  Full license text: https://creativecommons.org/licenses/by-nc-sa/4.0/
+//----------------------------------------------------------------------
+
 program notetask;
 
 {$mode objfpc}{$H+}
@@ -22,7 +28,7 @@ uses
   mainform,
   forminput,
   formfind,
-  formreplace;
+  formreplace, formabout;
 
   {$R *.res}
 
@@ -37,5 +43,6 @@ begin
   Application.CreateForm(TformReplaceText, formReplaceText);
   ApplicationTranslate(GetOSLanguage);
   SetFileTypeIcon('.tsk', 1);
+  Application.CreateForm(TformAboutNotetask, formAboutNotetask);
   Application.Run;
 end.

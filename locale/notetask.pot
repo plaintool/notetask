@@ -71,6 +71,10 @@ msgstr ""
 msgid "Untitled"
 msgstr ""
 
+#: tformaboutnotetask.caption
+msgid "About"
+msgstr ""
+
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"
 msgid "Cancel"

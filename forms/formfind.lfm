@@ -14,6 +14,7 @@ object formFindText: TformFindText
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   ShowInTaskBar = stNever
+  LCLVersion = '3.6.0.0'
   object labelWhat: TLabel
     Left = 8
     Height = 15

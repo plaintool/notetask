@@ -1,0 +1,7 @@
+object formAboutNotetask: TformAboutNotetask
+  Left = 318
+  Height = 286
+  Top = 250
+  Width = 338
+  Caption = 'About'
+end
