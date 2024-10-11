@@ -204,6 +204,7 @@ type
     FFoundText: string;
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
     procedure MemoChange(Sender: TObject);
+    procedure MemoEnter(Sender: TObject);
     procedure MemoSetBounds(aCol: integer; aRow: integer);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -734,7 +735,8 @@ begin
 
   MemoSetBounds(aCol, aRow);
   Memo.Parent := taskGrid;
-  Memo.OnChange := @MemoChange; // Event
+  Memo.OnChange := @MemoChange; // Event Change
+  Memo.OnEnter := @MemoEnter; //Event Enter
   Memo.Text := taskGrid.Cells[aCol, aRow];
   Memo.SelStart := Length(Memo.Text);
   Memo.SelLength := 0;
@@ -1264,6 +1266,21 @@ procedure TformNotetask.PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; 
 begin
   if AGrid is TStringGrid then
     AText := TStringGrid(AGrid).Cells[ACol, ARow];
+end;
+
+procedure TformNotetask.MemoEnter(Sender: TObject);
+begin
+  if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and
+     ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+  begin
+    Memo.Color := clHighlight;
+    Memo.Font.Color := clWhite;
+  end
+  else
+  begin
+    Memo.Color := clRowHighlight;
+    Memo.Font.Color := clBlack;
+  end;
 end;
 
 procedure TformNotetask.MemoChange(Sender: TObject);
