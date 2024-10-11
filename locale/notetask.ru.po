@@ -266,19 +266,6 @@ msgstr "Отменить все изменения"
 msgid "Word wrap"
 msgstr "Перенос по словам"
 
-#: tformnotetask.calendardialog.cancelcaption
-msgctxt "tformnotetask.calendardialog.cancelcaption"
-msgid "Cancel"
-msgstr "Отмена"
-
-#: tformnotetask.calendardialog.okcaption
-msgid "&ОК"
-msgstr "&ОК"
-
-#: tformnotetask.calendardialog.title
-msgid "Select date"
-msgstr "Выберите дату"
-
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
@@ -380,3 +367,4 @@ msgstr "Что:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Чем:"
+

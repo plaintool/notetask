@@ -39,7 +39,6 @@ object formNotetask: TformNotetask
         Width = 205
       end    
       item
-        ButtonStyle = cbsEllipsis
         Title.Caption = 'Date'
         Width = 140
       end>
@@ -57,7 +56,6 @@ object formNotetask: TformNotetask
     OnColRowDeleted = taskGridColRowDeleted
     OnColRowInserted = taskGridColRowInserted
     OnDrawCell = taskGridDrawCell
-    OnEditButtonClick = taskGridEditButtonClick
     OnHeaderClick = taskGridHeaderClick
     OnHeaderSized = taskGridHeaderSized
     OnMouseDown = taskGridMouseDown
@@ -476,21 +474,11 @@ object formNotetask: TformNotetask
     Left = 488
     Top = 112
   end
-  object calendarDialog: TCalendarDialog
-    Title = 'Select date'
-    DialogPosition = poDesigned
-    Date = 45568
-    DisplaySettings = [dsShowDayNames]
-    OKCaption = '&ОК'
-    CancelCaption = 'Cancel'
-    Left = 584
-    Top = 112
-  end
   object fontDialog: TFontDialog
     Title = 'Font select'
     MinFontSize = 0
     MaxFontSize = 0
-    Left = 680
+    Left = 576
     Top = 112
   end
   object Popup: TPopupMenu

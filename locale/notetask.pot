@@ -256,19 +256,6 @@ msgstr ""
 msgid "Word wrap"
 msgstr ""
 
-#: tformnotetask.calendardialog.cancelcaption
-msgctxt "tformnotetask.calendardialog.cancelcaption"
-msgid "Cancel"
-msgstr ""
-
-#: tformnotetask.calendardialog.okcaption
-msgid "&ОК"
-msgstr ""
-
-#: tformnotetask.calendardialog.title
-msgid "Select date"
-msgstr ""
-
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"

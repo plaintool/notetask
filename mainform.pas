@@ -18,6 +18,7 @@ uses
   Grids,
   Menus,
   PrintersDlgs,
+  DateTimePicker,
   Printers,
   LCLIntf,
   LCLType,
@@ -66,7 +67,6 @@ type
     aNewWindow: TAction;
     aOpen: TAction;
     ActionList: TActionList;
-    calendarDialog: TCalendarDialog;
     fontDialog: TFontDialog;
     MainMenu: TMainMenu;
     menuFile: TMenuItem;
@@ -139,7 +139,6 @@ type
     procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
-    procedure taskGridEditButtonClick(Sender: TObject);
     procedure taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -185,6 +184,7 @@ type
     procedure aFindPrevExecute(Sender: TObject);
   private
     Memo: TMemo;
+    DatePicker: TDateTimePicker;
     FChanged: boolean;
     FBackup: boolean;
     FIsEditing: boolean;
@@ -205,7 +205,9 @@ type
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
-    procedure MemoSetBounds(aCol: integer; aRow: integer);
+    procedure DatePickerChange(Sender: TObject);
+    procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 5; OffsetTop: integer = 1;
+      OffsetRight: integer = -10; OffsetBottom: integer = -2);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure SetChanged(aChanged: boolean = True);
@@ -484,34 +486,6 @@ begin
   CanClose := IsCanClose;
 end;
 
-procedure TformNotetask.taskGridEditButtonClick(Sender: TObject);
-var
-  Col, Row: integer;
-  CellRect: TRect;
-  CalendarX, CalendarY: integer;
-begin
-  // Get the current column and row
-  Col := taskGrid.Col;
-  Row := taskGrid.Row;
-
-  // Get the rectangle of the cell
-  CellRect := taskGrid.CellRect(Col, Row);
-
-  // Calculate the position for the calendar dialog
-  CalendarX := CellRect.CenterPoint.X; // Position to the left of the cell
-  CalendarY := CellRect.CenterPoint.Y; // Position below the cell
-
-  // Set the position of the calendar dialog
-  calendarDialog.Left := CalendarX + Left;
-  calendarDialog.Top := CalendarY + Top;
-
-  if calendarDialog.Execute then
-  begin
-    // Set the selected date in the corresponding cell
-    taskGrid.Cells[Col, Row] := DateToStr(calendarDialog.Date);
-  end;
-end;
-
 procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
 begin
   EditComplite;
@@ -707,53 +681,87 @@ begin
 end;
 
 procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
+var
+  sDateTime: TDateTime;
 begin
-  if (aCol in [1, 4]) then exit;
-  if (Assigned(Memo)) then Memo.Free;
-
-  Memo := TMemo.Create(Self);
-  Memo.Visible := False;
-  if (taskGrid.IsCellSelected[aCol, aRow]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+  if (aCol in [2, 3]) then
   begin
-    Memo.Color := clHighlight;
-    Memo.Font.Color := clWhite;
-  end
-  else
-  begin
-    Memo.Color := clRowHighlight;
-    Memo.Font.Color := clBlack;
-  end;
-  Memo.Font.Name := taskGrid.Font.Name;
-  Memo.Font.Size := taskGrid.Font.Size;
-  Memo.HideSelection := False;
-  Memo.TabStop := False;
-  Memo.WantTabs := True;
-  Memo.BorderStyle := bsNone;
-  Memo.WordWrap := FWordWrap;
-  Memo.WantReturns := FWordWrap;
-  Memo.ScrollBars := ssNone;
+    if (Assigned(Memo)) then Memo.Free;
 
-  MemoSetBounds(aCol, aRow);
-  Memo.Parent := taskGrid;
-  Memo.OnChange := @MemoChange; // Event Change
-  Memo.OnEnter := @MemoEnter; //Event Enter
-  Memo.Text := taskGrid.Cells[aCol, aRow];
-  Memo.SelStart := Length(Memo.Text);
-  Memo.SelLength := 0;
-  //  Memo.CaretPos := Point(Length(Memo.Text), 0);
-
-  Editor := Memo;
-
-  if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
-  begin
-    FIsSelecting := False;
+    Memo := TMemo.Create(Self);
     Memo.Visible := False;
-    FIsEditing := False;
+    if (taskGrid.IsCellSelected[aCol, aRow]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+    begin
+      Memo.Color := clHighlight;
+      Memo.Font.Color := clWhite;
+    end
+    else
+    begin
+      Memo.Color := clRowHighlight;
+      Memo.Font.Color := clBlack;
+    end;
+    Memo.Font.Name := taskGrid.Font.Name;
+    Memo.Font.Size := taskGrid.Font.Size;
+    Memo.HideSelection := False;
+    Memo.TabStop := False;
+    Memo.WantTabs := True;
+    Memo.BorderStyle := bsNone;
+    Memo.WordWrap := FWordWrap;
+    Memo.WantReturns := FWordWrap;
+    Memo.ScrollBars := ssNone;
+
+    EditControlSetBounds(Memo, aCol, aRow);
+    Memo.Parent := taskGrid;
+    Memo.OnChange := @MemoChange; // Event Change
+    Memo.OnEnter := @MemoEnter; //Event Enter
+    Memo.Text := taskGrid.Cells[aCol, aRow];
+    Memo.SelStart := Length(Memo.Text);
+    Memo.SelLength := 0;
+    //  Memo.CaretPos := Point(Length(Memo.Text), 0);
+
+    Editor := Memo;
+
+    if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
+    begin
+      Memo.Visible := False;
+      FIsSelecting := False;
+      FIsEditing := False;
+    end
+    else
+    begin
+      Memo.Visible := True;
+      FIsEditing := True;
+    end;
   end
   else
+  if (aCol = 4) then
   begin
-    Memo.Visible := True;
-    FIsEditing := True;
+    if (Assigned(DatePicker)) then DatePicker.Free;
+
+    DatePicker := TDateTimePicker.Create(Self);
+    DatePicker.AutoSize := False;
+    DatePicker.Kind := dtkDateTime;
+    DatePicker.TimeDisplay := tdHMS;
+    DatePicker.Options := [dtpoFlatButton];
+
+    EditControlSetBounds(DatePicker, aCol, aRow, 0, 0, 0, 0);
+    TryStrToDateTime(taskGrid.Cells[aCol, aRow], sDateTime);
+    DatePicker.DateTime := sDateTime;
+
+    DatePicker.OnChange := @DatePickerChange; // Event Change
+
+    Editor := DatePicker;
+    if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
+    begin
+      DatePicker.Visible := False;
+      FIsSelecting := False;
+      FIsEditing := False;
+    end
+    else
+    begin
+      DatePicker.Visible := True;
+      FIsEditing := True;
+    end;
   end;
 end;
 
@@ -1270,8 +1278,7 @@ end;
 
 procedure TformNotetask.MemoEnter(Sender: TObject);
 begin
-  if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and
-     ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+  if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
   begin
     Memo.Color := clHighlight;
     Memo.Font.Color := clWhite;
@@ -1288,16 +1295,25 @@ begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
   SetChanged;
-  MemoSetBounds(taskGrid.Col, taskGrid.Row);
+  EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
 end;
 
-procedure TformNotetask.MemoSetBounds(aCol: integer; aRow: integer);
+procedure TformNotetask.DatePickerChange(Sender: TObject);
+begin
+  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
+    TDateTimePicker(Sender).DateTime);
+  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
+  SetChanged;
+  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row);
+end;
+
+procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 5; OffsetTop: integer = 1;
+  OffsetRight: integer = -10; OffsetBottom: integer = -2);
 var
   Rect: TRect;
 begin
-  Application.ProcessMessages;
   Rect := taskGrid.CellRect(aCol, aRow);
-  Memo.SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 2);
+  Sender.SetBounds(Rect.Left + OffsetLeft, Rect.Top + OffsetTop, Rect.Right - Rect.Left + OffsetRight, Rect.Bottom - Rect.Top + OffsetBottom);
 end;
 
 procedure TformNotetask.ClearSelected(ShowConfirm: boolean = True);

@@ -21,7 +21,7 @@ uses
   forminput,
   formfind,
   formreplace,
-  stringtool;
+  stringtool, datetimectrls;
 
   {$R *.res}
 
