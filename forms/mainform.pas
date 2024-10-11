@@ -946,6 +946,7 @@ begin
   Tasks.InsertTask('[ ]', taskGrid.Row);
   FillGrid;
   FLineCount += 1;
+  taskGrid.Row := taskGrid.Row + 1;
   SetInfo;
   SetChanged;
 end;
@@ -1048,6 +1049,7 @@ begin
       Memo.SelText := CurrentDateTime;
       Memo.SelStart := PosStart + Length(CurrentDateTime);
     end;
+    Tasks.SetTask(taskGrid, taskGrid.Row);
     SetChanged;
   end
   else
@@ -1058,6 +1060,7 @@ begin
         taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
       else
         taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
+      Tasks.SetTask(taskGrid, taskGrid.Row);
       SetChanged;
     end;
   end;
@@ -1310,7 +1313,7 @@ begin
     TDateTimePicker(Sender).DateTime);
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
   SetChanged;
-  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row);
+  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
 end;
 
 procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 5; OffsetTop: integer = 1;
@@ -1489,7 +1492,7 @@ begin
       if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
       begin
         // Mark the task as completed in the collection
-         Tasks.CompleteTask(RowIndex);
+        Tasks.CompleteTask(RowIndex);
 
         if Tasks.GetTask(RowIndex).Done then
         begin
