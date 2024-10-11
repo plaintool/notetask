@@ -16,11 +16,13 @@
         <TextDesc Value="Notetask Editor: A simple solution for task text files"/>
       </XPManifest>
       <Icon Value="0"/>
-      <Resources Count="4">
-        <Resource_0 FileName="locale\notetask.ru.po" Type="RCDATA" ResourceName="NOTETASK.RU"/>
-        <Resource_1 FileName="check.bmp" Type="BITMAP" ResourceName="CHECK"/>
-        <Resource_2 FileName="uncheck.bmp" Type="BITMAP" ResourceName="UNCHECK"/>
-        <Resource_3 FileName="taskdoc.ico" Type="ICON" ResourceName="TASKDOC"/>
+      <Resources Count="6">
+        <Resource_0 FileName="check.bmp" Type="BITMAP" ResourceName="CHECK"/>
+        <Resource_1 FileName="uncheck.bmp" Type="BITMAP" ResourceName="UNCHECK"/>
+        <Resource_2 FileName="taskdoc.ico" Type="ICON" ResourceName="TASKDOC"/>
+        <Resource_3 FileName="locale\notetask.en.po" Type="RCDATA" ResourceName="NOTETASK.EN"/>
+        <Resource_4 FileName="locale\notetask.de.po" Type="RCDATA" ResourceName="NOTETASK.DE"/>
+        <Resource_5 FileName="locale\notetask.ru.po" Type="RCDATA" ResourceName="NOTETASK.RU"/>
       </Resources>
     </General>
     <i18n>
@@ -187,6 +189,7 @@
         <Filename Value="forms\formabout.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formAboutNotetask"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
     </Units>

@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -241,6 +240,21 @@ object formNotetask: TformNotetask
     end
     object menuHelp: TMenuItem
       Caption = 'Help'
+      object menuLanguage: TMenuItem
+        Caption = 'Language'
+        object menuEnglish: TMenuItem
+          Action = aLangEnglish
+        end
+        object menuDeutsch: TMenuItem
+          Action = aLangDeutsch
+        end
+        object menuRussian: TMenuItem
+          Action = aLangRussian
+        end
+      end
+      object Separator9: TMenuItem
+        Caption = '-'
+      end
       object menuAbout: TMenuItem
         Action = aAbout
       end
@@ -374,6 +388,7 @@ object formNotetask: TformNotetask
     object aAbout: TAction
       Category = 'Help'
       Caption = 'About...'
+      OnExecute = aAboutExecute
     end
     object aUndoAll: TAction
       Category = 'Edit'
@@ -446,6 +461,21 @@ object formNotetask: TformNotetask
       Caption = 'Date time'
       OnExecute = aDateTimeExecute
       ShortCut = 116
+    end
+    object aLangEnglish: TAction
+      Category = 'Language'
+      Caption = 'English'
+      OnExecute = aLangEnglishExecute
+    end
+    object aLangRussian: TAction
+      Category = 'Language'
+      Caption = 'Russian'
+      OnExecute = aLangRussianExecute
+    end
+    object aLangDeutsch: TAction
+      Category = 'Language'
+      Caption = 'Deutsch'
+      OnExecute = aLangDeutschExecute
     end
   end
   object openDialog: TOpenDialog

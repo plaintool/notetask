@@ -92,11 +92,11 @@ begin
 
   try
     try
-      // Load the resource file
-      Res := TResourceStream.Create(HInstance, 'notetask.' + Language, RT_RCDATA);
+      // Create string stream
       PoStringStream := TStringStream.Create('');
 
-      // Save the resource to the string stream
+      // Load the resource file and save the resource to the string stream
+      Res := TResourceStream.Create(HInstance, 'notetask.' + Language, RT_RCDATA);
       Res.SaveToStream(PoStringStream);
 
       // Read strings from the file

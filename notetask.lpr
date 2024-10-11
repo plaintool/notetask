@@ -43,6 +43,5 @@ begin
   Application.CreateForm(TformReplaceText, formReplaceText);
   ApplicationTranslate(GetOSLanguage);
   SetFileTypeIcon('.tsk', 1);
-  Application.CreateForm(TformAboutNotetask, formAboutNotetask);
   Application.Run;
 end.

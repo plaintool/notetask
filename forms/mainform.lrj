@@ -10,6 +10,7 @@
 {"hash":81171332,"name":"tformnotetask.menuformat.caption","sourcebytes":[70,111,114,109,97,116],"value":"Format"},
 {"hash":380871,"name":"tformnotetask.menuview.caption","sourcebytes":[86,105,101,119],"value":"View"},
 {"hash":322608,"name":"tformnotetask.menuhelp.caption","sourcebytes":[72,101,108,112],"value":"Help"},
+{"hash":139375349,"name":"tformnotetask.menulanguage.caption","sourcebytes":[76,97,110,103,117,97,103,101],"value":"Language"},
 {"hash":21703,"name":"tformnotetask.anew.caption","sourcebytes":[78,101,119],"value":"New"},
 {"hash":131794935,"name":"tformnotetask.anewwindow.caption","sourcebytes":[78,101,119,32,119,105,110,100,111,119],"value":"New window"},
 {"hash":107745630,"name":"tformnotetask.aopen.caption","sourcebytes":[79,112,101,110,46,46,46],"value":"Open..."},
@@ -43,6 +44,9 @@
 {"hash":24847854,"name":"tformnotetask.agoto.caption","sourcebytes":[71,111,32,116,111,46,46,46],"value":"Go to..."},
 {"hash":195296268,"name":"tformnotetask.aselectall.caption","sourcebytes":[83,101,108,101,99,116,32,97,108,108],"value":"Select all"},
 {"hash":175630005,"name":"tformnotetask.adatetime.caption","sourcebytes":[68,97,116,101,32,116,105,109,101],"value":"Date time"},
+{"hash":206450904,"name":"tformnotetask.alangenglish.caption","sourcebytes":[69,110,103,108,105,115,104],"value":"English"},
+{"hash":164273966,"name":"tformnotetask.alangrussian.caption","sourcebytes":[82,117,115,115,105,97,110],"value":"Russian"},
+{"hash":181189080,"name":"tformnotetask.alangdeutsch.caption","sourcebytes":[68,101,117,116,115,99,104],"value":"Deutsch"},
 {"hash":107761687,"name":"tformnotetask.opendialog.title","sourcebytes":[79,112,101,110,105,110,103],"value":"Opening"},
 {"hash":93900871,"name":"tformnotetask.savedialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
 {"hash":131550916,"name":"tformnotetask.fontdialog.title","sourcebytes":[70,111,110,116,32,115,101,108,101,99,116],"value":"Font select"}

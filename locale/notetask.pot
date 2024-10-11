@@ -71,8 +71,29 @@ msgstr ""
 msgid "Untitled"
 msgstr ""
 
+#: tformaboutnotetask.buttonok.caption
+msgctxt "tformaboutnotetask.buttonok.caption"
+msgid "OK"
+msgstr ""
+
 #: tformaboutnotetask.caption
 msgid "About"
+msgstr ""
+
+#: tformaboutnotetask.labelby.caption
+msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
+msgstr ""
+
+#: tformaboutnotetask.labellic.caption
+msgid "Full license text:"
+msgstr ""
+
+#: tformaboutnotetask.labellicurl.caption
+msgid "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+msgstr ""
+
+#: tformaboutnotetask.labelname.caption
+msgid "Notetask © 2024"
 msgstr ""
 
 #: tformfindtext.buttoncancel.caption
@@ -184,6 +205,18 @@ msgstr ""
 msgid "Insert task"
 msgstr ""
 
+#: tformnotetask.alangdeutsch.caption
+msgid "Deutsch"
+msgstr ""
+
+#: tformnotetask.alangenglish.caption
+msgid "English"
+msgstr ""
+
+#: tformnotetask.alangrussian.caption
+msgid "Russian"
+msgstr ""
+
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move task to bottom"
 msgstr ""
@@ -283,6 +316,10 @@ msgstr ""
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
+msgstr ""
+
+#: tformnotetask.menulanguage.caption
+msgid "Language"
 msgstr ""
 
 #: tformnotetask.menutask.caption

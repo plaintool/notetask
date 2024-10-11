@@ -135,6 +135,14 @@ type
     Separator8: TMenuItem;
     statusBar: TStatusBar;
     taskGrid: TStringGrid;
+    aLangEnglish: TAction;
+    menuLanguage: TMenuItem;
+    Separator9: TMenuItem;
+    menuEnglish: TMenuItem;
+    menuRussian: TMenuItem;
+    aLangRussian: TAction;
+    aLangDeutsch: TAction;
+    menuDeutsch: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -188,6 +196,10 @@ type
     procedure aReplaceExecute(Sender: TObject);
     procedure aFindNextExecute(Sender: TObject);
     procedure aFindPrevExecute(Sender: TObject);
+    procedure aAboutExecute(Sender: TObject);
+    procedure aLangEnglishExecute(Sender: TObject);
+    procedure aLangRussianExecute(Sender: TObject);
+    procedure aLangDeutschExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -281,7 +293,7 @@ resourcestring
 
 implementation
 
-uses filemanager, settings, stringtool, forminput, formfind, formreplace;
+uses filemanager, settings, stringtool, systemtool, forminput, formfind, formreplace, formabout;
 
   {$R *.lfm}
 
@@ -1270,6 +1282,36 @@ begin
     Find(FindText, MatchCase, WrapAround, False)
   else
     aFind.Execute;
+end;
+
+procedure TformNotetask.aAboutExecute(Sender: TObject);
+begin
+  formAboutNotetask := TformAboutNotetask.Create(nil);
+  try
+    formAboutNotetask.Left := Self.Left + 100;
+    formAboutNotetask.Top := Self.Top + 100;
+    formAboutNotetask.ShowModal;
+  finally
+    formAboutNotetask.Free;
+  end;
+end;
+
+procedure TformNotetask.aLangEnglishExecute(Sender: TObject);
+begin
+  ApplicationTranslate('en');
+  SetCaption;
+end;
+
+procedure TformNotetask.aLangRussianExecute(Sender: TObject);
+begin
+  ApplicationTranslate('ru');
+  SetCaption;
+end;
+
+procedure TformNotetask.aLangDeutschExecute(Sender: TObject);
+begin
+  ApplicationTranslate('de');
+  SetCaption;
 end;
 
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
