@@ -221,11 +221,11 @@ msgstr "Deutsch"
 
 #: tformnotetask.alangenglish.caption
 msgid "English"
-msgstr "Englisch"
+msgstr "English"
 
 #: tformnotetask.alangrussian.caption
 msgid "Russian"
-msgstr "Russisch"
+msgstr "Russian"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move task to bottom"
@@ -330,7 +330,7 @@ msgstr "Hilfe"
 
 #: tformnotetask.menulanguage.caption
 msgid "Language"
-msgstr "Sprache"
+msgstr "Language"
 
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"
