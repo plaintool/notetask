@@ -4,7 +4,7 @@ object formReplaceText: TformReplaceText
   Top = 0
   Width = 359
   BorderIcons = [biSystemMenu]
-  BorderStyle = bsSingle
+  BorderStyle = bsDialog
   Caption = 'Replace'
   ClientHeight = 154
   ClientWidth = 359

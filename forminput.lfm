@@ -4,13 +4,12 @@ object formInputText: TformInputText
   Top = 250
   Width = 250
   BorderIcons = [biSystemMenu]
-  BorderStyle = bsSingle
+  BorderStyle = bsDialog
   Caption = 'Go to task'
   ClientHeight = 100
   ClientWidth = 250
   OnShow = FormShow
   ShowInTaskBar = stNever
-  LCLVersion = '3.6.0.0'
   object buttonOk: TButton
     Left = 85
     Height = 25
