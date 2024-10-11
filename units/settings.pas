@@ -42,6 +42,8 @@ function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;
 
 implementation
 
+uses systemtool;
+
 function GetSettingsDirectory(fileName: string = ''): string;
 begin
   {$IFDEF Windows}
@@ -70,6 +72,7 @@ begin
     JSONObj.Add('Top', Form.RestoredTop);
     JSONObj.Add('Width', Form.RestoredWidth);
     JSONObj.Add('Height', Form.RestoredHeight);
+    JSONObj.Add('Language', Language);
 
     // Save font
     JSONObj.Add('FontName', Form.Font.Name);
@@ -135,6 +138,15 @@ begin
 
       if JSONObj.FindPath('Height') <> nil then
         Form.Height := JSONObj.FindPath('Height').AsInteger;
+
+      if JSONObj.FindPath('Language') <> nil then
+      begin
+        if (Language <> JSONObj.FindPath('Language').AsString) then
+        begin
+          Language := JSONObj.FindPath('Language').AsString;
+          Form.SetLanguage(Language);
+        end;
+      end;
 
       // Check and load font properties
       if JSONObj.FindPath('FontName') <> nil then

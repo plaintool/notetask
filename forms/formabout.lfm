@@ -160,7 +160,7 @@ object formAboutNotetask: TformAboutNotetask
     WordWrap = True
   end
   object labelName: TLabel
-    Left = 147
+    Left = 136
     Height = 55
     Top = 32
     Width = 309

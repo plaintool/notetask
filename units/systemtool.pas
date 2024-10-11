@@ -34,6 +34,9 @@ uses
 function GetOSLanguage: string;
 function ApplicationTranslate(const Language: string): boolean;
 
+var
+  Language: string;
+
 implementation
 
 function GetOSLanguage: string;

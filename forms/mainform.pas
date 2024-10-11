@@ -28,7 +28,6 @@ uses
   Printers,
   LCLIntf,
   LCLType,
-  ExtDlgs,
   Process,
   StrUtils,
   GridPrn,
@@ -240,14 +239,15 @@ type
     procedure ArchiveTasks;
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowArchived(Value: boolean);
-    function GetIsEditing: boolean;
     procedure CompleteTasks(aRow: integer = 0);
     procedure ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
+    function GetIsEditing: boolean;
     function IsCanClose: boolean;
   public
     FShowArchived: boolean;
 
+    procedure SetLanguage(aLanguage: string = string.Empty);
     procedure OpenFile(fileName: string);
     procedure SaveFile(fileName: string = string.Empty);
     procedure FillGrid;
@@ -311,6 +311,8 @@ begin
   clRowExpired := RGBToColor(255, 220, 220);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
+
+  SetLanguage;
 
   // Create TBitmap objects
   ResourceBitmapCheck := TBitmap.Create;
@@ -1298,19 +1300,19 @@ end;
 
 procedure TformNotetask.aLangEnglishExecute(Sender: TObject);
 begin
-  ApplicationTranslate('en');
+  SetLanguage('en');
   SetCaption;
 end;
 
 procedure TformNotetask.aLangRussianExecute(Sender: TObject);
 begin
-  ApplicationTranslate('ru');
+  SetLanguage('ru');
   SetCaption;
 end;
 
 procedure TformNotetask.aLangDeutschExecute(Sender: TObject);
 begin
-  ApplicationTranslate('de');
+  SetLanguage('de');
   SetCaption;
 end;
 
@@ -1717,6 +1719,26 @@ begin
   statusBar.Panels[2].Text := FLineEnding.ToString;
   statusBar.Panels[3].Text := FLineCount.ToString + rrows;
   SetCaption;
+end;
+
+procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);
+begin
+  aLangEnglish.Checked := False;
+  aLangDeutsch.Checked := False;
+  aLangRussian.Checked := False;
+
+  if (aLanguage <> string.Empty) then
+  begin
+    Language := aLanguage;
+    ApplicationTranslate(Language);
+  end;
+
+  case Language of
+    'en': aLangEnglish.Checked := True;
+    'de': aLangDeutsch.Checked := True;
+    'ru': aLangRussian.Checked := True;
+  end;
+
 end;
 
 procedure TformNotetask.SetCaption;

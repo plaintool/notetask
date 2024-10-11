@@ -28,20 +28,22 @@ uses
   mainform,
   forminput,
   formfind,
-  formreplace, formabout;
+  formreplace,
+  formabout;
 
   {$R *.res}
 
 begin
   RequireDerivedFormResource := True;
-  Application.Title:='Notetask';
-  Application.Scaled:=True;
+  Language := GetOSLanguage;
+  Application.Title := 'Notetask';
+  Application.Scaled := True;
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
   Application.CreateForm(TformInputText, formInputText);
   Application.CreateForm(TformFindText, formFindText);
   Application.CreateForm(TformReplaceText, formReplaceText);
-  ApplicationTranslate(GetOSLanguage);
+  ApplicationTranslate(Language);
   SetFileTypeIcon('.tsk', 1);
   Application.Run;
 end.
