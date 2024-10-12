@@ -15,7 +15,7 @@ uses
   Classes,
   SysUtils;
 
-function TextToStringList(const TextContent: string): TStringList;
+function TextToStringList(const Content: string): TStringList;
 
 function RemoveBrackets(const S: string): string;
 
@@ -25,14 +25,22 @@ function EncodeUrl(const url: string): string;
 
 implementation
 
-function TextToStringList(const TextContent: string): TStringList;
+function TextToStringList(const Content: string): TStringList;
 var
   StringList: TStringList;
 begin
   StringList := TStringList.Create;
   // Create a new instance of TStringList
   try
-    StringList.Text := TextContent; // Load text into TStringList
+    StringList.Text := Content; // Load text into TStringList
+
+    // Check if the file ends with a new line and the last line is not empty
+    if ((Content <> '') and (Content[Length(Content)] in [#10, #13]) and (StringList[StringList.Count - 1] = string.Empty)) then
+    begin
+      // Add an extra empty line only if the last line is not already empty
+      StringList.Add(string.Empty);
+    end;
+
     Result := StringList; // Return TStringList
   except
     StringList.Free; // Free memory on error

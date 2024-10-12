@@ -120,6 +120,13 @@ begin
     StringList.LoadFromFile(FileName, FileEncoding);
     Content := StringList.Text;
 
+    // Check if the file ends with a new line and the last line is not empty
+    if (Content <> '') and (Content[Length(Content)] in [#10, #13]) and (StringList[StringList.Count - 1] = string.Empty) then
+    begin
+      // Add an extra empty line only if the last line is not already empty
+      StringList.Add(string.Empty);
+    end;
+
     // Determine the line ending type
     if Pos(#13#10, Content) > 0 then
       LineEnding := TLineEnding.WindowsCRLF
@@ -132,7 +139,6 @@ begin
 
     // Count the number of lines
     LineCount := StringList.Count;
-
   finally
     StringList.Free;
   end;
@@ -159,6 +165,10 @@ begin
   // Open the file for writing
   FileStream := TFileStream.Create(FileName, fmCreate);
   try
+    // Write empty file
+    if StringList.Count = 0 then
+      Exit;
+
     for i := 0 to StringList.Count - 1 do
     begin
       // For each line except the last, add LineEndingStr
@@ -169,7 +179,8 @@ begin
 
       // Convert the string to bytes with the specified encoding
       Bytes := FileEncoding.GetBytes(unicodestring(LineWithEnding));
-      FileStream.WriteBuffer(Bytes[0], Length(Bytes)); // Write bytes to the file
+      if Assigned(Bytes) then
+        FileStream.WriteBuffer(Bytes[0], Length(Bytes)); // Write bytes to the file
     end;
   finally
     FileStream.Free; // Free resources
