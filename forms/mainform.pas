@@ -1906,8 +1906,15 @@ end;
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);
 begin
   aLangEnglish.Checked := False;
+  aLangSpanish.Checked := False;
+  aLangFrench.Checked := False;
   aLangGerman.Checked := False;
+  aLangItalian.Checked := False;
+  aLangPortuguese.Checked := False;
   aLangRussian.Checked := False;
+  aLangJapanese.Checked := False;
+  aLangKorean.Checked := False;
+  aLangChinese.Checked := False;
 
   if (aLanguage <> string.Empty) then
   begin
@@ -1917,10 +1924,16 @@ begin
 
   case Language of
     'en': aLangEnglish.Checked := True;
+    'es': aLangSpanish.Checked := True;
+    'fr': aLangFrench.Checked := True;
     'de': aLangGerman.Checked := True;
+    'it': aLangItalian.Checked := True;
+    'pt': aLangPortuguese.Checked := True;
     'ru': aLangRussian.Checked := True;
+    'ja': aLangJapanese.Checked := True;
+    'ko': aLangKorean.Checked := True;
+    'zh': aLangChinese.Checked := True;
   end;
-
 end;
 
 procedure TformNotetask.SetCaption;
