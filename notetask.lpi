@@ -34,7 +34,7 @@
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <BuildNr Value="1"/>
-      <StringTable ProductName="Notetask" ProductVersion="1.0"/>
+      <StringTable FileDescription="Notetask" ProductName="Notetask" ProductVersion="1.0"/>
     </VersionInfo>
     <BuildModes>
       <Item Name="Default" Default="True"/>
