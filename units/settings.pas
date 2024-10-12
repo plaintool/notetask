@@ -65,6 +65,7 @@ begin
     // Save form position and size
 
     JSONObj.Add('WordWrap', Form.WordWrap);
+    JSONObj.Add('BidiRightToLeft', Form.BiDiRightToLeft);
     JSONObj.Add('ShowArchived', Form.ShowArchived);
     JSONObj.Add('ShowStatusBar', Form.ShowStatusBar);
     JSONObj.Add('WindowState', Ord(Form.WindowState));
@@ -117,6 +118,9 @@ begin
       // Check and load form's position and size
       if JSONObj.FindPath('WordWrap') <> nil then
         Form.WordWrap := JSONObj.FindPath('WordWrap').AsBoolean;
+
+      if JSONObj.FindPath('BidiRightToLeft') <> nil then
+        Form.BiDiRightToLeft := JSONObj.FindPath('BidiRightToLeft').AsBoolean;
 
       if JSONObj.FindPath('ShowArchived') <> nil then
         Form.FShowArchived := JSONObj.FindPath('ShowArchived').AsBoolean;

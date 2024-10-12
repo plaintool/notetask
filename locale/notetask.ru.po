@@ -166,6 +166,10 @@ msgstr "О программе..."
 msgid "Archive / unarchive tasks"
 msgstr "Архивировать / деархивировать задачи"
 
+#: tformnotetask.abidirighttoleft.caption
+msgid "Reading order: right to left"
+msgstr "Порядок чтения: справа налево"
+
 #: tformnotetask.acopy.caption
 msgid "Copy"
 msgstr "Копировать"

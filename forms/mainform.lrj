@@ -20,7 +20,6 @@
 {"hash":151352958,"name":"tformnotetask.aprint.caption","sourcebytes":[80,114,105,110,116,46,46,46],"value":"Print..."},
 {"hash":315140,"name":"tformnotetask.aexit.caption","sourcebytes":[69,120,105,116],"value":"Exit"},
 {"hash":224751950,"name":"tformnotetask.afont.caption","sourcebytes":[70,111,110,116,46,46,46],"value":"Font..."},
-{"hash":141014752,"name":"tformnotetask.awordwrap.caption","sourcebytes":[87,111,114,100,32,119,114,97,112],"value":"Word wrap"},
 {"hash":378031,"name":"tformnotetask.aundo.caption","sourcebytes":[85,110,100,111],"value":"Undo"},
 {"hash":154661211,"name":"tformnotetask.ainserttask.caption","sourcebytes":[73,110,115,101,114,116,32,116,97,115,107],"value":"Insert task"},
 {"hash":64398979,"name":"tformnotetask.adeletetasks.caption","sourcebytes":[68,101,108,101,116,101,32,116,97,115,107,115],"value":"Delete tasks"},
@@ -47,6 +46,8 @@
 {"hash":206450904,"name":"tformnotetask.alangenglish.caption","sourcebytes":[69,110,103,108,105,115,104],"value":"English"},
 {"hash":164273966,"name":"tformnotetask.alangrussian.caption","sourcebytes":[82,117,115,115,105,97,110],"value":"Russian"},
 {"hash":181189080,"name":"tformnotetask.alangdeutsch.caption","sourcebytes":[68,101,117,116,115,99,104],"value":"Deutsch"},
+{"hash":38248388,"name":"tformnotetask.abidirighttoleft.caption","sourcebytes":[82,101,97,100,105,110,103,32,111,114,100,101,114,58,32,114,105,103,104,116,32,116,111,32,108,101,102,116],"value":"Reading order: right to left"},
+{"hash":141014752,"name":"tformnotetask.awordwrap.caption","sourcebytes":[87,111,114,100,32,119,114,97,112],"value":"Word wrap"},
 {"hash":107761687,"name":"tformnotetask.opendialog.title","sourcebytes":[79,112,101,110,105,110,103],"value":"Opening"},
 {"hash":93900871,"name":"tformnotetask.savedialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
 {"hash":131550916,"name":"tformnotetask.fontdialog.title","sourcebytes":[70,111,110,116,32,115,101,108,101,99,116],"value":"Font select"}

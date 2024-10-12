@@ -166,6 +166,10 @@ msgstr "About..."
 msgid "Archive / unarchive tasks"
 msgstr "Archive / unarchive tasks"
 
+#: tformnotetask.abidirighttoleft.caption
+msgid "Reading order: right to left"
+msgstr "Reading order: right to left"
+
 #: tformnotetask.acopy.caption
 msgid "Copy"
 msgstr "Copy"

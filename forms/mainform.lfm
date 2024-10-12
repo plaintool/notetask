@@ -223,6 +223,10 @@ object formNotetask: TformNotetask
         Action = aWordWrap
         AutoCheck = True
       end
+      object MenuItem6: TMenuItem
+        Action = aBidiRightToLeft
+        AutoCheck = True
+      end
       object menuFont: TMenuItem
         Action = aFont
       end
@@ -316,13 +320,6 @@ object formNotetask: TformNotetask
       Caption = 'Font...'
       OnExecute = aFontExecute
       ShortCut = 16468
-    end
-    object aWordWrap: TAction
-      Category = 'Format'
-      AutoCheck = True
-      Caption = 'Word wrap'
-      Checked = True
-      OnExecute = aWordWrapExecute
     end
     object aUndo: TAction
       Category = 'Edit'
@@ -476,6 +473,19 @@ object formNotetask: TformNotetask
       Category = 'Language'
       Caption = 'Deutsch'
       OnExecute = aLangDeutschExecute
+    end
+    object aBidiRightToLeft: TAction
+      Category = 'Format'
+      AutoCheck = True
+      Caption = 'Reading order: right to left'
+      OnExecute = aBidiRightToLeftExecute
+    end
+    object aWordWrap: TAction
+      Category = 'Format'
+      AutoCheck = True
+      Caption = 'Word wrap'
+      Checked = True
+      OnExecute = aWordWrapExecute
     end
   end
   object openDialog: TOpenDialog

@@ -142,6 +142,8 @@ type
     aLangRussian: TAction;
     aLangDeutsch: TAction;
     menuDeutsch: TMenuItem;
+    aBidiRightToLeft: TAction;
+    MenuItem6: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -199,6 +201,7 @@ type
     procedure aLangEnglishExecute(Sender: TObject);
     procedure aLangRussianExecute(Sender: TObject);
     procedure aLangDeutschExecute(Sender: TObject);
+    procedure aBidiRightToLeftExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -216,6 +219,7 @@ type
     FSortColumn: integer;
     FMatchCase: boolean;
     FWrapAround: boolean;
+    FBiDiRightToLeft: boolean;
     FFindActive: boolean;
     FFindText: string;
     FFoundText: string;
@@ -239,6 +243,7 @@ type
     procedure ArchiveTasks;
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowArchived(Value: boolean);
+    procedure SetBiDiRightToLeft(Value: boolean);
     procedure CompleteTasks(aRow: integer = 0);
     procedure ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
@@ -257,6 +262,7 @@ type
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
+    property BiDiRightToLeft: boolean read FBiDiRightToLeft write SetBiDiRightToLeft;
     property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property SortOrder: TSortOrder read FSortOrder write FSortOrder;
@@ -305,6 +311,7 @@ var
 begin
   FBackup := True;
   FWordWrap := True;
+  FBiDiRightToLeft := self.BiDiMode = bdRightToLeft;
   FShowStatusBar := True;
   FSortOrder := soAscending;
   clRowHighlight := RGBToColor(210, 230, 255);
@@ -327,6 +334,7 @@ begin
 
   // After load wordwrap setting
   aWordWrap.Checked := FWordWrap;
+  aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowStatusBar.Checked := FShowStatusBar;
   aShowArchived.Checked := FShowArchived;
 
@@ -691,22 +699,29 @@ begin
     begin
       drawrect := aRect;
       drawrect.Inflate(-4, 0);
-      if (FWordWrap) then
-        flags := dt_calcrect or dt_wordbreak or dt_left
+
+      flags := DT_CALCRECT;
+      if FBiDiRightToLeft then
+        flags := flags + DT_RIGHT
       else
-        flags := dt_calcrect or dt_left;
+        flags := flags + DT_LEFT;
+      if FWordWrap then
+        flags := flags or DT_WORDBREAK;
+
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
 
       if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
         grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2) // changing the row height fires the event again!
       else
       begin
-        drawrect.Right := aRect.Right;
-        if (FWordWrap) then
-          flags := dt_wordbreak or dt_left
+        drawrect.Right := aRect.Right - 4;
+        if FBiDiRightToLeft then
+          flags := DT_RIGHT
         else
-          flags := dt_left;
-        DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, dt_wordbreak or dt_left);
+          flags := DT_LEFT;
+        if FWordWrap then
+          flags := flags or DT_WORDBREAK;
+        DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
       end;
     end;
   end;
@@ -741,6 +756,10 @@ begin
     Memo.WordWrap := FWordWrap;
     Memo.WantReturns := FWordWrap;
     Memo.ScrollBars := ssNone;
+    if (FBiDiRightToLeft) then
+      Memo.BiDiMode := bdRightToLeft
+    else
+      Memo.BiDiMode := bdLeftToRight;
 
     EditControlSetBounds(Memo, aCol, aRow);
     Memo.Parent := taskGrid;
@@ -775,6 +794,10 @@ begin
     DatePicker.Kind := dtkDateTime;
     DatePicker.TimeDisplay := tdHMS;
     DatePicker.Options := [dtpoFlatButton];
+    if (FBiDiRightToLeft) then
+      DatePicker.BiDiMode := bdRightToLeft
+    else
+      DatePicker.BiDiMode := bdLeftToRight;
 
     EditControlSetBounds(DatePicker, aCol, aRow, 0, 0, 0, 0);
 
@@ -1214,6 +1237,16 @@ begin
   Invalidate;
 end;
 
+procedure TformNotetask.aBidiRightToLeftExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  EditComplite;
+  BiDiRightToLeft := aBidiRightToLeft.Checked;
+  ResetRowHeight;
+  Invalidate;
+end;
+
 procedure TformNotetask.aGoToExecute(Sender: TObject);
 var
   rowNum: integer;
@@ -1327,6 +1360,7 @@ begin
     MyTextStyle := TGridPrinter(Sender).Canvas.TextStyle;
     MyTextStyle.SingleLine := not FWordWrap;
     MyTextStyle.Wordbreak := WordWrap;
+    MyTextStyle.RightToLeft := BiDiRightToLeft;
     TGridPrinter(Sender).Canvas.TextStyle := MyTextStyle;
   end;
 end;
@@ -1639,6 +1673,26 @@ begin
   FillGrid;
 end;
 
+procedure TformNotetask.SetBiDiRightToLeft(Value: boolean);
+var
+  i: integer;
+begin
+  FBiDiRightToLeft := Value;
+
+  if (Value) then
+  begin
+    taskGrid.BiDiMode := bdRightToLeft;
+    for i := 1 to taskGrid.Columns.Count - 1 do
+      taskGrid.Columns[i].Alignment := taRightJustify;
+  end
+  else
+  begin
+    taskGrid.BiDiMode := bdLeftToRight;
+    for i := 1 to taskGrid.Columns.Count - 1 do
+      taskGrid.Columns[i].Alignment := taLeftJustify;
+  end;
+end;
+
 function TformNotetask.GetIsEditing: boolean;
 begin
   Result := (taskGrid.EditorMode) or (FIsEditing);
@@ -1782,8 +1836,8 @@ begin
 end;
 
 procedure TformNotetask.EditComplite;
-var
-  oldValue, newValue: string;
+//var
+//  oldValue, newValue: string;
 begin
   if taskGrid.EditorMode then
   begin
