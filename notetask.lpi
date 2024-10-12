@@ -29,6 +29,13 @@
       <EnableI18N Value="True"/>
       <OutDir Value="locale"/>
     </i18n>
+    <VersionInfo>
+      <UseVersionInfo Value="True"/>
+      <AutoIncrementBuild Value="True"/>
+      <MajorVersionNr Value="1"/>
+      <BuildNr Value="1"/>
+      <StringTable ProductName="Notetask" ProductVersion="1.0"/>
+    </VersionInfo>
     <BuildModes>
       <Item Name="Default" Default="True"/>
       <Item Name="Debug">
