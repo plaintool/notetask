@@ -103,24 +103,52 @@ constructor TTask.Create(const TaskString: string);
 var
   Parts, PartsSub: TStringArray; // Use TStringArray for compatibility
   CompletedStr: string;
+  i: integer;
+
+  procedure FillComment(start: integer = 1);
+  var
+    i: integer;
+  begin
+    FComment := string.Empty;
+    for i := start to High(Parts) do
+    begin
+      FComment += Parts[i];
+      if (i < High(Parts)) then FComment += '//';
+    end;
+    FComment := FComment.Trim;
+  end;
+
+  procedure FillText(start: integer = 1);
+  var
+    i: integer;
+  begin
+    FText := string.Empty;
+    for i := start to High(PartsSub) do
+    begin
+      FText += PartsSub[i];
+      if (i < High(PartsSub)) then FText += ',';
+    end;
+    FText := FText.Trim;
+  end;
+
 begin
   // Format: - [x] 01.01.2000, ~~Task~~ *// Comment*
   // Split the task string into parts
   Parts := TaskString.Split(['*//']);
-  if Length(Parts) = 2 then
+  if Length(Parts) >= 2 then
   begin
     CompletedStr := Parts[0].Trim;
-    FComment := Parts[1].Trim;
+    FillComment;
     if FComment.EndsWith('*') then
       Delete(FComment, Length(FComment), 1);
   end
   else
   begin
     Parts := TaskString.Split(['//']);
-    if Length(Parts) = 2 then
+    if Length(Parts) >= 2 then
     begin
       CompletedStr := Parts[0].Trim;
-      FComment := Parts[1].Trim;
+      FillComment;
     end
     else
       CompletedStr := Parts[0];
@@ -138,10 +166,10 @@ begin
   begin
     // Extract and trim the date string
     if (TryStrToDateTime(PartsSub[1].Trim, FDate)) and (Length(PartsSub) > 2) then
-      FText := PartsSub[2].Trim
+      FillText(2)
     else
     if (TryStrToDateTime(PartsSub[0].Trim, FDate)) and (Length(PartsSub) > 1) then
-      FText := PartsSub[1].Trim
+      FillText(1)
     else
       FText := CompletedStr.Trim;
   end
