@@ -7,12 +7,13 @@
       <SessionStorage Value="InProjectDir"/>
       <Title Value="Notetask"/>
       <Scaled Value="True"/>
+      <NSPrincipalClass Value="notetask"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <XPManifest>
         <DpiAware Value="True"/>
         <ExecutionLevel Value="highestAvailable"/>
-        <TextName Value=""/>
+        <TextName Value="notetask"/>
         <TextDesc Value=""/>
       </XPManifest>
       <Icon Value="0"/>
@@ -33,7 +34,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="3"/>
+      <BuildNr Value="5"/>
       <StringTable FileDescription="Notetask" LegalCopyright="Alexander Tverskoy" ProductName="Notetask" ProductVersion="1.0"/>
     </VersionInfo>
     <BuildModes>
