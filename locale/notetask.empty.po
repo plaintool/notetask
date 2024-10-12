@@ -54,6 +54,10 @@ msgstr ""
 msgid "Are you sure you want to delete selected tasks?"
 msgstr ""
 
+#: mainform.rfilenotfound
+msgid "The requested file was not found on the disk."
+msgstr ""
+
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
 msgstr ""
@@ -420,3 +424,4 @@ msgstr ""
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr ""
+

@@ -259,7 +259,7 @@ type
     FShowArchived: boolean;
 
     procedure SetLanguage(aLanguage: string = string.Empty);
-    procedure OpenFile(fileName: string);
+    function OpenFile(fileName: string): boolean;
     procedure SaveFile(fileName: string = string.Empty);
     procedure FillGrid;
 
@@ -292,6 +292,7 @@ resourcestring
   runtitled = 'Untitled';
   rrows = ' tasks';
   rcantfind = 'Can''t find';
+  rfilenotfound = 'The requested file was not found on the disk.';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rdeletesconfirm = 'Are you sure you want to delete selected tasks?';
   rarchiveconfirm = 'Are you sure you want to archive / unarchive this task?';
@@ -351,8 +352,8 @@ begin
     FilePath := ParamStr(1); // Get the file path
     if (not FilePath.StartsWith('--')) then
     begin
-      OpenFile(FilePath); // Function to load a task from the file
-      exit;
+      if OpenFile(FilePath) then // Function to load a task from the file
+        exit;
     end;
   end;
 
@@ -1781,10 +1782,17 @@ begin
     Result := True; // No changes, just close the form
 end;
 
-procedure TformNotetask.OpenFile(fileName: string);
+function TformNotetask.OpenFile(fileName: string): boolean;
 var
   Content: string;
 begin
+  Result := False;
+  if not FileExists(fileName) then
+  begin
+    ShowMessage(rfilenotfound);
+    exit;
+  end;
+
   FFileName := fileName;
   EditComplite;
   ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
@@ -1795,6 +1803,7 @@ begin
 
   ResetRowHeight;
   SetChanged(False);
+  Result := True;
 end;
 
 procedure TformNotetask.SaveFile(fileName: string = string.Empty);

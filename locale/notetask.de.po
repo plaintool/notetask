@@ -54,6 +54,10 @@ msgstr "Sind Sie sicher, dass Sie diese Aufgabe löschen möchten?"
 msgid "Are you sure you want to delete selected tasks?"
 msgstr "Sind Sie sicher, dass Sie die ausgewählten Aufgaben löschen möchten?"
 
+#: mainform.rfilenotfound
+msgid "The requested file was not found on the disk."
+msgstr "Die angeforderte Datei wurde auf der Festplatte nicht gefunden."
+
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
 msgstr "Die Zeilennummer liegt außerhalb des zulässigen Bereichs."
