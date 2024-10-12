@@ -12,8 +12,8 @@
       <XPManifest>
         <DpiAware Value="True"/>
         <ExecutionLevel Value="highestAvailable"/>
-        <TextName Value="Tverskoy.Alexander"/>
-        <TextDesc Value="Notetask Editor: A simple solution for task text files"/>
+        <TextName Value=""/>
+        <TextDesc Value=""/>
       </XPManifest>
       <Icon Value="0"/>
       <Resources Count="6">
@@ -33,8 +33,8 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="1"/>
-      <StringTable FileDescription="Notetask" ProductName="Notetask" ProductVersion="1.0"/>
+      <BuildNr Value="3"/>
+      <StringTable FileDescription="Notetask" LegalCopyright="Alexander Tverskoy" ProductName="Notetask" ProductVersion="1.0"/>
     </VersionInfo>
     <BuildModes>
       <Item Name="Default" Default="True"/>
