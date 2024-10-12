@@ -171,10 +171,16 @@ begin
     if (TryStrToDateTime(PartsSub[0].Trim, FDate)) and (Length(PartsSub) > 1) then
       FillText(1)
     else
+    begin
       FText := CompletedStr.Trim;
+      FDate := 0;
+    end;
   end
   else
+  begin
     FText := CompletedStr.Trim;
+    FDate := 0;
+  end;
 
   FText := StringReplace(FText, '<br>', sLineBreak, [rfReplaceAll]);
   FComment := StringReplace(FComment, '<br>', sLineBreak, [rfReplaceAll]);
