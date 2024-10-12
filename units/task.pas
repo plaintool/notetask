@@ -69,6 +69,8 @@ type
     function MoveTaskBottom(Index: integer): integer;
     function MoveTaskUp(Index: integer): integer;
     function MoveTaskDown(Index: integer): integer;
+    procedure SwapTasks(OldIndex, NewIndex: integer);
+    procedure MoveTask(OldIndex, NewIndex: integer);
     procedure CopyToClipboard(Grid: TStringGrid);
     function PasteFromClipboard(Grid: TStringGrid): TGridRect;
     procedure FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder; SortColumn: integer);
@@ -593,6 +595,74 @@ begin
 
     Result := Index + 1;//ReverseMap(Map(Index + 1));
   end;
+end;
+
+procedure TTasks.SwapTasks(OldIndex, NewIndex: integer);
+var
+  IndOld, IndNew: integer;
+  TempTask: TTask;
+begin
+  // Get mapped indices for old and new positions
+  IndOld := Map(OldIndex);
+  IndNew := Map(NewIndex);
+
+  // Check if both indices are valid
+  if (IndOld < 0) or (IndNew < 0) or (IndOld >= FCount) or (IndNew >= FCount) then
+    raise Exception.Create('Invalid index for swapping tasks');
+
+  CreateBackup; // Backup the current state before swapping
+
+  // Swap tasks in the task list
+  TempTask := FTaskList[IndOld];
+  FTaskList[IndOld] := FTaskList[IndNew];
+  FTaskList[IndNew] := TempTask;
+
+  // Swap the mapping in FMapGrid
+  FMapGrid[OldIndex] := IndNew;
+  FMapGrid[NewIndex] := IndOld;
+end;
+
+procedure TTasks.MoveTask(OldIndex, NewIndex: integer);
+var
+  Ind: integer;
+  TempTask: TTask;
+  i: integer;
+begin
+  Ind := Map(OldIndex);
+
+  // Validate the indices
+  if (Ind < 0) or (Ind >= FCount) or (NewIndex < 0) or (NewIndex >= FCount) then
+    Exit;
+
+  CreateBackup; // Backup the current state before moving
+
+  // Save the task to be moved
+  TempTask := FTaskList[Ind];
+
+  // If moving up
+  if NewIndex < OldIndex then
+  begin
+    // Shift tasks down
+    for i := OldIndex downto NewIndex + 1 do
+    begin
+      FTaskList[Map(i)] := FTaskList[Map(i - 1)];
+    end;
+  end
+  // If moving down
+  else if NewIndex > OldIndex then
+  begin
+    // Shift tasks up
+    for i := OldIndex to NewIndex - 1 do
+    begin
+      FTaskList[Map(i)] := FTaskList[Map(i + 1)];
+    end;
+  end;
+
+  // Insert the moved task into the new position
+  FTaskList[Map(NewIndex)] := TempTask;
+
+  // Update FMapGrid (if necessary)
+  // This may require additional logic depending on how you want to track indices.
 end;
 
 procedure TTasks.CopyToClipboard(Grid: TStringGrid);

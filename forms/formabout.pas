@@ -20,7 +20,7 @@ uses
   ExtCtrls,
   LCLIntf,
   LCLType,
-  LCLProc;
+  LCLProc, Menus;
 
 type
 

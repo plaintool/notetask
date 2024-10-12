@@ -54,8 +54,8 @@ object formNotetask: TformNotetask
     UseXORFeatures = True
     OnCheckboxToggled = taskGridCheckboxToggled
     OnColRowDeleted = taskGridColRowDeleted
-    OnColRowExchanged = taskGridColRowExchanged
     OnColRowInserted = taskGridColRowInserted
+    OnColRowMoved = taskGridColRowMoved
     OnDrawCell = taskGridDrawCell
     OnHeaderClick = taskGridHeaderClick
     OnHeaderSized = taskGridHeaderSized

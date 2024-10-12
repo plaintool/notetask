@@ -162,6 +162,7 @@ type
     procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
     procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState; var ABitmap: TBitmap);
+    procedure taskGridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure aArchiveTasksExecute(Sender: TObject);
     procedure aCopyExecute(Sender: TObject);
     procedure aCutExecute(Sender: TObject);
@@ -198,7 +199,6 @@ type
     procedure aLangEnglishExecute(Sender: TObject);
     procedure aLangRussianExecute(Sender: TObject);
     procedure aLangDeutschExecute(Sender: TObject);
-    procedure taskGridColRowExchanged(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -229,7 +229,7 @@ type
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol, aRow: integer);
-    procedure EditComplite(Validate: boolean = True);
+    procedure EditComplite;
     procedure SetInfo;
     procedure SetCaption;
     procedure ClearSelected(ShowConfirm: boolean = True);
@@ -527,13 +527,17 @@ begin
     aMoveTaskBottom.Enabled := SortColumn = 0;
     aMoveTaskUp.Enabled := SortColumn = 0;
     aMoveTaskDown.Enabled := SortColumn = 0;
+    if (SortColumn = 0) then
+      taskGrid.Options := taskGrid.Options + [goRowMoving]
+    else
+      taskGrid.Options := taskGrid.Options - [goRowMoving];
   end
   else
     // Set row when clicked on begining of row
   begin
     if (ssShift in GetKeyShiftState) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Top <> index) then
     begin
-      taskGrid.Selection := TGridRect.Create(1, taskGrid.Selection.Top, 4, index)
+      taskGrid.Selection := TGridRect.Create(1, taskGrid.Selection.Top, 4, index);
     end
     else
     begin
@@ -809,6 +813,15 @@ begin
       ABitmap := ResourceBitmapCheck // Use check bitmap
     else
       ABitmap := ResourceBitmapUncheck; // Use uncheck bitmap
+  end;
+end;
+
+procedure TformNotetask.taskGridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+begin
+  if (not IsColumn) then
+  begin
+    Tasks.MoveTask(sIndex, tIndex);
+    SetChanged;
   end;
 end;
 
@@ -1305,14 +1318,6 @@ begin
   SetCaption;
 end;
 
-procedure TformNotetask.taskGridColRowExchanged(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-begin
-  if (not IsColumn) then
-  begin
-
-  end;
-end;
-
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
 var
   MyTextStyle: TTextStyle;
@@ -1776,18 +1781,18 @@ begin
   end;
 end;
 
-procedure TformNotetask.EditComplite(Validate: boolean = True);
+procedure TformNotetask.EditComplite;
 var
   oldValue, newValue: string;
 begin
   if taskGrid.EditorMode then
   begin
-    if (Validate) then
-    begin
-      oldValue := Tasks.GetTaskValue(taskGrid.Col, taskGrid.Row);
-      newvalue := taskGrid.Cells[taskGrid.Col, taskGrid.Row];
-      taskGrid.OnValidateEntry(taskGrid, taskGrid.Col, taskGrid.Row, oldValue, newValue);
-    end;
+    //if (Validate) then
+    //begin
+    //  oldValue := Tasks.GetTaskValue(taskGrid.Col, taskGrid.Row);
+    //  newvalue := taskGrid.Cells[taskGrid.Col, taskGrid.Row];
+    //  taskGrid.OnValidateEntry(taskGrid, taskGrid.Col, taskGrid.Row, oldValue, newValue);
+    //end;
     taskGrid.EditorMode := False;
     FIsEditing := False; // Reset editing flag when exiting
   end;
@@ -1851,7 +1856,7 @@ var
   end;
 
 begin
-  if (FFindActive) then exit;
+  if (FFindActive) or (taskGrid.RowCount = 0) then exit;
   FFindActive := True;
   try
     FindText := aText;
