@@ -39,9 +39,7 @@
     </i18n>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="10"/>
       <StringTable FileDescription="Notetask" LegalCopyright="Alexander Tverskoy" ProductName="Notetask" ProductVersion="1.0"/>
     </VersionInfo>
     <BuildModes>
