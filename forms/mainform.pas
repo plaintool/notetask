@@ -529,9 +529,17 @@ begin
     aMoveTaskDown.Enabled := SortColumn = 0;
   end
   else
-  begin
     // Set row when clicked on begining of row
-    taskGrid.Row := index;
+  begin
+    if (ssShift in GetKeyShiftState) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Top <> index) then
+    begin
+      taskGrid.Selection := TGridRect.Create(1, taskGrid.Selection.Top, 4, index)
+    end
+    else
+    begin
+      taskGrid.Row := index;
+      taskGrid.Selection := TGridRect.Create(1, index, 4, index);
+    end;
   end;
 end;
 
