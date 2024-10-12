@@ -21,6 +21,8 @@ function RemoveBrackets(const S: string): string;
 
 function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;
 
+function EncodeUrl(const url: string): string;
+
 implementation
 
 function TextToStringList(const TextContent: string): TStringList;
@@ -88,6 +90,34 @@ begin
       end;
     end;
   end;
+end;
+
+function EncodeUrl(const url: string): string;
+var
+  x: integer;
+  sBuff: string;
+const
+  SafeMask = ['A'..'Z', '0'..'9', 'a'..'z', '*', '@', '.', '_', '-', '+'];
+begin
+  // Init
+  sBuff := '';
+
+  for x := 1 to Length(url) do
+  begin
+    // Check if we have a safe char
+    if url[x] in SafeMask then
+    begin
+      // Append all other chars
+      sBuff := sBuff + url[x];
+    end
+    else
+    begin
+      // Convert to hex
+      sBuff := sBuff + '%' + IntToHex(Ord(url[x]), 2);
+    end;
+  end;
+
+  Result := sBuff;
 end;
 
 end.

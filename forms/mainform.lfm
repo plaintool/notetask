@@ -216,6 +216,12 @@ object formNotetask: TformNotetask
       object menuMoveTaskBottom: TMenuItem
         Action = aMoveTaskBottom
       end
+      object Separator10: TMenuItem
+        Caption = '-'
+      end
+      object menuChatGpt: TMenuItem
+        Action = aChatGpt
+      end
     end
     object menuFormat: TMenuItem
       Caption = 'Format'
@@ -487,6 +493,12 @@ object formNotetask: TformNotetask
       Checked = True
       OnExecute = aWordWrapExecute
     end
+    object aChatGpt: TAction
+      Category = 'Task'
+      Caption = 'Ask ChatGPT...'
+      OnExecute = aChatGptExecute
+      ShortCut = 16465
+    end
   end
   object openDialog: TOpenDialog
     Title = 'Opening'
@@ -548,6 +560,12 @@ object formNotetask: TformNotetask
     end
     object MenuItem9: TMenuItem
       Action = aSelectAll
+    end
+    object Separator11: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem7: TMenuItem
+      Action = aChatGpt
     end
   end
 end

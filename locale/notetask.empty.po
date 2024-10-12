@@ -38,6 +38,10 @@ msgstr ""
 msgid "Can't find"
 msgstr ""
 
+#: mainform.rchatgpt
+msgid "https://chatgpt.com?q="
+msgstr ""
+
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
 msgstr ""
@@ -168,6 +172,10 @@ msgstr ""
 
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
+msgstr ""
+
+#: tformnotetask.achatgpt.caption
+msgid "Ask ChatGPT..."
 msgstr ""
 
 #: tformnotetask.acopy.caption
@@ -412,4 +420,3 @@ msgstr ""
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr ""
-

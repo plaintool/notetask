@@ -144,6 +144,11 @@ type
     menuDeutsch: TMenuItem;
     aBidiRightToLeft: TAction;
     MenuItem6: TMenuItem;
+    aChatGpt: TAction;
+    Separator10: TMenuItem;
+    menuChatGpt: TMenuItem;
+    Separator11: TMenuItem;
+    MenuItem7: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -202,6 +207,7 @@ type
     procedure aLangRussianExecute(Sender: TObject);
     procedure aLangDeutschExecute(Sender: TObject);
     procedure aBidiRightToLeftExecute(Sender: TObject);
+    procedure aChatGptExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -296,6 +302,7 @@ resourcestring
   rsavedialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
   rundoconfirm = 'Are you sure you want to discard all changes? This action cannot be undone.';
   rnumstringtoolarge = 'The line number is out of the allowed range.';
+  rchatgpt = 'https://chatgpt.com?q=';
 
 implementation
 
@@ -609,9 +616,22 @@ begin
 end;
 
 procedure TformNotetask.taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+var
+  Cell: TPoint;
 begin
   if (Button = mbRight) and (not IsEditing) then
+  begin
+    // Get the row index at the mouse coordinates
+    Cell := taskGrid.MouseToCell(TPoint.Create(X, Y));
+
+    // Check if the row index is valid
+    if (Cell.Y >= 0) and (Cell.Y < taskGrid.RowCount) then
+      taskGrid.Row := Cell.Y;
+    if (Cell.X > 0) and (Cell.X < 5) then
+      taskGrid.Col := Cell.X;
+
     Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
+  end;
 end;
 
 procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
@@ -886,6 +906,7 @@ end;
 procedure TformNotetask.aCutExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
 
   if not IsEditing then
   begin
@@ -903,6 +924,7 @@ end;
 procedure TformNotetask.aCopyExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
 
   if not IsEditing then
     Tasks.CopyToClipboard(taskGrid)
@@ -933,6 +955,7 @@ end;
 procedure TformNotetask.aDeleteExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
 
   if not IsEditing then
   begin
@@ -957,6 +980,7 @@ end;
 procedure TformNotetask.aSelectAllExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
 
   if not IsEditing then
     taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount)
@@ -1001,6 +1025,7 @@ var
   newRow: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 3 then exit;
 
   newRow := Tasks.MoveTaskTop(taskGrid.Row);
   FillGrid;
@@ -1017,6 +1042,7 @@ var
   newRow: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 3 then exit;
 
   newRow := Tasks.MoveTaskBottom(taskGrid.Row);
   FillGrid;
@@ -1033,6 +1059,7 @@ var
   newRow: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 3 then exit;
 
   newRow := Tasks.MoveTaskUp(taskGrid.Row);
   FillGrid;
@@ -1049,6 +1076,7 @@ var
   newRow: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 3 then exit;
 
   newRow := Tasks.MoveTaskDown(taskGrid.Row);
   FillGrid;
@@ -1063,6 +1091,7 @@ end;
 procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
 
   DeleteTasks;
 end;
@@ -1070,6 +1099,7 @@ end;
 procedure TformNotetask.aArchiveTasksExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
 
   ArchiveTasks;
 end;
@@ -1101,11 +1131,21 @@ begin
   begin
     if (taskGrid.Col > 0) then
     begin
-      if taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim = string.Empty then
-        taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
+      if (taskGrid.RowCount > 1) then
+      begin
+        if taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim = string.Empty then
+          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
+        else
+          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
+        Tasks.SetTask(taskGrid, taskGrid.Row);
+      end
       else
-        taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
-      Tasks.SetTask(taskGrid, taskGrid.Row);
+      begin
+        Tasks.InsertTask('- [ ] ' + CurrentDateTime + ',', taskGrid.Row);
+        FillGrid;
+        FLineCount += 1;
+        taskGrid.Row := taskGrid.Row + 1;
+      end;
       SetChanged;
     end;
   end;
@@ -1247,11 +1287,19 @@ begin
   Invalidate;
 end;
 
+procedure TformNotetask.aChatGptExecute(Sender: TObject);
+begin
+  if taskGrid.RowCount < 2 then exit;
+
+  OpenURL(rchatgpt + EncodeUrl(Tasks.GetTaskValue(2, taskGrid.Row)));
+end;
+
 procedure TformNotetask.aGoToExecute(Sender: TObject);
 var
   rowNum: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
 
   // Create an instance of the form
   with formInputText do
@@ -1284,6 +1332,7 @@ end;
 procedure TformNotetask.aFindExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
 
   formFindText.editFind.Text := FindText;
   if (formFindText.Left = 0) then
@@ -1296,6 +1345,7 @@ end;
 procedure TformNotetask.aReplaceExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
 
   formReplaceText.editFind.Text := FindText;
   if (formReplaceText.Left = 0) then
@@ -1307,6 +1357,8 @@ end;
 
 procedure TformNotetask.aFindNextExecute(Sender: TObject);
 begin
+  if taskGrid.RowCount < 2 then exit;
+
   if (FindText <> string.Empty) then
     Find(FindText, MatchCase, WrapAround, True)
   else
@@ -1315,6 +1367,8 @@ end;
 
 procedure TformNotetask.aFindPrevExecute(Sender: TObject);
 begin
+  if taskGrid.RowCount < 2 then exit;
+
   if (FindText <> string.Empty) then
     Find(FindText, MatchCase, WrapAround, False)
   else

@@ -38,6 +38,10 @@ msgstr "Вы уверены, что хотите архивировать / де
 msgid "Can't find"
 msgstr "Не удается найти"
 
+#: mainform.rchatgpt
+msgid "https://chatgpt.com?q="
+msgstr "https://chatgpt.com?q="
+
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
 msgstr "Вы уверены, что хотите очистить данные в выделенной области?"
@@ -169,6 +173,10 @@ msgstr "Архивировать / деархивировать задачи"
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "Порядок чтения: справа налево"
+
+#: tformnotetask.achatgpt.caption
+msgid "Ask ChatGPT..."
+msgstr "Спросить ChatGPT..."
 
 #: tformnotetask.acopy.caption
 msgid "Copy"

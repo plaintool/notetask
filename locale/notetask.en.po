@@ -38,6 +38,10 @@ msgstr "Are you sure you want to archive / unarchive selected tasks?"
 msgid "Can't find"
 msgstr "Can't find"
 
+#: mainform.rchatgpt
+msgid "https://chatgpt.com?q="
+msgstr "https://chatgpt.com?q="
+
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
 msgstr "Are you sure you want to clear the data in the selected area?"
@@ -169,6 +173,10 @@ msgstr "Archive / unarchive tasks"
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "Reading order: right to left"
+
+#: tformnotetask.achatgpt.caption
+msgid "Ask ChatGPT..."
+msgstr "Ask ChatGPT..."
 
 #: tformnotetask.acopy.caption
 msgid "Copy"
