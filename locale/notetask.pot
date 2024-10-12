@@ -221,16 +221,44 @@ msgstr ""
 msgid "Insert task"
 msgstr ""
 
-#: tformnotetask.alangdeutsch.caption
-msgid "Deutsch"
+#: tformnotetask.alangchinese.caption
+msgid "Chinese"
 msgstr ""
 
 #: tformnotetask.alangenglish.caption
 msgid "English"
 msgstr ""
 
+#: tformnotetask.alangfrench.caption
+msgid "French"
+msgstr ""
+
+#: tformnotetask.alanggerman.caption
+msgid "German"
+msgstr ""
+
+#: tformnotetask.alangitalian.caption
+msgid "Italian"
+msgstr ""
+
+#: tformnotetask.alangjapanese.caption
+msgid "Japanese"
+msgstr ""
+
+#: tformnotetask.alangkorean.caption
+msgid "Korean"
+msgstr ""
+
+#: tformnotetask.alangportuguese.caption
+msgid "Portuguese"
+msgstr ""
+
 #: tformnotetask.alangrussian.caption
 msgid "Russian"
+msgstr ""
+
+#: tformnotetask.alangspanish.caption
+msgid "Spanish"
 msgstr ""
 
 #: tformnotetask.amovetaskbottom.caption

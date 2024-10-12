@@ -103,7 +103,6 @@ constructor TTask.Create(const TaskString: string);
 var
   Parts, PartsSub: TStringArray; // Use TStringArray for compatibility
   CompletedStr: string;
-  i: integer;
 
   procedure FillComment(start: integer = 1);
   var

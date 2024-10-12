@@ -140,8 +140,8 @@ type
     menuEnglish: TMenuItem;
     menuRussian: TMenuItem;
     aLangRussian: TAction;
-    aLangDeutsch: TAction;
-    menuDeutsch: TMenuItem;
+    aLangGerman: TAction;
+    menuGerman: TMenuItem;
     aBidiRightToLeft: TAction;
     MenuItem6: TMenuItem;
     aChatGpt: TAction;
@@ -149,6 +149,20 @@ type
     menuChatGpt: TMenuItem;
     Separator11: TMenuItem;
     MenuItem7: TMenuItem;
+    aLangSpanish: TAction;
+    aLangFrench: TAction;
+    aLangItalian: TAction;
+    aLangPortuguese: TAction;
+    aLangJapanese: TAction;
+    aLangKorean: TAction;
+    aLangChinese: TAction;
+    menuSpanish: TMenuItem;
+    menuFrench: TMenuItem;
+    menuItalian: TMenuItem;
+    menuPortuguese: TMenuItem;
+    menuJapanese: TMenuItem;
+    menuKorean: TMenuItem;
+    menuChinese: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -205,9 +219,16 @@ type
     procedure aAboutExecute(Sender: TObject);
     procedure aLangEnglishExecute(Sender: TObject);
     procedure aLangRussianExecute(Sender: TObject);
-    procedure aLangDeutschExecute(Sender: TObject);
+    procedure aLangGermanExecute(Sender: TObject);
     procedure aBidiRightToLeftExecute(Sender: TObject);
     procedure aChatGptExecute(Sender: TObject);
+    procedure aLangSpanishExecute(Sender: TObject);
+    procedure aLangFrenchExecute(Sender: TObject);
+    procedure aLangItalianExecute(Sender: TObject);
+    procedure aLangPortugueseExecute(Sender: TObject);
+    procedure aLangJapaneseExecute(Sender: TObject);
+    procedure aLangKoreanExecute(Sender: TObject);
+    procedure aLangChineseExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -1394,15 +1415,57 @@ begin
   SetCaption;
 end;
 
+procedure TformNotetask.aLangSpanishExecute(Sender: TObject);
+begin
+  SetLanguage('es');
+  SetCaption;
+end;
+
+procedure TformNotetask.aLangFrenchExecute(Sender: TObject);
+begin
+  SetLanguage('fr');
+  SetCaption;
+end;
+
+procedure TformNotetask.aLangGermanExecute(Sender: TObject);
+begin
+  SetLanguage('de');
+  SetCaption;
+end;
+
+procedure TformNotetask.aLangItalianExecute(Sender: TObject);
+begin
+  SetLanguage('it');
+  SetCaption;
+end;
+
+procedure TformNotetask.aLangPortugueseExecute(Sender: TObject);
+begin
+  SetLanguage('pt');
+  SetCaption;
+end;
+
 procedure TformNotetask.aLangRussianExecute(Sender: TObject);
 begin
   SetLanguage('ru');
   SetCaption;
 end;
 
-procedure TformNotetask.aLangDeutschExecute(Sender: TObject);
+procedure TformNotetask.aLangJapaneseExecute(Sender: TObject);
 begin
-  SetLanguage('de');
+  SetLanguage('ja');
+  SetCaption;
+end;
+
+procedure TformNotetask.aLangKoreanExecute(Sender: TObject);
+begin
+  SetLanguage('ko');
+  SetCaption;
+end;
+
+procedure TformNotetask.aLangChineseExecute(Sender: TObject);
+begin
+  SetLanguage('zh');
   SetCaption;
 end;
 
@@ -1843,7 +1906,7 @@ end;
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);
 begin
   aLangEnglish.Checked := False;
-  aLangDeutsch.Checked := False;
+  aLangGerman.Checked := False;
   aLangRussian.Checked := False;
 
   if (aLanguage <> string.Empty) then
@@ -1854,7 +1917,7 @@ begin
 
   case Language of
     'en': aLangEnglish.Checked := True;
-    'de': aLangDeutsch.Checked := True;
+    'de': aLangGerman.Checked := True;
     'ru': aLangRussian.Checked := True;
   end;
 

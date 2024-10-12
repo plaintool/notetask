@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -256,11 +255,32 @@ object formNotetask: TformNotetask
         object menuEnglish: TMenuItem
           Action = aLangEnglish
         end
-        object menuDeutsch: TMenuItem
-          Action = aLangDeutsch
+        object menuSpanish: TMenuItem
+          Action = aLangSpanish
+        end
+        object menuFrench: TMenuItem
+          Action = aLangFrench
+        end
+        object menuGerman: TMenuItem
+          Action = aLangGerman
+        end
+        object menuItalian: TMenuItem
+          Action = aLangItalian
+        end
+        object menuPortuguese: TMenuItem
+          Action = aLangPortuguese
         end
         object menuRussian: TMenuItem
           Action = aLangRussian
+        end
+        object menuJapanese: TMenuItem
+          Action = aLangJapanese
+        end
+        object menuKorean: TMenuItem
+          Action = aLangKorean
+        end
+        object menuChinese: TMenuItem
+          Action = aLangChinese
         end
       end
       object Separator9: TMenuItem
@@ -471,16 +491,6 @@ object formNotetask: TformNotetask
       Caption = 'English'
       OnExecute = aLangEnglishExecute
     end
-    object aLangRussian: TAction
-      Category = 'Language'
-      Caption = 'Russian'
-      OnExecute = aLangRussianExecute
-    end
-    object aLangDeutsch: TAction
-      Category = 'Language'
-      Caption = 'Deutsch'
-      OnExecute = aLangDeutschExecute
-    end
     object aBidiRightToLeft: TAction
       Category = 'Format'
       AutoCheck = True
@@ -499,6 +509,51 @@ object formNotetask: TformNotetask
       Caption = 'Ask ChatGPT...'
       OnExecute = aChatGptExecute
       ShortCut = 16465
+    end
+    object aLangSpanish: TAction
+      Category = 'Language'
+      Caption = 'Spanish'
+      OnExecute = aLangSpanishExecute
+    end
+    object aLangFrench: TAction
+      Category = 'Language'
+      Caption = 'French'
+      OnExecute = aLangFrenchExecute
+    end
+    object aLangGerman: TAction
+      Category = 'Language'
+      Caption = 'German'
+      OnExecute = aLangGermanExecute
+    end
+    object aLangItalian: TAction
+      Category = 'Language'
+      Caption = 'Italian'
+      OnExecute = aLangItalianExecute
+    end
+    object aLangPortuguese: TAction
+      Category = 'Language'
+      Caption = 'Portuguese'
+      OnExecute = aLangPortugueseExecute
+    end
+    object aLangRussian: TAction
+      Category = 'Language'
+      Caption = 'Russian'
+      OnExecute = aLangRussianExecute
+    end
+    object aLangJapanese: TAction
+      Category = 'Language'
+      Caption = 'Japanese'
+      OnExecute = aLangJapaneseExecute
+    end
+    object aLangKorean: TAction
+      Category = 'Language'
+      Caption = 'Korean'
+      OnExecute = aLangKoreanExecute
+    end
+    object aLangChinese: TAction
+      Category = 'Language'
+      Caption = 'Chinese'
+      OnExecute = aLangChineseExecute
     end
   end
   object openDialog: TOpenDialog

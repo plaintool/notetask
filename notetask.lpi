@@ -17,13 +17,20 @@
         <TextDesc Value=""/>
       </XPManifest>
       <Icon Value="0"/>
-      <Resources Count="6">
+      <Resources Count="13">
         <Resource_0 FileName="img\check.bmp" Type="BITMAP" ResourceName="CHECK"/>
         <Resource_1 FileName="img\uncheck.bmp" Type="BITMAP" ResourceName="UNCHECK"/>
         <Resource_2 FileName="img\taskdoc.ico" Type="ICON" ResourceName="TASKDOC"/>
         <Resource_3 FileName="locale\notetask.en.po" Type="RCDATA" ResourceName="NOTETASK.EN"/>
-        <Resource_4 FileName="locale\notetask.de.po" Type="RCDATA" ResourceName="NOTETASK.DE"/>
-        <Resource_5 FileName="locale\notetask.ru.po" Type="RCDATA" ResourceName="NOTETASK.RU"/>
+        <Resource_4 FileName="locale\notetask.es.po" Type="RCDATA" ResourceName="NOTETASK.ES"/>
+        <Resource_5 FileName="locale\notetask.fr.po" Type="RCDATA" ResourceName="NOTETASK.FR"/>
+        <Resource_6 FileName="locale\notetask.de.po" Type="RCDATA" ResourceName="NOTETASK.DE"/>
+        <Resource_7 FileName="locale\notetask.it.po" Type="RCDATA" ResourceName="NOTETASK.IT"/>
+        <Resource_8 FileName="locale\notetask.pt.po" Type="RCDATA" ResourceName="NOTETASK.PT"/>
+        <Resource_9 FileName="locale\notetask.ru.po" Type="RCDATA" ResourceName="NOTETASK.RU"/>
+        <Resource_10 FileName="locale\notetask.ja.po" Type="RCDATA" ResourceName="NOTETASK.JA"/>
+        <Resource_11 FileName="locale\notetask.ko.po" Type="RCDATA" ResourceName="NOTETASK.KO"/>
+        <Resource_12 FileName="locale\notetask.zh.po" Type="RCDATA" ResourceName="NOTETASK.ZH"/>
       </Resources>
     </General>
     <i18n>
@@ -34,7 +41,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="7"/>
+      <BuildNr Value="10"/>
       <StringTable FileDescription="Notetask" LegalCopyright="Alexander Tverskoy" ProductName="Notetask" ProductVersion="1.0"/>
     </VersionInfo>
     <BuildModes>

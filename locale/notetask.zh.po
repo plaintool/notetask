@@ -5,7 +5,7 @@ msgstr ""
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: de\n"
+"Language: zh\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,30 +13,30 @@ msgstr ""
 
 #: formfind.rdirectiondown
 msgid "Down"
-msgstr "Unten"
+msgstr "下"
 
 #: formfind.rdirectionup
 msgid "Up"
-msgstr "Oben"
+msgstr "上"
 
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"
-msgstr "Notetask"
+msgstr "笔记任务"
 
 #: mainform.rarchiveconfirm
 msgctxt "mainform.rarchiveconfirm"
 msgid "Are you sure you want to archive / unarchive this task?"
-msgstr "Sind Sie sicher, dass Sie diese Aufgabe archivieren / dearchivieren möchten?"
+msgstr "您确定要归档/取消归档此任务吗？"
 
 #: mainform.rarchivesconfirm
 msgctxt "mainform.rarchivesconfirm"
 msgid "Are you sure you want to archive / unarchive selected tasks?"
-msgstr "Sind Sie sicher, dass Sie die ausgewählten Aufgaben archivieren / dearchivieren möchten?"
+msgstr "您确定要归档/取消归档所选任务吗？"
 
 #: mainform.rcantfind
 msgid "Can't find"
-msgstr "Kann nicht gefunden werden"
+msgstr "找不到"
 
 #: mainform.rchatgpt
 msgid "https://chatgpt.com?q="
@@ -44,67 +44,67 @@ msgstr "https://chatgpt.com?q="
 
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
-msgstr "Sind Sie sicher, dass Sie die Daten im ausgewählten Bereich löschen möchten?"
+msgstr "您确定要清除所选区域中的数据吗？"
 
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
-msgstr "Sind Sie sicher, dass Sie diese Aufgabe löschen möchten?"
+msgstr "您确定要删除此任务吗？"
 
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
-msgstr "Sind Sie sicher, dass Sie die ausgewählten Aufgaben löschen möchten?"
+msgstr "您确定要删除所选任务吗？"
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
-msgstr "Die angeforderte Datei wurde auf der Festplatte nicht gefunden."
+msgstr "在磁盘上找不到请求的文件。"
 
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
-msgstr "Die Zeilennummer liegt außerhalb des zulässigen Bereichs."
+msgstr "行号超出允许范围。"
 
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "Aufgaben-Dateien (*.tsk)|*.tsk|Text-Dateien (*.txt)|*.txt|Markdown-Dateien (*.md)|*.md|Alle Dateien (*.*)|*.*"
+msgstr "任务文件 (*.tsk)|*.tsk|文本文件 (*.txt)|*.txt|Markdown 文件 (*.md)|*.md|所有文件 (*.*)|*.*"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
-msgstr " Aufgaben"
+msgstr " 任务"
 
 #: mainform.rsavechanges
 msgid "Do you want to save the changes?"
-msgstr "Möchten Sie die Änderungen speichern?"
+msgstr "您想保存更改吗？"
 
 #: mainform.rsavedialogfilter
 msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "Aufgaben-Dateien (*.tsk)|*.tsk|Text-Dateien (*.txt)|*.txt|Markdown-Dateien (*.md)|*.md|Alle Dateien (*.*)|*.*"
+msgstr "任务文件 (*.tsk)|*.tsk|文本文件 (*.txt)|*.txt|Markdown 文件 (*.md)|*.md|所有文件 (*.*)|*.*"
 
 #: mainform.rundoconfirm
 msgid "Are you sure you want to discard all changes? This action cannot be undone."
-msgstr "Sind Sie sicher, dass Sie alle Änderungen verwerfen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+msgstr "您确定要放弃所有更改吗？此操作无法撤消。"
 
 #: mainform.runtitled
 msgid "Untitled"
-msgstr "Unbetitelt"
+msgstr "无标题"
 
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
-msgstr "OK"
+msgstr "确定"
 
 #: tformaboutnotetask.caption
 msgid "About"
-msgstr "Über"
+msgstr "关于"
 
 #: tformaboutnotetask.labelby.caption
 msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
-msgstr "von Alexander Tverskoy ist lizenziert unter CC BY-NC-SA 4.0"
+msgstr "由 Alexander Tverskoy 许可，采用 CC BY-NC-SA 4.0"
 
 #: tformaboutnotetask.labellic.caption
 msgid "Full license text:"
-msgstr "Vollständiger Lizenztext:"
+msgstr "完整许可文本："
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "https://creativecommons.org/licenses/by-nc-sa/4.0/"
@@ -112,124 +112,124 @@ msgstr "https://creativecommons.org/licenses/by-nc-sa/4.0/"
 
 #: tformaboutnotetask.labelname.caption
 msgid "Notetask © 2024"
-msgstr "Notizaufgabe © 2024"
+msgstr "笔记任务 © 2024"
 
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "Abbrechen"
+msgstr "取消"
 
 #: tformfindtext.buttonfind.caption
 msgctxt "tformfindtext.buttonfind.caption"
 msgid "Find Next"
-msgstr "Nächste finden"
+msgstr "查找下一个"
 
 #: tformfindtext.caption
 msgctxt "tformfindtext.caption"
 msgid "Find"
-msgstr "Suchen"
+msgstr "查找"
 
 #: tformfindtext.checkmatchcase.caption
 msgctxt "tformfindtext.checkmatchcase.caption"
 msgid "Match case"
-msgstr "Groß-/Kleinschreibung beachten"
+msgstr "区分大小写"
 
 #: tformfindtext.checkwraparound.caption
 msgctxt "tformfindtext.checkwraparound.caption"
 msgid "Wrap around"
-msgstr "Umblättern"
+msgstr "环绕查找"
 
 #: tformfindtext.labelwhat.caption
 msgctxt "tformfindtext.labelwhat.caption"
 msgid "Find what:"
-msgstr "Was suchen:"
+msgstr "查找内容："
 
 #: tformfindtext.radiodirection.caption
 msgctxt "tformfindtext.radiodirection.caption"
 msgid "Direction"
-msgstr "Richtung"
+msgstr "方向"
 
 #: tforminputtext.buttoncancel.caption
 msgctxt "tforminputtext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "Abbrechen"
+msgstr "取消"
 
 #: tforminputtext.buttonok.caption
 msgid "Go to"
-msgstr "Gehe zu"
+msgstr "转到"
 
 #: tforminputtext.caption
 msgid "Go to task"
-msgstr "Zu Aufgabe gehen"
+msgstr "转到任务"
 
 #: tforminputtext.labelcaption.caption
 msgid "Task number:"
-msgstr "Aufgabenummer:"
+msgstr "任务编号："
 
 #: tformnotetask.aabout.caption
 msgid "About..."
-msgstr "Über..."
+msgstr "关于..."
 
 #: tformnotetask.aarchivetasks.caption
 msgid "Archive / unarchive tasks"
-msgstr "Aufgaben archivieren / dearchivieren"
+msgstr "归档 / 取消归档任务"
 
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
-msgstr "Leserichtung: von rechts nach links"
+msgstr "阅读顺序：从右到左"
 
 #: tformnotetask.achatgpt.caption
 msgid "Ask ChatGPT..."
-msgstr "Frag ChatGPT..."
+msgstr "询问 ChatGPT..."
 
 #: tformnotetask.acopy.caption
 msgid "Copy"
-msgstr "Kopieren"
+msgstr "复制"
 
 #: tformnotetask.acut.caption
 msgid "Cut"
-msgstr "Ausschneiden"
+msgstr "剪切"
 
 #: tformnotetask.adatetime.caption
 msgid "Date time"
-msgstr "Datum und Uhrzeit"
+msgstr "日期时间"
 
 #: tformnotetask.adelete.caption
 msgid "Delete"
-msgstr "Löschen"
+msgstr "删除"
 
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
-msgstr "Aufgaben löschen"
+msgstr "删除任务"
 
 #: tformnotetask.aexit.caption
 msgid "Exit"
-msgstr "Beenden"
+msgstr "退出"
 
 #: tformnotetask.afind.caption
 msgid "Find..."
-msgstr "Suchen..."
+msgstr "查找..."
 
 #: tformnotetask.afindnext.caption
 msgid "Find next"
-msgstr "Nächste finden"
+msgstr "查找下一个"
 
 #: tformnotetask.afindprev.caption
 msgid "Find previous"
-msgstr "Vorherige finden"
+msgstr "查找上一个"
 
 #: tformnotetask.afont.caption
 msgid "Font..."
-msgstr "Schriftart..."
+msgstr "字体..."
 
 #: tformnotetask.agoto.caption
 msgid "Go to..."
-msgstr "Gehe zu..."
+msgstr "转到..."
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
-msgstr "Aufgabe einfügen"
+msgstr "插入任务"
 
 #: tformnotetask.alangchinese.caption
 msgid "Chinese"
@@ -273,104 +273,104 @@ msgstr "Spanish"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move task to bottom"
-msgstr "Aufgabe nach unten verschieben"
+msgstr "将任务移到底部"
 
 #: tformnotetask.amovetaskdown.caption
 msgid "Move task down"
-msgstr "Aufgabe nach unten verschieben"
+msgstr "将任务下移"
 
 #: tformnotetask.amovetasktop.caption
 msgid "Move task to top"
-msgstr "Aufgabe nach oben verschieben"
+msgstr "将任务移到顶部"
 
 #: tformnotetask.amovetaskup.caption
 msgid "Move task up"
-msgstr "Aufgabe nach oben verschieben"
+msgstr "将任务上移"
 
 #: tformnotetask.anew.caption
 msgid "New"
-msgstr "Neu"
+msgstr "新建"
 
 #: tformnotetask.anewwindow.caption
 msgid "New window"
-msgstr "Neues Fenster"
+msgstr "新窗口"
 
 #: tformnotetask.aopen.caption
 msgid "Open..."
-msgstr "Öffnen..."
+msgstr "打开..."
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."
-msgstr "Seiten Eigenschaften..."
+msgstr "页面属性..."
 
 #: tformnotetask.apaste.caption
 msgid "Paste"
-msgstr "Einfügen"
+msgstr "粘贴"
 
 #: tformnotetask.aprint.caption
 msgid "Print..."
-msgstr "Drucken..."
+msgstr "打印..."
 
 #: tformnotetask.areplace.caption
 msgid "Replace..."
-msgstr "Ersetzen..."
+msgstr "替换..."
 
 #: tformnotetask.asave.caption
 msgid "Save"
-msgstr "Speichern"
+msgstr "保存"
 
 #: tformnotetask.asaveas.caption
 msgid "Save as..."
-msgstr "Speichern unter..."
+msgstr "另存为..."
 
 #: tformnotetask.aselectall.caption
 msgid "Select all"
-msgstr "Alles auswählen"
+msgstr "全选"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "Archivierte Aufgaben anzeigen"
+msgstr "显示归档任务"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "Statusleiste anzeigen"
+msgstr "显示状态栏"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"
-msgstr "Rückgängig"
+msgstr "撤销"
 
 #: tformnotetask.aundoall.caption
 msgid "Undo all changes"
-msgstr "Alle Änderungen rückgängig machen"
+msgstr "撤销所有更改"
 
 #: tformnotetask.awordwrap.caption
 msgid "Word wrap"
-msgstr "Zeilenumbruch"
+msgstr "自动换行"
 
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
-msgstr "Notizaufgabe"
+msgstr "记事任务"
 
 #: tformnotetask.fontdialog.title
 msgid "Font select"
-msgstr "Schriftart auswählen"
+msgstr "选择字体"
 
 #: tformnotetask.menuedit.caption
 msgid "Edit"
-msgstr "Bearbeiten"
+msgstr "编辑"
 
 #: tformnotetask.menufile.caption
 msgid "File"
-msgstr "Datei"
+msgstr "文件"
 
 #: tformnotetask.menuformat.caption
 msgid "Format"
-msgstr "Format"
+msgstr "格式"
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
-msgstr "Hilfe"
+msgstr "帮助"
 
 #: tformnotetask.menulanguage.caption
 msgid "Language"
@@ -379,76 +379,76 @@ msgstr "Language"
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"
 msgid "Task"
-msgstr "Aufgabe"
+msgstr "任务"
 
 #: tformnotetask.menuview.caption
 msgid "View"
-msgstr "Ansicht"
+msgstr "查看"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"
-msgstr "Öffnen"
+msgstr "打开"
 
 #: tformnotetask.savedialog.title
 msgid "Saving"
-msgstr "Speichern"
+msgstr "保存"
 
 #: tformnotetask.taskgrid.columns[0].title.caption
 msgid "Done"
-msgstr "Fertig"
+msgstr "完成"
 
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
 msgid "Task"
-msgstr "Aufgabe"
+msgstr "任务"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgid "Comment"
-msgstr "Kommentar"
+msgstr "评论"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgid "Date"
-msgstr "Datum"
+msgstr "日期"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "Abbrechen"
+msgstr "取消"
 
 #: tformreplacetext.buttonfind.caption
 msgctxt "tformreplacetext.buttonfind.caption"
 msgid "Find Next"
-msgstr "Nächsten finden"
+msgstr "查找下一个"
 
 #: tformreplacetext.buttonreplace.caption
 msgctxt "tformreplacetext.buttonreplace.caption"
 msgid "Replace"
-msgstr "Ersetzen"
+msgstr "替换"
 
 #: tformreplacetext.buttonreplaceall.caption
 msgid "Replace All"
-msgstr "Alle ersetzen"
+msgstr "替换全部"
 
 #: tformreplacetext.caption
 msgctxt "tformreplacetext.caption"
 msgid "Replace"
-msgstr "Ersetzen"
+msgstr "替换"
 
 #: tformreplacetext.checkmatchcase.caption
 msgctxt "tformreplacetext.checkmatchcase.caption"
 msgid "Match case"
-msgstr "Groß-/Kleinschreibung beachten"
+msgstr "区分大小写"
 
 #: tformreplacetext.checkwraparound.caption
 msgctxt "tformreplacetext.checkwraparound.caption"
 msgid "Wrap around"
-msgstr "Umwickeln"
+msgstr "环绕查找"
 
 #: tformreplacetext.labelwhat.caption
 msgctxt "tformreplacetext.labelwhat.caption"
 msgid "Find what:"
-msgstr "Was suchen:"
+msgstr "查找内容："
 
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
-msgstr "Ersetzen durch:"
+msgstr "替换为："
