@@ -162,7 +162,6 @@ type
     procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
     procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState; var ABitmap: TBitmap);
-    procedure taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
     procedure aArchiveTasksExecute(Sender: TObject);
     procedure aCopyExecute(Sender: TObject);
     procedure aCutExecute(Sender: TObject);
@@ -199,6 +198,7 @@ type
     procedure aLangEnglishExecute(Sender: TObject);
     procedure aLangRussianExecute(Sender: TObject);
     procedure aLangDeutschExecute(Sender: TObject);
+    procedure taskGridColRowExchanged(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -804,25 +804,6 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridValidateEntry(Sender: TObject; aCol, aRow: integer; const OldValue: string; var NewValue: string);
-var
-  DateTime: TDateTime;
-begin
-  if (aCol = 4) then
-  begin
-    if (NewValue <> '') and (not TryStrToDateTime(NewValue, DateTime)) then
-      Abort;
-
-    if (OldValue <> NewValue) then
-    begin
-      SetChanged;
-
-      Tasks.SetTask(taskGrid, taskGrid.Row);
-      EditComplite(False);
-    end;
-  end;
-end;
-
 procedure TformNotetask.aUndoExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -1314,6 +1295,14 @@ procedure TformNotetask.aLangDeutschExecute(Sender: TObject);
 begin
   SetLanguage('de');
   SetCaption;
+end;
+
+procedure TformNotetask.taskGridColRowExchanged(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+begin
+  if (not IsColumn) then
+  begin
+
+  end;
 end;
 
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);

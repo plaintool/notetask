@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -48,13 +47,14 @@ object formNotetask: TformNotetask
     GridLineColor = 13290186
     GridLineStyle = psDot
     MouseWheelOption = mwGrid
-    Options = [goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goEditing, goAutoAddRows, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goRowHighlight]
+    Options = [goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goEditing, goAutoAddRows, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goAutoAddRowsSkipContentCheck, goRowHighlight]
     Options2 = [goEditorParentFont]
     RowCount = 2
     TabOrder = 0
     UseXORFeatures = True
     OnCheckboxToggled = taskGridCheckboxToggled
     OnColRowDeleted = taskGridColRowDeleted
+    OnColRowExchanged = taskGridColRowExchanged
     OnColRowInserted = taskGridColRowInserted
     OnDrawCell = taskGridDrawCell
     OnHeaderClick = taskGridHeaderClick
@@ -67,7 +67,6 @@ object formNotetask: TformNotetask
     OnSelectEditor = taskGridSelectEditor
     OnSelectCell = taskGridSelectCell
     OnUserCheckboxBitmap = taskGridUserCheckboxBitmap
-    OnValidateEntry = taskGridValidateEntry
     ColWidths = (
       42
       64
