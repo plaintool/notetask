@@ -349,10 +349,11 @@ begin
        (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/notetask.desktop') = 0) then
       Result := True;
   except
-  on E: Exception do
-  begin
-    // Handle file creation error
-    Exit;
+    on E: Exception do
+    begin
+      // Handle file creation error
+      Exit;
+    end;
   end;
 
   {$ENDIF}
