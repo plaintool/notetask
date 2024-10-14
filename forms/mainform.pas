@@ -710,10 +710,16 @@ begin
     else
     begin
       task := Tasks.GetTask(ARow);
-      if (not task.Done) and (task.Date > 0) and (task.Date < Now) then
+      if (not task.Done) and (task.Date > 0) and (task.Date < Now) then // Color expired task
       begin
         bgFill := clRowExpired;
         grid.Canvas.Font.Color := clBlack;
+      end
+      else
+      if (not task.Done) and (task.Archive) then
+      begin
+        bgFill := clWhite;
+        grid.Canvas.Font.Color := clMaroon;
       end
       else
       begin
