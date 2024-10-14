@@ -22,6 +22,9 @@ uses
   {$IFDEF Windows}
   ,Registry
   {$ENDIF}
+  {$IFDEF Linux}
+  ,Unix
+  {$ENDIF}
   ;
 
 type
@@ -344,9 +347,7 @@ begin
     if (FpSystem('xdg-mime install --mode user ' + UserHome + '/.local/share/mime/packages/notetask.xml') = 0) and
        (FpSystem('update-mime-database ' + UserHome + '/.local/share/mime') = 0) and
        (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/notetask.desktop') = 0) then
-    begin
       Result := True;
-    end;
   except
   on E: Exception do
   begin
@@ -408,6 +409,5 @@ begin
   end;
   {$ENDIF}
 end;
-
 
 end.

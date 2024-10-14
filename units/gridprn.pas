@@ -680,7 +680,12 @@ var
   P: array[0..2] of TPoint;
 begin
   details := ThemeServices.GetElementDetails(arrtb[ACheckState]);
-  cSize := ThemeServices.GetDetailSizeForPPI(Details, Screen.PixelsPerInch);
+  {$IFDEF Windows}
+   cSize := ThemeServices.GetDetailSizeForPPI(Details, Screen.PixelsPerInch);
+  {$ENDIF}
+  {$IFDEF Linux}
+  cSize := ThemeServices.GetDetailSize(Details);
+  {$ENDIF}
   cSize.cx := ScaleX(cSize.cx);
   cSize.cy := ScaleY(cSize.cy);
   R.Left := (ARect.Left + ARect.Right - cSize.cx) div 2;
