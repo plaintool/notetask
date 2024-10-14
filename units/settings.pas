@@ -320,6 +320,9 @@ begin
     MimeType := 'application/x-notetask'; // Define MIME type for the file extension
     UserHome := GetEnvironmentVariable('HOME');
 
+    // Create necessary directories if they do not exist
+    ForceDirectories(UserHome + '/.local/share/mime/packages/');
+
     // Create a .xml file for MIME type in user's home directory
     AssignFile(MimeFile, UserHome + '/.local/share/mime/packages/notetask.xml');
       Rewrite(MimeFile);
