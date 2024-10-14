@@ -148,7 +148,7 @@ begin
 
       if JSONObj.FindPath('Language') <> nil then
       begin
-        if (Language <> JSONObj.FindPath('Language').AsString) then
+        if (JSONObj.FindPath('Language').AsString <> string.Empty) and (Language <> JSONObj.FindPath('Language').AsString) then
         begin
           Language := JSONObj.FindPath('Language').AsString;
           Form.SetLanguage(Language);

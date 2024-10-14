@@ -348,8 +348,6 @@ begin
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
-  SetLanguage;
-
   // Create TBitmap objects
   ResourceBitmapCheck := TBitmap.Create;
   ResourceBitmapUncheck := TBitmap.Create;
@@ -360,6 +358,9 @@ begin
 
   LoadFormSettings(self);
   LoadGridSettings(taskGrid);
+
+    // Set language
+  SetLanguage;
 
   // After load wordwrap setting
   aWordWrap.Checked := FWordWrap;

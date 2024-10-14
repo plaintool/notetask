@@ -69,7 +69,7 @@ begin
   dispose(buffer);
   {$ELSE}
   {$IFDEF LINUX}
-  fbl := Copy(GetEnvironmentVariable('LC_CTYPE'), 1, 2);
+  fbl := Copy(GetEnvironmentVariable('LANG'), 1, 2);
   {$ELSE}
   GetLanguageIDs(l, fbl);
   {$ENDIF}
