@@ -359,7 +359,7 @@ begin
   LoadFormSettings(self);
   LoadGridSettings(taskGrid);
 
-    // Set language
+  // Set language
   SetLanguage;
 
   // After load wordwrap setting
@@ -644,15 +644,17 @@ var
 begin
   if (Button = mbRight) and (not IsEditing) then
   begin
-    // Get the row index at the mouse coordinates
-    Cell := taskGrid.MouseToCell(TPoint.Create(X, Y));
+    if (taskGrid.Selection.Height = 0) then
+    begin
+      // Get the row index at the mouse coordinates
+      Cell := taskGrid.MouseToCell(TPoint.Create(X, Y));
 
-    // Check if the row index is valid
-    if (Cell.Y >= 0) and (Cell.Y < taskGrid.RowCount) then
-      taskGrid.Row := Cell.Y;
-    if (Cell.X > 0) and (Cell.X < 5) then
-      taskGrid.Col := Cell.X;
-
+      // Check if the row index is valid
+      if (Cell.Y >= 0) and (Cell.Y < taskGrid.RowCount) then
+        taskGrid.Row := Cell.Y;
+      if (Cell.X > 0) and (Cell.X < 5) then
+        taskGrid.Col := Cell.X;
+    end;
     Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
   end;
 end;
