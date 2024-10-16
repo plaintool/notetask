@@ -338,6 +338,7 @@ procedure TformNotetask.FormCreate(Sender: TObject);
 var
   FilePath: string;
 begin
+  // Initialize variables
   FBackup := True;
   FWordWrap := True;
   FBiDiRightToLeft := self.BiDiMode = bdRightToLeft;
@@ -347,6 +348,10 @@ begin
   clRowExpired := RGBToColor(255, 220, 220);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
+
+  {$IFDEF Linux}
+  taskGrid.DefaultRowHeight := 33;
+  {$ENDIF}
 
   // Create TBitmap objects
   ResourceBitmapCheck := TBitmap.Create;
