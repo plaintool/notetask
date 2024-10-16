@@ -609,6 +609,7 @@ begin
     taskGrid.Cells[1, tIndex] := '0';
     FLineCount += 1;
     SetInfo;
+    SetChanged();
   end;
 end;
 
