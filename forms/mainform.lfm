@@ -47,7 +47,7 @@ object formNotetask: TformNotetask
     GridLineColor = 13290186
     GridLineStyle = psDot
     MouseWheelOption = mwGrid
-    Options = [goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goRowMoving, goEditing, goAutoAddRows, goTabs, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goRowHighlight]
+    Options = [goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goRowMoving, goEditing, goAutoAddRows, goTabs, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goAutoAddRowsSkipContentCheck, goRowHighlight]
     Options2 = [goEditorParentFont]
     RowCount = 2
     TabOrder = 0
