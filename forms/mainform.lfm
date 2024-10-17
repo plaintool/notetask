@@ -286,6 +286,9 @@ object formNotetask: TformNotetask
       object Separator9: TMenuItem
         Caption = '-'
       end
+      object menuDonate: TMenuItem
+        Action = aDonate
+      end
       object menuAbout: TMenuItem
         Action = aAbout
       end
@@ -408,11 +411,6 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Show archived tasks'
       OnExecute = aShowArchivedExecute
-    end
-    object aAbout: TAction
-      Category = 'Help'
-      Caption = 'About...'
-      OnExecute = aAboutExecute
     end
     object aUndoAll: TAction
       Category = 'Edit'
@@ -554,6 +552,16 @@ object formNotetask: TformNotetask
       Category = 'Language'
       Caption = 'Chinese'
       OnExecute = aLangChineseExecute
+    end
+    object aDonate: TAction
+      Category = 'Help'
+      Caption = 'Donate...'
+      OnExecute = aDonateExecute
+    end
+    object aAbout: TAction
+      Category = 'Help'
+      Caption = 'About...'
+      OnExecute = aAboutExecute
     end
   end
   object openDialog: TOpenDialog

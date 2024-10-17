@@ -114,6 +114,86 @@ msgstr "https://creativecommons.org/licenses/by-nc-sa/4.0/"
 msgid "Notetask © 2024"
 msgstr "노트작업 © 2024"
 
+#: tformdonatenotetask.buttonok.caption
+#, fuzzy
+msgctxt "tformdonatenotetask.buttonok.caption"
+msgid "OK"
+msgstr "확인"
+
+#: tformdonatenotetask.caption
+msgid "Donate"
+msgstr ""
+
+#: tformdonatenotetask.editwallet1.text
+msgid "3KMtk2XPJDbYo3DuivLGndRxmeHj2ZwR34"
+msgstr ""
+
+#: tformdonatenotetask.editwallet2.text
+msgctxt "tformdonatenotetask.editwallet2.text"
+msgid "0x55f12f9f7c4e08a74721e1e3efb0e17890347de2"
+msgstr ""
+
+#: tformdonatenotetask.editwallet3.text
+msgctxt "tformdonatenotetask.editwallet3.text"
+msgid "0x55f12f9f7c4e08a74721e1e3efb0e17890347de2"
+msgstr ""
+
+#: tformdonatenotetask.editwallet4.text
+msgid "TNgDL8FZnJG7AMvu9xzWbVV3KMSn7sXY4y"
+msgstr ""
+
+#: tformdonatenotetask.label1.caption
+msgid "Hey, help feed a hungry programmer! Every donation helps keep the caffeine flowing and the code coming. Thanks for supporting a small project that’s made with passion (and a lot of coffee)!"
+msgstr ""
+
+#: tformdonatenotetask.label10.caption
+msgid "Feel free to make a donation through any exchange, for example:"
+msgstr ""
+
+#: tformdonatenotetask.label11.caption
+msgid "or BNB Smart Chain(BEP20)"
+msgstr ""
+
+#: tformdonatenotetask.label2.caption
+msgid "BTC"
+msgstr ""
+
+#: tformdonatenotetask.label3.caption
+msgid "Bitcoin(BTC)"
+msgstr ""
+
+#: tformdonatenotetask.label4.caption
+msgid "ETH"
+msgstr ""
+
+#: tformdonatenotetask.label5.caption
+msgctxt "tformdonatenotetask.label5.caption"
+msgid "Ethereum(ERC20)"
+msgstr ""
+
+#: tformdonatenotetask.label6.caption
+msgctxt "tformdonatenotetask.label6.caption"
+msgid "USDT"
+msgstr ""
+
+#: tformdonatenotetask.label7.caption
+msgctxt "tformdonatenotetask.label7.caption"
+msgid "Ethereum(ERC20)"
+msgstr ""
+
+#: tformdonatenotetask.label8.caption
+msgid "Tron(TRC20) Адрес"
+msgstr ""
+
+#: tformdonatenotetask.label9.caption
+msgctxt "tformdonatenotetask.label9.caption"
+msgid "USDT"
+msgstr ""
+
+#: tformdonatenotetask.labelurl.caption
+msgid "https://changelly.com/buy-crypto?amount=15&from=usd"
+msgstr ""
+
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"
 msgid "Cancel"
@@ -202,6 +282,10 @@ msgstr "삭제"
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
 msgstr "작업 삭제"
+
+#: tformnotetask.adonate.caption
+msgid "Donate..."
+msgstr ""
 
 #: tformnotetask.aexit.caption
 msgid "Exit"
@@ -452,3 +536,4 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
+

@@ -545,7 +545,7 @@ begin
     TempTask := FTaskList[Ind];
 
     // Shift tasks down to make room at the top
-    for i := Index downto 1 do
+    for i := Index downto 2 do
       FTaskList[Map(i)] := FTaskList[Map(i - 1)];
 
     // Place the stored task at the top
@@ -571,7 +571,7 @@ begin
     TempTask := FTaskList[Ind];
 
     // Shift all tasks down to fill the gap
-    for i := Index to Length(MapGrid) - 1 do
+    for i := Index to Length(MapGrid) - 2 do
       FTaskList[Map(i)] := FTaskList[Map(i + 1)];
 
     // Place the stored task at the end
@@ -746,14 +746,19 @@ var
   TempDate: TDateTime;
   Rect: TGridRect;
   Index, i, j: integer;
+  RowTask: TTask;
+  IsEmpty: boolean;
   //  Id, Id0, Id1: integer;
 begin
   Result := Grid.Selection;
   if Clipboard.AsText = string.Empty then exit;
   CreateBackup;
 
+  RowTask := GetTask(Grid.Row);
+  IsEmpty := (RowTask.Text = string.Empty) and (RowTask.Comment = string.Empty) and (RowTask.Date = 0);
+
   TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText));
-  if (Grid.Selection.Height = 0) and (Grid.Selection.Width = 0) then
+  if (Grid.Selection.Height = 0) and (Grid.Selection.Width = 0) and (not IsEmpty) then
   begin
     for i := TempTasks.FCount - 1 downto 0 do
     begin

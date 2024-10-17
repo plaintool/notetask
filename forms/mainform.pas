@@ -163,6 +163,8 @@ type
     menuJapanese: TMenuItem;
     menuKorean: TMenuItem;
     menuChinese: TMenuItem;
+    aDonate: TAction;
+    menuDonate: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -229,6 +231,7 @@ type
     procedure aLangJapaneseExecute(Sender: TObject);
     procedure aLangKoreanExecute(Sender: TObject);
     procedure aLangChineseExecute(Sender: TObject);
+    procedure aDonateExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -328,7 +331,7 @@ resourcestring
 
 implementation
 
-uses filemanager, settings, stringtool, systemtool, forminput, formfind, formreplace, formabout;
+uses filemanager, settings, stringtool, systemtool, forminput, formfind, formreplace, formabout, formdonate;
 
   {$R *.lfm}
 
@@ -1482,6 +1485,18 @@ procedure TformNotetask.aLangChineseExecute(Sender: TObject);
 begin
   SetLanguage('zh');
   SetCaption;
+end;
+
+procedure TformNotetask.aDonateExecute(Sender: TObject);
+begin
+  formDonateNotetask := TformDonateNotetask.Create(nil);
+  try
+    formDonateNotetask.Left := Self.Left + 100;
+    formDonateNotetask.Top := Self.Top + 100;
+    formDonateNotetask.ShowModal;
+  finally
+    formDonateNotetask.Free;
+  end;
 end;
 
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);

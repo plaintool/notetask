@@ -18,9 +18,11 @@ uses
   Dialogs,
   StdCtrls,
   ExtCtrls,
+  Menus,
+  Classes,
   LCLIntf,
   LCLType,
-  LCLProc, Menus;
+  LCLProc;
 
 type
 

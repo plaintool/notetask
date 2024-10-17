@@ -32,7 +32,7 @@ uses
   ;
 
 function GetOSLanguage: string;
-function ApplicationTranslate(const Language: string): boolean;
+function ApplicationTranslate(const Language: string; AForm: TCustomForm = nil): boolean;
 
 var
   Language: string;
@@ -77,7 +77,7 @@ begin
   Result := fbl;
 end;
 
-function ApplicationTranslate(const Language: string): boolean;
+function ApplicationTranslate(const Language: string; AForm: TCustomForm = nil): boolean;
 var
   Res: TResourceStream;
   PoStringStream: TStringStream;
@@ -111,17 +111,25 @@ begin
 
       if Result then
       begin
-        // Create a local translator for the form
+        // Create a local translator for the form or forms
         LocalTranslator := TPOTranslator.Create(PoFile);
         LRSTranslator := LocalTranslator;
 
-        // Update the translation for all forms
-        for i := 0 to Screen.CustomFormCount - 1 do
-          LocalTranslator.UpdateTranslation(Screen.CustomForms[i]);
+        if Assigned(AForm) then
+        begin
+          // Translate only the specified form
+          LocalTranslator.UpdateTranslation(AForm);
+        end
+        else
+        begin
+          // Translate all forms
+          for i := 0 to Screen.CustomFormCount - 1 do
+            LocalTranslator.UpdateTranslation(Screen.CustomForms[i]);
 
-        // Update the translation for all data modules
-        for i := 0 to Screen.DataModuleCount - 1 do
-          LocalTranslator.UpdateTranslation(Screen.DataModules[i]);
+          // Translate all data modules
+          for i := 0 to Screen.DataModuleCount - 1 do
+            LocalTranslator.UpdateTranslation(Screen.DataModules[i]);
+        end;
       end;
 
     except
