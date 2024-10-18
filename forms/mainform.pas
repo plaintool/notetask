@@ -261,7 +261,7 @@ type
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
     procedure DatePickerChange(Sender: TObject);
-    procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 5; OffsetTop: integer = 1;
+    procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4; OffsetTop: integer = 0;
       OffsetRight: integer = -10; OffsetBottom: integer = -2);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -1560,8 +1560,8 @@ begin
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
 end;
 
-procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 5; OffsetTop: integer = 1;
-  OffsetRight: integer = -10; OffsetBottom: integer = -2);
+procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer; OffsetTop: integer;
+  OffsetRight: integer; OffsetBottom: integer);
 var
   Rect: TRect;
 begin
@@ -1971,6 +1971,8 @@ begin
     'ja': aLangJapanese.Checked := True;
     'ko': aLangKorean.Checked := True;
     'zh': aLangChinese.Checked := True;
+    else
+    // nolang
   end;
 end;
 
