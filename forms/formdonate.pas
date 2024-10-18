@@ -9,7 +9,7 @@ uses
   StdCtrls,
   Buttons,
   Clipbrd,
-  LCLIntf;
+  LCLIntf, Classes;
 
 type
 
@@ -42,6 +42,10 @@ type
     procedure buttonCopy3Click(Sender: TObject);
     procedure buttonCopy4Click(Sender: TObject);
     procedure labelUrlClick(Sender: TObject);
+    procedure editWallet4Click(Sender: TObject);
+    procedure editWallet3Click(Sender: TObject);
+    procedure editWallet1Click(Sender: TObject);
+    procedure editWallet2Click(Sender: TObject);
   private
 
   public
@@ -80,6 +84,26 @@ end;
 procedure TformDonateNotetask.labelUrlClick(Sender: TObject);
 begin
   OpenUrl(labelUrl.Caption);
+end;
+
+procedure TformDonateNotetask.editWallet4Click(Sender: TObject);
+begin
+  editWallet4.SelectAll;
+end;
+
+procedure TformDonateNotetask.editWallet3Click(Sender: TObject);
+begin
+    editWallet3.SelectAll;
+end;
+
+procedure TformDonateNotetask.editWallet1Click(Sender: TObject);
+begin
+    editWallet1.SelectAll;
+end;
+
+procedure TformDonateNotetask.editWallet2Click(Sender: TObject);
+begin
+    editWallet2.SelectAll;
 end;
 
 end.

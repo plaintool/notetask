@@ -15,9 +15,10 @@ object formDonateNotetask: TformDonateNotetask
     Top = 315
     Width = 75
     Anchors = [akRight, akBottom]
+    Cancel = True
     Caption = 'OK'
     ModalResult = 1
-    TabOrder = 0
+    TabOrder = 4
   end
   object editWallet1: TEdit
     Left = 16
@@ -27,8 +28,9 @@ object formDonateNotetask: TformDonateNotetask
     AutoSize = False
     Color = clBtnFace
     ReadOnly = True
-    TabOrder = 1
+    TabOrder = 2
     Text = '3KMtk2XPJDbYo3DuivLGndRxmeHj2ZwR34'
+    OnClick = editWallet1Click
   end
   object buttonCopy1: TSpeedButton
     Left = 311
@@ -101,8 +103,9 @@ object formDonateNotetask: TformDonateNotetask
     AutoSize = False
     Color = clBtnFace
     ReadOnly = True
-    TabOrder = 2
+    TabOrder = 3
     Text = '0x55f12f9f7c4e08a74721e1e3efb0e17890347de2'
+    OnClick = editWallet2Click
   end
   object buttonCopy2: TSpeedButton
     Left = 311
@@ -166,8 +169,9 @@ object formDonateNotetask: TformDonateNotetask
     AutoSize = False
     Color = clBtnFace
     ReadOnly = True
-    TabOrder = 3
+    TabOrder = 1
     Text = '0x55f12f9f7c4e08a74721e1e3efb0e17890347de2'
+    OnClick = editWallet3Click
   end
   object buttonCopy3: TSpeedButton
     Left = 310
@@ -230,8 +234,9 @@ object formDonateNotetask: TformDonateNotetask
     Width = 292
     AutoSize = False
     Color = clBtnFace
-    TabOrder = 4
+    TabOrder = 0
     Text = 'TNgDL8FZnJG7AMvu9xzWbVV3KMSn7sXY4y'
+    OnClick = editWallet4Click
   end
   object buttonCopy4: TSpeedButton
     Left = 310

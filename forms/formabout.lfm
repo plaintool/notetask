@@ -15,6 +15,7 @@ object formAboutNotetask: TformAboutNotetask
     Top = 262
     Width = 75
     Anchors = [akRight, akBottom]
+    Cancel = True
     Caption = 'OK'
     ModalResult = 1
     TabOrder = 0
