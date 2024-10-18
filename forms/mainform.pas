@@ -356,6 +356,9 @@ begin
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
+  {$IFDEF Windows}
+  taskGrid.DefaultRowHeight := 22;
+  {$ENDIF}
   {$IFDEF Linux}
   taskGrid.DefaultRowHeight := 33;
   {$ENDIF}
@@ -922,6 +925,7 @@ begin
   begin
     Tasks.UndoBackup;
     FillGrid;
+    ResetRowHeight;
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
@@ -1543,8 +1547,6 @@ begin
 end;
 
 procedure TformNotetask.MemoChange(Sender: TObject);
-var
-  test: integer;
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
   Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit); // Backup only on begin edit
