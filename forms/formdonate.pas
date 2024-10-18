@@ -36,7 +36,6 @@ type
     Label9: TLabel;
     labelUrl: TLabel;
     Label10: TLabel;
-    Label11: TLabel;
     procedure buttonCopy1Click(Sender: TObject);
     procedure buttonCopy2Click(Sender: TObject);
     procedure buttonCopy3Click(Sender: TObject);

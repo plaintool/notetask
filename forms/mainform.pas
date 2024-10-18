@@ -1069,9 +1069,9 @@ begin
 
   newRow := Tasks.MoveTaskTop(taskGrid.Row);
   FillGrid;
-  if (newRow > -1) then
+  if (newRow > -1) and (taskGrid.Row <> newRow) then
   begin
-    SwapRowHeights(taskGrid.Row, newRow);
+    ResetRowHeight();
     taskGrid.Row := newRow;
   end;
   SetChanged;
@@ -1086,9 +1086,9 @@ begin
 
   newRow := Tasks.MoveTaskBottom(taskGrid.Row);
   FillGrid;
-  if (newRow > -1) then
+  if (newRow > -1) and (taskGrid.Row <> newRow) then
   begin
-    SwapRowHeights(taskGrid.Row, newRow);
+    ResetRowHeight();
     taskGrid.Row := newRow;
   end;
   SetChanged;

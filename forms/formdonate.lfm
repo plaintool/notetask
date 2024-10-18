@@ -29,7 +29,7 @@ object formDonateNotetask: TformDonateNotetask
     Color = clBtnFace
     ReadOnly = True
     TabOrder = 2
-    Text = '3KMtk2XPJDbYo3DuivLGndRxmeHj2ZwR34'
+    Text = 'bc1qqzarmz7yzv34mgpxdp5v58ejre7twy8upalfa9'
     OnClick = editWallet1Click
   end
   object buttonCopy1: TSpeedButton
@@ -104,7 +104,7 @@ object formDonateNotetask: TformDonateNotetask
     Color = clBtnFace
     ReadOnly = True
     TabOrder = 3
-    Text = '0x55f12f9f7c4e08a74721e1e3efb0e17890347de2'
+    Text = '0x404d7f200A318979EC9eB940F022045e6d38e43D'
     OnClick = editWallet2Click
   end
   object buttonCopy2: TSpeedButton
@@ -170,7 +170,7 @@ object formDonateNotetask: TformDonateNotetask
     Color = clBtnFace
     ReadOnly = True
     TabOrder = 1
-    Text = '0x55f12f9f7c4e08a74721e1e3efb0e17890347de2'
+    Text = '0x404d7f200A318979EC9eB940F022045e6d38e43D'
     OnClick = editWallet3Click
   end
   object buttonCopy3: TSpeedButton
@@ -224,8 +224,8 @@ object formDonateNotetask: TformDonateNotetask
     Left = 62
     Height = 15
     Top = 160
-    Width = 92
-    Caption = 'Ethereum(ERC20)'
+    Width = 229
+    Caption = 'Ethereum(ERC20), BNB Smart Chain(BEP20)'
   end
   object editWallet4: TEdit
     Left = 16
@@ -235,7 +235,7 @@ object formDonateNotetask: TformDonateNotetask
     AutoSize = False
     Color = clBtnFace
     TabOrder = 0
-    Text = 'TNgDL8FZnJG7AMvu9xzWbVV3KMSn7sXY4y'
+    Text = 'TJvoYPRWw35SFxP5wh4c97Egm5TaS8uBVE'
     OnClick = editWallet4Click
   end
   object buttonCopy4: TSpeedButton
@@ -280,8 +280,8 @@ object formDonateNotetask: TformDonateNotetask
     Left = 62
     Height = 15
     Top = 104
-    Width = 100
-    Caption = 'Tron(TRC20) Адрес'
+    Width = 64
+    Caption = 'Tron(TRC20)'
   end
   object Label9: TLabel
     Left = 16
@@ -312,12 +312,5 @@ object formDonateNotetask: TformDonateNotetask
     Top = 64
     Width = 344
     Caption = 'Feel free to make a donation through any exchange, for example:'
-  end
-  object Label11: TLabel
-    Left = 158
-    Height = 15
-    Top = 160
-    Width = 145
-    Caption = 'or BNB Smart Chain(BEP20)'
   end
 end
