@@ -262,7 +262,7 @@ type
     procedure MemoEnter(Sender: TObject);
     procedure DatePickerChange(Sender: TObject);
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4; OffsetTop: integer = 0;
-      OffsetRight: integer = -10; OffsetBottom: integer = -2);
+      OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure SetChanged(aChanged: boolean = True);
@@ -1543,11 +1543,14 @@ begin
 end;
 
 procedure TformNotetask.MemoChange(Sender: TObject);
+var
+  test: integer;
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
   Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit); // Backup only on begin edit
   FMemoStartEdit := False;
   SetChanged;
+  taskGrid.Repaint;
   EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
 end;
 
