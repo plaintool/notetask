@@ -115,14 +115,13 @@ msgid "Notetask © 2024"
 msgstr "노트작업 © 2024"
 
 #: tformdonatenotetask.buttonok.caption
-#, fuzzy
 msgctxt "tformdonatenotetask.buttonok.caption"
 msgid "OK"
-msgstr "확인"
+msgstr "OK"
 
 #: tformdonatenotetask.caption
-msgid "Donate"
-msgstr ""
+msgid "Buy me a coffee"
+msgstr "커피 한 잔 주세요"
 
 #: tformdonatenotetask.editwallet1.text
 msgid "bc1qqzarmz7yzv34mgpxdp5v58ejre7twy8upalfa9"
@@ -145,19 +144,19 @@ msgstr ""
 #: tformdonatenotetask.label1.caption
 msgctxt "tformdonatenotetask.label1.caption"
 msgid "Hey, help feed a hungry programmer! Every donation helps keep the caffeine flowing and the code coming. Thanks for supporting a small project that’s made with passion (and a lot of coffee)!"
-msgstr ""
+msgstr "안녕하세요, 배고픈 프로그래머를 도와주세요! 모든 기부는 카페인이 흐르고 코드가 계속 나오도록 도와줍니다. 열정(그리고 많은 커피)으로 만들어진 작은 프로젝트를 지원해 주셔서 감사합니다!"
 
 #: tformdonatenotetask.label10.caption
 msgctxt "tformdonatenotetask.label10.caption"
 msgid "Feel free to make a donation through any exchange, for example:"
-msgstr ""
+msgstr "어떤 거래소를 통해서도 기부하셔도 됩니다. 예를 들어:"
 
 #: tformdonatenotetask.label2.caption
 msgid "BTC"
 msgstr ""
 
 #: tformdonatenotetask.label3.caption
-msgid "Bitcoin(BTC)"
+msgid "Bitcoin (BTC)"
 msgstr ""
 
 #: tformdonatenotetask.label4.caption
@@ -166,7 +165,7 @@ msgstr ""
 
 #: tformdonatenotetask.label5.caption
 msgctxt "tformdonatenotetask.label5.caption"
-msgid "Ethereum(ERC20)"
+msgid "Ethereum (ERC20)"
 msgstr ""
 
 #: tformdonatenotetask.label6.caption
@@ -176,11 +175,11 @@ msgstr ""
 
 #: tformdonatenotetask.label7.caption
 msgctxt "tformdonatenotetask.label7.caption"
-msgid "Ethereum(ERC20), BNB Smart Chain(BEP20)"
+msgid "Ethereum (ERC20), BNB Smart Chain (BEP20)"
 msgstr ""
 
 #: tformdonatenotetask.label8.caption
-msgid "Tron(TRC20)"
+msgid "Tron (TRC20)"
 msgstr ""
 
 #: tformdonatenotetask.label9.caption
@@ -282,8 +281,8 @@ msgid "Delete tasks"
 msgstr "작업 삭제"
 
 #: tformnotetask.adonate.caption
-msgid "Donate..."
-msgstr ""
+msgid "Buy me a coffee..."
+msgstr "커피 한 잔 주세요..."
 
 #: tformnotetask.aexit.caption
 msgid "Exit"

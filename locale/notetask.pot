@@ -110,7 +110,7 @@ msgid "OK"
 msgstr ""
 
 #: tformdonatenotetask.caption
-msgid "Donate"
+msgid "Buy me a coffee"
 msgstr ""
 
 #: tformdonatenotetask.editwallet1.text
@@ -146,7 +146,7 @@ msgid "BTC"
 msgstr ""
 
 #: tformdonatenotetask.label3.caption
-msgid "Bitcoin(BTC)"
+msgid "Bitcoin (BTC)"
 msgstr ""
 
 #: tformdonatenotetask.label4.caption
@@ -155,7 +155,7 @@ msgstr ""
 
 #: tformdonatenotetask.label5.caption
 msgctxt "tformdonatenotetask.label5.caption"
-msgid "Ethereum(ERC20)"
+msgid "Ethereum (ERC20)"
 msgstr ""
 
 #: tformdonatenotetask.label6.caption
@@ -165,11 +165,11 @@ msgstr ""
 
 #: tformdonatenotetask.label7.caption
 msgctxt "tformdonatenotetask.label7.caption"
-msgid "Ethereum(ERC20), BNB Smart Chain(BEP20)"
+msgid "Ethereum (ERC20), BNB Smart Chain (BEP20)"
 msgstr ""
 
 #: tformdonatenotetask.label8.caption
-msgid "Tron(TRC20)"
+msgid "Tron (TRC20)"
 msgstr ""
 
 #: tformdonatenotetask.label9.caption
@@ -271,7 +271,7 @@ msgid "Delete tasks"
 msgstr ""
 
 #: tformnotetask.adonate.caption
-msgid "Donate..."
+msgid "Buy me a coffee..."
 msgstr ""
 
 #: tformnotetask.aexit.caption

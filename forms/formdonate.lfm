@@ -1,18 +1,19 @@
 object formDonateNotetask: TformDonateNotetask
   Left = 318
-  Height = 352
+  Height = 378
   Top = 250
   Width = 441
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = 'Donate'
-  ClientHeight = 352
+  Caption = 'Buy me a coffee'
+  ClientHeight = 378
   ClientWidth = 441
   Color = clWindow
+  OnCreate = FormCreate
   object buttonOk: TButton
     Left = 356
     Height = 25
-    Top = 315
+    Top = 341
     Width = 75
     Anchors = [akRight, akBottom]
     Cancel = True
@@ -23,7 +24,7 @@ object formDonateNotetask: TformDonateNotetask
   object editWallet1: TEdit
     Left = 16
     Height = 23
-    Top = 240
+    Top = 272
     Width = 294
     AutoSize = False
     Color = clBtnFace
@@ -35,7 +36,7 @@ object formDonateNotetask: TformDonateNotetask
   object buttonCopy1: TSpeedButton
     Left = 311
     Height = 23
-    Top = 240
+    Top = 272
     Width = 25
     Color = clWindow
     Flat = True
@@ -72,9 +73,9 @@ object formDonateNotetask: TformDonateNotetask
   end
   object Label1: TLabel
     Left = 16
-    Height = 48
+    Height = 64
     Top = 8
-    Width = 351
+    Width = 368
     AutoSize = False
     Caption = 'Hey, help feed a hungry programmer! Every donation helps keep the caffeine flowing and the code coming. Thanks for supporting a small project that’s made with passion (and a lot of coffee)!'
     WordWrap = True
@@ -82,8 +83,9 @@ object formDonateNotetask: TformDonateNotetask
   object Label2: TLabel
     Left = 16
     Height = 15
-    Top = 216
+    Top = 248
     Width = 22
+    AutoSize = False
     Caption = 'BTC'
     Font.Style = [fsBold]
     ParentFont = False
@@ -91,14 +93,15 @@ object formDonateNotetask: TformDonateNotetask
   object Label3: TLabel
     Left = 63
     Height = 15
-    Top = 216
-    Width = 64
-    Caption = 'Bitcoin(BTC)'
+    Top = 248
+    Width = 81
+    AutoSize = False
+    Caption = 'Bitcoin (BTC)'
   end
   object editWallet2: TEdit
     Left = 16
     Height = 23
-    Top = 296
+    Top = 328
     Width = 294
     AutoSize = False
     Color = clBtnFace
@@ -110,7 +113,7 @@ object formDonateNotetask: TformDonateNotetask
   object buttonCopy2: TSpeedButton
     Left = 311
     Height = 23
-    Top = 296
+    Top = 328
     Width = 25
     Color = clWindow
     Flat = True
@@ -148,8 +151,9 @@ object formDonateNotetask: TformDonateNotetask
   object Label4: TLabel
     Left = 16
     Height = 15
-    Top = 272
+    Top = 304
     Width = 22
+    AutoSize = False
     Caption = 'ETH'
     Font.Style = [fsBold]
     ParentFont = False
@@ -157,14 +161,15 @@ object formDonateNotetask: TformDonateNotetask
   object Label5: TLabel
     Left = 63
     Height = 15
-    Top = 272
-    Width = 92
-    Caption = 'Ethereum(ERC20)'
+    Top = 304
+    Width = 113
+    AutoSize = False
+    Caption = 'Ethereum (ERC20)'
   end
   object editWallet3: TEdit
     Left = 16
     Height = 23
-    Top = 184
+    Top = 216
     Width = 293
     AutoSize = False
     Color = clBtnFace
@@ -176,7 +181,7 @@ object formDonateNotetask: TformDonateNotetask
   object buttonCopy3: TSpeedButton
     Left = 310
     Height = 23
-    Top = 184
+    Top = 216
     Width = 25
     Color = clWindow
     Flat = True
@@ -214,8 +219,9 @@ object formDonateNotetask: TformDonateNotetask
   object Label6: TLabel
     Left = 16
     Height = 15
-    Top = 160
+    Top = 192
     Width = 32
+    AutoSize = False
     Caption = 'USDT'
     Font.Style = [fsBold]
     ParentFont = False
@@ -223,14 +229,15 @@ object formDonateNotetask: TformDonateNotetask
   object Label7: TLabel
     Left = 62
     Height = 15
-    Top = 160
-    Width = 229
-    Caption = 'Ethereum(ERC20), BNB Smart Chain(BEP20)'
+    Top = 192
+    Width = 248
+    AutoSize = False
+    Caption = 'Ethereum (ERC20), BNB Smart Chain (BEP20)'
   end
   object editWallet4: TEdit
     Left = 16
     Height = 23
-    Top = 128
+    Top = 160
     Width = 292
     AutoSize = False
     Color = clBtnFace
@@ -241,7 +248,7 @@ object formDonateNotetask: TformDonateNotetask
   object buttonCopy4: TSpeedButton
     Left = 310
     Height = 23
-    Top = 128
+    Top = 160
     Width = 25
     Color = clWindow
     Flat = True
@@ -279,15 +286,17 @@ object formDonateNotetask: TformDonateNotetask
   object Label8: TLabel
     Left = 62
     Height = 15
-    Top = 104
-    Width = 64
-    Caption = 'Tron(TRC20)'
+    Top = 136
+    Width = 75
+    AutoSize = False
+    Caption = 'Tron (TRC20)'
   end
   object Label9: TLabel
     Left = 16
     Height = 15
-    Top = 104
+    Top = 136
     Width = 32
+    AutoSize = False
     Caption = 'USDT'
     Font.Style = [fsBold]
     ParentFont = False
@@ -296,8 +305,9 @@ object formDonateNotetask: TformDonateNotetask
     Cursor = crHandPoint
     Left = 16
     Height = 15
-    Top = 80
+    Top = 104
     Width = 312
+    AutoSize = False
     Caption = 'https://changelly.com/buy-crypto?amount=15&from=usd'
     Font.Color = clBlue
     Font.Style = [fsUnderline]
@@ -308,9 +318,11 @@ object formDonateNotetask: TformDonateNotetask
   end
   object Label10: TLabel
     Left = 16
-    Height = 15
-    Top = 64
-    Width = 344
+    Height = 32
+    Top = 72
+    Width = 360
+    AutoSize = False
     Caption = 'Feel free to make a donation through any exchange, for example:'
+    WordWrap = True
   end
 end

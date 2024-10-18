@@ -115,14 +115,13 @@ msgid "Notetask © 2024"
 msgstr "Notetask © 2024"
 
 #: tformdonatenotetask.buttonok.caption
-#, fuzzy
 msgctxt "tformdonatenotetask.buttonok.caption"
 msgid "OK"
 msgstr "OK"
 
 #: tformdonatenotetask.caption
-msgid "Donate"
-msgstr ""
+msgid "Buy me a coffee"
+msgstr "Doe para um café"
 
 #: tformdonatenotetask.editwallet1.text
 msgid "bc1qqzarmz7yzv34mgpxdp5v58ejre7twy8upalfa9"
@@ -145,19 +144,19 @@ msgstr ""
 #: tformdonatenotetask.label1.caption
 msgctxt "tformdonatenotetask.label1.caption"
 msgid "Hey, help feed a hungry programmer! Every donation helps keep the caffeine flowing and the code coming. Thanks for supporting a small project that’s made with passion (and a lot of coffee)!"
-msgstr ""
+msgstr "Ei, ajude a alimentar um programador faminto! Cada doação ajuda a manter a cafeína fluindo e o código vindo. Obrigado por apoiar um pequeno projeto feito com paixão (e muito café)!"
 
 #: tformdonatenotetask.label10.caption
 msgctxt "tformdonatenotetask.label10.caption"
 msgid "Feel free to make a donation through any exchange, for example:"
-msgstr ""
+msgstr "Sinta-se à vontade para fazer uma doação por qualquer exchange, por exemplo:"
 
 #: tformdonatenotetask.label2.caption
 msgid "BTC"
 msgstr ""
 
 #: tformdonatenotetask.label3.caption
-msgid "Bitcoin(BTC)"
+msgid "Bitcoin (BTC)"
 msgstr ""
 
 #: tformdonatenotetask.label4.caption
@@ -166,7 +165,7 @@ msgstr ""
 
 #: tformdonatenotetask.label5.caption
 msgctxt "tformdonatenotetask.label5.caption"
-msgid "Ethereum(ERC20)"
+msgid "Ethereum (ERC20)"
 msgstr ""
 
 #: tformdonatenotetask.label6.caption
@@ -176,11 +175,11 @@ msgstr ""
 
 #: tformdonatenotetask.label7.caption
 msgctxt "tformdonatenotetask.label7.caption"
-msgid "Ethereum(ERC20), BNB Smart Chain(BEP20)"
+msgid "Ethereum (ERC20), BNB Smart Chain (BEP20)"
 msgstr ""
 
 #: tformdonatenotetask.label8.caption
-msgid "Tron(TRC20)"
+msgid "Tron (TRC20)"
 msgstr ""
 
 #: tformdonatenotetask.label9.caption
@@ -282,8 +281,8 @@ msgid "Delete tasks"
 msgstr "Excluir tarefas"
 
 #: tformnotetask.adonate.caption
-msgid "Donate..."
-msgstr ""
+msgid "Buy me a coffee..."
+msgstr "Doe para um café..."
 
 #: tformnotetask.aexit.caption
 msgid "Exit"

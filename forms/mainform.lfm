@@ -555,7 +555,7 @@ object formNotetask: TformNotetask
     end
     object aDonate: TAction
       Category = 'Help'
-      Caption = 'Donate...'
+      Caption = 'Buy me a coffee...'
       OnExecute = aDonateExecute
     end
     object aAbout: TAction

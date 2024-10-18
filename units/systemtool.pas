@@ -107,9 +107,10 @@ begin
       PoFile.ReadPOText(PoStringStream.DataString);
 
       // Translate resource strings (this works for messagestring and resourcestring)
-      Result := TranslateResourceStrings(PoFile);
+      if (not Assigned(AForm)) then
+        Result := TranslateResourceStrings(PoFile);
 
-      if Result then
+      if (Result) or (Assigned(AForm)) then
       begin
         // Create a local translator for the form or forms
         LocalTranslator := TPOTranslator.Create(PoFile);

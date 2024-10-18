@@ -45,6 +45,7 @@ type
     procedure editWallet3Click(Sender: TObject);
     procedure editWallet1Click(Sender: TObject);
     procedure editWallet2Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
 
   public
@@ -56,9 +57,16 @@ var
 
 implementation
 
-{$R *.lfm}
+uses systemtool;
 
-{ TformDonateNotetask }
+  {$R *.lfm}
+
+  { TformDonateNotetask }
+
+procedure TformDonateNotetask.FormCreate(Sender: TObject);
+begin
+  ApplicationTranslate(language, self);
+end;
 
 procedure TformDonateNotetask.buttonCopy1Click(Sender: TObject);
 begin
@@ -92,17 +100,17 @@ end;
 
 procedure TformDonateNotetask.editWallet3Click(Sender: TObject);
 begin
-    editWallet3.SelectAll;
+  editWallet3.SelectAll;
 end;
 
 procedure TformDonateNotetask.editWallet1Click(Sender: TObject);
 begin
-    editWallet1.SelectAll;
+  editWallet1.SelectAll;
 end;
 
 procedure TformDonateNotetask.editWallet2Click(Sender: TObject);
 begin
-    editWallet2.SelectAll;
+  editWallet2.SelectAll;
 end;
 
 end.
