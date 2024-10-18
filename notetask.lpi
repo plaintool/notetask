@@ -214,6 +214,7 @@
         <Filename Value="forms\formdonate.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formDonateNotetask"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
     </Units>

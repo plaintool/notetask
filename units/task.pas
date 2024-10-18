@@ -575,9 +575,9 @@ begin
       FTaskList[Map(i)] := FTaskList[Map(i + 1)];
 
     // Place the stored task at the end
-    FTaskList[Map(FCount)] := TempTask;
+    FTaskList[MapGrid[High(MapGrid)]] := TempTask;
 
-    Result := Length(MapGrid) - 1;//ReverseMap(FCount);
+    Result := Length(MapGrid) - 1; //ReverseMap(FCount);
   end;
 end;
 

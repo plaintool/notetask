@@ -230,7 +230,6 @@ object formDonateNotetask: TformDonateNotetask
     Width = 292
     AutoSize = False
     Color = clBtnFace
-    ReadOnly = True
     TabOrder = 4
     Text = 'TNgDL8FZnJG7AMvu9xzWbVV3KMSn7sXY4y'
   end
@@ -293,11 +292,12 @@ object formDonateNotetask: TformDonateNotetask
     Left = 16
     Height = 15
     Top = 80
-    Width = 302
+    Width = 312
     Caption = 'https://changelly.com/buy-crypto?amount=15&from=usd'
     Font.Color = clBlue
     Font.Style = [fsUnderline]
     ParentFont = False
+    ShowAccelChar = False
     WordWrap = True
     OnClick = labelUrlClick
   end
