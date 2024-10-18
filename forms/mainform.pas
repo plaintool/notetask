@@ -165,6 +165,9 @@ type
     menuChinese: TMenuItem;
     aDonate: TAction;
     menuDonate: TMenuItem;
+    MenuItem8: TMenuItem;
+    Separator12: TMenuItem;
+    MenuItem10: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -237,6 +240,7 @@ type
     DatePicker: TDateTimePicker;
     FChanged: boolean;
     FBackup: boolean;
+    FMemoStartEdit: boolean;
     FIsEditing: boolean;
     FIsSelecting: boolean;
     FFileName: string;
@@ -601,13 +605,14 @@ begin
     if (taskGrid.Cells[4, aRow] = '') then
       taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
   end;
-  Tasks.SetTask(taskGrid, aRow);
+  Tasks.SetTask(taskGrid, aRow, FBackup);
 end;
 
 procedure TformNotetask.taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
 begin
   if (not IsColumn) then
   begin
+    if FBackup then Tasks.CreateBackup;
     Tasks.AddMap(Tasks.AddTask('[ ]'));
     taskGrid.Cells[1, tIndex] := '0';
     FLineCount += 1;
@@ -842,6 +847,7 @@ begin
     begin
       Memo.Visible := True;
       FIsEditing := True;
+      FMemoStartEdit := True;
     end;
   end
   else
@@ -930,6 +936,7 @@ begin
 
   if not IsEditing then
   begin
+    // Need confirm?
     Confirm := MessageDlg(rundoconfirm, mtConfirmation, [mbYes, mbNo], 0);
 
     if Confirm = mrYes then
@@ -1164,7 +1171,7 @@ begin
       Memo.SelText := CurrentDateTime;
       Memo.SelStart := PosStart + Length(CurrentDateTime);
     end;
-    Tasks.SetTask(taskGrid, taskGrid.Row);
+    Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
     SetChanged;
   end
   else
@@ -1177,7 +1184,7 @@ begin
           taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
         else
           taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
-        Tasks.SetTask(taskGrid, taskGrid.Row);
+        Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
       end
       else
       begin
@@ -1192,10 +1199,14 @@ begin
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
+var
+  new: TStringList;
 begin
   if IsCanClose then
   begin
-    Tasks := TTasks.Create();
+    new := TStringList.Create;
+    new.Add(string.Empty);
+    Tasks := TTasks.Create(new);
     SetChanged(False);
     EditComplite;
     FFileName := string.Empty;
@@ -1203,11 +1214,8 @@ begin
     FLineEnding := FLineEnding.WindowsCRLF;
     taskGrid.Clean;
     taskGrid.RowCount := 2;
+    taskGrid.Col := 2;
     FLineCount := 1;
-
-    Tasks.InitMap(1);
-    Tasks.AddMap(Tasks.AddTask('[ ]'));
-    taskGrid.Cells[1, 1] := '0';
     SetInfo;
   end;
 end;
@@ -1521,6 +1529,7 @@ end;
 
 procedure TformNotetask.MemoEnter(Sender: TObject);
 begin
+  FMemoStartEdit := True;
   if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
   begin
     Memo.Color := clHighlight;
@@ -1536,7 +1545,8 @@ end;
 procedure TformNotetask.MemoChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
+  Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit); // Backup only on begin edit
+  FMemoStartEdit := False;
   SetChanged;
   EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
 end;
@@ -1603,8 +1613,7 @@ begin
 
     if (Confirm = mrYes) or (not ShowConfirm) then
     begin
-      if (FBackup) then
-        Tasks.CreateBackup;
+      if (FBackup) then Tasks.CreateBackup;
 
       // RemoveTask from collection
       taskGrid.DeleteRow(RowIndex);
@@ -1628,8 +1637,7 @@ begin
 
     if (Confirm = mrYes) or (not ShowConfirm) then
     begin
-      if (FBackup) then
-        Tasks.CreateBackup;
+      if (FBackup) then Tasks.CreateBackup;
 
       // Delete rows from the end to avoid index shifting
       for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
@@ -1665,8 +1673,7 @@ begin
 
     if Confirm = mrYes then
     begin
-      if (FBackup) then
-        Tasks.CreateBackup;
+      if (FBackup) then Tasks.CreateBackup;
 
       // Archivate task
       Tasks.ArchiveTask(RowIndex);
@@ -1688,8 +1695,7 @@ begin
 
     if Confirm = mrYes then
     begin
-      if (FBackup) then
-        Tasks.CreateBackup;
+      if (FBackup) then Tasks.CreateBackup;
 
       // Archive tasks from the end to avoid index shifting
       for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
@@ -1718,7 +1724,7 @@ begin
   // If multiple rows are selected
   if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
   begin
-    Tasks.CreateBackup;
+    if FBackup then Tasks.CreateBackup;
     // Mark tasks as completed from the end to avoid index shifting
     for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
     begin
@@ -1737,7 +1743,7 @@ begin
         else
           taskGrid.Cells[1, RowIndex] := '0';
 
-        Tasks.SetTask(taskGrid, RowIndex, False);
+        Tasks.SetTask(taskGrid, RowIndex, False); // Backup created on start
       end;
     end;
     SetChanged; // Mark that data has changed
@@ -1894,6 +1900,8 @@ begin
   Tasks := TTasks.Create(TextToStringList(Content));
   FillGrid;
 
+  taskGrid.Row := 1;
+  taskGrid.Col := 2;
   ResetRowHeight;
   SetChanged(False);
   Result := True;
@@ -2001,23 +2009,16 @@ begin
     Memo.Text := Tasks.GetTaskValue(aCol, aRow);
     Memo.SelectAll;
     Memo.SetFocus;
+    FMemoStartEdit := True;
   end;
 end;
 
 procedure TformNotetask.EditComplite;
-//var
-//  oldValue, newValue: string;
 begin
   if taskGrid.EditorMode then
   begin
-    //if (Validate) then
-    //begin
-    //  oldValue := Tasks.GetTaskValue(taskGrid.Col, taskGrid.Row);
-    //  newvalue := taskGrid.Cells[taskGrid.Col, taskGrid.Row];
-    //  taskGrid.OnValidateEntry(taskGrid, taskGrid.Col, taskGrid.Row, oldValue, newValue);
-    //end;
     taskGrid.EditorMode := False;
-    FIsEditing := False; // Reset editing flag when exiting
+    FIsEditing := False;
   end;
 end;
 
@@ -2247,7 +2248,7 @@ begin
   FBackup := False;
   Row := taskGrid.Row;
   Col := taskGrid.Col;
-  Tasks.CreateBackup;
+  Tasks.CreateBackup; // FBackup = false here
   try
     while (Find(aText, aMatchCase, aWrapAround, True, True)) do
     begin

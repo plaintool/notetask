@@ -248,8 +248,8 @@ msgid "About..."
 msgstr "정보..."
 
 #: tformnotetask.aarchivetasks.caption
-msgid "Archive / unarchive tasks"
-msgstr "작업 아카이브 / 아카이브 해제"
+msgid "Archive tasks ↔"
+msgstr "작업 아카이브 ↔"
 
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
@@ -533,4 +533,3 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
-

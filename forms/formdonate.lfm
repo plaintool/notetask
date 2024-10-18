@@ -91,7 +91,7 @@ object formDonateNotetask: TformDonateNotetask
     ParentFont = False
   end
   object Label3: TLabel
-    Left = 63
+    Left = 56
     Height = 15
     Top = 248
     Width = 81
@@ -159,7 +159,7 @@ object formDonateNotetask: TformDonateNotetask
     ParentFont = False
   end
   object Label5: TLabel
-    Left = 63
+    Left = 56
     Height = 15
     Top = 304
     Width = 113
@@ -227,7 +227,7 @@ object formDonateNotetask: TformDonateNotetask
     ParentFont = False
   end
   object Label7: TLabel
-    Left = 62
+    Left = 56
     Height = 15
     Top = 192
     Width = 248
@@ -284,7 +284,7 @@ object formDonateNotetask: TformDonateNotetask
     OnClick = buttonCopy4Click
   end
   object Label8: TLabel
-    Left = 62
+    Left = 56
     Height = 15
     Top = 136
     Width = 75

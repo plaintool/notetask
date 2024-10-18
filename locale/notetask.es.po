@@ -248,8 +248,8 @@ msgid "About..."
 msgstr "Acerca de..."
 
 #: tformnotetask.aarchivetasks.caption
-msgid "Archive / unarchive tasks"
-msgstr "Archivar / desarchivar tareas"
+msgid "Archive tasks ↔"
+msgstr "Archivar tareas ↔"
 
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
@@ -533,4 +533,3 @@ msgstr "Buscar qué:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Reemplazar con:"
-

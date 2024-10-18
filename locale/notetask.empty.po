@@ -248,7 +248,7 @@ msgid "About..."
 msgstr ""
 
 #: tformnotetask.aarchivetasks.caption
-msgid "Archive / unarchive tasks"
+msgid "Archive tasks ↔"
 msgstr ""
 
 #: tformnotetask.abidirighttoleft.caption

@@ -248,8 +248,8 @@ msgid "About..."
 msgstr "このアプリについて..."
 
 #: tformnotetask.aarchivetasks.caption
-msgid "Archive / unarchive tasks"
-msgstr "タスクをアーカイブ/アーカイブ解除"
+msgid "Archive tasks ↔"
+msgstr "タスクをアーカイブ ↔"
 
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
@@ -533,4 +533,3 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
-

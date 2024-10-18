@@ -23,7 +23,7 @@
 {"hash":378031,"name":"tformnotetask.aundo.caption","sourcebytes":[85,110,100,111],"value":"Undo"},
 {"hash":154661211,"name":"tformnotetask.ainserttask.caption","sourcebytes":[73,110,115,101,114,116,32,116,97,115,107],"value":"Insert task"},
 {"hash":64398979,"name":"tformnotetask.adeletetasks.caption","sourcebytes":[68,101,108,101,116,101,32,116,97,115,107,115],"value":"Delete tasks"},
-{"hash":4978211,"name":"tformnotetask.aarchivetasks.caption","sourcebytes":[65,114,99,104,105,118,101,32,47,32,117,110,97,114,99,104,105,118,101,32,116,97,115,107,115],"value":"Archive / unarchive tasks"},
+{"hash":178919812,"name":"tformnotetask.aarchivetasks.caption","sourcebytes":[65,114,99,104,105,118,101,32,116,97,115,107,115,32,226,134,148],"value":"Archive tasks \u2194"},
 {"hash":15644272,"name":"tformnotetask.amovetasktop.caption","sourcebytes":[77,111,118,101,32,116,97,115,107,32,116,111,32,116,111,112],"value":"Move task to top"},
 {"hash":265228464,"name":"tformnotetask.amovetaskup.caption","sourcebytes":[77,111,118,101,32,116,97,115,107,32,117,112],"value":"Move task up"},
 {"hash":252832030,"name":"tformnotetask.amovetaskdown.caption","sourcebytes":[77,111,118,101,32,116,97,115,107,32,100,111,119,110],"value":"Move task down"},

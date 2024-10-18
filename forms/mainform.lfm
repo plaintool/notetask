@@ -371,7 +371,7 @@ object formNotetask: TformNotetask
     end
     object aArchiveTasks: TAction
       Category = 'Task'
-      Caption = 'Archive / unarchive tasks'
+      Caption = 'Archive tasks ↔'
       OnExecute = aArchiveTasksExecute
       ShortCut = 24641
     end
@@ -624,6 +624,15 @@ object formNotetask: TformNotetask
     end
     object MenuItem9: TMenuItem
       Action = aSelectAll
+    end
+    object Separator12: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem8: TMenuItem
+      Action = aDeleteTasks
+    end
+    object MenuItem10: TMenuItem
+      Action = aArchiveTasks
     end
     object Separator11: TMenuItem
       Caption = '-'
