@@ -163,7 +163,8 @@ begin
 
   PartsSub := CompletedStr.Split([',']);
   // Check completion status based on the first character in the string
-  FDone := PartsSub[0].Trim.ToLower.StartsWith('- [x]') or PartsSub[0].Trim.ToLower.StartsWith('-[x]') or PartsSub[0].Trim.ToLower.StartsWith('[x]');
+  FDone := PartsSub[0].Trim.ToLower.StartsWith('- [x]') or PartsSub[0].Trim.ToLower.StartsWith('-[x]') or
+    PartsSub[0].Trim.ToLower.StartsWith('[x]');
 
   // Checks if the task is completed
   PartsSub[0] := RemoveBrackets(PartsSub[0]);
@@ -245,8 +246,8 @@ begin
     else
       // Forming the task string considering the completion date and comment
       if Date > 0 then
-        Result := Format('%s %s, %s%s', [DoneString, FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Date),
-          TextString, CommentString]).Trim
+        Result := Format('%s %s, %s%s', [DoneString, FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
+          FormatSettings.LongTimeFormat, Date), TextString, CommentString]).Trim
       else
         Result := Format('%s %s%s', [DoneString, TextString, CommentString]).Trim;
   end;
@@ -925,7 +926,7 @@ begin
     Exit;
   end;
 
-  Result := '0' + rminutes;
+  Result := string.Empty; //'0' + rminutes;
 end;
 
 procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);
@@ -1058,6 +1059,9 @@ begin
     // Fill the grid with tasks
     for I := 0 to Count - 1 do
     begin
+      Grid.Cells[0, RowIndex] := RowIndex.ToString;
+
+      // Duration calculation
       if (ShowDuration) then
       begin
         if (FTaskList[I].Date > 0) and (FTaskList[I].Date < MinDate) then
@@ -1073,17 +1077,10 @@ begin
         end;
         if (FTaskList[I].Date > MaxDate) then
           MaxDate := FTaskList[I].Date;
-      end;
 
-      if (ShowArchive = True) or (FTaskList[I].Archive = False) then
-      begin
-        Grid.Cells[0, RowIndex] := RowIndex.ToString;
-        Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].Done));
-        Grid.Cells[2, RowIndex] := FTaskList[I].Text;
-        Grid.Cells[3, RowIndex] := FTaskList[I].Comment;
         if FTaskList[I].Date > 0 then
         begin
-          if (ShowDuration) and (LastDate > 0) then
+          if (LastDate > 0) then
           begin
             DateDiff := CalcDateDiff(FTaskList[I].Date, LastDate);
             if (DateDiff = '-') and (LastDate <> Now) then
@@ -1094,17 +1091,25 @@ begin
             if (DateDiff <> '-') then
               Grid.Cells[0, RowIndex] := RowIndex.ToString + '. ' + DateDiff;
           end;
+        end;
 
-          Grid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, FTaskList[I].Date);
+        if FTaskList[I].Date > 0 then
+          LastDate := FTaskList[I].Date;
+      end;
+
+      // Fill task in grid for archive or not
+      if (ShowArchive = True) or (FTaskList[I].Archive = False) then
+      begin
+        Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].Done));
+        Grid.Cells[2, RowIndex] := FTaskList[I].Text;
+        Grid.Cells[3, RowIndex] := FTaskList[I].Comment;
+        if FTaskList[I].Date > 0 then
+        begin
+          Grid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
+            FTaskList[I].Date);
         end
         else
           Grid.Cells[4, RowIndex] := string.Empty;
-
-        if (ShowDuration) then
-        begin
-          if FTaskList[I].Date > 0 then
-            LastDate := FTaskList[I].Date;
-        end;
 
         FMapGrid[RowIndex] := I;
 

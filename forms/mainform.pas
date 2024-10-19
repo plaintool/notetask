@@ -197,7 +197,8 @@ type
     procedure taskGridResize(Sender: TObject);
     procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
-    procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState; var ABitmap: TBitmap);
+    procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState;
+      var ABitmap: TBitmap);
     procedure taskGridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure aArchiveTasksExecute(Sender: TObject);
     procedure aCopyExecute(Sender: TObject);
@@ -276,8 +277,8 @@ type
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
     procedure DatePickerChange(Sender: TObject);
-    procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4; OffsetTop: integer = 0;
-      OffsetRight: integer = -8; OffsetBottom: integer = 0);
+    procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
+      OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure SetChanged(aChanged: boolean = True);
@@ -703,7 +704,8 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
+procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
+  MousePos: TPoint; var Handled: boolean);
 begin
   EditComplite;
 end;
@@ -922,7 +924,8 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState; var ABitmap: TBitmap);
+procedure TformNotetask.taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer;
+  const CheckedState: TCheckboxState; var ABitmap: TBitmap);
 begin
   // Check if we're in the correct column
   if aCol = 1 then
@@ -1624,7 +1627,7 @@ end;
 procedure TformNotetask.MemoChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit); // Backup only on begin edit
+  Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit and FBackup); // Backup only on begin edit
   FMemoStartEdit := False;
   SetChanged;
   taskGrid.Repaint;
@@ -1633,21 +1636,22 @@ end;
 
 procedure TformNotetask.DatePickerChange(Sender: TObject);
 begin
-  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
-    TDateTimePicker(Sender).DateTime);
+  taskGrid.Cells[taskGrid.Col, taskGrid.Row] :=
+    FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, TDateTimePicker(Sender).DateTime);
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
   if (FShowDuration) then FillGrid;
   SetChanged;
 end;
 
-procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer; OffsetTop: integer;
-  OffsetRight: integer; OffsetBottom: integer);
+procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer;
+  OffsetTop: integer; OffsetRight: integer; OffsetBottom: integer);
 var
   Rect: TRect;
 begin
   Rect := taskGrid.CellRect(aCol, aRow);
-  Sender.SetBounds(Rect.Left + OffsetLeft, Rect.Top + OffsetTop, Rect.Right - Rect.Left + OffsetRight, Rect.Bottom - Rect.Top + OffsetBottom);
+  Sender.SetBounds(Rect.Left + OffsetLeft, Rect.Top + OffsetTop, Rect.Right - Rect.Left + OffsetRight,
+    Rect.Bottom - Rect.Top + OffsetBottom);
 end;
 
 procedure TformNotetask.ClearSelected(ShowConfirm: boolean = True);
@@ -2323,6 +2327,8 @@ begin
 end;
 
 function TformNotetask.Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
+var
+  sValue, sText: unicodestring;
 
   procedure FindNextExecute;
   begin
@@ -2333,10 +2339,15 @@ function TformNotetask.Replace(aText, aToText: string; aMatchCase, aWrapAround: 
   end;
 
 begin
-  if (FFoundText = string.Empty) or (Memo.SelText <> aText) then
+  sValue := unicodestring(Memo.SelText);
+  sText := unicodestring(aText);
+
+  if (FFoundText = string.Empty) or ((aMatchCase) and (sValue <> sText)) or ((not aMatchCase) and
+    (UnicodeLowerCase(sValue) <> UnicodeLowerCase(sText))) then
     FindNextExecute
   else
   begin
+    Tasks.CreateBackup;
     Memo.SelText := aToText;
     FindNextExecute;
   end;
