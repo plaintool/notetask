@@ -22,7 +22,7 @@ msgstr "위로"
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"
-msgstr "노트작업"
+msgstr "Notetask"
 
 #: mainform.rarchiveconfirm
 msgctxt "mainform.rarchiveconfirm"
@@ -122,7 +122,7 @@ msgstr "정보"
 
 #: tformaboutnotetask.labelby.caption
 msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
-msgstr "알렉산더 트버스코이가 CC BY-NC-SA 4.0에 따라 라이센스됩니다."
+msgstr "알렉산더 트버스코이가 CC BY-NC-SA 4.0에 따라 라이센스됩니다"
 
 #: tformaboutnotetask.labellic.caption
 msgid "Full license text:"
@@ -130,7 +130,7 @@ msgstr "전체 라이센스 텍스트:"
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "https://creativecommons.org/licenses/by-nc-sa/4.0/"
-msgstr "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+msgstr ""
 
 #: tformaboutnotetask.labelname.caption
 msgid "Notetask © 2024"

@@ -40,7 +40,7 @@ msgstr "Kann nicht gefunden werden"
 
 #: mainform.rchatgpt
 msgid "https://chatgpt.com?q="
-msgstr "https://chatgpt.com?q="
+msgstr ""
 
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
@@ -134,7 +134,7 @@ msgstr "https://creativecommons.org/licenses/by-nc-sa/4.0/"
 
 #: tformaboutnotetask.labelname.caption
 msgid "Notetask © 2024"
-msgstr "Notizaufgabe © 2024"
+msgstr "Notetask © 2024"
 
 #: tformdonatenotetask.buttonok.caption
 msgctxt "tformdonatenotetask.buttonok.caption"

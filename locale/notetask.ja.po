@@ -22,7 +22,7 @@ msgstr "上"
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"
-msgstr "ノートタスク"
+msgstr "Notetask"
 
 #: mainform.rarchiveconfirm
 msgctxt "mainform.rarchiveconfirm"
@@ -40,7 +40,7 @@ msgstr "見つかりません"
 
 #: mainform.rchatgpt
 msgid "https://chatgpt.com?q="
-msgstr "https://chatgpt.com?q="
+msgstr ""
 
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
@@ -130,7 +130,7 @@ msgstr "ライセンスの全文:"
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "https://creativecommons.org/licenses/by-nc-sa/4.0/"
-msgstr "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+msgstr ""
 
 #: tformaboutnotetask.labelname.caption
 msgid "Notetask © 2024"
