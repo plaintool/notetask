@@ -644,6 +644,8 @@ begin
     Tasks.DeleteTask(tIndex);
     FLineCount -= 1;
     SetInfo;
+
+    if ShowDuration then FillGrid;
   end;
 end;
 
@@ -927,6 +929,8 @@ begin
   begin
     Tasks.MoveTask(sIndex, tIndex);
     SetChanged;
+
+    if ShowDuration then FillGrid;
   end;
 end;
 
@@ -1023,10 +1027,8 @@ begin
 
   if not IsEditing then
   begin
-    //    if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
     ClearSelected(False);
-    //    else
-    //      DeleteTask;
+    if ShowDuration then FillGrid;
   end
   else
   if (taskGrid.InplaceEditor is TCustomEdit) then

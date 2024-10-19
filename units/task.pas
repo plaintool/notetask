@@ -871,10 +871,10 @@ var
   YearsDiff, MonthsDiff, DaysDiff, HoursDiff, MinutesDiff: integer;
 begin
   // Calculate difference in yeard
-  YearsDiff := YearsBetween(EndDate, StartDate);
+  YearsDiff := YearsBetween(EndDate, StartDate, True);
   if YearsDiff <> 0 then
   begin
-    if YearsDiff > 0 then
+    if (StartDate > EndDate) then
       Result := IntToStr(YearsDiff) + ryears
     else
       Result := '-';
@@ -885,7 +885,7 @@ begin
   MonthsDiff := MonthsBetween(EndDate, StartDate);
   if MonthsDiff <> 0 then
   begin
-    if MonthsDiff > 0 then
+    if (StartDate > EndDate) then
       Result := IntToStr(MonthsDiff) + rmonths
     else
       Result := '-';
@@ -896,7 +896,7 @@ begin
   DaysDiff := DaysBetween(EndDate, StartDate);
   if DaysDiff <> 0 then
   begin
-    if DaysDiff > 0 then
+    if (StartDate > EndDate) then
       Result := IntToStr(DaysDiff) + rdays
     else
       Result := '-';
@@ -907,7 +907,7 @@ begin
   HoursDiff := HoursBetween(EndDate, StartDate);
   if HoursDiff <> 0 then
   begin
-    if HoursDiff > 0 then
+    if (StartDate > EndDate) then
       Result := IntToStr(HoursDiff) + rhours
     else
       Result := '-';
@@ -918,7 +918,7 @@ begin
   MinutesDiff := MinutesBetween(EndDate, StartDate);
   if MinutesDiff <> 0 then
   begin
-    if MinutesDiff > 0 then
+    if (StartDate > EndDate) then
       Result := IntToStr(MinutesDiff) + rminutes
     else
       Result := '-';
@@ -1034,10 +1034,10 @@ begin
     eventOnColRowDeleted := Grid.OnColRowDeleted;
     Grid.OnColRowInserted := nil;
     Grid.OnColRowDeleted := nil;
+    LastDate := Now;
     MinDate := Now;
     MaxDate := 0;
     PrevDate := 0;
-    LastDate := 0;
 
     ArhCount := 0;
     for I := 0 to Count - 1 do
@@ -1066,11 +1066,11 @@ begin
         if (i > 0) and (FTaskList[I].Date > 0) and (FTaskList[I].Date < LastDate) then
         begin
           for j := i - 1 downto 0 do
+          begin
+            MinDate := FTaskList[J].Date;
             if (FTaskList[J].Date > 0) and (FTaskList[J].Date <= FTaskList[I].Date) then
-            begin
-              MinDate := FTaskList[J].Date;
               break;
-            end;
+          end;
         end;
         if (FTaskList[I].Date > MaxDate) then
           MaxDate := FTaskList[I].Date;
@@ -1087,7 +1087,7 @@ begin
           if (ShowDuration) and (LastDate > 0) then
           begin
             DateDiff := CalcDateDiff(FTaskList[I].Date, LastDate);
-            if (DateDiff = '-') then
+            if (DateDiff = '-') and (LastDate <> Now) then
             begin
               DateDiff := CalcDateDiff(FTaskList[I].Date, MinDate);
               MinDate := FTaskList[I].Date;
