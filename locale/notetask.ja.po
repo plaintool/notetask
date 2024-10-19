@@ -448,7 +448,7 @@ msgstr "すべて選択"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "アーカイブされたタスクを表示"
+msgstr "アーカイブされたタスク"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
@@ -456,7 +456,7 @@ msgstr "継続時間"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "ステータスバーを表示"
+msgstr "ステータスバー"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"
@@ -575,4 +575,3 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
-

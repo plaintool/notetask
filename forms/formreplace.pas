@@ -86,11 +86,11 @@ end;
 
 procedure TformReplaceText.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
-  if Key = VK_ESCAPE then
-    Close;
-
-  if Key = VK_RETURN then
-    buttonFind.Click;
+  //if Key = VK_ESCAPE then
+  //  Close;
+  //
+  //if Key = VK_RETURN then
+  //  buttonFind.Click;
 end;
 
 procedure TformReplaceText.editFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);

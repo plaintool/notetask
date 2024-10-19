@@ -1,20 +1,19 @@
 object formFindText: TformFindText
   Left = 0
-  Height = 129
+  Height = 137
   Top = 0
-  Width = 371
+  Width = 381
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Find'
-  ClientHeight = 129
-  ClientWidth = 371
+  ClientHeight = 137
+  ClientWidth = 381
   FormStyle = fsStayOnTop
   KeyPreview = True
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   ShowInTaskBar = stNever
-  LCLVersion = '3.6.0.0'
   object labelWhat: TLabel
     Left = 8
     Height = 15
@@ -23,39 +22,45 @@ object formFindText: TformFindText
     Caption = 'Find what:'
   end
   object editFind: TEdit
-    Left = 72
+    Left = 84
     Height = 23
     Top = 8
-    Width = 200
+    Width = 186
+    Anchors = [akTop, akLeft, akRight]
     TabOrder = 0
     OnChange = editFindChange
     OnKeyDown = editFindKeyDown
   end
   object buttonFind: TButton
-    Left = 280
+    Left = 276
     Height = 23
     Top = 8
-    Width = 84
+    Width = 98
+    Anchors = [akTop, akRight]
     Caption = 'Find Next'
+    Default = True
     Enabled = False
     TabOrder = 1
     OnClick = buttonFindClick
   end
   object buttonCancel: TButton
-    Left = 280
+    Left = 276
     Height = 23
-    Top = 37
-    Width = 84
+    Top = 36
+    Width = 98
+    Anchors = [akTop, akRight]
+    Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
     OnClick = buttonCancelClick
   end
   object radioDirection: TRadioGroup
-    Left = 152
+    Left = 124
     Height = 45
     Top = 37
-    Width = 120
+    Width = 146
+    Anchors = [akTop, akRight]
     AutoFill = True
     Caption = 'Direction'
     ChildSizing.LeftRightSpacing = 6
@@ -66,7 +71,7 @@ object formFindText: TformFindText
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 2
     ClientHeight = 25
-    ClientWidth = 116
+    ClientWidth = 142
     Columns = 2
     Items.Strings = (
       'Up'
@@ -77,16 +82,18 @@ object formFindText: TformFindText
   object checkMatchCase: TCheckBox
     Left = 10
     Height = 19
-    Top = 77
+    Top = 85
     Width = 78
+    Anchors = [akLeft, akBottom]
     Caption = 'Match case'
     TabOrder = 4
   end
   object checkWrapAround: TCheckBox
     Left = 10
     Height = 19
-    Top = 101
+    Top = 109
     Width = 87
+    Anchors = [akLeft, akBottom]
     Caption = 'Wrap around'
     TabOrder = 5
   end

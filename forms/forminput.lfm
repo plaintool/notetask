@@ -10,13 +10,13 @@ object formInputText: TformInputText
   ClientWidth = 250
   OnShow = FormShow
   ShowInTaskBar = stNever
-  LCLVersion = '3.6.0.0'
   object buttonOk: TButton
     Left = 85
     Height = 25
     Top = 64
     Width = 75
     Caption = 'Go to'
+    Default = True
     ModalResult = 1
     TabOrder = 1
   end
@@ -25,6 +25,7 @@ object formInputText: TformInputText
     Height = 25
     Top = 64
     Width = 75
+    Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2

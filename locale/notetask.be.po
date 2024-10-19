@@ -221,7 +221,7 @@ msgstr "Скасаваць"
 #: tformfindtext.buttonfind.caption
 msgctxt "tformfindtext.buttonfind.caption"
 msgid "Find Next"
-msgstr "Знайсці наступны"
+msgstr "Знайсці далей"
 
 #: tformfindtext.caption
 msgctxt "tformfindtext.caption"
@@ -448,15 +448,15 @@ msgstr "Выбраць усё"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "Паказаць архіўныя задачы"
+msgstr "Архіўныя задачы"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
-msgstr "Паказаць працягласць"
+msgstr "Працягласць"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "Паказаць панэль стану"
+msgstr "Панэль стану"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"
@@ -541,7 +541,7 @@ msgstr "Скасаваць"
 #: tformreplacetext.buttonfind.caption
 msgctxt "tformreplacetext.buttonfind.caption"
 msgid "Find Next"
-msgstr "Знайсці наступны"
+msgstr "Знайсці далей"
 
 #: tformreplacetext.buttonreplace.caption
 msgctxt "tformreplacetext.buttonreplace.caption"

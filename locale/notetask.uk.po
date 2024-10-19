@@ -448,15 +448,15 @@ msgstr "Вибрати все"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "Показати архівовані завдання"
+msgstr "Архівовані завдання"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
-msgstr "Показати тривалість"
+msgstr "Тривалість"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "Показати панель стану"
+msgstr "Панель стану"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

@@ -2,12 +2,12 @@ object formReplaceText: TformReplaceText
   Left = 0
   Height = 154
   Top = 0
-  Width = 359
+  Width = 383
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Replace'
   ClientHeight = 154
-  ClientWidth = 359
+  ClientWidth = 383
   FormStyle = fsStayOnTop
   OnKeyDown = FormKeyDown
   OnShow = FormShow
@@ -21,19 +21,21 @@ object formReplaceText: TformReplaceText
     Caption = 'Find what:'
   end
   object editFind: TEdit
-    Left = 88
+    Left = 100
     Height = 23
     Top = 8
-    Width = 170
+    Width = 171
+    Anchors = [akTop, akLeft, akRight]
     TabOrder = 0
     OnChange = editFindChange
     OnKeyDown = editFindKeyDown
   end
   object buttonFind: TButton
-    Left = 265
+    Left = 276
     Height = 23
     Top = 8
-    Width = 84
+    Width = 98
+    Anchors = [akTop, akRight]
     Caption = 'Find Next'
     Default = True
     Enabled = False
@@ -41,10 +43,11 @@ object formReplaceText: TformReplaceText
     OnClick = buttonFindClick
   end
   object buttonCancel: TButton
-    Left = 265
+    Left = 276
     Height = 23
     Top = 97
-    Width = 84
+    Width = 98
+    Anchors = [akTop, akRight]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
@@ -75,28 +78,31 @@ object formReplaceText: TformReplaceText
     Caption = 'Replace with:'
   end
   object editReplace: TEdit
-    Left = 88
+    Left = 100
     Height = 23
     Top = 40
-    Width = 170
+    Width = 171
+    Anchors = [akTop, akLeft, akRight]
     TabOrder = 1
     OnKeyDown = editFindKeyDown
   end
   object buttonReplace: TButton
-    Left = 265
+    Left = 276
     Height = 23
     Top = 37
-    Width = 84
+    Width = 98
+    Anchors = [akTop, akRight]
     Caption = 'Replace'
     Enabled = False
     TabOrder = 3
     OnClick = buttonReplaceClick
   end
   object buttonReplaceAll: TButton
-    Left = 265
+    Left = 276
     Height = 23
     Top = 67
-    Width = 84
+    Width = 98
+    Anchors = [akTop, akRight]
     Caption = 'Replace All'
     Enabled = False
     TabOrder = 4

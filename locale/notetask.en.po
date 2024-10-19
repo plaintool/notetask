@@ -448,15 +448,15 @@ msgstr "Select all"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "Show archived tasks"
+msgstr "Archived tasks"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
-msgstr "Show duration"
+msgstr "Duration"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "Show status bar"
+msgstr "Status bar"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"
@@ -575,4 +575,3 @@ msgstr "Find what:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Replace with:"
-

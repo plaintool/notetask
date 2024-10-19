@@ -91,11 +91,11 @@ msgstr "बिना शीर्षक"
 
 #: task.rdays
 msgid "d"
-msgstr "d"
+msgstr "द"
 
 #: task.rhours
 msgid "h"
-msgstr "h"
+msgstr "घ"
 
 #: task.rminutes
 msgctxt "task.rminutes"
@@ -105,11 +105,11 @@ msgstr "मिन"
 #: task.rmonths
 msgctxt "task.rmonths"
 msgid "m"
-msgstr "m"
+msgstr "म"
 
 #: task.ryears
 msgid "y"
-msgstr "y"
+msgstr "व"
 
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
@@ -448,15 +448,15 @@ msgstr "सभी चुनें"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "संरक्षित कार्य दिखाएं"
+msgstr "संरक्षित कार्य"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
-msgstr "अवधि दिखाएं"
+msgstr "अवधि"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "स्थिति पट्टी दिखाएं"
+msgstr "स्थिति पट्टी"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

@@ -91,25 +91,25 @@ msgstr "بلا عنوان"
 
 #: task.rdays
 msgid "d"
-msgstr "يوم"
+msgstr "ي"
 
 #: task.rhours
 msgid "h"
-msgstr "ساعة"
+msgstr "س"
 
 #: task.rminutes
 msgctxt "task.rminutes"
 msgid "min"
-msgstr "دقيقة"
+msgstr "د"
 
 #: task.rmonths
 msgctxt "task.rmonths"
 msgid "m"
-msgstr "شهر"
+msgstr "ش"
 
 #: task.ryears
 msgid "y"
-msgstr "سنة"
+msgstr "س"
 
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
@@ -448,15 +448,15 @@ msgstr "تحديد الكل"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "عرض المهام المؤرشفة"
+msgstr "المهام المؤرشفة"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
-msgstr "عرض المدة"
+msgstr "مدة"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "عرض شريط الحالة"
+msgstr "شريط الحالة"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

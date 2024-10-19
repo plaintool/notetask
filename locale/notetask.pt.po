@@ -13,11 +13,11 @@ msgstr ""
 
 #: formfind.rdirectiondown
 msgid "Down"
-msgstr "Para baixo"
+msgstr "Baixo"
 
 #: formfind.rdirectionup
 msgid "Up"
-msgstr "Para cima"
+msgstr "Cima"
 
 #: mainform.rapp
 msgctxt "mainform.rapp"
@@ -221,7 +221,7 @@ msgstr "Cancelar"
 #: tformfindtext.buttonfind.caption
 msgctxt "tformfindtext.buttonfind.caption"
 msgid "Find Next"
-msgstr "Encontrar próximo"
+msgstr "Encontrar sig"
 
 #: tformfindtext.caption
 msgctxt "tformfindtext.caption"
@@ -241,7 +241,7 @@ msgstr "Envolver"
 #: tformfindtext.labelwhat.caption
 msgctxt "tformfindtext.labelwhat.caption"
 msgid "Find what:"
-msgstr "Encontrar o que:"
+msgstr "Encontrar:"
 
 #: tformfindtext.radiodirection.caption
 msgctxt "tformfindtext.radiodirection.caption"
@@ -316,7 +316,7 @@ msgstr "Encontrar..."
 
 #: tformnotetask.afindnext.caption
 msgid "Find next"
-msgstr "Encontrar próximo"
+msgstr "Encontrar sig"
 
 #: tformnotetask.afindprev.caption
 msgid "Find previous"
@@ -448,7 +448,7 @@ msgstr "Selecionar tudo"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "Mostrar tarefas arquivadas"
+msgstr "Tarefas arquivadas"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
@@ -456,7 +456,7 @@ msgstr "Duração"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "Mostrar barra de status"
+msgstr "Barra de status"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"
@@ -541,7 +541,7 @@ msgstr "Cancelar"
 #: tformreplacetext.buttonfind.caption
 msgctxt "tformreplacetext.buttonfind.caption"
 msgid "Find Next"
-msgstr "Encontrar próximo"
+msgstr "Encontrar sig"
 
 #: tformreplacetext.buttonreplace.caption
 msgctxt "tformreplacetext.buttonreplace.caption"
@@ -575,4 +575,3 @@ msgstr "Encontrar o quê:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Substituir por:"
-

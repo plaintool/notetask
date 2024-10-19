@@ -95,12 +95,12 @@ msgstr "日"
 
 #: task.rhours
 msgid "h"
-msgstr "小时"
+msgstr "时"
 
 #: task.rminutes
 msgctxt "task.rminutes"
 msgid "min"
-msgstr "分钟"
+msgstr "分"
 
 #: task.rmonths
 msgctxt "task.rmonths"
@@ -448,7 +448,7 @@ msgstr "全选"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "显示归档任务"
+msgstr "归档任务"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
@@ -456,7 +456,7 @@ msgstr "持续时间"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "显示状态栏"
+msgstr "状态栏"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"
@@ -575,4 +575,3 @@ msgstr "查找内容："
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "替换为："
-
