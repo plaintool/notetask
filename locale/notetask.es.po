@@ -334,6 +334,14 @@ msgstr "Ir a..."
 msgid "Insert task"
 msgstr "Insertar tarea"
 
+#: tformnotetask.alangarabic.caption
+msgid "Arabic"
+msgstr ""
+
+#: tformnotetask.alangbelarusian.caption
+msgid "Belarusian"
+msgstr ""
+
 #: tformnotetask.alangchinese.caption
 msgid "Chinese"
 msgstr "Chinese"
@@ -349,6 +357,10 @@ msgstr "French"
 #: tformnotetask.alanggerman.caption
 msgid "German"
 msgstr "German"
+
+#: tformnotetask.alanghindi.caption
+msgid "Hindi"
+msgstr ""
 
 #: tformnotetask.alangitalian.caption
 msgid "Italian"
@@ -373,6 +385,10 @@ msgstr "Russian"
 #: tformnotetask.alangspanish.caption
 msgid "Spanish"
 msgstr "Spanish"
+
+#: tformnotetask.alangukrainian.caption
+msgid "Ukrainian"
+msgstr ""
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move task to bottom"
@@ -559,3 +575,4 @@ msgstr "Buscar qué:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Reemplazar con:"
+

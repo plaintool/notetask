@@ -5,7 +5,7 @@ msgstr ""
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: ja\n"
+"Language: hi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,11 +13,11 @@ msgstr ""
 
 #: formfind.rdirectiondown
 msgid "Down"
-msgstr "下"
+msgstr "नीचे"
 
 #: formfind.rdirectionup
 msgid "Up"
-msgstr "上"
+msgstr "ऊपर"
 
 #: mainform.rapp
 msgctxt "mainform.rapp"
@@ -27,16 +27,16 @@ msgstr "Notetask"
 #: mainform.rarchiveconfirm
 msgctxt "mainform.rarchiveconfirm"
 msgid "Are you sure you want to archive / unarchive this task?"
-msgstr "このタスクをアーカイブ/アーカイブ解除しますか？"
+msgstr "क्या आप सुनिश्चित हैं कि आप इस कार्य को संग्रहित / असंग्रहित करना चाहते हैं?"
 
 #: mainform.rarchivesconfirm
 msgctxt "mainform.rarchivesconfirm"
 msgid "Are you sure you want to archive / unarchive selected tasks?"
-msgstr "選択したタスクをアーカイブ/アーカイブ解除しますか？"
+msgstr "क्या आप सुनिश्चित हैं कि आप चयनित कार्यों को संग्रहित / असंग्रहित करना चाहते हैं?"
 
 #: mainform.rcantfind
 msgid "Can't find"
-msgstr "見つかりません"
+msgstr "नहीं मिल रहा"
 
 #: mainform.rchatgpt
 msgid "https://chatgpt.com?q="
@@ -44,89 +44,89 @@ msgstr ""
 
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
-msgstr "選択したエリアのデータをクリアしてもよろしいですか？"
+msgstr "क्या आप सुनिश्चित हैं कि आप चयनित क्षेत्र में डेटा को साफ़ करना चाहते हैं?"
 
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
-msgstr "このタスクを削除してもよろしいですか？"
+msgstr "क्या आप सुनिश्चित हैं कि आप इस कार्य को हटाना चाहते हैं?"
 
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
-msgstr "選択したタスクを削除してもよろしいですか？"
+msgstr "क्या आप सुनिश्चित हैं कि आप चयनित कार्यों को हटाना चाहते हैं?"
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
-msgstr "要求されたファイルはディスク上に見つかりませんでした。"
+msgstr "अनुरोधित फ़ाइल डिस्क पर नहीं मिली।"
 
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
-msgstr "行番号が許可された範囲外です。"
+msgstr "लाइन नंबर अनुमत सीमा से बाहर है।"
 
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "タスクファイル (*.tsk)|*.tsk|テキストファイル (*.txt)|*.txt|Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.*"
+msgstr "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
-msgstr " タスク"
+msgstr " कार्य"
 
 #: mainform.rsavechanges
 msgid "Do you want to save the changes?"
-msgstr "変更を保存しますか？"
+msgstr "क्या आप परिवर्तन सहेजना चाहते हैं?"
 
 #: mainform.rsavedialogfilter
 msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "タスクファイル (*.tsk)|*.tsk|テキストファイル (*.txt)|*.txt|Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.*"
+msgstr "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 
 #: mainform.rundoconfirm
 msgid "Are you sure you want to discard all changes? This action cannot be undone."
-msgstr "すべての変更を破棄してもよろしいですか？この操作は元に戻せません。"
+msgstr "क्या आप सुनिश्चित हैं कि आप सभी परिवर्तनों को अस्वीकार करना चाहते हैं? इस क्रिया को पूर्ववत नहीं किया जा सकता।"
 
 #: mainform.runtitled
 msgid "Untitled"
-msgstr "無題"
+msgstr "बिना शीर्षक"
 
 #: task.rdays
 msgid "d"
-msgstr "日"
+msgstr "d"
 
 #: task.rhours
 msgid "h"
-msgstr "時"
+msgstr "h"
 
 #: task.rminutes
 msgctxt "task.rminutes"
 msgid "min"
-msgstr "分"
+msgstr "मिन"
 
 #: task.rmonths
 msgctxt "task.rmonths"
 msgid "m"
-msgstr "月"
+msgstr "m"
 
 #: task.ryears
 msgid "y"
-msgstr "年"
+msgstr "y"
 
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
-msgstr "OK"
+msgstr "ठीक है"
 
 #: tformaboutnotetask.caption
 msgid "About"
-msgstr "このアプリについて"
+msgstr "के बारे में"
 
 #: tformaboutnotetask.labelby.caption
 msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
-msgstr "アレクサンダー・トヴェルスコイによるもので、CC BY-NC-SA 4.0ライセンスの下で提供されています"
+msgstr "अलेक्जेंडर त्वरस्कोय द्वारा, CC BY-NC-SA 4.0 के तहत लाइसेंस प्राप्त"
 
 #: tformaboutnotetask.labellic.caption
 msgid "Full license text:"
-msgstr "ライセンスの全文:"
+msgstr "पूर्ण लाइसेंस पाठ:"
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "https://creativecommons.org/licenses/by-nc-sa/4.0/"
@@ -134,16 +134,16 @@ msgstr ""
 
 #: tformaboutnotetask.labelname.caption
 msgid "Notetask © 2024"
-msgstr "ノートタスク © 2024"
+msgstr "नोटेटास्क © 2024"
 
 #: tformdonatenotetask.buttonok.caption
 msgctxt "tformdonatenotetask.buttonok.caption"
 msgid "OK"
-msgstr "OK"
+msgstr "ठीक है"
 
 #: tformdonatenotetask.caption
 msgid "Buy me a coffee"
-msgstr "コーヒーを支援する"
+msgstr "मुझे एक कॉफी खरीदें"
 
 #: tformdonatenotetask.editwallet1.text
 msgid "bc1qqzarmz7yzv34mgpxdp5v58ejre7twy8upalfa9"
@@ -166,12 +166,12 @@ msgstr ""
 #: tformdonatenotetask.label1.caption
 msgctxt "tformdonatenotetask.label1.caption"
 msgid "Hey, help feed a hungry programmer! Every donation helps keep the caffeine flowing and the code coming. Thanks for supporting a small project that’s made with passion (and a lot of coffee)!"
-msgstr "ねぇ、空腹のプログラマーを助けて！ 寄付は、カフェインを流し続け、コードを提供するのに役立ちます。情熱（そして大量のコーヒー）で作られた小さなプロジェクトをサポートしてくれてありがとう！"
+msgstr "हे, एक भूखे प्रोग्रामर को खिलाने में मदद करें! हर दान कैफीन को प्रवाहित रखने और कोडिंग को जारी रखने में मदद करता है। एक छोटे से प्रोजेक्ट का समर्थन करने के लिए धन्यवाद, जो जुनून (और बहुत सारी कॉफी) के साथ बनाया गया है!"
 
 #: tformdonatenotetask.label10.caption
 msgctxt "tformdonatenotetask.label10.caption"
 msgid "Feel free to make a donation through any exchange, for example:"
-msgstr "どの取引所からでも自由に寄付してください。例えば："
+msgstr "किसी भी एक्सचेंज के माध्यम से दान करने में संकोच न करें, उदाहरण के लिए:"
 
 #: tformdonatenotetask.label2.caption
 msgid "BTC"
@@ -216,131 +216,131 @@ msgstr ""
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "キャンセル"
+msgstr "रद्द करें"
 
 #: tformfindtext.buttonfind.caption
 msgctxt "tformfindtext.buttonfind.caption"
 msgid "Find Next"
-msgstr "次を検索"
+msgstr "अगला खोजें"
 
 #: tformfindtext.caption
 msgctxt "tformfindtext.caption"
 msgid "Find"
-msgstr "検索"
+msgstr "खोजें"
 
 #: tformfindtext.checkmatchcase.caption
 msgctxt "tformfindtext.checkmatchcase.caption"
 msgid "Match case"
-msgstr "大文字と小文字を区別"
+msgstr "केस मिलाएं"
 
 #: tformfindtext.checkwraparound.caption
 msgctxt "tformfindtext.checkwraparound.caption"
 msgid "Wrap around"
-msgstr "折り返す"
+msgstr "लपेटें"
 
 #: tformfindtext.labelwhat.caption
 msgctxt "tformfindtext.labelwhat.caption"
 msgid "Find what:"
-msgstr "何を検索しますか："
+msgstr "क्या खोजें:"
 
 #: tformfindtext.radiodirection.caption
 msgctxt "tformfindtext.radiodirection.caption"
 msgid "Direction"
-msgstr "方向"
+msgstr "दिशा"
 
 #: tforminputtext.buttoncancel.caption
 msgctxt "tforminputtext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "キャンセル"
+msgstr "रद्द करें"
 
 #: tforminputtext.buttonok.caption
 msgid "Go to"
-msgstr "移動"
+msgstr "जाएं"
 
 #: tforminputtext.caption
 msgid "Go to task"
-msgstr "タスクに移動"
+msgstr "कार्य पर जाएं"
 
 #: tforminputtext.labelcaption.caption
 msgid "Task number:"
-msgstr "タスク番号："
+msgstr "कार्य संख्या:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."
-msgstr "このアプリについて..."
+msgstr "के बारे में..."
 
 #: tformnotetask.aarchivetasks.caption
 msgid "Archive tasks ↔"
-msgstr "タスクをアーカイブ ↔"
+msgstr "कार्य संग्रहीत करें ↔"
 
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
-msgstr "読みの順序：右から左"
+msgstr "पढ़ने का क्रम: दाएं से बाएं"
 
 #: tformnotetask.achatgpt.caption
 msgid "Ask ChatGPT..."
-msgstr "ChatGPTに聞く..."
+msgstr "ChatGPT से पूछें..."
 
 #: tformnotetask.acopy.caption
 msgid "Copy"
-msgstr "コピー"
+msgstr "कॉपी"
 
 #: tformnotetask.acut.caption
 msgid "Cut"
-msgstr "切り取り"
+msgstr "कट"
 
 #: tformnotetask.adatetime.caption
 msgid "Date time"
-msgstr "日付 時間"
+msgstr "तारीख और समय"
 
 #: tformnotetask.adelete.caption
 msgid "Delete"
-msgstr "削除"
+msgstr "हटाएं"
 
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
-msgstr "タスクを削除"
+msgstr "कार्य हटाएं"
 
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
-msgstr "コーヒーを支援する..."
+msgstr "मुझे एक कॉफी खरीदें..."
 
 #: tformnotetask.aexit.caption
 msgid "Exit"
-msgstr "終了"
+msgstr "बाहर निकलें"
 
 #: tformnotetask.afind.caption
 msgid "Find..."
-msgstr "検索..."
+msgstr "खोजें..."
 
 #: tformnotetask.afindnext.caption
 msgid "Find next"
-msgstr "次を検索"
+msgstr "अगला खोजें"
 
 #: tformnotetask.afindprev.caption
 msgid "Find previous"
-msgstr "前を検索"
+msgstr "पिछला खोजें"
 
 #: tformnotetask.afont.caption
 msgid "Font..."
-msgstr "フォント..."
+msgstr "फॉन्ट..."
 
 #: tformnotetask.agoto.caption
 msgid "Go to..."
-msgstr "移動..."
+msgstr "जाएं..."
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
-msgstr "タスクを挿入"
+msgstr "कार्य डालें"
 
 #: tformnotetask.alangarabic.caption
 msgid "Arabic"
-msgstr ""
+msgstr "Arabic"
 
 #: tformnotetask.alangbelarusian.caption
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusian"
 
 #: tformnotetask.alangchinese.caption
 msgid "Chinese"
@@ -360,7 +360,7 @@ msgstr "German"
 
 #: tformnotetask.alanghindi.caption
 msgid "Hindi"
-msgstr ""
+msgstr "Hindi"
 
 #: tformnotetask.alangitalian.caption
 msgid "Italian"
@@ -388,112 +388,112 @@ msgstr "Spanish"
 
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainian"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move task to bottom"
-msgstr "タスクを下に移動"
+msgstr "कार्य को नीचे ले जाएं"
 
 #: tformnotetask.amovetaskdown.caption
 msgid "Move task down"
-msgstr "タスクを下に移動"
+msgstr "कार्य को नीचे ले जाएं"
 
 #: tformnotetask.amovetasktop.caption
 msgid "Move task to top"
-msgstr "タスクを上に移動"
+msgstr "कार्य को ऊपर ले जाएं"
 
 #: tformnotetask.amovetaskup.caption
 msgid "Move task up"
-msgstr "タスクを上に移動"
+msgstr "कार्य को ऊपर ले जाएं"
 
 #: tformnotetask.anew.caption
 msgid "New"
-msgstr "新規"
+msgstr "नया"
 
 #: tformnotetask.anewwindow.caption
 msgid "New window"
-msgstr "新しいウィンドウ"
+msgstr "नया विंडो"
 
 #: tformnotetask.aopen.caption
 msgid "Open..."
-msgstr "開く..."
+msgstr "खोलें..."
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."
-msgstr "ページプロパティ..."
+msgstr "पृष्ठ गुण..."
 
 #: tformnotetask.apaste.caption
 msgid "Paste"
-msgstr "貼り付け"
+msgstr "पेस्ट"
 
 #: tformnotetask.aprint.caption
 msgid "Print..."
-msgstr "印刷..."
+msgstr "प्रिंट करें..."
 
 #: tformnotetask.areplace.caption
 msgid "Replace..."
-msgstr "置換..."
+msgstr "बदलें..."
 
 #: tformnotetask.asave.caption
 msgid "Save"
-msgstr "保存"
+msgstr "सहेजें"
 
 #: tformnotetask.asaveas.caption
 msgid "Save as..."
-msgstr "名前を付けて保存..."
+msgstr "के रूप में सहेजें..."
 
 #: tformnotetask.aselectall.caption
 msgid "Select all"
-msgstr "すべて選択"
+msgstr "सभी चुनें"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "アーカイブされたタスクを表示"
+msgstr "संरक्षित कार्य दिखाएं"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
-msgstr "継続時間"
+msgstr "अवधि दिखाएं"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "ステータスバーを表示"
+msgstr "स्थिति पट्टी दिखाएं"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"
-msgstr "元に戻す"
+msgstr "पूर्ववत करें"
 
 #: tformnotetask.aundoall.caption
 msgid "Undo all changes"
-msgstr "すべての変更を元に戻す"
+msgstr "सभी परिवर्तन पूर्ववत करें"
 
 #: tformnotetask.awordwrap.caption
 msgid "Word wrap"
-msgstr "行の折り返し"
+msgstr "शब्द लपेटना"
 
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
-msgstr "ノートタスク"
+msgstr "नोट कार्य"
 
 #: tformnotetask.fontdialog.title
 msgid "Font select"
-msgstr "フォント選択"
+msgstr "फॉन्ट चयन"
 
 #: tformnotetask.menuedit.caption
 msgid "Edit"
-msgstr "編集"
+msgstr "संपादित करें"
 
 #: tformnotetask.menufile.caption
 msgid "File"
-msgstr "ファイル"
+msgstr "फाइल"
 
 #: tformnotetask.menuformat.caption
 msgid "Format"
-msgstr "フォーマット"
+msgstr "फॉर्मेट"
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
-msgstr "ヘルプ"
+msgstr "सहायता"
 
 #: tformnotetask.menulanguage.caption
 msgid "Language"
@@ -502,77 +502,76 @@ msgstr "Language"
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"
 msgid "Task"
-msgstr "タスク"
+msgstr "कार्य"
 
 #: tformnotetask.menuview.caption
 msgid "View"
-msgstr "表示"
+msgstr "दृश्य"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"
-msgstr "オープン"
+msgstr "खोलना"
 
 #: tformnotetask.savedialog.title
 msgid "Saving"
-msgstr "保存"
+msgstr "सहेजना"
 
 #: tformnotetask.taskgrid.columns[0].title.caption
 msgid "Done"
-msgstr "完了"
+msgstr "पूर्ण"
 
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
 msgid "Task"
-msgstr "タスク"
+msgstr "कार्य"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgid "Comment"
-msgstr "コメント"
+msgstr "टिप्पणी"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgid "Date"
-msgstr "日付"
+msgstr "तारीख"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "キャンセル"
+msgstr "रद्द करें"
 
 #: tformreplacetext.buttonfind.caption
 msgctxt "tformreplacetext.buttonfind.caption"
 msgid "Find Next"
-msgstr "次を検索"
+msgstr "अगला खोजें"
 
 #: tformreplacetext.buttonreplace.caption
 msgctxt "tformreplacetext.buttonreplace.caption"
 msgid "Replace"
-msgstr "置換"
+msgstr "बदलें"
 
 #: tformreplacetext.buttonreplaceall.caption
 msgid "Replace All"
-msgstr "すべて置換"
+msgstr "सभी बदलें"
 
 #: tformreplacetext.caption
 msgctxt "tformreplacetext.caption"
 msgid "Replace"
-msgstr "置換"
+msgstr "बदलें"
 
 #: tformreplacetext.checkmatchcase.caption
 msgctxt "tformreplacetext.checkmatchcase.caption"
 msgid "Match case"
-msgstr "大文字と小文字を区別"
+msgstr "केस मिलाएं"
 
 #: tformreplacetext.checkwraparound.caption
 msgctxt "tformreplacetext.checkwraparound.caption"
 msgid "Wrap around"
-msgstr "折り返す"
+msgstr "लपेटें"
 
 #: tformreplacetext.labelwhat.caption
 msgctxt "tformreplacetext.labelwhat.caption"
 msgid "Find what:"
-msgstr "検索する文字列:"
+msgstr "क्या खोजें:"
 
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
-msgstr "置換後:"
-
+msgstr "इसके साथ बदलें:"

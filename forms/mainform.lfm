@@ -253,14 +253,14 @@ object formNotetask: TformNotetask
         object menuEnglish: TMenuItem
           Action = aLangEnglish
         end
+        object menuGerman: TMenuItem
+          Action = aLangGerman
+        end
         object menuSpanish: TMenuItem
           Action = aLangSpanish
         end
         object menuFrench: TMenuItem
           Action = aLangFrench
-        end
-        object menuGerman: TMenuItem
-          Action = aLangGerman
         end
         object menuItalian: TMenuItem
           Action = aLangItalian
@@ -271,14 +271,26 @@ object formNotetask: TformNotetask
         object menuRussian: TMenuItem
           Action = aLangRussian
         end
+        object MenuItem13: TMenuItem
+          Action = aLangUkrainian
+        end
+        object MenuItem14: TMenuItem
+          Action = aLangBelarusian
+        end
+        object MenuItem12: TMenuItem
+          Action = aLangHindi
+        end
+        object MenuItem11: TMenuItem
+          Action = aLangArabic
+        end
+        object menuChinese: TMenuItem
+          Action = aLangChinese
+        end
         object menuJapanese: TMenuItem
           Action = aLangJapanese
         end
         object menuKorean: TMenuItem
           Action = aLangKorean
-        end
-        object menuChinese: TMenuItem
-          Action = aLangChinese
         end
       end
       object Separator9: TMenuItem
@@ -506,6 +518,11 @@ object formNotetask: TformNotetask
       OnExecute = aChatGptExecute
       ShortCut = 16465
     end
+    object aLangGerman: TAction
+      Category = 'Language'
+      Caption = 'German'
+      OnExecute = aLangGermanExecute
+    end
     object aLangSpanish: TAction
       Category = 'Language'
       Caption = 'Spanish'
@@ -515,11 +532,6 @@ object formNotetask: TformNotetask
       Category = 'Language'
       Caption = 'French'
       OnExecute = aLangFrenchExecute
-    end
-    object aLangGerman: TAction
-      Category = 'Language'
-      Caption = 'German'
-      OnExecute = aLangGermanExecute
     end
     object aLangItalian: TAction
       Category = 'Language'
@@ -536,21 +548,6 @@ object formNotetask: TformNotetask
       Caption = 'Russian'
       OnExecute = aLangRussianExecute
     end
-    object aLangJapanese: TAction
-      Category = 'Language'
-      Caption = 'Japanese'
-      OnExecute = aLangJapaneseExecute
-    end
-    object aLangKorean: TAction
-      Category = 'Language'
-      Caption = 'Korean'
-      OnExecute = aLangKoreanExecute
-    end
-    object aLangChinese: TAction
-      Category = 'Language'
-      Caption = 'Chinese'
-      OnExecute = aLangChineseExecute
-    end
     object aDonate: TAction
       Category = 'Help'
       Caption = 'Buy me a coffee...'
@@ -566,6 +563,41 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Show duration'
       OnExecute = aShowDurationExecute
+    end
+    object aLangUkrainian: TAction
+      Category = 'Language'
+      Caption = 'Ukrainian'
+      OnExecute = aLangUkrainianExecute
+    end
+    object aLangBelarusian: TAction
+      Category = 'Language'
+      Caption = 'Belarusian'
+      OnExecute = aLangBelarusianExecute
+    end
+    object aLangHindi: TAction
+      Category = 'Language'
+      Caption = 'Hindi'
+      OnExecute = aLangHindiExecute
+    end
+    object aLangArabic: TAction
+      Category = 'Language'
+      Caption = 'Arabic'
+      OnExecute = aLangArabicExecute
+    end
+    object aLangChinese: TAction
+      Category = 'Language'
+      Caption = 'Chinese'
+      OnExecute = aLangChineseExecute
+    end
+    object aLangJapanese: TAction
+      Category = 'Language'
+      Caption = 'Japanese'
+      OnExecute = aLangJapaneseExecute
+    end
+    object aLangKorean: TAction
+      Category = 'Language'
+      Caption = 'Korean'
+      OnExecute = aLangKoreanExecute
     end
   end
   object openDialog: TOpenDialog

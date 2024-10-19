@@ -5,7 +5,7 @@ msgstr ""
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: ja\n"
+"Language: be\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,11 +13,11 @@ msgstr ""
 
 #: formfind.rdirectiondown
 msgid "Down"
-msgstr "下"
+msgstr "Уніз"
 
 #: formfind.rdirectionup
 msgid "Up"
-msgstr "上"
+msgstr "Уверх"
 
 #: mainform.rapp
 msgctxt "mainform.rapp"
@@ -27,16 +27,16 @@ msgstr "Notetask"
 #: mainform.rarchiveconfirm
 msgctxt "mainform.rarchiveconfirm"
 msgid "Are you sure you want to archive / unarchive this task?"
-msgstr "このタスクをアーカイブ/アーカイブ解除しますか？"
+msgstr "Вы ўпэўненыя, што хочаце архіваваць / разархіваваць гэтую задачу?"
 
 #: mainform.rarchivesconfirm
 msgctxt "mainform.rarchivesconfirm"
 msgid "Are you sure you want to archive / unarchive selected tasks?"
-msgstr "選択したタスクをアーカイブ/アーカイブ解除しますか？"
+msgstr "Вы ўпэўненыя, што хочаце архіваваць / разархіваваць выбраныя задачы?"
 
 #: mainform.rcantfind
 msgid "Can't find"
-msgstr "見つかりません"
+msgstr "Нельга знайсці"
 
 #: mainform.rchatgpt
 msgid "https://chatgpt.com?q="
@@ -44,72 +44,72 @@ msgstr ""
 
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
-msgstr "選択したエリアのデータをクリアしてもよろしいですか？"
+msgstr "Вы ўпэўненыя, што хочаце ачысціць дадзеныя ў абранай зоне?"
 
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
-msgstr "このタスクを削除してもよろしいですか？"
+msgstr "Вы ўпэўненыя, што хочаце выдаліць гэтую задачу?"
 
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
-msgstr "選択したタスクを削除してもよろしいですか？"
+msgstr "Вы ўпэўненыя, што хочаце выдаліць выбраныя задачы?"
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
-msgstr "要求されたファイルはディスク上に見つかりませんでした。"
+msgstr "Запытаны файл не знойдзены на дыску."
 
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
-msgstr "行番号が許可された範囲外です。"
+msgstr "Нумар радка выходзіць за дапушчальныя межы."
 
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "タスクファイル (*.tsk)|*.tsk|テキストファイル (*.txt)|*.txt|Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.*"
+msgstr "Файлы задач (*.tsk)|*.tsk|Тэкставыя файлы (*.txt)|*.txt|Markdown файлы (*.md)|*.md|Усе файлы (*.*)|*.*"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
-msgstr " タスク"
+msgstr " задач"
 
 #: mainform.rsavechanges
 msgid "Do you want to save the changes?"
-msgstr "変更を保存しますか？"
+msgstr "Вы хочаце захаваць змены?"
 
 #: mainform.rsavedialogfilter
 msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "タスクファイル (*.tsk)|*.tsk|テキストファイル (*.txt)|*.txt|Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.*"
+msgstr "Файлы задач (*.tsk)|*.tsk|Тэкставыя файлы (*.txt)|*.txt|Markdown файлы (*.md)|*.md|Усе файлы (*.*)|*.*"
 
 #: mainform.rundoconfirm
 msgid "Are you sure you want to discard all changes? This action cannot be undone."
-msgstr "すべての変更を破棄してもよろしいですか？この操作は元に戻せません。"
+msgstr "Вы ўпэўненыя, што хочаце адмовіцца ад усіх змяненняў? Гэта дзеянне немагчыма адклікаць."
 
 #: mainform.runtitled
 msgid "Untitled"
-msgstr "無題"
+msgstr "Без назвы"
 
 #: task.rdays
 msgid "d"
-msgstr "日"
+msgstr "д"
 
 #: task.rhours
 msgid "h"
-msgstr "時"
+msgstr "г"
 
 #: task.rminutes
 msgctxt "task.rminutes"
 msgid "min"
-msgstr "分"
+msgstr "хв"
 
 #: task.rmonths
 msgctxt "task.rmonths"
 msgid "m"
-msgstr "月"
+msgstr "м"
 
 #: task.ryears
 msgid "y"
-msgstr "年"
+msgstr "г"
 
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
@@ -118,23 +118,23 @@ msgstr "OK"
 
 #: tformaboutnotetask.caption
 msgid "About"
-msgstr "このアプリについて"
+msgstr "Пра праграму"
 
 #: tformaboutnotetask.labelby.caption
 msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
-msgstr "アレクサンダー・トヴェルスコイによるもので、CC BY-NC-SA 4.0ライセンスの下で提供されています"
+msgstr "аўтар: Аляксандр Тверскі, ліцэнзія CC BY-NC-SA 4.0"
 
 #: tformaboutnotetask.labellic.caption
 msgid "Full license text:"
-msgstr "ライセンスの全文:"
+msgstr "Тэкст ліцэнзіі цалкам:"
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "https://creativecommons.org/licenses/by-nc-sa/4.0/"
-msgstr ""
+msgstr "https://creativecommons.org/licenses/by-nc-sa/4.0/"
 
 #: tformaboutnotetask.labelname.caption
 msgid "Notetask © 2024"
-msgstr "ノートタスク © 2024"
+msgstr "Запіс задач © 2024"
 
 #: tformdonatenotetask.buttonok.caption
 msgctxt "tformdonatenotetask.buttonok.caption"
@@ -143,7 +143,7 @@ msgstr "OK"
 
 #: tformdonatenotetask.caption
 msgid "Buy me a coffee"
-msgstr "コーヒーを支援する"
+msgstr "Купіце мне каву"
 
 #: tformdonatenotetask.editwallet1.text
 msgid "bc1qqzarmz7yzv34mgpxdp5v58ejre7twy8upalfa9"
@@ -166,12 +166,12 @@ msgstr ""
 #: tformdonatenotetask.label1.caption
 msgctxt "tformdonatenotetask.label1.caption"
 msgid "Hey, help feed a hungry programmer! Every donation helps keep the caffeine flowing and the code coming. Thanks for supporting a small project that’s made with passion (and a lot of coffee)!"
-msgstr "ねぇ、空腹のプログラマーを助けて！ 寄付は、カフェインを流し続け、コードを提供するのに役立ちます。情熱（そして大量のコーヒー）で作られた小さなプロジェクトをサポートしてくれてありがとう！"
+msgstr "Прывітанне, дапамажыце накарміць праграміста! Кожная ахвяраванне дапамагае падтрымліваць каву і код. Дзякуй за падтрымку маленькага праекта, зробленага з захапленнем (і шмат кавы)!"
 
 #: tformdonatenotetask.label10.caption
 msgctxt "tformdonatenotetask.label10.caption"
 msgid "Feel free to make a donation through any exchange, for example:"
-msgstr "どの取引所からでも自由に寄付してください。例えば："
+msgstr "Не саромейцеся рабіць ахвяраванне праз любую біржу, напрыклад:"
 
 #: tformdonatenotetask.label2.caption
 msgid "BTC"
@@ -216,131 +216,131 @@ msgstr ""
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "キャンセル"
+msgstr "Скасаваць"
 
 #: tformfindtext.buttonfind.caption
 msgctxt "tformfindtext.buttonfind.caption"
 msgid "Find Next"
-msgstr "次を検索"
+msgstr "Знайсці наступны"
 
 #: tformfindtext.caption
 msgctxt "tformfindtext.caption"
 msgid "Find"
-msgstr "検索"
+msgstr "Знайсці"
 
 #: tformfindtext.checkmatchcase.caption
 msgctxt "tformfindtext.checkmatchcase.caption"
 msgid "Match case"
-msgstr "大文字と小文字を区別"
+msgstr "Улічваць рэгістр"
 
 #: tformfindtext.checkwraparound.caption
 msgctxt "tformfindtext.checkwraparound.caption"
 msgid "Wrap around"
-msgstr "折り返す"
+msgstr "Агортка"
 
 #: tformfindtext.labelwhat.caption
 msgctxt "tformfindtext.labelwhat.caption"
 msgid "Find what:"
-msgstr "何を検索しますか："
+msgstr "Што знайсці:"
 
 #: tformfindtext.radiodirection.caption
 msgctxt "tformfindtext.radiodirection.caption"
 msgid "Direction"
-msgstr "方向"
+msgstr "Напрамак"
 
 #: tforminputtext.buttoncancel.caption
 msgctxt "tforminputtext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "キャンセル"
+msgstr "Скасаваць"
 
 #: tforminputtext.buttonok.caption
 msgid "Go to"
-msgstr "移動"
+msgstr "Перайсці да"
 
 #: tforminputtext.caption
 msgid "Go to task"
-msgstr "タスクに移動"
+msgstr "Перайсці да задачы"
 
 #: tforminputtext.labelcaption.caption
 msgid "Task number:"
-msgstr "タスク番号："
+msgstr "Нумар задачы:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."
-msgstr "このアプリについて..."
+msgstr "Пра..."
 
 #: tformnotetask.aarchivetasks.caption
 msgid "Archive tasks ↔"
-msgstr "タスクをアーカイブ ↔"
+msgstr "Архіваваць задачы ↔"
 
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
-msgstr "読みの順序：右から左"
+msgstr "Напрамак чытання: справа налева"
 
 #: tformnotetask.achatgpt.caption
 msgid "Ask ChatGPT..."
-msgstr "ChatGPTに聞く..."
+msgstr "Спытайцеся ў ChatGPT..."
 
 #: tformnotetask.acopy.caption
 msgid "Copy"
-msgstr "コピー"
+msgstr "Капіраваць"
 
 #: tformnotetask.acut.caption
 msgid "Cut"
-msgstr "切り取り"
+msgstr "Вырваць"
 
 #: tformnotetask.adatetime.caption
 msgid "Date time"
-msgstr "日付 時間"
+msgstr "Дата і час"
 
 #: tformnotetask.adelete.caption
 msgid "Delete"
-msgstr "削除"
+msgstr "Выдаліць"
 
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
-msgstr "タスクを削除"
+msgstr "Выдаліць задачы"
 
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
-msgstr "コーヒーを支援する..."
+msgstr "Купіце мне каву..."
 
 #: tformnotetask.aexit.caption
 msgid "Exit"
-msgstr "終了"
+msgstr "Выход"
 
 #: tformnotetask.afind.caption
 msgid "Find..."
-msgstr "検索..."
+msgstr "Знайсці..."
 
 #: tformnotetask.afindnext.caption
 msgid "Find next"
-msgstr "次を検索"
+msgstr "Знайсці наступны"
 
 #: tformnotetask.afindprev.caption
 msgid "Find previous"
-msgstr "前を検索"
+msgstr "Знайсці папярэдні"
 
 #: tformnotetask.afont.caption
 msgid "Font..."
-msgstr "フォント..."
+msgstr "Шрыфт..."
 
 #: tformnotetask.agoto.caption
 msgid "Go to..."
-msgstr "移動..."
+msgstr "Перайсці да..."
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
-msgstr "タスクを挿入"
+msgstr "Уставіць задачу"
 
 #: tformnotetask.alangarabic.caption
 msgid "Arabic"
-msgstr ""
+msgstr "Arabic"
 
 #: tformnotetask.alangbelarusian.caption
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusian"
 
 #: tformnotetask.alangchinese.caption
 msgid "Chinese"
@@ -360,7 +360,7 @@ msgstr "German"
 
 #: tformnotetask.alanghindi.caption
 msgid "Hindi"
-msgstr ""
+msgstr "Hindi"
 
 #: tformnotetask.alangitalian.caption
 msgid "Italian"
@@ -388,112 +388,112 @@ msgstr "Spanish"
 
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainian"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move task to bottom"
-msgstr "タスクを下に移動"
+msgstr "Перасунуць задачу ўніз"
 
 #: tformnotetask.amovetaskdown.caption
 msgid "Move task down"
-msgstr "タスクを下に移動"
+msgstr "Перасунуць задачу ўніз"
 
 #: tformnotetask.amovetasktop.caption
 msgid "Move task to top"
-msgstr "タスクを上に移動"
+msgstr "Перасунуць задачу ўверх"
 
 #: tformnotetask.amovetaskup.caption
 msgid "Move task up"
-msgstr "タスクを上に移動"
+msgstr "Перасунуць задачу ўверх"
 
 #: tformnotetask.anew.caption
 msgid "New"
-msgstr "新規"
+msgstr "Новы"
 
 #: tformnotetask.anewwindow.caption
 msgid "New window"
-msgstr "新しいウィンドウ"
+msgstr "Новае акно"
 
 #: tformnotetask.aopen.caption
 msgid "Open..."
-msgstr "開く..."
+msgstr "Адкрыць..."
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."
-msgstr "ページプロパティ..."
+msgstr "Уласцівасці старонкі..."
 
 #: tformnotetask.apaste.caption
 msgid "Paste"
-msgstr "貼り付け"
+msgstr "Уставіць"
 
 #: tformnotetask.aprint.caption
 msgid "Print..."
-msgstr "印刷..."
+msgstr "Друкаваць..."
 
 #: tformnotetask.areplace.caption
 msgid "Replace..."
-msgstr "置換..."
+msgstr "Замяніць..."
 
 #: tformnotetask.asave.caption
 msgid "Save"
-msgstr "保存"
+msgstr "Сахраніць"
 
 #: tformnotetask.asaveas.caption
 msgid "Save as..."
-msgstr "名前を付けて保存..."
+msgstr "Сахраніць як..."
 
 #: tformnotetask.aselectall.caption
 msgid "Select all"
-msgstr "すべて選択"
+msgstr "Выбраць усё"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "アーカイブされたタスクを表示"
+msgstr "Паказаць архіўныя задачы"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
-msgstr "継続時間"
+msgstr "Паказаць працягласць"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "ステータスバーを表示"
+msgstr "Паказаць панэль стану"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"
-msgstr "元に戻す"
+msgstr "Скасаваць"
 
 #: tformnotetask.aundoall.caption
 msgid "Undo all changes"
-msgstr "すべての変更を元に戻す"
+msgstr "Скасаваць усе змены"
 
 #: tformnotetask.awordwrap.caption
 msgid "Word wrap"
-msgstr "行の折り返し"
+msgstr "Перанос слоў"
 
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
-msgstr "ノートタスク"
+msgstr "Запісковая задача"
 
 #: tformnotetask.fontdialog.title
 msgid "Font select"
-msgstr "フォント選択"
+msgstr "Выбар шрыфта"
 
 #: tformnotetask.menuedit.caption
 msgid "Edit"
-msgstr "編集"
+msgstr "Рэдагаваць"
 
 #: tformnotetask.menufile.caption
 msgid "File"
-msgstr "ファイル"
+msgstr "Файл"
 
 #: tformnotetask.menuformat.caption
 msgid "Format"
-msgstr "フォーマット"
+msgstr "Фармат"
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
-msgstr "ヘルプ"
+msgstr "Дапамога"
 
 #: tformnotetask.menulanguage.caption
 msgid "Language"
@@ -502,77 +502,76 @@ msgstr "Language"
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"
 msgid "Task"
-msgstr "タスク"
+msgstr "Задача"
 
 #: tformnotetask.menuview.caption
 msgid "View"
-msgstr "表示"
+msgstr "Пагляд"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"
-msgstr "オープン"
+msgstr "Адкрыццё"
 
 #: tformnotetask.savedialog.title
 msgid "Saving"
-msgstr "保存"
+msgstr "Сахраненне"
 
 #: tformnotetask.taskgrid.columns[0].title.caption
 msgid "Done"
-msgstr "完了"
+msgstr "Зроблена"
 
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
 msgid "Task"
-msgstr "タスク"
+msgstr "Задача"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgid "Comment"
-msgstr "コメント"
+msgstr "Каментар"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgid "Date"
-msgstr "日付"
+msgstr "Дата"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "キャンセル"
+msgstr "Скасаваць"
 
 #: tformreplacetext.buttonfind.caption
 msgctxt "tformreplacetext.buttonfind.caption"
 msgid "Find Next"
-msgstr "次を検索"
+msgstr "Знайсці наступны"
 
 #: tformreplacetext.buttonreplace.caption
 msgctxt "tformreplacetext.buttonreplace.caption"
 msgid "Replace"
-msgstr "置換"
+msgstr "Замяніць"
 
 #: tformreplacetext.buttonreplaceall.caption
 msgid "Replace All"
-msgstr "すべて置換"
+msgstr "Замяніць усе"
 
 #: tformreplacetext.caption
 msgctxt "tformreplacetext.caption"
 msgid "Replace"
-msgstr "置換"
+msgstr "Замяніць"
 
 #: tformreplacetext.checkmatchcase.caption
 msgctxt "tformreplacetext.checkmatchcase.caption"
 msgid "Match case"
-msgstr "大文字と小文字を区別"
+msgstr "Улічваць рэгістры"
 
 #: tformreplacetext.checkwraparound.caption
 msgctxt "tformreplacetext.checkwraparound.caption"
 msgid "Wrap around"
-msgstr "折り返す"
+msgstr "Перанос"
 
 #: tformreplacetext.labelwhat.caption
 msgctxt "tformreplacetext.labelwhat.caption"
 msgid "Find what:"
-msgstr "検索する文字列:"
+msgstr "Знайсці што:"
 
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
-msgstr "置換後:"
-
+msgstr "Замяніць на:"

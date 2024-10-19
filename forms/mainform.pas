@@ -170,6 +170,14 @@ type
     MenuItem10: TMenuItem;
     aShowDuration: TAction;
     menuShowDuration: TMenuItem;
+    aLangArabic: TAction;
+    aLangUkrainian: TAction;
+    aLangBelarusian: TAction;
+    aLangHindi: TAction;
+    MenuItem11: TMenuItem;
+    MenuItem12: TMenuItem;
+    MenuItem13: TMenuItem;
+    MenuItem14: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -238,6 +246,10 @@ type
     procedure aLangChineseExecute(Sender: TObject);
     procedure aDonateExecute(Sender: TObject);
     procedure aShowDurationExecute(Sender: TObject);
+    procedure aLangUkrainianExecute(Sender: TObject);
+    procedure aLangBelarusianExecute(Sender: TObject);
+    procedure aLangHindiExecute(Sender: TObject);
+    procedure aLangArabicExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -1534,6 +1546,34 @@ begin
   if ShowDuration then FillGrid;
 end;
 
+procedure TformNotetask.aLangUkrainianExecute(Sender: TObject);
+begin
+  SetLanguage('uk');
+  SetCaption;
+  if ShowDuration then FillGrid;
+end;
+
+procedure TformNotetask.aLangBelarusianExecute(Sender: TObject);
+begin
+  SetLanguage('be');
+  SetCaption;
+  if ShowDuration then FillGrid;
+end;
+
+procedure TformNotetask.aLangHindiExecute(Sender: TObject);
+begin
+  SetLanguage('hi');
+  SetCaption;
+  if ShowDuration then FillGrid;
+end;
+
+procedure TformNotetask.aLangArabicExecute(Sender: TObject);
+begin
+  SetLanguage('ar');
+  SetCaption;
+  if ShowDuration then FillGrid;
+end;
+
 procedure TformNotetask.aDonateExecute(Sender: TObject);
 begin
   formDonateNotetask := TformDonateNotetask.Create(nil);
@@ -1997,15 +2037,19 @@ end;
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);
 begin
   aLangEnglish.Checked := False;
+  aLangGerman.Checked := False;
   aLangSpanish.Checked := False;
   aLangFrench.Checked := False;
-  aLangGerman.Checked := False;
   aLangItalian.Checked := False;
   aLangPortuguese.Checked := False;
   aLangRussian.Checked := False;
+  aLangUkrainian.Checked := False;
+  aLangBelarusian.Checked := False;
+  aLangHindi.Checked := False;
+  aLangArabic.Checked := False;
+  aLangChinese.Checked := False;
   aLangJapanese.Checked := False;
   aLangKorean.Checked := False;
-  aLangChinese.Checked := False;
 
   if (aLanguage <> string.Empty) then
   begin
@@ -2015,15 +2059,19 @@ begin
 
   case Language of
     'en': aLangEnglish.Checked := True;
+    'de': aLangGerman.Checked := True;
     'es': aLangSpanish.Checked := True;
     'fr': aLangFrench.Checked := True;
-    'de': aLangGerman.Checked := True;
     'it': aLangItalian.Checked := True;
     'pt': aLangPortuguese.Checked := True;
     'ru': aLangRussian.Checked := True;
+    'uk': aLangUkrainian.Checked := True;
+    'be': aLangBelarusian.Checked := True;
+    'hi': aLangHindi.Checked := True;
+    'ar': aLangArabic.Checked := True;
+    'zh': aLangChinese.Checked := True;
     'ja': aLangJapanese.Checked := True;
     'ko': aLangKorean.Checked := True;
-    'zh': aLangChinese.Checked := True;
     else
     // nolang
   end;

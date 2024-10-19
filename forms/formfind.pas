@@ -61,14 +61,19 @@ uses mainform, formreplace;
 
 procedure TformFindText.FormCreate(Sender: TObject);
 begin
-  radioDirection.Items.Clear;
-  radioDirection.Items.Add(rdirectionup);
-  radioDirection.Items.Add(rdirectiondown);
   radioDirection.ItemIndex := 1;
 end;
 
 procedure TformFindText.FormShow(Sender: TObject);
+var
+  ind: integer;
 begin
+  ind := radioDirection.ItemIndex;
+  radioDirection.Items.Clear;
+  radioDirection.Items.Add(rdirectionup);
+  radioDirection.Items.Add(rdirectiondown);
+  radioDirection.ItemIndex := ind;
+
   editFind.SetFocus;
   formReplaceText.Hide;
 end;
