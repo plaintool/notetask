@@ -931,7 +931,7 @@ end;
 procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);
 var
   I, J, ArhCount, RowIndex: integer;
-  PrevDate, LastDate, MinDate, MaxDate: TDateTime;
+  LastDate, MinDate, MaxDate: TDateTime;
   DateDiff: string;
   eventOnColRowInserted: TGridOperationEvent;
   eventOnColRowDeleted: TGridOperationEvent;
@@ -1037,7 +1037,6 @@ begin
     LastDate := Now;
     MinDate := Now;
     MaxDate := 0;
-    PrevDate := 0;
 
     ArhCount := 0;
     for I := 0 to Count - 1 do
@@ -1105,7 +1104,6 @@ begin
         begin
           if FTaskList[I].Date > 0 then
             LastDate := FTaskList[I].Date;
-          PrevDate := FTaskList[I].Date;
         end;
 
         FMapGrid[RowIndex] := I;
