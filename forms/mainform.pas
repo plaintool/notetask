@@ -168,6 +168,8 @@ type
     MenuItem8: TMenuItem;
     Separator12: TMenuItem;
     MenuItem10: TMenuItem;
+    aShowDuration: TAction;
+    menuShowDuration: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -235,6 +237,7 @@ type
     procedure aLangKoreanExecute(Sender: TObject);
     procedure aLangChineseExecute(Sender: TObject);
     procedure aDonateExecute(Sender: TObject);
+    procedure aShowDurationExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -276,6 +279,7 @@ type
     procedure ArchiveTask(aRow: integer = 0);
     procedure ArchiveTasks;
     procedure SetShowStatusBar(Value: boolean);
+    procedure SetShowDuration(Value: boolean);
     procedure SetShowArchived(Value: boolean);
     procedure SetBiDiRightToLeft(Value: boolean);
     procedure CompleteTasks(aRow: integer = 0);
@@ -285,6 +289,7 @@ type
     function IsCanClose: boolean;
   public
     FShowArchived: boolean;
+    FShowDuration: boolean;
 
     procedure SetLanguage(aLanguage: string = string.Empty);
     function OpenFile(fileName: string): boolean;
@@ -298,6 +303,7 @@ type
     property WordWrap: boolean read FWordWrap write FWordWrap;
     property BiDiRightToLeft: boolean read FBiDiRightToLeft write SetBiDiRightToLeft;
     property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
+    property ShowDuration: boolean read FShowDuration write SetShowDuration;
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property SortOrder: TSortOrder read FSortOrder write FSortOrder;
     property SortColumn: integer read FSortColumn write FSortColumn;
@@ -382,6 +388,12 @@ begin
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowStatusBar.Checked := FShowStatusBar;
   aShowArchived.Checked := FShowArchived;
+  aShowDuration.Checked := FShowDuration;
+
+  if (FShowDuration) then
+    taskGrid.DefaultColWidth := 55
+  else
+    taskGrid.DefaultColWidth := 40;
 
   // Check if a command line argument is passed
   if ParamCount > 0 then
@@ -575,6 +587,7 @@ begin
     FSortColumn := Index;
 
     FillGrid;
+    ResetRowHeight;
 
     aMoveTaskTop.Enabled := SortColumn = 0;
     aMoveTaskBottom.Enabled := SortColumn = 0;
@@ -1168,6 +1181,7 @@ begin
     if (taskGrid.Col = 4) then
     begin
       taskGrid.Cells[4, taskGrid.Row] := CurrentDateTime;
+      FillGrid;
     end
     else
     begin
@@ -1189,6 +1203,8 @@ begin
         else
           taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
         Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
+        if (FShowDuration) and (taskGrid.Col = 4) then
+          FillGrid;
       end
       else
       begin
@@ -1310,6 +1326,13 @@ begin
   if Screen.ActiveForm <> Self then exit;
 
   ShowArchived := aShowArchived.Checked;
+end;
+
+procedure TformNotetask.aShowDurationExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowDuration := aShowDuration.Checked;
 end;
 
 procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
@@ -1443,60 +1466,70 @@ procedure TformNotetask.aLangEnglishExecute(Sender: TObject);
 begin
   SetLanguage('en');
   SetCaption;
+  if ShowDuration then FillGrid;
 end;
 
 procedure TformNotetask.aLangSpanishExecute(Sender: TObject);
 begin
   SetLanguage('es');
   SetCaption;
+  if ShowDuration then FillGrid;
 end;
 
 procedure TformNotetask.aLangFrenchExecute(Sender: TObject);
 begin
   SetLanguage('fr');
   SetCaption;
+  if ShowDuration then FillGrid;
 end;
 
 procedure TformNotetask.aLangGermanExecute(Sender: TObject);
 begin
   SetLanguage('de');
   SetCaption;
+  if ShowDuration then FillGrid;
 end;
 
 procedure TformNotetask.aLangItalianExecute(Sender: TObject);
 begin
   SetLanguage('it');
   SetCaption;
+  if ShowDuration then FillGrid;
 end;
 
 procedure TformNotetask.aLangPortugueseExecute(Sender: TObject);
 begin
   SetLanguage('pt');
   SetCaption;
+  if ShowDuration then FillGrid;
 end;
 
 procedure TformNotetask.aLangRussianExecute(Sender: TObject);
 begin
   SetLanguage('ru');
   SetCaption;
+  if ShowDuration then FillGrid;
 end;
 
 procedure TformNotetask.aLangJapaneseExecute(Sender: TObject);
 begin
   SetLanguage('ja');
   SetCaption;
+  if ShowDuration then FillGrid;
 end;
 
 procedure TformNotetask.aLangKoreanExecute(Sender: TObject);
 begin
   SetLanguage('ko');
   SetCaption;
+  if ShowDuration then FillGrid;
 end;
 
 procedure TformNotetask.aLangChineseExecute(Sender: TObject);
 begin
   SetLanguage('zh');
   SetCaption;
+  if ShowDuration then FillGrid;
 end;
 
 procedure TformNotetask.aDonateExecute(Sender: TObject);
@@ -1561,8 +1594,9 @@ begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
     TDateTimePicker(Sender).DateTime);
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
-  SetChanged;
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
+  if (FShowDuration) then FillGrid;
+  SetChanged;
 end;
 
 procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer; OffsetTop: integer;
@@ -1832,6 +1866,18 @@ begin
   FillGrid;
 end;
 
+procedure TformNotetask.SetShowDuration(Value: boolean);
+begin
+  FShowDuration := Value;
+
+  if (FShowDuration) then
+    taskGrid.DefaultColWidth := 55
+  else
+    taskGrid.DefaultColWidth := 40;
+
+  FillGrid;
+end;
+
 procedure TformNotetask.SetBiDiRightToLeft(Value: boolean);
 var
   i: integer;
@@ -1935,7 +1981,7 @@ end;
 
 procedure TformNotetask.FillGrid;
 begin
-  Tasks.FillGrid(taskGrid, FShowArchived, SortOrder, SortColumn);
+  Tasks.FillGrid(taskGrid, FShowArchived, FShowDuration, SortOrder, SortColumn);
 end;
 
 procedure TformNotetask.SetInfo;

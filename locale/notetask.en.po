@@ -89,6 +89,28 @@ msgstr "Are you sure you want to discard all changes? This action cannot be undo
 msgid "Untitled"
 msgstr "Untitled"
 
+#: task.rdays
+msgid "d"
+msgstr "d"
+
+#: task.rhours
+msgid "h"
+msgstr "h"
+
+#: task.rminutes
+msgctxt "task.rminutes"
+msgid "min"
+msgstr "min"
+
+#: task.rmonths
+msgctxt "task.rmonths"
+msgid "m"
+msgstr "m"
+
+#: task.ryears
+msgid "y"
+msgstr "y"
+
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
@@ -411,6 +433,10 @@ msgstr "Select all"
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "Show archived tasks"
+
+#: tformnotetask.ashowduration.caption
+msgid "Show duration"
+msgstr "Show duration"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"

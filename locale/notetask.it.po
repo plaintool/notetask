@@ -89,6 +89,28 @@ msgstr "Sei sicuro di voler annullare tutte le modifiche? Questa azione non può
 msgid "Untitled"
 msgstr "Senza titolo"
 
+#: task.rdays
+msgid "d"
+msgstr "g"
+
+#: task.rhours
+msgid "h"
+msgstr "h"
+
+#: task.rminutes
+msgctxt "task.rminutes"
+msgid "min"
+msgstr "min"
+
+#: task.rmonths
+msgctxt "task.rmonths"
+msgid "m"
+msgstr "m"
+
+#: task.ryears
+msgid "y"
+msgstr "a"
+
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
@@ -411,6 +433,10 @@ msgstr "Seleziona tutto"
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "Mostra compiti archiviati"
+
+#: tformnotetask.ashowduration.caption
+msgid "Show duration"
+msgstr "Durata"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"

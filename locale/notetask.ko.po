@@ -89,6 +89,28 @@ msgstr "모든 변경 사항을 버리시겠습니까? 이 작업은 취소할 �
 msgid "Untitled"
 msgstr "제목 없음"
 
+#: task.rdays
+msgid "d"
+msgstr "일"
+
+#: task.rhours
+msgid "h"
+msgstr "시"
+
+#: task.rminutes
+msgctxt "task.rminutes"
+msgid "min"
+msgstr "분"
+
+#: task.rmonths
+msgctxt "task.rmonths"
+msgid "m"
+msgstr "월"
+
+#: task.ryears
+msgid "y"
+msgstr "년"
+
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
@@ -411,6 +433,10 @@ msgstr "모두 선택"
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "보관된 작업 보기"
+
+#: tformnotetask.ashowduration.caption
+msgid "Show duration"
+msgstr "지속 시간"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"

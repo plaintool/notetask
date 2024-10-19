@@ -57,6 +57,7 @@
 {"hash":166743253,"name":"tformnotetask.alangchinese.caption","sourcebytes":[67,104,105,110,101,115,101],"value":"Chinese"},
 {"hash":255115374,"name":"tformnotetask.adonate.caption","sourcebytes":[66,117,121,32,109,101,32,97,32,99,111,102,102,101,101,46,46,46],"value":"Buy me a coffee..."},
 {"hash":158102910,"name":"tformnotetask.aabout.caption","sourcebytes":[65,98,111,117,116,46,46,46],"value":"About..."},
+{"hash":92158654,"name":"tformnotetask.ashowduration.caption","sourcebytes":[83,104,111,119,32,100,117,114,97,116,105,111,110],"value":"Show duration"},
 {"hash":107761687,"name":"tformnotetask.opendialog.title","sourcebytes":[79,112,101,110,105,110,103],"value":"Opening"},
 {"hash":93900871,"name":"tformnotetask.savedialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
 {"hash":131550916,"name":"tformnotetask.fontdialog.title","sourcebytes":[70,111,110,116,32,115,101,108,101,99,116],"value":"Font select"}

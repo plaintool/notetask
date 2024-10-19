@@ -79,6 +79,28 @@ msgstr ""
 msgid "Untitled"
 msgstr ""
 
+#: task.rdays
+msgid "d"
+msgstr ""
+
+#: task.rhours
+msgid "h"
+msgstr ""
+
+#: task.rminutes
+msgctxt "task.rminutes"
+msgid "min"
+msgstr ""
+
+#: task.rmonths
+msgctxt "task.rmonths"
+msgid "m"
+msgstr ""
+
+#: task.ryears
+msgid "y"
+msgstr ""
+
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
@@ -400,6 +422,10 @@ msgstr ""
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
+msgstr ""
+
+#: tformnotetask.ashowduration.caption
+msgid "Show duration"
 msgstr ""
 
 #: tformnotetask.ashowstatusbar.caption

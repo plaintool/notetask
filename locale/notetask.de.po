@@ -89,6 +89,28 @@ msgstr "Sind Sie sicher, dass Sie alle Änderungen verwerfen möchten? Diese Akt
 msgid "Untitled"
 msgstr "Unbetitelt"
 
+#: task.rdays
+msgid "d"
+msgstr "T"
+
+#: task.rhours
+msgid "h"
+msgstr "h"
+
+#: task.rminutes
+msgctxt "task.rminutes"
+msgid "min"
+msgstr "min"
+
+#: task.rmonths
+msgctxt "task.rmonths"
+msgid "m"
+msgstr "M"
+
+#: task.ryears
+msgid "y"
+msgstr "J"
+
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
@@ -411,6 +433,10 @@ msgstr "Alles auswählen"
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "Archivierte Aufgaben anzeigen"
+
+#: tformnotetask.ashowduration.caption
+msgid "Show duration"
+msgstr "Dauer"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"

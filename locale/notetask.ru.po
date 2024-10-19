@@ -89,6 +89,28 @@ msgstr "Вы уверены, что хотите отменить все изм�
 msgid "Untitled"
 msgstr "Безымянный"
 
+#: task.rdays
+msgid "d"
+msgstr "д"
+
+#: task.rhours
+msgid "h"
+msgstr "ч"
+
+#: task.rminutes
+msgctxt "task.rminutes"
+msgid "min"
+msgstr "мин"
+
+#: task.rmonths
+msgctxt "task.rmonths"
+msgid "m"
+msgstr "м"
+
+#: task.ryears
+msgid "y"
+msgstr "г"
+
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
@@ -411,6 +433,10 @@ msgstr "Выделить все"
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "Архивные задачи"
+
+#: tformnotetask.ashowduration.caption
+msgid "Show duration"
+msgstr "Продолжительность"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"

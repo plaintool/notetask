@@ -89,6 +89,28 @@ msgstr "您确定要放弃所有更改吗？此操作无法撤消。"
 msgid "Untitled"
 msgstr "无标题"
 
+#: task.rdays
+msgid "d"
+msgstr "日"
+
+#: task.rhours
+msgid "h"
+msgstr "小时"
+
+#: task.rminutes
+msgctxt "task.rminutes"
+msgid "min"
+msgstr "分钟"
+
+#: task.rmonths
+msgctxt "task.rmonths"
+msgid "m"
+msgstr "月"
+
+#: task.ryears
+msgid "y"
+msgstr "年"
+
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
@@ -411,6 +433,10 @@ msgstr "全选"
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "显示归档任务"
+
+#: tformnotetask.ashowduration.caption
+msgid "Show duration"
+msgstr "持续时间"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"

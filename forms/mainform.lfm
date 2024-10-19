@@ -42,6 +42,7 @@ object formNotetask: TformNotetask
         Title.Caption = 'Date'
         Width = 140
       end>
+    DefaultColWidth = 50
     FixedColor = clWindow
     Flat = True
     GridLineColor = 13290186
@@ -67,13 +68,6 @@ object formNotetask: TformNotetask
     OnSelectEditor = taskGridSelectEditor
     OnSelectCell = taskGridSelectCell
     OnUserCheckboxBitmap = taskGridUserCheckboxBitmap
-    ColWidths = (
-      42
-      64
-      335
-      205
-      140
-    )
     RowHeights = (
       22
       27
@@ -241,6 +235,10 @@ object formNotetask: TformNotetask
       Caption = 'View'
       object menuShowArchived: TMenuItem
         Action = aShowArchived
+        AutoCheck = True
+      end
+      object menuShowDuration: TMenuItem
+        Action = aShowDuration
         AutoCheck = True
       end
       object menuShowStatusBar: TMenuItem
@@ -562,6 +560,12 @@ object formNotetask: TformNotetask
       Category = 'Help'
       Caption = 'About...'
       OnExecute = aAboutExecute
+    end
+    object aShowDuration: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Show duration'
+      OnExecute = aShowDurationExecute
     end
   end
   object openDialog: TOpenDialog

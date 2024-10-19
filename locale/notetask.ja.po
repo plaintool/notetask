@@ -89,6 +89,28 @@ msgstr "すべての変更を破棄してもよろしいですか？この操作
 msgid "Untitled"
 msgstr "無題"
 
+#: task.rdays
+msgid "d"
+msgstr "日"
+
+#: task.rhours
+msgid "h"
+msgstr "時"
+
+#: task.rminutes
+msgctxt "task.rminutes"
+msgid "min"
+msgstr "分"
+
+#: task.rmonths
+msgctxt "task.rmonths"
+msgid "m"
+msgstr "月"
+
+#: task.ryears
+msgid "y"
+msgstr "年"
+
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
@@ -411,6 +433,10 @@ msgstr "すべて選択"
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "アーカイブされたタスクを表示"
+
+#: tformnotetask.ashowduration.caption
+msgid "Show duration"
+msgstr "継続時間"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"

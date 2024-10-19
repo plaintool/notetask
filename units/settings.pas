@@ -71,6 +71,7 @@ begin
     JSONObj.Add('BidiRightToLeft', Form.BiDiRightToLeft);
     JSONObj.Add('ShowArchived', Form.ShowArchived);
     JSONObj.Add('ShowStatusBar', Form.ShowStatusBar);
+    JSONObj.Add('ShowDuration', Form.ShowDuration);
     JSONObj.Add('WindowState', Ord(Form.WindowState));
     JSONObj.Add('Left', Form.RestoredLeft);
     JSONObj.Add('Top', Form.RestoredTop);
@@ -127,6 +128,9 @@ begin
 
       if JSONObj.FindPath('ShowArchived') <> nil then
         Form.FShowArchived := JSONObj.FindPath('ShowArchived').AsBoolean;
+
+      if JSONObj.FindPath('ShowDuration') <> nil then
+         Form.FShowDuration := JSONObj.FindPath('ShowDuration').AsBoolean;
 
       if JSONObj.FindPath('ShowStatusBar') <> nil then
         Form.ShowStatusBar := JSONObj.FindPath('ShowStatusBar').AsBoolean;
@@ -238,7 +242,7 @@ begin
       // RowArray := JSONObj.FindPath('RowHeights') as TJSONArray;
 
       // Set column widths
-      for i := 0 to ColumnArray.Count - 1 do
+      for i := 1 to ColumnArray.Count - 1 do
         Grid.ColWidths[i] := ColumnArray.Items[i].AsInteger;
 
       // Set row heights

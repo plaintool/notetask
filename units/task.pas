@@ -15,7 +15,8 @@ uses
   Classes,
   SysUtils,
   Grids,
-  Clipbrd;
+  Clipbrd,
+  DateUtils;
 
 type
   TIntegerArray = array of integer;
@@ -73,7 +74,7 @@ type
     procedure MoveTask(OldIndex, NewIndex: integer);
     procedure CopyToClipboard(Grid: TStringGrid);
     function PasteFromClipboard(Grid: TStringGrid): TGridRect;
-    procedure FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder; SortColumn: integer);
+    procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);
     function ToStringList: TStringList;
     procedure CreateBackup;
     procedure UndoBackup;
@@ -83,6 +84,13 @@ type
     property Count: integer read FCount;
     property MapGrid: TIntegerArray read FMapGrid;
   end;
+
+resourcestring
+  rminutes = 'min';
+  rhours = 'h';
+  rdays = 'd';
+  rmonths = 'm';
+  ryears = 'y';
 
 implementation
 
@@ -858,9 +866,73 @@ begin
   end;
 end;
 
-procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive: boolean; SortOrder: TSortOrder; SortColumn: integer);
+function CalcDateDiff(const StartDate, EndDate: TDateTime): string;
+var
+  YearsDiff, MonthsDiff, DaysDiff, HoursDiff, MinutesDiff: integer;
+begin
+  // Calculate difference in yeard
+  YearsDiff := YearsBetween(EndDate, StartDate);
+  if YearsDiff <> 0 then
+  begin
+    if YearsDiff > 0 then
+      Result := IntToStr(YearsDiff) + ryears
+    else
+      Result := '-';
+    Exit;
+  end;
+
+  // Calculate difference in months
+  MonthsDiff := MonthsBetween(EndDate, StartDate);
+  if MonthsDiff <> 0 then
+  begin
+    if MonthsDiff > 0 then
+      Result := IntToStr(MonthsDiff) + rmonths
+    else
+      Result := '-';
+    Exit;
+  end;
+
+  // Calculate difference in days
+  DaysDiff := DaysBetween(EndDate, StartDate);
+  if DaysDiff <> 0 then
+  begin
+    if DaysDiff > 0 then
+      Result := IntToStr(DaysDiff) + rdays
+    else
+      Result := '-';
+    Exit;
+  end;
+
+  // Calculate difference in hours
+  HoursDiff := HoursBetween(EndDate, StartDate);
+  if HoursDiff <> 0 then
+  begin
+    if HoursDiff > 0 then
+      Result := IntToStr(HoursDiff) + rhours
+    else
+      Result := '-';
+    Exit;
+  end;
+
+  // Calculate difference in minutes
+  MinutesDiff := MinutesBetween(EndDate, StartDate);
+  if MinutesDiff <> 0 then
+  begin
+    if MinutesDiff > 0 then
+      Result := IntToStr(MinutesDiff) + rminutes
+    else
+      Result := '-';
+    Exit;
+  end;
+
+  Result := '0' + rminutes;
+end;
+
+procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);
 var
   I, J, ArhCount, RowIndex: integer;
+  PrevDate, LastDate, MinDate, MaxDate: TDateTime;
+  DateDiff: string;
   eventOnColRowInserted: TGridOperationEvent;
   eventOnColRowDeleted: TGridOperationEvent;
 
@@ -962,6 +1034,10 @@ begin
     eventOnColRowDeleted := Grid.OnColRowDeleted;
     Grid.OnColRowInserted := nil;
     Grid.OnColRowDeleted := nil;
+    MinDate := Now;
+    MaxDate := 0;
+    PrevDate := 0;
+    LastDate := 0;
 
     ArhCount := 0;
     for I := 0 to Count - 1 do
@@ -983,15 +1059,54 @@ begin
     // Fill the grid with tasks
     for I := 0 to Count - 1 do
     begin
+      if (ShowDuration) then
+      begin
+        if (FTaskList[I].Date > 0) and (FTaskList[I].Date < MinDate) then
+          MinDate := FTaskList[I].Date;
+        if (i > 0) and (FTaskList[I].Date > 0) and (FTaskList[I].Date < LastDate) then
+        begin
+          for j := i - 1 downto 0 do
+            if (FTaskList[J].Date > 0) and (FTaskList[J].Date <= FTaskList[I].Date) then
+            begin
+              MinDate := FTaskList[J].Date;
+              break;
+            end;
+        end;
+        if (FTaskList[I].Date > MaxDate) then
+          MaxDate := FTaskList[I].Date;
+      end;
+
       if (ShowArchive = True) or (FTaskList[I].Archive = False) then
       begin
+        Grid.Cells[0, RowIndex] := RowIndex.ToString;
         Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].Done));
         Grid.Cells[2, RowIndex] := FTaskList[I].Text;
         Grid.Cells[3, RowIndex] := FTaskList[I].Comment;
         if FTaskList[I].Date > 0 then
-          Grid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, FTaskList[I].Date)
+        begin
+          if (ShowDuration) and (LastDate > 0) then
+          begin
+            DateDiff := CalcDateDiff(FTaskList[I].Date, LastDate);
+            if (DateDiff = '-') then
+            begin
+              DateDiff := CalcDateDiff(FTaskList[I].Date, MinDate);
+              MinDate := FTaskList[I].Date;
+            end;
+            if (DateDiff <> '-') then
+              Grid.Cells[0, RowIndex] := RowIndex.ToString + '. ' + DateDiff;
+          end;
+
+          Grid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, FTaskList[I].Date);
+        end
         else
           Grid.Cells[4, RowIndex] := string.Empty;
+
+        if (ShowDuration) then
+        begin
+          if FTaskList[I].Date > 0 then
+            LastDate := FTaskList[I].Date;
+          PrevDate := FTaskList[I].Date;
+        end;
 
         FMapGrid[RowIndex] := I;
 
