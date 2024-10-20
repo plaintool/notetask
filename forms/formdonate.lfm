@@ -1,19 +1,19 @@
 object formDonateNotetask: TformDonateNotetask
   Left = 318
-  Height = 429
+  Height = 442
   Top = 250
   Width = 441
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Buy me a coffee'
-  ClientHeight = 429
+  ClientHeight = 442
   ClientWidth = 441
   Color = clWindow
   OnCreate = FormCreate
   object buttonOk: TButton
     Left = 356
     Height = 25
-    Top = 392
+    Top = 405
     Width = 75
     Anchors = [akRight, akBottom]
     Cancel = True
@@ -24,8 +24,8 @@ object formDonateNotetask: TformDonateNotetask
   object editWallet1: TEdit
     Left = 16
     Height = 23
-    Top = 292
-    Width = 352
+    Top = 308
+    Width = 388
     AutoSize = False
     Color = clBtnFace
     ReadOnly = True
@@ -34,9 +34,9 @@ object formDonateNotetask: TformDonateNotetask
     OnClick = editWallet1Click
   end
   object buttonCopy1: TSpeedButton
-    Left = 368
+    Left = 404
     Height = 23
-    Top = 292
+    Top = 308
     Width = 25
     Color = clWindow
     Flat = True
@@ -83,7 +83,7 @@ object formDonateNotetask: TformDonateNotetask
   object Label2: TLabel
     Left = 16
     Height = 15
-    Top = 268
+    Top = 284
     Width = 22
     Caption = 'BTC'
     Font.Style = [fsBold]
@@ -92,15 +92,15 @@ object formDonateNotetask: TformDonateNotetask
   object Label3: TLabel
     Left = 60
     Height = 15
-    Top = 268
+    Top = 284
     Width = 67
     Caption = 'Bitcoin (BTC)'
   end
   object editWallet2: TEdit
     Left = 16
     Height = 23
-    Top = 348
-    Width = 352
+    Top = 364
+    Width = 388
     AutoSize = False
     Color = clBtnFace
     ReadOnly = True
@@ -109,9 +109,9 @@ object formDonateNotetask: TformDonateNotetask
     OnClick = editWallet2Click
   end
   object buttonCopy2: TSpeedButton
-    Left = 368
+    Left = 404
     Height = 23
-    Top = 348
+    Top = 364
     Width = 25
     Color = clWindow
     Flat = True
@@ -149,7 +149,7 @@ object formDonateNotetask: TformDonateNotetask
   object Label4: TLabel
     Left = 16
     Height = 15
-    Top = 324
+    Top = 340
     Width = 22
     Caption = 'ETH'
     Font.Style = [fsBold]
@@ -158,15 +158,15 @@ object formDonateNotetask: TformDonateNotetask
   object Label5: TLabel
     Left = 60
     Height = 15
-    Top = 324
+    Top = 340
     Width = 95
     Caption = 'Ethereum (ERC20)'
   end
   object editWallet3: TEdit
     Left = 16
     Height = 23
-    Top = 236
-    Width = 352
+    Top = 252
+    Width = 388
     AutoSize = False
     Color = clBtnFace
     ReadOnly = True
@@ -175,9 +175,9 @@ object formDonateNotetask: TformDonateNotetask
     OnClick = editWallet3Click
   end
   object buttonCopy3: TSpeedButton
-    Left = 368
+    Left = 404
     Height = 23
-    Top = 236
+    Top = 252
     Width = 25
     Color = clWindow
     Flat = True
@@ -215,7 +215,7 @@ object formDonateNotetask: TformDonateNotetask
   object Label6: TLabel
     Left = 16
     Height = 15
-    Top = 212
+    Top = 228
     Width = 32
     Caption = 'USDT'
     Font.Style = [fsBold]
@@ -224,15 +224,15 @@ object formDonateNotetask: TformDonateNotetask
   object Label7: TLabel
     Left = 60
     Height = 15
-    Top = 212
+    Top = 228
     Width = 235
     Caption = 'Ethereum (ERC20), BNB Smart Chain (BEP20)'
   end
   object editWallet4: TEdit
     Left = 16
     Height = 23
-    Top = 180
-    Width = 352
+    Top = 196
+    Width = 388
     AutoSize = False
     Color = clBtnFace
     TabOrder = 0
@@ -240,9 +240,9 @@ object formDonateNotetask: TformDonateNotetask
     OnClick = editWallet4Click
   end
   object buttonCopy4: TSpeedButton
-    Left = 368
+    Left = 404
     Height = 23
-    Top = 180
+    Top = 196
     Width = 25
     Color = clWindow
     Flat = True
@@ -280,14 +280,14 @@ object formDonateNotetask: TformDonateNotetask
   object Label8: TLabel
     Left = 60
     Height = 15
-    Top = 156
+    Top = 172
     Width = 67
     Caption = 'Tron (TRC20)'
   end
   object Label9: TLabel
     Left = 16
     Height = 15
-    Top = 156
+    Top = 172
     Width = 32
     Caption = 'USDT'
     Font.Style = [fsBold]
