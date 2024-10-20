@@ -1,20 +1,21 @@
 object formInputText: TformInputText
   Left = 318
-  Height = 100
+  Height = 103
   Top = 250
   Width = 250
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Go to task'
-  ClientHeight = 100
+  ClientHeight = 103
   ClientWidth = 250
   OnShow = FormShow
   ShowInTaskBar = stNever
   object buttonOk: TButton
     Left = 85
     Height = 25
-    Top = 64
+    Top = 67
     Width = 75
+    Anchors = [akLeft, akBottom]
     Caption = 'Go to'
     Default = True
     ModalResult = 1
@@ -23,8 +24,9 @@ object formInputText: TformInputText
   object buttonCancel: TButton
     Left = 165
     Height = 25
-    Top = 64
+    Top = 67
     Width = 75
+    Anchors = [akLeft, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
