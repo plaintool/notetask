@@ -1061,7 +1061,8 @@ begin
     // Fill the grid with tasks
     for I := 0 to Count - 1 do
     begin
-      Grid.Cells[0, RowIndex] := RowIndex.ToString;
+      if (Grid.RowCount > RowIndex) then
+        Grid.Cells[0, RowIndex] := RowIndex.ToString;
 
       // Duration calculation
       if (ShowDuration) then
@@ -1090,7 +1091,7 @@ begin
               DateDiff := CalcDateDiff(FTaskList[I].Date, MinDate);
               MinDate := FTaskList[I].Date;
             end;
-            if (DateDiff <> '-') then
+            if (DateDiff <> '-') and (Grid.RowCount > RowIndex) then
               Grid.Cells[0, RowIndex] := RowIndex.ToString + '. ' + DateDiff;
           end;
         end;
