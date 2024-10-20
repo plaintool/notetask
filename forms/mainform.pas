@@ -2132,7 +2132,7 @@ end;
 function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
 var
   sValue, sText: unicodestring;
-  Counter, CurRow, CurCol: integer;
+  Counter, CurRow, CurCol, StartRow, StartCol: integer;
 
   function FindMemo: boolean;
   var
@@ -2177,11 +2177,21 @@ var
 
   procedure NotFound;
   begin
-    taskGrid.Row := FLastFoundRow;
-    taskGrid.Col := FLastFoundCol;
-    taskGrid.EditorMode := True;
-    Memo.SelStart := FLastFoundSelStart;
-    Memo.SelLength := FLastFoundSelLength;
+    if (aText = FFoundText) then
+    begin
+      taskGrid.Row := FLastFoundRow;
+      taskGrid.Col := FLastFoundCol;
+      taskGrid.EditorMode := True;
+      Memo.SelStart := FLastFoundSelStart;
+      Memo.SelLength := FLastFoundSelLength;
+    end
+    else
+    begin
+      FLastFoundRow := StartRow;
+      FLastFoundCol := StartCol;
+      taskGrid.Row := FLastFoundRow;
+      taskGrid.Col := FLastFoundCol;
+    end;
     if (not Silent) then
       ShowMessage(rcantfind + ' "' + string(sText) + '"');
   end;
@@ -2193,6 +2203,8 @@ begin
     FindText := aText;
     MatchCase := aMatchCase;
     WrapAround := aWrapAround;
+    StartRow := taskGrid.Row;
+    StartCol := taskGrid.Col;
 
     if taskGrid.Col = 1 then taskGrid.Col := 2;
     taskGrid.EditorMode := True;
