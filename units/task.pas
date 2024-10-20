@@ -427,7 +427,11 @@ var
   Task: TTask;
   i, Ind: integer;
 begin
-  Ind := Map(Index);
+  if (Index = 0) then
+    Ind := FCount - 1
+  else
+    Ind := Map(Index);
+
   if (Ind < 0) and (Ind >= FCount) then
     exit(-1);
 
