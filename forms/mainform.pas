@@ -305,10 +305,9 @@ type
     FShowDuration: boolean;
 
     procedure SetLanguage(aLanguage: string = string.Empty);
-    function OpenFile(fileName: string): boolean;
-    procedure SaveFile(fileName: string = string.Empty);
     procedure FillGrid;
-
+    procedure SaveFile(fileName: string = string.Empty);
+    function OpenFile(fileName: string): boolean;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
     function Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
@@ -1944,87 +1943,6 @@ begin
   end;
 end;
 
-function TformNotetask.GetIsEditing: boolean;
-begin
-  Result := (taskGrid.EditorMode) or (FIsEditing);
-end;
-
-function TformNotetask.IsCanClose: boolean;
-var
-  UserResponse: integer;
-begin
-  if FChanged then
-  begin
-    // Show message with Yes, No, and Cancel options
-    UserResponse := MessageDlg(rsavechanges, mtConfirmation, [mbYes, mbNo, mbCancel], 0);
-
-    case UserResponse of
-      mrYes:
-      begin
-        // Call save method and allow form to close
-        aSave.Execute;
-        Result := True;
-      end;
-      mrNo:
-      begin
-        // Do not save, but allow form to close
-        Result := True;
-      end;
-      else
-        Result := False;
-    end;
-  end
-  else
-    Result := True; // No changes, just close the form
-end;
-
-function TformNotetask.OpenFile(fileName: string): boolean;
-var
-  Content: string;
-begin
-  Result := False;
-  if not FileExists(fileName) then
-  begin
-    ShowMessage(rfilenotfound);
-    exit;
-  end;
-
-  FFileName := fileName;
-  EditComplite;
-  ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
-  SetInfo;
-
-  Tasks := TTasks.Create(TextToStringList(Content));
-  FillGrid;
-
-  taskGrid.Row := 1;
-  taskGrid.Col := 2;
-  ResetRowHeight;
-  SetChanged(False);
-  Result := True;
-end;
-
-procedure TformNotetask.SaveFile(fileName: string = string.Empty);
-begin
-  if (fileName = string.Empty) and (FFileName = string.Empty) then
-    aSaveAs.Execute;
-
-  if (fileName = string.Empty) then
-    fileName := FFileName
-  else
-    FFileName := fileName;
-
-  if (fileName <> string.Empty) then
-  begin
-    EditComplite;
-    SaveTextFile(fileName, Tasks.ToStringList, FEncoding, FLineEnding);
-    SetChanged(False);
-    Tasks.CreateBackupInit;
-  end;
-
-  SetInfo;
-end;
-
 procedure TformNotetask.FillGrid;
 begin
   Tasks.FillGrid(taskGrid, FShowArchived, FShowDuration, SortOrder, SortColumn);
@@ -2127,6 +2045,87 @@ begin
     taskGrid.EditorMode := False;
     FIsEditing := False;
   end;
+end;
+
+procedure TformNotetask.SaveFile(fileName: string = string.Empty);
+begin
+  if (fileName = string.Empty) and (FFileName = string.Empty) then
+    aSaveAs.Execute;
+
+  if (fileName = string.Empty) then
+    fileName := FFileName
+  else
+    FFileName := fileName;
+
+  if (fileName <> string.Empty) then
+  begin
+    EditComplite;
+    SaveTextFile(fileName, Tasks.ToStringList, FEncoding, FLineEnding);
+    SetChanged(False);
+    Tasks.CreateBackupInit;
+  end;
+
+  SetInfo;
+end;
+
+function TformNotetask.OpenFile(fileName: string): boolean;
+var
+  Content: string;
+begin
+  Result := False;
+  if not FileExists(fileName) then
+  begin
+    ShowMessage(rfilenotfound);
+    exit;
+  end;
+
+  FFileName := fileName;
+  EditComplite;
+  ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
+  SetInfo;
+
+  Tasks := TTasks.Create(TextToStringList(Content));
+  FillGrid;
+
+  taskGrid.Row := 1;
+  taskGrid.Col := 2;
+  ResetRowHeight;
+  SetChanged(False);
+  Result := True;
+end;
+
+function TformNotetask.GetIsEditing: boolean;
+begin
+  Result := (taskGrid.EditorMode) or (FIsEditing);
+end;
+
+function TformNotetask.IsCanClose: boolean;
+var
+  UserResponse: integer;
+begin
+  if FChanged then
+  begin
+    // Show message with Yes, No, and Cancel options
+    UserResponse := MessageDlg(rsavechanges, mtConfirmation, [mbYes, mbNo, mbCancel], 0);
+
+    case UserResponse of
+      mrYes:
+      begin
+        // Call save method and allow form to close
+        aSave.Execute;
+        Result := True;
+      end;
+      mrNo:
+      begin
+        // Do not save, but allow form to close
+        Result := True;
+      end;
+      else
+        Result := False;
+    end;
+  end
+  else
+    Result := True; // No changes, just close the form
 end;
 
 function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
