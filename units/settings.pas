@@ -266,6 +266,7 @@ var
   IconPath: string;
   {$ENDIF}
   {$IFDEF Linux}
+  ThemeFile: TextFile;
   MimeFile: TextFile;
   DesktopFile: TextFile;
   MimeType: string;
@@ -275,6 +276,35 @@ var
   PlistFile: TextFile;
   BundlePath: string;
   UserHome: string;
+  {$ENDIF}
+
+  {$IFDEF Linux}
+  procedure SaveIconFromResources(const ResName, OutputPath: string);
+  var
+    ResourceStream: TResourceStream;
+    FileStream: TFileStream;
+  begin
+    try
+      // Open the resource stream (ResName is the name of the resource, e.g., "icon.png")
+      ResourceStream := TResourceStream.Create(HInstance, ResName, RT_GROUP_ICON);
+      try
+        // Create the output file
+        FileStream := TFileStream.Create(OutputPath, fmCreate);
+        try
+          // Copy the content of the resource to the file
+          FileStream.CopyFrom(ResourceStream, ResourceStream.Size);
+        finally
+          FileStream.Free; // Free the file stream
+        end;
+      finally
+        ResourceStream.Free; // Free the resource stream
+      end;
+      Writeln('Icon successfully saved to: ', OutputPath); // Success message
+    except
+      on E: Exception do
+        Writeln('Error while saving the icon: ', E.Message); // Error message
+    end;
+  end;
   {$ENDIF}
 begin
   Result := False; // Initialize result to false
@@ -327,6 +357,23 @@ begin
     // Create necessary directories if they do not exist
     ForceDirectories(UserHome + '/.local/share/mime/packages/');
     ForceDirectories(UserHome + '/.local/share/applications/');
+    ForceDirectories(UserHome + '/.local/share/icons/notetask');
+
+    SaveIconFromResources('TASKDOC', UserHome + '/.local/share/icons/notetask/taskdoc.ico');
+
+    // Create the index.theme file for the icon theme
+    AssignFile(ThemeFile, UserHome + '/.local/share/icons/notetask/index.theme');
+    Rewrite(ThemeFile);
+    Writeln(ThemeFile, '[Icon Theme]');
+    Writeln(ThemeFile, 'Name=Notetask Icon Theme');
+    Writeln(ThemeFile, 'Comment=Icons for Notetask application');
+    Writeln(ThemeFile, 'Inherits=default'); // Optionally specify a parent icon theme
+    Writeln(ThemeFile, 'Directories=' + UserHome + '/.local/share/icons/notetask/'); // Specify the directory containing the icons
+    Writeln(ThemeFile, '');
+    Writeln(ThemeFile, '[notetask]');
+    Writeln(ThemeFile, 'Size=256'); // Specify the size of the icons
+    Writeln(ThemeFile, 'Type=Scalable'); // Type can be Fixed or Scalable
+    CloseFile(ThemeFile);
 
     // Create a .xml file for MIME type
     AssignFile(MimeFile, UserHome + '/.local/share/mime/packages/astverskoy-notetask.xml');
@@ -336,7 +383,7 @@ begin
     Writeln(MimeFile, '  <mime-type type="', MimeType, '">');
     Writeln(MimeFile, '    <comment>Notetask file</comment>');
     Writeln(MimeFile, '    <glob pattern="*', Ext, '"/>');
-    Writeln(MimeFile, '    <icon name="notetask"/>'); // Ensure this matches your icon file
+    Writeln(MimeFile, '    <icon name="' + UserHome + '/.local/share/icons/notetask/taskdoc.ico"/>');
     Writeln(MimeFile, '  </mime-type>');
     Writeln(MimeFile, '</mime-info>');
     CloseFile(MimeFile);
@@ -355,8 +402,8 @@ begin
     // Update MIME database
     if (FpSystem('xdg-mime install --mode user ' + UserHome + '/.local/share/mime/packages/astverskoy-notetask.xml') = 0) and
        (FpSystem('update-mime-database ' + UserHome + '/.local/share/mime') = 0) and
-       (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/astverskoy-notetask.desktop') = 0)
-       then
+       (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/astverskoy-notetask.desktop') = 0) and
+       (FpSystem('gtk-update-icon-cache '+UserHome+'/.local/share/icons/notetask/ -f') = 0) then
     begin
       Result := True; // Indicate success
     end
