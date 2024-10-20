@@ -130,7 +130,7 @@ begin
         Form.FShowArchived := JSONObj.FindPath('ShowArchived').AsBoolean;
 
       if JSONObj.FindPath('ShowDuration') <> nil then
-         Form.FShowDuration := JSONObj.FindPath('ShowDuration').AsBoolean;
+        Form.FShowDuration := JSONObj.FindPath('ShowDuration').AsBoolean;
 
       if JSONObj.FindPath('ShowStatusBar') <> nil then
         Form.ShowStatusBar := JSONObj.FindPath('ShowStatusBar').AsBoolean;
@@ -321,48 +321,57 @@ begin
   {$IFDEF Linux}
   try
     AppPath := Application.ExeName;
-    MimeType := 'application/x-notetask'; // Define MIME type for the file extension
+    MimeType := 'application/x-notetask';
     UserHome := GetEnvironmentVariable('HOME');
 
     // Create necessary directories if they do not exist
     ForceDirectories(UserHome + '/.local/share/mime/packages/');
+    ForceDirectories(UserHome + '/.local/share/applications/');
 
-    // Create a .xml file for MIME type in user's home directory
-    AssignFile(MimeFile, UserHome + '/.local/share/mime/packages/notetask.xml');
-      Rewrite(MimeFile);
-      Writeln(MimeFile, '<?xml version="1.0" encoding="UTF-8"?>');
-      Writeln(MimeFile, '<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">');
-      Writeln(MimeFile, '  <mime-type type="', MimeType, '">');
-      Writeln(MimeFile, '    <comment>Notetask file</comment>');
-      Writeln(MimeFile, '    <glob pattern="*.', Ext, '"/>');
-      Writeln(MimeFile, '  </mime-type>');
-      Writeln(MimeFile, '</mime-info>');
-      CloseFile(MimeFile);
+    // Create a .xml file for MIME type
+    AssignFile(MimeFile, UserHome + '/.local/share/mime/packages/astverskoy-notetask.xml');
+    Rewrite(MimeFile);
+    Writeln(MimeFile, '<?xml version="1.0" encoding="UTF-8"?>');
+    Writeln(MimeFile, '<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">');
+    Writeln(MimeFile, '  <mime-type type="', MimeType, '">');
+    Writeln(MimeFile, '    <comment>Notetask file</comment>');
+    Writeln(MimeFile, '    <glob pattern="*', Ext, '"/>');
+    Writeln(MimeFile, '    <icon name="notetask"/>'); // Ensure this matches your icon file
+    Writeln(MimeFile, '  </mime-type>');
+    Writeln(MimeFile, '</mime-info>');
+    CloseFile(MimeFile);
 
-    // Create a .desktop file for the application
-    AssignFile(DesktopFile, UserHome + '/.local/share/applications/notetask.desktop');
-      Rewrite(DesktopFile);
-      Writeln(DesktopFile, '[Desktop Entry]');
-      Writeln(DesktopFile, 'Name=Notetask');
-      Writeln(DesktopFile, 'Exec=', AppPath, ' %f'); // %f passes the filename to the application
-      Writeln(DesktopFile, 'Icon=', AppPath); // Optionally specify an icon
-      Writeln(DesktopFile, 'Type=Application');
-      Writeln(DesktopFile, 'MimeType=', MimeType);
-      CloseFile(DesktopFile);
+    // Create a .desktop file
+    AssignFile(DesktopFile, UserHome + '/.local/share/applications/astverskoy-notetask.desktop');
+    Rewrite(DesktopFile);
+    Writeln(DesktopFile, '[Desktop Entry]');
+    Writeln(DesktopFile, 'Name=Notetask');
+    Writeln(DesktopFile, 'Exec=', AppPath, ' %f');
+    Writeln(DesktopFile, 'Icon=notetask'); // Specify the icon name or full path if necessary
+    Writeln(DesktopFile, 'Type=Application');
+    Writeln(DesktopFile, 'MimeType=', MimeType);
+    CloseFile(DesktopFile);
 
-    // Update MIME database and register the application
-    if (FpSystem('xdg-mime install --mode user ' + UserHome + '/.local/share/mime/packages/notetask.xml') = 0) and
+    // Update MIME database
+    if (FpSystem('xdg-mime install --mode user ' + UserHome + '/.local/share/mime/packages/astverskoy-notetask.xml') = 0) and
        (FpSystem('update-mime-database ' + UserHome + '/.local/share/mime') = 0) and
-       (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/notetask.desktop') = 0) then
-      Result := True;
+       (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/astverskoy-notetask.desktop') = 0)
+       then
+    begin
+      Result := True; // Indicate success
+    end
+    else
+    begin
+      // Log error or handle failure
+      Writeln('Error updating MIME database or desktop menu.');
+    end;
   except
     on E: Exception do
     begin
-      // Handle file creation error
+      Writeln('Error: ', E.Message); // Print the error message for diagnosis
       Exit;
     end;
   end;
-
   {$ENDIF}
 
   {$IFDEF MacOS}
