@@ -807,7 +807,11 @@ begin
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
 
       if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
-        grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2) // changing the row height fires the event again!
+      begin
+        // changing the row height fires the event again!
+        grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2);
+        grid.Invalidate;
+      end
       else
       begin
         drawrect.Right := aRect.Right - 4;

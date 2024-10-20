@@ -1,12 +1,12 @@
 object formFindText: TformFindText
   Left = 0
-  Height = 137
+  Height = 144
   Top = 0
   Width = 381
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Find'
-  ClientHeight = 137
+  ClientHeight = 144
   ClientWidth = 381
   FormStyle = fsStayOnTop
   KeyPreview = True
@@ -58,7 +58,7 @@ object formFindText: TformFindText
   object radioDirection: TRadioGroup
     Left = 124
     Height = 45
-    Top = 37
+    Top = 44
     Width = 146
     Anchors = [akTop, akRight]
     AutoFill = True
@@ -82,7 +82,7 @@ object formFindText: TformFindText
   object checkMatchCase: TCheckBox
     Left = 10
     Height = 19
-    Top = 85
+    Top = 92
     Width = 78
     Anchors = [akLeft, akBottom]
     Caption = 'Match case'
@@ -91,7 +91,7 @@ object formFindText: TformFindText
   object checkWrapAround: TCheckBox
     Left = 10
     Height = 19
-    Top = 109
+    Top = 116
     Width = 87
     Anchors = [akLeft, akBottom]
     Caption = 'Wrap around'
