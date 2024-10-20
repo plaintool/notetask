@@ -438,10 +438,10 @@ begin
   Task := TTask.Create(TaskString); // Create a new task
   SetLength(FTaskList, FCount + 1); // Resize the array
 
-  // Shift tasks to the right to make space for the new task
+  // Shift tasks down to make space for the new task
   for i := FCount downto Ind + 1 do
   begin
-    FTaskList[i] := FTaskList[i - 1]; // Move tasks one position to the right
+    FTaskList[i] := FTaskList[i - 1]; // Move tasks one position down
   end;
 
   FTaskList[Ind] := Task; // Insert the new task at the specified index
@@ -1047,6 +1047,8 @@ begin
       Grid.RowCount := Count + 1
     else
       Grid.RowCount := Count - ArhCount + 1;
+
+    if (Grid.RowCount = 1) then exit;
 
     // Default row indexing based on sort order
     if SortOrder = soAscending then
