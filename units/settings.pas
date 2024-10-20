@@ -365,44 +365,45 @@ begin
     AssignFile(ThemeFile, UserHome + '/.local/share/icons/notetask/index.theme');
     Rewrite(ThemeFile);
     Writeln(ThemeFile, '[Icon Theme]');
-    Writeln(ThemeFile, 'Name=Notetask Icon Theme');
+    Writeln(ThemeFile, 'Name=notetask');
     Writeln(ThemeFile, 'Comment=Icons for Notetask application');
     Writeln(ThemeFile, 'Inherits=default'); // Optionally specify a parent icon theme
-    Writeln(ThemeFile, 'Directories=' + UserHome + '/.local/share/icons/notetask/'); // Specify the directory containing the icons
+    Writeln(ThemeFile, 'Directories=notetask');
     Writeln(ThemeFile, '');
     Writeln(ThemeFile, '[notetask]');
-    Writeln(ThemeFile, 'Size=256'); // Specify the size of the icons
-    Writeln(ThemeFile, 'Type=Scalable'); // Type can be Fixed or Scalable
+    Writeln(ThemeFile, 'Size=16;32;48;64;128;256'); // Specify available icon sizes
+    Writeln(ThemeFile, 'Type=Fixed'); // Type can be Fixed or Scalable
+    Writeln(ThemeFile, 'Icon=taskdoc.ico'); // Name of the ICO file
     CloseFile(ThemeFile);
 
     // Create a .xml file for MIME type
-    AssignFile(MimeFile, UserHome + '/.local/share/mime/packages/astverskoy-notetask.xml');
+    AssignFile(MimeFile, UserHome + '/.local/share/mime/packages/x-notetask.xml');
     Rewrite(MimeFile);
     Writeln(MimeFile, '<?xml version="1.0" encoding="UTF-8"?>');
     Writeln(MimeFile, '<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">');
     Writeln(MimeFile, '  <mime-type type="', MimeType, '">');
     Writeln(MimeFile, '    <comment>Notetask file</comment>');
     Writeln(MimeFile, '    <glob pattern="*', Ext, '"/>');
-    Writeln(MimeFile, '    <icon name="' + UserHome + '/.local/share/icons/notetask/taskdoc.ico"/>');
+    Writeln(MimeFile, '    <icon name="notetask/taskdoc.ico"/>');
     Writeln(MimeFile, '  </mime-type>');
     Writeln(MimeFile, '</mime-info>');
     CloseFile(MimeFile);
 
     // Create a .desktop file
-    AssignFile(DesktopFile, UserHome + '/.local/share/applications/astverskoy-notetask.desktop');
+    AssignFile(DesktopFile, UserHome + '/.local/share/applications/x-notetask.desktop');
     Rewrite(DesktopFile);
     Writeln(DesktopFile, '[Desktop Entry]');
     Writeln(DesktopFile, 'Name=Notetask');
     Writeln(DesktopFile, 'Exec=', AppPath, ' %f');
-    Writeln(DesktopFile, 'Icon=notetask'); // Specify the icon name or full path if necessary
+    //Writeln(DesktopFile, 'Icon=notetask'); // Specify the icon name or full path if necessary
     Writeln(DesktopFile, 'Type=Application');
     Writeln(DesktopFile, 'MimeType=', MimeType);
     CloseFile(DesktopFile);
 
     // Update MIME database
-    if (FpSystem('xdg-mime install --mode user ' + UserHome + '/.local/share/mime/packages/astverskoy-notetask.xml') = 0) and
+    if (FpSystem('xdg-mime install --mode user ' + UserHome + '/.local/share/mime/packages/x-notetask.xml') = 0) and
        (FpSystem('update-mime-database ' + UserHome + '/.local/share/mime') = 0) and
-       (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/astverskoy-notetask.desktop') = 0) and
+       (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/x-notetask.desktop') = 0) and
        (FpSystem('gtk-update-icon-cache '+UserHome+'/.local/share/icons/notetask/ -f') = 0) then
     begin
       Result := True; // Indicate success
