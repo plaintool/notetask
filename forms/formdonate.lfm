@@ -85,7 +85,6 @@ object formDonateNotetask: TformDonateNotetask
     Height = 15
     Top = 260
     Width = 22
-    AutoSize = False
     Caption = 'BTC'
     Font.Style = [fsBold]
     ParentFont = False
@@ -95,7 +94,6 @@ object formDonateNotetask: TformDonateNotetask
     Height = 15
     Top = 260
     Width = 67
-    AutoSize = False
     Caption = 'Bitcoin (BTC)'
   end
   object editWallet2: TEdit
@@ -153,7 +151,6 @@ object formDonateNotetask: TformDonateNotetask
     Height = 15
     Top = 316
     Width = 22
-    AutoSize = False
     Caption = 'ETH'
     Font.Style = [fsBold]
     ParentFont = False
@@ -163,7 +160,6 @@ object formDonateNotetask: TformDonateNotetask
     Height = 15
     Top = 316
     Width = 95
-    AutoSize = False
     Caption = 'Ethereum (ERC20)'
   end
   object editWallet3: TEdit
@@ -221,7 +217,6 @@ object formDonateNotetask: TformDonateNotetask
     Height = 15
     Top = 204
     Width = 32
-    AutoSize = False
     Caption = 'USDT'
     Font.Style = [fsBold]
     ParentFont = False
@@ -231,7 +226,6 @@ object formDonateNotetask: TformDonateNotetask
     Height = 15
     Top = 204
     Width = 235
-    AutoSize = False
     Caption = 'Ethereum (ERC20), BNB Smart Chain (BEP20)'
   end
   object editWallet4: TEdit
@@ -288,7 +282,6 @@ object formDonateNotetask: TformDonateNotetask
     Height = 15
     Top = 148
     Width = 67
-    AutoSize = False
     Caption = 'Tron (TRC20)'
   end
   object Label9: TLabel
@@ -296,7 +289,6 @@ object formDonateNotetask: TformDonateNotetask
     Height = 15
     Top = 148
     Width = 32
-    AutoSize = False
     Caption = 'USDT'
     Font.Style = [fsBold]
     ParentFont = False
@@ -307,7 +299,6 @@ object formDonateNotetask: TformDonateNotetask
     Height = 15
     Top = 124
     Width = 312
-    AutoSize = False
     Caption = 'https://changelly.com/buy-crypto?amount=15&from=usd'
     Font.Color = clBlue
     Font.Style = [fsUnderline]
