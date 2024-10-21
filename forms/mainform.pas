@@ -833,8 +833,6 @@ var
 begin
   if (aCol in [2, 3]) then
   begin
-    if (Assigned(Memo)) then Memo.Free;
-
     Memo := TMemo.Create(Self);
     Memo.Visible := False;
     if (taskGrid.IsCellSelected[aCol, aRow]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
@@ -864,11 +862,10 @@ begin
     EditControlSetBounds(Memo, aCol, aRow);
     Memo.Parent := taskGrid;
     Memo.OnChange := @MemoChange; // Event Change
-    Memo.OnEnter := @MemoEnter; //Event Enter
+    Memo.OnEnter := @MemoEnter; // Event Enter
     Memo.Text := taskGrid.Cells[aCol, aRow];
     Memo.SelStart := Length(Memo.Text);
     Memo.SelLength := 0;
-    //  Memo.CaretPos := Point(Length(Memo.Text), 0);
 
     Editor := Memo;
 
@@ -888,9 +885,8 @@ begin
   else
   if (aCol = 4) then
   begin
-    if (Assigned(DatePicker)) then DatePicker.Free;
-
     DatePicker := TDateTimePicker.Create(Self);
+    DatePicker.Visible := False;
     DatePicker.AutoSize := False;
     DatePicker.Kind := dtkDateTime;
     DatePicker.TimeDisplay := tdHMS;
@@ -2088,6 +2084,8 @@ begin
   ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
   SetInfo;
 
+  if Assigned(Tasks) then
+    Tasks.Free;
   Tasks := TTasks.Create(TextToStringList(Content));
   FillGrid;
 

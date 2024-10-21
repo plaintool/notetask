@@ -76,6 +76,7 @@
           <Linking>
             <Debugging>
               <DebugInfoType Value="dsDwarf3"/>
+              <UseHeaptrc Value="True"/>
               <TrashVariables Value="True"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>

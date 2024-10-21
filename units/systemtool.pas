@@ -114,6 +114,7 @@ begin
       begin
         // Create a local translator for the form or forms
         LocalTranslator := TPOTranslator.Create(PoFile);
+        if (Assigned(LRSTranslator)) then LRSTranslator.Free;
         LRSTranslator := LocalTranslator;
 
         if Assigned(AForm) then

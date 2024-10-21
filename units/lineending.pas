@@ -13,23 +13,51 @@ interface
 
 type
   TLineEnding = class
+  private
+  class var FWindowsCRLF: TLineEnding;
+  class var FUnixLF: TLineEnding;
+  class var FMacintoshCR: TLineEnding;
+  class var FUnknown: TLineEnding;
+    class function GetWindowsCRLF: TLineEnding; static;
+    class function GetUnixLF: TLineEnding; static;
+    class function GetMacintoshCR: TLineEnding; static;
+    class function GetUnknown: TLineEnding; static;
   public
-  class var WindowsCRLF: TLineEnding;
-  class var UnixLF: TLineEnding;
-  class var MacintoshCR: TLineEnding;
-  class var Unknown: TLineEnding;
-    class constructor Create;
+    class property WindowsCRLF: TLineEnding read GetWindowsCRLF;
+    class property UnixLF: TLineEnding read GetUnixLF;
+    class property MacintoshCR: TLineEnding read GetMacintoshCR;
+    class property Unknown: TLineEnding read GetUnknown;
     function ToString: string; override;
   end;
 
 implementation
 
-class constructor TLineEnding.Create;
+class function TLineEnding.GetWindowsCRLF: TLineEnding;
 begin
-  WindowsCRLF := TLineEnding.Create;
-  UnixLF := TLineEnding.Create;
-  MacintoshCR := TLineEnding.Create;
-  Unknown := TLineEnding.Create;
+  if not Assigned(FWindowsCRLF) then
+    FWindowsCRLF := TLineEnding.Create;
+  Result := FWindowsCRLF;
+end;
+
+class function TLineEnding.GetUnixLF: TLineEnding;
+begin
+  if not Assigned(FUnixLF) then
+    FUnixLF := TLineEnding.Create;
+  Result := FUnixLF;
+end;
+
+class function TLineEnding.GetMacintoshCR: TLineEnding;
+begin
+  if not Assigned(FMacintoshCR) then
+    FMacintoshCR := TLineEnding.Create;
+  Result := FMacintoshCR;
+end;
+
+class function TLineEnding.GetUnknown: TLineEnding;
+begin
+  if not Assigned(FUnknown) then
+    FUnknown := TLineEnding.Create;
+  Result := FUnknown;
 end;
 
 function TLineEnding.ToString: string;
