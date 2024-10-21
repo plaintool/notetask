@@ -29,6 +29,7 @@ type
     FDate: TDateTime; // Date of task completion
     FComment: string; // Comment for the task
     FText: string; // Description of the task
+    FCommentItalic: boolean; // Comment is italic
   public
     constructor Create;
     constructor Create(const TaskString: string); // Constructor that takes a task string
@@ -38,6 +39,7 @@ type
     property Date: TDateTime read FDate write FDate;
     property Comment: string read FComment write FComment;
     property Text: string read FText write FText;
+    property CommentItalic: boolean read FCommentItalic write FCommentItalic;
     function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string; reintroduce;
   end;
 
@@ -105,6 +107,7 @@ begin
   FDate := 0;
   FComment := string.Empty;
   FText := string.Empty;
+  FCommentItalic := True;
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -139,11 +142,15 @@ var
   end;
 
 begin
-  // Format: - [x] 01.01.2000, ~~Task~~ *// Comment*
+  // Format: - [x] 01.01.2000, ~~Task~~ // *Comment*
+
   // Split the task string into parts
+  FCommentItalic := False;
+
   Parts := TaskString.Split(['*//']);
   if Length(Parts) >= 2 then
   begin
+    FCommentItalic := True;
     CompletedStr := Parts[0].Trim;
     FillComment;
     if FComment.EndsWith('*') then
@@ -159,6 +166,19 @@ begin
     end
     else
       CompletedStr := Parts[0];
+  end;
+
+  // Remove star in start and end of comment
+  if (TrimLeft(FComment).StartsWith('*')) and (TrimRight(FComment).EndsWith('*')) then
+  begin
+    FCommentItalic := True;
+    FComment := TrimLeft(FComment);
+    Delete(FComment, 1, 1);
+    if (TrimRight(FComment).EndsWith('*')) then
+    begin
+      FComment := TrimRight(FComment);
+      Delete(FComment, Length(FComment), 1);
+    end;
   end;
 
   PartsSub := CompletedStr.Split([',']);
@@ -210,26 +230,30 @@ var
   DoneString: string;
   CommentString: string;
 begin
-  // Replace line breaks from task desctioption and comment
+  // Replace line breaks from task description and comment
   TextString := StringReplace(Text, sLineBreak, '<br>', [rfReplaceAll]);
   Comment := StringReplace(Comment, sLineBreak, '<br>', [rfReplaceAll]);
 
   // Add '~~' for archived tasks
-  if (FArchive) then
+  if FArchive then
     TextString := '~~' + TextString + '~~';
 
   // Check completion
   if Done then
     DoneString := '- [x]'
-  else
-  if AddEmptyCompletion then
+  else if AddEmptyCompletion then
     DoneString := '- [ ]'
   else
     DoneString := string.Empty;
 
   // Check comments
   if Comment <> string.Empty then
-    CommentString := ' *// ' + Comment + '*'
+  begin
+    if CommentItalic then
+      CommentString := ' // *' + Comment + '*'
+    else
+      CommentString := ' // ' + Comment;
+  end
   else
     CommentString := string.Empty;
 
@@ -304,6 +328,29 @@ begin
   FMapGrid := nil;
 
   inherited;
+end;
+
+function TTasks.ToStringList: TStringList;
+var
+  i: integer;
+  addCompleted: boolean;
+begin
+  Result := TStringList.Create;
+  try
+    addCompleted := False;
+    for i := 0 to FCount - 1 do
+      if FTaskList[i].Done then addCompleted := True;
+    if (FCount = 1) and (FTaskList[0].Text = string.Empty) and (FTaskList[0].Comment = string.Empty) and (FTaskList[0].Date = 0) then
+      addCompleted := True;
+
+    for i := 0 to FCount - 1 do
+    begin
+      Result.Add(FTaskList[i].ToString(0, addCompleted)); // Add task string to TStringList
+    end;
+  except
+    Result.Free;
+    raise;
+  end;
 end;
 
 procedure TTasks.InitMap(Length: integer);
@@ -771,103 +818,107 @@ begin
   IsEmpty := (RowTask.Text = string.Empty) and (RowTask.Comment = string.Empty) and (RowTask.Date = 0);
 
   TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText));
-  if (Grid.Selection.Height = 0) and (Grid.Selection.Width = 0) and (not IsEmpty) then
-  begin
-    for i := TempTasks.FCount - 1 downto 0 do
+  try
+    if (Grid.Selection.Height = 0) and (Grid.Selection.Width = 0) and (not IsEmpty) then
     begin
-      InsertTask(TempTasks.GetTask(i + 1).ToString(), Grid.Row, False);
-      // if i = 0 then Id0 := Id;
-      // if i = TempTasks.FCount - 1 then Id1 := Id;
-    end;
-    // Result := TGridRect.Create(1, ReverseMap(id0), 4, ReverseMap(id1));
-  end
-  else
-  begin
-    index := 1;
-    Rect := Grid.Selection; // Get grid selection rect
-
-    for i := Rect.Top to Rect.Bottom do
-    begin
-      if (index > TempTasks.FCount) then Index := 1;
-      for j := Rect.Left to Rect.Right do
-      begin
-        if j = 1 then GetTask(i).Done := TempTasks.GetTask(index).Done;
-        if j = 2 then
-        begin
-          if (TempTasks.GetTask(index).Text <> string.Empty) then
-            GetTask(i).Text := TempTasks.GetTask(index).Text
-          else
-          if Rect.Width = 0 then
-          begin
-            if (TempTasks.GetTask(index).Comment <> string.Empty) then
-              GetTask(i).Text := TempTasks.GetTask(index).Comment
-            else
-            if (TempTasks.GetTask(index).Date <> 0) then
-              GetTask(i).Text := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
-                TempTasks.GetTask(index).Date)
-            else
-              GetTask(i).Text := string.Empty;
-          end
-          else
-            GetTask(i).Text := string.Empty;
-        end;
-        if j = 3 then
-        begin
-          if (TempTasks.GetTask(index).Comment <> string.Empty) then
-            GetTask(i).Comment := TempTasks.GetTask(index).Comment
-          else
-          if Rect.Width = 0 then
-          begin
-            if (TempTasks.GetTask(index).Text <> string.Empty) then
-              GetTask(i).Comment := TempTasks.GetTask(index).Text
-            else
-            if (TempTasks.GetTask(index).Date <> 0) then
-              GetTask(i).Comment := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
-                TempTasks.GetTask(index).Date)
-            else
-              GetTask(i).Comment := string.Empty;
-          end
-          else
-            GetTask(i).Comment := string.Empty;
-        end;
-        if j = 4 then
-        begin
-          if (TempTasks.GetTask(index).Date <> 0) then
-            GetTask(i).Date := TempTasks.GetTask(index).Date
-          else
-          if Rect.Width = 0 then
-          begin
-            if (TempTasks.GetTask(index).Text <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Text, TempDate)) then
-              GetTask(i).Date := TempDate
-            else
-            if (TempTasks.GetTask(index).Comment <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Comment, TempDate)) then
-              GetTask(i).Date := TempDate
-            else
-              GetTask(i).Date := 0;
-          end
-          else
-            GetTask(i).Date := 0;
-        end;
-      end;
-      Inc(index);
-    end;
-
-    // Insert if clipboard is bigger than selection
-    if index - 1 < TempTasks.FCount then
-    begin
-      for i := TempTasks.FCount - 1 downto index - 1 do
+      for i := TempTasks.FCount - 1 downto 0 do
       begin
         InsertTask(TempTasks.GetTask(i + 1).ToString(), Grid.Row, False);
+        // if i = 0 then Id0 := Id;
+        // if i = TempTasks.FCount - 1 then Id1 := Id;
       end;
-      Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom + (TempTasks.Count - Index) + 1);
+      // Result := TGridRect.Create(1, ReverseMap(id0), 4, ReverseMap(id1));
     end
     else
     begin
-      if (TempTasks.Count < Rect.Height) then
-        Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom - (Rect.Height - TempTasks.Count) - 1)
+      index := 1;
+      Rect := Grid.Selection; // Get grid selection rect
+
+      for i := Rect.Top to Rect.Bottom do
+      begin
+        if (index > TempTasks.FCount) then Index := 1;
+        for j := Rect.Left to Rect.Right do
+        begin
+          if j = 1 then GetTask(i).Done := TempTasks.GetTask(index).Done;
+          if j = 2 then
+          begin
+            if (TempTasks.GetTask(index).Text <> string.Empty) then
+              GetTask(i).Text := TempTasks.GetTask(index).Text
+            else
+            if Rect.Width = 0 then
+            begin
+              if (TempTasks.GetTask(index).Comment <> string.Empty) then
+                GetTask(i).Text := TempTasks.GetTask(index).Comment
+              else
+              if (TempTasks.GetTask(index).Date <> 0) then
+                GetTask(i).Text := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
+                  TempTasks.GetTask(index).Date)
+              else
+                GetTask(i).Text := string.Empty;
+            end
+            else
+              GetTask(i).Text := string.Empty;
+          end;
+          if j = 3 then
+          begin
+            if (TempTasks.GetTask(index).Comment <> string.Empty) then
+              GetTask(i).Comment := TempTasks.GetTask(index).Comment
+            else
+            if Rect.Width = 0 then
+            begin
+              if (TempTasks.GetTask(index).Text <> string.Empty) then
+                GetTask(i).Comment := TempTasks.GetTask(index).Text
+              else
+              if (TempTasks.GetTask(index).Date <> 0) then
+                GetTask(i).Comment := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
+                  TempTasks.GetTask(index).Date)
+              else
+                GetTask(i).Comment := string.Empty;
+            end
+            else
+              GetTask(i).Comment := string.Empty;
+          end;
+          if j = 4 then
+          begin
+            if (TempTasks.GetTask(index).Date <> 0) then
+              GetTask(i).Date := TempTasks.GetTask(index).Date
+            else
+            if Rect.Width = 0 then
+            begin
+              if (TempTasks.GetTask(index).Text <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Text, TempDate)) then
+                GetTask(i).Date := TempDate
+              else
+              if (TempTasks.GetTask(index).Comment <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Comment, TempDate)) then
+                GetTask(i).Date := TempDate
+              else
+                GetTask(i).Date := 0;
+            end
+            else
+              GetTask(i).Date := 0;
+          end;
+        end;
+        Inc(index);
+      end;
+
+      // Insert if clipboard is bigger than selection
+      if index - 1 < TempTasks.FCount then
+      begin
+        for i := TempTasks.FCount - 1 downto index - 1 do
+        begin
+          InsertTask(TempTasks.GetTask(i + 1).ToString(), Grid.Row, False);
+        end;
+        Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom + (TempTasks.Count - Index) + 1);
+      end
       else
-        Result := Rect;
+      begin
+        if (TempTasks.Count < Rect.Height) then
+          Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom - (Rect.Height - TempTasks.Count) - 1)
+        else
+          Result := Rect;
+      end;
     end;
+  finally
+    TempTasks.Free; // Free the temporary TTasks object
   end;
 end;
 
@@ -933,29 +984,6 @@ begin
   Result := string.Empty; //'0' + rminutes;
 end;
 
-function TTasks.ToStringList: TStringList;
-var
-  i: integer;
-  addCompleted: boolean;
-begin
-  Result := TStringList.Create;
-  try
-    addCompleted := False;
-    for i := 0 to FCount - 1 do
-      if FTaskList[i].Done then addCompleted := True;
-    if (FCount = 1) and (FTaskList[0].Text = string.Empty) and (FTaskList[0].Comment = string.Empty) and (FTaskList[0].Date = 0) then
-      addCompleted := True;
-
-    for i := 0 to FCount - 1 do
-    begin
-      Result.Add(FTaskList[i].ToString(0, addCompleted)); // Add task string to TStringList
-    end;
-  except
-    Result.Free;
-    raise;
-  end;
-end;
-
 procedure TTasks.CreateBackup;
 var
   i: integer;
@@ -991,8 +1019,14 @@ begin
 
   // Free old task list before resizing and replacing
   for i := 0 to High(FTaskList) do
+  begin
     if Assigned(FTaskList[i]) then
+    begin
       FTaskList[i].Free;
+      FTaskList[i] := nil; // Set to nil after freeing
+    end;
+  end;
+  SetLength(FTaskList, 0);
 
   // Restore task list from the original backup
   SetLength(FTaskList, Length(FBackupTaskList));
@@ -1006,8 +1040,14 @@ begin
 
   // Free old backup task list before resizing and replacing
   for i := 0 to High(FBackupTaskList) do
+  begin
     if Assigned(FBackupTaskList[i]) then
+    begin
       FBackupTaskList[i].Free;
+      FBackupTaskList[i] := nil; // Set to nil after freeing
+    end;
+  end;
+  SetLength(FBackupTaskList, 0);
 
   // Update the backup with the intermediate state
   SetLength(FBackupTaskList, Length(TempTaskList));
@@ -1015,20 +1055,40 @@ begin
   begin
     FBackupTaskList[i] := TTask.Create;
     FBackupTaskList[i].Copy(TempTaskList[i]);
-    TempTaskList[i].Free; // Free the temporary task after copying
+
+    // Free the temporary task after copying
+    if Assigned(TempTaskList[i]) then
+    begin
+      TempTaskList[i].Free;
+      TempTaskList[i] := nil; // Set to nil after freeing
+    end;
   end;
+
+  // Optionally, clear the TempTaskList array itself
+  SetLength(TempTaskList, 0);
 end;
 
 procedure TTasks.CreateBackupInit;
 var
   i: integer;
 begin
-  // Create a backup of the task list and map grid
+  // Free old backup task list if it exists
+  for i := 0 to High(FInitTaskList) do
+  begin
+    if Assigned(FInitTaskList[i]) then
+    begin
+      FInitTaskList[i].Free; // Free the old task
+      FInitTaskList[i] := nil; // Set to nil after freeing
+    end;
+  end;
+  SetLength(FInitTaskList, 0);
+
+  // Create a backup of the task list
   SetLength(FInitTaskList, Length(FTaskList));
   for i := 0 to High(FInitTaskList) do
   begin
-    FInitTaskList[i] := TTask.Create;
-    FInitTaskList[i].Copy(FTaskList[i]);
+    FInitTaskList[i] := TTask.Create; // Create a new task
+    FInitTaskList[i].Copy(FTaskList[i]); // Copy the task data
   end;
 end;
 
@@ -1036,9 +1096,19 @@ procedure TTasks.UndoBackupInit;
 var
   i: integer;
 begin
+  // Resize the task list to match the initial task list
   SetLength(FTaskList, Length(FInitTaskList));
+
   for i := 0 to High(FInitTaskList) do
   begin
+    // If there's already an object in FTaskList, free it
+    if Assigned(FTaskList[i]) then
+    begin
+      FTaskList[i].Free;
+      FTaskList[i] := nil; // Set to nil after freeing
+    end;
+
+    // Create a new task and copy the initial task data
     FTaskList[i] := TTask.Create;
     FTaskList[i].Copy(FInitTaskList[i]);
   end;

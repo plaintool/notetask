@@ -641,7 +641,7 @@ begin
   if (not IsColumn) then
   begin
     if FBackup then Tasks.CreateBackup;
-    Tasks.AddMap(Tasks.AddTask('[ ]'));
+    Tasks.AddMap(Tasks.AddTask('[ ] // **'));
     taskGrid.Cells[1, tIndex] := '0';
     FLineCount += 1;
     SetInfo;
@@ -779,6 +779,9 @@ begin
     if (aCol = 2) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).Archive) then
       grid.Canvas.Font.Style := [fsStrikeOut];
 
+    if (aCol = 3) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).CommentItalic) then
+      grid.Canvas.Font.Style := [fsItalic];
+
     // Fill the cell background
     grid.Canvas.Brush.Color := bgFill;
     grid.canvas.Brush.Style := bsSolid;
@@ -810,7 +813,9 @@ begin
       begin
         // changing the row height fires the event again!
         grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2);
+        {$IFDEF Linux}
         grid.Invalidate;
+        {$ENDIF}
       end
       else
       begin
@@ -1092,10 +1097,11 @@ procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  Tasks.InsertTask('[ ]', taskGrid.Row);
+  Tasks.InsertTask('[ ] // **', taskGrid.Row);
   FillGrid;
   FLineCount += 1;
   taskGrid.Row := taskGrid.Row + 1;
+  ResetRowHeight;
   SetInfo;
   SetChanged;
 end;
@@ -1241,7 +1247,7 @@ begin
   if IsCanClose then
   begin
     new := TStringList.Create;
-    new.Add(string.Empty);
+    new.Add('[ ] // **');
     Tasks := TTasks.Create(new);
     SetChanged(False);
     EditComplite;
@@ -1881,6 +1887,8 @@ begin
     else
       taskGrid.RowHeights[aRow] := aHeight;
   end;
+  if (Assigned(Memo)) and ((aRow = 0) or (aRow = taskGrid.Row)) then
+    Memo.Height := taskGrid.DefaultRowHeight;
 end;
 
 procedure TformNotetask.SwapRowHeights(RowIndex1, RowIndex2: integer);

@@ -183,7 +183,9 @@ begin
         FileStream.WriteBuffer(Bytes[0], Length(Bytes)); // Write bytes to the file
     end;
   finally
-    FileStream.Free; // Free resources
+    // Free resources
+    FileStream.Free;
+    StringList.Free;
   end;
 end;
 
