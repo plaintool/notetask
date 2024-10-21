@@ -724,7 +724,7 @@ begin
   Ind := Map(OldIndex);
 
   // Validate the indices
-  if (Ind < 0) or (Ind >= FCount) or (NewIndex < 0) or (NewIndex >= FCount) then
+  if (Ind < 0) or (Ind >= FCount) or (NewIndex < 0) or (NewIndex > FCount) then
     Exit;
 
   CreateBackup; // Backup the current state before moving
@@ -814,8 +814,13 @@ begin
   if Clipboard.AsText = string.Empty then exit;
   CreateBackup;
 
-  RowTask := GetTask(Grid.Row);
-  IsEmpty := (RowTask.Text = string.Empty) and (RowTask.Comment = string.Empty) and (RowTask.Date = 0);
+  if (Grid.Row > 0) then
+  begin
+    RowTask := GetTask(Grid.Row);
+    IsEmpty := (RowTask.Text = string.Empty) and (RowTask.Comment = string.Empty) and (RowTask.Date = 0);
+  end
+  else
+    IsEmpty := False;
 
   TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText));
   try
@@ -843,7 +848,10 @@ begin
           if j = 2 then
           begin
             if (TempTasks.GetTask(index).Text <> string.Empty) then
-              GetTask(i).Text := TempTasks.GetTask(index).Text
+            begin
+              GetTask(i).Text := TempTasks.GetTask(index).Text;
+              GetTask(i).Archive := TempTasks.GetTask(index).Archive;
+            end
             else
             if Rect.Width = 0 then
             begin
@@ -862,7 +870,10 @@ begin
           if j = 3 then
           begin
             if (TempTasks.GetTask(index).Comment <> string.Empty) then
-              GetTask(i).Comment := TempTasks.GetTask(index).Comment
+            begin
+              GetTask(i).Comment := TempTasks.GetTask(index).Comment;
+              GetTask(i).CommentItalic := TempTasks.GetTask(index).CommentItalic;
+            end
             else
             if Rect.Width = 0 then
             begin
