@@ -41,7 +41,7 @@ begin
     StringList.Text := Content; // Load text into TStringList
 
     // Check if the file ends with a new line and the last line is not empty
-    if ((Content <> '') and (Content[Length(Content)] in [#10, #13]) and (StringList[StringList.Count - 1] = string.Empty)) then
+    if (Content <> '') and (Content[Length(Content)] in [#10, #13]) then
     begin
       // Add an extra empty line only if the last line is not already empty
       StringList.Add(string.Empty);

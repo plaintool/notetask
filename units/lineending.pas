@@ -27,6 +27,7 @@ type
     class property MacintoshCR: TLineEnding read GetMacintoshCR;
     class property Unknown: TLineEnding read GetUnknown;
     function ToString: string; override;
+    function Value: string;
   end;
 
 implementation
@@ -69,6 +70,18 @@ begin
     Result := 'Macintosh (CR)'
   else
     Result := 'Unknown';
+end;
+
+function TLineEnding.Value: string;
+begin
+  if Self = WindowsCRLF then
+    Result := sLineBreak // Windows: CRLF
+  else if Self = UnixLF then
+    Result := #10 // Unix: LF
+  else if Self = MacintoshCR then
+    Result := #13 // Macintosh: CR
+  else
+    Result := ''; // Unknown
 end;
 
 end.

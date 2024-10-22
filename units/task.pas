@@ -360,8 +360,8 @@ begin
     addCompleted := False;
     for i := 0 to FCount - 1 do
       if FTaskList[i].Done then addCompleted := True;
-    if (FCount = 1) and (FTaskList[0].Text = string.Empty) and (FTaskList[0].Comment = string.Empty) and (FTaskList[0].Date = 0) then
-      addCompleted := True;
+    //if (FCount = 1) and (FTaskList[0].Text = string.Empty) and (FTaskList[0].Comment = string.Empty) and (FTaskList[0].Date = 0) then
+    //  addCompleted := True;
 
     for i := 0 to FCount - 1 do
     begin

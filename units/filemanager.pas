@@ -25,6 +25,8 @@ function IsValidAnsi(var Buffer: array of byte; BytesRead: integer): boolean;
 
 function DetectEncoding(const FileName: string): TEncoding;
 
+function EndsWithLineBreak(const FileName: string): boolean;
+
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
   out LineEnding: TLineEnding; out LineCount: integer);
 
@@ -161,6 +163,34 @@ begin
   end;
 end;
 
+function EndsWithLineBreak(const FileName: string): boolean;
+var
+  FileStream: TFileStream;
+  Buffer: array of byte;
+begin
+  Result := False; // Предполагаем, что переноса нет
+  Buffer := [];
+  FileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
+  try
+    // Проверяем размер файла
+    if FileStream.Size > 0 then
+    begin
+      // Создаем буфер размером 1 байт
+      SetLength(Buffer, 1);
+      // Переходим в конец файла
+      FileStream.Position := FileStream.Size - 1;
+      // Читаем последний байт
+      FileStream.Read(Buffer[0], 1);
+
+      // Проверяем, является ли последний байт символом переноса строки
+      if (Buffer[0] = byte(#10)) or (Buffer[0] = byte(#13)) then
+        Result := True;
+    end;
+  finally
+    FileStream.Free;
+  end;
+end;
+
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
   out LineEnding: TLineEnding; out LineCount: integer);
 var
@@ -171,16 +201,11 @@ begin
 
   // Read the file content using TStringList
   StringList := TStringList.Create;
+  // Don't add line break at end string
+  StringList.Options := StringList.Options - [soTrailingLineBreak];
   try
     StringList.LoadFromFile(FileName, FileEncoding);
     Content := StringList.Text;
-
-    // Check if the file ends with a new line and the last line is not empty
-    if (Content <> '') and (Content[Length(Content)] in [#10, #13]) and (StringList[StringList.Count - 1] = string.Empty) then
-    begin
-      // Add an extra empty line only if the last line is not already empty
-      StringList.Add(string.Empty);
-    end;
 
     // Determine the line ending type
     if Pos(#13#10, Content) > 0 then
@@ -191,6 +216,28 @@ begin
       LineEnding := TLineEnding.MacintoshCR
     else
       LineEnding := TLineEnding.Unknown;
+
+    if Content = string.Empty then
+    begin
+      LineEnding := TLineEnding.WindowsCRLF;
+      if (StringList.Count = 1) and (Stringlist[0] = string.empty) then
+      begin
+        StringList.Add(string.Empty);
+        Content += LineEnding.Value;
+      end
+      else
+      if StringList.Count = 0 then
+      begin
+        StringList.Add(string.Empty);
+        Content += '[]';
+      end;
+    end
+    else
+    if (EndsWithLineBreak(FileName)) then
+    begin
+      StringList.Add(string.Empty);
+      Content += LineEnding.Value;
+    end;
 
     // Count the number of lines
     LineCount := StringList.Count;
