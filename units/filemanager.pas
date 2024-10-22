@@ -20,9 +20,9 @@ function GetEncodingName(Encoding: TEncoding): string;
 
 function IsBOMEncoding(Encoding: TEncoding): boolean;
 
-function IsValidAscii(Buffer: array of byte; BytesRead: integer): boolean;
+function IsValidAscii(var Buffer: array of byte; BytesRead: integer): boolean;
 
-function IsValidAnsi(Buffer: array of byte; BytesRead: integer): boolean;
+function IsValidAnsi(var Buffer: array of byte; BytesRead: integer): boolean;
 
 function DetectEncoding(const FileName: string): TEncoding;
 
@@ -78,7 +78,7 @@ begin
     exit(True);
 end;
 
-function IsValidAscii(Buffer: array of byte; BytesRead: integer): boolean;
+function IsValidAscii(var Buffer: array of byte; BytesRead: integer): boolean;
 var
   i: integer;
 begin
@@ -94,7 +94,7 @@ begin
   end;
 end;
 
-function IsValidAnsi(Buffer: array of byte; BytesRead: integer): boolean;
+function IsValidAnsi(var Buffer: array of byte; BytesRead: integer): boolean;
 var
   i: integer;
 begin

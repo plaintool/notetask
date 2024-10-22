@@ -116,7 +116,7 @@ end;
 
 constructor TTask.Create(const TaskString: string);
 var
-  Parts, PartsSub: TStringArray; // Use TStringArray for compatibility
+  PartComment, PartDate: TStringArray; // Use TStringArray for compatibility
   CompletedStr: string;
 
   procedure FillComment(start: integer = 1);
@@ -124,10 +124,10 @@ var
     i: integer;
   begin
     FComment := string.Empty;
-    for i := start to High(Parts) do
+    for i := start to High(PartComment) do
     begin
-      FComment += Parts[i];
-      if (i < High(Parts)) then FComment += '//';
+      FComment += PartComment[i];
+      if (i < High(PartComment)) then FComment += '//';
     end;
   end;
 
@@ -136,23 +136,23 @@ var
     i: integer;
   begin
     FText := string.Empty;
-    for i := start to High(PartsSub) do
+    for i := start to High(PartDate) do
     begin
-      FText += PartsSub[i];
-      if (i < High(PartsSub)) then FText += ',';
+      FText += PartDate[i];
+      if (i < High(PartDate)) then FText += ',';
     end;
   end;
 
 begin
   // Format: - [x] 01.01.2000, ~~Task~~ // *Comment*
 
-  // Split the task string into parts
+  // Split the task string into PartComment
   FCommentItalic := False;
 
-  Parts := TaskString.Split(['//']);
-  if (Length(Parts) >= 2) and (not Parts[0].EndsWith(':')) then
+  PartComment := TaskString.Split(['//']);
+  if (Length(PartComment) >= 2) and (not PartComment[0].EndsWith(':')) then
   begin
-    CompletedStr := Parts[0];
+    CompletedStr := PartComment[0];
     if (Length(CompletedStr) > 0) and (CompletedStr.EndsWith(' ')) then
     begin
       Delete(CompletedStr, Length(CompletedStr), 1);
@@ -161,7 +161,7 @@ begin
     FillComment;
   end
   else
-    CompletedStr := Parts[0];
+    CompletedStr := PartComment[0];
 
   // Remove star in start and end of comment
   if (FComment.TrimLeft.StartsWith('*')) and (FComment.TrimRight.EndsWith('*')) then
@@ -188,22 +188,19 @@ begin
     end;
   end;
 
-  PartsSub := CompletedStr.Split([',']);
+  PartDate := CompletedStr.Split([',']);
 
   // Check completion status based on the first character in the string
-  FDone := DetectDone(PartsSub[0]);
+  FDone := DetectDone(PartDate[0]);
+  PartDate[0] := RemoveBrackets(PartDate[0]);
 
   // Checks if the task is completed
-  PartsSub[0] := RemoveBrackets(PartsSub[0]);
   CompletedStr := RemoveBrackets(CompletedStr);
 
-  if Length(PartsSub) > 1 then
+  if Length(PartDate) > 1 then
   begin
     // Extract and trim the date string
-    if (TryStrToDateTime(PartsSub[1].Trim, FDate)) and (Length(PartsSub) > 2) then
-      FillText(2)
-    else
-    if (TryStrToDateTime(PartsSub[0].Trim, FDate)) and (Length(PartsSub) > 1) then
+    if (Length(PartDate) > 1) and (TryStrToDateTime(PartDate[0].Trim, FDate)) then
       FillText(1)
     else
     begin

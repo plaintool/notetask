@@ -17,6 +17,8 @@ uses
 
 function TextToStringList(const Content: string): TStringList;
 
+function IsBracket(const Input: string): Boolean;
+
 function RemoveBrackets(const S: string): string;
 
 function DetectDone(const Input: string): boolean;
@@ -24,6 +26,9 @@ function DetectDone(const Input: string): boolean;
 function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;
 
 function EncodeUrl(const url: string): string;
+
+const
+  Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
 
 implementation
 
@@ -50,9 +55,27 @@ begin
   end;
 end;
 
+function IsBracket(const Input: string): Boolean;
+var
+  TrimmedInput: string;
+  I: Integer;
+begin
+  // Trim the input string
+  TrimmedInput := Trim(Input);
+
+  // Check if the trimmed string is in the Brackets array
+  Result := False;
+  for I := Low(Brackets) to High(Brackets) do
+  begin
+    if Brackets[I] = TrimmedInput then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
 function RemoveBrackets(const S: string): string;
-const
-  Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
 var
   I: integer;
 begin
@@ -68,7 +91,6 @@ begin
       // Remove first space
       if (Length(Result) > 0) and (Result.StartsWith(' ')) then
         Delete(Result, 1, 1);
-
       Break;
     end;
   end;
