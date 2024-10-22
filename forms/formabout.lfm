@@ -1,18 +1,18 @@
 object formAboutNotetask: TformAboutNotetask
   Left = 318
-  Height = 299
+  Height = 291
   Top = 250
   Width = 466
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'About'
-  ClientHeight = 299
+  ClientHeight = 291
   ClientWidth = 466
   Color = clWhite
   object buttonOk: TButton
     Left = 381
     Height = 25
-    Top = 262
+    Top = 254
     Width = 75
     Anchors = [akRight, akBottom]
     Cancel = True
@@ -152,9 +152,9 @@ object formAboutNotetask: TformAboutNotetask
     }
   end
   object labelBy: TLabel
-    Left = 136
+    Left = 140
     Height = 15
-    Top = 96
+    Top = 88
     Width = 296
     Alignment = taCenter
     Caption = 'by Alexander Tverskoy is licensed under the MIT License.'
@@ -163,25 +163,25 @@ object formAboutNotetask: TformAboutNotetask
   object labelName: TLabel
     Left = 136
     Height = 55
-    Top = 32
+    Top = 16
     Width = 309
     Caption = 'Notetask © 2024'
     Font.Height = -41
     ParentFont = False
   end
   object labelLic: TLabel
-    Left = 136
+    Left = 140
     Height = 15
-    Top = 124
+    Top = 116
     Width = 215
     Caption = 'For questions or feedback, contact me at'
     WordWrap = True
   end
   object LabelLicUrl: TLabel
     Cursor = crHandPoint
-    Left = 136
+    Left = 140
     Height = 15
-    Top = 148
+    Top = 140
     Width = 160
     Caption = 'mailto:astverskoy@gmail.com'
     Font.Color = clBlue
@@ -193,7 +193,7 @@ object formAboutNotetask: TformAboutNotetask
   object Memo1: TMemo
     Left = 16
     Height = 69
-    Top = 180
+    Top = 172
     Width = 440
     Color = clBtnFace
     Lines.Strings = (
