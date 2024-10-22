@@ -135,6 +135,18 @@ var
     end;
   end;
 
+  procedure FillCompletedStr(start: integer = 0);
+  var
+    i: integer;
+  begin
+    CompletedStr := string.Empty;
+    for i := start to High(PartComment) do
+    begin
+      CompletedStr += PartComment[i];
+      if (i < High(PartComment)) then CompletedStr += '//';
+    end;
+  end;
+
   procedure FillText(start: integer = 1);
   var
     i: integer;
@@ -169,7 +181,7 @@ begin
       EmptyComment := True;
   end
   else
-    CompletedStr := PartComment[0];
+    FillCompletedStr;
 
   // Remove star in start and end of comment
   if (FComment.TrimLeft.StartsWith('*')) and (FComment.TrimRight.EndsWith('*')) then
