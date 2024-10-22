@@ -1258,7 +1258,12 @@ begin
     for I := 0 to Count - 1 do
     begin
       if (Grid.RowCount > RowIndex) then
-        Grid.Cells[0, RowIndex] := RowIndex.ToString;
+      begin
+        if (SortOrder = soAscending) then
+          Grid.Cells[0, RowIndex] := RowIndex.ToString
+        else
+          Grid.Cells[0, RowIndex] := (Grid.RowCount - RowIndex).ToString;
+      end;
 
       // Duration calculation
       if (ShowDuration) then
