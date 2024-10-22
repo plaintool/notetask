@@ -149,10 +149,9 @@ begin
   // Split the task string into parts
   FCommentItalic := False;
 
-  Parts := TaskString.Split(['*//']);
-  if Length(Parts) >= 2 then
+  Parts := TaskString.Split(['//']);
+  if (Length(Parts) >= 2) and (not Parts[0].EndsWith(':')) then
   begin
-    FCommentItalic := True;
     CompletedStr := Parts[0];
     if (Length(CompletedStr) > 0) and (CompletedStr.EndsWith(' ')) then
     begin
@@ -160,28 +159,9 @@ begin
       SpaceBeforeComment := True;
     end;
     FillComment;
-    if FComment.TrimRight.EndsWith('*') then
-    begin
-      FComment := TrimRight(FComment);
-      Delete(FComment, Length(FComment), 1);
-    end;
   end
   else
-  begin
-    Parts := TaskString.Split(['//']);
-    if Length(Parts) >= 2 then
-    begin
-      CompletedStr := Parts[0];
-      if (Length(CompletedStr) > 0) and (CompletedStr.EndsWith(' ')) then
-      begin
-        Delete(CompletedStr, Length(CompletedStr), 1);
-        SpaceBeforeComment := True;
-      end;
-      FillComment;
-    end
-    else
-      CompletedStr := Parts[0];
-  end;
+    CompletedStr := Parts[0];
 
   // Remove star in start and end of comment
   if (FComment.TrimLeft.StartsWith('*')) and (FComment.TrimRight.EndsWith('*')) then
