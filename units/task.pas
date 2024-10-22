@@ -221,7 +221,13 @@ begin
   begin
     // Extract and trim the date string
     if (Length(PartDate) > 1) and (TryStrToDateTime(PartDate[0].Trim, FDate)) then
-      FillText(1)
+    begin
+      FillText(1);
+      if (Length(FText) > 0) and (FText.StartsWith(' ')) then
+      begin
+        Delete(FText, 1, 1);
+      end;
+    end
     else
     begin
       FText := CompletedStr;
