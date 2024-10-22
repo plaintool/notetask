@@ -251,6 +251,7 @@ type
     procedure aLangBelarusianExecute(Sender: TObject);
     procedure aLangHindiExecute(Sender: TObject);
     procedure aLangArabicExecute(Sender: TObject);
+    procedure taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -259,6 +260,7 @@ type
     FMemoStartEdit: boolean;
     FIsEditing: boolean;
     FIsSelecting: boolean;
+    FDisableCheckToggled: boolean;
     FFileName: string;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
@@ -625,12 +627,49 @@ begin
   end;
 end;
 
+procedure TformNotetask.taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
+var
+  MousePosScreen, MousePosClient, CheckBoxCenter: TPoint;
+  CheckBoxRect: TRect;
+  CheckBoxSize: integer;
+begin
+  // Define checkbox area size (16x16)
+  CheckBoxSize := 14;
+
+  // Get mouse position in screen coordinates
+  MousePosScreen := Mouse.CursorPos;
+
+  // Convert screen coordinates to client coordinates (relative to the form)
+  MousePosClient := taskGrid.ScreenToClient(MousePosScreen);
+
+  // Get the center of the checkbox (approximately the center of the cell)
+  CheckBoxCenter := taskGrid.CellRect(ACol, ARow).CenterPoint;
+
+  // Define the 16x16 rectangle around the checkbox
+  CheckBoxRect.Left := CheckBoxCenter.X - CheckBoxSize div 2;
+  CheckBoxRect.Top := CheckBoxCenter.Y - CheckBoxSize div 2;
+  CheckBoxRect.Right := CheckBoxCenter.X + CheckBoxSize div 2;
+  CheckBoxRect.Bottom := CheckBoxCenter.Y + CheckBoxSize div 2;
+
+  // Check if the mouse is within the 16x16 checkbox area
+  if not PtInRect(CheckBoxRect, MousePosClient) then
+  begin
+    // If the mouse is outside the checkbox, prevent the state from being changed
+    FDisableCheckToggled := True;
+    exit;
+  end;
+  FDisableCheckToggled := False;
+  taskGrid.Cells[ACol, ARow] := IfThen(Value = cbChecked, '1', '0');
+end;
+
 procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
 begin
+  if (FDisableCheckToggled) then exit;
+
   SetChanged;
   if (aState = cbChecked) then
   begin
-    if (taskGrid.Cells[4, aRow] = '') then
+    if (taskGrid.Cells[4, aRow] = string.Empty) then
       taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
   end;
   Tasks.SetTask(taskGrid, aRow, FBackup);

@@ -68,6 +68,7 @@ object formNotetask: TformNotetask
     OnResize = taskGridResize
     OnSelectEditor = taskGridSelectEditor
     OnSelectCell = taskGridSelectCell
+    OnSetCheckboxState = taskGridSetCheckboxState
     OnUserCheckboxBitmap = taskGridUserCheckboxBitmap
     RowHeights = (
       22
