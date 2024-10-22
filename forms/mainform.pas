@@ -1841,7 +1841,6 @@ begin
   end
   else
     ArchiveTask;
-  Invalidate;
 end;
 
 procedure TformNotetask.CompleteTasks(aRow: integer = 0);
@@ -1901,7 +1900,6 @@ begin
       SetChanged; // Mark that data has changed
     end;
   end;
-  Invalidate;
 end;
 
 procedure TformNotetask.ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
