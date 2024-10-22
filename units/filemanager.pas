@@ -20,6 +20,10 @@ function GetEncodingName(Encoding: TEncoding): string;
 
 function IsBOMEncoding(Encoding: TEncoding): boolean;
 
+function IsValidAscii(Buffer: array of byte; BytesRead: integer): boolean;
+
+function IsValidAnsi(Buffer: array of byte; BytesRead: integer): boolean;
+
 function DetectEncoding(const FileName: string): TEncoding;
 
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
@@ -74,62 +78,85 @@ begin
     exit(True);
 end;
 
+function IsValidAscii(Buffer: array of byte; BytesRead: integer): boolean;
+var
+  i: integer;
+begin
+  Result := True; // Assume valid ASCII
+
+  for i := 0 to BytesRead - 1 do
+  begin
+    if Buffer[i] > $7F then
+    begin
+      Result := False; // Invalid ASCII character found
+      Exit;
+    end;
+  end;
+end;
+
+function IsValidAnsi(Buffer: array of byte; BytesRead: integer): boolean;
+var
+  i: integer;
+begin
+  Result := True; // Assume valid ANSI
+
+  for i := 0 to BytesRead - 1 do
+  begin
+    // Allow characters from 0 to 255 (Windows-1251)
+    if (Buffer[i] > $7F) and (Buffer[i] < $C0) and (Buffer[i] <> $A0) and (Buffer[i] <> $A1) and
+      (Buffer[i] <> $A2) and (Buffer[i] <> $A3) and (Buffer[i] <> $A4) and (Buffer[i] <> $A5) and
+      (Buffer[i] <> $A6) and (Buffer[i] <> $A7) and (Buffer[i] <> $A8) and (Buffer[i] <> $A9) and
+      (Buffer[i] <> $AA) and (Buffer[i] <> $AB) and (Buffer[i] <> $AC) and (Buffer[i] <> $AD) and
+      (Buffer[i] <> $AE) and (Buffer[i] <> $AF) then
+    begin
+      Result := False; // Invalid ANSI character found
+      Exit;
+    end;
+  end;
+end;
+
 function DetectEncoding(const FileName: string): TEncoding;
 var
   FileStream: TFileStream;
   Buffer: array[0..3] of byte = (0, 0, 0, 0);
   ContentBuffer: array of byte; // Dynamic array
   BytesRead: integer;
-  i: integer;
-  Utf8Candidate: boolean;
 begin
-  Result := TEncoding.UTF8;
+  Result := TEncoding.UTF8; // Assume UTF-8 by default
   ContentBuffer := [];
-  // Assume UTF-8 by default
   FileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
   try
     // Read the first 4 bytes to check for BOM
     BytesRead := FileStream.Read(Buffer, SizeOf(Buffer));
 
+    // Check if the read bytes correspond to BOM
     if BytesRead >= 3 then
     begin
       // Check for UTF-8 BOM
       if (Buffer[0] = $EF) and (Buffer[1] = $BB) and (Buffer[2] = $BF) then
-        Result := TEncoding.GetEncoding(65001)
+        exit(TEncoding.GetEncoding(65001)) // UTF-8 BOM
       // Check for UTF-16 LE BOM
       else if (Buffer[0] = $FF) and (Buffer[1] = $FE) then
-        Result := TEncoding.GetEncoding(1200)
+        exit(TEncoding.GetEncoding(1200)) // UTF-16 LE BOM
       // Check for UTF-16 BE BOM
       else if (Buffer[0] = $FE) and (Buffer[1] = $FF) then
-        Result := TEncoding.GetEncoding(1201);
-    end
-    else
-    begin
-      // If no BOM is found, check the content for text patterns
-      FileStream.Position := 0;
-      // Reset position to the beginning of the file
-      SetLength(ContentBuffer, 1024);
-      // Create a dynamic array for the first 1024 bytes
-      BytesRead := FileStream.Read(ContentBuffer[0], Length(ContentBuffer));
-
-      // Check if the file content could be UTF-8
-      Utf8Candidate := True;
-      for i := 0 to BytesRead - 1 do
-      begin
-        // If any byte does not match UTF-8 structure, assume ANSI
-        if (ContentBuffer[i] >= $80) and (ContentBuffer[i] <= $BF) then
-        begin
-          Utf8Candidate := False;
-          Break;
-        end;
-      end;
-
-      // If no invalid UTF-8 bytes were found, assume UTF-8, otherwise ANSI
-      if Utf8Candidate then
-        Result := TEncoding.UTF8
-      else
-        Result := TEncoding.ANSI;
+        exit(TEncoding.GetEncoding(1201)); // UTF-16 BE BOM
     end;
+
+    // If no BOM is found, check the content for text patterns
+    // Reset position to the beginning of the file
+    FileStream.Position := 0;
+    // Create a dynamic array for the first 1024 bytes
+    SetLength(ContentBuffer, 1024);
+    BytesRead := FileStream.Read(ContentBuffer[0], Length(ContentBuffer));
+
+    // Check if the file content could be ANSI
+    if IsValidAnsi(ContentBuffer, BytesRead) then
+      Result := TEncoding.ANSI
+    else if IsValidAscii(ContentBuffer, BytesRead) then
+      Result := TEncoding.ASCII
+    else
+      Result := TEncoding.UTF8; // If neither ANSI nor ASCII, assume UTF-8
   finally
     FileStream.Free;
   end;
