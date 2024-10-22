@@ -30,6 +30,8 @@ type
     FComment: string; // Comment for the task
     FText: string; // Description of the task
     FCommentItalic: boolean; // Comment is italic
+    FSpaceBeforeComment: boolean; // Space before comment in file
+    FSpaceAfterComment: boolean; // Space after comment in file
   public
     constructor Create;
     constructor Create(const TaskString: string); // Constructor that takes a task string
@@ -40,6 +42,8 @@ type
     property Comment: string read FComment write FComment;
     property Text: string read FText write FText;
     property CommentItalic: boolean read FCommentItalic write FCommentItalic;
+    property SpaceBeforeComment: boolean read FSpaceBeforeComment write FSpaceBeforeComment;
+    property SpaceAfterComment: boolean read FSpaceAfterComment write FSpaceAfterComment;
     function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string; reintroduce;
   end;
 
@@ -150,6 +154,11 @@ begin
   begin
     FCommentItalic := True;
     CompletedStr := Parts[0];
+    if (Length(CompletedStr) > 0) and (CompletedStr.EndsWith(' ')) then
+    begin
+      Delete(CompletedStr, Length(CompletedStr), 1);
+      SpaceBeforeComment := True;
+    end;
     FillComment;
     if FComment.TrimRight.EndsWith('*') then
     begin
@@ -163,6 +172,11 @@ begin
     if Length(Parts) >= 2 then
     begin
       CompletedStr := Parts[0];
+      if (Length(CompletedStr) > 0) and (CompletedStr.EndsWith(' ')) then
+      begin
+        Delete(CompletedStr, Length(CompletedStr), 1);
+        SpaceBeforeComment := True;
+      end;
       FillComment;
     end
     else
@@ -173,7 +187,11 @@ begin
   if (FComment.TrimLeft.StartsWith('*')) and (FComment.TrimRight.EndsWith('*')) then
   begin
     FCommentItalic := True;
-    FComment := TrimLeft(FComment);
+    if (Length(FComment) > 0) and (FComment.StartsWith(' ')) then
+    begin
+      FComment := TrimLeft(FComment);
+      SpaceAfterComment := True;
+    end;
     Delete(FComment, 1, 1);
     if (TrimRight(FComment).EndsWith('*')) then
     begin
@@ -251,10 +269,15 @@ begin
   // Check comments
   if Comment <> string.Empty then
   begin
+    CommentString := string.Empty;
+    if (SpaceBeforeComment) then CommentString += ' ';
+    CommentString += '//';
+    if (SpaceAfterComment) then CommentString += ' ';
+
     if CommentItalic then
-      CommentString := ' // *' + Comment + '*'
+      CommentString += '*' + Comment + '*'
     else
-      CommentString := ' // ' + Comment;
+      CommentString += Comment;
   end
   else
     CommentString := string.Empty;
@@ -271,11 +294,22 @@ begin
         Result := string.Empty; // If the completion date is missing, return an empty string
     else
       // Forming the task string considering the completion date and comment
-      if Date > 0 then
-        Result := Format('%s %s, %s%s', [DoneString, FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
-          FormatSettings.LongTimeFormat, Date), TextString, CommentString]).Trim
+      if (DoneString = string.Empty) then
+      begin
+        if Date > 0 then
+          Result := Format('%s, %s%s', [FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
+            FormatSettings.LongTimeFormat, Date), TextString, CommentString])
+        else
+          Result := Format('%s%s', [TextString, CommentString]);
+      end
       else
-        Result := Format('%s %s%s', [DoneString, TextString, CommentString]).Trim;
+      begin
+        if Date > 0 then
+          Result := Format('%s %s, %s%s', [DoneString, FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
+            FormatSettings.LongTimeFormat, Date), TextString, CommentString]).Trim
+        else
+          Result := Format('%s %s%s', [DoneString, TextString, CommentString]).Trim;
+      end;
   end;
 end;
 
