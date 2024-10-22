@@ -29,6 +29,7 @@ type
     FComment: string; // Comment for the task
     FText: string; // Description of the task
     FCommentItalic: boolean; // Comment is italic
+    FEmptyComment: boolean; // Has empty comment symbols
     FSpaceBeforeComment: boolean; // Space before comment in file
     FSpaceAfterComment: boolean; // Space after comment in file
   public
@@ -41,6 +42,7 @@ type
     property Comment: string read FComment write FComment;
     property Text: string read FText write FText;
     property CommentItalic: boolean read FCommentItalic write FCommentItalic;
+    property EmptyComment: boolean read FEmptyComment write FEmptyComment;
     property SpaceBeforeComment: boolean read FSpaceBeforeComment write FSpaceBeforeComment;
     property SpaceAfterComment: boolean read FSpaceAfterComment write FSpaceAfterComment;
     function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string; reintroduce;
@@ -111,6 +113,9 @@ begin
   FComment := string.Empty;
   FText := string.Empty;
   FCommentItalic := True;
+  FEmptyComment := False;
+  FSpaceAfterComment := False;
+  FSpaceBeforeComment := False;
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -158,6 +163,10 @@ begin
       SpaceBeforeComment := True;
     end;
     FillComment;
+
+    // Test for empty comment symbols
+    if (FComment.Trim = string.empty) then
+      EmptyComment := True;
   end
   else
     CompletedStr := PartComment[0];
@@ -251,17 +260,20 @@ begin
     DoneString := string.Empty;
 
   // Check comments
-  if Comment <> string.Empty then
+  if (Comment <> string.Empty) or (EmptyComment) then
   begin
     CommentString := string.Empty;
     if (SpaceBeforeComment) then CommentString += ' ';
     CommentString += '//';
     if (SpaceAfterComment) then CommentString += ' ';
 
-    if CommentItalic then
-      CommentString += '*' + Comment + '*'
-    else
-      CommentString += Comment;
+    if (Comment <> string.Empty) then
+    begin
+      if CommentItalic then
+        CommentString += '*' + Comment + '*'
+      else
+        CommentString += Comment;
+    end;
   end
   else
     CommentString := string.Empty;
