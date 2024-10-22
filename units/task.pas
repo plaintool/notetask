@@ -125,7 +125,6 @@ var
       FComment += Parts[i];
       if (i < High(Parts)) then FComment += '//';
     end;
-    FComment := FComment.Trim;
   end;
 
   procedure FillText(start: integer = 1);
@@ -138,7 +137,6 @@ var
       FText += PartsSub[i];
       if (i < High(PartsSub)) then FText += ',';
     end;
-    FText := FText.Trim;
   end;
 
 begin
@@ -151,17 +149,20 @@ begin
   if Length(Parts) >= 2 then
   begin
     FCommentItalic := True;
-    CompletedStr := Parts[0].Trim;
+    CompletedStr := Parts[0];
     FillComment;
-    if FComment.EndsWith('*') then
+    if FComment.TrimRight.EndsWith('*') then
+    begin
+      FComment := TrimRight(FComment);
       Delete(FComment, Length(FComment), 1);
+    end;
   end
   else
   begin
     Parts := TaskString.Split(['//']);
     if Length(Parts) >= 2 then
     begin
-      CompletedStr := Parts[0].Trim;
+      CompletedStr := Parts[0];
       FillComment;
     end
     else
@@ -169,7 +170,7 @@ begin
   end;
 
   // Remove star in start and end of comment
-  if (TrimLeft(FComment).StartsWith('*')) and (TrimRight(FComment).EndsWith('*')) then
+  if (FComment.TrimLeft.StartsWith('*')) and (FComment.TrimRight.EndsWith('*')) then
   begin
     FCommentItalic := True;
     FComment := TrimLeft(FComment);
@@ -182,9 +183,9 @@ begin
   end;
 
   PartsSub := CompletedStr.Split([',']);
+
   // Check completion status based on the first character in the string
-  FDone := PartsSub[0].Trim.ToLower.StartsWith('- [x]') or PartsSub[0].Trim.ToLower.StartsWith('-[x]') or
-    PartsSub[0].Trim.ToLower.StartsWith('[x]');
+  FDone := DetectDone(PartsSub[0]);
 
   // Checks if the task is completed
   PartsSub[0] := RemoveBrackets(PartsSub[0]);
@@ -200,13 +201,13 @@ begin
       FillText(1)
     else
     begin
-      FText := CompletedStr.Trim;
+      FText := CompletedStr;
       FDate := 0;
     end;
   end
   else
   begin
-    FText := CompletedStr.Trim;
+    FText := CompletedStr;
     FDate := 0;
   end;
 
@@ -214,9 +215,10 @@ begin
   FComment := StringReplace(FComment, '<br>', sLineBreak, [rfReplaceAll]);
 
   // Check if Text starts and ends with '~~'
-  if FText.StartsWith('~~') and FText.EndsWith('~~') then
+  if FText.TrimLeft.StartsWith('~~') and FText.TrimRight.EndsWith('~~') then
   begin
     FArchive := True;
+    FText := Trim(FText);
     // Remove '~~' from the start and end of the Text
     FText := FText.Substring(2, Length(FText) - 4);
   end
