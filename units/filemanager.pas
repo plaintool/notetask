@@ -16,11 +16,11 @@ uses
   SysUtils,
   lineending;
 
-function DetectEncoding(const FileName: string): TEncoding;
-
 function GetEncodingName(Encoding: TEncoding): string;
 
 function IsBOMEncoding(Encoding: TEncoding): boolean;
+
+function DetectEncoding(const FileName: string): TEncoding;
 
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
   out LineEnding: TLineEnding; out LineCount: integer);
@@ -28,6 +28,51 @@ procedure ReadTextFile(const FileName: string; out Content: string; out FileEnco
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
 
 implementation
+
+function GetEncodingName(Encoding: TEncoding): string;
+begin
+  if Encoding = TEncoding.UTF8 then
+    Result := 'UTF-8'
+  else if Encoding = TEncoding.Unicode then
+    Result := 'UTF-16 LE'
+  else if Encoding = TEncoding.BigEndianUnicode then
+    Result := 'UTF-16 BE'
+  else if (Encoding.CodePage = 65001) then // Encoding.CodePage = 65001
+    Result := 'UTF-8 BOM'
+  else if (Encoding.CodePage = 1200) then // Encoding.CodePage = 1200
+    Result := 'UTF-16 LE BOM'
+  else if Encoding.CodePage = 1201 then // Encoding.CodePage = 1201
+    Result := 'UTF-16 BE BOM'
+  else if Encoding = TEncoding.ANSI then
+    Result := 'ANSI'
+  else if Encoding = TEncoding.ASCII then
+    Result := 'ASCII'
+  else if Encoding = TEncoding.UTF7 then
+    Result := 'UTF-7'
+  else if Encoding = TEncoding.Default then
+    Result := 'Default'
+  else
+    Result := 'Unknown';
+end;
+
+function IsBOMEncoding(Encoding: TEncoding): boolean;
+begin
+  // Assume false by default
+  Result := False;
+
+  if Encoding = TEncoding.UTF8 then
+    exit(False)
+  else if Encoding = TEncoding.Unicode then
+    exit(False)
+  else if Encoding = TEncoding.BigEndianUnicode then
+    exit(False)
+  else if Encoding.CodePage = 65001 then // UTF-8 с BOM
+    exit(True)
+  else if Encoding.CodePage = 1200 then // UTF-16 LE с BOM
+    exit(True)
+  else if Encoding.CodePage = 1201 then // UTF-16 BE с BOM
+    exit(True);
+end;
 
 function DetectEncoding(const FileName: string): TEncoding;
 var
@@ -88,51 +133,6 @@ begin
   finally
     FileStream.Free;
   end;
-end;
-
-function GetEncodingName(Encoding: TEncoding): string;
-begin
-  if Encoding = TEncoding.UTF8 then
-    Result := 'UTF-8'
-  else if Encoding = TEncoding.Unicode then
-    Result := 'UTF-16 LE'
-  else if Encoding = TEncoding.BigEndianUnicode then
-    Result := 'UTF-16 BE'
-  else if (Encoding.CodePage = 65001) then // Encoding.CodePage = 65001
-    Result := 'UTF-8 BOM'
-  else if (Encoding.CodePage = 1200) then // Encoding.CodePage = 1200
-    Result := 'UTF-16 LE BOM'
-  else if Encoding.CodePage = 1201 then // Encoding.CodePage = 1201
-    Result := 'UTF-16 BE BOM'
-  else if Encoding = TEncoding.ANSI then
-    Result := 'ANSI'
-  else if Encoding = TEncoding.ASCII then
-    Result := 'ASCII'
-  else if Encoding = TEncoding.UTF7 then
-    Result := 'UTF-7'
-  else if Encoding = TEncoding.Default then
-    Result := 'Default'
-  else
-    Result := 'Unknown';
-end;
-
-function IsBOMEncoding(Encoding: TEncoding): boolean;
-begin
-  // Assume false by default
-  Result := False;
-
-  if Encoding = TEncoding.UTF8 then
-    exit(False)
-  else if Encoding = TEncoding.Unicode then
-    exit(False)
-  else if Encoding = TEncoding.BigEndianUnicode then
-    exit(False)
-  else if Encoding.CodePage = 65001 then // UTF-8 с BOM
-    exit(True)
-  else if Encoding.CodePage = 1200 then // UTF-16 LE с BOM
-    exit(True)
-  else if Encoding.CodePage = 1201 then // UTF-16 BE с BOM
-    exit(True);
 end;
 
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
