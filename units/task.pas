@@ -198,6 +198,14 @@ begin
       FComment := TrimRight(FComment);
       Delete(FComment, Length(FComment), 1);
     end;
+  end
+  else
+  begin
+    if (Length(FComment) > 0) and (FComment.StartsWith(' ')) then
+    begin
+      SpaceAfterComment := True;
+      Delete(FComment, 1, 1);
+    end;
   end;
 
   PartsSub := CompletedStr.Split([',']);
