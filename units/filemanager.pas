@@ -20,7 +20,10 @@ function DetectEncoding(const FileName: string): TEncoding;
 
 function GetEncodingName(Encoding: TEncoding): string;
 
-procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding; out LineCount: integer);
+function IsBOMEncoding(Encoding: TEncoding): boolean;
+
+procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
+  out LineEnding: TLineEnding; out LineCount: integer);
 
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
 
@@ -47,13 +50,13 @@ begin
     begin
       // Check for UTF-8 BOM
       if (Buffer[0] = $EF) and (Buffer[1] = $BB) and (Buffer[2] = $BF) then
-        Result := TEncoding.UTF8
+        Result := TEncoding.GetEncoding(65001)
       // Check for UTF-16 LE BOM
       else if (Buffer[0] = $FF) and (Buffer[1] = $FE) then
-        Result := TEncoding.Unicode
+        Result := TEncoding.GetEncoding(1200)
       // Check for UTF-16 BE BOM
       else if (Buffer[0] = $FE) and (Buffer[1] = $FF) then
-        Result := TEncoding.BigEndianUnicode;
+        Result := TEncoding.GetEncoding(1201);
     end
     else
     begin
@@ -95,6 +98,12 @@ begin
     Result := 'UTF-16 LE'
   else if Encoding = TEncoding.BigEndianUnicode then
     Result := 'UTF-16 BE'
+  else if (Encoding.CodePage = 65001) then // Encoding.CodePage = 65001
+    Result := 'UTF-8 BOM'
+  else if (Encoding.CodePage = 1200) then // Encoding.CodePage = 1200
+    Result := 'UTF-16 LE BOM'
+  else if Encoding.CodePage = 1201 then // Encoding.CodePage = 1201
+    Result := 'UTF-16 BE BOM'
   else if Encoding = TEncoding.ANSI then
     Result := 'ANSI'
   else if Encoding = TEncoding.ASCII then
@@ -107,7 +116,27 @@ begin
     Result := 'Unknown';
 end;
 
-procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding; out LineCount: integer);
+function IsBOMEncoding(Encoding: TEncoding): boolean;
+begin
+  // Assume false by default
+  Result := False;
+
+  if Encoding = TEncoding.UTF8 then
+    exit(False)
+  else if Encoding = TEncoding.Unicode then
+    exit(False)
+  else if Encoding = TEncoding.BigEndianUnicode then
+    exit(False)
+  else if Encoding.CodePage = 65001 then // UTF-8 с BOM
+    exit(True)
+  else if Encoding.CodePage = 1200 then // UTF-16 LE с BOM
+    exit(True)
+  else if Encoding.CodePage = 1201 then // UTF-16 BE с BOM
+    exit(True);
+end;
+
+procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
+  out LineEnding: TLineEnding; out LineCount: integer);
 var
   StringList: TStringList;
 begin
@@ -151,6 +180,7 @@ var
   i: integer;
   LineWithEnding: string;
   Bytes: TBytes;
+  Preamble: TBytes; // Array for BOM
 begin
   // Set the line ending type based on the provided LineEnding
   if LineEnding = TLineEnding.WindowsCRLF then
@@ -165,6 +195,14 @@ begin
   // Open the file for writing
   FileStream := TFileStream.Create(FileName, fmCreate);
   try
+    // Write the BOM (if any) before writing the content
+    if (IsBOMEncoding(FileEncoding)) then
+    begin
+      Preamble := FileEncoding.GetPreamble;
+      if Length(Preamble) > 0 then
+        FileStream.WriteBuffer(Preamble[0], Length(Preamble)); // Write BOM
+    end;
+
     // Write empty file
     if StringList.Count = 0 then
       Exit;
