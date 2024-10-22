@@ -121,15 +121,19 @@ msgid "About"
 msgstr "के बारे में"
 
 #: tformaboutnotetask.labelby.caption
-msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
+#, fuzzy
+#| msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
+msgid "by Alexander Tverskoy is licensed under the MIT License."
 msgstr "अलेक्जेंडर त्वरस्कोय द्वारा, CC BY-NC-SA 4.0 के तहत लाइसेंस प्राप्त"
 
 #: tformaboutnotetask.labellic.caption
-msgid "Full license text:"
+#, fuzzy
+#| msgid "Full license text:"
+msgid "For questions or feedback, contact me at"
 msgstr "पूर्ण लाइसेंस पाठ:"
 
 #: tformaboutnotetask.labellicurl.caption
-msgid "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+msgid "mailto:astverskoy@gmail.com"
 msgstr ""
 
 #: tformaboutnotetask.labelname.caption
@@ -575,3 +579,4 @@ msgstr "क्या खोजें:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "इसके साथ बदलें:"
+

@@ -12,6 +12,7 @@ object formReplaceText: TformReplaceText
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   ShowInTaskBar = stNever
+  LCLVersion = '3.6.0.0'
   object labelWhat: TLabel
     Left = 10
     Height = 15

@@ -1,8 +1,7 @@
-//----------------------------------------------------------------------
+//---------------------------------------------------------------------
 //  Notetask © 2024 by Alexander Tverskoy
-//  Licensed under CC BY-NC-SA 4.0
-//  Full license text: https://creativecommons.org/licenses/by-nc-sa/4.0/
-//----------------------------------------------------------------------
+//  Licensed under the MIT License
+//---------------------------------------------------------------------
 
 unit formabout;
 
@@ -36,7 +35,6 @@ type
     labelLic: TLabel;
     LabelLicUrl: TLabel;
     Memo1: TMemo;
-    Image1: TImage;
     procedure LabelLicUrlClick(Sender: TObject);
   private
 

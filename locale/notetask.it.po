@@ -121,15 +121,19 @@ msgid "About"
 msgstr "Informazioni"
 
 #: tformaboutnotetask.labelby.caption
-msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
+#, fuzzy
+#| msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
+msgid "by Alexander Tverskoy is licensed under the MIT License."
 msgstr "di Alexander Tverskoy è concesso in licenza sotto CC BY-NC-SA 4.0"
 
 #: tformaboutnotetask.labellic.caption
-msgid "Full license text:"
+#, fuzzy
+#| msgid "Full license text:"
+msgid "For questions or feedback, contact me at"
 msgstr "Testo completo della licenza:"
 
 #: tformaboutnotetask.labellicurl.caption
-msgid "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+msgid "mailto:astverskoy@gmail.com"
 msgstr ""
 
 #: tformaboutnotetask.labelname.caption
@@ -575,3 +579,4 @@ msgstr "Trova cosa:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Sostituisci con:"
+
