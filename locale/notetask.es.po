@@ -121,16 +121,14 @@ msgid "About"
 msgstr "Acerca de"
 
 #: tformaboutnotetask.labelby.caption
-#, fuzzy
 #| msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
 msgid "by Alexander Tverskoy is licensed under the MIT License."
-msgstr "por Alexander Tverskoy está licenciado bajo CC BY-NC-SA 4.0"
+msgstr ""
 
 #: tformaboutnotetask.labellic.caption
-#, fuzzy
 #| msgid "Full license text:"
 msgid "For questions or feedback, contact me at"
-msgstr "Texto completo de la licencia:"
+msgstr ""
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "mailto:astverskoy@gmail.com"
@@ -340,11 +338,11 @@ msgstr "Insertar tarea"
 
 #: tformnotetask.alangarabic.caption
 msgid "Arabic"
-msgstr ""
+msgstr "Arabic"
 
 #: tformnotetask.alangbelarusian.caption
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusian"
 
 #: tformnotetask.alangchinese.caption
 msgid "Chinese"
@@ -364,7 +362,7 @@ msgstr "German"
 
 #: tformnotetask.alanghindi.caption
 msgid "Hindi"
-msgstr ""
+msgstr "Hindi"
 
 #: tformnotetask.alangitalian.caption
 msgid "Italian"
@@ -392,7 +390,7 @@ msgstr "Spanish"
 
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainian"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move task to bottom"
@@ -453,6 +451,26 @@ msgstr "Seleccionar todo"
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "Tareas archivadas"
+
+#: tformnotetask.ashowcolumnamount.caption
+msgid "Column amount"
+msgstr "Columna cantidad"
+
+#: tformnotetask.ashowcolumncomment.caption
+msgid "Column comment"
+msgstr "Columna comentario"
+
+#: tformnotetask.ashowcolumndate.caption
+msgid "Column date"
+msgstr "Column date"
+
+#: tformnotetask.ashowcolumndone.caption
+msgid "Column done"
+msgstr "Columna hecho"
+
+#: tformnotetask.ashowcolumnfavorite.caption
+msgid "Column fovorite"
+msgstr "Columna favorita"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
@@ -579,4 +597,3 @@ msgstr "Buscar qué:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Reemplazar con:"
-

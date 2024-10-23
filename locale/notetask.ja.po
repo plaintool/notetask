@@ -121,16 +121,14 @@ msgid "About"
 msgstr "このアプリについて"
 
 #: tformaboutnotetask.labelby.caption
-#, fuzzy
 #| msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
 msgid "by Alexander Tverskoy is licensed under the MIT License."
-msgstr "アレクサンダー・トヴェルスコイによるもので、CC BY-NC-SA 4.0ライセンスの下で提供されています"
+msgstr ""
 
 #: tformaboutnotetask.labellic.caption
-#, fuzzy
 #| msgid "Full license text:"
 msgid "For questions or feedback, contact me at"
-msgstr "ライセンスの全文:"
+msgstr ""
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "mailto:astverskoy@gmail.com"
@@ -340,11 +338,11 @@ msgstr "タスクを挿入"
 
 #: tformnotetask.alangarabic.caption
 msgid "Arabic"
-msgstr ""
+msgstr "Arabic"
 
 #: tformnotetask.alangbelarusian.caption
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusian"
 
 #: tformnotetask.alangchinese.caption
 msgid "Chinese"
@@ -364,7 +362,7 @@ msgstr "German"
 
 #: tformnotetask.alanghindi.caption
 msgid "Hindi"
-msgstr ""
+msgstr "Hindi"
 
 #: tformnotetask.alangitalian.caption
 msgid "Italian"
@@ -392,7 +390,7 @@ msgstr "Spanish"
 
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainian"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move task to bottom"
@@ -453,6 +451,26 @@ msgstr "すべて選択"
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "アーカイブされたタスク"
+
+#: tformnotetask.ashowcolumnamount.caption
+msgid "Column amount"
+msgstr "列金額"
+
+#: tformnotetask.ashowcolumncomment.caption
+msgid "Column comment"
+msgstr "列コメント"
+
+#: tformnotetask.ashowcolumndate.caption
+msgid "Column date"
+msgstr "列日付"
+
+#: tformnotetask.ashowcolumndone.caption
+msgid "Column done"
+msgstr "列完了"
+
+#: tformnotetask.ashowcolumnfavorite.caption
+msgid "Column fovorite"
+msgstr "列お気に入り"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
@@ -579,4 +597,3 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
-

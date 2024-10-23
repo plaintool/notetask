@@ -121,16 +121,14 @@ msgid "About"
 msgstr "حول"
 
 #: tformaboutnotetask.labelby.caption
-#, fuzzy
 #| msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
 msgid "by Alexander Tverskoy is licensed under the MIT License."
-msgstr "بواسطة ألكسندر تيفيرسكي مرخص بموجب CC BY-NC-SA 4.0"
+msgstr ""
 
 #: tformaboutnotetask.labellic.caption
-#, fuzzy
 #| msgid "Full license text:"
 msgid "For questions or feedback, contact me at"
-msgstr "نص الرخصة الكامل:"
+msgstr ""
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "mailto:astverskoy@gmail.com"
@@ -454,6 +452,26 @@ msgstr "تحديد الكل"
 msgid "Show archived tasks"
 msgstr "المهام المؤرشفة"
 
+#: tformnotetask.ashowcolumnamount.caption
+msgid "Column amount"
+msgstr "عمود المبلغ"
+
+#: tformnotetask.ashowcolumncomment.caption
+msgid "Column comment"
+msgstr "عمود التعليق"
+
+#: tformnotetask.ashowcolumndate.caption
+msgid "Column date"
+msgstr "عمود التاريخ"
+
+#: tformnotetask.ashowcolumndone.caption
+msgid "Column done"
+msgstr "عمود تم"
+
+#: tformnotetask.ashowcolumnfavorite.caption
+msgid "Column fovorite"
+msgstr "عمود المفضل"
+
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
 msgstr "مدة"
@@ -579,4 +597,3 @@ msgstr "ابحث عن ماذا:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "استبدال بـ:"
-

@@ -121,16 +121,14 @@ msgid "About"
 msgstr "Про програму"
 
 #: tformaboutnotetask.labelby.caption
-#, fuzzy
 #| msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
 msgid "by Alexander Tverskoy is licensed under the MIT License."
-msgstr "автор Олександр Тверськой, ліцензовано за CC BY-NC-SA 4.0"
+msgstr ""
 
 #: tformaboutnotetask.labellic.caption
-#, fuzzy
 #| msgid "Full license text:"
 msgid "For questions or feedback, contact me at"
-msgstr "Повний текст ліцензії:"
+msgstr ""
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "mailto:astverskoy@gmail.com"
@@ -454,6 +452,26 @@ msgstr "Вибрати все"
 msgid "Show archived tasks"
 msgstr "Архівовані завдання"
 
+#: tformnotetask.ashowcolumnamount.caption
+msgid "Column amount"
+msgstr "Стовпець сума"
+
+#: tformnotetask.ashowcolumncomment.caption
+msgid "Column comment"
+msgstr "Стовпець коментар"
+
+#: tformnotetask.ashowcolumndate.caption
+msgid "Column date"
+msgstr "Стовпець дата"
+
+#: tformnotetask.ashowcolumndone.caption
+msgid "Column done"
+msgstr "Стовпець виконано"
+
+#: tformnotetask.ashowcolumnfavorite.caption
+msgid "Column fovorite"
+msgstr "Стовпець улюблене"
+
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
 msgstr "Тривалість"
@@ -579,4 +597,3 @@ msgstr "Знайти що:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Замінити на:"
-

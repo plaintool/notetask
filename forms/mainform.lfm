@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -246,6 +245,31 @@ object formNotetask: TformNotetask
       object menuShowStatusBar: TMenuItem
         Action = aShowStatusBar
         AutoCheck = True
+      end
+      object Separator13: TMenuItem
+        Caption = '-'
+      end
+      object menuColumnDone: TMenuItem
+        Action = aShowColumnDone
+        AutoCheck = True
+      end
+      object menuColumnComment: TMenuItem
+        Action = aShowColumnComment
+        AutoCheck = True
+      end
+      object menuColumnDate: TMenuItem
+        Action = aShowColumnDate
+        AutoCheck = True
+      end
+      object menuColumnAmount: TMenuItem
+        Action = aShowColumnAmount
+        AutoCheck = True
+        Visible = False
+      end
+      object menuColumnFavorite: TMenuItem
+        Action = aShowColumnFavorite
+        AutoCheck = True
+        Visible = False
       end
     end
     object menuHelp: TMenuItem
@@ -600,6 +624,40 @@ object formNotetask: TformNotetask
       Category = 'Language'
       Caption = 'Korean'
       OnExecute = aLangKoreanExecute
+    end
+    object aShowColumnDone: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column done'
+      Checked = True
+      OnExecute = aShowColumnDoneExecute
+    end
+    object aShowColumnComment: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column comment'
+      Checked = True
+      OnExecute = aShowColumnCommentExecute
+    end
+    object aShowColumnDate: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column date'
+      Checked = True
+      OnExecute = aShowColumnDateExecute
+    end
+    object aShowColumnAmount: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column amount'
+      OnExecute = aShowColumnAmountExecute
+    end
+    object aShowColumnFavorite: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column fovorite'
+      Checked = True
+      OnExecute = aShowColumnFavoriteExecute
     end
   end
   object openDialog: TOpenDialog

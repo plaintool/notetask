@@ -450,6 +450,26 @@ msgstr ""
 msgid "Show archived tasks"
 msgstr ""
 
+#: tformnotetask.ashowcolumnamount.caption
+msgid "Column amount"
+msgstr ""
+
+#: tformnotetask.ashowcolumncomment.caption
+msgid "Column comment"
+msgstr ""
+
+#: tformnotetask.ashowcolumndate.caption
+msgid "Column date"
+msgstr ""
+
+#: tformnotetask.ashowcolumndone.caption
+msgid "Column done"
+msgstr ""
+
+#: tformnotetask.ashowcolumnfavorite.caption
+msgid "Column fovorite"
+msgstr ""
+
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
 msgstr ""

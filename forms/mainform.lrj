@@ -62,6 +62,11 @@
 {"hash":166743253,"name":"tformnotetask.alangchinese.caption","sourcebytes":[67,104,105,110,101,115,101],"value":"Chinese"},
 {"hash":141052309,"name":"tformnotetask.alangjapanese.caption","sourcebytes":[74,97,112,97,110,101,115,101],"value":"Japanese"},
 {"hash":86412158,"name":"tformnotetask.alangkorean.caption","sourcebytes":[75,111,114,101,97,110],"value":"Korean"},
+{"hash":72144773,"name":"tformnotetask.ashowcolumndone.caption","sourcebytes":[67,111,108,117,109,110,32,100,111,110,101],"value":"Column done"},
+{"hash":8421508,"name":"tformnotetask.ashowcolumncomment.caption","sourcebytes":[67,111,108,117,109,110,32,99,111,109,109,101,110,116],"value":"Column comment"},
+{"hash":72141669,"name":"tformnotetask.ashowcolumndate.caption","sourcebytes":[67,111,108,117,109,110,32,100,97,116,101],"value":"Column date"},
+{"hash":203534356,"name":"tformnotetask.ashowcolumnamount.caption","sourcebytes":[67,111,108,117,109,110,32,97,109,111,117,110,116],"value":"Column amount"},
+{"hash":85122069,"name":"tformnotetask.ashowcolumnfavorite.caption","sourcebytes":[67,111,108,117,109,110,32,102,111,118,111,114,105,116,101],"value":"Column fovorite"},
 {"hash":107761687,"name":"tformnotetask.opendialog.title","sourcebytes":[79,112,101,110,105,110,103],"value":"Opening"},
 {"hash":93900871,"name":"tformnotetask.savedialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
 {"hash":131550916,"name":"tformnotetask.fontdialog.title","sourcebytes":[70,111,110,116,32,115,101,108,101,99,116],"value":"Font select"}

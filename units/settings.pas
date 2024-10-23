@@ -38,6 +38,8 @@ function LoadFormSettings(Form: TformNotetask): boolean;
 
 procedure SaveGridSettings(Grid: TStringGrid);
 
+function LoadColumnWidthsFromFile: TJSONArray;
+
 function LoadGridSettings(Grid: TStringGrid): boolean;
 
 function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;
@@ -71,6 +73,11 @@ begin
     JSONObj.Add('ShowArchived', Form.ShowArchived);
     JSONObj.Add('ShowStatusBar', Form.ShowStatusBar);
     JSONObj.Add('ShowDuration', Form.ShowDuration);
+    JSONObj.Add('ShowColumnDone', Form.ShowColumnDone);
+    JSONObj.Add('ShowColumnComment', Form.ShowColumnComment);
+    JSONObj.Add('ShowColumnDate', Form.ShowColumnDate);
+    JSONObj.Add('ShowColumnAmount', Form.ShowColumnAmount);
+    JSONObj.Add('ShowColumnFavorite', Form.ShowColumnFavorite);
     JSONObj.Add('WindowState', Ord(Form.WindowState));
     JSONObj.Add('Left', Form.RestoredLeft);
     JSONObj.Add('Top', Form.RestoredTop);
@@ -131,6 +138,21 @@ begin
       if JSONObj.FindPath('ShowDuration') <> nil then
         Form.FShowDuration := JSONObj.FindPath('ShowDuration').AsBoolean;
 
+      if JSONObj.FindPath('ShowColumnDone') <> nil then
+        Form.FShowColumnDone := JSONObj.FindPath('ShowColumnDone').AsBoolean;
+
+      if JSONObj.FindPath('ShowColumnComment') <> nil then
+        Form.FShowColumnComment := JSONObj.FindPath('ShowColumnComment').AsBoolean;
+
+      if JSONObj.FindPath('ShowColumnDate') <> nil then
+        Form.FShowColumnDate := JSONObj.FindPath('ShowColumnDate').AsBoolean;
+
+      if JSONObj.FindPath('ShowColumnAmount') <> nil then
+        Form.FShowColumnAmount := JSONObj.FindPath('ShowColumnAmount').AsBoolean;
+
+      if JSONObj.FindPath('ShowColumnFavorite') <> nil then
+        Form.FShowColumnFavorite := JSONObj.FindPath('ShowColumnFavorite').AsBoolean;
+
       if JSONObj.FindPath('ShowStatusBar') <> nil then
         Form.ShowStatusBar := JSONObj.FindPath('ShowStatusBar').AsBoolean;
 
@@ -179,6 +201,7 @@ procedure SaveGridSettings(Grid: TStringGrid);
 var
   JSONObj: TJSONObject;
   ColumnArray: TJSONArray;
+  SavedArray: TJSONArray;
   // RowArray: TJSONArray;
   i: integer;
   FileName: string;
@@ -190,8 +213,17 @@ begin
   // RowArray := TJSONArray.Create;
 
   // Save column widths
+  SavedArray := LoadColumnWidthsFromFile;
   for i := 0 to Grid.ColCount - 1 do
-    ColumnArray.Add(Grid.ColWidths[i]);
+  begin
+    if (Grid.ColWidths[i] > 0) then
+      ColumnArray.Add(Grid.ColWidths[i])
+    else
+    begin
+      if (Assigned(SavedArray)) then
+        ColumnArray.Add(SavedArray[i]);
+    end;
+  end;
 
   // Save row heights
   //  for i := 0 to Grid.RowCount - 1 do
@@ -212,18 +244,16 @@ begin
   JSONObj.Free;
 end;
 
-function LoadGridSettings(Grid: TStringGrid): boolean;
+function LoadColumnWidthsFromFile: TJSONArray;
 var
   JSONData: TJSONData;
   JSONObj: TJSONObject;
   ColumnArray: TJSONArray;
-  // RowArray: TJSONArray;
-  i: integer;
   FileContent: string;
   FileStream: TFileStream;
   FileName: string;
 begin
-  Result := False;
+  Result := nil;
   FileContent := string.Empty;
   FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
   ForceDirectories(GetSettingsDirectory);
@@ -238,23 +268,32 @@ begin
     try
       JSONObj := JSONData as TJSONObject;
       ColumnArray := JSONObj.FindPath('ColumnWidths') as TJSONArray;
-      // RowArray := JSONObj.FindPath('RowHeights') as TJSONArray;
-
-      // Set column widths
-      for i := 1 to ColumnArray.Count - 1 do
-        Grid.ColWidths[i] := ColumnArray.Items[i].AsInteger;
-
-      // Set row heights
-      //  for i := 0 to RowArray.Count - 1 do
-      //  Grid.RowHeights[i] := RowArray.Items[i].AsInteger;
-
-      Result := True;
+      Result := ColumnArray.Clone as TJSONArray; // Clone to return a copy
     finally
       JSONData.Free;
     end;
   finally
     FileStream.Free;
   end;
+end;
+
+function LoadGridSettings(Grid: TStringGrid): boolean;
+var
+  ColumnArray: TJSONArray;
+  i: integer;
+begin
+  Result := False;
+
+  // Get column widths array from file
+  ColumnArray := LoadColumnWidthsFromFile;
+
+  if ColumnArray = nil then Exit;
+
+  // Set column widths
+  for i := 1 to ColumnArray.Count - 1 do
+    Grid.ColWidths[i] := ColumnArray.Items[i].AsInteger;
+
+  Result := True;
 end;
 
 function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;

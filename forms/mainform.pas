@@ -177,6 +177,17 @@ type
     MenuItem12: TMenuItem;
     MenuItem13: TMenuItem;
     MenuItem14: TMenuItem;
+    aShowColumnDone: TAction;
+    aShowColumnComment: TAction;
+    aShowColumnDate: TAction;
+    Separator13: TMenuItem;
+    menuColumnDone: TMenuItem;
+    menuColumnComment: TMenuItem;
+    menuColumnDate: TMenuItem;
+    aShowColumnAmount: TAction;
+    aShowColumnFavorite: TAction;
+    menuColumnAmount: TMenuItem;
+    menuColumnFavorite: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -251,6 +262,11 @@ type
     procedure aLangHindiExecute(Sender: TObject);
     procedure aLangArabicExecute(Sender: TObject);
     procedure taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
+    procedure aShowColumnDoneExecute(Sender: TObject);
+    procedure aShowColumnCommentExecute(Sender: TObject);
+    procedure aShowColumnDateExecute(Sender: TObject);
+    procedure aShowColumnAmountExecute(Sender: TObject);
+    procedure aShowColumnFavoriteExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -295,6 +311,11 @@ type
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowDuration(Value: boolean);
     procedure SetShowArchived(Value: boolean);
+    procedure SetShowColumnDone(Value: boolean);
+    procedure SetShowColumnComment(Value: boolean);
+    procedure SetShowColumnDate(Value: boolean);
+    procedure SetShowColumnAmount(Value: boolean);
+    procedure SetShowColumnFavorite(Value: boolean);
     procedure SetBiDiRightToLeft(Value: boolean);
     procedure CompleteTasks(aRow: integer = 0);
     procedure ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
@@ -304,6 +325,11 @@ type
   public
     FShowArchived: boolean;
     FShowDuration: boolean;
+    FShowColumnDone: boolean;
+    FShowColumnComment: boolean;
+    FShowColumnDate: boolean;
+    FShowColumnAmount: boolean;
+    FShowColumnFavorite: boolean;
 
     procedure SetLanguage(aLanguage: string = string.Empty);
     procedure FillGrid;
@@ -317,6 +343,11 @@ type
     property BiDiRightToLeft: boolean read FBiDiRightToLeft write SetBiDiRightToLeft;
     property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
     property ShowDuration: boolean read FShowDuration write SetShowDuration;
+    property ShowColumnDone: boolean read FShowColumnDone write SetShowColumnDone;
+    property ShowColumnComment: boolean read FShowColumnComment write SetShowColumnComment;
+    property ShowColumnDate: boolean read FShowColumnDate write SetShowColumnDate;
+    property ShowColumnAmount: boolean read FShowColumnAmount write SetShowColumnAmount;
+    property ShowColumnFavorite: boolean read FShowColumnFavorite write SetShowColumnFavorite;
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property SortOrder: TSortOrder read FSortOrder write FSortOrder;
     property SortColumn: integer read FSortColumn write FSortColumn;
@@ -367,8 +398,13 @@ begin
   // Initialize variables
   FBackup := True;
   FWordWrap := True;
-  FBiDiRightToLeft := self.BiDiMode = bdRightToLeft;
   FShowStatusBar := True;
+  FShowColumnDone := True;
+  FShowColumnComment := True;
+  FShowColumnDate := True;
+  FShowColumnAmount := True;
+  FShowColumnFavorite := True;
+  FBiDiRightToLeft := self.BiDiMode = bdRightToLeft;
   FSortOrder := soAscending;
   clRowHighlight := RGBToColor(210, 230, 255);
   clRowExpired := RGBToColor(255, 220, 220);
@@ -401,8 +437,19 @@ begin
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowStatusBar.Checked := FShowStatusBar;
   aShowArchived.Checked := FShowArchived;
-  aShowDuration.Checked := FShowDuration;
 
+  aShowColumnDone.Checked := FShowColumnDone;
+  aShowColumnComment.Checked := FShowColumnComment;
+  aShowColumnDate.Checked := FShowColumnDate;
+  aShowColumnAmount.Checked := FShowColumnAmount;
+  aShowColumnFavorite.Checked := FShowColumnFavorite;
+  taskGrid.Columns.Items[0].Visible := FShowColumnDone;
+  taskGrid.Columns.Items[2].Visible := FShowColumnComment;
+  taskGrid.Columns.Items[3].Visible := FShowColumnDate;
+  //taskGrid.Columns.Items[4].Visible := FShowColumnAmount;
+  //taskGrid.Columns.Items[5].Visible := FShowColumnFavorite;
+
+  aShowDuration.Checked := FShowDuration;
   if (FShowDuration) then
     taskGrid.DefaultColWidth := 55
   else
@@ -1379,6 +1426,13 @@ begin
   SaveFile(FFileName);
 end;
 
+procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowStatusBar := aShowStatusBar.Checked;
+end;
+
 procedure TformNotetask.aShowArchivedExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -1393,11 +1447,39 @@ begin
   ShowDuration := aShowDuration.Checked;
 end;
 
-procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
+procedure TformNotetask.aShowColumnDoneExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  ShowStatusBar := aShowStatusBar.Checked;
+  ShowColumnDone := aShowColumnDone.Checked;
+end;
+
+procedure TformNotetask.aShowColumnCommentExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowColumnComment := aShowColumnComment.Checked;
+end;
+
+procedure TformNotetask.aShowColumnDateExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowColumnDate := aShowColumnDate.Checked;
+end;
+
+procedure TformNotetask.aShowColumnAmountExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowColumnAmount := aShowColumnAmount.Checked;
+end;
+
+procedure TformNotetask.aShowColumnFavoriteExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowColumnFavorite := aShowColumnFavorite.Checked;
 end;
 
 procedure TformNotetask.aWordWrapExecute(Sender: TObject);
@@ -1966,6 +2048,36 @@ begin
     taskGrid.DefaultColWidth := 40;
 
   FillGrid;
+end;
+
+procedure TformNotetask.SetShowColumnDone(Value: boolean);
+begin
+  FShowColumnDone := Value;
+  taskGrid.Columns.Items[0].Visible := FShowColumnDone;
+end;
+
+procedure TformNotetask.SetShowColumnComment(Value: boolean);
+begin
+  FShowColumnComment := Value;
+  taskGrid.Columns.Items[2].Visible := FShowColumnComment;
+end;
+
+procedure TformNotetask.SetShowColumnDate(Value: boolean);
+begin
+  FShowColumnDate := Value;
+  taskGrid.Columns.Items[3].Visible := FShowColumnDate;
+end;
+
+procedure TformNotetask.SetShowColumnAmount(Value: boolean);
+begin
+  FShowColumnAmount := Value;
+  taskGrid.Columns.Items[4].Visible := FShowColumnAmount;
+end;
+
+procedure TformNotetask.SetShowColumnFavorite(Value: boolean);
+begin
+  FShowColumnFavorite := Value;
+  taskGrid.Columns.Items[5].Visible := FShowColumnFavorite;
 end;
 
 procedure TformNotetask.SetBiDiRightToLeft(Value: boolean);

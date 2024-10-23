@@ -121,16 +121,14 @@ msgid "About"
 msgstr "О программе"
 
 #: tformaboutnotetask.labelby.caption
-#, fuzzy
 #| msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
 msgid "by Alexander Tverskoy is licensed under the MIT License."
-msgstr "автор Александр Тверкой, лицензия CC BY-NC-SA 4.0"
+msgstr ""
 
 #: tformaboutnotetask.labellic.caption
-#, fuzzy
 #| msgid "Full license text:"
 msgid "For questions or feedback, contact me at"
-msgstr "Полный текст лицензии:"
+msgstr ""
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "mailto:astverskoy@gmail.com"
@@ -340,11 +338,11 @@ msgstr "Вставить задачу"
 
 #: tformnotetask.alangarabic.caption
 msgid "Arabic"
-msgstr ""
+msgstr "Arabic"
 
 #: tformnotetask.alangbelarusian.caption
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusian"
 
 #: tformnotetask.alangchinese.caption
 msgid "Chinese"
@@ -364,7 +362,7 @@ msgstr "German"
 
 #: tformnotetask.alanghindi.caption
 msgid "Hindi"
-msgstr ""
+msgstr "Hindi"
 
 #: tformnotetask.alangitalian.caption
 msgid "Italian"
@@ -392,7 +390,7 @@ msgstr "Spanish"
 
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainian"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move task to bottom"
@@ -453,6 +451,26 @@ msgstr "Выделить все"
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "Архивные задачи"
+
+#: tformnotetask.ashowcolumnamount.caption
+msgid "Column amount"
+msgstr "Столбец сумма"
+
+#: tformnotetask.ashowcolumncomment.caption
+msgid "Column comment"
+msgstr "Столбец комментарий"
+
+#: tformnotetask.ashowcolumndate.caption
+msgid "Column date"
+msgstr "Столбец дата"
+
+#: tformnotetask.ashowcolumndone.caption
+msgid "Column done"
+msgstr "Столбец готово"
+
+#: tformnotetask.ashowcolumnfavorite.caption
+msgid "Column fovorite"
+msgstr "Столбец избранное"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
@@ -579,4 +597,3 @@ msgstr "Что:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Чем:"
-

@@ -121,16 +121,14 @@ msgid "About"
 msgstr "정보"
 
 #: tformaboutnotetask.labelby.caption
-#, fuzzy
 #| msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
 msgid "by Alexander Tverskoy is licensed under the MIT License."
-msgstr "알렉산더 트버스코이가 CC BY-NC-SA 4.0에 따라 라이센스됩니다"
+msgstr ""
 
 #: tformaboutnotetask.labellic.caption
-#, fuzzy
 #| msgid "Full license text:"
 msgid "For questions or feedback, contact me at"
-msgstr "전체 라이센스 텍스트:"
+msgstr ""
 
 #: tformaboutnotetask.labellicurl.caption
 msgid "mailto:astverskoy@gmail.com"
@@ -138,7 +136,7 @@ msgstr ""
 
 #: tformaboutnotetask.labelname.caption
 msgid "Notetask © 2024"
-msgstr "노트작업 © 2024"
+msgstr "Notetask © 2024"
 
 #: tformdonatenotetask.buttonok.caption
 msgctxt "tformdonatenotetask.buttonok.caption"
@@ -340,11 +338,11 @@ msgstr "작업 삽입"
 
 #: tformnotetask.alangarabic.caption
 msgid "Arabic"
-msgstr ""
+msgstr "Arabic"
 
 #: tformnotetask.alangbelarusian.caption
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusian"
 
 #: tformnotetask.alangchinese.caption
 msgid "Chinese"
@@ -364,7 +362,7 @@ msgstr "German"
 
 #: tformnotetask.alanghindi.caption
 msgid "Hindi"
-msgstr ""
+msgstr "Hindi"
 
 #: tformnotetask.alangitalian.caption
 msgid "Italian"
@@ -392,7 +390,7 @@ msgstr "Spanish"
 
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainian"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move task to bottom"
@@ -453,6 +451,26 @@ msgstr "모두 선택"
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
 msgstr "보관된 작업"
+
+#: tformnotetask.ashowcolumnamount.caption
+msgid "Column amount"
+msgstr "열 금액"
+
+#: tformnotetask.ashowcolumncomment.caption
+msgid "Column comment"
+msgstr "열 댓글"
+
+#: tformnotetask.ashowcolumndate.caption
+msgid "Column date"
+msgstr "열 날짜"
+
+#: tformnotetask.ashowcolumndone.caption
+msgid "Column done"
+msgstr "열 완료"
+
+#: tformnotetask.ashowcolumnfavorite.caption
+msgid "Column fovorite"
+msgstr "열 즐겨찾기"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
@@ -579,4 +597,3 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
-
