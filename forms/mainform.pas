@@ -710,16 +710,12 @@ end;
 
 procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
 begin
-  if (FDisableCheckToggle) then exit;
-
-  SetChanged;
-  if (aState = cbChecked) then
+  if (aCol = 1) then
   begin
-    if (taskGrid.Cells[4, aRow] = string.Empty) then
-      taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
+    if (FDisableCheckToggle) then exit;
+
+    CompleteTasks(aRow);
   end;
-  Tasks.SetTask(taskGrid, aRow, FBackup);
-  if (ShowDuration) and (aState = cbChecked) then FillGrid;
 end;
 
 procedure TformNotetask.taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
@@ -1929,6 +1925,7 @@ end;
 procedure TformNotetask.CompleteTasks(aRow: integer = 0);
 var
   RowIndex: integer;
+  Check: boolean;
   i: integer;
 begin
   // If multiple rows are selected
@@ -1942,7 +1939,7 @@ begin
       if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
       begin
         // Mark the task as completed in the collection
-        Tasks.CompleteTask(RowIndex);
+        Tasks.CompleteTask(RowIndex, False);
 
         if Tasks.GetTask(RowIndex).Done then
         begin
@@ -1956,6 +1953,7 @@ begin
         Tasks.SetTask(taskGrid, RowIndex, False); // Backup created on start
       end;
     end;
+    if ShowDuration then FillGrid;
     SetChanged; // Mark that data has changed
   end
   else
@@ -1966,12 +1964,14 @@ begin
     else
       RowIndex := aRow;
 
+    Check := False;
     if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
     begin
       // Mark the task as completed in the collection
       Tasks.CompleteTask(RowIndex);
       if Tasks.GetTask(RowIndex).Done then
       begin
+        Check := True;
         taskGrid.Cells[1, RowIndex] := '1';
         if (taskGrid.Cells[4, RowIndex] = '') then
           taskGrid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
@@ -1980,6 +1980,7 @@ begin
         taskGrid.Cells[1, RowIndex] := '0';
 
       Tasks.SetTask(taskGrid, RowIndex, FBackup);
+      if (ShowDuration) and (Check) then FillGrid;
       SetChanged; // Mark that data has changed
     end;
   end;

@@ -447,6 +447,7 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Show archived tasks'
       OnExecute = aShowArchivedExecute
+      ShortCut = 112
     end
     object aUndoAll: TAction
       Category = 'Edit'

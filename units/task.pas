@@ -72,7 +72,7 @@ type
     function InsertTask(const TaskString: string; Index: integer; Backup: boolean = True): integer;
     procedure DeleteTask(Index: integer);
     procedure ArchiveTask(Index: integer);
-    procedure CompleteTask(Index: integer);
+    procedure CompleteTask(Index: integer; Backup: boolean = True);
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
     function MoveTaskTop(Index: integer): integer;
     function MoveTaskBottom(Index: integer): integer;
@@ -599,7 +599,7 @@ begin
   FTaskList[Ind].Archive := not FTaskList[Ind].Archive;
 end;
 
-procedure TTasks.CompleteTask(Index: integer);
+procedure TTasks.CompleteTask(Index: integer; Backup: boolean = True);
 var
   Ind: integer;
 begin
@@ -607,7 +607,7 @@ begin
   if (Ind < 0) or (Ind >= FCount) then
     exit;
 
-  CreateBackup;
+  if Backup then CreateBackup;
 
   FTaskList[Ind].Done := not FTaskList[Ind].Done;
 end;
