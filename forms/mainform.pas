@@ -672,7 +672,7 @@ begin
       taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
   end;
   Tasks.SetTask(taskGrid, aRow, FBackup);
-  if ShowDuration then FillGrid;
+  if (ShowDuration) and (aState = cbChecked) then FillGrid;
 end;
 
 procedure TformNotetask.taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
