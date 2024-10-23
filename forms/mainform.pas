@@ -259,7 +259,7 @@ type
     FMemoStartEdit: boolean;
     FIsEditing: boolean;
     FIsSelecting: boolean;
-    FDisableCheckToggled: boolean;
+    FDisableCheckToggle: boolean;
     FFileName: string;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
@@ -654,16 +654,16 @@ begin
   if not PtInRect(CheckBoxRect, MousePosClient) then
   begin
     // If the mouse is outside the checkbox, prevent the state from being changed
-    FDisableCheckToggled := True;
+    FDisableCheckToggle := True;
     exit;
   end;
-  FDisableCheckToggled := False;
+  FDisableCheckToggle := False;
   taskGrid.Cells[ACol, ARow] := IfThen(Value = cbChecked, '1', '0');
 end;
 
 procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
 begin
-  if (FDisableCheckToggled) then exit;
+  if (FDisableCheckToggle) then exit;
 
   SetChanged;
   if (aState = cbChecked) then
@@ -672,6 +672,7 @@ begin
       taskGrid.Cells[4, aRow] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
   end;
   Tasks.SetTask(taskGrid, aRow, FBackup);
+  if ShowDuration then FillGrid;
 end;
 
 procedure TformNotetask.taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
