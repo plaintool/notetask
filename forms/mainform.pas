@@ -1804,6 +1804,7 @@ begin
       Tasks.ArchiveTask(RowIndex);
       FillGrid;
       ResetRowHeight;
+      SetInfo;
       SetChanged;
     end;
   end;
@@ -1835,6 +1836,7 @@ begin
       end;
       FillGrid;
       ResetRowHeight;
+      SetInfo;
       SetChanged; // Mark that data has changed
     end;
   end
