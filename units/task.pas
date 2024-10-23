@@ -59,6 +59,7 @@ type
   public
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
+    function ToStringList: TStringList;
     procedure InitMap(Length: integer);
     function Map(Index: integer): integer;
     function ReverseMap(Value: integer): integer;
@@ -82,13 +83,14 @@ type
     procedure CopyToClipboard(Grid: TStringGrid);
     function PasteFromClipboard(Grid: TStringGrid): TGridRect;
     procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);
-    function ToStringList: TStringList;
     procedure CreateBackup;
     procedure UndoBackup;
     procedure CreateBackupInit;
     procedure UndoBackupInit;
+    function GetCountArchive: integer;
 
     property Count: integer read FCount;
+    property CountArhive: integer read GetCountArchive;
     property MapGrid: TIntegerArray read FMapGrid;
   end;
 
@@ -1175,6 +1177,15 @@ begin
   end;
 
   FCount := Length(FTaskList); // Restore the task count
+end;
+
+function TTasks.GetCountArchive: integer;
+var
+  I: integer;
+begin
+  Result := 0;
+  for I := 0 to Count - 1 do
+    if FTaskList[I].Archive then Result += 1;
 end;
 
 procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);

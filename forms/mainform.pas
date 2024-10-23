@@ -682,7 +682,6 @@ begin
     if FBackup then Tasks.CreateBackup;
     Tasks.AddMap(Tasks.AddTask('[ ] // **'));
     taskGrid.Cells[1, tIndex] := '0';
-    FLineCount += 1;
     SetInfo;
     SetChanged();
   end;
@@ -693,7 +692,6 @@ begin
   if (not IsColumn) then
   begin
     Tasks.DeleteTask(tIndex);
-    FLineCount -= 1;
     SetInfo;
 
     if ShowDuration then FillGrid;
@@ -1001,6 +999,7 @@ begin
     Tasks.UndoBackup;
     FillGrid;
     ResetRowHeight;
+    SetInfo;
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
@@ -1023,6 +1022,7 @@ begin
       Tasks.UndoBackupInit;
       FillGrid;
       ResetRowHeight;
+      SetInfo;
       Tasks.CreateBackup;
       SetChanged(False);
     end;
@@ -1138,7 +1138,6 @@ begin
 
   Tasks.InsertTask('[ ] // **', taskGrid.Row);
   FillGrid;
-  FLineCount += 1;
   taskGrid.Row := taskGrid.Row + 1;
   ResetRowHeight;
   SetInfo;
@@ -1271,7 +1270,6 @@ begin
       begin
         Tasks.InsertTask('- [ ] ' + CurrentDateTime + ',', taskGrid.Row);
         FillGrid;
-        FLineCount += 1;
         taskGrid.Row := taskGrid.Row + 1;
       end;
       SetChanged;
@@ -1296,7 +1294,6 @@ begin
     taskGrid.Clean;
     taskGrid.RowCount := 2;
     taskGrid.Col := 2;
-    FLineCount := 1;
     SetInfo;
   end;
 end;
@@ -1717,7 +1714,6 @@ begin
       Memo.OnChange := @MemoChange;
     end;
     SetChanged;
-    FLineCount := Tasks.Count;
     SetInfo;
   end;
 end;
@@ -1996,10 +1992,16 @@ begin
 end;
 
 procedure TformNotetask.SetInfo;
+var
+  CurCount: integer;
 begin
   statusBar.Panels[1].Text := UpperCase(GetEncodingName(FEncoding));
   statusBar.Panels[2].Text := FLineEnding.ToString;
-  statusBar.Panels[3].Text := FLineCount.ToString + rrows;
+  CurCount := Tasks.Count - Tasks.GetCountArchive;
+  if (CurCount = Tasks.Count) then
+    statusBar.Panels[3].Text := Tasks.Count.ToString + rrows
+  else
+    statusBar.Panels[3].Text := (Tasks.Count - Tasks.GetCountArchive).ToString + ' / ' + Tasks.Count.ToString + rrows;
   SetCaption;
 end;
 
@@ -2129,7 +2131,6 @@ begin
   FFileName := fileName;
   EditComplite;
   ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
-  SetInfo;
 
   if Assigned(Tasks) then
     Tasks.Free;
@@ -2140,6 +2141,7 @@ begin
   taskGrid.Col := 2;
   ResetRowHeight;
   SetChanged(False);
+  SetInfo;
   Result := True;
 end;
 
