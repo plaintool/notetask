@@ -222,7 +222,7 @@
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="LICENSE"/>
+        <Filename Value="LICENSE.txt"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>

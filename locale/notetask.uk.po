@@ -121,12 +121,10 @@ msgid "About"
 msgstr "Про програму"
 
 #: tformaboutnotetask.labelby.caption
-#| msgid "by Alexander Tverskoy is licensed under CC BY-NC-SA 4.0"
-msgid "by Alexander Tverskoy is licensed under the MIT License."
+msgid "by Alexander Tverskoy is licensed under the GNU General Public License, Version 3 "
 msgstr ""
 
 #: tformaboutnotetask.labellic.caption
-#| msgid "Full license text:"
 msgid "For questions or feedback, contact me at"
 msgstr ""
 
@@ -597,3 +595,4 @@ msgstr "Знайти що:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Замінити на:"
+

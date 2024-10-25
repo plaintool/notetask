@@ -1,7 +1,7 @@
 {"version":1,"strings":[
 {"hash":4691652,"name":"tformaboutnotetask.caption","sourcebytes":[65,98,111,117,116],"value":"About"},
 {"hash":1339,"name":"tformaboutnotetask.buttonok.caption","sourcebytes":[79,75],"value":"OK"},
-{"hash":220655150,"name":"tformaboutnotetask.labelby.caption","sourcebytes":[98,121,32,65,108,101,120,97,110,100,101,114,32,84,118,101,114,115,107,111,121,32,105,115,32,108,105,99,101,110,115,101,100,32,117,110,100,101,114,32,116,104,101,32,77,73,84,32,76,105,99,101,110,115,101,46],"value":"by Alexander Tverskoy is licensed under the MIT License."},
+{"hash":141283632,"name":"tformaboutnotetask.labelby.caption","sourcebytes":[98,121,32,65,108,101,120,97,110,100,101,114,32,84,118,101,114,115,107,111,121,32,105,115,32,108,105,99,101,110,115,101,100,32,117,110,100,101,114,32,116,104,101,32,71,78,85,32,71,101,110,101,114,97,108,32,80,117,98,108,105,99,32,76,105,99,101,110,115,101,44,32,86,101,114,115,105,111,110,32,51,32],"value":"by Alexander Tverskoy is licensed under the GNU General Public License, Version 3 "},
 {"hash":2005044,"name":"tformaboutnotetask.labelname.caption","sourcebytes":[78,111,116,101,116,97,115,107,32,194,169,32,50,48,50,52],"value":"Notetask \u00A9 2024"},
 {"hash":199884644,"name":"tformaboutnotetask.labellic.caption","sourcebytes":[70,111,114,32,113,117,101,115,116,105,111,110,115,32,111,114,32,102,101,101,100,98,97,99,107,44,32,99,111,110,116,97,99,116,32,109,101,32,97,116],"value":"For questions or feedback, contact me at"},
 {"hash":185959117,"name":"tformaboutnotetask.labellicurl.caption","sourcebytes":[109,97,105,108,116,111,58,97,115,116,118,101,114,115,107,111,121,64,103,109,97,105,108,46,99,111,109],"value":"mailto:astverskoy@gmail.com"}
