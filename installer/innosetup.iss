@@ -49,7 +49,7 @@ LicenseFile=D:\Lazarus\Notetask\LICENSE.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-OutputDir=D:\Lazarus\Notetask\release
+OutputDir=D:\Lazarus\Notetask\installer
 OutputBaseFilename=notetask
 Compression=lzma
 SolidCompression=yes
