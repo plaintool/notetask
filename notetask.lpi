@@ -133,9 +133,6 @@
     </RunParams>
     <RequiredPackages>
       <Item>
-        <PackageName Value="DateTimeCtrlsDsgn"/>
-      </Item>
-      <Item>
         <PackageName Value="DateTimeCtrls"/>
       </Item>
       <Item>
