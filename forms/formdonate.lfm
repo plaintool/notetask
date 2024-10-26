@@ -225,8 +225,8 @@ object formDonateNotetask: TformDonateNotetask
     Left = 60
     Height = 15
     Top = 228
-    Width = 235
-    Caption = 'Ethereum (ERC20), BNB Smart Chain (BEP20)'
+    Width = 302
+    Caption = 'ETH Ethereum (ERC20), BSC Binance Smart Chain (BEP20)'
   end
   object editWallet4: TEdit
     Left = 16
@@ -281,8 +281,8 @@ object formDonateNotetask: TformDonateNotetask
     Left = 60
     Height = 15
     Top = 172
-    Width = 67
-    Caption = 'Tron (TRC20)'
+    Width = 90
+    Caption = 'TRX Tron (TRC20)'
   end
   object Label9: TLabel
     Left = 16

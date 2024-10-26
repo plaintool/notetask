@@ -197,11 +197,11 @@ msgstr ""
 
 #: tformdonatenotetask.label7.caption
 msgctxt "tformdonatenotetask.label7.caption"
-msgid "Ethereum (ERC20), BNB Smart Chain (BEP20)"
+msgid "ETH Ethereum (ERC20), BSC Binance Smart Chain (BEP20)"
 msgstr ""
 
 #: tformdonatenotetask.label8.caption
-msgid "Tron (TRC20)"
+msgid "TRX Tron (TRC20)"
 msgstr ""
 
 #: tformdonatenotetask.label9.caption
