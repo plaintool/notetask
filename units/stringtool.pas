@@ -15,9 +15,9 @@ uses
   Classes,
   SysUtils;
 
-function TextToStringList(const Content: string): TStringList;
+function TextToStringList(const Content: string; TrimEnd: boolean = False): TStringList;
 
-function IsBracket(const Input: string): Boolean;
+function IsBracket(const Input: string): boolean;
 
 function RemoveBrackets(const S: string): string;
 
@@ -32,7 +32,7 @@ const
 
 implementation
 
-function TextToStringList(const Content: string): TStringList;
+function TextToStringList(const Content: string; TrimEnd: boolean = False): TStringList;
 var
   StringList: TStringList;
 begin
@@ -42,7 +42,7 @@ begin
     StringList.Text := Content; // Load text into TStringList
 
     // Check if the file ends with a new line and the last line is not empty
-    if (Content <> '') and (Content[Length(Content)] in [#10, #13]) then
+    if (Content <> '') and (Content[Length(Content)] in [#10, #13]) and (not TrimEnd) then
     begin
       // Add an extra empty line only if the last line is not already empty
       StringList.Add(string.Empty);
@@ -55,10 +55,10 @@ begin
   end;
 end;
 
-function IsBracket(const Input: string): Boolean;
+function IsBracket(const Input: string): boolean;
 var
   TrimmedInput: string;
-  I: Integer;
+  I: integer;
 begin
   // Trim the input string
   TrimmedInput := Trim(Input);

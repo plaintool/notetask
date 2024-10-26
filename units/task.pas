@@ -337,6 +337,10 @@ begin
   FDate := Original.FDate;
   FComment := Original.FComment;
   FText := Original.FText;
+  FCommentItalic := Original.FCommentItalic;
+  FEmptyComment := Original.FEmptyComment;
+  FSpaceBeforeComment := Original.FSpaceBeforeComment;
+  FSpaceAfterComment := Original.FSpaceAfterComment;
 end;
 
 { TTasks }
@@ -875,13 +879,17 @@ begin
   else
     IsEmpty := False;
 
-  TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText));
+  TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText, True));
   try
     if (Grid.Selection.Height = 0) and (Grid.Selection.Width = 0) and (not IsEmpty) then
     begin
+      if (Grid.Row = 0) then
+        index := 1
+      else
+        index := Grid.Row;
       for i := TempTasks.FCount - 1 downto 0 do
       begin
-        InsertTask(TempTasks.GetTask(i + 1).ToString(), Grid.Row, False);
+        InsertTask(TempTasks.GetTask(i + 1).ToString(), index, False);
         // if i = 0 then Id0 := Id;
         // if i = TempTasks.FCount - 1 then Id1 := Id;
       end;
@@ -890,78 +898,87 @@ begin
     else
     begin
       index := 1;
-      Rect := Grid.Selection; // Get grid selection rect
 
-      for i := Rect.Top to Rect.Bottom do
+      if (Grid.Selection.Height = 0) and (Grid.Selection.Width = 0) and (IsEmpty) then
       begin
-        if (index > TempTasks.FCount) then Index := 1;
-        for j := Rect.Left to Rect.Right do
+        GetTask(Grid.Row).Copy(TempTasks.GetTask(index));
+        Inc(index);
+      end
+      else
+      begin
+        Rect := Grid.Selection; // Get grid selection rect
+        for i := Rect.Top to Rect.Bottom do
         begin
-          if j = 1 then GetTask(i).Done := TempTasks.GetTask(index).Done;
-          if j = 2 then
+          if (index > TempTasks.FCount) then Index := 1;
+          for j := Rect.Left to Rect.Right do
           begin
-            if (TempTasks.GetTask(index).Text <> string.Empty) then
-            begin
-              GetTask(i).Text := TempTasks.GetTask(index).Text;
-              GetTask(i).Archive := TempTasks.GetTask(index).Archive;
-            end
-            else
-            if Rect.Width = 0 then
-            begin
-              if (TempTasks.GetTask(index).Comment <> string.Empty) then
-                GetTask(i).Text := TempTasks.GetTask(index).Comment
-              else
-              if (TempTasks.GetTask(index).Date <> 0) then
-                GetTask(i).Text := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
-                  TempTasks.GetTask(index).Date)
-              else
-                GetTask(i).Text := string.Empty;
-            end
-            else
-              GetTask(i).Text := string.Empty;
-          end;
-          if j = 3 then
-          begin
-            if (TempTasks.GetTask(index).Comment <> string.Empty) then
-            begin
-              GetTask(i).Comment := TempTasks.GetTask(index).Comment;
-              GetTask(i).CommentItalic := TempTasks.GetTask(index).CommentItalic;
-            end
-            else
-            if Rect.Width = 0 then
+            if j = 1 then GetTask(i).Done := TempTasks.GetTask(index).Done;
+            if j = 2 then
             begin
               if (TempTasks.GetTask(index).Text <> string.Empty) then
-                GetTask(i).Comment := TempTasks.GetTask(index).Text
+              begin
+                GetTask(i).Text := TempTasks.GetTask(index).Text;
+                GetTask(i).Archive := TempTasks.GetTask(index).Archive;
+              end
               else
-              if (TempTasks.GetTask(index).Date <> 0) then
-                GetTask(i).Comment := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
-                  TempTasks.GetTask(index).Date)
+              if Rect.Width = 0 then
+              begin
+                if (TempTasks.GetTask(index).Comment <> string.Empty) then
+                  GetTask(i).Text := TempTasks.GetTask(index).Comment
+                else
+                if (TempTasks.GetTask(index).Date <> 0) then
+                  GetTask(i).Text := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
+                    TempTasks.GetTask(index).Date)
+                else
+                  GetTask(i).Text := string.Empty;
+              end
+              else
+                GetTask(i).Text := string.Empty;
+            end;
+            if j = 3 then
+            begin
+              if (TempTasks.GetTask(index).Comment <> string.Empty) then
+              begin
+                GetTask(i).Comment := TempTasks.GetTask(index).Comment;
+                GetTask(i).CommentItalic := TempTasks.GetTask(index).CommentItalic;
+              end
+              else
+              if Rect.Width = 0 then
+              begin
+                if (TempTasks.GetTask(index).Text <> string.Empty) then
+                  GetTask(i).Comment := TempTasks.GetTask(index).Text
+                else
+                if (TempTasks.GetTask(index).Date <> 0) then
+                  GetTask(i).Comment := FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
+                    FormatSettings.LongTimeFormat, TempTasks.GetTask(index).Date)
+                else
+                  GetTask(i).Comment := string.Empty;
+              end
               else
                 GetTask(i).Comment := string.Empty;
-            end
-            else
-              GetTask(i).Comment := string.Empty;
-          end;
-          if j = 4 then
-          begin
-            if (TempTasks.GetTask(index).Date <> 0) then
-              GetTask(i).Date := TempTasks.GetTask(index).Date
-            else
-            if Rect.Width = 0 then
+            end;
+            if j = 4 then
             begin
-              if (TempTasks.GetTask(index).Text <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Text, TempDate)) then
-                GetTask(i).Date := TempDate
+              if (TempTasks.GetTask(index).Date <> 0) then
+                GetTask(i).Date := TempTasks.GetTask(index).Date
               else
-              if (TempTasks.GetTask(index).Comment <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Comment, TempDate)) then
-                GetTask(i).Date := TempDate
+              if Rect.Width = 0 then
+              begin
+                if (TempTasks.GetTask(index).Text <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Text, TempDate)) then
+                  GetTask(i).Date := TempDate
+                else
+                if (TempTasks.GetTask(index).Comment <> string.Empty) and
+                  (TryStrToDateTime(TempTasks.GetTask(index).Comment, TempDate)) then
+                  GetTask(i).Date := TempDate
+                else
+                  GetTask(i).Date := 0;
+              end
               else
                 GetTask(i).Date := 0;
-            end
-            else
-              GetTask(i).Date := 0;
+            end;
           end;
+          Inc(index);
         end;
-        Inc(index);
       end;
 
       // Insert if clipboard is bigger than selection
