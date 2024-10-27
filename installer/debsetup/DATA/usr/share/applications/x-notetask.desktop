@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=Notetask
+Exec=/user/bin/notetask %f
+Type=Application
+MimeType=application/x-notetask

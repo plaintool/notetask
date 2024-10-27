@@ -1,0 +1,7 @@
+Package: Notetask
+Version: 1.0
+Section: base
+Priority: optional
+Architecture: all
+Maintainer: Alexander Tverskoy <astverskoy@gmail.com>
+Description: A simple application for creating and organizing task lists

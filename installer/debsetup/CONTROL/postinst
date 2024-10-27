@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+chmod +x /usr/bin/notetask
+update-mime-database /usr/share/mime/
