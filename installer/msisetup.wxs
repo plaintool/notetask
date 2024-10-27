@@ -6,53 +6,40 @@
 
     <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Component Id="Notetask" DiskId="1" Guid="2cf58c8a-ad81-49e9-acbc-b1a3262acfc6">
-        <!-- Изменен KeyPath на запись реестра -->
-        <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="InstallPath" Type="string" Value="[INSTALLDIR]" KeyPath="yes" />
-        <File Id="NOTETASK.EXE" Name="notetask.exe" Source="D:\Lazarus\Notetask\notetask.exe">
-          <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Notetask" WorkingDirectory="INSTALLDIR" Icon="DesktopIcon.exe" IconIndex="0" />
-          <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Notetask" Icon="StartMenuIcon.exe" IconIndex="0" />
-        </File>
-        <File Id="LICENSE.TXT" Name="LICENSE.txt" Source="D:\Lazarus\Notetask\LICENSE.txt" />
-      </Component>
-
+      
+      <!-- Component для файлов -->
+      <Directory Id="INSTALLDIR" Name="Notetask">
+        <Component Id="NotetaskFiles" DiskId="1" Guid="2cf58c8a-ad81-49e9-acbc-b1a3262acfc6" KeyPath="yes">
+          <File Id="NOTETASK.EXE" Name="notetask.exe" Source="D:\Lazarus\Notetask\notetask.exe" />
+          <File Id="LICENSE.TXT" Name="LICENSE.txt" Source="D:\Lazarus\Notetask\LICENSE.txt" />
+        </Component>
+      </Directory>
+      
       <Directory Id="DesktopFolder" />
       <Directory Id="ProgramMenuFolder">
         <Directory Id="ProgramMenuDir" Name="Notetask">
+          
+          <!-- Component для ярлыков и реестра пользователя -->
+          <Component Id="Notetask" Guid="5B51614C-D5BE-4BDC-9EF3-97147A0DF68C">
+            <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="InstallPath" Type="string" Value="[INSTALLDIR]" KeyPath="yes" />
+            <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Notetask" WorkingDirectory="INSTALLDIR" Icon="DesktopIcon.exe" IconIndex="0" />
+            <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Notetask" Icon="StartMenuIcon.exe" IconIndex="0" />
+          </Component>
+
           <Component Id="StartMenuShortcuts" Guid="5B51614C-D5BE-4BDC-9EF3-97147A0DF68C">
             <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
-            <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Type="string" Value="[ProductName]" KeyPath="yes"/>
+            <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="Product" Type="string" Value="[ProductName]" KeyPath="no"/>
             <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
           </Component>
+
         </Directory>
       </Directory>
     </Directory>
 
-    <!-- Registry entries for .tsk file association and application registration -->
-    <DirectoryRef Id="TARGETDIR">
-      <Component Id="RegistryEntries" Guid="5F2DB9C1-7F15-4B34-9FE2-8425AE6C56A4">
-        <RegistryKey Root="HKCU" Key="Software\Classes\.tsk" Action="createAndRemoveOnUninstall">
-          <RegistryValue Type="string" Value="notetask" KeyPath="yes" />
-        </RegistryKey>
-
-        <RegistryKey Root="HKCU" Key="Software\Classes\notetask\DefaultIcon" Action="createAndRemoveOnUninstall">
-          <RegistryValue Type="string" Value="[INSTALLDIR]notetask.exe,1" />
-        </RegistryKey>
-        <RegistryKey Root="HKCU" Key="Software\Classes\notetask\shell\open\command" Action="createAndRemoveOnUninstall">
-          <RegistryValue Type="string" Value="&quot;[INSTALLDIR]notetask.exe&quot; &quot;%1&quot;" />
-        </RegistryKey>
-
-        <!-- Application registration -->
-        <RegistryKey Root="HKCU" Key="Software\Classes\Applications\notetask.exe\shell\open\command" Action="createAndRemoveOnUninstall">
-          <RegistryValue Type="string" Value="&quot;[INSTALLDIR]notetask.exe&quot; &quot;%1&quot;" />
-        </RegistryKey>
-      </Component>
-    </DirectoryRef>
-
     <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+      <ComponentRef Id="NotetaskFiles" />
       <ComponentRef Id="Notetask" />
       <ComponentRef Id="StartMenuShortcuts" />
-      <ComponentRef Id="RegistryEntries" />
     </Feature>
 
     <UI>
