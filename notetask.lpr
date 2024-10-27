@@ -45,6 +45,6 @@ begin
   Application.CreateForm(TformFindText, formFindText);
   Application.CreateForm(TformReplaceText, formReplaceText);
   ApplicationTranslate(Language);
-  SetFileTypeIcon('.tsk', 1);
+  //SetFileTypeIcon('.tsk', 1);
   Application.Run;
 end.
