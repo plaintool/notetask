@@ -190,14 +190,14 @@ var
   {$ENDIF}
 
   {$IFDEF Linux}
-  procedure SaveIconFromResources(const ResName, OutputPath: string);
+  procedure SaveIconFromResources(const ResName, OutputPath: string; ResType: PChar = RT_RCDATA);
   var
     ResourceStream: TResourceStream;
     FileStream: TFileStream;
   begin
     try
       // Open the resource stream (ResName is the name of the resource, e.g., "icon.png")
-      ResourceStream := TResourceStream.Create(HInstance, ResName, RT_GROUP_ICON);
+      ResourceStream := TResourceStream.Create(HInstance, ResName, ResType);
       try
         // Create the output file
         FileStream := TFileStream.Create(OutputPath, fmCreate);
@@ -268,24 +268,23 @@ begin
     // Create necessary directories if they do not exist
     ForceDirectories(UserHome + '/.local/share/mime/packages/');
     ForceDirectories(UserHome + '/.local/share/applications/');
-    ForceDirectories(UserHome + '/.local/share/icons/notetask');
+    //ForceDirectories(UserHome + '/.local/share/icons/hicolor/48x48/mimetypes');
 
-    SaveIconFromResources('TASKDOC', UserHome + '/.local/share/icons/notetask/taskdoc.ico');
+    //SaveIconFromResources('X-TASKDOC', UserHome + '/.local/share/icons/hicolor/48x48/mimetypes/x-taskdoc.png');
 
     // Create the index.theme file for the icon theme
-    AssignFile(ThemeFile, UserHome + '/.local/share/icons/notetask/index.theme');
-    Rewrite(ThemeFile);
-    Writeln(ThemeFile, '[Icon Theme]');
-    Writeln(ThemeFile, 'Name=notetask');
-    Writeln(ThemeFile, 'Comment=Icons for Notetask application');
-    Writeln(ThemeFile, 'Inherits=default'); // Optionally specify a parent icon theme
-    Writeln(ThemeFile, 'Directories=notetask');
-    Writeln(ThemeFile, '');
-    Writeln(ThemeFile, '[notetask]');
-    Writeln(ThemeFile, 'Size=16;32;48;64;128;256'); // Specify available icon sizes
-    Writeln(ThemeFile, 'Type=Fixed'); // Type can be Fixed or Scalable
-    Writeln(ThemeFile, 'Icon=taskdoc.ico'); // Name of the ICO file
-    CloseFile(ThemeFile);
+    //AssignFile(ThemeFile, UserHome + '/.local/share/icons/hicolor/index.theme');
+    //Rewrite(ThemeFile);
+    //Writeln(ThemeFile, '[Icon Theme]');
+    //Writeln(ThemeFile, 'Name=Hicolor');
+    //Writeln(ThemeFile, 'Comment=Fallback icon theme');
+    //Writeln(ThemeFile, 'Hidden=true');
+    //Writeln(ThemeFile, 'Directories=48x48/mimetypes');
+    //Writeln(ThemeFile, '');
+    //Writeln(ThemeFile, '[48x48/mimetypes]');
+    //Writeln(ThemeFile, 'Size=48'); // Specify available icon sizes
+    //Writeln(ThemeFile, 'Type=Fixed'); // Type can be Fixed or Scalable
+    //CloseFile(ThemeFile);
 
     // Create a .xml file for MIME type
     AssignFile(MimeFile, UserHome + '/.local/share/mime/packages/x-notetask.xml');
@@ -295,7 +294,7 @@ begin
     Writeln(MimeFile, '  <mime-type type="', MimeType, '">');
     Writeln(MimeFile, '    <comment>Notetask file</comment>');
     Writeln(MimeFile, '    <glob pattern="*', Ext, '"/>');
-    Writeln(MimeFile, '    <icon name="notetask/taskdoc.ico"/>');
+    //Writeln(MimeFile, '    <icon name="x-taskdoc"/>');
     Writeln(MimeFile, '  </mime-type>');
     Writeln(MimeFile, '</mime-info>');
     CloseFile(MimeFile);
@@ -306,16 +305,17 @@ begin
     Writeln(DesktopFile, '[Desktop Entry]');
     Writeln(DesktopFile, 'Name=Notetask');
     Writeln(DesktopFile, 'Exec=', AppPath, ' %f');
-    //Writeln(DesktopFile, 'Icon=notetask'); // Specify the icon name or full path if necessary
     Writeln(DesktopFile, 'Type=Application');
     Writeln(DesktopFile, 'MimeType=', MimeType);
     CloseFile(DesktopFile);
 
     // Update MIME database
     if (FpSystem('xdg-mime install --mode user ' + UserHome + '/.local/share/mime/packages/x-notetask.xml') = 0) and
+       (FpSystem('xdg-icon-resource install --context mimetypes --size 48 ' + UserHome + '/.local/share/icons/hicolor/48x48/mimetypes/x-taskdoc.png x-taskdoc') = 0) and
        (FpSystem('update-mime-database ' + UserHome + '/.local/share/mime') = 0) and
-       (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/x-notetask.desktop') = 0) and
-       (FpSystem('gtk-update-icon-cache '+UserHome+'/.local/share/icons/notetask/ -f') = 0) then
+       (FpSystem('gtk-update-icon-cache '+UserHome+'/.local/share/icons/hicolor -f') = 0) and
+       (FpSystem('xdg-desktop-menu install --mode user ' + UserHome + '/.local/share/applications/x-notetask.desktop') = 0)
+       then
     begin
       Result := True; // Indicate success
     end
