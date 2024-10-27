@@ -26,7 +26,8 @@
             <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Notetask" Icon="StartMenuIcon.exe" IconIndex="0" />
           </Component>
 
-          <Component Id="StartMenuShortcuts" Guid="5B51614C-D5BE-4BDC-9EF3-97147A0DF68C">
+          <!-- Component для удаления ярлыков -->
+          <Component Id="StartMenuShortcuts" Guid="6A8B514C-D8BE-4ADC-9EF3-12347B0DF123">
             <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
             <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="Product" Type="string" Value="[ProductName]" KeyPath="no"/>
             <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
