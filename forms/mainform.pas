@@ -1348,6 +1348,8 @@ var
 begin
   if Screen.ActiveForm <> Self then exit;
 
+  SaveFormSettings(self); // Save setting for new process
+
   Process := TProcess.Create(nil); // Create a new process
   try
     Process.Executable := ParamStr(0); // Set the executable to the current application
