@@ -42,8 +42,12 @@ implementation
 function GetOSLanguage: string;
   {platform-independent method to read the language of the user interface}
 var
-  l, fbl: string;
+  fbl: string;
+  {$IFDEF Windows}
+  l:string;
+  {$ENDIF}
   {$IFDEF LCLCarbon}
+  l:string;
   theLocaleRef: CFLocaleRef;
   locale: CFStringRef;
   buffer: StringPtr;
@@ -53,8 +57,8 @@ var
   {$ENDIF}
 begin
   fbl := string.Empty;
-  l := string.Empty;
   {$IFDEF LCLCarbon}
+  l := string.Empty;
   theLocaleRef := CFLocaleCopyCurrent;
   locale := CFLocaleGetIdentifier(theLocaleRef);
   encoding := 0;
@@ -71,6 +75,7 @@ begin
   {$IFDEF LINUX}
   fbl := Copy(GetEnvironmentVariable('LANG'), 1, 2);
   {$ELSE}
+  l := string.Empty;
   GetLanguageIDs(l, fbl);
   {$ENDIF}
   {$ENDIF}
