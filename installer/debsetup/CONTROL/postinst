@@ -7,5 +7,8 @@ chmod +x /usr/bin/notetask
 # Register the x-notetask.desktop file as a new MIME type.
 xdg-mime install /usr/share/applications/x-notetask.desktop
 
+# Add the 'NoteTask' application to the system's desktop menu.
+xdg-desktop-menu install /usr/share/applications/x-notetask.desktop
+
 # Update the MIME database to apply changes system-wide.
 update-mime-database /usr/share/mime/
