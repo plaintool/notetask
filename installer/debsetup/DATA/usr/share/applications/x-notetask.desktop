@@ -4,5 +4,5 @@ Exec=/usr/bin/notetask %f
 Type=Application
 MimeType=application/x-notetask
 Terminal=false
-Icon=notetask
+Icon=x-notetask
 Categories=TextEditor;Office;Development;
