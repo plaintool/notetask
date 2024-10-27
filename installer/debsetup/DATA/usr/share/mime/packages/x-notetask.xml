@@ -2,7 +2,8 @@
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
   <mime-type type="application/x-notetask">
     <comment>Notetask file</comment>
+    <generic-icon name="taskdoc"/>
+	<sub-class-of type="text/plain"/>
     <glob pattern="*.tsk"/>
-    <icon name="taskdoc"/>
   </mime-type>
 </mime-info>
