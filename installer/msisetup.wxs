@@ -7,10 +7,9 @@
     <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
     <Directory Id="TARGETDIR" Name="SourceDir">
       
-      <!-- Component для файлов -->
       <Directory Id="INSTALLDIR" Name="Notetask">
-        <Component Id="NotetaskFiles" DiskId="1" Guid="2cf58c8a-ad81-49e9-acbc-b1a3262acfc6" KeyPath="yes">
-          <File Id="NOTETASK.EXE" Name="notetask.exe" Source="D:\Lazarus\Notetask\notetask.exe" />
+        <Component Id="NotetaskFiles" DiskId="1" Guid="2cf58c8a-ad81-49e9-acbc-b1a3262acfc6">
+          <File Id="NOTETASK.EXE" Name="notetask.exe" Source="D:\Lazarus\Notetask\notetask.exe" KeyPath="yes" />
           <File Id="LICENSE.TXT" Name="LICENSE.txt" Source="D:\Lazarus\Notetask\LICENSE.txt" />
         </Component>
       </Directory>
@@ -19,17 +18,15 @@
       <Directory Id="ProgramMenuFolder">
         <Directory Id="ProgramMenuDir" Name="Notetask">
           
-          <!-- Component для ярлыков и реестра пользователя -->
-          <Component Id="Notetask" Guid="5B51614C-D5BE-4BDC-9EF3-97147A0DF68C">
-            <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="InstallPath" Type="string" Value="[INSTALLDIR]" KeyPath="yes" />
-            <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Notetask" WorkingDirectory="INSTALLDIR" Icon="DesktopIcon.exe" IconIndex="0" />
-            <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Notetask" Icon="StartMenuIcon.exe" IconIndex="0" />
+          <Component Id="NotetaskShortcuts" Guid="5B51614C-D5BE-4BDC-9EF3-97147A0DF68C">
+            <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="InstallPath" Type="string" Value="[INSTALLDIR]" />
+            <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Notetask" WorkingDirectory="INSTALLDIR" Target="[INSTALLDIR]notetask.exe" Icon="DesktopIcon.exe" IconIndex="0" />
+            <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Notetask" Target="[INSTALLDIR]notetask.exe" Icon="StartMenuIcon.exe" IconIndex="0" />
           </Component>
 
-          <!-- Component для удаления ярлыков -->
           <Component Id="StartMenuShortcuts" Guid="6A8B514C-D8BE-4ADC-9EF3-12347B0DF123">
             <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
-            <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="Product" Type="string" Value="[ProductName]" KeyPath="no"/>
+            <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="Product" Type="string" Value="[ProductName]"/>
             <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
           </Component>
 
@@ -39,7 +36,7 @@
 
     <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
       <ComponentRef Id="NotetaskFiles" />
-      <ComponentRef Id="Notetask" />
+      <ComponentRef Id="NotetaskShortcuts" />
       <ComponentRef Id="StartMenuShortcuts" />
     </Feature>
 
