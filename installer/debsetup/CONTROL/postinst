@@ -14,12 +14,12 @@ xdg-desktop-menu install /usr/share/applications/x-notetask.desktop
 update-mime-database /usr/share/mime/
 
 # Install the main application icon (for menus and application launchers) with a size of 128x128.
-xdg-icon-resource install --context apps --size 128 /usr/share/icons/hicolor/128x128/apps/x-notetask.png x-notetask
-xdg-icon-resource install --context apps --size 64 /usr/share/icons/hicolor/64x64/apps/x-notetask.png x-notetask
+xdg-icon-resource install --context apps --size 128 /usr/share/icons/hicolor/128x128/apps/notetask.png notetask
+xdg-icon-resource install --context apps --size 64 /usr/share/icons/hicolor/64x64/apps/notetask.png notetask
 
 # Install the MIME-type icon associated with .tsk files (or custom file types) with a size of 128x128.
-xdg-icon-resource install --context mimetypes --size 128 /usr/share/icons/hicolor/128x128/mimetypes/x-taskdoc.png x-taskdoc
-xdg-icon-resource install --context mimetypes --size 64 /usr/share/icons/hicolor/64x64/mimetypes/x-taskdoc.png x-taskdoc
+xdg-icon-resource install --context mimetypes --size 128 /usr/share/icons/hicolor/128x128/mimetypes/taskdoc.png application-x-notetask
+xdg-icon-resource install --context mimetypes --size 64 /usr/share/icons/hicolor/64x64/mimetypes/taskdoc.png application-x-notetask
 
 # Update the icon cache to make sure the system recognizes the new icons.
 gtk-update-icon-cache /usr/share/icons/hicolor

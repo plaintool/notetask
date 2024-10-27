@@ -3,6 +3,6 @@
   <mime-type type="application/x-notetask">
     <comment>Notetask file</comment>
     <glob pattern="*.tsk"/>
-    <icon name="x-taskdoc"/>
+    <icon name="taskdoc"/>
   </mime-type>
 </mime-info>
