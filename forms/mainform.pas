@@ -941,9 +941,15 @@ begin
     Memo.WantReturns := FWordWrap;
     Memo.ScrollBars := ssNone;
     if (FBiDiRightToLeft) then
-      Memo.BiDiMode := bdRightToLeft
+    begin
+      Memo.BiDiMode := bdRightToLeft;
+      Memo.Alignment := taRightJustify;
+    end
     else
+    begin
       Memo.BiDiMode := bdLeftToRight;
+      Memo.Alignment := taLeftJustify;
+    end;
 
     EditControlSetBounds(Memo, aCol, aRow);
     Memo.Parent := taskGrid;
