@@ -1,49 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="7821A44B-2330-49F0-B439-F6CD2A17472E" Name="Notetask" Language="1033" Version="0.0.0.1" Manufacturer="Alexander Tverskoy" UpgradeCode="45C75BC5-3DDC-453B-A7AB-7E2AE0D88699">
-    <Package Description="Notetask" Comments="Simple test" InstallerVersion="200" Compressed="yes" InstallScope="perUser"/>
-
-    <WixVariable Id="WixUILicenseRtf" Value="D:\Lazarus\Notetask\installer\LICENSE.rtf" /> 
-
-    <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      
-      <Directory Id="INSTALLDIR" Name="Notetask">
-        <Component Id="NotetaskFiles" DiskId="1" Guid="2cf58c8a-ad81-49e9-acbc-b1a3262acfc6">
-          <File Id="NOTETASK.EXE" Name="notetask.exe" Source="D:\Lazarus\Notetask\notetask.exe" KeyPath="yes" />
-          <File Id="LICENSE.TXT" Name="LICENSE.txt" Source="D:\Lazarus\Notetask\LICENSE.txt" />
-        </Component>
-      </Directory>
-      
-      <Directory Id="DesktopFolder" />
-      <Directory Id="ProgramMenuFolder">
-        <Directory Id="ProgramMenuDir" Name="Notetask">
-          
-          <Component Id="NotetaskShortcuts" Guid="5B51614C-D5BE-4BDC-9EF3-97147A0DF68C">
-            <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="InstallPath" Type="string" Value="[INSTALLDIR]" />
-            <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Notetask" WorkingDirectory="INSTALLDIR" Target="[INSTALLDIR]notetask.exe" Icon="DesktopIcon.exe" IconIndex="0" />
-            <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Notetask" Target="[INSTALLDIR]notetask.exe" Icon="StartMenuIcon.exe" IconIndex="0" />
-          </Component>
-
-          <Component Id="StartMenuShortcuts" Guid="6A8B514C-D8BE-4ADC-9EF3-12347B0DF123">
-            <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
-            <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="Product" Type="string" Value="[ProductName]"/>
-            <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
-          </Component>
-
+    <Product Id="7821A44B-2330-49F0-B439-F6CD2A17472E" Name="Notetask" Language="1033" Version="1.0.0.0" Manufacturer="Alexander Tverskoy" UpgradeCode="45C75BC5-3DDC-453B-A7AB-7E2AE0D88699">
+        <Package Description="Notetask" Comments="Simple test" InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
+        <WixVariable Id="WixUILicenseRtf" Value="D:\Lazarus\Notetask\installer\LICENSE.rtf" />
+        <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLDIR" Name="Notetask">
+                    <Component Id="NotetaskFiles" DiskId="1" Guid="2cf58c8a-ad81-49e9-acbc-b1a3262acfc6">
+                        <File Id="NOTETASK.EXE" Name="notetask.exe" Source="D:\Lazarus\Notetask\notetask.exe" KeyPath="yes" />
+                        <File Id="LICENSE.TXT" Name="LICENSE.txt" Source="D:\Lazarus\Notetask\LICENSE.txt" />
+                    </Component>
+                </Directory>
+            </Directory>
+            <Directory Id="DesktopFolder" />
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ProgramMenuDir" Name="Notetask">
+                    <Component Id="NotetaskShortcuts" Guid="5B51614C-D5BE-4BDC-9EF3-97147A0DF68C">
+                        <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="InstallPath" Type="string" Value="[INSTALLDIR]" />
+                        <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Notetask" WorkingDirectory="INSTALLDIR" Target="[INSTALLDIR]notetask.exe" Icon="DesktopIcon.exe" IconIndex="0" />
+                        <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Notetask" Target="[INSTALLDIR]notetask.exe" Icon="StartMenuIcon.exe" IconIndex="0" />
+                    </Component>
+                    <Component Id="StartMenuShortcuts" Guid="6A8B514C-D8BE-4ADC-9EF3-12347B0DF123">
+                        <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+                        <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="Product" Type="string" Value="[ProductName]" />
+                        <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
+                    </Component>
+                </Directory>
+            </Directory>
         </Directory>
-      </Directory>
-    </Directory>
-
-    <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
-      <ComponentRef Id="NotetaskFiles" />
-      <ComponentRef Id="NotetaskShortcuts" />
-      <ComponentRef Id="StartMenuShortcuts" />
-    </Feature>
-
-    <UI>
-      <UIRef Id="WixUI_Minimal" />
-    </UI>
-    <Icon Id="DesktopIcon.exe" SourceFile="D:\Lazarus\Notetask\notetask.exe" />
-    <Icon Id="StartMenuIcon.exe" SourceFile="D:\Lazarus\Notetask\notetask.exe" />
-  </Product>
+        <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+            <ComponentRef Id="NotetaskFiles" />
+            <ComponentRef Id="NotetaskShortcuts" />
+            <ComponentRef Id="StartMenuShortcuts" />
+        </Feature>
+        <UI>
+            <UIRef Id="WixUI_Minimal" />
+        </UI>
+        <Icon Id="DesktopIcon.exe" SourceFile="D:\Lazarus\Notetask\notetask.exe" />
+        <Icon Id="StartMenuIcon.exe" SourceFile="D:\Lazarus\Notetask\notetask.exe" />
+    </Product>
 </Wix>
