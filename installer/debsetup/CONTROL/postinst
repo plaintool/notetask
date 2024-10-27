@@ -1,4 +1,11 @@
 #!/bin/bash -e
+# Enables 'exit on error' mode, so the script will stop if any command fails.
 
+# Make the 'notetask' binary executable.
 chmod +x /usr/bin/notetask
+
+# Register the x-notetask.desktop file as a new MIME type.
+xdg-mime install /usr/share/applications/x-notetask.desktop
+
+# Update the MIME database to apply changes system-wide.
 update-mime-database /usr/share/mime/
