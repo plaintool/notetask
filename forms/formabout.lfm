@@ -1,18 +1,19 @@
 object formAboutNotetask: TformAboutNotetask
   Left = 318
-  Height = 291
+  Height = 282
   Top = 250
   Width = 466
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'About'
-  ClientHeight = 291
+  ClientHeight = 282
   ClientWidth = 466
   Color = clWhite
+  Scaled = False
   object buttonOk: TButton
     Left = 381
     Height = 25
-    Top = 254
+    Top = 245
     Width = 75
     Anchors = [akRight, akBottom]
     Cancel = True
@@ -152,36 +153,36 @@ object formAboutNotetask: TformAboutNotetask
     }
   end
   object labelBy: TLabel
-    Left = 15
+    Left = 140
     Height = 15
-    Top = 124
-    Width = 433
+    Top = 72
+    Width = 208
     Alignment = taCenter
-    Caption = 'by Alexander Tverskoy is licensed under the GNU General Public License, Version 3 '
+    Caption = 'by Alexander Tverskoy is licensed under'
     WordWrap = True
   end
   object labelName: TLabel
     Left = 136
     Height = 55
-    Top = 32
+    Top = 12
     Width = 309
     Caption = 'Notetask © 2024'
     Font.Height = -41
     ParentFont = False
   end
   object labelLic: TLabel
-    Left = 16
+    Left = 140
     Height = 15
-    Top = 148
+    Top = 112
     Width = 215
     Caption = 'For questions or feedback, contact me at'
     WordWrap = True
   end
   object LabelLicUrl: TLabel
     Cursor = crHandPoint
-    Left = 236
+    Left = 140
     Height = 15
-    Top = 148
+    Top = 132
     Width = 160
     Caption = 'mailto:astverskoy@gmail.com'
     Font.Color = clBlue
@@ -193,8 +194,9 @@ object formAboutNotetask: TformAboutNotetask
   object Memo1: TMemo
     Left = 16
     Height = 69
-    Top = 172
+    Top = 164
     Width = 440
+    Anchors = [akLeft, akBottom]
     Color = clBtnFace
     Lines.Strings = (
       'A simple application for creating and organizing task lists, offering essential features for efficient task management, similar to Notepad in its simplicity and functionality.'
@@ -207,5 +209,14 @@ object formAboutNotetask: TformAboutNotetask
     )
     ScrollBars = ssVertical
     TabOrder = 1
+  end
+  object labelBy1: TLabel
+    Left = 140
+    Height = 15
+    Top = 92
+    Width = 222
+    Alignment = taCenter
+    Caption = 'the GNU General Public License, Version 3 '
+    WordWrap = True
   end
 end

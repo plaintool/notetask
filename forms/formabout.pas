@@ -36,6 +36,7 @@ type
     labelLic: TLabel;
     LabelLicUrl: TLabel;
     Memo1: TMemo;
+    labelBy1: TLabel;
     procedure LabelLicUrlClick(Sender: TObject);
   private
 

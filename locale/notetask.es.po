@@ -121,7 +121,11 @@ msgid "About"
 msgstr "Acerca de"
 
 #: tformaboutnotetask.labelby.caption
-msgid "by Alexander Tverskoy is licensed under the GNU General Public License, Version 3 "
+msgid "by Alexander Tverskoy is licensed under"
+msgstr ""
+
+#: tformaboutnotetask.labelby1.caption
+msgid "the GNU General Public License, Version 3 "
 msgstr ""
 
 #: tformaboutnotetask.labellic.caption
@@ -595,3 +599,4 @@ msgstr "Buscar qué:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Reemplazar con:"
+
