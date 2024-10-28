@@ -545,25 +545,25 @@ begin
     Key := 0;
   end
   else
-  if (Shift = [ssCtrl]) and (Key = VK_PRIOR) then // Ctrl + Page Up
+  if ((Shift = [ssCtrl]) or (Shift = [ssAlt])) and (Key = VK_PRIOR) then // Ctrl || Alt + Page Up
   begin
     aMoveTaskTop.Execute;
     Key := 0;
   end
   else
-  if (Shift = [ssCtrl]) and (Key = VK_NEXT) then // Ctrl + Page Down
+  if ((Shift = [ssCtrl]) or (Shift = [ssAlt])) and (Key = VK_NEXT) then // Ctrl || Alt + Page Down
   begin
     aMoveTaskBottom.Execute;
     Key := 0;
   end
   else
-  if (Shift = [ssCtrl]) and (Key = VK_UP) then // Ctrl + Up
+  if ((Shift = [ssCtrl]) or (Shift = [ssAlt])) and (Key = VK_UP) then // Ctrl || Alt + Up
   begin
     aMoveTaskUp.Execute;
     Key := 0;
   end
   else
-  if (Shift = [ssCtrl]) and (Key = VK_DOWN) then // Ctrl + Down
+  if ((Shift = [ssCtrl]) or (Shift = [ssAlt])) and (Key = VK_DOWN) then // Ctrl || Alt + Down
   begin
     aMoveTaskDown.Execute;
     Key := 0;
