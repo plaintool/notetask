@@ -864,11 +864,11 @@ var
   Rect: TGridRect;
   Index, i, j: integer;
   RowTask: TTask;
-  IsEmpty, NoInsert: boolean;
+  IsEmpty, DoInsert: boolean;
   //  Id, Id0, Id1: integer;
 begin
   Result := Grid.Selection;
-  NoInsert := False;
+  DoInsert := True;
   if Clipboard.AsText = string.Empty then exit;
   CreateBackup;
 
@@ -908,9 +908,10 @@ begin
       else
       begin
         Rect := Grid.Selection; // Get grid selection rect
-        if ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) and (not ((Grid.Selection.Left = 2) and (Grid.Selection.Right = 2))) then
+        if ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) and
+          (not ((Grid.Selection.Left = 2) and (Grid.Selection.Right = 2))) then
         begin
-          NoInsert := True;
+          DoInsert := False;
         end;
 
         for i := Rect.Top to Rect.Bottom do
@@ -918,7 +919,7 @@ begin
           if (index > TempTasks.FCount) then
           begin
             Index := 1;
-            NoInsert := True;
+            DoInsert := False;
           end;
           for j := Rect.Left to Rect.Right do
           begin
@@ -992,7 +993,7 @@ begin
       end;
 
       // Insert if clipboard is bigger than selection
-      if (not NoInsert) and (index - 1 < TempTasks.FCount) then
+      if (DoInsert) and (index - 1 < TempTasks.FCount) then
       begin
         for i := TempTasks.FCount - 1 downto index - 1 do
         begin
@@ -1001,12 +1002,7 @@ begin
         Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom + (TempTasks.Count - Index) + 1);
       end
       else
-      begin
-        if (TempTasks.Count < Rect.Height) then
-          Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom - (Rect.Height - TempTasks.Count) - 1)
-        else
-          Result := Rect;
-      end;
+        Result := Rect;
     end;
   finally
     TempTasks.Free; // Free the temporary TTasks object
