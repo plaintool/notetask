@@ -334,7 +334,8 @@ type
 
     procedure SetLanguage(aLanguage: string = string.Empty);
     procedure FillGrid;
-    procedure SaveFile(fileName: string = string.Empty);
+    function SaveFileAs: boolean;
+    function SaveFile(fileName: string = string.Empty): boolean;
     function OpenFile(fileName: string): boolean;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
     function Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
@@ -1376,6 +1377,20 @@ begin
   end;
 end;
 
+procedure TformNotetask.aSaveAsExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  SaveFileAs;
+end;
+
+procedure TformNotetask.aSaveExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  SaveFile(FFileName);
+end;
+
 procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -1412,23 +1427,6 @@ begin
       gridPrinter.Free;
     end;
   end;
-end;
-
-procedure TformNotetask.aSaveAsExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if (saveDialog.Execute) then
-  begin
-    SaveFile(saveDialog.FileName);
-  end;
-end;
-
-procedure TformNotetask.aSaveExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  SaveFile(FFileName);
 end;
 
 procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
@@ -2220,10 +2218,20 @@ begin
   end;
 end;
 
-procedure TformNotetask.SaveFile(fileName: string = string.Empty);
+function TformNotetask.SaveFileAs: boolean;
+begin
+  if (saveDialog.Execute) then
+  begin
+    Result := SaveFile(saveDialog.FileName);
+  end
+  else
+    Result := False;
+end;
+
+function TformNotetask.SaveFile(fileName: string = string.Empty): boolean;
 begin
   if (fileName = string.Empty) and (FFileName = string.Empty) then
-    aSaveAs.Execute;
+    Result := SaveFileAs;
 
   if (fileName = string.Empty) then
     fileName := FFileName
@@ -2236,9 +2244,40 @@ begin
     SaveTextFile(fileName, Tasks.ToStringList, FEncoding, FLineEnding);
     SetChanged(False);
     Tasks.CreateBackupInit;
-  end;
+    Result := True;
+  end
+  else
+    Result := False;
 
   SetInfo;
+end;
+
+function TformNotetask.IsCanClose: boolean;
+var
+  UserResponse: integer;
+begin
+  if FChanged then
+  begin
+    // Show message with Yes, No, and Cancel options
+    UserResponse := MessageDlg(rsavechanges, mtConfirmation, [mbYes, mbNo, mbCancel], 0);
+
+    case UserResponse of
+      mrYes:
+      begin
+        // Call save method and allow form to close
+        Result := SaveFile(FFileName);
+      end;
+      mrNo:
+      begin
+        // Do not save, but allow form to close
+        Result := True;
+      end;
+      else
+        Result := False;
+    end;
+  end
+  else
+    Result := True; // No changes, just close the form
 end;
 
 function TformNotetask.OpenFile(fileName: string): boolean;
@@ -2272,35 +2311,6 @@ end;
 function TformNotetask.GetIsEditing: boolean;
 begin
   Result := (taskGrid.EditorMode) or (FIsEditing);
-end;
-
-function TformNotetask.IsCanClose: boolean;
-var
-  UserResponse: integer;
-begin
-  if FChanged then
-  begin
-    // Show message with Yes, No, and Cancel options
-    UserResponse := MessageDlg(rsavechanges, mtConfirmation, [mbYes, mbNo, mbCancel], 0);
-
-    case UserResponse of
-      mrYes:
-      begin
-        // Call save method and allow form to close
-        aSave.Execute;
-        Result := True;
-      end;
-      mrNo:
-      begin
-        // Do not save, but allow form to close
-        Result := True;
-      end;
-      else
-        Result := False;
-    end;
-  end
-  else
-    Result := True; // No changes, just close the form
 end;
 
 function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
