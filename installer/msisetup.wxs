@@ -2,15 +2,25 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product Id="7821A44B-2330-49F0-B439-F6CD2A17472E" Name="Notetask" Language="1033" Version="1.0.0.0" Manufacturer="Alexander Tverskoy" UpgradeCode="45C75BC5-3DDC-453B-A7AB-7E2AE0D88699">
         <Package Description="Notetask" Comments="Simple test" InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
+		<Property Id="ALLUSERS" Value="2" />
+		<Property Id="MSIFASTINSTALL" Value="1" />
+		<Property Id="MSIINSTALLPERUSER" Value="1" />
         <WixVariable Id="WixUILicenseRtf" Value="D:\Lazarus\Notetask\installer\LICENSE.rtf" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="ProgramFilesFolder">
+            <Directory Id="LocalAppDataFolder">
                 <Directory Id="INSTALLDIR" Name="Notetask">
                     <Component Id="NotetaskFiles" DiskId="1" Guid="2cf58c8a-ad81-49e9-acbc-b1a3262acfc6">
-                        <File Id="NOTETASK.EXE" Name="notetask.exe" Source="D:\Lazarus\Notetask\notetask.exe" KeyPath="yes" />
-                        <File Id="LICENSE.TXT" Name="LICENSE.txt" Source="D:\Lazarus\Notetask\LICENSE.txt" />
-                    </Component>
+					<!-- Files to be installed -->
+						<File Id="NOTETASK.EXE" Name="notetask.exe" Source="D:\Lazarus\Notetask\notetask.exe" />
+						<File Id="LICENSE.TXT" Name="LICENSE.txt" Source="D:\Lazarus\Notetask\LICENSE.txt" />
+
+						<!-- Registry KeyPath to satisfy ICE38 -->
+						<RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="InstallPath" Type="string" Value="[INSTALLDIR]" KeyPath="yes" />
+
+						<!-- Remove INSTALLDIR on uninstall -->
+						<RemoveFolder Id="RemoveINSTALLDIR" Directory="INSTALLDIR" On="uninstall" />
+					</Component>
                 </Directory>
             </Directory>
             <Directory Id="DesktopFolder" />
