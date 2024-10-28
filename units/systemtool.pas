@@ -177,7 +177,7 @@ var
   IconPath: string;
   {$ENDIF}
   {$IFDEF Linux}
-  ThemeFile: TextFile;
+  //ThemeFile: TextFile;
   MimeFile: TextFile;
   DesktopFile: TextFile;
   MimeType: string;
