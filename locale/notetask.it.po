@@ -165,8 +165,8 @@ msgstr ""
 
 #: tformdonatenotetask.label1.caption
 msgctxt "tformdonatenotetask.label1.caption"
-msgid "Hey, help feed a hungry programmer! Every donation helps keep the caffeine flowing and the code coming. Thanks for supporting a small project that’s made with passion (and a lot of coffee)!"
-msgstr "Ehi, aiuta a sfamare un programmatore affamato! Ogni donazione aiuta a mantenere la caffeina e il codice in arrivo. Grazie per supportare un piccolo progetto fatto con passione (e tanto caffè)!"
+msgid "Hey there! Fuel this passion project with a little caffeine boost! Every donation helps keep the code rolling and the coffee brewing. Thanks for supporting the work and the developer behind it!"
+msgstr "Ciao! Dai una spinta a questo progetto appassionato con un po' di caffeina! Ogni donazione aiuta a mantenere il codice attivo e il caffè caldo. Grazie per supportare il lavoro e il programmatore dietro di esso!"
 
 #: tformdonatenotetask.label10.caption
 msgctxt "tformdonatenotetask.label10.caption"
@@ -595,4 +595,3 @@ msgstr "Trova cosa:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Sostituisci con:"
-

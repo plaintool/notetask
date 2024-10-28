@@ -77,7 +77,7 @@ object formDonateNotetask: TformDonateNotetask
     Top = 8
     Width = 415
     AutoSize = False
-    Caption = 'Hey, help feed a hungry programmer! Every donation helps keep the caffeine flowing and the code coming. Thanks for supporting a small project that’s made with passion (and a lot of coffee)!'
+    Caption = 'Hey there! Fuel this passion project with a little caffeine boost! Every donation helps keep the code rolling and the coffee brewing. Thanks for supporting the work and the developer behind it!'
     WordWrap = True
   end
   object Label2: TLabel

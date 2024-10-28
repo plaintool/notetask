@@ -155,7 +155,7 @@ msgstr ""
 
 #: tformdonatenotetask.label1.caption
 msgctxt "tformdonatenotetask.label1.caption"
-msgid "Hey, help feed a hungry programmer! Every donation helps keep the caffeine flowing and the code coming. Thanks for supporting a small project that’s made with passion (and a lot of coffee)!"
+msgid "Hey there! Fuel this passion project with a little caffeine boost! Every donation helps keep the code rolling and the coffee brewing. Thanks for supporting the work and the developer behind it!"
 msgstr ""
 
 #: tformdonatenotetask.label10.caption

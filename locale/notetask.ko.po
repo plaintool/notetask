@@ -165,8 +165,8 @@ msgstr ""
 
 #: tformdonatenotetask.label1.caption
 msgctxt "tformdonatenotetask.label1.caption"
-msgid "Hey, help feed a hungry programmer! Every donation helps keep the caffeine flowing and the code coming. Thanks for supporting a small project that’s made with passion (and a lot of coffee)!"
-msgstr "안녕하세요, 배고픈 프로그래머를 도와주세요! 모든 기부는 카페인이 흐르고 코드가 계속 나오도록 도와줍니다. 열정(그리고 많은 커피)으로 만들어진 작은 프로젝트를 지원해 주셔서 감사합니다!"
+msgid "Hey there! Fuel this passion project with a little caffeine boost! Every donation helps keep the code rolling and the coffee brewing. Thanks for supporting the work and the developer behind it!"
+msgstr "안녕하세요! 이 열정 가득한 프로젝트에 약간의 카페인 부스트를 주세요! 후원 덕분에 코드가 계속 이어지고 커피가 준비됩니다. 이 프로젝트와 개발자를 지원해 주셔서 감사합니다!"
 
 #: tformdonatenotetask.label10.caption
 msgctxt "tformdonatenotetask.label10.caption"
@@ -595,4 +595,3 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
-
