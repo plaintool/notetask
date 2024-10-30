@@ -1388,12 +1388,7 @@ begin
     for I := 0 to Count - 1 do
     begin
       if (Grid.RowCount > RowIndex) then
-      begin
-        if (SortOrder = soAscending) then
-          Grid.Cells[0, RowIndex] := RowIndex.ToString
-        else
-          Grid.Cells[0, RowIndex] := (Grid.RowCount - RowIndex).ToString;
-      end;
+        Grid.Cells[0, RowIndex] := (I + 1).ToString;
 
       // Duration calculation
       if (ShowDuration) then
@@ -1442,7 +1437,7 @@ begin
             if (DateDiff <> '-') and (Grid.RowCount > RowIndex) and ((RowIndex > 1) or (DateDiff <> '0' + rseconds)) then
             begin
               AddDatesInterval;
-              Grid.Cells[0, RowIndex] := RowIndex.ToString + '. ' + DateDiff;
+              Grid.Cells[0, RowIndex] := (I + 1).ToString + '. ' + DateDiff;
             end;
           end;
         end;
