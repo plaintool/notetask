@@ -107,6 +107,10 @@ msgctxt "task.rmonths"
 msgid "m"
 msgstr "міс"
 
+#: task.rseconds
+msgid "sec"
+msgstr "с"
+
 #: task.ryears
 msgid "y"
 msgstr "р"
@@ -599,4 +603,3 @@ msgstr "Знайти що:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Замінити на:"
-

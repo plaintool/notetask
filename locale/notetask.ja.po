@@ -107,6 +107,10 @@ msgctxt "task.rmonths"
 msgid "m"
 msgstr "月"
 
+#: task.rseconds
+msgid "sec"
+msgstr "秒"
+
 #: task.ryears
 msgid "y"
 msgstr "年"
@@ -599,4 +603,3 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
-

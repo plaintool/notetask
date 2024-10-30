@@ -107,6 +107,10 @@ msgctxt "task.rmonths"
 msgid "m"
 msgstr "म"
 
+#: task.rseconds
+msgid "sec"
+msgstr "से"
+
 #: task.ryears
 msgid "y"
 msgstr "व"
@@ -599,4 +603,3 @@ msgstr "क्या खोजें:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "इसके साथ बदलें:"
-

@@ -107,6 +107,10 @@ msgctxt "task.rmonths"
 msgid "m"
 msgstr "월"
 
+#: task.rseconds
+msgid "sec"
+msgstr "초"
+
 #: task.ryears
 msgid "y"
 msgstr "년"
@@ -599,4 +603,3 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
-

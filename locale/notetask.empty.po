@@ -107,6 +107,10 @@ msgctxt "task.rmonths"
 msgid "m"
 msgstr ""
 
+#: task.rseconds
+msgid "sec"
+msgstr ""
+
 #: task.ryears
 msgid "y"
 msgstr ""

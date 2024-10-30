@@ -89,6 +89,7 @@ type
     procedure CreateBackupInit;
     procedure UndoBackupInit;
     function GetCountArchive: integer;
+    function CalcDateDiff(const StartDate, EndDate: TDateTime): string;
 
     property Count: integer read FCount;
     property CountArhive: integer read GetCountArchive;
@@ -96,6 +97,7 @@ type
   end;
 
 resourcestring
+  rseconds = 'sec';
   rminutes = 'min';
   rhours = 'h';
   rdays = 'd';
@@ -1009,68 +1011,6 @@ begin
   end;
 end;
 
-function CalcDateDiff(const StartDate, EndDate: TDateTime): string;
-var
-  YearsDiff, MonthsDiff, DaysDiff, HoursDiff, MinutesDiff: integer;
-begin
-  // Calculate difference in yeard
-  YearsDiff := YearsBetween(EndDate, StartDate, True);
-  if YearsDiff <> 0 then
-  begin
-    if (StartDate > EndDate) then
-      Result := IntToStr(YearsDiff) + ryears
-    else
-      Result := '-';
-    Exit;
-  end;
-
-  // Calculate difference in months
-  MonthsDiff := MonthsBetween(EndDate, StartDate);
-  if MonthsDiff <> 0 then
-  begin
-    if (StartDate > EndDate) then
-      Result := IntToStr(MonthsDiff) + rmonths
-    else
-      Result := '-';
-    Exit;
-  end;
-
-  // Calculate difference in days
-  DaysDiff := DaysBetween(EndDate, StartDate);
-  if DaysDiff <> 0 then
-  begin
-    if (StartDate > EndDate) then
-      Result := IntToStr(DaysDiff) + rdays
-    else
-      Result := '-';
-    Exit;
-  end;
-
-  // Calculate difference in hours
-  HoursDiff := HoursBetween(EndDate, StartDate);
-  if HoursDiff <> 0 then
-  begin
-    if (StartDate > EndDate) then
-      Result := IntToStr(HoursDiff) + rhours
-    else
-      Result := '-';
-    Exit;
-  end;
-
-  // Calculate difference in minutes
-  MinutesDiff := MinutesBetween(EndDate, StartDate);
-  if MinutesDiff <> 0 then
-  begin
-    if (StartDate > EndDate) then
-      Result := IntToStr(MinutesDiff) + rminutes
-    else
-      Result := '-';
-    Exit;
-  end;
-
-  Result := string.Empty; //'0' + rminutes;
-end;
-
 procedure TTasks.CreateBackup;
 var
   i: integer;
@@ -1203,6 +1143,79 @@ begin
   FCount := Length(FTaskList); // Restore the task count
 end;
 
+function TTasks.CalcDateDiff(const StartDate, EndDate: TDateTime): string;
+var
+  YearsDiff, MonthsDiff, DaysDiff, HoursDiff, MinutesDiff, SecondsDiff: integer;
+begin
+  // Calculate difference in yeard
+  YearsDiff := YearsBetween(EndDate, StartDate, True);
+  if YearsDiff <> 0 then
+  begin
+    if (StartDate > EndDate) then
+      Result := IntToStr(YearsDiff) + ryears
+    else
+      Result := '-';
+    Exit;
+  end;
+
+  // Calculate difference in months
+  MonthsDiff := MonthsBetween(EndDate, StartDate);
+  if MonthsDiff <> 0 then
+  begin
+    if (StartDate > EndDate) then
+      Result := IntToStr(MonthsDiff) + rmonths
+    else
+      Result := '-';
+    Exit;
+  end;
+
+  // Calculate difference in days
+  DaysDiff := DaysBetween(EndDate, StartDate);
+  if DaysDiff <> 0 then
+  begin
+    if (StartDate > EndDate) then
+      Result := IntToStr(DaysDiff) + rdays
+    else
+      Result := '-';
+    Exit;
+  end;
+
+  // Calculate difference in hours
+  HoursDiff := HoursBetween(EndDate, StartDate);
+  if HoursDiff <> 0 then
+  begin
+    if (StartDate > EndDate) then
+      Result := IntToStr(HoursDiff) + rhours
+    else
+      Result := '-';
+    Exit;
+  end;
+
+  // Calculate difference in minutes
+  MinutesDiff := MinutesBetween(EndDate, StartDate);
+  if MinutesDiff <> 0 then
+  begin
+    if (StartDate > EndDate) then
+      Result := IntToStr(MinutesDiff) + rminutes
+    else
+      Result := '-';
+    Exit;
+  end;
+
+  // Calculate difference in seconds
+  SecondsDiff := SecondsBetween(EndDate, StartDate);
+  if SecondsDiff <> 0 then
+  begin
+    if (StartDate > EndDate) then
+      Result := IntToStr(SecondsDiff) + rseconds
+    else
+      Result := '-';
+    Exit;
+  end;
+
+  Result := '0' + rseconds;
+end;
+
 function TTasks.GetCountArchive: integer;
 var
   I: integer;
@@ -1216,10 +1229,13 @@ procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean;
 var
   I, J, ArhCount, RowIndex: integer;
   LastDate, MinDate, MaxDate: TDateTime;
+  StartDates, EndDates: array of TDateTime;
+  StartDate, EndDate: TDateTime;
   DateDiff: string;
   eventOnColRowInserted: TGridOperationEvent;
   eventOnColRowDeleted: TGridOperationEvent;
 
+// Compare tasks for soring
   function CompareTasks(Index1, Index2: integer): integer;
   var
     Task1, Task2: TTask;
@@ -1311,6 +1327,32 @@ var
     end;
   end;
 
+  // Add new dates interval to calulate task time length
+  procedure AddDatesInterval();
+  begin
+    SetLength(StartDates, Length(StartDates) + 1);
+    SetLength(EndDates, Length(EndDates) + 1);
+    StartDates[High(StartDates)] := StartDate;
+    EndDates[High(EndDates)] := EndDate;
+  end;
+
+  // Calculate total duration of all tasks
+  function CalculateTotalDuration: TDateTime;
+  var
+    i: integer;
+    TotalDuration: TDateTime;
+  begin
+    TotalDuration := 0;
+
+    // Проходим по каждому интервалу
+    for i := Low(StartDates) to High(StartDates) do
+    begin
+      TotalDuration := TotalDuration + (EndDates[i] - StartDates[i]);
+    end;
+
+    Result := TotalDuration;
+  end;
+
 begin
   try
     Grid.BeginUpdate;
@@ -1321,10 +1363,13 @@ begin
     LastDate := Now;
     MinDate := Now;
     MaxDate := 0;
+    StartDate := 0;
+    EndDate := 0;
+    SetLength(StartDates, 0);
+    SetLength(EndDates, 0);
 
-    ArhCount := 0;
-    for I := 0 to Count - 1 do
-      if FTaskList[I].Archive then ArhCount += 1;
+    // Archive tasks count
+    ArhCount := GetCountArchive;
 
     if (ShowArchive) then
       Grid.RowCount := Count + 1
@@ -1353,35 +1398,56 @@ begin
       // Duration calculation
       if (ShowDuration) then
       begin
+        // Check if the task's date is earlier than the current minimum date
         if (FTaskList[I].Date > 0) and (FTaskList[I].Date < MinDate) then
           MinDate := FTaskList[I].Date;
+
+        // For non-initial tasks, check previous tasks to adjust the minimum date further if needed
         if (i > 0) and (FTaskList[I].Date > 0) and (FTaskList[I].Date < LastDate) then
         begin
+          // Loop through previous tasks to find a suitable minimum date
           for j := i - 1 downto 0 do
           begin
             MinDate := FTaskList[J].Date;
+            // Break the loop if a valid previous task date is found
             if (FTaskList[J].Date > 0) and (FTaskList[J].Date <= FTaskList[I].Date) then
               break;
           end;
         end;
+
+        // Update the maximum date if the current task date is later than the current maximum
         if (FTaskList[I].Date > MaxDate) then
           MaxDate := FTaskList[I].Date;
 
+        // Calculate and display the date difference if applicable
         if FTaskList[I].Date > 0 then
         begin
           if (LastDate > 0) then
           begin
-            DateDiff := CalcDateDiff(FTaskList[I].Date, LastDate);
+            StartDate := FTaskList[I].Date;
+            EndDate := LastDate;
+            DateDiff := CalcDateDiff(StartDate, EndDate);
+
+            // If the date difference is invalid, recalculate with the minimum date
             if (DateDiff = '-') and (LastDate <> Now) then
             begin
-              DateDiff := CalcDateDiff(FTaskList[I].Date, MinDate);
+              StartDate := FTaskList[I].Date;
+              EndDate := MinDate;
+              DateDiff := CalcDateDiff(StartDate, EndDate);
+
               MinDate := FTaskList[I].Date;
             end;
-            if (DateDiff <> '-') and (Grid.RowCount > RowIndex) then
+
+            // Display the calculated date difference in the grid
+            if (DateDiff <> '-') and (Grid.RowCount > RowIndex) and ((RowIndex > 1) or (DateDiff <> '0' + rseconds)) then
+            begin
+              AddDatesInterval;
               Grid.Cells[0, RowIndex] := RowIndex.ToString + '. ' + DateDiff;
+            end;
           end;
         end;
 
+        // Update LastDate to the current task's date for the next iteration
         if FTaskList[I].Date > 0 then
           LastDate := FTaskList[I].Date;
       end;
@@ -1407,6 +1473,15 @@ begin
         else
           RowIndex -= 1;
       end;
+    end;
+
+    // Total duration calculation
+    Grid.Cells[0, 0] := string.Empty;
+    if (Length(StartDates) > 0) and (Length(StartDates) = Length(EndDates)) then
+    begin
+      DateDiff := CalcDateDiff(0, CalculateTotalDuration);
+      if (DateDiff <> '-') and (DateDiff <> '0' + rseconds) then
+        Grid.Cells[0, 0] := DateDiff;
     end;
 
     // Perform sorting if SortColumn is between 1 and 4
