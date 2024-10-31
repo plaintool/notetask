@@ -75,10 +75,10 @@ type
     procedure ArchiveTask(Index: integer);
     procedure CompleteTask(Index: integer; Backup: boolean = True);
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
-    function MoveTaskTop(Index: integer): integer;
-    function MoveTaskBottom(Index: integer): integer;
-    function MoveTaskUp(Index: integer): integer;
-    function MoveTaskDown(Index: integer): integer;
+    function MoveTaskTop(Index, Index2: integer): integer;
+    function MoveTaskBottom(Index, Index2: integer): integer;
+    function MoveTaskUp(Index, Index2: integer): integer;
+    function MoveTaskDown(Index, Index2: integer): integer;
     procedure SwapTasks(OldIndex, NewIndex: integer);
     procedure MoveTask(OldIndex, NewIndex: integer);
     procedure CopyToClipboard(Grid: TStringGrid);
@@ -648,7 +648,7 @@ begin
   end;
 end;
 
-function TTasks.MoveTaskTop(Index: integer): integer;
+function TTasks.MoveTaskTop(Index, Index2: integer): integer;
 var
   TempTask: TTask; // Declare the temporary variable here
   i, Ind: integer;
@@ -674,7 +674,7 @@ begin
   end;
 end;
 
-function TTasks.MoveTaskBottom(Index: integer): integer;
+function TTasks.MoveTaskBottom(Index, Index2: integer): integer;
 var
   TempTask: TTask; // Declare the temporary variable here
   i, Ind: integer;
@@ -700,7 +700,7 @@ begin
   end;
 end;
 
-function TTasks.MoveTaskUp(Index: integer): integer;
+function TTasks.MoveTaskUp(Index, Index2: integer): integer;
 var
   TempTask: TTask;   // Temporary variable for swapping tasks
   Ind: integer;
@@ -724,7 +724,7 @@ begin
   end;
 end;
 
-function TTasks.MoveTaskDown(Index: integer): integer;
+function TTasks.MoveTaskDown(Index, Index2: integer): integer;
 var
   TempTask: TTask;
   Ind: integer;

@@ -1202,7 +1202,7 @@ begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
-  newRow := Tasks.MoveTaskTop(taskGrid.Row);
+  newRow := Tasks.MoveTaskTop(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
   FillGrid;
   if (newRow > -1) and (taskGrid.Row <> newRow) then
   begin
@@ -1219,7 +1219,7 @@ begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
-  newRow := Tasks.MoveTaskBottom(taskGrid.Row);
+  newRow := Tasks.MoveTaskBottom(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
   FillGrid;
   if (newRow > -1) and (taskGrid.Row <> newRow) then
   begin
@@ -1236,7 +1236,7 @@ begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
-  newRow := Tasks.MoveTaskUp(taskGrid.Row);
+  newRow := Tasks.MoveTaskUp(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
   FillGrid;
   if (newRow > -1) then
   begin
@@ -1253,7 +1253,7 @@ begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
-  newRow := Tasks.MoveTaskDown(taskGrid.Row);
+  newRow := Tasks.MoveTaskDown(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
   FillGrid;
   if (newRow > -1) then
   begin
