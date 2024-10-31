@@ -725,7 +725,7 @@ begin
   if (not IsColumn) then
   begin
     if FBackup then Tasks.CreateBackup;
-    Tasks.AddMap(Tasks.AddTask('[ ] // **'));
+    Tasks.AddMap(Tasks.AddTask('[ ]'));
     taskGrid.Cells[1, tIndex] := '0';
     SetInfo;
     SetChanged();
@@ -1187,7 +1187,7 @@ procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  Tasks.InsertTask('[ ] // **', taskGrid.Row);
+  Tasks.InsertTask('[ ]', taskGrid.Row);
   FillGrid;
   taskGrid.Row := taskGrid.Row + 1;
   ResetRowHeight;
@@ -1335,7 +1335,7 @@ begin
   if IsCanClose then
   begin
     new := TStringList.Create;
-    new.Add('[ ] // **');
+    new.Add('[ ]');
     Tasks := TTasks.Create(new);
     SetChanged(False);
     EditComplite;
