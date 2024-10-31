@@ -75,10 +75,10 @@ type
     procedure ArchiveTask(Index: integer);
     procedure CompleteTask(Index: integer; Backup: boolean = True);
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
-    function MoveTaskTop(Index, Index2: integer): integer;
-    function MoveTaskBottom(Index, Index2: integer): integer;
-    function MoveTaskUp(Index, Index2: integer): integer;
-    function MoveTaskDown(Index, Index2: integer): integer;
+    function MoveTaskTop(Index1, Index2: integer): integer;
+    function MoveTaskBottom(Index1, Index2: integer): integer;
+    function MoveTaskUp(Index1, Index2: integer): integer;
+    function MoveTaskDown(Index1, Index2: integer): integer;
     procedure SwapTasks(OldIndex, NewIndex: integer);
     procedure MoveTask(OldIndex, NewIndex: integer);
     procedure CopyToClipboard(Grid: TStringGrid);
@@ -648,23 +648,23 @@ begin
   end;
 end;
 
-function TTasks.MoveTaskTop(Index, Index2: integer): integer;
+function TTasks.MoveTaskTop(Index1, Index2: integer): integer;
 var
   TempTask: TTask; // Declare the temporary variable here
   i, Ind: integer;
 begin
-  Ind := Map(Index);
+  Ind := Map(Index1);
   Result := -1;
-  // Check if the index is valid and not already at the top
+  // Check if the Index1 is valid and not already at the top
   if (Ind >= 0) and (Ind < FCount) then
   begin
     CreateBackup;
 
-    // Store the task at the given index
+    // Store the task at the given Index1
     TempTask := FTaskList[Ind];
 
     // Shift tasks down to make room at the top
-    for i := Index downto 2 do
+    for i := Index1 downto 2 do
       FTaskList[Map(i)] := FTaskList[Map(i - 1)];
 
     // Place the stored task at the top
@@ -674,23 +674,23 @@ begin
   end;
 end;
 
-function TTasks.MoveTaskBottom(Index, Index2: integer): integer;
+function TTasks.MoveTaskBottom(Index1, Index2: integer): integer;
 var
   TempTask: TTask; // Declare the temporary variable here
   i, Ind: integer;
 begin
-  Ind := Map(Index);
+  Ind := Map(Index1);
   Result := -1;
-  // Check if the index is valid and not already at the bottom
+  // Check if the Index1 is valid and not already at the bottom
   if (Ind >= 0) and (Ind < FCount) then
   begin
     CreateBackup;
 
-    // Store the task at the given index
+    // Store the task at the given Index1
     TempTask := FTaskList[Ind];
 
     // Shift all tasks down to fill the gap
-    for i := Index to Length(MapGrid) - 2 do
+    for i := Index1 to Length(MapGrid) - 2 do
       FTaskList[Map(i)] := FTaskList[Map(i + 1)];
 
     // Place the stored task at the end
@@ -700,52 +700,52 @@ begin
   end;
 end;
 
-function TTasks.MoveTaskUp(Index, Index2: integer): integer;
+function TTasks.MoveTaskUp(Index1, Index2: integer): integer;
 var
   TempTask: TTask;   // Temporary variable for swapping tasks
   Ind: integer;
 begin
-  Ind := Map(Index);
+  Ind := Map(Index1);
   Result := -1;
-  if (Index > 1) and (Ind >= 0) and (Ind < FCount) then
+  if (Index1 > 1) and (Ind >= 0) and (Ind < FCount) then
   begin
     CreateBackup;
 
     // Save the task in the temporary variable
     TempTask := FTaskList[Ind];
 
-    // Shift the task at Index - 1 to Index
-    FTaskList[Ind] := FTaskList[Map(Index - 1)];
+    // Shift the task at Index1 - 1 to Index1
+    FTaskList[Ind] := FTaskList[Map(Index1 - 1)];
 
-    // Place the temporary task in Index - 1
-    FTaskList[Map(Index - 1)] := TempTask;
+    // Place the temporary task in Index1 - 1
+    FTaskList[Map(Index1 - 1)] := TempTask;
 
-    Result := Index - 1;//ReverseMap(Map(Index - 1));
+    Result := Index1 - 1;//ReverseMap(Map(Index1 - 1));
   end;
 end;
 
-function TTasks.MoveTaskDown(Index, Index2: integer): integer;
+function TTasks.MoveTaskDown(Index1, Index2: integer): integer;
 var
   TempTask: TTask;
   Ind: integer;
 begin
-  Ind := Map(Index);
+  Ind := Map(Index1);
   Result := -1;
-  // Check if the index is valid and not the last task
-  if (Index < Length(MapGrid) - 1) and (Ind >= 0) and (Ind < FCount) then
+  // Check if the Index1 is valid and not the last task
+  if (Index1 < Length(MapGrid) - 1) and (Ind >= 0) and (Ind < FCount) then
   begin
     CreateBackup;
 
-    // Temporarily store the task at the current index
+    // Temporarily store the task at the current Index1
     TempTask := FTaskList[Ind];
 
-    // Move the task below to the current index
-    FTaskList[Ind] := FTaskList[Map(Index + 1)];
+    // Move the task below to the current Index1
+    FTaskList[Ind] := FTaskList[Map(Index1 + 1)];
 
     // Place the stored task below
-    FTaskList[Map(Index + 1)] := TempTask;
+    FTaskList[Map(Index1 + 1)] := TempTask;
 
-    Result := Index + 1;//ReverseMap(Map(Index + 1));
+    Result := Index1 + 1;//ReverseMap(Map(Index1 + 1));
   end;
 end;
 
