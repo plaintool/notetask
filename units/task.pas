@@ -1461,7 +1461,7 @@ begin
             DateDiff := CalcDateDiff(StartDate, EndDate);
 
             // If the date difference is invalid, recalculate with the minimum date
-            if (DateDiff = '-') and (LastDate <> Now) then
+            if (DateDiff = '-') and (MinDate > 0) and (LastDate <> Now) then
             begin
               StartDate := FTaskList[I].Date;
               EndDate := MinDate;
