@@ -291,6 +291,8 @@ type
     FFindActive: boolean;
     FFindText: string;
     FFoundText: string;
+    FLastGridSelection: TRect;
+    FLastGridRow, FLastGridCol: integer;
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
@@ -319,6 +321,8 @@ type
     procedure SetShowColumnFavorite(Value: boolean);
     procedure SetBiDiRightToLeft(Value: boolean);
     procedure CompleteTasks(aRow: integer = 0);
+    procedure GridBackupSelection;
+    procedure GridClearSelection;
     procedure ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     function GetIsEditing: boolean;
@@ -1042,13 +1046,25 @@ begin
 end;
 
 procedure TformNotetask.aUndoExecute(Sender: TObject);
+var
+  TempRect: TRect;
+  TempLastRow, TempLastCol: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
 
   if not IsEditing then
   begin
+    TempRect := FLastGridSelection;
+    TempLastRow := FLastGridRow;
+    TempLastCol := FLastGridCol;
+    GridBackupSelection;
+
     Tasks.UndoBackup;
     FillGrid;
+
+    taskGrid.Row := TempLastRow;
+    taskGrid.Col := TempLastCol;
+    taskGrid.Selection := TRect.Create(TempRect.Left, TempRect.Top, TempRect.Right, TempRect.Bottom);
     ResetRowHeight;
     SetInfo;
   end
@@ -1072,6 +1088,7 @@ begin
     begin
       Tasks.UndoBackupInit;
       FillGrid;
+      GridClearSelection;
       ResetRowHeight;
       SetInfo;
       Tasks.CreateBackup;
@@ -1202,6 +1219,7 @@ begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
+  GridBackupSelection;
   Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
   if (SortOrder = soAscending) then
     newRow := Tasks.MoveTaskTop(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
@@ -1225,6 +1243,7 @@ begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
+  GridBackupSelection;
   Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
   if (SortOrder = soAscending) then
     newRow := Tasks.MoveTaskBottom(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
@@ -1249,6 +1268,7 @@ begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
+  GridBackupSelection;
   Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
   if (SortOrder = soAscending) then
     newRow := Tasks.MoveTaskUp(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
@@ -1272,6 +1292,7 @@ begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
+  GridBackupSelection;
   Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
   if (SortOrder = soAscending) then
     newRow := Tasks.MoveTaskDown(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
@@ -1283,7 +1304,7 @@ begin
   begin
     ResetRowHeight();
     taskGrid.Row := newRow;
-    taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, newRow - Len+1, taskGrid.Selection.Right, newRow);
+    taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, newRow - Len + 1, taskGrid.Selection.Right, newRow);
   end;
   SetChanged;
 end;
@@ -1816,6 +1837,7 @@ begin
 
   if (Confirm = mrYes) or (not ShowConfirm) then
   begin
+    GridBackupSelection;
     Tasks.ClearTasksInRect(taskGrid, taskGrid.Selection);
     if (Assigned(Memo)) then
     begin
@@ -1848,6 +1870,7 @@ begin
 
     if (Confirm = mrYes) or (not ShowConfirm) then
     begin
+      GridBackupSelection;
       if (FBackup) then Tasks.CreateBackup;
 
       // RemoveTask from collection
@@ -1872,6 +1895,7 @@ begin
 
     if (Confirm = mrYes) or (not ShowConfirm) then
     begin
+      GridBackupSelection;
       if (FBackup) then Tasks.CreateBackup;
 
       // Delete rows from the end to avoid index shifting
@@ -1908,6 +1932,7 @@ begin
 
     if Confirm = mrYes then
     begin
+      GridBackupSelection;
       if (FBackup) then Tasks.CreateBackup;
 
       // Archivate task
@@ -1932,6 +1957,7 @@ begin
 
     if Confirm = mrYes then
     begin
+      GridBackupSelection;
       if (FBackup) then Tasks.CreateBackup;
 
       // Archive tasks from the end to avoid index shifting
@@ -1963,7 +1989,11 @@ begin
   // If multiple rows are selected
   if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
   begin
-    if FBackup then Tasks.CreateBackup;
+    if FBackup then
+    begin
+      GridBackupSelection;
+      Tasks.CreateBackup;
+    end;
     // Mark tasks as completed from the end to avoid index shifting
     for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
     begin
@@ -1999,8 +2029,13 @@ begin
     Check := False;
     if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
     begin
+      if FBackup then
+      begin
+        GridBackupSelection;
+        Tasks.CreateBackup;
+      end;
       // Mark the task as completed in the collection
-      Tasks.CompleteTask(RowIndex);
+      Tasks.CompleteTask(RowIndex, False);
       if Tasks.GetTask(RowIndex).Done then
       begin
         Check := True;
@@ -2011,11 +2046,28 @@ begin
       else
         taskGrid.Cells[1, RowIndex] := '0';
 
-      Tasks.SetTask(taskGrid, RowIndex, FBackup);
+      Tasks.SetTask(taskGrid, RowIndex, False);
       if (ShowDuration) and (Check) then FillGrid;
       SetChanged; // Mark that data has changed
     end;
   end;
+end;
+
+procedure TformNotetask.GridBackupSelection;
+begin
+  FLastGridSelection := taskGrid.Selection;
+  FLastGridRow := taskGrid.Row;
+  FLastGridCol := taskGrid.Col;
+end;
+
+procedure TformNotetask.GridClearSelection;
+begin
+  FLastGridSelection := TRect.Empty;
+  FLastGridRow := 1;
+  FLastGridCol := 2;
+  taskGrid.ClearSelections;
+  taskGrid.Row := 1;
+  taskGrid.Col := 2;
 end;
 
 procedure TformNotetask.ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
@@ -2568,6 +2620,7 @@ begin
     FindNextExecute
   else
   begin
+    GridBackupSelection;
     Tasks.CreateBackup;
     Memo.SelText := aToText;
     FindNextExecute;
@@ -2583,6 +2636,7 @@ begin
   FBackup := False;
   Row := taskGrid.Row;
   Col := taskGrid.Col;
+  GridBackupSelection;
   Tasks.CreateBackup; // FBackup = false here
   try
     while (Find(aText, aMatchCase, aWrapAround, True, True)) do
