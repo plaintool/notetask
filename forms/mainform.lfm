@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -414,25 +413,25 @@ object formNotetask: TformNotetask
     end
     object aMoveTaskTop: TAction
       Category = 'Task'
-      Caption = 'Move task to top'
+      Caption = 'Move tasks to top'
       OnExecute = aMoveTaskTopExecute
       ShortCut = 16417
     end
     object aMoveTaskUp: TAction
       Category = 'Task'
-      Caption = 'Move task up'
+      Caption = 'Move tasks up'
       OnExecute = aMoveTaskUpExecute
       ShortCut = 16422
     end
     object aMoveTaskDown: TAction
       Category = 'Task'
-      Caption = 'Move task down'
+      Caption = 'Move tasks down'
       OnExecute = aMoveTaskDownExecute
       ShortCut = 16424
     end
     object aMoveTaskBottom: TAction
       Category = 'Task'
-      Caption = 'Move task to bottom'
+      Caption = 'Move tasks to bottom'
       OnExecute = aMoveTaskBottomExecute
       ShortCut = 16418
     end

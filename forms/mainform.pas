@@ -1197,68 +1197,93 @@ end;
 
 procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
 var
-  newRow: integer;
+  newRow, len: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
-  newRow := Tasks.MoveTaskTop(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+  Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  if (SortOrder = soAscending) then
+    newRow := Tasks.MoveTaskTop(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
+  else
+    newRow := Tasks.MoveTaskBottom(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
+
   FillGrid;
-  if (newRow > -1) and (taskGrid.Row <> newRow) then
+  if (newRow > -1) then
   begin
     ResetRowHeight();
-    taskGrid.Row := newRow;
+    taskGrid.Row := 0;
+    taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, 0, taskGrid.Selection.Right, Len);
   end;
   SetChanged;
 end;
 
 procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
 var
-  newRow: integer;
+  newRow, Len: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
-  newRow := Tasks.MoveTaskBottom(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+  Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  if (SortOrder = soAscending) then
+    newRow := Tasks.MoveTaskBottom(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
+  else
+    newRow := Tasks.MoveTaskTop(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
+
   FillGrid;
-  if (newRow > -1) and (taskGrid.Row <> newRow) then
+  if (newRow > -1) then
   begin
     ResetRowHeight();
-    taskGrid.Row := newRow;
+    taskGrid.Row := taskGrid.RowCount - Len;
+    taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, taskGrid.RowCount - Len, taskGrid.Selection.Right,
+      taskGrid.RowCount);
   end;
   SetChanged;
 end;
 
 procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
 var
-  newRow: integer;
+  newRow, Len: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
-  newRow := Tasks.MoveTaskUp(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+  Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  if (SortOrder = soAscending) then
+    newRow := Tasks.MoveTaskUp(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
+  else
+    newRow := Tasks.MoveTaskDown(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
+
   FillGrid;
   if (newRow > -1) then
   begin
-    SwapRowHeights(taskGrid.Row, newRow);
+    ResetRowHeight();
     taskGrid.Row := newRow;
+    taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, newRow, taskGrid.Selection.Right, newRow + Len - 1);
   end;
   SetChanged;
 end;
 
 procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
 var
-  newRow: integer;
+  newRow, Len: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
-  newRow := Tasks.MoveTaskDown(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+  Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  if (SortOrder = soAscending) then
+    newRow := Tasks.MoveTaskDown(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
+  else
+    newRow := Tasks.MoveTaskUp(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
+
   FillGrid;
   if (newRow > -1) then
   begin
-    SwapRowHeights(taskGrid.Row, newRow);
+    ResetRowHeight();
     taskGrid.Row := newRow;
+    taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, newRow - Len+1, taskGrid.Selection.Right, newRow);
   end;
   SetChanged;
 end;

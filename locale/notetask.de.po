@@ -399,20 +399,20 @@ msgid "Ukrainian"
 msgstr "Ukrainian"
 
 #: tformnotetask.amovetaskbottom.caption
-msgid "Move task to bottom"
-msgstr "Aufgabe nach unten verschieben"
+msgid "Move tasks to bottom"
+msgstr "Aufgaben nach unten verschieben"
 
 #: tformnotetask.amovetaskdown.caption
-msgid "Move task down"
-msgstr "Aufgabe nach unten verschieben"
+msgid "Move tasks down"
+msgstr "Aufgaben nach unten bewegen"
 
 #: tformnotetask.amovetasktop.caption
-msgid "Move task to top"
-msgstr "Aufgabe nach oben verschieben"
+msgid "Move tasks to top"
+msgstr "Aufgaben nach oben verschieben"
 
 #: tformnotetask.amovetaskup.caption
-msgid "Move task up"
-msgstr "Aufgabe nach oben verschieben"
+msgid "Move tasks up"
+msgstr "Aufgaben nach oben bewegen"
 
 #: tformnotetask.anew.caption
 msgid "New"
