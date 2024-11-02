@@ -18,6 +18,7 @@ uses
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms,
+  SysUtils,
   DateTimeCtrls,
   lineending,
   filemanager,
@@ -37,8 +38,9 @@ uses
 begin
   RequireDerivedFormResource := True;
   Language := GetOSLanguage;
-  Application.Title:='Notetask';
-  Application.Scaled:=True;
+  DefaultFormatSettings.DecimalSeparator := '.';
+  Application.Title := 'Notetask';
+  Application.Scaled := True;
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
   Application.CreateForm(TformInputText, formInputText);

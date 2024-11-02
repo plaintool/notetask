@@ -66,6 +66,7 @@ begin
     JSONObj.Add('ShowStatusBar', Form.ShowStatusBar);
     JSONObj.Add('ShowDuration', Form.ShowDuration);
     JSONObj.Add('ShowColumnDone', Form.ShowColumnDone);
+    JSONObj.Add('ShowColumnTask', Form.ShowColumnTask);
     JSONObj.Add('ShowColumnComment', Form.ShowColumnComment);
     JSONObj.Add('ShowColumnDate', Form.ShowColumnDate);
     JSONObj.Add('ShowColumnAmount', Form.ShowColumnAmount);
@@ -133,6 +134,9 @@ begin
       if JSONObj.FindPath('ShowColumnDone') <> nil then
         Form.FShowColumnDone := JSONObj.FindPath('ShowColumnDone').AsBoolean;
 
+      if JSONObj.FindPath('ShowColumnTask') <> nil then
+        Form.FShowColumnTask := JSONObj.FindPath('ShowColumnTask').AsBoolean;
+
       if JSONObj.FindPath('ShowColumnComment') <> nil then
         Form.FShowColumnComment := JSONObj.FindPath('ShowColumnComment').AsBoolean;
 
@@ -194,50 +198,45 @@ var
   JSONObj: TJSONObject;
   ColumnArray: TJSONArray;
   SavedArray: TJSONArray;
-  // RowArray: TJSONArray;
-  i: integer;
   FileName: string;
+  i: integer;
 begin
   FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
   ForceDirectories(GetSettingsDirectory);
-  JSONObj := TJSONObject.Create;
-  ColumnArray := TJSONArray.Create;
-  // RowArray := TJSONArray.Create;
 
   // Save column widths
   SavedArray := LoadColumnWidthsFromFile;
   try
+    ColumnArray := TJSONArray.Create;
     for i := 0 to Grid.ColCount - 1 do
     begin
       if (Grid.ColWidths[i] > 0) then
         ColumnArray.Add(Grid.ColWidths[i])
       else
       begin
-        if (Assigned(SavedArray)) then
-          ColumnArray.Add(SavedArray[i]);
+        if (Assigned(SavedArray)) and (SavedArray.Count = Grid.ColCount) then
+          ColumnArray.Add(SavedArray[i].Clone);
       end;
     end;
   finally
     SavedArray.Free;
   end;
 
-  // Save row heights
-  //  for i := 0 to Grid.RowCount - 1 do
-  //  RowArray.Add(Grid.RowHeights[i]);
-
-  JSONObj.Add('ColumnWidths', ColumnArray);
-  //JSONObj.Add('RowHeights', RowArray);
-
-  // Write to file
-  with TStringList.Create do
+  JSONObj := TJSONObject.Create;
   try
-    Add(JSONObj.AsJSON);
-    SaveToFile(FileName);
-  finally
-    Free;
-  end;
+    JSONObj.Add('ColumnWidths', ColumnArray);
 
-  JSONObj.Free;
+    // Write to file
+    with TStringList.Create do
+    try
+      Add(JSONObj.AsJSON);
+      SaveToFile(FileName);
+    finally
+      Free;
+    end;
+  finally
+    JSONObj.Free;
+  end;
 end;
 
 function LoadColumnWidthsFromFile: TJSONArray;

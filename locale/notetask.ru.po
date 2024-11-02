@@ -486,6 +486,10 @@ msgstr "Столбец готово"
 msgid "Column fovorite"
 msgstr "Столбец избранное"
 
+#: tformnotetask.ashowcolumntask.caption
+msgid "Column task"
+msgstr "Столбец задача"
+
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
 msgstr "Продолжительность"
@@ -562,12 +566,24 @@ msgid "Task"
 msgstr "Задача"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
+msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
 msgid "Comment"
 msgstr "Комментарий"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
+msgctxt "tformnotetask.taskgrid.columns[3].title.caption"
+msgid "Amount"
+msgstr "Сумма"
+
+#: tformnotetask.taskgrid.columns[4].title.caption
+msgctxt "tformnotetask.taskgrid.columns[4].title.caption"
 msgid "Date"
 msgstr "Дата"
+
+#: tformnotetask.taskgrid.columns[5].title.caption
+msgctxt "tformnotetask.taskgrid.columns[5].title.caption"
+msgid "Star"
+msgstr "Звезда"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

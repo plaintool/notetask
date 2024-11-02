@@ -486,6 +486,10 @@ msgstr "कॉलम पूर्ण"
 msgid "Column fovorite"
 msgstr "कॉलम पसंदीदा"
 
+#: tformnotetask.ashowcolumntask.caption
+msgid "Column task"
+msgstr "स्तंभ कार्य"
+
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
 msgstr "अवधि"
@@ -562,12 +566,24 @@ msgid "Task"
 msgstr "कार्य"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
+msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
 msgid "Comment"
 msgstr "टिप्पणी"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
+msgctxt "tformnotetask.taskgrid.columns[3].title.caption"
+msgid "Amount"
+msgstr "राशि"
+
+#: tformnotetask.taskgrid.columns[4].title.caption
+msgctxt "tformnotetask.taskgrid.columns[4].title.caption"
 msgid "Date"
-msgstr "तारीख"
+msgstr "तिथि"
+
+#: tformnotetask.taskgrid.columns[5].title.caption
+msgctxt "tformnotetask.taskgrid.columns[5].title.caption"
+msgid "Star"
+msgstr "सितारा"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

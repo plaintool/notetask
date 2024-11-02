@@ -191,9 +191,11 @@ type
     menuColumnFavorite: TMenuItem;
     aIndentTasks: TAction;
     aOutdentTasks: TAction;
-    MenuItem15: TMenuItem;
+    menuIndentTasks: TMenuItem;
     Separator14: TMenuItem;
-    MenuItem16: TMenuItem;
+    menuOutdentTasks: TMenuItem;
+    aShowColumnTask: TAction;
+    menuColumnTask: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -269,6 +271,7 @@ type
     procedure aLangArabicExecute(Sender: TObject);
     procedure taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
     procedure aShowColumnDoneExecute(Sender: TObject);
+    procedure aShowColumnTaskExecute(Sender: TObject);
     procedure aShowColumnCommentExecute(Sender: TObject);
     procedure aShowColumnDateExecute(Sender: TObject);
     procedure aShowColumnAmountExecute(Sender: TObject);
@@ -304,6 +307,7 @@ type
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
     procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure MemoKeyPress(Sender: TObject; var Key: char);
     procedure DatePickerChange(Sender: TObject);
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
@@ -320,11 +324,13 @@ type
     procedure ArchiveTask(aRow: integer = 0);
     procedure ArchiveTasks;
     procedure CompleteTasks(aRow: integer = 0);
+    procedure StarTask(aRow: integer = 0);
     procedure IndentTasks(Outdent: boolean = False);
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowDuration(Value: boolean);
     procedure SetShowArchived(Value: boolean);
     procedure SetShowColumnDone(Value: boolean);
+    procedure SetShowColumnTask(Value: boolean);
     procedure SetShowColumnComment(Value: boolean);
     procedure SetShowColumnDate(Value: boolean);
     procedure SetShowColumnAmount(Value: boolean);
@@ -340,9 +346,10 @@ type
     FShowArchived: boolean;
     FShowDuration: boolean;
     FShowColumnDone: boolean;
+    FShowColumnTask: boolean;
     FShowColumnComment: boolean;
-    FShowColumnDate: boolean;
     FShowColumnAmount: boolean;
+    FShowColumnDate: boolean;
     FShowColumnFavorite: boolean;
 
     procedure SetLanguage(aLanguage: string = string.Empty);
@@ -359,6 +366,7 @@ type
     property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
     property ShowDuration: boolean read FShowDuration write SetShowDuration;
     property ShowColumnDone: boolean read FShowColumnDone write SetShowColumnDone;
+    property ShowColumnTask: boolean read FShowColumnTask write SetShowColumnTask;
     property ShowColumnComment: boolean read FShowColumnComment write SetShowColumnComment;
     property ShowColumnDate: boolean read FShowColumnDate write SetShowColumnDate;
     property ShowColumnAmount: boolean read FShowColumnAmount write SetShowColumnAmount;
@@ -379,6 +387,8 @@ var
   clRowExpired: TColor;
   ResourceBitmapCheck: TBitmap;
   ResourceBitmapUncheck: TBitmap;
+  ResourceBitmapStarGold: TBitmap;
+  ResourceBitmapStarGray: TBitmap;
 
 resourcestring
   rapp = 'Notetask';
@@ -415,9 +425,10 @@ begin
   FWordWrap := True;
   FShowStatusBar := True;
   FShowColumnDone := True;
+  FShowColumnTask := True;
   FShowColumnComment := True;
   FShowColumnDate := True;
-  FShowColumnAmount := True;
+  FShowColumnAmount := False;
   FShowColumnFavorite := True;
   FBiDiRightToLeft := self.BiDiMode = bdRightToLeft;
   FSortOrder := soAscending;
@@ -436,10 +447,18 @@ begin
   // Create TBitmap objects
   ResourceBitmapCheck := TBitmap.Create;
   ResourceBitmapUncheck := TBitmap.Create;
+  ResourceBitmapStarGold := TBitmap.Create;
+  ResourceBitmapStarGray := TBitmap.Create;
 
   // Load bitmaps from resources
   ResourceBitmapCheck.LoadFromResourceName(HInstance, 'CHECK');
   ResourceBitmapUncheck.LoadFromResourceName(HInstance, 'UNCHECK');
+  ResourceBitmapStarGold.LoadFromResourceName(HInstance, 'STARGOLD');
+  ResourceBitmapStarGold.Transparent := True;
+  ResourceBitmapStarGold.TransparentColor := clFuchsia;
+  ResourceBitmapStarGray.LoadFromResourceName(HInstance, 'STARGRAY');
+  ResourceBitmapStarGray.Transparent := True;
+  ResourceBitmapStarGray.TransparentColor := clFuchsia;
 
   LoadFormSettings(self);
   LoadGridSettings(taskGrid);
@@ -454,15 +473,17 @@ begin
   aShowArchived.Checked := FShowArchived;
 
   aShowColumnDone.Checked := FShowColumnDone;
+  aShowColumnTask.Checked := FShowColumnTask;
   aShowColumnComment.Checked := FShowColumnComment;
   aShowColumnDate.Checked := FShowColumnDate;
   aShowColumnAmount.Checked := FShowColumnAmount;
   aShowColumnFavorite.Checked := FShowColumnFavorite;
   taskGrid.Columns.Items[0].Visible := FShowColumnDone;
+  taskGrid.Columns.Items[1].Visible := FShowColumnTask;
   taskGrid.Columns.Items[2].Visible := FShowColumnComment;
-  taskGrid.Columns.Items[3].Visible := FShowColumnDate;
-  //taskGrid.Columns.Items[4].Visible := FShowColumnAmount;
-  //taskGrid.Columns.Items[5].Visible := FShowColumnFavorite;
+  taskGrid.Columns.Items[3].Visible := FShowColumnAmount;
+  taskGrid.Columns.Items[4].Visible := FShowColumnDate;
+  taskGrid.Columns.Items[5].Visible := FShowColumnFavorite;
 
   aShowDuration.Checked := FShowDuration;
   if (FShowDuration) then
@@ -493,6 +514,8 @@ begin
   Tasks.Free;
   ResourceBitmapCheck.Free;
   ResourceBitmapUncheck.Free;
+  ResourceBitmapStarGold.Free;
+  ResourceBitmapStarGray.Free;
 end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -633,7 +656,7 @@ begin
     Key := 0;
   end
   else
-  if ((Shift = [ssCtrl]) or not FWordWrap) and (Key = VK_RETURN) then // Ctrl + Enter
+  if ((Shift = [ssCtrl]) or (not FWordWrap) or (taskGrid.Col = 4)) and (Key = VK_RETURN) then // Ctrl + Enter
   begin
     if IsEditing then
     begin
@@ -690,12 +713,12 @@ begin
   begin
     if (ssShift in GetKeyShiftState) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Top <> index) then
     begin
-      taskGrid.Selection := TGridRect.Create(1, taskGrid.Selection.Top, 4, index);
+      taskGrid.Selection := TGridRect.Create(1, taskGrid.Selection.Top, 6, index);
     end
     else
     begin
       taskGrid.Row := index;
-      taskGrid.Selection := TGridRect.Create(1, index, 4, index);
+      taskGrid.Selection := TGridRect.Create(1, index, 6, index);
     end;
   end;
 end;
@@ -706,32 +729,35 @@ var
   CheckBoxRect: TRect;
   CheckBoxSize: integer;
 begin
-  // Define checkbox area size (16x16)
-  CheckBoxSize := 14;
-
-  // Get mouse position in screen coordinates
-  MousePosScreen := Mouse.CursorPos;
-
-  // Convert screen coordinates to client coordinates (relative to the form)
-  MousePosClient := taskGrid.ScreenToClient(MousePosScreen);
-
-  // Get the center of the checkbox (approximately the center of the cell)
-  CheckBoxCenter := taskGrid.CellRect(ACol, ARow).CenterPoint;
-
-  // Define the 16x16 rectangle around the checkbox
-  CheckBoxRect.Left := CheckBoxCenter.X - CheckBoxSize div 2;
-  CheckBoxRect.Top := CheckBoxCenter.Y - CheckBoxSize div 2;
-  CheckBoxRect.Right := CheckBoxCenter.X + CheckBoxSize div 2;
-  CheckBoxRect.Bottom := CheckBoxCenter.Y + CheckBoxSize div 2;
-
-  // Check if the mouse is within the 16x16 checkbox area
-  if not PtInRect(CheckBoxRect, MousePosClient) then
+  if (aCol = 1) then
   begin
-    // If the mouse is outside the checkbox, prevent the state from being changed
-    FDisableCheckToggle := True;
-    exit;
+    // Define checkbox area size (16x16)
+    CheckBoxSize := 14;
+
+    // Get mouse position in screen coordinates
+    MousePosScreen := Mouse.CursorPos;
+
+    // Convert screen coordinates to client coordinates (relative to the form)
+    MousePosClient := taskGrid.ScreenToClient(MousePosScreen);
+
+    // Get the center of the checkbox (approximately the center of the cell)
+    CheckBoxCenter := taskGrid.CellRect(ACol, ARow).CenterPoint;
+
+    // Define the 16x16 rectangle around the checkbox
+    CheckBoxRect.Left := CheckBoxCenter.X - CheckBoxSize div 2;
+    CheckBoxRect.Top := CheckBoxCenter.Y - CheckBoxSize div 2;
+    CheckBoxRect.Right := CheckBoxCenter.X + CheckBoxSize div 2;
+    CheckBoxRect.Bottom := CheckBoxCenter.Y + CheckBoxSize div 2;
+
+    // Check if the mouse is within the 16x16 checkbox area
+    if not PtInRect(CheckBoxRect, MousePosClient) then
+    begin
+      // If the mouse is outside the checkbox, prevent the state from being changed
+      FDisableCheckToggle := True;
+      exit;
+    end;
+    FDisableCheckToggle := False;
   end;
-  FDisableCheckToggle := False;
   taskGrid.Cells[ACol, ARow] := IfThen(Value = cbChecked, '1', '0');
 end;
 
@@ -742,6 +768,11 @@ begin
     if (FDisableCheckToggle) then exit;
 
     CompleteTasks(aRow);
+  end
+  else
+  if (aCol = 6) then
+  begin
+    StarTask(aRow);
   end;
 end;
 
@@ -849,6 +880,7 @@ begin
     grid.Canvas.Pen.Color := clSilver;
     grid.Canvas.Pen.Style := psSolid;
     grid.Canvas.Pen.Width := 1;
+    grid.Canvas.Pen.Width := 0;
     grid.Canvas.Brush.Style := bsClear;
     grid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
   end
@@ -887,8 +919,14 @@ begin
       end;
     end;
 
-    if (aCol = 2) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).Archive) then
-      grid.Canvas.Font.Style := [fsStrikeOut];
+    if (aCol = 2) and (Tasks.HasTask(ARow)) then
+    begin
+      if Tasks.GetTask(ARow).Star then
+        grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsBold];
+
+      if Tasks.GetTask(ARow).Archive then
+        grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsStrikeOut];
+    end;
 
     if (aCol = 3) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).CommentItalic) then
       grid.Canvas.Font.Style := [fsItalic];
@@ -896,9 +934,9 @@ begin
     // Fill the cell background
     grid.Canvas.Brush.Color := bgFill;
     grid.canvas.Brush.Style := bsSolid;
-    grid.canvas.fillrect(aRect);
+    grid.canvas.FillRect(aRect);
 
-    if (aCol = 1) then
+    if (aCol in [1, 6]) then
     begin
       grid.DefaultDrawCell(aCol, aRow, aRect, aState);
       exit;
@@ -947,7 +985,7 @@ procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: intege
 var
   sDateTime: TDateTime;
 begin
-  if (aCol in [2, 3]) then
+  if (aCol in [2, 3, 4]) then
   begin
     Memo := TMemo.Create(Self);
     Memo.Visible := False;
@@ -964,12 +1002,12 @@ begin
     Memo.Font.Name := taskGrid.Font.Name;
     Memo.Font.Size := taskGrid.Font.Size;
     Memo.HideSelection := False;
+    Memo.BorderStyle := bsNone;
+    Memo.ScrollBars := ssNone;
     Memo.TabStop := False;
     Memo.WantTabs := True;
-    Memo.BorderStyle := bsNone;
-    Memo.WordWrap := FWordWrap;
-    Memo.WantReturns := FWordWrap;
-    Memo.ScrollBars := ssNone;
+    Memo.WordWrap := (FWordWrap) and (aCol <> 4);
+    Memo.WantReturns := (FWordWrap) and (aCol <> 4);
     if (FBiDiRightToLeft) then
     begin
       Memo.BiDiMode := bdRightToLeft;
@@ -986,6 +1024,8 @@ begin
     Memo.OnChange := @MemoChange; // Event Change
     Memo.OnEnter := @MemoEnter; // Event Enter
     Memo.OnKeyDown := @MemoKeyDown; // Event KeyDown
+    if (aCol = 4) then
+      Memo.OnKeyPress := @MemoKeyPress; // Event KeyPress for amount column only
     Memo.Text := taskGrid.Cells[aCol, aRow];
     Memo.SelStart := Length(Memo.Text);
     Memo.SelLength := 0;
@@ -1006,7 +1046,7 @@ begin
     end;
   end
   else
-  if (aCol = 4) then
+  if (aCol = 5) then
   begin
     DatePicker := TDateTimePicker.Create(Self);
     DatePicker.Visible := False;
@@ -1057,6 +1097,15 @@ begin
       ABitmap := ResourceBitmapCheck // Use check bitmap
     else
       ABitmap := ResourceBitmapUncheck; // Use uncheck bitmap
+  end
+  else
+  if aCol = 6 then
+  begin
+    // Assign the appropriate bitmap based on the CheckedState
+    if CheckedState = cbChecked then
+      ABitmap := ResourceBitmapStarGold // Use check bitmap
+    else
+      ABitmap := ResourceBitmapStarGray; // Use uncheck bitmap
   end;
 end;
 
@@ -1201,7 +1250,7 @@ begin
   if taskGrid.RowCount < 2 then exit;
 
   if not IsEditing then
-    taskGrid.Selection := TGridRect.Create(0, 0, 4, taskGrid.RowCount)
+    taskGrid.Selection := TGridRect.Create(0, 0, 6, taskGrid.RowCount)
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
     (taskGrid.InplaceEditor as TCustomEdit).SelectAll;
@@ -1375,12 +1424,13 @@ begin
   CurrentDateTime := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
   if IsEditing then
   begin
-    if (taskGrid.Col = 4) then
+    if (taskGrid.Col = 5) then
     begin
-      taskGrid.Cells[4, taskGrid.Row] := CurrentDateTime;
+      taskGrid.Cells[5, taskGrid.Row] := CurrentDateTime;
       FillGrid;
     end
     else
+    if (taskGrid.Col in [2, 3]) then
     begin
       PosStart := Memo.SelStart;
       Memo.SelText := CurrentDateTime;
@@ -1400,7 +1450,7 @@ begin
         else
           taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
         Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
-        if (FShowDuration) and (taskGrid.Col = 4) then
+        if (FShowDuration) and (taskGrid.Col = 5) then
           FillGrid;
       end
       else
@@ -1541,6 +1591,13 @@ begin
   if Screen.ActiveForm <> Self then exit;
 
   ShowColumnDone := aShowColumnDone.Checked;
+end;
+
+procedure TformNotetask.aShowColumnTaskExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowColumnTask := aShowColumnTask.Checked;
 end;
 
 procedure TformNotetask.aShowColumnCommentExecute(Sender: TObject);
@@ -1856,6 +1913,19 @@ begin
   end;
 end;
 
+procedure TformNotetask.MemoKeyPress(Sender: TObject; var Key: char);
+begin
+  // Replace comma with dot for decimal input
+  if Key = ',' then
+    Key := '.';
+
+  // Allow digits and one decimal point
+  if not (Key in ['0'..'9', '.', #8, #13]) then
+    Key := #0 // Block other keys
+  else if (Key = '.') and (Pos('.', TMemo(Sender).Text) > 0) then
+    Key := #0; // Block second decimal point
+end;
+
 procedure TformNotetask.DatePickerChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] :=
@@ -2068,8 +2138,8 @@ begin
         if Tasks.GetTask(RowIndex).Done then
         begin
           taskGrid.Cells[1, RowIndex] := '1';
-          if (taskGrid.Cells[4, RowIndex] = '') then
-            taskGrid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
+          if (taskGrid.Cells[5, RowIndex] = '') then
+            taskGrid.Cells[5, RowIndex] := DateToString(Now);
         end
         else
           taskGrid.Cells[1, RowIndex] := '0';
@@ -2102,8 +2172,8 @@ begin
       begin
         Check := True;
         taskGrid.Cells[1, RowIndex] := '1';
-        if (taskGrid.Cells[4, RowIndex] = '') then
-          taskGrid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
+        if (taskGrid.Cells[5, RowIndex] = '') then
+          taskGrid.Cells[5, RowIndex] := DateToString(Now);
       end
       else
         taskGrid.Cells[1, RowIndex] := '0';
@@ -2112,6 +2182,34 @@ begin
       if (ShowDuration) and (Check) then FillGrid;
       SetChanged; // Mark that data has changed
     end;
+  end;
+end;
+
+procedure TformNotetask.StarTask(aRow: integer = 0);
+var
+  RowIndex: integer;
+begin
+  if (aRow = 0) then
+    RowIndex := taskGrid.Row
+  else
+    RowIndex := aRow;
+
+  if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+  begin
+    if FBackup then
+    begin
+      GridBackupSelection;
+      Tasks.CreateBackup;
+    end;
+    // Mark the task as completed in the collection
+    Tasks.StarTask(RowIndex, False);
+    if Tasks.GetTask(RowIndex).Star then
+      taskGrid.Cells[6, RowIndex] := '1'
+    else
+      taskGrid.Cells[6, RowIndex] := '0';
+
+    Tasks.SetTask(taskGrid, RowIndex, False);
+    SetChanged; // Mark that data has changed
   end;
 end;
 
@@ -2230,22 +2328,28 @@ begin
   taskGrid.Columns.Items[0].Visible := FShowColumnDone;
 end;
 
+procedure TformNotetask.SetShowColumnTask(Value: boolean);
+begin
+  FShowColumnTask := Value;
+  taskGrid.Columns.Items[1].Visible := FShowColumnTask;
+end;
+
 procedure TformNotetask.SetShowColumnComment(Value: boolean);
 begin
   FShowColumnComment := Value;
   taskGrid.Columns.Items[2].Visible := FShowColumnComment;
 end;
 
-procedure TformNotetask.SetShowColumnDate(Value: boolean);
-begin
-  FShowColumnDate := Value;
-  taskGrid.Columns.Items[3].Visible := FShowColumnDate;
-end;
-
 procedure TformNotetask.SetShowColumnAmount(Value: boolean);
 begin
   FShowColumnAmount := Value;
-  taskGrid.Columns.Items[4].Visible := FShowColumnAmount;
+  taskGrid.Columns.Items[3].Visible := FShowColumnAmount;
+end;
+
+procedure TformNotetask.SetShowColumnDate(Value: boolean);
+begin
+  FShowColumnDate := Value;
+  taskGrid.Columns.Items[4].Visible := FShowColumnDate;
 end;
 
 procedure TformNotetask.SetShowColumnFavorite(Value: boolean);
@@ -2593,7 +2697,7 @@ begin
       end;
 
       // Move to col
-      if ((aDirectionDown) and (CurCol < 3)) or ((not aDirectionDown) and (CurCol > 2)) then
+      if ((aDirectionDown) and (CurCol < 4)) or ((not aDirectionDown) and (CurCol > 2)) then
       begin
         // Move to next col
         if (aDirectionDown) then
@@ -2633,7 +2737,7 @@ begin
             Dec(CurRow);
             CurCol := 4;
             taskGrid.Row := taskGrid.Row - 1;
-            taskGrid.Col := 3;
+            taskGrid.Col := 4;
             Memo.SelStart := Length(unicodestring(Memo.Text)) - 1;
             Memo.SelLength := 0;
           end;
@@ -2659,8 +2763,8 @@ begin
           begin
             CurRow := taskGrid.RowCount - 1;
             taskGrid.Row := taskGrid.RowCount - 1;
-            CurCol := 3;
-            taskGrid.Col := 3;
+            CurCol := 4;
+            taskGrid.Col := 4;
           end;
           Inc(Counter);
         end

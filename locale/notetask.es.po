@@ -486,6 +486,10 @@ msgstr "Columna hecho"
 msgid "Column fovorite"
 msgstr "Columna favorita"
 
+#: tformnotetask.ashowcolumntask.caption
+msgid "Column task"
+msgstr "Columna Tarea"
+
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
 msgstr "Duración"
@@ -562,12 +566,24 @@ msgid "Task"
 msgstr "Tarea"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
+msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
 msgid "Comment"
 msgstr "Comentario"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
+msgctxt "tformnotetask.taskgrid.columns[3].title.caption"
+msgid "Amount"
+msgstr "Monto"
+
+#: tformnotetask.taskgrid.columns[4].title.caption
+msgctxt "tformnotetask.taskgrid.columns[4].title.caption"
 msgid "Date"
 msgstr "Fecha"
+
+#: tformnotetask.taskgrid.columns[5].title.caption
+msgctxt "tformnotetask.taskgrid.columns[5].title.caption"
+msgid "Star"
+msgstr "Estrella"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

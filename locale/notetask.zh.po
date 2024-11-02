@@ -486,6 +486,10 @@ msgstr "列完成"
 msgid "Column fovorite"
 msgstr "列收藏"
 
+#: tformnotetask.ashowcolumntask.caption
+msgid "Column task"
+msgstr "列任务"
+
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
 msgstr "持续时间"
@@ -562,12 +566,24 @@ msgid "Task"
 msgstr "任务"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
+msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
 msgid "Comment"
 msgstr "评论"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
+msgctxt "tformnotetask.taskgrid.columns[3].title.caption"
+msgid "Amount"
+msgstr "金额"
+
+#: tformnotetask.taskgrid.columns[4].title.caption
+msgctxt "tformnotetask.taskgrid.columns[4].title.caption"
 msgid "Date"
 msgstr "日期"
+
+#: tformnotetask.taskgrid.columns[5].title.caption
+msgctxt "tformnotetask.taskgrid.columns[5].title.caption"
+msgid "Star"
+msgstr "星标"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

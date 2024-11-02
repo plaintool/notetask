@@ -17,13 +17,17 @@ uses
 
 function TextToStringList(const Content: string; TrimEnd: boolean = False): TStringList;
 
+function DateToString(Value: TDateTime): string;
+
+function FloatToString(Value: Double): string;
+
 function IsBracket(const Input: string): boolean;
 
 function RemoveBrackets(const S: string): string;
 
 function DetectDone(const Input: string): boolean;
 
-function TrimLeadingSpaces(const Input: string; MaxSpaces: Integer = 4): string;
+function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 4): string;
 
 function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;
 
@@ -55,6 +59,16 @@ begin
     StringList.Free; // Free memory on error
     raise; // Re-throw the exception
   end;
+end;
+
+function DateToString(Value: TDateTime): string;
+begin
+  Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Value);
+end;
+
+function FloatToString(Value: Double): string;
+begin
+  Result := FloatToStr(Value);
 end;
 
 function IsBracket(const Input: string): boolean;
@@ -117,9 +131,9 @@ begin
   end;
 end;
 
-function TrimLeadingSpaces(const Input: string; MaxSpaces: Integer = 4): string;
+function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 4): string;
 var
-  i, SpaceCount: Integer;
+  i, SpaceCount: integer;
 begin
   SpaceCount := 0;
 

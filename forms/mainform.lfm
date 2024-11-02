@@ -22,6 +22,7 @@ object formNotetask: TformNotetask
     Width = 851
     Align = alClient
     BorderStyle = bsNone
+    ColCount = 7
     ColumnClickSorts = True
     Columns = <    
       item
@@ -32,15 +33,25 @@ object formNotetask: TformNotetask
       end    
       item
         Title.Caption = 'Task'
-        Width = 335
+        Width = 300
       end    
       item
         Title.Caption = 'Comment'
-        Width = 205
+        Width = 200
+      end    
+      item
+        Title.Caption = 'Amount'
+        Width = 100
       end    
       item
         Title.Caption = 'Date'
         Width = 140
+      end    
+      item
+        Alignment = taCenter
+        ButtonStyle = cbsCheckboxColumn
+        Title.Caption = 'Star'
+        Width = 32
       end>
     DefaultColWidth = 50
     FixedColor = clWindow
@@ -214,10 +225,10 @@ object formNotetask: TformNotetask
       object Separator14: TMenuItem
         Caption = '-'
       end
-      object MenuItem15: TMenuItem
+      object menuIndentTasks: TMenuItem
         Action = aIndentTasks
       end
-      object MenuItem16: TMenuItem
+      object menuOutdentTasks: TMenuItem
         Action = aOutdentTasks
       end
       object Separator10: TMenuItem
@@ -262,23 +273,25 @@ object formNotetask: TformNotetask
         Action = aShowColumnDone
         AutoCheck = True
       end
+      object menuColumnTask: TMenuItem
+        Action = aShowColumnTask
+        AutoCheck = True
+      end
       object menuColumnComment: TMenuItem
         Action = aShowColumnComment
+        AutoCheck = True
+      end
+      object menuColumnAmount: TMenuItem
+        Action = aShowColumnAmount
         AutoCheck = True
       end
       object menuColumnDate: TMenuItem
         Action = aShowColumnDate
         AutoCheck = True
       end
-      object menuColumnAmount: TMenuItem
-        Action = aShowColumnAmount
-        AutoCheck = True
-        Visible = False
-      end
       object menuColumnFavorite: TMenuItem
         Action = aShowColumnFavorite
         AutoCheck = True
-        Visible = False
       end
     end
     object menuHelp: TMenuItem
@@ -636,6 +649,31 @@ object formNotetask: TformNotetask
       Checked = True
       OnExecute = aShowColumnDoneExecute
     end
+    object aIndentTasks: TAction
+      Category = 'Task'
+      Caption = 'Indent tasks'
+      OnExecute = aIndentTasksExecute
+      ShortCut = 16393
+    end
+    object aOutdentTasks: TAction
+      Category = 'Task'
+      Caption = 'Outdent tasks'
+      OnExecute = aOutdentTasksExecute
+      ShortCut = 24585
+    end
+    object aChatGpt: TAction
+      Category = 'Task'
+      Caption = 'Ask ChatGPT...'
+      OnExecute = aChatGptExecute
+      ShortCut = 16465
+    end
+    object aShowColumnTask: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column task'
+      Checked = True
+      OnExecute = aShowColumnTaskExecute
+    end
     object aShowColumnComment: TAction
       Category = 'View'
       AutoCheck = True
@@ -662,24 +700,6 @@ object formNotetask: TformNotetask
       Caption = 'Column fovorite'
       Checked = True
       OnExecute = aShowColumnFavoriteExecute
-    end
-    object aIndentTasks: TAction
-      Category = 'Task'
-      Caption = 'Indent tasks'
-      OnExecute = aIndentTasksExecute
-      ShortCut = 16393
-    end
-    object aOutdentTasks: TAction
-      Category = 'Task'
-      Caption = 'Outdent tasks'
-      OnExecute = aOutdentTasksExecute
-      ShortCut = 24585
-    end
-    object aChatGpt: TAction
-      Category = 'Task'
-      Caption = 'Ask ChatGPT...'
-      OnExecute = aChatGptExecute
-      ShortCut = 16465
     end
   end
   object openDialog: TOpenDialog

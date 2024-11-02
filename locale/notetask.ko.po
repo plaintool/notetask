@@ -486,6 +486,10 @@ msgstr "열 완료"
 msgid "Column fovorite"
 msgstr "열 즐겨찾기"
 
+#: tformnotetask.ashowcolumntask.caption
+msgid "Column task"
+msgstr "열 작업"
+
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
 msgstr "지속 시간"
@@ -562,12 +566,24 @@ msgid "Task"
 msgstr "작업"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
+msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
 msgid "Comment"
 msgstr "댓글"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
+msgctxt "tformnotetask.taskgrid.columns[3].title.caption"
+msgid "Amount"
+msgstr "금액"
+
+#: tformnotetask.taskgrid.columns[4].title.caption
+msgctxt "tformnotetask.taskgrid.columns[4].title.caption"
 msgid "Date"
 msgstr "날짜"
+
+#: tformnotetask.taskgrid.columns[5].title.caption
+msgctxt "tformnotetask.taskgrid.columns[5].title.caption"
+msgid "Star"
+msgstr "별"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

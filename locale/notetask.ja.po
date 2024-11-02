@@ -486,6 +486,10 @@ msgstr "列完了"
 msgid "Column fovorite"
 msgstr "列お気に入り"
 
+#: tformnotetask.ashowcolumntask.caption
+msgid "Column task"
+msgstr "列タスク"
+
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
 msgstr "継続時間"
@@ -562,12 +566,24 @@ msgid "Task"
 msgstr "タスク"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
+msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
 msgid "Comment"
 msgstr "コメント"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
+msgctxt "tformnotetask.taskgrid.columns[3].title.caption"
+msgid "Amount"
+msgstr "金額"
+
+#: tformnotetask.taskgrid.columns[4].title.caption
+msgctxt "tformnotetask.taskgrid.columns[4].title.caption"
 msgid "Date"
 msgstr "日付"
+
+#: tformnotetask.taskgrid.columns[5].title.caption
+msgctxt "tformnotetask.taskgrid.columns[5].title.caption"
+msgid "Star"
+msgstr "星"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

@@ -29,10 +29,14 @@ type
     FDate: TDateTime; // Date of task completion
     FComment: string; // Comment for the task
     FText: string; // Description of the task
+    FAmount: double; // Amount
+    FStar: boolean; // Starred
     FCommentItalic: boolean; // Comment is italic
     FEmptyComment: boolean; // Has empty comment symbols
     FSpaceBeforeComment: boolean; // Space before comment in file
     FSpaceAfterComment: boolean; // Space after comment in file
+    function GetDate: string;
+    function GetAmount: string;
   public
     constructor Create;
     constructor Create(const TaskString: string); // Constructor that takes a task string
@@ -40,8 +44,12 @@ type
     property Done: boolean read FDone write FDone;
     property Archive: boolean read FArchive write FArchive;
     property Date: TDateTime read FDate write FDate;
+    property DateStr: string read GetDate;
     property Comment: string read FComment write FComment;
     property Text: string read FText write FText;
+    property Amount: double read FAmount write FAmount;
+    property AmountStr: string read GetAmount;
+    property Star: boolean read FStar write FStar;
     property CommentItalic: boolean read FCommentItalic write FCommentItalic;
     property EmptyComment: boolean read FEmptyComment write FEmptyComment;
     property SpaceBeforeComment: boolean read FSpaceBeforeComment write FSpaceBeforeComment;
@@ -74,6 +82,7 @@ type
     procedure DeleteTask(Index: integer);
     procedure ArchiveTask(Index: integer);
     procedure CompleteTask(Index: integer; Backup: boolean = True);
+    procedure StarTask(Index: integer; Backup: boolean = True);
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
     function MoveTasksTop(Index1, Index2: integer): integer;
     function MoveTasksBottom(Index1, Index2: integer): integer;
@@ -115,8 +124,10 @@ begin
   FDone := False;
   FArchive := False;
   FDate := 0;
+  FAmount := 0;
   FComment := string.Empty;
   FText := string.Empty;
+  FStar := False;
   FCommentItalic := True;
   FEmptyComment := False;
   FSpaceAfterComment := False;
@@ -165,7 +176,7 @@ var
   end;
 
 begin
-  // Format: - [x] 01.01.2000, ~~Task~~ // *Comment*
+  // Format: - [x] 01.01.2000, 123, ~~Task~~ // Comment
 
   // Split the task string into PartComment
   FCommentItalic := False;
@@ -222,12 +233,16 @@ begin
   // Checks if the task is completed
   CompletedStr := RemoveBrackets(CompletedStr);
 
-  if Length(PartDate) > 1 then
+  if Length(PartDate) > 2 then
   begin
     // Extract and trim the date string
-    if (Length(PartDate) > 1) and (TryStrToDateTime(PartDate[0].Trim, FDate)) then
+    if (TryStrToDateTime(PartDate[0].Trim, FDate)) then
     begin
-      FillText(1);
+      // Extract and trim the amount string
+      if (TryStrToFloat(PartDate[1].Trim, FAmount)) then
+        FillText(2)
+      else
+        FillText(1);
       if (Length(FText) > 0) and (FText.StartsWith(' ')) then
       begin
         Delete(FText, 1, 1);
@@ -237,6 +252,36 @@ begin
     begin
       FText := CompletedStr;
       FDate := 0;
+    end;
+  end
+  else
+  if Length(PartDate) > 1 then
+  begin
+    // Extract and trim the amount string
+    if (TryStrToFloat(PartDate[0].Trim, FAmount)) then
+    begin
+      FillText(1);
+      if (Length(FText) > 0) and (FText.StartsWith(' ')) then
+      begin
+        Delete(FText, 1, 1);
+      end;
+    end
+    else
+    begin
+      // Extract and trim the date string
+      if (TryStrToDateTime(PartDate[0].Trim, FDate)) then
+      begin
+        FillText(1);
+        if (Length(FText) > 0) and (FText.StartsWith(' ')) then
+        begin
+          Delete(FText, 1, 1);
+        end;
+      end
+      else
+      begin
+        FText := CompletedStr;
+        FDate := 0;
+      end;
     end;
   end
   else
@@ -258,6 +303,17 @@ begin
   end
   else
     FArchive := False;
+
+  // Check if Text starts and ends with '**'
+  if FText.TrimLeft.StartsWith('**') and FText.TrimRight.EndsWith('**') then
+  begin
+    FStar := True;
+    FText := Trim(FText);
+    // Remove '**' from the start and end of the Text
+    FText := FText.Substring(2, Length(FText) - 4);
+  end
+  else
+    FStar := False;
 end;
 
 function TTask.ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string;
@@ -269,6 +325,10 @@ begin
   // Replace line breaks from task description and comment
   TextString := StringReplace(Text, sLineBreak, '<br>', [rfReplaceAll]);
   Comment := StringReplace(Comment, sLineBreak, '<br>', [rfReplaceAll]);
+
+  // Add '**' for starred tasks
+  if FStar then
+    TextString := '**' + TextString + '**';
 
   // Add '~~' for archived tasks
   if FArchive then
@@ -307,27 +367,50 @@ begin
     2: Result := TextString; // Returning only the task string
     3: Result := CommentString; // Returning only the comment
     4:
-      if Date > 0 then
-        Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Date).Trim
+      if Amount > 0 then
+        Result := FloatToString(Amount)
+      else
+        Result := string.Empty;
+    5:
+      if FDate > 0 then
+        Result := DateStr.Trim
       else
         Result := string.Empty; // If the completion date is missing, return an empty string
     else
       // Forming the task string considering the completion date and comment
       if (DoneString = string.Empty) then
       begin
-        if Date > 0 then
-          Result := Format('%s, %s%s', [FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
-            FormatSettings.LongTimeFormat, Date), TextString, CommentString])
+        if Amount > 0 then
+        begin
+          if Date > 0 then
+            Result := Format('%s, %s, %s%s', [DateStr, AmountStr, TextString, CommentString])
+          else
+            Result := Format('%s, %s%s', [AmountStr, TextString, CommentString]);
+        end
         else
-          Result := Format('%s%s', [TextString, CommentString]);
+        begin
+          if Date > 0 then
+            Result := Format('%s, %s%s', [DateStr, TextString, CommentString])
+          else
+            Result := Format('%s%s', [TextString, CommentString]);
+        end;
       end
       else
       begin
-        if Date > 0 then
-          Result := Format('%s %s, %s%s', [DoneString, FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
-            FormatSettings.LongTimeFormat, Date), TextString, CommentString]).Trim
+        if Amount > 0 then
+        begin
+          if Date > 0 then
+            Result := Format('%s %s, %s, %s%s', [DoneString, DateStr, AmountStr, TextString, CommentString]).Trim
+          else
+            Result := Format('%s %s, %s%s', [DoneString, AmountStr, TextString, CommentString]).Trim;
+        end
         else
-          Result := Format('%s %s%s', [DoneString, TextString, CommentString]).Trim;
+        begin
+          if Date > 0 then
+            Result := Format('%s %s, %s%s', [DoneString, DateStr, TextString, CommentString]).Trim
+          else
+            Result := Format('%s %s%s', [DoneString, TextString, CommentString]).Trim;
+        end;
       end;
   end;
 end;
@@ -337,12 +420,24 @@ begin
   FDone := Original.FDone;
   FArchive := Original.FArchive;
   FDate := Original.FDate;
+  FAmount := Original.FAmount;
   FComment := Original.FComment;
   FText := Original.FText;
+  FStar := Original.FStar;
   FCommentItalic := Original.FCommentItalic;
   FEmptyComment := Original.FEmptyComment;
   FSpaceBeforeComment := Original.FSpaceBeforeComment;
   FSpaceAfterComment := Original.FSpaceAfterComment;
+end;
+
+function TTask.GetDate: string;
+begin
+  Result := DateToString(FDate);
+end;
+
+function TTask.GetAmount: string;
+begin
+  Result := FloatToString(FAmount);
 end;
 
 { TTasks }
@@ -487,7 +582,14 @@ begin
   else
   if ACol = 3 then Result := GetTask(aRow).Comment
   else
-  if ACol = 4 then Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, GetTask(aRow).Date);
+  if ACol = 4 then Result := GetTask(aRow).AmountStr
+  else
+  if ACol = 5 then Result := GetTask(aRow).DateStr
+  else
+  if ACol = 6 then
+    if GetTask(aRow).FStar then Result := '1'
+    else
+      Result := '0';
 end;
 
 function TTasks.HasTask(Index: integer): boolean;
@@ -501,7 +603,8 @@ end;
 procedure TTasks.SetTask(Grid: TStringGrid; Row: integer; Backup: boolean = True);
 var
   Task: TTask;
-  Date: TDateTime;
+  pDate: TDateTime;
+  pAmount: double;
 begin
   if (Row > 0) and (Row <= FCount) then
   begin
@@ -515,14 +618,22 @@ begin
     Task.Done := StrToBoolDef(Grid.Cells[1, Row], False); // Convert to boolean
     Task.Text := Grid.Cells[2, Row];
     Task.Comment := Grid.Cells[3, Row];
-    if not TryStrToDateTime(Grid.Cells[4, Row], Date) then
+    if not TryStrToFloat(Grid.Cells[4, Row], pAmount) then
     begin
-      Date := 0; // If parsing the date failed, set to 0
+      pAmount := 0; // If parsing the amount failed, set to 0
       Grid.Cells[4, Row] := '';
     end
     else
-      Grid.Cells[4, Row] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Date);
-    Task.Date := Date;
+      Grid.Cells[4, Row] := FloatToString(pAmount);
+    Task.Amount := pAmount;
+    if not TryStrToDateTime(Grid.Cells[5, Row], pDate) then
+    begin
+      pDate := 0; // If parsing the date failed, set to 0
+      Grid.Cells[5, Row] := '';
+    end
+    else
+      Grid.Cells[5, Row] := DateToString(pDate);
+    Task.Date := pDate;
   end
   else
     raise Exception.Create('Invalid row or task index');
@@ -619,6 +730,19 @@ begin
   FTaskList[Ind].Done := not FTaskList[Ind].Done;
 end;
 
+procedure TTasks.StarTask(Index: integer; Backup: boolean = True);
+var
+  Ind: integer;
+begin
+  Ind := Map(Index);
+  if (Ind < 0) or (Ind >= FCount) then
+    exit;
+
+  if Backup then CreateBackup;
+
+  FTaskList[Ind].Star := not FTaskList[Ind].Star;
+end;
+
 procedure TTasks.ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
 var
   i, j: integer;
@@ -637,7 +761,11 @@ begin
       if (j = 3) then
         GetTask(i).Comment := ''; // Clear comment
       if (j = 4) then
+        GetTask(i).Amount := 0; // Reset amount
+      if (j = 5) then
         GetTask(i).Date := 0; // Reset completion date
+      if (j = 6) then
+        GetTask(i).Star := False; // Reset starred
 
       // For grid column
       if (j = 1) then
@@ -858,7 +986,7 @@ procedure TTasks.CopyToClipboard(Grid: TStringGrid);
 var
   SelectedText: TStringList;
   Rect: TGridRect;
-  Done, Text, Comment, Date: string;
+  pDone, pText, pComment, pAmount, pDate: string;
   Row1, Row2, RowText: string;
   i, j: integer;
 begin
@@ -870,14 +998,18 @@ begin
     begin
       for j := Rect.Left to Rect.Right do
       begin
-        if (j = 1) then Done := GetTask(i).ToString(j).Trim;
-        if (j = 2) then Text := GetTask(i).ToString(j).Trim;
-        if (j = 3) then Comment := GetTask(i).ToString(j).Trim;
-        if (j = 4) then Date := GetTask(i).ToString(j).Trim;
+        if (j = 1) then pDone := GetTask(i).ToString(j).Trim;
+        if (j = 2) then pText := GetTask(i).ToString(j).Trim;
+        if (j = 3) then pComment := GetTask(i).ToString(j).Trim;
+        if (j = 4) then pAmount := GetTask(i).ToString(j).Trim;
+        if (j = 5) then pDate := GetTask(i).ToString(j).Trim;
       end;
-      Row1 := (Done + ' ' + Date).Trim;
-      Row2 := (Text + ' ' + Comment).Trim;
-      if (Date <> string.Empty) and (Row2 <> string.Empty) then
+      Row1 := (pDone + ' ' + pDate).Trim;
+      Row2 := (pText + ' ' + pComment).Trim;
+
+      if (pAmount <> string.Empty) then
+        Row1 += ', ' + pAmount;
+      if (pDate <> string.Empty) and (Row2 <> string.Empty) then
         Row1 += ', '
       else
       if (Row1 <> string.Empty) and (Row2 <> string.Empty) then
@@ -900,6 +1032,7 @@ function TTasks.PasteFromClipboard(Grid: TStringGrid): TGridRect;
 var
   TempTasks: TTasks;
   TempDate: TDateTime;
+  TempAmount: double;
   Rect: TGridRect;
   Index, i, j: integer;
   RowTask: TTask;
@@ -962,7 +1095,9 @@ begin
           end;
           for j := Rect.Left to Rect.Right do
           begin
-            if j = 1 then GetTask(i).Done := TempTasks.GetTask(index).Done;
+            if j = 1 then
+              GetTask(i).Done := TempTasks.GetTask(index).Done
+            else
             if j = 2 then
             begin
               if (TempTasks.GetTask(index).Text <> string.Empty) then
@@ -984,7 +1119,8 @@ begin
               end
               else
                 GetTask(i).Text := string.Empty;
-            end;
+            end
+            else
             if j = 3 then
             begin
               if (TempTasks.GetTask(index).Comment <> string.Empty) then
@@ -1006,8 +1142,29 @@ begin
               end
               else
                 GetTask(i).Comment := string.Empty;
-            end;
+            end
+            else
             if j = 4 then
+            begin
+              if (TempTasks.GetTask(index).Amount <> 0) then
+                GetTask(i).Amount := TempTasks.GetTask(index).Amount
+              else
+              if Rect.Width = 0 then
+              begin
+                if (TempTasks.GetTask(index).Text <> string.Empty) and (TryStrToFloat(TempTasks.GetTask(index).Text, TempAmount)) then
+                  GetTask(i).Amount := TempAmount
+                else
+                if (TempTasks.GetTask(index).Comment <> string.Empty) and
+                  (TryStrToFloat(TempTasks.GetTask(index).Comment, TempAmount)) then
+                  GetTask(i).Amount := TempAmount
+                else
+                  GetTask(i).Amount := 0;
+              end
+              else
+                GetTask(i).Amount := 0;
+            end
+            else
+            if j = 5 then
             begin
               if (TempTasks.GetTask(index).Date <> 0) then
                 GetTask(i).Date := TempTasks.GetTask(index).Date
@@ -1278,6 +1435,7 @@ var
     Task1, Task2: TTask;
     Value1, Value2: string;
     DateTime1, DateTime2: TDateTime;
+    Amount1, Amount2: double;
   begin
     Task1 := FTaskList[FMapGrid[Index1]];
     Task2 := FTaskList[FMapGrid[Index2]];
@@ -1299,6 +1457,29 @@ var
         Value2 := Task2.Comment;
       end;
       4: begin
+        // Completion amount (compare as double)
+        Amount1 := Task1.Amount;
+        Amount2 := Task2.Amount;
+
+        if Amount1 = Amount2 then
+          Result := 0
+        else if SortOrder = soAscending then
+        begin
+          if Amount1 < Amount2 then
+            Result := -1
+          else
+            Result := 1;
+        end
+        else
+        begin
+          if Amount1 > Amount2 then
+            Result := -1
+          else
+            Result := 1;
+        end;
+        Exit;
+      end;
+      5: begin
         // Completion date (compare as DateTime)
         DateTime1 := Task1.Date;
         DateTime2 := Task2.Date;
@@ -1319,8 +1500,12 @@ var
           else
             Result := 1;
         end;
-
         Exit;
+      end;
+      6: begin
+        // Completed status
+        Value1 := IntToStr(Ord(Task1.Star));
+        Value2 := IntToStr(Ord(Task2.Star));
       end;
       else
         // Default comparison (index comparison)
@@ -1490,13 +1675,20 @@ begin
         Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].Done));
         Grid.Cells[2, RowIndex] := FTaskList[I].Text;
         Grid.Cells[3, RowIndex] := FTaskList[I].Comment;
-        if FTaskList[I].Date > 0 then
+        if FTaskList[I].Amount > 0 then
         begin
-          Grid.Cells[4, RowIndex] := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
-            FTaskList[I].Date);
+          Grid.Cells[4, RowIndex] := FTaskList[I].AmountStr;
         end
         else
           Grid.Cells[4, RowIndex] := string.Empty;
+
+        if FTaskList[I].Date > 0 then
+        begin
+          Grid.Cells[5, RowIndex] := FTaskList[I].DateStr;
+        end
+        else
+          Grid.Cells[5, RowIndex] := string.Empty;
+        Grid.Cells[6, RowIndex] := IntToStr(Ord(FTaskList[I].Star));
 
         FMapGrid[RowIndex] := I;
 
@@ -1517,7 +1709,7 @@ begin
     end;
 
     // Perform sorting if SortColumn is between 1 and 4
-    if (SortColumn >= 1) and (SortColumn <= 4) then
+    if (SortColumn >= 1) and (SortColumn <= 6) then
     begin
       // Bubble Sort logic to sort rows based on CompareTasks function
       for I := 1 to Grid.RowCount - 2 do
