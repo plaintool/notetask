@@ -338,6 +338,10 @@ msgstr "字体..."
 msgid "Go to..."
 msgstr "转到..."
 
+#: tformnotetask.aindenttasks.caption
+msgid "Indent tasks"
+msgstr "增加任务缩进"
+
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
 msgstr "插入任务"
@@ -425,6 +429,10 @@ msgstr "新窗口"
 #: tformnotetask.aopen.caption
 msgid "Open..."
 msgstr "打开..."
+
+#: tformnotetask.aoutdenttasks.caption
+msgid "Outdent tasks"
+msgstr "减少任务缩进"
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."

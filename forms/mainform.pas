@@ -189,6 +189,11 @@ type
     aShowColumnFavorite: TAction;
     menuColumnAmount: TMenuItem;
     menuColumnFavorite: TMenuItem;
+    aIndentTasks: TAction;
+    aOutdentTasks: TAction;
+    MenuItem15: TMenuItem;
+    Separator14: TMenuItem;
+    MenuItem16: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -268,6 +273,8 @@ type
     procedure aShowColumnDateExecute(Sender: TObject);
     procedure aShowColumnAmountExecute(Sender: TObject);
     procedure aShowColumnFavoriteExecute(Sender: TObject);
+    procedure aIndentTasksExecute(Sender: TObject);
+    procedure aOutdentTasksExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -296,6 +303,7 @@ type
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
+    procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure DatePickerChange(Sender: TObject);
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
@@ -311,6 +319,8 @@ type
     procedure DeleteTasks(ShowConfirm: boolean = True);
     procedure ArchiveTask(aRow: integer = 0);
     procedure ArchiveTasks;
+    procedure CompleteTasks(aRow: integer = 0);
+    procedure IndentTasks(Outdent: boolean = False);
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowDuration(Value: boolean);
     procedure SetShowArchived(Value: boolean);
@@ -320,7 +330,6 @@ type
     procedure SetShowColumnAmount(Value: boolean);
     procedure SetShowColumnFavorite(Value: boolean);
     procedure SetBiDiRightToLeft(Value: boolean);
-    procedure CompleteTasks(aRow: integer = 0);
     procedure GridBackupSelection;
     procedure GridClearSelection;
     procedure ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
@@ -547,6 +556,18 @@ begin
   if (Shift = [ssCtrl]) and (Key = VK_F) then // Ctrl + F
   begin
     aFind.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_TAB) then // Ctrl + Tab
+  begin
+    aIndentTasks.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl, ssShift]) and (Key = VK_TAB) then // Ctrl + Shift + Tab
+  begin
+    aOutdentTasks.Execute;
     Key := 0;
   end
   else
@@ -964,6 +985,7 @@ begin
     Memo.Parent := taskGrid;
     Memo.OnChange := @MemoChange; // Event Change
     Memo.OnEnter := @MemoEnter; // Event Enter
+    Memo.OnKeyDown := @MemoKeyDown; // Event KeyDown
     Memo.Text := taskGrid.Cells[aCol, aRow];
     Memo.SelStart := Length(Memo.Text);
     Memo.SelLength := 0;
@@ -1226,9 +1248,9 @@ begin
   GridBackupSelection;
   Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
   if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTaskTop(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
+    newRow := Tasks.MoveTasksTop(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
   else
-    newRow := Tasks.MoveTaskBottom(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
+    newRow := Tasks.MoveTasksBottom(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
 
   FillGrid;
   if (newRow > -1) then
@@ -1250,9 +1272,9 @@ begin
   GridBackupSelection;
   Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
   if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTaskBottom(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
+    newRow := Tasks.MoveTasksBottom(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
   else
-    newRow := Tasks.MoveTaskTop(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
+    newRow := Tasks.MoveTasksTop(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
 
   FillGrid;
   if (newRow > -1) then
@@ -1275,9 +1297,9 @@ begin
   GridBackupSelection;
   Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
   if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTaskUp(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
+    newRow := Tasks.MoveTasksUp(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
   else
-    newRow := Tasks.MoveTaskDown(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
+    newRow := Tasks.MoveTasksDown(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
 
   FillGrid;
   if (newRow > -1) then
@@ -1299,9 +1321,9 @@ begin
   GridBackupSelection;
   Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
   if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTaskDown(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
+    newRow := Tasks.MoveTasksDown(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
   else
-    newRow := Tasks.MoveTaskUp(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
+    newRow := Tasks.MoveTasksUp(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
 
   FillGrid;
   if (newRow > -1) then
@@ -1311,6 +1333,20 @@ begin
     taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, newRow - Len + 1, taskGrid.Selection.Right, newRow);
   end;
   SetChanged;
+end;
+
+procedure TformNotetask.aIndentTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
+  IndentTasks;
+end;
+
+procedure TformNotetask.aOutdentTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
+  IndentTasks(True);
 end;
 
 procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);
@@ -1810,6 +1846,16 @@ begin
   EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
 end;
 
+procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+begin
+  if Key = VK_TAB then
+  begin
+    // Insert spaces
+    Memo.SelText := '    ';
+    Key := 0;
+  end;
+end;
+
 procedure TformNotetask.DatePickerChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] :=
@@ -2067,6 +2113,33 @@ begin
       SetChanged; // Mark that data has changed
     end;
   end;
+end;
+
+procedure TformNotetask.IndentTasks(Outdent: boolean = False);
+var
+  RowIndex: integer;
+  i: integer;
+begin
+  if FBackup then
+  begin
+    GridBackupSelection;
+    Tasks.CreateBackup;
+  end;
+  // Mark tasks as completed from the end to avoid index shifting
+  for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
+  begin
+    RowIndex := i;
+    if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+    begin
+      if (not Outdent) then
+        taskGrid.Cells[2, RowIndex] := '    ' + taskGrid.Cells[2, RowIndex]
+      else
+        taskGrid.Cells[2, RowIndex] := TrimLeadingSpaces(taskGrid.Cells[2, RowIndex]);
+
+      Tasks.SetTask(taskGrid, RowIndex, False); // Backup created on start
+    end;
+  end;
+  SetChanged; // Mark that data has changed
 end;
 
 procedure TformNotetask.GridBackupSelection;

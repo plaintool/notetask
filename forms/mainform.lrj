@@ -44,7 +44,6 @@
 {"hash":175630005,"name":"tformnotetask.adatetime.caption","sourcebytes":[68,97,116,101,32,116,105,109,101],"value":"Date time"},
 {"hash":38248388,"name":"tformnotetask.abidirighttoleft.caption","sourcebytes":[82,101,97,100,105,110,103,32,111,114,100,101,114,58,32,114,105,103,104,116,32,116,111,32,108,101,102,116],"value":"Reading order: right to left"},
 {"hash":141014752,"name":"tformnotetask.awordwrap.caption","sourcebytes":[87,111,114,100,32,119,114,97,112],"value":"Word wrap"},
-{"hash":17959694,"name":"tformnotetask.achatgpt.caption","sourcebytes":[65,115,107,32,67,104,97,116,71,80,84,46,46,46],"value":"Ask ChatGPT..."},
 {"hash":255115374,"name":"tformnotetask.adonate.caption","sourcebytes":[66,117,121,32,109,101,32,97,32,99,111,102,102,101,101,46,46,46],"value":"Buy me a coffee..."},
 {"hash":158102910,"name":"tformnotetask.aabout.caption","sourcebytes":[65,98,111,117,116,46,46,46],"value":"About..."},
 {"hash":92158654,"name":"tformnotetask.ashowduration.caption","sourcebytes":[83,104,111,119,32,100,117,114,97,116,105,111,110],"value":"Show duration"},
@@ -67,6 +66,9 @@
 {"hash":72141669,"name":"tformnotetask.ashowcolumndate.caption","sourcebytes":[67,111,108,117,109,110,32,100,97,116,101],"value":"Column date"},
 {"hash":203534356,"name":"tformnotetask.ashowcolumnamount.caption","sourcebytes":[67,111,108,117,109,110,32,97,109,111,117,110,116],"value":"Column amount"},
 {"hash":85122069,"name":"tformnotetask.ashowcolumnfavorite.caption","sourcebytes":[67,111,108,117,109,110,32,102,111,118,111,114,105,116,101],"value":"Column fovorite"},
+{"hash":58599027,"name":"tformnotetask.aindenttasks.caption","sourcebytes":[73,110,100,101,110,116,32,116,97,115,107,115],"value":"Indent tasks"},
+{"hash":11544099,"name":"tformnotetask.aoutdenttasks.caption","sourcebytes":[79,117,116,100,101,110,116,32,116,97,115,107,115],"value":"Outdent tasks"},
+{"hash":17959694,"name":"tformnotetask.achatgpt.caption","sourcebytes":[65,115,107,32,67,104,97,116,71,80,84,46,46,46],"value":"Ask ChatGPT..."},
 {"hash":107761687,"name":"tformnotetask.opendialog.title","sourcebytes":[79,112,101,110,105,110,103],"value":"Opening"},
 {"hash":93900871,"name":"tformnotetask.savedialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
 {"hash":131550916,"name":"tformnotetask.fontdialog.title","sourcebytes":[70,111,110,116,32,115,101,108,101,99,116],"value":"Font select"}

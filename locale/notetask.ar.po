@@ -338,6 +338,10 @@ msgstr "خط..."
 msgid "Go to..."
 msgstr "اذهب إلى..."
 
+#: tformnotetask.aindenttasks.caption
+msgid "Indent tasks"
+msgstr "زيادة المسافة البادئة للمهام"
+
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
 msgstr "إدراج مهمة"
@@ -425,6 +429,10 @@ msgstr "نافذة جديدة"
 #: tformnotetask.aopen.caption
 msgid "Open..."
 msgstr "افتح..."
+
+#: tformnotetask.aoutdenttasks.caption
+msgid "Outdent tasks"
+msgstr "تقليل المسافة البادئة للمهام"
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."

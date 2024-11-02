@@ -338,6 +338,10 @@ msgstr "Fonte..."
 msgid "Go to..."
 msgstr "Ir para..."
 
+#: tformnotetask.aindenttasks.caption
+msgid "Indent tasks"
+msgstr "Aumentar recuo das tarefas"
+
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
 msgstr "Inserir tarefa"
@@ -425,6 +429,10 @@ msgstr "Nova janela"
 #: tformnotetask.aopen.caption
 msgid "Open..."
 msgstr "Abrir..."
+
+#: tformnotetask.aoutdenttasks.caption
+msgid "Outdent tasks"
+msgstr "Diminuir recuo das tarefas"
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."

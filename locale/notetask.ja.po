@@ -338,6 +338,10 @@ msgstr "フォント..."
 msgid "Go to..."
 msgstr "移動..."
 
+#: tformnotetask.aindenttasks.caption
+msgid "Indent tasks"
+msgstr "タスクのインデントを増やす"
+
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
 msgstr "タスクを挿入"
@@ -425,6 +429,10 @@ msgstr "新しいウィンドウ"
 #: tformnotetask.aopen.caption
 msgid "Open..."
 msgstr "開く..."
+
+#: tformnotetask.aoutdenttasks.caption
+msgid "Outdent tasks"
+msgstr "タスクのインデントを減らす"
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."

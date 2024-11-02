@@ -338,6 +338,10 @@ msgstr "Carattere..."
 msgid "Go to..."
 msgstr "Vai a..."
 
+#: tformnotetask.aindenttasks.caption
+msgid "Indent tasks"
+msgstr "Aumenta rientro delle attività"
+
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
 msgstr "Inserisci compito"
@@ -425,6 +429,10 @@ msgstr "Nuova finestra"
 #: tformnotetask.aopen.caption
 msgid "Open..."
 msgstr "Apri..."
+
+#: tformnotetask.aoutdenttasks.caption
+msgid "Outdent tasks"
+msgstr "Riduci rientro delle attività"
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."

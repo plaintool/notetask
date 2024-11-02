@@ -23,6 +23,8 @@ function RemoveBrackets(const S: string): string;
 
 function DetectDone(const Input: string): boolean;
 
+function TrimLeadingSpaces(const Input: string; MaxSpaces: Integer = 4): string;
+
 function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;
 
 function EncodeUrl(const url: string): string;
@@ -113,6 +115,25 @@ begin
       Exit;
     end;
   end;
+end;
+
+function TrimLeadingSpaces(const Input: string; MaxSpaces: Integer = 4): string;
+var
+  i, SpaceCount: Integer;
+begin
+  SpaceCount := 0;
+
+  // Count leading spaces, up to MaxSpaces
+  for i := 1 to Length(Input) do
+  begin
+    if (Input[i] = ' ') and (SpaceCount < MaxSpaces) then
+      Inc(SpaceCount)
+    else
+      Break;
+  end;
+
+  // Remove the leading spaces
+  Result := Copy(Input, SpaceCount + 1, Length(Input) - SpaceCount);
 end;
 
 function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;

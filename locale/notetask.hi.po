@@ -338,6 +338,10 @@ msgstr "फॉन्ट..."
 msgid "Go to..."
 msgstr "जाएं..."
 
+#: tformnotetask.aindenttasks.caption
+msgid "Indent tasks"
+msgstr "कार्यों की इंडेंट बढ़ाएं"
+
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
 msgstr "कार्य डालें"
@@ -425,6 +429,10 @@ msgstr "नया विंडो"
 #: tformnotetask.aopen.caption
 msgid "Open..."
 msgstr "खोलें..."
+
+#: tformnotetask.aoutdenttasks.caption
+msgid "Outdent tasks"
+msgstr "कार्यों की इंडेंट घटाएं"
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."

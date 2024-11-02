@@ -338,6 +338,10 @@ msgstr "Police..."
 msgid "Go to..."
 msgstr "Aller à..."
 
+#: tformnotetask.aindenttasks.caption
+msgid "Indent tasks"
+msgstr "Augmenter l'indentation des tâches"
+
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
 msgstr "Insérer la tâche"
@@ -425,6 +429,10 @@ msgstr "Nouvelle fenêtre"
 #: tformnotetask.aopen.caption
 msgid "Open..."
 msgstr "Ouvrir..."
+
+#: tformnotetask.aoutdenttasks.caption
+msgid "Outdent tasks"
+msgstr "Diminuer l'indentation des tâches"
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."

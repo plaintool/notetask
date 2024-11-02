@@ -206,15 +206,19 @@ begin
 
   // Save column widths
   SavedArray := LoadColumnWidthsFromFile;
-  for i := 0 to Grid.ColCount - 1 do
-  begin
-    if (Grid.ColWidths[i] > 0) then
-      ColumnArray.Add(Grid.ColWidths[i])
-    else
+  try
+    for i := 0 to Grid.ColCount - 1 do
     begin
-      if (Assigned(SavedArray)) then
-        ColumnArray.Add(SavedArray[i]);
+      if (Grid.ColWidths[i] > 0) then
+        ColumnArray.Add(Grid.ColWidths[i])
+      else
+      begin
+        if (Assigned(SavedArray)) then
+          ColumnArray.Add(SavedArray[i]);
+      end;
     end;
+  finally
+    SavedArray.Free;
   end;
 
   // Save row heights
@@ -285,6 +289,7 @@ begin
   for i := 1 to ColumnArray.Count - 1 do
     Grid.ColWidths[i] := ColumnArray.Items[i].AsInteger;
 
+  ColumnArray.Free;
   Result := True;
 end;
 

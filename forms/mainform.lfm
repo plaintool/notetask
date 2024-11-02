@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -211,6 +210,15 @@ object formNotetask: TformNotetask
       end
       object menuMoveTaskBottom: TMenuItem
         Action = aMoveTaskBottom
+      end
+      object Separator14: TMenuItem
+        Caption = '-'
+      end
+      object MenuItem15: TMenuItem
+        Action = aIndentTasks
+      end
+      object MenuItem16: TMenuItem
+        Action = aOutdentTasks
       end
       object Separator10: TMenuItem
         Caption = '-'
@@ -535,12 +543,6 @@ object formNotetask: TformNotetask
       Checked = True
       OnExecute = aWordWrapExecute
     end
-    object aChatGpt: TAction
-      Category = 'Task'
-      Caption = 'Ask ChatGPT...'
-      OnExecute = aChatGptExecute
-      ShortCut = 16465
-    end
     object aDonate: TAction
       Category = 'Help'
       Caption = 'Buy me a coffee...'
@@ -660,6 +662,24 @@ object formNotetask: TformNotetask
       Caption = 'Column fovorite'
       Checked = True
       OnExecute = aShowColumnFavoriteExecute
+    end
+    object aIndentTasks: TAction
+      Category = 'Task'
+      Caption = 'Indent tasks'
+      OnExecute = aIndentTasksExecute
+      ShortCut = 16393
+    end
+    object aOutdentTasks: TAction
+      Category = 'Task'
+      Caption = 'Outdent tasks'
+      OnExecute = aOutdentTasksExecute
+      ShortCut = 24585
+    end
+    object aChatGpt: TAction
+      Category = 'Task'
+      Caption = 'Ask ChatGPT...'
+      OnExecute = aChatGptExecute
+      ShortCut = 16465
     end
   end
   object openDialog: TOpenDialog

@@ -338,6 +338,10 @@ msgstr ""
 msgid "Go to..."
 msgstr ""
 
+#: tformnotetask.aindenttasks.caption
+msgid "Indent tasks"
+msgstr ""
+
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
 msgstr ""
@@ -424,6 +428,10 @@ msgstr ""
 
 #: tformnotetask.aopen.caption
 msgid "Open..."
+msgstr ""
+
+#: tformnotetask.aoutdenttasks.caption
+msgid "Outdent tasks"
 msgstr ""
 
 #: tformnotetask.apageproperties.caption

@@ -338,6 +338,10 @@ msgstr "Шрифт..."
 msgid "Go to..."
 msgstr "Перейти до..."
 
+#: tformnotetask.aindenttasks.caption
+msgid "Indent tasks"
+msgstr " Збільшити відступ завдань"
+
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
 msgstr "Вставити завдання"
@@ -425,6 +429,10 @@ msgstr "Нове вікно"
 #: tformnotetask.aopen.caption
 msgid "Open..."
 msgstr "Відкрити..."
+
+#: tformnotetask.aoutdenttasks.caption
+msgid "Outdent tasks"
+msgstr "Зменшити відступ завдань"
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."

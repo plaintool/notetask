@@ -338,6 +338,10 @@ msgstr "글꼴..."
 msgid "Go to..."
 msgstr "이동하기..."
 
+#: tformnotetask.aindenttasks.caption
+msgid "Indent tasks"
+msgstr "작업 들여쓰기 늘리기"
+
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
 msgstr "작업 삽입"
@@ -425,6 +429,10 @@ msgstr "새 창"
 #: tformnotetask.aopen.caption
 msgid "Open..."
 msgstr "열기..."
+
+#: tformnotetask.aoutdenttasks.caption
+msgid "Outdent tasks"
+msgstr "작업 들여쓰기 줄이기"
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."

@@ -75,10 +75,10 @@ type
     procedure ArchiveTask(Index: integer);
     procedure CompleteTask(Index: integer; Backup: boolean = True);
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
-    function MoveTaskTop(Index1, Index2: integer): integer;
-    function MoveTaskBottom(Index1, Index2: integer): integer;
-    function MoveTaskUp(Index1, Index2: integer): integer;
-    function MoveTaskDown(Index1, Index2: integer): integer;
+    function MoveTasksTop(Index1, Index2: integer): integer;
+    function MoveTasksBottom(Index1, Index2: integer): integer;
+    function MoveTasksUp(Index1, Index2: integer): integer;
+    function MoveTasksDown(Index1, Index2: integer): integer;
     procedure SwapTasks(OldIndex, NewIndex: integer);
     procedure MoveTask(OldIndex, NewIndex: integer);
     procedure CopyToClipboard(Grid: TStringGrid);
@@ -648,7 +648,7 @@ begin
   end;
 end;
 
-function TTasks.MoveTaskTop(Index1, Index2: integer): integer;
+function TTasks.MoveTasksTop(Index1, Index2: integer): integer;
 var
   TempTasks: array of TTask; // Temporary array for selected tasks
   i, IndStart, IndEnd, Len: integer;
@@ -683,7 +683,7 @@ begin
   end;
 end;
 
-function TTasks.MoveTaskBottom(Index1, Index2: integer): integer;
+function TTasks.MoveTasksBottom(Index1, Index2: integer): integer;
 var
   TempTasks: array of TTask; // Temporary array for selected tasks
   i, IndStart, IndEnd, Len: integer;
@@ -716,7 +716,7 @@ begin
   end;
 end;
 
-function TTasks.MoveTaskUp(Index1, Index2: integer): integer;
+function TTasks.MoveTasksUp(Index1, Index2: integer): integer;
 var
   TempTasks: array of TTask; // Temporary array for selected tasks
   i, IndStart, IndEnd, Len: integer;
@@ -750,7 +750,7 @@ begin
   end;
 end;
 
-function TTasks.MoveTaskDown(Index1, Index2: integer): integer;
+function TTasks.MoveTasksDown(Index1, Index2: integer): integer;
 var
   TempTasks: array of TTask; // Temporary array for selected tasks
   i, IndStart, IndEnd, Len: integer;
