@@ -340,7 +340,7 @@ msgstr "Перейти до..."
 
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
-msgstr " Збільшити відступ завдань"
+msgstr "Збільшити відступ завдань"
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
