@@ -728,7 +728,11 @@ procedure TformNotetask.taskGridColRowInserted(Sender: TObject; IsColumn: boolea
 begin
   if (not IsColumn) then
   begin
-    if FBackup then Tasks.CreateBackup;
+    if FBackup then
+    begin
+      GridBackupSelection;
+      Tasks.CreateBackup;
+    end;
     Tasks.AddMap(Tasks.AddTask('[ ]'));
     taskGrid.Cells[1, tIndex] := '0';
     SetInfo;
@@ -1088,9 +1092,9 @@ begin
     begin
       Tasks.UndoBackupInit;
       FillGrid;
-      GridClearSelection;
       ResetRowHeight;
       SetInfo;
+      GridClearSelection;
       Tasks.CreateBackup;
       SetChanged(False);
     end;
@@ -1870,8 +1874,11 @@ begin
 
     if (Confirm = mrYes) or (not ShowConfirm) then
     begin
-      GridBackupSelection;
-      if (FBackup) then Tasks.CreateBackup;
+      if (FBackup) then
+      begin
+        GridBackupSelection;
+        Tasks.CreateBackup;
+      end;
 
       // RemoveTask from collection
       taskGrid.DeleteRow(RowIndex);
@@ -1895,8 +1902,11 @@ begin
 
     if (Confirm = mrYes) or (not ShowConfirm) then
     begin
-      GridBackupSelection;
-      if (FBackup) then Tasks.CreateBackup;
+      if (FBackup) then
+      begin
+        GridBackupSelection;
+        Tasks.CreateBackup;
+      end;
 
       // Delete rows from the end to avoid index shifting
       for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
@@ -1932,8 +1942,11 @@ begin
 
     if Confirm = mrYes then
     begin
-      GridBackupSelection;
-      if (FBackup) then Tasks.CreateBackup;
+      if (FBackup) then
+      begin
+        GridBackupSelection;
+        Tasks.CreateBackup;
+      end;
 
       // Archivate task
       Tasks.ArchiveTask(RowIndex);
@@ -1957,8 +1970,11 @@ begin
 
     if Confirm = mrYes then
     begin
-      GridBackupSelection;
-      if (FBackup) then Tasks.CreateBackup;
+      if (FBackup) then
+      begin
+        GridBackupSelection;
+        Tasks.CreateBackup;
+      end;
 
       // Archive tasks from the end to avoid index shifting
       for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
