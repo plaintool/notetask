@@ -644,7 +644,10 @@ begin
   begin
     if not IsEditing then
     begin
-      CompleteTasks;
+      if (taskGrid.Col = 6) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
+        StarTask
+      else
+        CompleteTasks;
       Key := 0;
     end;
   end
@@ -2210,6 +2213,7 @@ begin
 
     Tasks.SetTask(taskGrid, RowIndex, False);
     SetChanged; // Mark that data has changed
+    Invalidate;
   end;
 end;
 

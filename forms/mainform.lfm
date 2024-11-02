@@ -29,7 +29,7 @@ object formNotetask: TformNotetask
         Alignment = taCenter
         ButtonStyle = cbsCheckboxColumn
         Title.Caption = 'Done'
-        Width = 64
+        Width = 50
       end    
       item
         Title.Caption = 'Task'
@@ -51,7 +51,7 @@ object formNotetask: TformNotetask
         Alignment = taCenter
         ButtonStyle = cbsCheckboxColumn
         Title.Caption = 'Star'
-        Width = 32
+        Width = 50
       end>
     DefaultColWidth = 50
     FixedColor = clWindow
