@@ -388,6 +388,7 @@ var
   formNotetask: TformNotetask;
   Tasks: TTasks; // Tasks collection
   clRowHighlight: TColor;
+  clRowFocused: TColor;
   clRowExpired: TColor;
   ResourceBitmapCheck: TBitmap;
   ResourceBitmapUncheck: TBitmap;
@@ -438,6 +439,7 @@ begin
   FSortColumn := 0;
   FSortOrder := soAscending;
   clRowHighlight := RGBToColor(210, 230, 255);
+  clRowFocused := RGBToColor(190, 210, 255);
   clRowExpired := RGBToColor(255, 220, 220);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
@@ -854,6 +856,7 @@ var
   bgFill: TColor;
   flags: cardinal;
   task: TTask;
+  amount: double;
 begin
   grid := Sender as TStringGrid;
 
@@ -870,15 +873,21 @@ begin
   else
   begin
     // Determine background color
+    if (gdFocused in aState) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
+    begin
+      bgFill := clRowFocused;    // Focused
+      grid.Canvas.Font.Color := clBlack;
+    end
+    else
     if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
     begin
-      bgFill := clHighlight;
-      grid.Canvas.Font.Color := clWhite; // Set font color to white when selected
+      bgFill := clHighlight;    // Multiselect
+      grid.Canvas.Font.Color := clWhite;
     end
     else
     if gdRowHighlight in aState then
     begin
-      bgFill := clRowHighlight;
+      bgFill := clRowHighlight; // Highlight
       grid.Canvas.Font.Color := clBlack;
     end
     else
@@ -886,18 +895,18 @@ begin
       task := Tasks.GetTask(ARow);
       if (ShowColumnDate) and (not task.Done) and (task.Date > 0) and (task.Date < Now) then // Color expired task
       begin
-        bgFill := clRowExpired;
+        bgFill := clRowExpired; // Expired warning red
         grid.Canvas.Font.Color := clBlack;
       end
       else
       if (not task.Done) and (task.Archive) then
       begin
-        bgFill := clWhite;
+        bgFill := clWhite; // Not done but arhive warning color
         grid.Canvas.Font.Color := clMaroon;
       end
       else
       begin
-        bgFill := clWhite;
+        bgFill := clWhite; // All other white
         grid.Canvas.Font.Color := clBlack;
       end;
     end;
@@ -922,7 +931,7 @@ begin
       exit;
     end;
 
-    if (aCol = 4) then
+    if (aCol = 4) and (TryStrToFloat(grid.Cells[ACol, ARow], amount)) then
       S := FormatFloat('#,##0.##########', StrToFloat(grid.Cells[ACol, ARow]))
     else
       S := grid.Cells[ACol, ARow];
@@ -944,7 +953,7 @@ begin
 
       if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
       begin
-        // changing the row height fires the event again!
+        // Changing the row height fires the event again!
         grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2);
         {$IFDEF Linux}
         grid.Invalidate;
@@ -1874,7 +1883,7 @@ begin
   end
   else
   begin
-    Memo.Color := clRowHighlight;
+    Memo.Color := clRowFocused;
     Memo.Font.Color := clBlack;
   end;
 end;
