@@ -80,6 +80,7 @@ object formNotetask: TformNotetask
     OnMouseWheel = taskGridMouseWheel
     OnResize = taskGridResize
     OnSelectEditor = taskGridSelectEditor
+    OnSelection = taskGridSelection
     OnSelectCell = taskGridSelectCell
     OnSetCheckboxState = taskGridSetCheckboxState
     OnUserCheckboxBitmap = taskGridUserCheckboxBitmap

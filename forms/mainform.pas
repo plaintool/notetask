@@ -279,6 +279,7 @@ type
     procedure aShowColumnFavoriteExecute(Sender: TObject);
     procedure aIndentTasksExecute(Sender: TObject);
     procedure aOutdentTasksExecute(Sender: TObject);
+    procedure taskGridSelection(Sender: TObject; aCol, aRow: integer);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -304,6 +305,7 @@ type
     FFoundText: string;
     FLastGridSelection: TRect;
     FLastGridRow, FLastGridCol: integer;
+    FLastSelectionHeight: integer;
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
@@ -1210,6 +1212,7 @@ begin
     if (SortColumn = 0) then
       taskGrid.Selection := Sel;
     SetChanged;
+    SetInfo;
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
@@ -1391,6 +1394,13 @@ begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
   IndentTasks(True);
+end;
+
+procedure TformNotetask.taskGridSelection(Sender: TObject; aCol, aRow: integer);
+begin
+  if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
+    SetInfo;
+  FLastSelectionHeight := taskGrid.Selection.Height;
 end;
 
 procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);
@@ -2455,8 +2465,17 @@ begin
   statusBar.Panels[1].Text := UpperCase(GetEncodingName(FEncoding));
   statusBar.Panels[2].Text := FLineEnding.ToString;
 
-  CurCount := Tasks.CalcCount(ShowArchived, False);
-  CurDone := Tasks.CalcCount(ShowArchived, True);
+  if (taskGrid.Selection.Height = 0) then
+  begin
+    CurCount := Tasks.CalcCount(ShowArchived, False);
+    CurDone := Tasks.CalcCount(ShowArchived, True);
+  end
+  else
+  begin
+    CurCount := Tasks.CalcCount(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+    CurDone := Tasks.CalcCount(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+  end;
+
   if (CurCount = CurDone) or (CurDone = 0) then
     statusBar.Panels[3].Text := CurCount.ToString + rrows
   else
@@ -2464,8 +2483,16 @@ begin
 
   if (ShowColumnAmount) then
   begin
-    SumCount := Tasks.CalcSum(ShowArchived, False);
-    SumDone := Tasks.CalcSum(ShowArchived, True);
+    if (taskGrid.Selection.Height = 0) then
+    begin
+      SumCount := Tasks.CalcSum(ShowArchived, False);
+      SumDone := Tasks.CalcSum(ShowArchived, True);
+    end
+    else
+    begin
+      SumCount := Tasks.CalcSum(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+      SumDone := Tasks.CalcSum(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+    end;
     if (SumCount > 0) then
     begin
       if (SumDone = 0) then

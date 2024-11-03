@@ -99,8 +99,8 @@ type
     procedure UndoBackupInit;
     function GetCountArchive: integer;
     function CalcDateDiff(const StartDate, EndDate: TDateTime): string;
-    function CalcCount(Archive, Done: boolean): integer;
-    function CalcSum(Archive, Done: boolean): double;
+    function CalcCount(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): integer;
+    function CalcSum(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): double;
 
     property Count: integer read FCount;
     property CountArhive: integer read GetCountArchive;
@@ -1063,7 +1063,7 @@ begin
 
   TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText, True));
   try
-    if (Grid.Selection.Height = 0) and (Grid.Selection.Width = 0) and (not IsEmpty) then
+    if (Grid.Selection.Height = 0) and (Grid.Selection.Width = 5) and (not IsEmpty) then
     begin
       if (Grid.Row = 0) then
         index := 1
@@ -1419,27 +1419,51 @@ begin
   Result := '0' + rseconds;
 end;
 
-function TTasks.CalcCount(Archive, Done: boolean): integer;
+function TTasks.CalcCount(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): integer;
 var
-  I: integer;
+  I, Ind: integer;
 begin
   Result := 0;
-  for I := 0 to Count - 1 do
+  if (StartIndex = 0) and (EndIndex = 0) then
   begin
-    if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) then
-      Result += 1;
+    for I := 0 to Count - 1 do
+    begin
+      if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) then
+        Result += 1;
+    end;
+  end
+  else
+  begin
+    for I := StartIndex to EndIndex do
+    begin
+      Ind := Map(I);
+      if (Ind > -1) and ((Archive = True) or (FTaskList[Ind].Archive = False)) and ((Done = False) or (FTaskList[Ind].Done = True)) then
+        Result += 1;
+    end;
   end;
 end;
 
-function TTasks.CalcSum(Archive, Done: boolean): double;
+function TTasks.CalcSum(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): double;
 var
-  I: integer;
+  I, Ind: integer;
 begin
   Result := 0;
-  for I := 0 to Count - 1 do
+  if (StartIndex = 0) and (EndIndex = 0) then
   begin
-    if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) then
-      Result += FTaskList[I].Amount;
+    for I := 0 to Count - 1 do
+    begin
+      if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) then
+        Result += FTaskList[I].Amount;
+    end;
+  end
+  else
+  begin
+    for I := StartIndex to EndIndex do
+    begin
+      Ind := Map(I);
+      if (Ind > -1) and ((Archive = True) or (FTaskList[Ind].Archive = False)) and ((Done = False) or (FTaskList[Ind].Done = True)) then
+        Result += FTaskList[Ind].Amount;
+    end;
   end;
 end;
 
