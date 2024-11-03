@@ -440,8 +440,8 @@ begin
   FBiDiRightToLeft := self.BiDiMode = bdRightToLeft;
   FSortColumn := 0;
   FSortOrder := soAscending;
-  clRowHighlight := RGBToColor(210, 230, 255);
-  clRowFocused := RGBToColor(190, 210, 255);
+  clRowHighlight := RGBToColor(220, 240, 255);
+  clRowFocused := RGBToColor(200, 220, 255);
   clRowExpired := RGBToColor(255, 220, 220);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
@@ -2495,7 +2495,7 @@ begin
     end;
     if (SumCount > 0) then
     begin
-      if (SumDone = 0) then
+      if (SumCount = SumDone) or (SumDone = 0) then
         statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumCount)
       else
         statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumDone) + ' / ' + FormatFloat('#,##0.00', SumCount);
