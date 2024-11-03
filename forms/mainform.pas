@@ -922,7 +922,11 @@ begin
       exit;
     end;
 
-    S := grid.Cells[ACol, ARow];
+    if (aCol = 4) then
+      S := FormatFloat('#,##0.##########', StrToFloat(grid.Cells[ACol, ARow]))
+    else
+      S := grid.Cells[ACol, ARow];
+
     if Length(S) > 0 then
     begin
       drawrect := aRect;
@@ -2456,9 +2460,9 @@ begin
     if (SumCount > 0) then
     begin
       if (SumDone = 0) then
-        statusBar.Panels[4].Text := SumCount.ToString
+        statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumCount)
       else
-        statusBar.Panels[4].Text := SumDone.ToString + ' / ' + SumCount.ToString;
+        statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumDone) + ' / ' + FormatFloat('#,##0.00', SumCount);
     end
     else
       statusBar.Panels[4].Text := string.empty;
