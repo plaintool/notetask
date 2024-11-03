@@ -2579,10 +2579,12 @@ begin
   if Assigned(Tasks) then
     Tasks.Free;
   Tasks := TTasks.Create(TextToStringList(Content));
-  FillGrid;
 
   LoadGridSettings(Self, taskGrid, FFileName);
   ApplyColumnSetting;
+
+  FillGrid;
+
   taskGrid.Row := 1;
   taskGrid.Col := 2;
   ResetRowHeight;
