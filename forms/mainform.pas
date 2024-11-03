@@ -1741,99 +1741,99 @@ end;
 procedure TformNotetask.aLangEnglishExecute(Sender: TObject);
 begin
   SetLanguage('en');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangSpanishExecute(Sender: TObject);
 begin
   SetLanguage('es');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangFrenchExecute(Sender: TObject);
 begin
   SetLanguage('fr');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangGermanExecute(Sender: TObject);
 begin
   SetLanguage('de');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangItalianExecute(Sender: TObject);
 begin
   SetLanguage('it');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangPortugueseExecute(Sender: TObject);
 begin
   SetLanguage('pt');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangRussianExecute(Sender: TObject);
 begin
   SetLanguage('ru');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangJapaneseExecute(Sender: TObject);
 begin
   SetLanguage('ja');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangKoreanExecute(Sender: TObject);
 begin
   SetLanguage('ko');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangChineseExecute(Sender: TObject);
 begin
   SetLanguage('zh');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangUkrainianExecute(Sender: TObject);
 begin
   SetLanguage('uk');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangBelarusianExecute(Sender: TObject);
 begin
   SetLanguage('be');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangHindiExecute(Sender: TObject);
 begin
   SetLanguage('hi');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aLangArabicExecute(Sender: TObject);
 begin
   SetLanguage('ar');
-  SetCaption;
   if ShowDuration then FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aDonateExecute(Sender: TObject);
