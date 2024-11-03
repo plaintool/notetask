@@ -1007,13 +1007,15 @@ begin
       Row1 := (pDone + ' ' + pDate).Trim;
       Row2 := (pText + ' ' + pComment).Trim;
 
-      if (pAmount <> string.Empty) then
-        Row1 += ', ' + pAmount;
       if (pDate <> string.Empty) and (Row2 <> string.Empty) then
         Row1 += ', '
       else
       if (Row1 <> string.Empty) and (Row2 <> string.Empty) then
         Row1 += ' ';
+
+      if (pAmount <> string.Empty) then
+        Row1 += pAmount + ', ';
+
       RowText := Row1 + Row2;
       SelectedText.Add(RowText.Trim);
     end;
