@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -101,6 +100,9 @@ object formNotetask: TformNotetask
       end    
       item
         Bevel = pbNone
+        Width = 150
+      end    
+      item
         Width = 150
       end    
       item

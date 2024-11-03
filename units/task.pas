@@ -99,6 +99,8 @@ type
     procedure UndoBackupInit;
     function GetCountArchive: integer;
     function CalcDateDiff(const StartDate, EndDate: TDateTime): string;
+    function CalcCount(Archive, Done: boolean): integer;
+    function CalcSum(Archive, Done: boolean): double;
 
     property Count: integer read FCount;
     property CountArhive: integer read GetCountArchive;
@@ -1410,6 +1412,30 @@ begin
   end;
 
   Result := '0' + rseconds;
+end;
+
+function TTasks.CalcCount(Archive, Done: boolean): integer;
+var
+  I: integer;
+begin
+  Result := 0;
+  for I := 0 to Count - 1 do
+  begin
+    if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) then
+      Result += 1;
+  end;
+end;
+
+function TTasks.CalcSum(Archive, Done: boolean): double;
+var
+  I: integer;
+begin
+  Result := 0;
+  for I := 0 to Count - 1 do
+  begin
+    if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) then
+      Result += FTaskList[I].Amount;
+  end;
 end;
 
 function TTasks.GetCountArchive: integer;

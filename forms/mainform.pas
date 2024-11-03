@@ -1889,6 +1889,9 @@ begin
   SetChanged;
   taskGrid.Repaint;
   EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
+
+  if (taskGrid.Col = 4) then
+    SetInfo;
 end;
 
 procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -2137,6 +2140,7 @@ begin
     end;
     if ShowDuration then FillGrid;
     SetChanged; // Mark that data has changed
+    SetInfo;
   end
   else
   begin
@@ -2169,6 +2173,7 @@ begin
       Tasks.SetTask(taskGrid, RowIndex, False);
       if (ShowDuration) and (Check) then FillGrid;
       SetChanged; // Mark that data has changed
+      SetInfo;
     end;
   end;
 end;
@@ -2317,6 +2322,7 @@ procedure TformNotetask.SetShowArchived(Value: boolean);
 begin
   FShowArchived := Value;
   FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.SetShowDuration(Value: boolean);
@@ -2353,6 +2359,7 @@ procedure TformNotetask.SetShowColumnAmount(Value: boolean);
 begin
   FShowColumnAmount := Value;
   taskGrid.Columns.Items[3].Visible := FShowColumnAmount;
+  SetInfo;
 end;
 
 procedure TformNotetask.SetShowColumnDate(Value: boolean);
@@ -2396,15 +2403,37 @@ end;
 procedure TformNotetask.SetInfo;
 var
   CurCount: integer;
+  CurDone: integer;
+  SumCount: double;
+  SumDone: double;
 begin
+  SetCaption;
   statusBar.Panels[1].Text := UpperCase(GetEncodingName(FEncoding));
   statusBar.Panels[2].Text := FLineEnding.ToString;
-  CurCount := Tasks.Count - Tasks.GetCountArchive;
-  if (CurCount = Tasks.Count) then
-    statusBar.Panels[3].Text := Tasks.Count.ToString + rrows
+
+  CurCount := Tasks.CalcCount(ShowArchived, False);
+  CurDone := Tasks.CalcCount(ShowArchived, True);
+  if (CurCount = CurDone) or (CurDone = 0) then
+    statusBar.Panels[3].Text := CurCount.ToString + rrows
   else
-    statusBar.Panels[3].Text := (Tasks.Count - Tasks.GetCountArchive).ToString + ' / ' + Tasks.Count.ToString + rrows;
-  SetCaption;
+    statusBar.Panels[3].Text := CurDone.ToString + ' / ' + CurCount.ToString + rrows;
+
+  if (ShowColumnAmount) then
+  begin
+    SumCount := Tasks.CalcSum(ShowArchived, False);
+    SumDone := Tasks.CalcSum(ShowArchived, True);
+    if (SumCount > 0) then
+    begin
+      if (SumDone = 0) then
+        statusBar.Panels[4].Text := SumCount.ToString
+      else
+        statusBar.Panels[4].Text := SumDone.ToString + ' / ' + SumCount.ToString;
+    end
+    else
+      statusBar.Panels[4].Text := string.empty;
+  end
+  else
+    statusBar.Panels[4].Text := string.empty;
 end;
 
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);
