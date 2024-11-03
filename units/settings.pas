@@ -265,7 +265,8 @@ begin
       JSONObj := JSONData as TJSONObject;
 
       // Attempt to find settings for the specified Item
-      if JSONObj.Find(Item) = nil then Exit;
+      if JSONObj.Find(Item) = nil then Item := string.Empty;
+      if JSONObj.Find(Item) = nil then exit;
       ItemSettings := JSONObj.Find(Item) as TJSONObject;
 
       // Load settings into the form and grid from the ItemSettings object

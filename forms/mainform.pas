@@ -2601,6 +2601,9 @@ begin
     ShowMessage(rfilenotfound);
     exit;
   end;
+  // Save settings for new file
+  //SaveGridSettings(Self, taskGrid, string.Empty);
+  // Save settings for current file
   SaveGridSettings(Self, taskGrid, FFileName);
 
   FFileName := fileName;
@@ -2611,6 +2614,7 @@ begin
     Tasks.Free;
   Tasks := TTasks.Create(TextToStringList(Content));
 
+  // Load saved settings for file
   LoadGridSettings(Self, taskGrid, FFileName);
   ApplyColumnSetting;
 
