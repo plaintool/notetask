@@ -889,7 +889,7 @@ begin
     else
     begin
       task := Tasks.GetTask(ARow);
-      if (not task.Done) and (task.Date > 0) and (task.Date < Now) then // Color expired task
+      if (ShowColumnDate) and (not task.Done) and (task.Date > 0) and (task.Date < Now) then // Color expired task
       begin
         bgFill := clRowExpired;
         grid.Canvas.Font.Color := clBlack;
