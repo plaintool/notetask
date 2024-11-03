@@ -681,18 +681,18 @@ object formNotetask: TformNotetask
       Checked = True
       OnExecute = aShowColumnCommentExecute
     end
+    object aShowColumnAmount: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column amount'
+      OnExecute = aShowColumnAmountExecute
+    end
     object aShowColumnDate: TAction
       Category = 'View'
       AutoCheck = True
       Caption = 'Column date'
       Checked = True
       OnExecute = aShowColumnDateExecute
-    end
-    object aShowColumnAmount: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column amount'
-      OnExecute = aShowColumnAmountExecute
     end
     object aShowColumnFavorite: TAction
       Category = 'View'

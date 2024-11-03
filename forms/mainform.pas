@@ -460,8 +460,8 @@ begin
   ResourceBitmapStarGray.Transparent := True;
   ResourceBitmapStarGray.TransparentColor := clFuchsia;
 
-  LoadFormSettings(self);
-  LoadGridSettings(taskGrid);
+  LoadFormSettings(Self);
+  LoadGridSettings(Self, taskGrid, FFileName);
 
   // Set language
   SetLanguage;
@@ -507,7 +507,8 @@ end;
 
 procedure TformNotetask.FormDestroy(Sender: TObject);
 begin
-  SaveFormSettings(self);
+  SaveGridSettings(Self, taskGrid, FFileName);
+  SaveFormSettings(Self);
 
   // Free allocated resources
   FLineEnding.Free;
@@ -809,7 +810,6 @@ end;
 procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
 begin
   taskGridResize(Sender);
-  SaveGridSettings(taskGrid);
 end;
 
 procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
@@ -2574,6 +2574,7 @@ begin
   Tasks := TTasks.Create(TextToStringList(Content));
   FillGrid;
 
+  LoadGridSettings(Self, taskGrid, FFileName);
   taskGrid.Row := 1;
   taskGrid.Col := 2;
   ResetRowHeight;

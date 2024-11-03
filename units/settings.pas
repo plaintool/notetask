@@ -30,11 +30,9 @@ procedure SaveFormSettings(Form: TformNotetask);
 
 function LoadFormSettings(Form: TformNotetask): boolean;
 
-procedure SaveGridSettings(Grid: TStringGrid);
+procedure SaveGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string);
 
-function LoadColumnWidthsFromFile: TJSONArray;
-
-function LoadGridSettings(Grid: TStringGrid): boolean;
+function LoadGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string): boolean;
 
 implementation
 
@@ -59,23 +57,15 @@ begin
   JSONObj := TJSONObject.Create;
   try
     // Save form position and size
-
-    JSONObj.Add('WordWrap', Form.WordWrap);
-    JSONObj.Add('BidiRightToLeft', Form.BiDiRightToLeft);
-    JSONObj.Add('ShowArchived', Form.ShowArchived);
-    JSONObj.Add('ShowStatusBar', Form.ShowStatusBar);
-    JSONObj.Add('ShowDuration', Form.ShowDuration);
-    JSONObj.Add('ShowColumnDone', Form.ShowColumnDone);
-    JSONObj.Add('ShowColumnTask', Form.ShowColumnTask);
-    JSONObj.Add('ShowColumnComment', Form.ShowColumnComment);
-    JSONObj.Add('ShowColumnDate', Form.ShowColumnDate);
-    JSONObj.Add('ShowColumnAmount', Form.ShowColumnAmount);
-    JSONObj.Add('ShowColumnFavorite', Form.ShowColumnFavorite);
-    JSONObj.Add('WindowState', Ord(Form.WindowState));
     JSONObj.Add('Left', Form.RestoredLeft);
     JSONObj.Add('Top', Form.RestoredTop);
     JSONObj.Add('Width', Form.RestoredWidth);
     JSONObj.Add('Height', Form.RestoredHeight);
+    JSONObj.Add('WindowState', Ord(Form.WindowState));
+    JSONObj.Add('WordWrap', Form.WordWrap);
+    JSONObj.Add('BidiRightToLeft', Form.BiDiRightToLeft);
+    JSONObj.Add('ShowStatusBar', Form.ShowStatusBar);
+    JSONObj.Add('ShowArchived', Form.ShowArchived);
     JSONObj.Add('Language', Language);
 
     // Save font
@@ -119,42 +109,6 @@ begin
       JSONObj := JSONData as TJSONObject;
 
       // Check and load form's position and size
-      if JSONObj.FindPath('WordWrap') <> nil then
-        Form.WordWrap := JSONObj.FindPath('WordWrap').AsBoolean;
-
-      if JSONObj.FindPath('BidiRightToLeft') <> nil then
-        Form.BiDiRightToLeft := JSONObj.FindPath('BidiRightToLeft').AsBoolean;
-
-      if JSONObj.FindPath('ShowArchived') <> nil then
-        Form.FShowArchived := JSONObj.FindPath('ShowArchived').AsBoolean;
-
-      if JSONObj.FindPath('ShowDuration') <> nil then
-        Form.FShowDuration := JSONObj.FindPath('ShowDuration').AsBoolean;
-
-      if JSONObj.FindPath('ShowColumnDone') <> nil then
-        Form.FShowColumnDone := JSONObj.FindPath('ShowColumnDone').AsBoolean;
-
-      if JSONObj.FindPath('ShowColumnTask') <> nil then
-        Form.FShowColumnTask := JSONObj.FindPath('ShowColumnTask').AsBoolean;
-
-      if JSONObj.FindPath('ShowColumnComment') <> nil then
-        Form.FShowColumnComment := JSONObj.FindPath('ShowColumnComment').AsBoolean;
-
-      if JSONObj.FindPath('ShowColumnDate') <> nil then
-        Form.FShowColumnDate := JSONObj.FindPath('ShowColumnDate').AsBoolean;
-
-      if JSONObj.FindPath('ShowColumnAmount') <> nil then
-        Form.FShowColumnAmount := JSONObj.FindPath('ShowColumnAmount').AsBoolean;
-
-      if JSONObj.FindPath('ShowColumnFavorite') <> nil then
-        Form.FShowColumnFavorite := JSONObj.FindPath('ShowColumnFavorite').AsBoolean;
-
-      if JSONObj.FindPath('ShowStatusBar') <> nil then
-        Form.ShowStatusBar := JSONObj.FindPath('ShowStatusBar').AsBoolean;
-
-      if JSONObj.FindPath('WindowState') <> nil then
-        Form.WindowState := TWindowState(JSONObj.FindPath('WindowState').AsInteger);
-
       if JSONObj.FindPath('Left') <> nil then
         Form.Left := JSONObj.FindPath('Left').AsInteger;
 
@@ -166,6 +120,21 @@ begin
 
       if JSONObj.FindPath('Height') <> nil then
         Form.Height := JSONObj.FindPath('Height').AsInteger;
+
+      if JSONObj.FindPath('WindowState') <> nil then
+        Form.WindowState := TWindowState(JSONObj.FindPath('WindowState').AsInteger);
+
+      if JSONObj.FindPath('WordWrap') <> nil then
+        Form.WordWrap := JSONObj.FindPath('WordWrap').AsBoolean;
+
+      if JSONObj.FindPath('BidiRightToLeft') <> nil then
+        Form.BiDiRightToLeft := JSONObj.FindPath('BidiRightToLeft').AsBoolean;
+
+      if JSONObj.FindPath('ShowArchived') <> nil then
+        Form.FShowArchived := JSONObj.FindPath('ShowArchived').AsBoolean;
+
+      if JSONObj.FindPath('ShowStatusBar') <> nil then
+        Form.ShowStatusBar := JSONObj.FindPath('ShowStatusBar').AsBoolean;
 
       if JSONObj.FindPath('Language') <> nil then
       begin
@@ -193,38 +162,36 @@ begin
   end;
 end;
 
-procedure SaveGridSettings(Grid: TStringGrid);
+procedure SaveGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string);
 var
   JSONObj: TJSONObject;
-  ColumnArray: TJSONArray;
-  SavedArray: TJSONArray;
   FileName: string;
-  i: integer;
 begin
   FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
   ForceDirectories(GetSettingsDirectory);
 
-  // Save column widths
-  SavedArray := LoadColumnWidthsFromFile;
-  try
-    ColumnArray := TJSONArray.Create;
-    for i := 0 to Grid.ColCount - 1 do
-    begin
-      if (Grid.ColWidths[i] > 0) then
-        ColumnArray.Add(Grid.ColWidths[i])
-      else
-      begin
-        if (Assigned(SavedArray)) and (SavedArray.Count = Grid.ColCount) then
-          ColumnArray.Add(SavedArray[i].Clone);
-      end;
-    end;
-  finally
-    SavedArray.Free;
-  end;
-
   JSONObj := TJSONObject.Create;
   try
-    JSONObj.Add('ColumnWidths', ColumnArray);
+    JSONObj.Add('ShowDuration', Form.ShowDuration);
+    JSONObj.Add('ShowColumnDone', Form.ShowColumnDone);
+    JSONObj.Add('ShowColumnTask', Form.ShowColumnTask);
+    JSONObj.Add('ShowColumnComment', Form.ShowColumnComment);
+    JSONObj.Add('ShowColumnDate', Form.ShowColumnDate);
+    JSONObj.Add('ShowColumnAmount', Form.ShowColumnAmount);
+    JSONObj.Add('ShowColumnFavorite', Form.ShowColumnFavorite);
+
+    if (Grid.Columns[0].Visible) then
+      JSONObj.Add('ColumnDone', Grid.Columns[0].Width);
+    if (Grid.Columns[1].Visible) then
+      JSONObj.Add('ColumnTask', Grid.Columns[1].Width);
+    if (Grid.Columns[2].Visible) then
+      JSONObj.Add('ColumnComment', Grid.Columns[2].Width);
+    if (Grid.Columns[3].Visible) then
+      JSONObj.Add('ColumnDate', Grid.Columns[3].Width);
+    if (Grid.Columns[4].Visible) then
+      JSONObj.Add('ColumnAmount', Grid.Columns[4].Width);
+    if (Grid.Columns[5].Visible) then
+      JSONObj.Add('ColumnFavorite', Grid.Columns[5].Width);
 
     // Write to file
     with TStringList.Create do
@@ -239,16 +206,15 @@ begin
   end;
 end;
 
-function LoadColumnWidthsFromFile: TJSONArray;
+function LoadGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string): boolean;
 var
   JSONData: TJSONData;
   JSONObj: TJSONObject;
-  ColumnArray: TJSONArray;
   FileContent: string;
   FileStream: TFileStream;
   FileName: string;
 begin
-  Result := nil;
+  Result := False;
   FileContent := string.Empty;
   FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
   ForceDirectories(GetSettingsDirectory);
@@ -262,33 +228,52 @@ begin
     JSONData := GetJSON(FileContent);
     try
       JSONObj := JSONData as TJSONObject;
-      ColumnArray := JSONObj.FindPath('ColumnWidths') as TJSONArray;
-      Result := ColumnArray.Clone as TJSONArray; // Clone to return a copy
+
+      if JSONObj.FindPath('ShowDuration') <> nil then
+        Form.FShowDuration := JSONObj.FindPath('ShowDuration').AsBoolean;
+
+      if JSONObj.FindPath('ShowColumnDone') <> nil then
+        Form.FShowColumnDone := JSONObj.FindPath('ShowColumnDone').AsBoolean;
+
+      if JSONObj.FindPath('ShowColumnTask') <> nil then
+        Form.FShowColumnTask := JSONObj.FindPath('ShowColumnTask').AsBoolean;
+
+      if JSONObj.FindPath('ShowColumnComment') <> nil then
+        Form.FShowColumnComment := JSONObj.FindPath('ShowColumnComment').AsBoolean;
+
+      if JSONObj.FindPath('ShowColumnDate') <> nil then
+        Form.FShowColumnDate := JSONObj.FindPath('ShowColumnDate').AsBoolean;
+
+      if JSONObj.FindPath('ShowColumnAmount') <> nil then
+        Form.FShowColumnAmount := JSONObj.FindPath('ShowColumnAmount').AsBoolean;
+
+      if JSONObj.FindPath('ShowColumnFavorite') <> nil then
+        Form.FShowColumnFavorite := JSONObj.FindPath('ShowColumnFavorite').AsBoolean;
+
+      if JSONObj.FindPath('ColumnDone') <> nil then
+        Grid.Columns[0].Width := JSONObj.FindPath('ColumnDone').AsInteger;
+
+      if JSONObj.FindPath('ColumnTask') <> nil then
+        Grid.Columns[1].Width := JSONObj.FindPath('ColumnTask').AsInteger;
+
+      if JSONObj.FindPath('ColumnComment') <> nil then
+        Grid.Columns[2].Width := JSONObj.FindPath('ColumnComment').AsInteger;
+
+      if JSONObj.FindPath('ColumnDate') <> nil then
+        Grid.Columns[3].Width := JSONObj.FindPath('ColumnDate').AsInteger;
+
+      if JSONObj.FindPath('ColumnAmount') <> nil then
+        Grid.Columns[4].Width := JSONObj.FindPath('ColumnAmount').AsInteger;
+
+      if JSONObj.FindPath('ColumnFavorite') <> nil then
+        Grid.Columns[5].Width := JSONObj.FindPath('ColumnFavorite').AsInteger;
+
     finally
       JSONData.Free;
     end;
   finally
     FileStream.Free;
   end;
-end;
-
-function LoadGridSettings(Grid: TStringGrid): boolean;
-var
-  ColumnArray: TJSONArray;
-  i: integer;
-begin
-  Result := False;
-
-  // Get column widths array from file
-  ColumnArray := LoadColumnWidthsFromFile;
-
-  if ColumnArray = nil then Exit;
-
-  // Set column widths
-  for i := 1 to ColumnArray.Count - 1 do
-    Grid.ColWidths[i] := ColumnArray.Items[i].AsInteger;
-
-  ColumnArray.Free;
   Result := True;
 end;
 
