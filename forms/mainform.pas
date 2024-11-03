@@ -1575,6 +1575,7 @@ begin
   if Screen.ActiveForm <> Self then exit;
 
   ShowStatusBar := aShowStatusBar.Checked;
+  SetInfo;
 end;
 
 procedure TformNotetask.aShowArchivedExecute(Sender: TObject);
@@ -2462,8 +2463,12 @@ var
   SumDone: double;
 begin
   SetCaption;
-  statusBar.Panels[1].Text := UpperCase(GetEncodingName(FEncoding));
-  statusBar.Panels[2].Text := FLineEnding.ToString;
+  if (not ShowStatusBar) then exit;
+
+  if Assigned(FEncoding) then
+    statusBar.Panels[1].Text := UpperCase(GetEncodingName(FEncoding));
+  if Assigned(FLineEnding) then
+    statusBar.Panels[2].Text := FLineEnding.ToString;
 
   if (taskGrid.Selection.Height = 0) then
   begin
