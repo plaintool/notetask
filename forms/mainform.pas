@@ -909,7 +909,7 @@ begin
       grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsStrikeOut];
 
     if (aCol = 3) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).CommentItalic) then
-      grid.Canvas.Font.Style := [fsItalic];
+      grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsItalic];
 
     // Fill the cell background
     grid.Canvas.Brush.Color := bgFill;
