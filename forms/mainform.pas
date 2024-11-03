@@ -196,6 +196,7 @@ type
     menuOutdentTasks: TMenuItem;
     aShowColumnTask: TAction;
     menuColumnTask: TMenuItem;
+    TitleImages: TImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -337,6 +338,8 @@ type
     procedure SetShowColumnAmount(Value: boolean);
     procedure SetShowColumnFavorite(Value: boolean);
     procedure ApplyColumnSetting;
+    procedure ApplySortArrow;
+    procedure ApplySorting;
     procedure GridBackupSelection;
     procedure GridClearSelection;
     procedure ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
@@ -432,6 +435,7 @@ begin
   FShowColumnAmount := False;
   FShowColumnFavorite := True;
   FBiDiRightToLeft := self.BiDiMode = bdRightToLeft;
+  FSortColumn := 0;
   FSortOrder := soAscending;
   clRowHighlight := RGBToColor(210, 230, 255);
   clRowExpired := RGBToColor(255, 220, 220);
@@ -462,7 +466,7 @@ begin
   ResourceBitmapStarGray.TransparentColor := clFuchsia;
 
   LoadFormSettings(Self);
-  LoadGridSettings(Self, taskGrid, FFileName);
+  LoadGridSettings(Self, taskGrid, string.Empty);
 
   // Set language
   SetLanguage;
@@ -682,20 +686,11 @@ begin
       SortOrder := soDescending
     else
       SortOrder := soAscending;
+    taskGrid.SortOrder := SortOrder;
 
     FSortColumn := Index;
 
-    FillGrid;
-    ResetRowHeight;
-
-    aMoveTaskTop.Enabled := SortColumn = 0;
-    aMoveTaskBottom.Enabled := SortColumn = 0;
-    aMoveTaskUp.Enabled := SortColumn = 0;
-    aMoveTaskDown.Enabled := SortColumn = 0;
-    if (SortColumn = 0) then
-      taskGrid.Options := taskGrid.Options + [goRowMoving]
-    else
-      taskGrid.Options := taskGrid.Options - [goRowMoving];
+    ApplySorting;
   end
   else
     // Set row when clicked on begining of row
@@ -2395,6 +2390,43 @@ begin
   taskGrid.Columns.Items[3].Visible := FShowColumnAmount;
   taskGrid.Columns.Items[4].Visible := FShowColumnDate;
   taskGrid.Columns.Items[5].Visible := FShowColumnFavorite;
+
+  ApplySortArrow;
+end;
+
+procedure TformNotetask.ApplySortArrow;
+var
+  i: integer;
+begin
+  for i := 0 to taskGrid.Columns.Count - 1 do
+    taskGrid.Columns[i].Title.ImageIndex := -1;
+  if (SortColumn > 0) then
+  begin
+    if SortOrder = soAscending then
+      taskGrid.Columns[SortColumn - 1].Title.ImageIndex := 0
+    else
+      taskGrid.Columns[SortColumn - 1].Title.ImageIndex := 1;
+  end;
+end;
+
+procedure TformNotetask.ApplySorting;
+var
+  i: integer;
+begin
+  FillGrid;
+  ResetRowHeight;
+
+  for i := 0 to taskGrid.Columns.Count - 1 do
+    taskGrid.Columns[i].Title.ImageIndex := -1;
+
+  aMoveTaskTop.Enabled := SortColumn = 0;
+  aMoveTaskBottom.Enabled := SortColumn = 0;
+  aMoveTaskUp.Enabled := SortColumn = 0;
+  aMoveTaskDown.Enabled := SortColumn = 0;
+  if (SortColumn = 0) then
+    taskGrid.Options := taskGrid.Options + [goRowMoving]
+  else
+    taskGrid.Options := taskGrid.Options - [goRowMoving];
 end;
 
 procedure TformNotetask.FillGrid;

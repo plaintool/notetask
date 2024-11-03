@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -59,11 +58,14 @@ object formNotetask: TformNotetask
     Flat = True
     GridLineColor = 13290186
     GridLineStyle = psDot
+    ImageIndexSortAsc = 0
+    ImageIndexSortDesc = 1
     MouseWheelOption = mwGrid
     Options = [goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goRowMoving, goEditing, goAutoAddRows, goTabs, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goAutoAddRowsSkipContentCheck, goRowHighlight]
     Options2 = [goEditorParentFont]
     RowCount = 2
     TabOrder = 0
+    TitleImageList = TitleImages
     UseXORFeatures = True
     OnCheckboxToggled = taskGridCheckboxToggled
     OnColRowDeleted = taskGridColRowDeleted
@@ -782,5 +784,16 @@ object formNotetask: TformNotetask
     object MenuItem7: TMenuItem
       Action = aChatGpt
     end
+  end
+  object TitleImages: TImageList
+    Left = 240
+    Top = 184
+    Bitmap = {
+      4C7A020000001000000010000000870000000000000078DA5BB66C19C3B2514C
+      0BCC09C48781F80010B393A8970988D702F17F285E01C48C24E8EF45D20BC31D
+      44EACDC1A21786D309E8F505E23F78F483E43CF1E87F8A472F0C3F1A4D5BA378
+      906262D2EF133CFABD08E49FDF40EC41C00D1978F4A712E98F2E2C7ADB480807
+      5059B51249EF3212CB2F10E600E27D40BC8B8CF27314138901D95F2A38
+    }
   end
 end
