@@ -2353,6 +2353,7 @@ begin
     taskGrid.DefaultColWidth := 40;
 
   FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.SetShowColumnDone(Value: boolean);
@@ -2461,6 +2462,8 @@ var
   CurDone: integer;
   SumCount: double;
   SumDone: double;
+  DurationCount: string;
+  DurationDone: string;
 begin
   SetCaption;
   if (not ShowStatusBar) then exit;
@@ -2470,6 +2473,7 @@ begin
   if Assigned(FLineEnding) then
     statusBar.Panels[2].Text := FLineEnding.ToString;
 
+  // Task counts
   if (taskGrid.Selection.Height = 0) then
   begin
     CurCount := Tasks.CalcCount(ShowArchived, False);
@@ -2486,6 +2490,7 @@ begin
   else
     statusBar.Panels[3].Text := CurDone.ToString + ' / ' + CurCount.ToString + rrows;
 
+  // Task amounts
   if (ShowColumnAmount) then
   begin
     if (taskGrid.Selection.Height = 0) then
@@ -2510,6 +2515,28 @@ begin
   end
   else
     statusBar.Panels[4].Text := string.empty;
+
+  // Task durations
+  if (ShowDuration) then
+  begin
+    if (taskGrid.Selection.Height = 0) then
+    begin
+      DurationCount := Tasks.CalcDuration(ShowArchived, False);
+      DurationDone := Tasks.CalcDuration(ShowArchived, True);
+    end
+    else
+    begin
+      DurationCount := Tasks.CalcDuration(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+      DurationDone := Tasks.CalcDuration(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+    end;
+    if (DurationCount = DurationDone) or (DurationDone = string.Empty) then
+      statusBar.Panels[5].Text := DurationCount
+    else
+      statusBar.Panels[5].Text := DurationDone + ' / ' + DurationCount;
+  end
+  else
+    statusBar.Panels[5].Text := string.empty;
+
 end;
 
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);

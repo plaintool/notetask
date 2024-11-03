@@ -35,6 +35,7 @@ type
     FEmptyComment: boolean; // Has empty comment symbols
     FSpaceBeforeComment: boolean; // Space before comment in file
     FSpaceAfterComment: boolean; // Space after comment in file
+    FDateStart, FDateEnd: TDateTime; // Calculated time interval
     function GetDate: string;
     function GetAmount: string;
   public
@@ -101,6 +102,7 @@ type
     function CalcDateDiff(const StartDate, EndDate: TDateTime): string;
     function CalcCount(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): integer;
     function CalcSum(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): double;
+    function CalcDuration(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): string;
 
     property Count: integer read FCount;
     property CountArhive: integer read GetCountArchive;
@@ -1467,6 +1469,33 @@ begin
   end;
 end;
 
+function TTasks.CalcDuration(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): string;
+var
+  I, Ind: integer;
+  TotalDuration: TDateTime;
+begin
+  Result := string.Empty;
+  TotalDuration := 0;
+  if (StartIndex = 0) and (EndIndex = 0) then
+  begin
+    for I := 0 to Count - 1 do
+    begin
+      if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) then
+        TotalDuration += (FTaskList[I].FDateEnd - FTaskList[I].FDateStart);
+    end;
+  end
+  else
+  begin
+    for I := StartIndex to EndIndex do
+    begin
+      Ind := Map(I);
+      if (Ind > -1) and ((Archive = True) or (FTaskList[Ind].Archive = False)) and ((Done = False) or (FTaskList[Ind].Done = True)) then
+        TotalDuration += (FTaskList[Ind].FDateEnd - FTaskList[Ind].FDateStart);
+    end;
+  end;
+  Result := CalcDateDiff(0, TotalDuration).Replace('-', string.Empty);
+end;
+
 function TTasks.GetCountArchive: integer;
 var
   I: integer;
@@ -1607,12 +1636,14 @@ var
   end;
 
   // Add new dates interval to calulate task time length
-  procedure AddDatesInterval();
+  procedure AddDatesInterval(Index: integer);
   begin
     SetLength(StartDates, Length(StartDates) + 1);
     SetLength(EndDates, Length(EndDates) + 1);
     StartDates[High(StartDates)] := StartDate;
     EndDates[High(EndDates)] := EndDate;
+    FTaskList[Index].FDateStart := StartDate;
+    FTaskList[Index].FDateEnd := EndDate;
   end;
 
   // Calculate total duration of all tasks
@@ -1626,7 +1657,7 @@ var
     // Проходим по каждому интервалу
     for i := Low(StartDates) to High(StartDates) do
     begin
-      TotalDuration := TotalDuration + (EndDates[i] - StartDates[i]);
+      TotalDuration += (EndDates[i] - StartDates[i]);
     end;
 
     Result := TotalDuration;
@@ -1715,7 +1746,7 @@ begin
             // Display the calculated date difference in the grid
             if (DateDiff <> '-') and (Grid.RowCount > RowIndex) and ((RowIndex > 1) or (DateDiff <> '0' + rseconds)) then
             begin
-              AddDatesInterval;
+              AddDatesInterval(I);
               Grid.Cells[0, RowIndex] := (I + 1).ToString + '. ' + DateDiff;
             end;
           end;
