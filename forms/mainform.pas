@@ -326,6 +326,7 @@ type
     procedure CompleteTasks(aRow: integer = 0);
     procedure StarTask(aRow: integer = 0);
     procedure IndentTasks(Outdent: boolean = False);
+    procedure SetBiDiRightToLeft(Value: boolean);
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowDuration(Value: boolean);
     procedure SetShowArchived(Value: boolean);
@@ -335,7 +336,7 @@ type
     procedure SetShowColumnDate(Value: boolean);
     procedure SetShowColumnAmount(Value: boolean);
     procedure SetShowColumnFavorite(Value: boolean);
-    procedure SetBiDiRightToLeft(Value: boolean);
+    procedure ApplyColumnSetting;
     procedure GridBackupSelection;
     procedure GridClearSelection;
     procedure ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
@@ -472,24 +473,8 @@ begin
   aShowStatusBar.Checked := FShowStatusBar;
   aShowArchived.Checked := FShowArchived;
 
-  aShowColumnDone.Checked := FShowColumnDone;
-  aShowColumnTask.Checked := FShowColumnTask;
-  aShowColumnComment.Checked := FShowColumnComment;
-  aShowColumnDate.Checked := FShowColumnDate;
-  aShowColumnAmount.Checked := FShowColumnAmount;
-  aShowColumnFavorite.Checked := FShowColumnFavorite;
-  taskGrid.Columns.Items[0].Visible := FShowColumnDone;
-  taskGrid.Columns.Items[1].Visible := FShowColumnTask;
-  taskGrid.Columns.Items[2].Visible := FShowColumnComment;
-  taskGrid.Columns.Items[3].Visible := FShowColumnAmount;
-  taskGrid.Columns.Items[4].Visible := FShowColumnDate;
-  taskGrid.Columns.Items[5].Visible := FShowColumnFavorite;
-
-  aShowDuration.Checked := FShowDuration;
-  if (FShowDuration) then
-    taskGrid.DefaultColWidth := 55
-  else
-    taskGrid.DefaultColWidth := 40;
+  // Apply loaded settings to columns
+  ApplyColumnSetting;
 
   // Check if a command line argument is passed
   if ParamCount > 0 then
@@ -507,8 +492,8 @@ end;
 
 procedure TformNotetask.FormDestroy(Sender: TObject);
 begin
-  SaveGridSettings(Self, taskGrid, FFileName);
   SaveFormSettings(Self);
+  SaveGridSettings(Self, taskGrid, FFileName);
 
   // Free allocated resources
   FLineEnding.Free;
@@ -2302,6 +2287,26 @@ begin
   taskGrid.RowHeights[RowIndex2] := TempHeight;
 end;
 
+procedure TformNotetask.SetBiDiRightToLeft(Value: boolean);
+var
+  i: integer;
+begin
+  FBiDiRightToLeft := Value;
+
+  if (Value) then
+  begin
+    taskGrid.BiDiMode := bdRightToLeft;
+    for i := 1 to taskGrid.Columns.Count - 1 do
+      taskGrid.Columns[i].Alignment := taRightJustify;
+  end
+  else
+  begin
+    taskGrid.BiDiMode := bdLeftToRight;
+    for i := 1 to taskGrid.Columns.Count - 1 do
+      taskGrid.Columns[i].Alignment := taLeftJustify;
+  end;
+end;
+
 procedure TformNotetask.SetShowStatusBar(Value: boolean);
 begin
   FShowStatusBar := Value;
@@ -2362,24 +2367,25 @@ begin
   taskGrid.Columns.Items[5].Visible := FShowColumnFavorite;
 end;
 
-procedure TformNotetask.SetBiDiRightToLeft(Value: boolean);
-var
-  i: integer;
+procedure TformNotetask.ApplyColumnSetting;
 begin
-  FBiDiRightToLeft := Value;
-
-  if (Value) then
-  begin
-    taskGrid.BiDiMode := bdRightToLeft;
-    for i := 1 to taskGrid.Columns.Count - 1 do
-      taskGrid.Columns[i].Alignment := taRightJustify;
-  end
+  aShowDuration.Checked := FShowDuration;
+  if (FShowDuration) then
+    taskGrid.DefaultColWidth := 55
   else
-  begin
-    taskGrid.BiDiMode := bdLeftToRight;
-    for i := 1 to taskGrid.Columns.Count - 1 do
-      taskGrid.Columns[i].Alignment := taLeftJustify;
-  end;
+    taskGrid.DefaultColWidth := 40;
+  aShowColumnDone.Checked := FShowColumnDone;
+  aShowColumnTask.Checked := FShowColumnTask;
+  aShowColumnComment.Checked := FShowColumnComment;
+  aShowColumnDate.Checked := FShowColumnDate;
+  aShowColumnAmount.Checked := FShowColumnAmount;
+  aShowColumnFavorite.Checked := FShowColumnFavorite;
+  taskGrid.Columns.Items[0].Visible := FShowColumnDone;
+  taskGrid.Columns.Items[1].Visible := FShowColumnTask;
+  taskGrid.Columns.Items[2].Visible := FShowColumnComment;
+  taskGrid.Columns.Items[3].Visible := FShowColumnAmount;
+  taskGrid.Columns.Items[4].Visible := FShowColumnDate;
+  taskGrid.Columns.Items[5].Visible := FShowColumnFavorite;
 end;
 
 procedure TformNotetask.FillGrid;
@@ -2564,6 +2570,7 @@ begin
     ShowMessage(rfilenotfound);
     exit;
   end;
+  SaveGridSettings(Self, taskGrid, FFileName);
 
   FFileName := fileName;
   EditComplite;
@@ -2575,6 +2582,7 @@ begin
   FillGrid;
 
   LoadGridSettings(Self, taskGrid, FFileName);
+  ApplyColumnSetting;
   taskGrid.Row := 1;
   taskGrid.Col := 2;
   ResetRowHeight;

@@ -57,10 +57,20 @@ begin
   JSONObj := TJSONObject.Create;
   try
     // Save form position and size
-    JSONObj.Add('Left', Form.RestoredLeft);
-    JSONObj.Add('Top', Form.RestoredTop);
-    JSONObj.Add('Width', Form.RestoredWidth);
-    JSONObj.Add('Height', Form.RestoredHeight);
+    if (Form.WindowState in [wsMaximized, wsMinimized]) then
+    begin
+      JSONObj.Add('Left', Form.RestoredLeft);
+      JSONObj.Add('Top', Form.RestoredTop);
+      JSONObj.Add('Width', Form.RestoredWidth);
+      JSONObj.Add('Height', Form.RestoredHeight);
+    end
+    else
+    begin
+      JSONObj.Add('Left', Form.Left);
+      JSONObj.Add('Top', Form.Top);
+      JSONObj.Add('Width', Form.Width);
+      JSONObj.Add('Height', Form.Height);
+    end;
     JSONObj.Add('WindowState', Ord(Form.WindowState));
     JSONObj.Add('WordWrap', Form.WordWrap);
     JSONObj.Add('BidiRightToLeft', Form.BiDiRightToLeft);
@@ -164,63 +174,88 @@ end;
 
 procedure SaveGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string);
 var
-  JSONObj: TJSONObject;
+  ItemSettings: TJSONObject;
+  JSONFile: TJSONObject;
+  ExistingItem: TJSONData;
   FileName: string;
+  FileStream: TFileStream;
 begin
   FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
-  ForceDirectories(GetSettingsDirectory);
+  Item := Item.ToLower;
+  ForceDirectories(GetSettingsDirectory); // Ensure the directory exists
 
-  JSONObj := TJSONObject.Create;
-  try
-    JSONObj.Add('ShowDuration', Form.ShowDuration);
-    JSONObj.Add('ShowColumnDone', Form.ShowColumnDone);
-    JSONObj.Add('ShowColumnTask', Form.ShowColumnTask);
-    JSONObj.Add('ShowColumnComment', Form.ShowColumnComment);
-    JSONObj.Add('ShowColumnDate', Form.ShowColumnDate);
-    JSONObj.Add('ShowColumnAmount', Form.ShowColumnAmount);
-    JSONObj.Add('ShowColumnFavorite', Form.ShowColumnFavorite);
-
-    if (Grid.Columns[0].Visible) then
-      JSONObj.Add('ColumnDone', Grid.Columns[0].Width);
-    if (Grid.Columns[1].Visible) then
-      JSONObj.Add('ColumnTask', Grid.Columns[1].Width);
-    if (Grid.Columns[2].Visible) then
-      JSONObj.Add('ColumnComment', Grid.Columns[2].Width);
-    if (Grid.Columns[3].Visible) then
-      JSONObj.Add('ColumnDate', Grid.Columns[3].Width);
-    if (Grid.Columns[4].Visible) then
-      JSONObj.Add('ColumnAmount', Grid.Columns[4].Width);
-    if (Grid.Columns[5].Visible) then
-      JSONObj.Add('ColumnFavorite', Grid.Columns[5].Width);
-
-    // Write to file
-    with TStringList.Create do
+  // Load the existing JSON file or create a new JSON object
+  if FileExists(FileName) then
+  begin
+    FileStream := TFileStream.Create(FileName, fmOpenRead);
     try
-      Add(JSONObj.AsJSON);
-      SaveToFile(FileName);
+      JSONFile := TJSONObject(GetJSON(FileStream));
     finally
-      Free;
+      FileStream.Free;
+    end;
+  end
+  else
+    JSONFile := TJSONObject.Create;
+
+  try
+    // Create a JSON object for the specified Item settings
+    ItemSettings := TJSONObject.Create;
+    ItemSettings.Add('ShowDuration', Form.ShowDuration);
+    ItemSettings.Add('ShowColumnDone', Form.ShowColumnDone);
+    ItemSettings.Add('ShowColumnTask', Form.ShowColumnTask);
+    ItemSettings.Add('ShowColumnComment', Form.ShowColumnComment);
+    ItemSettings.Add('ShowColumnDate', Form.ShowColumnDate);
+    ItemSettings.Add('ShowColumnAmount', Form.ShowColumnAmount);
+    ItemSettings.Add('ShowColumnFavorite', Form.ShowColumnFavorite);
+
+    // Add column widths if the columns are visible
+    if Grid.Columns[0].Visible then
+      ItemSettings.Add('ColumnDone', Grid.Columns[0].Width);
+    if Grid.Columns[1].Visible then
+      ItemSettings.Add('ColumnTask', Grid.Columns[1].Width);
+    if Grid.Columns[2].Visible then
+      ItemSettings.Add('ColumnComment', Grid.Columns[2].Width);
+    if Grid.Columns[3].Visible then
+      ItemSettings.Add('ColumnDate', Grid.Columns[3].Width);
+    if Grid.Columns[4].Visible then
+      ItemSettings.Add('ColumnAmount', Grid.Columns[4].Width);
+    if Grid.Columns[5].Visible then
+      ItemSettings.Add('ColumnFavorite', Grid.Columns[5].Width);
+
+    ExistingItem := JSONFile.Find(Item); // Find the existing Item by key
+    if Assigned(ExistingItem) then
+      JSONFile.Remove(ExistingItem); // Remove the existing Item if found
+
+    JSONFile.Add(Item, ItemSettings); // Add the new or updated Item settings
+
+    // Write the JSON object back to the file
+    FileStream := TFileStream.Create(FileName, fmCreate);
+    try
+      FileStream.Write(Pointer(JSONFile.AsJSON)^, Length(JSONFile.AsJSON));
+    finally
+      FileStream.Free;
     end;
   finally
-    JSONObj.Free;
+    JSONFile.Free;
   end;
 end;
 
 function LoadGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string): boolean;
 var
   JSONData: TJSONData;
-  JSONObj: TJSONObject;
+  JSONObj, ItemSettings: TJSONObject;
   FileContent: string;
   FileStream: TFileStream;
   FileName: string;
 begin
   Result := False;
-  FileContent := string.Empty;
+  FileContent := '';
   FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
-  ForceDirectories(GetSettingsDirectory);
+  Item := Item.ToLower;
+  ForceDirectories(GetSettingsDirectory); // Ensure the directory exists
   if not FileExists(FileName) then Exit;
 
-  // Read from file
+  // Read from the settings file
   FileStream := TFileStream.Create(FileName, fmOpenRead);
   try
     SetLength(FileContent, FileStream.Size);
@@ -229,44 +264,49 @@ begin
     try
       JSONObj := JSONData as TJSONObject;
 
-      if JSONObj.FindPath('ShowDuration') <> nil then
-        Form.FShowDuration := JSONObj.FindPath('ShowDuration').AsBoolean;
+      // Attempt to find settings for the specified Item
+      if JSONObj.Find(Item) = nil then Exit;
+      ItemSettings := JSONObj.Find(Item) as TJSONObject;
 
-      if JSONObj.FindPath('ShowColumnDone') <> nil then
-        Form.FShowColumnDone := JSONObj.FindPath('ShowColumnDone').AsBoolean;
+      // Load settings into the form and grid from the ItemSettings object
+      if ItemSettings.FindPath('ShowDuration') <> nil then
+        Form.FShowDuration := ItemSettings.FindPath('ShowDuration').AsBoolean;
 
-      if JSONObj.FindPath('ShowColumnTask') <> nil then
-        Form.FShowColumnTask := JSONObj.FindPath('ShowColumnTask').AsBoolean;
+      if ItemSettings.FindPath('ShowColumnDone') <> nil then
+        Form.FShowColumnDone := ItemSettings.FindPath('ShowColumnDone').AsBoolean;
 
-      if JSONObj.FindPath('ShowColumnComment') <> nil then
-        Form.FShowColumnComment := JSONObj.FindPath('ShowColumnComment').AsBoolean;
+      if ItemSettings.FindPath('ShowColumnTask') <> nil then
+        Form.FShowColumnTask := ItemSettings.FindPath('ShowColumnTask').AsBoolean;
 
-      if JSONObj.FindPath('ShowColumnDate') <> nil then
-        Form.FShowColumnDate := JSONObj.FindPath('ShowColumnDate').AsBoolean;
+      if ItemSettings.FindPath('ShowColumnComment') <> nil then
+        Form.FShowColumnComment := ItemSettings.FindPath('ShowColumnComment').AsBoolean;
 
-      if JSONObj.FindPath('ShowColumnAmount') <> nil then
-        Form.FShowColumnAmount := JSONObj.FindPath('ShowColumnAmount').AsBoolean;
+      if ItemSettings.FindPath('ShowColumnDate') <> nil then
+        Form.FShowColumnDate := ItemSettings.FindPath('ShowColumnDate').AsBoolean;
 
-      if JSONObj.FindPath('ShowColumnFavorite') <> nil then
-        Form.FShowColumnFavorite := JSONObj.FindPath('ShowColumnFavorite').AsBoolean;
+      if ItemSettings.FindPath('ShowColumnAmount') <> nil then
+        Form.FShowColumnAmount := ItemSettings.FindPath('ShowColumnAmount').AsBoolean;
 
-      if JSONObj.FindPath('ColumnDone') <> nil then
-        Grid.Columns[0].Width := JSONObj.FindPath('ColumnDone').AsInteger;
+      if ItemSettings.FindPath('ShowColumnFavorite') <> nil then
+        Form.FShowColumnFavorite := ItemSettings.FindPath('ShowColumnFavorite').AsBoolean;
 
-      if JSONObj.FindPath('ColumnTask') <> nil then
-        Grid.Columns[1].Width := JSONObj.FindPath('ColumnTask').AsInteger;
+      if ItemSettings.FindPath('ColumnDone') <> nil then
+        Grid.Columns[0].Width := ItemSettings.FindPath('ColumnDone').AsInteger;
 
-      if JSONObj.FindPath('ColumnComment') <> nil then
-        Grid.Columns[2].Width := JSONObj.FindPath('ColumnComment').AsInteger;
+      if ItemSettings.FindPath('ColumnTask') <> nil then
+        Grid.Columns[1].Width := ItemSettings.FindPath('ColumnTask').AsInteger;
 
-      if JSONObj.FindPath('ColumnDate') <> nil then
-        Grid.Columns[3].Width := JSONObj.FindPath('ColumnDate').AsInteger;
+      if ItemSettings.FindPath('ColumnComment') <> nil then
+        Grid.Columns[2].Width := ItemSettings.FindPath('ColumnComment').AsInteger;
 
-      if JSONObj.FindPath('ColumnAmount') <> nil then
-        Grid.Columns[4].Width := JSONObj.FindPath('ColumnAmount').AsInteger;
+      if ItemSettings.FindPath('ColumnDate') <> nil then
+        Grid.Columns[3].Width := ItemSettings.FindPath('ColumnDate').AsInteger;
 
-      if JSONObj.FindPath('ColumnFavorite') <> nil then
-        Grid.Columns[5].Width := JSONObj.FindPath('ColumnFavorite').AsInteger;
+      if ItemSettings.FindPath('ColumnAmount') <> nil then
+        Grid.Columns[4].Width := ItemSettings.FindPath('ColumnAmount').AsInteger;
+
+      if ItemSettings.FindPath('ColumnFavorite') <> nil then
+        Grid.Columns[5].Width := ItemSettings.FindPath('ColumnFavorite').AsInteger;
 
     finally
       JSONData.Free;
