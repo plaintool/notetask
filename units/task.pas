@@ -235,6 +235,11 @@ begin
   // Checks if the task is completed
   CompletedStr := RemoveBrackets(CompletedStr);
 
+  if (TryStrToFloat(CleanAmount(CompletedStr), FAmount)) then
+  begin
+    FDate := 0;
+  end
+  else
   if Length(PartDate) > 2 then
   begin
     // Extract and trim the date string
@@ -1106,14 +1111,14 @@ begin
             begin
               if (TempTasks.GetTask(index).Text <> string.Empty) then
               begin
-                GetTask(i).Text := TempTasks.GetTask(index).Text;
+                GetTask(i).Text := CleanString(TempTasks.GetTask(index).Text);
                 GetTask(i).Archive := TempTasks.GetTask(index).Archive;
               end
               else
               if Rect.Width = 0 then
               begin
                 if (TempTasks.GetTask(index).Comment <> string.Empty) then
-                  GetTask(i).Text := TempTasks.GetTask(index).Comment
+                  GetTask(i).Text := CleanString(TempTasks.GetTask(index).Comment)
                 else
                 if (TempTasks.GetTask(index).Date <> 0) then
                   GetTask(i).Text := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
@@ -1129,18 +1134,17 @@ begin
             begin
               if (TempTasks.GetTask(index).Comment <> string.Empty) then
               begin
-                GetTask(i).Comment := TempTasks.GetTask(index).Comment;
+                GetTask(i).Comment := CleanString(TempTasks.GetTask(index).Comment);
                 GetTask(i).CommentItalic := TempTasks.GetTask(index).CommentItalic;
               end
               else
               if Rect.Width = 0 then
               begin
                 if (TempTasks.GetTask(index).Text <> string.Empty) then
-                  GetTask(i).Comment := TempTasks.GetTask(index).Text
+                  GetTask(i).Comment := CleanString(TempTasks.GetTask(index).Text)
                 else
                 if (TempTasks.GetTask(index).Date <> 0) then
-                  GetTask(i).Comment := FormatDateTime(FormatSettings.ShortDateFormat + ' ' +
-                    FormatSettings.LongTimeFormat, TempTasks.GetTask(index).Date)
+                  GetTask(i).Comment := DateToString(TempTasks.GetTask(index).Date)
                 else
                   GetTask(i).Comment := string.Empty;
               end
@@ -1155,11 +1159,12 @@ begin
               else
               if Rect.Width = 0 then
               begin
-                if (TempTasks.GetTask(index).Text <> string.Empty) and (TryStrToFloat(TempTasks.GetTask(index).Text, TempAmount)) then
+                if (TempTasks.GetTask(index).Text <> string.Empty) and
+                  (TryStrToFloat(CleanAmount(TempTasks.GetTask(index).Text), TempAmount)) then
                   GetTask(i).Amount := TempAmount
                 else
                 if (TempTasks.GetTask(index).Comment <> string.Empty) and
-                  (TryStrToFloat(TempTasks.GetTask(index).Comment, TempAmount)) then
+                  (TryStrToFloat(CleanAmount(TempTasks.GetTask(index).Comment), TempAmount)) then
                   GetTask(i).Amount := TempAmount
                 else
                   GetTask(i).Amount := 0;

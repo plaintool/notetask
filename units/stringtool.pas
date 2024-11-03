@@ -19,11 +19,15 @@ function TextToStringList(const Content: string; TrimEnd: boolean = False): TStr
 
 function DateToString(Value: TDateTime): string;
 
-function FloatToString(Value: Double): string;
+function FloatToString(Value: double): string;
 
 function IsBracket(const Input: string): boolean;
 
 function RemoveBrackets(const S: string): string;
+
+function CleanString(const Value: string): string;
+
+function CleanAmount(const Value: string): string;
 
 function DetectDone(const Input: string): boolean;
 
@@ -66,7 +70,7 @@ begin
   Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Value);
 end;
 
-function FloatToString(Value: Double): string;
+function FloatToString(Value: double): string;
 begin
   Result := FloatToStr(Value);
 end;
@@ -110,6 +114,16 @@ begin
       Break;
     end;
   end;
+end;
+
+function CleanString(const Value: string): string;
+begin
+  Result := Value.Replace(#9, ' ');
+end;
+
+function CleanAmount(const Value: string): string;
+begin
+  Result := Value.Replace(' ', string.empty).Replace(',', '.').Trim;
 end;
 
 function DetectDone(const Input: string): boolean;
