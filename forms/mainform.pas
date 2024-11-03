@@ -902,14 +902,11 @@ begin
       end;
     end;
 
-    if (aCol = 2) and (Tasks.HasTask(ARow)) then
-    begin
-      if Tasks.GetTask(ARow).Star then
-        grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsBold];
+    if (Tasks.HasTask(ARow)) and (Tasks.GetTask(ARow).Star) then
+      grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsBold];
 
-      if Tasks.GetTask(ARow).Archive then
-        grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsStrikeOut];
-    end;
+    if (aCol = 2) and (Tasks.HasTask(ARow)) and (Tasks.GetTask(ARow).Archive) then
+      grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsStrikeOut];
 
     if (aCol = 3) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).CommentItalic) then
       grid.Canvas.Font.Style := [fsItalic];
