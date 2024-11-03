@@ -1125,11 +1125,9 @@ begin
     Tasks.UndoBackup;
     FillGrid;
 
-    if (TempLastRow > 1) and (TempLastCol <> 2) then
-    begin
+    taskGrid.Col := TempLastCol;
+    if (TempLastRow > 1) then
       taskGrid.Row := TempLastRow;
-      taskGrid.Col := TempLastCol;
-    end;
     if (TempRect.Width > 0) and (TempRect.Height > 0) then
       taskGrid.Selection := TRect.Create(TempRect.Left, TempRect.Top, TempRect.Right, TempRect.Bottom);
     ResetRowHeight;
