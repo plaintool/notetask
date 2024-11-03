@@ -1703,6 +1703,10 @@ begin
       // Duration calculation
       if (ShowDuration) then
       begin
+        // Clear task dates
+        FTaskList[I].FDateStart := 0;
+        FTaskList[I].FDateEnd := 0;
+
         // Check if the task's date is earlier than the current minimum date
         if (FTaskList[I].Date > 0) and (FTaskList[I].Date < MinDate) then
           MinDate := FTaskList[I].Date;

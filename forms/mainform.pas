@@ -1426,7 +1426,7 @@ var
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  CurrentDateTime := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Now);
+  CurrentDateTime := DateToString(Now);
   if IsEditing then
   begin
     if (taskGrid.Col = 5) then
@@ -1443,6 +1443,7 @@ begin
     end;
     Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
     SetChanged;
+    SetInfo;
   end
   else
   begin
@@ -1465,6 +1466,7 @@ begin
         taskGrid.Row := taskGrid.Row + 1;
       end;
       SetChanged;
+      SetInfo;
     end;
   end;
 end;
