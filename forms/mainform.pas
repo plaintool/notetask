@@ -2488,7 +2488,6 @@ begin
     CurAll := Tasks.CalcCount(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
     CurDone := Tasks.CalcCount(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
   end;
-
   if (CurAll = CurDone) or (CurDone = 0) then
     statusBar.Panels[3].Text := CurAll.ToString + rrows
   else
