@@ -1228,6 +1228,7 @@ begin
   begin
     ClearSelected(False);
     if ShowDuration then FillGrid;
+    SetInfo;
   end
   else
   if (taskGrid.InplaceEditor is TCustomEdit) then
