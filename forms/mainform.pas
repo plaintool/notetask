@@ -2344,6 +2344,7 @@ procedure TformNotetask.SetShowArchived(Value: boolean);
 begin
   FShowArchived := Value;
   FillGrid;
+  ResetRowHeight;
   SetInfo;
 end;
 
