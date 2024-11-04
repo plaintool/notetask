@@ -1945,6 +1945,7 @@ begin
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
   if (FShowDuration) then FillGrid;
   SetChanged;
+  SetInfo;
 end;
 
 procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer;
@@ -2460,12 +2461,12 @@ end;
 
 procedure TformNotetask.SetInfo;
 var
-  CurCount: integer;
+  CurAll: integer;
   CurDone: integer;
-  SumCount: double;
+  SumAll: double;
   SumDone: double;
-  DurationCount: string;
-  DurationDone: string;
+  DurationAll: string;
+  DurationCurrent: string;
 begin
   SetCaption;
   if (not ShowStatusBar) then exit;
@@ -2478,39 +2479,39 @@ begin
   // Task counts
   if (taskGrid.Selection.Height = 0) then
   begin
-    CurCount := Tasks.CalcCount(ShowArchived, False);
+    CurAll := Tasks.CalcCount(ShowArchived, False);
     CurDone := Tasks.CalcCount(ShowArchived, True);
   end
   else
   begin
-    CurCount := Tasks.CalcCount(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+    CurAll := Tasks.CalcCount(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
     CurDone := Tasks.CalcCount(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
   end;
 
-  if (CurCount = CurDone) or (CurDone = 0) then
-    statusBar.Panels[3].Text := CurCount.ToString + rrows
+  if (CurAll = CurDone) or (CurDone = 0) then
+    statusBar.Panels[3].Text := CurAll.ToString + rrows
   else
-    statusBar.Panels[3].Text := CurDone.ToString + ' / ' + CurCount.ToString + rrows;
+    statusBar.Panels[3].Text := CurDone.ToString + ' / ' + CurAll.ToString + rrows;
 
   // Task amounts
   if (ShowColumnAmount) then
   begin
     if (taskGrid.Selection.Height = 0) then
     begin
-      SumCount := Tasks.CalcSum(ShowArchived, False);
+      SumAll := Tasks.CalcSum(ShowArchived, False);
       SumDone := Tasks.CalcSum(ShowArchived, True);
     end
     else
     begin
-      SumCount := Tasks.CalcSum(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+      SumAll := Tasks.CalcSum(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
       SumDone := Tasks.CalcSum(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
     end;
-    if (SumCount > 0) then
+    if (SumAll > 0) then
     begin
-      if (SumCount = SumDone) or (SumDone = 0) then
-        statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumCount)
+      if (SumAll = SumDone) or (SumDone = 0) then
+        statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumAll)
       else
-        statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumDone) + ' / ' + FormatFloat('#,##0.00', SumCount);
+        statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumDone) + ' / ' + FormatFloat('#,##0.00', SumAll);
     end
     else
       statusBar.Panels[4].Text := string.empty;
@@ -2523,22 +2524,21 @@ begin
   begin
     if (taskGrid.Selection.Height = 0) then
     begin
-      DurationCount := Tasks.CalcDuration(ShowArchived, False);
-      DurationDone := Tasks.CalcDuration(ShowArchived, True);
+      DurationAll := Tasks.CalcDuration(ShowArchived, False);
+      DurationCurrent := Tasks.CalcDuration(ShowArchived, True);
     end
     else
     begin
-      DurationCount := Tasks.CalcDuration(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
-      DurationDone := Tasks.CalcDuration(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+      DurationAll := Tasks.CalcDuration(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+      DurationCurrent := Tasks.CalcDuration(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
     end;
-    if (DurationCount = DurationDone) or (DurationDone = string.Empty) then
-      statusBar.Panels[5].Text := DurationCount
+    if (DurationAll = DurationCurrent) or (DurationCurrent = string.Empty) then
+      statusBar.Panels[5].Text := DurationAll
     else
-      statusBar.Panels[5].Text := DurationDone + ' / ' + DurationCount;
+      statusBar.Panels[5].Text := DurationCurrent + ' / ' + DurationAll;
   end
   else
     statusBar.Panels[5].Text := string.empty;
-
 end;
 
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);

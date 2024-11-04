@@ -100,6 +100,7 @@ type
     procedure UndoBackupInit;
     function GetCountArchive: integer;
     function CalcDateDiff(const StartDate, EndDate: TDateTime): string;
+    function CalcDateDiffAccuracy(const StartDate, EndDate: TDateTime): string;
     function CalcCount(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): integer;
     function CalcSum(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): double;
     function CalcDuration(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): string;
@@ -238,9 +239,8 @@ begin
   CompletedStr := RemoveBrackets(CompletedStr);
 
   if (TryStrToFloat(CleanAmount(CompletedStr), FAmount)) then
-  begin
-    FDate := 0;
-  end
+  else
+  if (TryStrToDateTime(CompletedStr, FDate)) then
   else
   if Length(PartDate) > 2 then
   begin
@@ -260,7 +260,6 @@ begin
     else
     begin
       FText := CompletedStr;
-      FDate := 0;
     end;
   end
   else
@@ -1421,6 +1420,95 @@ begin
   Result := '0' + rseconds;
 end;
 
+function TTasks.CalcDateDiffAccuracy(const StartDate, EndDate: TDateTime): string;
+var
+  YearsDiff, MonthsDiff, DaysDiff, HoursDiff, MinutesDiff, SecondsDiff: integer;
+  TempEndDate: TDateTime;
+begin
+  Result := '';
+  TempEndDate := Abs(EndDate);
+
+  // Calculate difference in years
+  YearsDiff := YearsBetween(TempEndDate, StartDate);
+  if (YearsDiff = 0) and (IncYear(StartDate) <= TempEndDate) then
+    YearsDiff := 1;
+
+  if YearsDiff <> 0 then
+  begin
+    Result := Result + IntToStr(YearsDiff) + ryears;
+    TempEndDate := IncYear(TempEndDate, -YearsDiff); // Decrement TempEndDate by YearsDiff years
+  end;
+
+  // Calculate difference in months
+  if (TempEndDate > StartDate) then
+  begin
+    MonthsDiff := MonthsBetween(TempEndDate, StartDate);
+    if (MonthsDiff = 0) and (IncMonth(StartDate) <= TempEndDate) then
+      MonthsDiff := 1;
+
+    if MonthsDiff <> 0 then
+    begin
+      Result := Result + ' ' + IntToStr(MonthsDiff) + rmonths;
+      TempEndDate := IncMonth(TempEndDate, -MonthsDiff); // Decrement TempEndDate by MonthsDiff months
+    end;
+  end;
+
+  // Calculate difference in days
+  if (TempEndDate > StartDate) then
+  begin
+    DaysDiff := DaysBetween(TempEndDate, StartDate);
+    if (DaysDiff = 0) and (IncDay(StartDate) <= TempEndDate) then
+      DaysDiff := 1;
+
+    if DaysDiff <> 0 then
+    begin
+      Result := Result + ' ' + IntToStr(DaysDiff) + rdays;
+      TempEndDate := IncDay(TempEndDate, -DaysDiff); // Decrement TempEndDate by DaysDiff days
+    end;
+  end;
+
+  // Calculate difference in hours
+  if (TempEndDate > StartDate) then
+  begin
+    HoursDiff := HoursBetween(TempEndDate, StartDate);
+    if (HoursDiff = 0) and (IncHour(StartDate) <= TempEndDate) then
+      HoursDiff := 1;
+
+    if HoursDiff <> 0 then
+    begin
+      Result := Result + ' ' + IntToStr(HoursDiff) + rhours;
+      TempEndDate := IncHour(TempEndDate, -HoursDiff); // Decrement TempEndDate by HoursDiff hours
+    end;
+  end;
+
+  // Calculate difference in minutes
+  if (TempEndDate > StartDate) then
+  begin
+    MinutesDiff := MinutesBetween(TempEndDate, StartDate);
+    if (MinutesDiff = 0) and (IncMinute(StartDate) <= TempEndDate) then
+      MinutesDiff := 1;
+
+    if MinutesDiff <> 0 then
+    begin
+      Result := Result + ' ' + IntToStr(MinutesDiff) + rminutes;
+      TempEndDate := IncMinute(TempEndDate, -MinutesDiff); // Decrement TempEndDate by MinutesDiff minutes
+    end;
+  end;
+
+  // Calculate difference in seconds
+  if (TempEndDate > StartDate) then
+  begin
+    SecondsDiff := SecondsBetween(TempEndDate, StartDate);
+    if SecondsDiff <> 0 then
+    begin
+      Result := Result + ' ' + IntToStr(SecondsDiff) + rseconds;
+    end;
+  end;
+
+  // Remove leading/trailing whitespace
+  Result := Trim(Result);
+end;
+
 function TTasks.CalcCount(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): integer;
 var
   I, Ind: integer;
@@ -1493,7 +1581,7 @@ begin
         TotalDuration += (FTaskList[Ind].FDateEnd - FTaskList[Ind].FDateStart);
     end;
   end;
-  Result := CalcDateDiff(0, TotalDuration).Replace('-', string.Empty);
+  Result := CalcDateDiffAccuracy(0, TotalDuration).Replace('-', string.Empty);
 end;
 
 function TTasks.GetCountArchive: integer;
