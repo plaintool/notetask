@@ -484,7 +484,7 @@ msgstr "列お気に入り"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr ""
+msgstr "列のメモ"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"

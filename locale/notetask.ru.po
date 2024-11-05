@@ -484,7 +484,7 @@ msgstr "Столбец избранное"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr ""
+msgstr "Столбец заметка"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"

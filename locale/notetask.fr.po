@@ -484,7 +484,7 @@ msgstr "Colonne favorite"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr ""
+msgstr "Colonne note"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"

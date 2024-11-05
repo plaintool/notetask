@@ -484,7 +484,7 @@ msgstr "عمود المفضل"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr ""
+msgstr "عمود ملاحظة"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"

@@ -472,7 +472,7 @@ msgstr "Columna cantidad"
 
 #: tformnotetask.ashowcolumndate.caption
 msgid "Column date"
-msgstr "Column date"
+msgstr "Columna date"
 
 #: tformnotetask.ashowcolumndone.caption
 msgid "Column done"
@@ -484,7 +484,7 @@ msgstr "Columna favorita"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr ""
+msgstr "Columna nota"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"

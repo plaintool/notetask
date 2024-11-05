@@ -484,7 +484,7 @@ msgstr "Слупок абранае"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr ""
+msgstr "Слупок нататка"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
@@ -513,7 +513,7 @@ msgstr "Перанос слоў"
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
-msgstr "Запісковая задача"
+msgstr "Notetask"
 
 #: tformnotetask.fontdialog.title
 msgid "Font select"
@@ -568,7 +568,7 @@ msgstr "Заданне"
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
 msgid "Note"
-msgstr "Заўвага"
+msgstr "Нататка"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgctxt "tformnotetask.taskgrid.columns[3].title.caption"

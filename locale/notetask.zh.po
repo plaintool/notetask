@@ -484,7 +484,7 @@ msgstr "列收藏"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr ""
+msgstr "列注"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"

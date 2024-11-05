@@ -484,7 +484,7 @@ msgstr "열 즐겨찾기"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr ""
+msgstr "열 메모"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"

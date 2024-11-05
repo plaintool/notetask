@@ -484,7 +484,7 @@ msgstr "कॉलम पसंदीदा"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr ""
+msgstr "कॉलम नोट"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"

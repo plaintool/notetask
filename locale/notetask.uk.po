@@ -484,7 +484,7 @@ msgstr "Стовпець улюблене"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr ""
+msgstr "Стовпець примітка"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"

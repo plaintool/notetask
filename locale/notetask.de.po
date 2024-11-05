@@ -484,7 +484,7 @@ msgstr "Spalte Favorit"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr ""
+msgstr "Spalte Notiz"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
