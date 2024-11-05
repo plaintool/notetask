@@ -470,10 +470,6 @@ msgstr "Архівовані завдання"
 msgid "Column amount"
 msgstr "Стовпець сума"
 
-#: tformnotetask.ashowcolumncomment.caption
-msgid "Column comment"
-msgstr "Стовпець коментар"
-
 #: tformnotetask.ashowcolumndate.caption
 msgid "Column date"
 msgstr "Стовпець дата"
@@ -485,6 +481,10 @@ msgstr "Стовпець виконано"
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
 msgstr "Стовпець улюблене"
+
+#: tformnotetask.ashowcolumnnote.caption
+msgid "Column note"
+msgstr ""
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
@@ -567,8 +567,8 @@ msgstr "Завдання"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
-msgid "Comment"
-msgstr "Коментар"
+msgid "Note"
+msgstr "Примітка"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgctxt "tformnotetask.taskgrid.columns[3].title.caption"

@@ -470,10 +470,6 @@ msgstr "Архіўныя задачы"
 msgid "Column amount"
 msgstr "Слупок сума"
 
-#: tformnotetask.ashowcolumncomment.caption
-msgid "Column comment"
-msgstr "Слупок каментар"
-
 #: tformnotetask.ashowcolumndate.caption
 msgid "Column date"
 msgstr "Слупок дата"
@@ -485,6 +481,10 @@ msgstr "Слупок выканана"
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
 msgstr "Слупок абранае"
+
+#: tformnotetask.ashowcolumnnote.caption
+msgid "Column note"
+msgstr ""
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
@@ -567,8 +567,8 @@ msgstr "Заданне"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
-msgid "Comment"
-msgstr "Каментар"
+msgid "Note"
+msgstr "Заўвага"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgctxt "tformnotetask.taskgrid.columns[3].title.caption"

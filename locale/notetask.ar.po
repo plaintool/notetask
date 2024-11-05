@@ -470,10 +470,6 @@ msgstr "المهام المؤرشفة"
 msgid "Column amount"
 msgstr "عمود المبلغ"
 
-#: tformnotetask.ashowcolumncomment.caption
-msgid "Column comment"
-msgstr "عمود التعليق"
-
 #: tformnotetask.ashowcolumndate.caption
 msgid "Column date"
 msgstr "عمود التاريخ"
@@ -485,6 +481,10 @@ msgstr "عمود تم"
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
 msgstr "عمود المفضل"
+
+#: tformnotetask.ashowcolumnnote.caption
+msgid "Column note"
+msgstr ""
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
@@ -567,8 +567,8 @@ msgstr "مهمة"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
-msgid "Comment"
-msgstr "تعليق"
+msgid "Note"
+msgstr "ملاحظة"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgctxt "tformnotetask.taskgrid.columns[3].title.caption"

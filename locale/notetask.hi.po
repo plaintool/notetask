@@ -470,10 +470,6 @@ msgstr "संरक्षित कार्य"
 msgid "Column amount"
 msgstr "कॉलम राशि"
 
-#: tformnotetask.ashowcolumncomment.caption
-msgid "Column comment"
-msgstr "कॉलम टिप्पणी"
-
 #: tformnotetask.ashowcolumndate.caption
 msgid "Column date"
 msgstr "कॉलम तिथि"
@@ -485,6 +481,10 @@ msgstr "कॉलम पूर्ण"
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
 msgstr "कॉलम पसंदीदा"
+
+#: tformnotetask.ashowcolumnnote.caption
+msgid "Column note"
+msgstr ""
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
@@ -567,8 +567,8 @@ msgstr "कार्य"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
-msgid "Comment"
-msgstr "टिप्पणी"
+msgid "Note"
+msgstr "नोट"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgctxt "tformnotetask.taskgrid.columns[3].title.caption"

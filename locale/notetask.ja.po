@@ -470,10 +470,6 @@ msgstr "アーカイブされたタスク"
 msgid "Column amount"
 msgstr "列金額"
 
-#: tformnotetask.ashowcolumncomment.caption
-msgid "Column comment"
-msgstr "列コメント"
-
 #: tformnotetask.ashowcolumndate.caption
 msgid "Column date"
 msgstr "列日付"
@@ -485,6 +481,10 @@ msgstr "列完了"
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
 msgstr "列お気に入り"
+
+#: tformnotetask.ashowcolumnnote.caption
+msgid "Column note"
+msgstr ""
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
@@ -567,8 +567,8 @@ msgstr "タスク"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
-msgid "Comment"
-msgstr "コメント"
+msgid "Note"
+msgstr "メモ"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgctxt "tformnotetask.taskgrid.columns[3].title.caption"

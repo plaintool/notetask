@@ -203,7 +203,7 @@ begin
     ItemSettings.Add('ShowDuration', Form.ShowDuration);
     ItemSettings.Add('ShowColumnDone', Form.ShowColumnDone);
     ItemSettings.Add('ShowColumnTask', Form.ShowColumnTask);
-    ItemSettings.Add('ShowColumnComment', Form.ShowColumnComment);
+    ItemSettings.Add('ShowColumnNote', Form.ShowColumnNote);
     ItemSettings.Add('ShowColumnDate', Form.ShowColumnDate);
     ItemSettings.Add('ShowColumnAmount', Form.ShowColumnAmount);
     ItemSettings.Add('ShowColumnFavorite', Form.ShowColumnFavorite);
@@ -214,7 +214,7 @@ begin
     if Grid.Columns[1].Visible then
       ItemSettings.Add('ColumnTask', Grid.Columns[1].Width);
     if Grid.Columns[2].Visible then
-      ItemSettings.Add('ColumnComment', Grid.Columns[2].Width);
+      ItemSettings.Add('ColumnNote', Grid.Columns[2].Width);
     if Grid.Columns[3].Visible then
       ItemSettings.Add('ColumnDate', Grid.Columns[3].Width);
     if Grid.Columns[4].Visible then
@@ -282,8 +282,8 @@ begin
       if ItemSettings.FindPath('ShowColumnTask') <> nil then
         Form.FShowColumnTask := ItemSettings.FindPath('ShowColumnTask').AsBoolean;
 
-      if ItemSettings.FindPath('ShowColumnComment') <> nil then
-        Form.FShowColumnComment := ItemSettings.FindPath('ShowColumnComment').AsBoolean;
+      if ItemSettings.FindPath('ShowColumnNote') <> nil then
+        Form.FShowColumnNote := ItemSettings.FindPath('ShowColumnNote').AsBoolean;
 
       if ItemSettings.FindPath('ShowColumnDate') <> nil then
         Form.FShowColumnDate := ItemSettings.FindPath('ShowColumnDate').AsBoolean;
@@ -300,8 +300,8 @@ begin
       if ItemSettings.FindPath('ColumnTask') <> nil then
         Grid.Columns[1].Width := ItemSettings.FindPath('ColumnTask').AsInteger;
 
-      if ItemSettings.FindPath('ColumnComment') <> nil then
-        Grid.Columns[2].Width := ItemSettings.FindPath('ColumnComment').AsInteger;
+      if ItemSettings.FindPath('ColumnNote') <> nil then
+        Grid.Columns[2].Width := ItemSettings.FindPath('ColumnNote').AsInteger;
 
       if ItemSettings.FindPath('ColumnDate') <> nil then
         Grid.Columns[3].Width := ItemSettings.FindPath('ColumnDate').AsInteger;

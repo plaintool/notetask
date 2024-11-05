@@ -27,14 +27,14 @@ type
     FDone: boolean; // Status of task completion
     FArchive: boolean; // Archive task
     FDate: TDateTime; // Date of task completion
-    FComment: string; // Comment for the task
+    FNote: string; // Note for the task
     FText: string; // Description of the task
     FAmount: double; // Amount
     FStar: boolean; // Starred
-    FCommentItalic: boolean; // Comment is italic
-    FEmptyComment: boolean; // Has empty comment symbols
-    FSpaceBeforeComment: boolean; // Space before comment in file
-    FSpaceAfterComment: boolean; // Space after comment in file
+    FNoteItalic: boolean; // Note is italic
+    FEmptyNote: boolean; // Has empty note symbols
+    FSpaceBeforeNote: boolean; // Space before note in file
+    FSpaceAfterNote: boolean; // Space after note in file
     FDateStart, FDateEnd: TDateTime; // Calculated time interval
     function GetDate: string;
     function GetAmount: string;
@@ -46,15 +46,15 @@ type
     property Archive: boolean read FArchive write FArchive;
     property Date: TDateTime read FDate write FDate;
     property DateStr: string read GetDate;
-    property Comment: string read FComment write FComment;
+    property Note: string read FNote write FNote;
     property Text: string read FText write FText;
     property Amount: double read FAmount write FAmount;
     property AmountStr: string read GetAmount;
     property Star: boolean read FStar write FStar;
-    property CommentItalic: boolean read FCommentItalic write FCommentItalic;
-    property EmptyComment: boolean read FEmptyComment write FEmptyComment;
-    property SpaceBeforeComment: boolean read FSpaceBeforeComment write FSpaceBeforeComment;
-    property SpaceAfterComment: boolean read FSpaceAfterComment write FSpaceAfterComment;
+    property NoteItalic: boolean read FNoteItalic write FNoteItalic;
+    property EmptyNote: boolean read FEmptyNote write FEmptyNote;
+    property SpaceBeforeNote: boolean read FSpaceBeforeNote write FSpaceBeforeNote;
+    property SpaceAfterNote: boolean read FSpaceAfterNote write FSpaceAfterNote;
     function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string; reintroduce;
   end;
 
@@ -130,29 +130,29 @@ begin
   FArchive := False;
   FDate := 0;
   FAmount := 0;
-  FComment := string.Empty;
+  FNote := string.Empty;
   FText := string.Empty;
   FStar := False;
-  FCommentItalic := True;
-  FEmptyComment := False;
-  FSpaceAfterComment := False;
-  FSpaceBeforeComment := False;
+  FNoteItalic := True;
+  FEmptyNote := False;
+  FSpaceAfterNote := False;
+  FSpaceBeforeNote := False;
 end;
 
 constructor TTask.Create(const TaskString: string);
 var
-  PartComment, PartDate: TStringArray; // Use TStringArray for compatibility
+  PartNote, PartDate: TStringArray; // Use TStringArray for compatibility
   CompletedStr: string;
 
-  procedure FillComment(start: integer = 1);
+  procedure FillNote(start: integer = 1);
   var
     i: integer;
   begin
-    FComment := string.Empty;
-    for i := start to High(PartComment) do
+    FNote := string.Empty;
+    for i := start to High(PartNote) do
     begin
-      FComment += PartComment[i];
-      if (i < High(PartComment)) then FComment += '//';
+      FNote += PartNote[i];
+      if (i < High(PartNote)) then FNote += '//';
     end;
   end;
 
@@ -161,10 +161,10 @@ var
     i: integer;
   begin
     CompletedStr := string.Empty;
-    for i := start to High(PartComment) do
+    for i := start to High(PartNote) do
     begin
-      CompletedStr += PartComment[i];
-      if (i < High(PartComment)) then CompletedStr += '//';
+      CompletedStr += PartNote[i];
+      if (i < High(PartNote)) then CompletedStr += '//';
     end;
   end;
 
@@ -181,51 +181,51 @@ var
   end;
 
 begin
-  // Format: - [x] 01.01.2000, 123, ~~Task~~ // Comment
+  // Format: - [x] 01.01.2000, 123, ~~Task~~ // Note
 
-  // Split the task string into PartComment
-  FCommentItalic := False;
+  // Split the task string into PartNote
+  FNoteItalic := False;
 
-  PartComment := TaskString.Split(['//']);
-  if (Length(PartComment) >= 2) and (not PartComment[0].EndsWith(':')) then
+  PartNote := TaskString.Split(['//']);
+  if (Length(PartNote) >= 2) and (not PartNote[0].EndsWith(':')) then
   begin
-    CompletedStr := PartComment[0];
+    CompletedStr := PartNote[0];
     if (Length(CompletedStr) > 0) and (CompletedStr.EndsWith(' ')) then
     begin
       Delete(CompletedStr, Length(CompletedStr), 1);
-      SpaceBeforeComment := True;
+      SpaceBeforeNote := True;
     end;
-    FillComment;
+    FillNote;
 
-    // Test for empty comment symbols
-    if (FComment.Trim = string.empty) then
-      EmptyComment := True;
+    // Test for empty Note symbols
+    if (FNote.Trim = string.empty) then
+      EmptyNote := True;
   end
   else
     FillCompletedStr;
 
-  // Remove star in start and end of comment
-  if (FComment.TrimLeft.StartsWith('*')) and (FComment.TrimRight.EndsWith('*')) then
+  // Remove star in start and end of Note
+  if (FNote.TrimLeft.StartsWith('*')) and (FNote.TrimRight.EndsWith('*')) then
   begin
-    FCommentItalic := True;
-    if (Length(FComment) > 0) and (FComment.StartsWith(' ')) then
+    FNoteItalic := True;
+    if (Length(FNote) > 0) and (FNote.StartsWith(' ')) then
     begin
-      FComment := TrimLeft(FComment);
-      SpaceAfterComment := True;
+      FNote := TrimLeft(FNote);
+      SpaceAfterNote := True;
     end;
-    Delete(FComment, 1, 1);
-    if (TrimRight(FComment).EndsWith('*')) then
+    Delete(FNote, 1, 1);
+    if (TrimRight(FNote).EndsWith('*')) then
     begin
-      FComment := TrimRight(FComment);
-      Delete(FComment, Length(FComment), 1);
+      FNote := TrimRight(FNote);
+      Delete(FNote, Length(FNote), 1);
     end;
   end
   else
   begin
-    if (Length(FComment) > 0) and (FComment.StartsWith(' ')) then
+    if (Length(FNote) > 0) and (FNote.StartsWith(' ')) then
     begin
-      SpaceAfterComment := True;
-      Delete(FComment, 1, 1);
+      SpaceAfterNote := True;
+      Delete(FNote, 1, 1);
     end;
   end;
 
@@ -299,7 +299,7 @@ begin
   end;
 
   FText := StringReplace(FText, '<br>', sLineBreak, [rfReplaceAll]);
-  FComment := StringReplace(FComment, '<br>', sLineBreak, [rfReplaceAll]);
+  FNote := StringReplace(FNote, '<br>', sLineBreak, [rfReplaceAll]);
 
   // Check if Text starts and ends with '~~'
   if FText.TrimLeft.StartsWith('~~') and FText.TrimRight.EndsWith('~~') then
@@ -328,11 +328,11 @@ function TTask.ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): s
 var
   TextString: string;
   DoneString: string;
-  CommentString: string;
+  NoteString: string;
 begin
-  // Replace line breaks from task description and comment
+  // Replace line breaks from task description and Note
   TextString := StringReplace(Text, sLineBreak, '<br>', [rfReplaceAll]);
-  Comment := StringReplace(Comment, sLineBreak, '<br>', [rfReplaceAll]);
+  Note := StringReplace(Note, sLineBreak, '<br>', [rfReplaceAll]);
 
   // Add '**' for starred tasks
   if FStar then
@@ -350,30 +350,30 @@ begin
   else
     DoneString := string.Empty;
 
-  // Check comments
-  if (Comment <> string.Empty) or (EmptyComment) then
+  // Check notes
+  if (Note <> string.Empty) or (EmptyNote) then
   begin
-    CommentString := string.Empty;
-    if (SpaceBeforeComment) then CommentString += ' ';
-    CommentString += '//';
-    if (SpaceAfterComment) then CommentString += ' ';
+    NoteString := string.Empty;
+    if (SpaceBeforeNote) then NoteString += ' ';
+    NoteString += '//';
+    if (SpaceAfterNote) then NoteString += ' ';
 
-    if (Comment <> string.Empty) then
+    if (Note <> string.Empty) then
     begin
-      if CommentItalic then
-        CommentString += '*' + Comment + '*'
+      if NoteItalic then
+        NoteString += '*' + Note + '*'
       else
-        CommentString += Comment;
+        NoteString += Note;
     end;
   end
   else
-    CommentString := string.Empty;
+    NoteString := string.Empty;
 
   // Form the task string based on the provided Col
   case Col of
     1: Result := DoneString; // Returning only the completion status
     2: Result := TextString; // Returning only the task string
-    3: Result := CommentString; // Returning only the comment
+    3: Result := NoteString; // Returning only the Note
     4:
       if Amount > 0 then
         Result := FloatToString(Amount)
@@ -385,22 +385,22 @@ begin
       else
         Result := string.Empty; // If the completion date is missing, return an empty string
     else
-      // Forming the task string considering the completion date and comment
+      // Forming the task string considering the completion date and Note
       if (DoneString = string.Empty) then
       begin
         if Amount > 0 then
         begin
           if Date > 0 then
-            Result := Format('%s, %s, %s%s', [DateStr, AmountStr, TextString, CommentString])
+            Result := Format('%s, %s, %s%s', [DateStr, AmountStr, TextString, NoteString])
           else
-            Result := Format('%s, %s%s', [AmountStr, TextString, CommentString]);
+            Result := Format('%s, %s%s', [AmountStr, TextString, NoteString]);
         end
         else
         begin
           if Date > 0 then
-            Result := Format('%s, %s%s', [DateStr, TextString, CommentString])
+            Result := Format('%s, %s%s', [DateStr, TextString, NoteString])
           else
-            Result := Format('%s%s', [TextString, CommentString]);
+            Result := Format('%s%s', [TextString, NoteString]);
         end;
       end
       else
@@ -408,16 +408,16 @@ begin
         if Amount > 0 then
         begin
           if Date > 0 then
-            Result := Format('%s %s, %s, %s%s', [DoneString, DateStr, AmountStr, TextString, CommentString]).Trim
+            Result := Format('%s %s, %s, %s%s', [DoneString, DateStr, AmountStr, TextString, NoteString]).Trim
           else
-            Result := Format('%s %s, %s%s', [DoneString, AmountStr, TextString, CommentString]).Trim;
+            Result := Format('%s %s, %s%s', [DoneString, AmountStr, TextString, NoteString]).Trim;
         end
         else
         begin
           if Date > 0 then
-            Result := Format('%s %s, %s%s', [DoneString, DateStr, TextString, CommentString]).Trim
+            Result := Format('%s %s, %s%s', [DoneString, DateStr, TextString, NoteString]).Trim
           else
-            Result := Format('%s %s%s', [DoneString, TextString, CommentString]).Trim;
+            Result := Format('%s %s%s', [DoneString, TextString, NoteString]).Trim;
         end;
       end;
   end;
@@ -429,13 +429,13 @@ begin
   FArchive := Original.FArchive;
   FDate := Original.FDate;
   FAmount := Original.FAmount;
-  FComment := Original.FComment;
+  FNote := Original.FNote;
   FText := Original.FText;
   FStar := Original.FStar;
-  FCommentItalic := Original.FCommentItalic;
-  FEmptyComment := Original.FEmptyComment;
-  FSpaceBeforeComment := Original.FSpaceBeforeComment;
-  FSpaceAfterComment := Original.FSpaceAfterComment;
+  FNoteItalic := Original.FNoteItalic;
+  FEmptyNote := Original.FEmptyNote;
+  FSpaceBeforeNote := Original.FSpaceBeforeNote;
+  FSpaceAfterNote := Original.FSpaceAfterNote;
 end;
 
 function TTask.GetDate: string;
@@ -502,7 +502,7 @@ begin
     addCompleted := False;
     for i := 0 to FCount - 1 do
       if FTaskList[i].Done then addCompleted := True;
-    //if (FCount = 1) and (FTaskList[0].Text = string.Empty) and (FTaskList[0].Comment = string.Empty) and (FTaskList[0].Date = 0) then
+    //if (FCount = 1) and (FTaskList[0].Text = string.Empty) and (FTaskList[0].Note = string.Empty) and (FTaskList[0].Date = 0) then
     //  addCompleted := True;
 
     for i := 0 to FCount - 1 do
@@ -588,7 +588,7 @@ begin
   else
   if ACol = 2 then Result := GetTask(aRow).Text
   else
-  if ACol = 3 then Result := GetTask(aRow).Comment
+  if ACol = 3 then Result := GetTask(aRow).Note
   else
   if ACol = 4 then Result := GetTask(aRow).AmountStr
   else
@@ -625,7 +625,7 @@ begin
     // Reading data from the grid
     Task.Done := StrToBoolDef(Grid.Cells[1, Row], False); // Convert to boolean
     Task.Text := Grid.Cells[2, Row];
-    Task.Comment := Grid.Cells[3, Row];
+    Task.Note := Grid.Cells[3, Row];
     if not TryStrToFloat(Grid.Cells[4, Row], pAmount) then
     begin
       pAmount := 0; // If parsing the amount failed, set to 0
@@ -767,7 +767,7 @@ begin
       if (j = 2) then
         GetTask(i).Text := ''; // Clear task description
       if (j = 3) then
-        GetTask(i).Comment := ''; // Clear comment
+        GetTask(i).Note := ''; // Clear note
       if (j = 4) then
         GetTask(i).Amount := 0; // Reset amount
       if (j = 5) then
@@ -994,7 +994,7 @@ procedure TTasks.CopyToClipboard(Grid: TStringGrid);
 var
   SelectedText: TStringList;
   Rect: TGridRect;
-  pDone, pText, pComment, pAmount, pDate: string;
+  pDone, pText, pNote, pAmount, pDate: string;
   Row1, Row2, RowText: string;
   i, j: integer;
 begin
@@ -1008,12 +1008,12 @@ begin
       begin
         if (j = 1) then pDone := GetTask(i).ToString(j).Trim;
         if (j = 2) then pText := GetTask(i).ToString(j).Trim;
-        if (j = 3) then pComment := GetTask(i).ToString(j).Trim;
+        if (j = 3) then pNote := GetTask(i).ToString(j).Trim;
         if (j = 4) then pAmount := GetTask(i).ToString(j).Trim;
         if (j = 5) then pDate := GetTask(i).ToString(j).Trim;
       end;
       Row1 := (pDone + ' ' + pDate).Trim;
-      Row2 := (pText + ' ' + pComment).Trim;
+      Row2 := (pText + ' ' + pNote).Trim;
 
       if (pDate <> string.Empty) and (Row2 <> string.Empty) then
         Row1 += ', '
@@ -1057,7 +1057,7 @@ begin
   if (Grid.Row > 0) then
   begin
     RowTask := GetTask(Grid.Row);
-    IsEmpty := (RowTask.Text = string.Empty) and (RowTask.Comment = string.Empty) and (RowTask.Date = 0);
+    IsEmpty := (RowTask.Text = string.Empty) and (RowTask.Note = string.Empty) and (RowTask.Date = 0);
   end
   else
     IsEmpty := False;
@@ -1118,8 +1118,8 @@ begin
               else
               if Rect.Width = 0 then
               begin
-                if (TempTasks.GetTask(index).Comment <> string.Empty) then
-                  GetTask(i).Text := CleanString(TempTasks.GetTask(index).Comment)
+                if (TempTasks.GetTask(index).Note <> string.Empty) then
+                  GetTask(i).Text := CleanString(TempTasks.GetTask(index).Note)
                 else
                 if (TempTasks.GetTask(index).Date <> 0) then
                   GetTask(i).Text := DateToString(TempTasks.GetTask(index).Date)
@@ -1135,27 +1135,27 @@ begin
             else
             if j = 3 then
             begin
-              if (TempTasks.GetTask(index).Comment <> string.Empty) then
+              if (TempTasks.GetTask(index).Note <> string.Empty) then
               begin
-                GetTask(i).Comment := CleanString(TempTasks.GetTask(index).Comment);
-                GetTask(i).CommentItalic := TempTasks.GetTask(index).CommentItalic;
+                GetTask(i).Note := CleanString(TempTasks.GetTask(index).Note);
+                GetTask(i).NoteItalic := TempTasks.GetTask(index).NoteItalic;
               end
               else
               if Rect.Width = 0 then
               begin
                 if (TempTasks.GetTask(index).Text <> string.Empty) then
-                  GetTask(i).Comment := CleanString(TempTasks.GetTask(index).Text)
+                  GetTask(i).Note := CleanString(TempTasks.GetTask(index).Text)
                 else
                 if (TempTasks.GetTask(index).Date <> 0) then
-                  GetTask(i).Comment := DateToString(TempTasks.GetTask(index).Date)
+                  GetTask(i).Note := DateToString(TempTasks.GetTask(index).Date)
                 else
                 if (TempTasks.GetTask(index).Amount <> 0) then
-                  GetTask(i).Comment := FloatToString(TempTasks.GetTask(index).Amount)
+                  GetTask(i).Note := FloatToString(TempTasks.GetTask(index).Amount)
                 else
-                  GetTask(i).Comment := string.Empty;
+                  GetTask(i).Note := string.Empty;
               end
               else
-                GetTask(i).Comment := string.Empty;
+                GetTask(i).Note := string.Empty;
             end
             else
             if j = 4 then
@@ -1169,8 +1169,8 @@ begin
                   (TryStrToFloat(CleanAmount(TempTasks.GetTask(index).Text), TempAmount)) then
                   GetTask(i).Amount := TempAmount
                 else
-                if (TempTasks.GetTask(index).Comment <> string.Empty) and
-                  (TryStrToFloat(CleanAmount(TempTasks.GetTask(index).Comment), TempAmount)) then
+                if (TempTasks.GetTask(index).Note <> string.Empty) and
+                  (TryStrToFloat(CleanAmount(TempTasks.GetTask(index).Note), TempAmount)) then
                   GetTask(i).Amount := TempAmount
                 else
                   GetTask(i).Amount := 0;
@@ -1189,8 +1189,8 @@ begin
                 if (TempTasks.GetTask(index).Text <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Text, TempDate)) then
                   GetTask(i).Date := TempDate
                 else
-                if (TempTasks.GetTask(index).Comment <> string.Empty) and
-                  (TryStrToDateTime(TempTasks.GetTask(index).Comment, TempDate)) then
+                if (TempTasks.GetTask(index).Note <> string.Empty) and
+                  (TryStrToDateTime(TempTasks.GetTask(index).Note, TempDate)) then
                   GetTask(i).Date := TempDate
                 else
                   GetTask(i).Date := 0;
@@ -1631,9 +1631,9 @@ var
         Value2 := Task2.Text;
       end;
       3: begin
-        // Comment
-        Value1 := Task1.Comment;
-        Value2 := Task2.Comment;
+        // Note
+        Value1 := Task1.Note;
+        Value2 := Task2.Note;
       end;
       4: begin
         // Completion amount (compare as double)
@@ -1859,7 +1859,7 @@ begin
       begin
         Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].Done));
         Grid.Cells[2, RowIndex] := FTaskList[I].Text;
-        Grid.Cells[3, RowIndex] := FTaskList[I].Comment;
+        Grid.Cells[3, RowIndex] := FTaskList[I].Note;
         if FTaskList[I].Amount > 0 then
         begin
           Grid.Cells[4, RowIndex] := FTaskList[I].AmountStr;

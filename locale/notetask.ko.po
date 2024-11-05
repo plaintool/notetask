@@ -470,10 +470,6 @@ msgstr "보관된 작업"
 msgid "Column amount"
 msgstr "열 금액"
 
-#: tformnotetask.ashowcolumncomment.caption
-msgid "Column comment"
-msgstr "열 댓글"
-
 #: tformnotetask.ashowcolumndate.caption
 msgid "Column date"
 msgstr "열 날짜"
@@ -485,6 +481,10 @@ msgstr "열 완료"
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
 msgstr "열 즐겨찾기"
+
+#: tformnotetask.ashowcolumnnote.caption
+msgid "Column note"
+msgstr ""
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
@@ -567,8 +567,8 @@ msgstr "작업"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
-msgid "Comment"
-msgstr "댓글"
+msgid "Note"
+msgstr "메모"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgctxt "tformnotetask.taskgrid.columns[3].title.caption"

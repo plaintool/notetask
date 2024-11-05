@@ -36,7 +36,7 @@ object formNotetask: TformNotetask
         Width = 300
       end    
       item
-        Title.Caption = 'Comment'
+        Title.Caption = 'Note'
         Width = 200
       end    
       item
@@ -287,8 +287,8 @@ object formNotetask: TformNotetask
         Action = aShowColumnTask
         AutoCheck = True
       end
-      object menuColumnComment: TMenuItem
-        Action = aShowColumnComment
+      object menuColumnNote: TMenuItem
+        Action = aShowColumnNote
         AutoCheck = True
       end
       object menuColumnAmount: TMenuItem
@@ -684,12 +684,12 @@ object formNotetask: TformNotetask
       Checked = True
       OnExecute = aShowColumnTaskExecute
     end
-    object aShowColumnComment: TAction
+    object aShowColumnNote: TAction
       Category = 'View'
       AutoCheck = True
-      Caption = 'Column comment'
+      Caption = 'Column note'
       Checked = True
-      OnExecute = aShowColumnCommentExecute
+      OnExecute = aShowColumnNoteExecute
     end
     object aShowColumnAmount: TAction
       Category = 'View'

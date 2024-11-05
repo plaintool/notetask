@@ -179,11 +179,11 @@ type
     MenuItem13: TMenuItem;
     MenuItem14: TMenuItem;
     aShowColumnDone: TAction;
-    aShowColumnComment: TAction;
+    aShowColumnNote: TAction;
     aShowColumnDate: TAction;
     Separator13: TMenuItem;
     menuColumnDone: TMenuItem;
-    menuColumnComment: TMenuItem;
+    menuColumnNote: TMenuItem;
     menuColumnDate: TMenuItem;
     aShowColumnAmount: TAction;
     aShowColumnFavorite: TAction;
@@ -273,7 +273,7 @@ type
     procedure taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
     procedure aShowColumnDoneExecute(Sender: TObject);
     procedure aShowColumnTaskExecute(Sender: TObject);
-    procedure aShowColumnCommentExecute(Sender: TObject);
+    procedure aShowColumnNoteExecute(Sender: TObject);
     procedure aShowColumnDateExecute(Sender: TObject);
     procedure aShowColumnAmountExecute(Sender: TObject);
     procedure aShowColumnFavoriteExecute(Sender: TObject);
@@ -335,7 +335,7 @@ type
     procedure SetShowArchived(Value: boolean);
     procedure SetShowColumnDone(Value: boolean);
     procedure SetShowColumnTask(Value: boolean);
-    procedure SetShowColumnComment(Value: boolean);
+    procedure SetShowColumnNote(Value: boolean);
     procedure SetShowColumnDate(Value: boolean);
     procedure SetShowColumnAmount(Value: boolean);
     procedure SetShowColumnFavorite(Value: boolean);
@@ -353,7 +353,7 @@ type
     FShowDuration: boolean;
     FShowColumnDone: boolean;
     FShowColumnTask: boolean;
-    FShowColumnComment: boolean;
+    FShowColumnNote: boolean;
     FShowColumnAmount: boolean;
     FShowColumnDate: boolean;
     FShowColumnFavorite: boolean;
@@ -373,7 +373,7 @@ type
     property ShowDuration: boolean read FShowDuration write SetShowDuration;
     property ShowColumnDone: boolean read FShowColumnDone write SetShowColumnDone;
     property ShowColumnTask: boolean read FShowColumnTask write SetShowColumnTask;
-    property ShowColumnComment: boolean read FShowColumnComment write SetShowColumnComment;
+    property ShowColumnNote: boolean read FShowColumnNote write SetShowColumnNote;
     property ShowColumnDate: boolean read FShowColumnDate write SetShowColumnDate;
     property ShowColumnAmount: boolean read FShowColumnAmount write SetShowColumnAmount;
     property ShowColumnFavorite: boolean read FShowColumnFavorite write SetShowColumnFavorite;
@@ -433,7 +433,7 @@ begin
   FShowStatusBar := True;
   FShowColumnDone := True;
   FShowColumnTask := True;
-  FShowColumnComment := True;
+  FShowColumnNote := True;
   FShowColumnDate := True;
   FShowColumnAmount := False;
   FShowColumnFavorite := True;
@@ -919,7 +919,7 @@ begin
     if (aCol = 2) and (Tasks.HasTask(ARow)) and (Tasks.GetTask(ARow).Archive) then
       grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsStrikeOut];
 
-    if (aCol = 3) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).CommentItalic) then
+    if (aCol = 3) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).NoteItalic) then
       grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsItalic];
 
     // Fill the cell background
@@ -1609,11 +1609,11 @@ begin
   ShowColumnTask := aShowColumnTask.Checked;
 end;
 
-procedure TformNotetask.aShowColumnCommentExecute(Sender: TObject);
+procedure TformNotetask.aShowColumnNoteExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  ShowColumnComment := aShowColumnComment.Checked;
+  ShowColumnNote := aShowColumnNote.Checked;
 end;
 
 procedure TformNotetask.aShowColumnDateExecute(Sender: TObject);
@@ -2373,10 +2373,10 @@ begin
   taskGrid.Columns.Items[1].Visible := FShowColumnTask;
 end;
 
-procedure TformNotetask.SetShowColumnComment(Value: boolean);
+procedure TformNotetask.SetShowColumnNote(Value: boolean);
 begin
-  FShowColumnComment := Value;
-  taskGrid.Columns.Items[2].Visible := FShowColumnComment;
+  FShowColumnNote := Value;
+  taskGrid.Columns.Items[2].Visible := FShowColumnNote;
 end;
 
 procedure TformNotetask.SetShowColumnAmount(Value: boolean);
@@ -2407,13 +2407,13 @@ begin
     taskGrid.DefaultColWidth := 40;
   aShowColumnDone.Checked := FShowColumnDone;
   aShowColumnTask.Checked := FShowColumnTask;
-  aShowColumnComment.Checked := FShowColumnComment;
+  aShowColumnNote.Checked := FShowColumnNote;
   aShowColumnDate.Checked := FShowColumnDate;
   aShowColumnAmount.Checked := FShowColumnAmount;
   aShowColumnFavorite.Checked := FShowColumnFavorite;
   taskGrid.Columns.Items[0].Visible := FShowColumnDone;
   taskGrid.Columns.Items[1].Visible := FShowColumnTask;
-  taskGrid.Columns.Items[2].Visible := FShowColumnComment;
+  taskGrid.Columns.Items[2].Visible := FShowColumnNote;
   taskGrid.Columns.Items[3].Visible := FShowColumnAmount;
   taskGrid.Columns.Items[4].Visible := FShowColumnDate;
   taskGrid.Columns.Items[5].Visible := FShowColumnFavorite;

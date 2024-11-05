@@ -470,10 +470,6 @@ msgstr "Archived tasks"
 msgid "Column amount"
 msgstr "Column amount"
 
-#: tformnotetask.ashowcolumncomment.caption
-msgid "Column comment"
-msgstr "Column comment"
-
 #: tformnotetask.ashowcolumndate.caption
 msgid "Column date"
 msgstr "Column date"
@@ -485,6 +481,10 @@ msgstr "Column done"
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
 msgstr "Column fovorite"
+
+#: tformnotetask.ashowcolumnnote.caption
+msgid "Column note"
+msgstr ""
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
@@ -567,8 +567,8 @@ msgstr "Task"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
-msgid "Comment"
-msgstr "Comment"
+msgid "Note"
+msgstr "Note"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgctxt "tformnotetask.taskgrid.columns[3].title.caption"
