@@ -375,7 +375,7 @@ begin
     2: Result := TextString; // Returning only the task string
     3: Result := NoteString; // Returning only the Note
     4:
-      if Amount > 0 then
+      if Amount <> 0 then
         Result := FloatToString(Amount)
       else
         Result := string.Empty;
@@ -388,7 +388,7 @@ begin
       // Forming the task string considering the completion date and Note
       if (DoneString = string.Empty) then
       begin
-        if Amount > 0 then
+        if Amount <> 0 then
         begin
           if Date > 0 then
             Result := Format('%s, %s, %s%s', [DateStr, AmountStr, TextString, NoteString])
@@ -405,7 +405,7 @@ begin
       end
       else
       begin
-        if Amount > 0 then
+        if Amount <> 0 then
         begin
           if Date > 0 then
             Result := Format('%s %s, %s, %s%s', [DoneString, DateStr, AmountStr, TextString, NoteString]).Trim
@@ -1860,7 +1860,7 @@ begin
         Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].Done));
         Grid.Cells[2, RowIndex] := FTaskList[I].Text;
         Grid.Cells[3, RowIndex] := FTaskList[I].Note;
-        if FTaskList[I].Amount > 0 then
+        if FTaskList[I].Amount <> 0 then
         begin
           Grid.Cells[4, RowIndex] := FTaskList[I].AmountStr;
         end

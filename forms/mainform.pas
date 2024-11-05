@@ -219,6 +219,8 @@ type
     procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState;
       var ABitmap: TBitmap);
     procedure taskGridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+    procedure taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
+    procedure taskGridSelection(Sender: TObject; aCol, aRow: integer);
     procedure aArchiveTasksExecute(Sender: TObject);
     procedure aCopyExecute(Sender: TObject);
     procedure aCutExecute(Sender: TObject);
@@ -270,7 +272,6 @@ type
     procedure aLangBelarusianExecute(Sender: TObject);
     procedure aLangHindiExecute(Sender: TObject);
     procedure aLangArabicExecute(Sender: TObject);
-    procedure taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
     procedure aShowColumnDoneExecute(Sender: TObject);
     procedure aShowColumnTaskExecute(Sender: TObject);
     procedure aShowColumnNoteExecute(Sender: TObject);
@@ -279,7 +280,6 @@ type
     procedure aShowColumnFavoriteExecute(Sender: TObject);
     procedure aIndentTasksExecute(Sender: TObject);
     procedure aOutdentTasksExecute(Sender: TObject);
-    procedure taskGridSelection(Sender: TObject; aCol, aRow: integer);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -1115,6 +1115,13 @@ begin
   end;
 end;
 
+procedure TformNotetask.taskGridSelection(Sender: TObject; aCol, aRow: integer);
+begin
+  if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
+    SetInfo;
+  FLastSelectionHeight := taskGrid.Selection.Height;
+end;
+
 procedure TformNotetask.aUndoExecute(Sender: TObject);
 var
   TempRect: TRect;
@@ -1395,13 +1402,6 @@ begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
   IndentTasks(True);
-end;
-
-procedure TformNotetask.taskGridSelection(Sender: TObject; aCol, aRow: integer);
-begin
-  if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
-    SetInfo;
-  FLastSelectionHeight := taskGrid.Selection.Height;
 end;
 
 procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);
@@ -1932,7 +1932,7 @@ begin
     Key := '.';
 
   // Allow digits and one decimal point
-  if not (Key in ['0'..'9', '.', #8, #13]) then
+  if not (Key in ['0'..'9', '.', '-', #8, #13]) then
     Key := #0 // Block other keys
   else if (Key = '.') and (Pos('.', TMemo(Sender).Text) > 0) then
     Key := #0; // Block second decimal point
@@ -2507,7 +2507,7 @@ begin
       SumAll := Tasks.CalcSum(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
       SumDone := Tasks.CalcSum(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
     end;
-    if (SumAll > 0) then
+    if (SumAll <> 0) then
     begin
       if (SumAll = SumDone) or (SumDone = 0) then
         statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumAll)
