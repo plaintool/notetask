@@ -1122,8 +1122,10 @@ begin
                   GetTask(i).Text := CleanString(TempTasks.GetTask(index).Comment)
                 else
                 if (TempTasks.GetTask(index).Date <> 0) then
-                  GetTask(i).Text := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat,
-                    TempTasks.GetTask(index).Date)
+                  GetTask(i).Text := DateToString(TempTasks.GetTask(index).Date)
+                else
+                if (TempTasks.GetTask(index).Amount <> 0) then
+                  GetTask(i).Text := FloatToString(TempTasks.GetTask(index).Amount)
                 else
                   GetTask(i).Text := string.Empty;
               end
@@ -1146,6 +1148,9 @@ begin
                 else
                 if (TempTasks.GetTask(index).Date <> 0) then
                   GetTask(i).Comment := DateToString(TempTasks.GetTask(index).Date)
+                else
+                if (TempTasks.GetTask(index).Amount <> 0) then
+                  GetTask(i).Comment := FloatToString(TempTasks.GetTask(index).Amount)
                 else
                   GetTask(i).Comment := string.Empty;
               end
