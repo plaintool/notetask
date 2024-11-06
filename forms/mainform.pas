@@ -344,7 +344,7 @@ type
     procedure ApplySorting;
     procedure GridBackupSelection;
     procedure GridClearSelection;
-    procedure ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
+    procedure ResetRowHeight(aRow: integer = 0; newHeight: integer = 0);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     function GetIsEditing: boolean;
     function IsCanClose: boolean;
@@ -1310,7 +1310,7 @@ begin
   FillGrid;
   if (newRow > -1) then
   begin
-    ResetRowHeight();
+    ResetRowHeight;
     taskGrid.Row := 0;
     taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, 0, taskGrid.Selection.Right, Len);
   end;
@@ -1334,7 +1334,7 @@ begin
   FillGrid;
   if (newRow > -1) then
   begin
-    ResetRowHeight();
+    ResetRowHeight;
     taskGrid.Row := taskGrid.RowCount - Len;
     taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, taskGrid.RowCount - Len, taskGrid.Selection.Right,
       taskGrid.RowCount);
@@ -1359,9 +1359,10 @@ begin
   FillGrid;
   if (newRow > -1) then
   begin
-    ResetRowHeight();
+    ResetRowHeight(-1);
     taskGrid.Row := newRow;
     taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, newRow, taskGrid.Selection.Right, newRow + Len - 1);
+    ResetRowHeight(-1);
   end;
   SetChanged;
 end;
@@ -1383,9 +1384,10 @@ begin
   FillGrid;
   if (newRow > -1) then
   begin
-    ResetRowHeight();
+    ResetRowHeight(-1);
     taskGrid.Row := newRow;
     taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, newRow - Len + 1, taskGrid.Selection.Right, newRow);
+    ResetRowHeight(-1);
   end;
   SetChanged;
 end;
@@ -2273,26 +2275,40 @@ begin
   taskGrid.Col := 2;
 end;
 
-procedure TformNotetask.ResetRowHeight(aRow: integer = 0; aHeight: integer = 0);
+procedure TformNotetask.ResetRowHeight(aRow: integer = 0; newHeight: integer = 0);
 var
   i: integer;
 begin
+  // if -1 only selection
+  if (aRow = -1) then
+  begin
+    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+    begin
+      if newHeight = 0 then
+        taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight
+      else
+        taskGrid.RowHeights[i] := newHeight;
+    end;
+  end
+  else
+  // if 0 for all rows
   if (aRow = 0) then
   begin
     for i := 0 to taskGrid.RowCount - 1 do
     begin
-      if aHeight = 0 then
+      if newHeight = 0 then
         taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight
       else
-        taskGrid.RowHeights[i] := aHeight;
+        taskGrid.RowHeights[i] := newHeight;
     end;
   end
   else
+    // if valid row just that row
   begin
-    if aHeight = 0 then
+    if newHeight = 0 then
       taskGrid.RowHeights[aRow] := taskGrid.DefaultRowHeight
     else
-      taskGrid.RowHeights[aRow] := aHeight;
+      taskGrid.RowHeights[aRow] := newHeight;
   end;
   if (Assigned(Memo)) and ((aRow = 0) or (aRow = taskGrid.Row)) then
     Memo.Height := taskGrid.DefaultRowHeight;
