@@ -1133,25 +1133,28 @@ procedure TformNotetask.aUndoExecute(Sender: TObject);
 var
   TempRect: TRect;
   TempLastRow, TempLastCol: integer;
+  TempTopRow: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
 
   if not IsEditing then
   begin
+    TempTopRow := taskGrid.TopRow;
     TempRect := FLastGridSelection;
     TempLastRow := FLastGridRow;
     TempLastCol := FLastGridCol;
     GridBackupSelection;
 
     Tasks.UndoBackup;
-    FillGrid;
 
+    FillGrid;
+    ResetRowHeight;
     taskGrid.Col := TempLastCol;
     if (TempLastRow > 1) then
       taskGrid.Row := TempLastRow;
     if (TempRect.Width > 0) and (TempRect.Height > 0) then
       taskGrid.Selection := TRect.Create(TempRect.Left, TempRect.Top, TempRect.Right, TempRect.Bottom);
-    ResetRowHeight;
+    taskGrid.TopRow := TempTopRow;
     SetInfo;
   end
   else
@@ -1289,12 +1292,19 @@ begin
 end;
 
 procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
+var
+  Ind: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
-  Tasks.InsertTask('[ ]', taskGrid.Row);
+
+  GridBackupSelection;
+  Ind := Tasks.InsertTask('[ ]', taskGrid.Row);
   FillGrid;
-  taskGrid.Row := taskGrid.Row + 1;
-  ResetRowHeight(0, False);
+  ResetRowHeight;
+  if (Ind > 0) then
+    taskGrid.Row := Tasks.ReverseMap(Ind)
+  else
+    taskGrid.Row := taskGrid.Row + 1;
   SetInfo;
   SetChanged;
 end;
