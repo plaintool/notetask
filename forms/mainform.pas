@@ -2464,6 +2464,12 @@ var
 begin
   SetLength(FLastRowHeights, taskGrid.RowCount);
 
+  if aRow = -1 then
+  begin
+    FromRow := taskGrid.Selection.Top;
+    ToRow := taskGrid.Selection.Bottom;
+  end
+  else
   if aRow = 0 then
   begin
     FromRow := 1;
@@ -2515,7 +2521,7 @@ begin
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
       if newHeight = 0 then
-        taskGrid.RowHeights[i] := LastRowHeight(i)
+        taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight
       else
         taskGrid.RowHeights[i] := newHeight;
     end;
@@ -2527,7 +2533,7 @@ begin
     for i := 1 to taskGrid.RowCount - 1 do
     begin
       if newHeight = 0 then
-        taskGrid.RowHeights[i] := LastRowHeight(i)
+        taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight
       else
         taskGrid.RowHeights[i] := newHeight;
     end;
@@ -2536,12 +2542,14 @@ begin
     // if valid row just that row
   begin
     if newHeight = 0 then
-      taskGrid.RowHeights[aRow] := LastRowHeight(aRow)
+      taskGrid.RowHeights[aRow] := taskGrid.DefaultRowHeight
     else
       taskGrid.RowHeights[aRow] := newHeight;
   end;
   if (Assigned(Memo)) and ((aRow = 0) or (aRow = taskGrid.Row)) then
     Memo.Height := taskGrid.DefaultRowHeight;
+
+  CalcRowHeights(aRow);
 end;
 
 function TformNotetask.LastRowHeight(aRow: integer): integer;
