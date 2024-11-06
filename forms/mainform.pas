@@ -307,6 +307,7 @@ type
     FLastGridRow, FLastGridCol: integer;
     FLastSelectionHeight: integer;
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
+    FLastRowHeights: array of integer;
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
     procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -346,6 +347,7 @@ type
     procedure GridClearSelection;
     procedure ResetRowHeight(aRow: integer = 0; newHeight: integer = 0);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
+    function GetScrollPosition: integer;
     function GetIsEditing: boolean;
     function IsCanClose: boolean;
   public
@@ -360,6 +362,8 @@ type
 
     procedure SetLanguage(aLanguage: string = string.Empty);
     procedure FillGrid;
+    procedure CalcRowHeights(aRow: integer = 0);
+    function LastRowHeight(aRow: integer): integer;
     function SaveFileAs: boolean;
     function SaveFile(fileName: string = string.Empty): boolean;
     function OpenFile(fileName: string): boolean;
@@ -794,6 +798,7 @@ end;
 procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
 begin
   taskGridResize(Sender);
+  CalcRowHeights;
 end;
 
 procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
@@ -953,25 +958,25 @@ begin
 
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
 
-      if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
-      begin
-        // Changing the row height fires the event again!
-        grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2);
-        {$IFDEF Linux}
-        grid.Invalidate;
-        {$ENDIF}
-      end
+      //if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
+      //begin
+      //  // Changing the row height fires the event again!
+      //  grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2);
+      //  {$IFDEF Linux}
+      //  grid.Invalidate;
+      //  {$ENDIF}
+      //end
+      //else
+      //begin
+      drawrect.Right := aRect.Right - 4;
+      if FBiDiRightToLeft then
+        flags := DT_RIGHT
       else
-      begin
-        drawrect.Right := aRect.Right - 4;
-        if FBiDiRightToLeft then
-          flags := DT_RIGHT
-        else
-          flags := DT_LEFT;
-        if FWordWrap then
-          flags := flags or DT_WORDBREAK;
-        DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
-      end;
+        flags := DT_LEFT;
+      if FWordWrap then
+        flags := flags or DT_WORDBREAK;
+      DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
+      //end;
     end;
   end;
 end;
@@ -1284,7 +1289,6 @@ end;
 procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
-
   Tasks.InsertTask('[ ]', taskGrid.Row);
   FillGrid;
   taskGrid.Row := taskGrid.Row + 1;
@@ -1910,9 +1914,8 @@ begin
   Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit and FBackup); // Backup only on begin edit
   FMemoStartEdit := False;
   SetChanged;
-  taskGrid.Repaint;
+  CalcRowHeights(taskGrid.Row);
   EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
-
   if (taskGrid.Col = 4) then
     SetInfo;
 end;
@@ -2275,43 +2278,16 @@ begin
   taskGrid.Col := 2;
 end;
 
-procedure TformNotetask.ResetRowHeight(aRow: integer = 0; newHeight: integer = 0);
+function TformNotetask.GetScrollPosition: integer;
 var
   i: integer;
 begin
-  // if -1 only selection
-  if (aRow = -1) then
+  Result := 0;
+
+  for i := 1 to taskGrid.TopRow do
   begin
-    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-    begin
-      if newHeight = 0 then
-        taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight
-      else
-        taskGrid.RowHeights[i] := newHeight;
-    end;
-  end
-  else
-  // if 0 for all rows
-  if (aRow = 0) then
-  begin
-    for i := 0 to taskGrid.RowCount - 1 do
-    begin
-      if newHeight = 0 then
-        taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight
-      else
-        taskGrid.RowHeights[i] := newHeight;
-    end;
-  end
-  else
-    // if valid row just that row
-  begin
-    if newHeight = 0 then
-      taskGrid.RowHeights[aRow] := taskGrid.DefaultRowHeight
-    else
-      taskGrid.RowHeights[aRow] := newHeight;
+    Result += taskGrid.RowHeights[i] + taskGrid.GridLineWidth;
   end;
-  if (Assigned(Memo)) and ((aRow = 0) or (aRow = taskGrid.Row)) then
-    Memo.Height := taskGrid.DefaultRowHeight;
 end;
 
 procedure TformNotetask.SwapRowHeights(RowIndex1, RowIndex2: integer);
@@ -2475,6 +2451,105 @@ end;
 procedure TformNotetask.FillGrid;
 begin
   Tasks.FillGrid(taskGrid, FShowArchived, FShowDuration, SortOrder, SortColumn);
+  CalcRowHeights;
+end;
+
+procedure TformNotetask.CalcRowHeights(aRow: integer = 0);
+var
+  i, j: integer;
+  drawrect: TRect;
+  flags: cardinal;
+  FromRow, ToRow: integer;
+  s: string;
+begin
+  SetLength(FLastRowHeights, taskGrid.RowCount);
+
+  if aRow = 0 then
+  begin
+    FromRow := 1;
+    ToRow := taskGrid.RowCount - 1;
+  end
+  else
+  begin
+    FromRow := aRow;
+    ToRow := aRow;
+  end;
+
+  for j := 2 to 3 do
+  begin
+    for i := FromRow to ToRow do
+    begin
+      drawrect := taskGrid.CellRect(j, i);
+      drawrect.Inflate(-4, 0);
+
+      s := taskGrid.Cells[j, i];
+
+      flags := DT_CALCRECT;
+      if FBiDiRightToLeft then
+        flags := flags + DT_RIGHT
+      else
+        flags := flags + DT_LEFT;
+      if FWordWrap then
+        flags := flags or DT_WORDBREAK;
+
+      DrawText(taskGrid.canvas.handle, PChar(S), Length(S), drawrect, flags);
+
+      if (drawrect.bottom - drawrect.top) > taskGrid.RowHeights[i] then
+      begin
+        FLastRowHeights[i] := (drawrect.bottom - drawrect.top + 2);
+        taskGrid.RowHeights[i] := FLastRowHeights[i];
+      end
+      else
+        FLastRowHeights[i] := taskGrid.RowHeights[i];
+    end;
+  end;
+end;
+
+procedure TformNotetask.ResetRowHeight(aRow: integer = 0; newHeight: integer = 0);
+var
+  i: integer;
+begin
+  // if -1 only selection
+  if (aRow = -1) then
+  begin
+    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+    begin
+      if newHeight = 0 then
+        taskGrid.RowHeights[i] := LastRowHeight(i)
+      else
+        taskGrid.RowHeights[i] := newHeight;
+    end;
+  end
+  else
+  // if 0 for all rows
+  if (aRow = 0) then
+  begin
+    for i := 1 to taskGrid.RowCount - 1 do
+    begin
+      if newHeight = 0 then
+        taskGrid.RowHeights[i] := LastRowHeight(i)
+      else
+        taskGrid.RowHeights[i] := newHeight;
+    end;
+  end
+  else
+    // if valid row just that row
+  begin
+    if newHeight = 0 then
+      taskGrid.RowHeights[aRow] := LastRowHeight(aRow)
+    else
+      taskGrid.RowHeights[aRow] := newHeight;
+  end;
+  if (Assigned(Memo)) and ((aRow = 0) or (aRow = taskGrid.Row)) then
+    Memo.Height := taskGrid.DefaultRowHeight;
+end;
+
+function TformNotetask.LastRowHeight(aRow: integer): integer;
+begin
+  if (Length(FLastRowHeights) > aRow) then
+    Result := FLastRowHeights[aRow]
+  else
+    Result := taskGrid.DefaultRowHeight;
 end;
 
 procedure TformNotetask.SetInfo;
