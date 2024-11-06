@@ -345,7 +345,7 @@ type
     procedure ApplySorting;
     procedure GridBackupSelection;
     procedure GridClearSelection;
-    procedure ResetRowHeight(aRow: integer = 0; newHeight: integer = 0);
+    procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
@@ -1294,7 +1294,7 @@ begin
   Tasks.InsertTask('[ ]', taskGrid.Row);
   FillGrid;
   taskGrid.Row := taskGrid.Row + 1;
-  ResetRowHeight;
+  ResetRowHeight(0, False);
   SetInfo;
   SetChanged;
 end;
@@ -2513,7 +2513,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.ResetRowHeight(aRow: integer = 0; newHeight: integer = 0);
+procedure TformNotetask.ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
 var
   i: integer;
 begin
@@ -2521,37 +2521,23 @@ begin
   if (aRow = -1) then
   begin
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-    begin
-      if newHeight = 0 then
-        taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight
-      else
-        taskGrid.RowHeights[i] := newHeight;
-    end;
+      taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight;
   end
   else
   // if 0 for all rows
   if (aRow = 0) then
   begin
     for i := 1 to taskGrid.RowCount - 1 do
-    begin
-      if newHeight = 0 then
-        taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight
-      else
-        taskGrid.RowHeights[i] := newHeight;
-    end;
+      taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight;
   end
-  else
-    // if valid row just that row
-  begin
-    if newHeight = 0 then
-      taskGrid.RowHeights[aRow] := taskGrid.DefaultRowHeight
-    else
-      taskGrid.RowHeights[aRow] := newHeight;
-  end;
+  else // if valid row just that row
+    taskGrid.RowHeights[aRow] := taskGrid.DefaultRowHeight;
+
   if (Assigned(Memo)) and ((aRow = 0) or (aRow = taskGrid.Row)) then
     Memo.Height := taskGrid.DefaultRowHeight;
 
-  CalcRowHeights(aRow);
+  if (aCalcRowHeight) then
+    CalcRowHeights(aRow);
 end;
 
 function TformNotetask.LastRowHeight(aRow: integer): integer;
