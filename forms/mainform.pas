@@ -653,11 +653,13 @@ begin
   if (Key = VK_ESCAPE) then // Escape
   begin
     if IsEditing then
-      EditComplite;
+      EditComplite
+    else
+      taskGrid.ClearSelections;
     Key := 0;
   end
   else
-  if ((Shift = [ssCtrl]) or (not FWordWrap) or (taskGrid.Col = 4)) and (Key = VK_RETURN) then // Ctrl + Enter
+  if (Shift = [ssCtrl]) and (Key = VK_RETURN) then // Ctrl + Enter
   begin
     if IsEditing then
     begin
@@ -1007,7 +1009,7 @@ begin
     Memo.TabStop := False;
     Memo.WantTabs := True;
     Memo.WordWrap := (FWordWrap) and (aCol <> 4);
-    Memo.WantReturns := (FWordWrap) and (aCol <> 4);
+    Memo.WantReturns := aCol in [2, 3];
     if (FBiDiRightToLeft) then
     begin
       Memo.BiDiMode := bdRightToLeft;
