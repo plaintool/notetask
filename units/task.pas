@@ -1046,8 +1046,7 @@ var
   Rect: TGridRect;
   Index, i, j: integer;
   RowTask: TTask;
-  IsEmpty, DoInsert: boolean;
-  //  Id, Id0, Id1: integer;
+  IsRowEmpty, DoInsert: boolean;
 begin
   Result := Grid.Selection;
   DoInsert := True;
@@ -1057,41 +1056,40 @@ begin
   if (Grid.Row > 0) then
   begin
     RowTask := GetTask(Grid.Row);
-    IsEmpty := (RowTask.Text = string.Empty) and (RowTask.Note = string.Empty) and (RowTask.Date = 0);
+    IsRowEmpty := (RowTask.Text = string.Empty) and (RowTask.Note = string.Empty) and (RowTask.Date = 0);
   end
   else
-    IsEmpty := False;
+    IsRowEmpty := False;
 
   TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText, True));
   try
-    if ((Grid.Selection.Height = 0) and (TempTasks.Count > 1) and (not IsEmpty)) or (Grid.Row = 0) then
+    // If the row is not empty and only it is selected, and the number of tasks to insert is more than one,
+    // or if the grid is empty, we insert as new tasks
+    if ((not IsRowEmpty) and (TempTasks.Count > 1) and (Grid.Selection.Height = 0)) or (Grid.Row = 0) then
     begin
       if (Grid.Row = 0) then
         index := 1
       else
         index := Grid.Row;
       for i := TempTasks.FCount - 1 downto 0 do
-      begin
         InsertTask(TempTasks.GetTask(i + 1).ToString(), index, False);
-        // if i = 0 then Id0 := Id;
-        // if i = TempTasks.FCount - 1 then Id1 := Id;
-      end;
-      // Result := TGridRect.Create(1, ReverseMap(id0), 4, ReverseMap(id1));
     end
     else
     begin
       index := 1;
 
-      if (Grid.Selection.Height = 0) and (Grid.Selection.Width = 0) and (IsEmpty) then
+      // If the line is empty and one line is selected, then we start with it
+      if (IsRowEmpty) and (Grid.Selection.Height = 0) then
       begin
         GetTask(Grid.Row).Copy(TempTasks.GetTask(index));
         Inc(index);
       end
       else
       begin
-        Rect := Grid.Selection; // Get grid selection rect
-        if ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) and
-          (not ((Grid.Selection.Left = 2) and (Grid.Selection.Right = 2))) then
+        Rect := Grid.Selection;
+
+        // If the selection has height, then do not insert records below
+        if (Grid.Selection.Height > 0) then
         begin
           DoInsert := False;
         end;
