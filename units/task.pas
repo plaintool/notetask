@@ -1064,7 +1064,7 @@ begin
 
   TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText, True));
   try
-    if ((Grid.Selection.Height = 0) and (Grid.Selection.Width = 5) and (not IsEmpty)) or (Grid.Row = 0) then
+    if ((Grid.Selection.Height = 0) and (TempTasks.Count > 1) and (not IsEmpty)) or (Grid.Row = 0) then
     begin
       if (Grid.Row = 0) then
         index := 1
