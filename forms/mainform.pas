@@ -322,6 +322,7 @@ type
     procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure MemoKeyPress(Sender: TObject; var Key: char);
     procedure DatePickerChange(Sender: TObject);
+    procedure DatePickerEnter(Sender: TObject);
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
@@ -815,6 +816,8 @@ procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; 
 begin
   taskGridResize(Sender);
   CalcRowHeights;
+  EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
+  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
 end;
 
 procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
@@ -1067,6 +1070,9 @@ begin
     DatePicker := TDateTimePicker.Create(Self);
     DatePicker.Visible := False;
     DatePicker.AutoSize := False;
+    DatePicker.BorderStyle := bsNone;
+    DatePicker.ParentFont := True;
+    DatePicker.ArrowShape := asClassicSmaller;
     DatePicker.Kind := dtkDateTime;
     DatePicker.TimeDisplay := tdHMS;
     DatePicker.Options := [dtpoFlatButton];
@@ -1086,6 +1092,7 @@ begin
     end;
 
     DatePicker.OnChange := @DatePickerChange; // Event Change
+    DatePicker.OnEnter := @DatePickerEnter; // Event Enter
 
     Editor := DatePicker;
     if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
@@ -2081,14 +2088,29 @@ begin
   SetInfo;
 end;
 
+procedure TformNotetask.DatePickerEnter(Sender: TObject);
+begin
+  if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+  begin
+    DatePicker.Color := clHighlight;
+    DatePicker.Font.Color := clWhite;
+  end
+  else
+  begin
+    DatePicker.Color := clRowFocused;
+    DatePicker.Font.Color := clBlack;
+  end;
+end;
+
 procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer;
   OffsetTop: integer; OffsetRight: integer; OffsetBottom: integer);
 var
   Rect: TRect;
 begin
   Rect := taskGrid.CellRect(aCol, aRow);
-  Sender.SetBounds(Rect.Left + OffsetLeft, Rect.Top + OffsetTop, Rect.Right - Rect.Left + OffsetRight,
-    Rect.Bottom - Rect.Top + OffsetBottom);
+  if Assigned(Sender) then
+    Sender.SetBounds(Rect.Left + OffsetLeft, Rect.Top + OffsetTop, Rect.Right - Rect.Left + OffsetRight,
+      Rect.Bottom - Rect.Top + OffsetBottom);
 end;
 
 procedure TformNotetask.ClearSelected(ShowConfirm: boolean = True);
