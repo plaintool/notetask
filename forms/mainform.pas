@@ -1699,33 +1699,41 @@ procedure TformNotetask.ExecuteTerminal;
 var
   Process: TProcess;
   i: integer;
-  Commands: string;
-  Executable: string;
+  Executable, TempFile: string;
 begin
-  // Create a new process
-  Process := TProcess.Create(nil);
+  // Create a temporary file for commands
+  {$IFDEF Windows}
+  TempFile := GetTempDir +'notetask.bat';  // Path for Windows
+  {$ELSE}
+  TempFile := GetTempDir + 'notetask.sh';  // Path for Linux
+  {$ENDIF}
 
+  // Write all commands to the file
+  AssignFile(Output, TempFile);
+  Rewrite(Output);
   try
-    // Determine which command interpreter to use
-    {$IFDEF Windows}
-    Executable := 'cmd.exe';
-    Commands := '/K'; // Use /K to keep the terminal open
-    {$ELSE}
-    Executable := '/bin/bash';
-    Commands := '-c'; // Use -c to execute the commands in one shell session
-    {$ENDIF}
-
-    // Accumulate all commands
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
-      Commands += Tasks.GetTask(i).Text; // Use '&' to chain commands
-      if (i < taskGrid.Selection.Bottom) then Commands += ' & ';
+      WriteLn(Output, Tasks.GetTask(i).Text);  // Write each command to the file
     end;
+  finally
+    CloseFile(Output);
+  end;
 
-    // Configure the process options
+  // Create a new process
+  Process := TProcess.Create(nil);
+  try
+    {$IFDEF Windows}
+    Executable := 'cmd.exe';  // For Windows
+    Process.Parameters.Add('/K');
+    Process.Parameters.Add(TempFile);  // Run the .bat file
+    {$ELSE}
+    Executable := '/bin/bash';  // For Linux
+    Process.Parameters.Add(TempFile);  // Run the .sh file
+    {$ENDIF}
+
     Process.Executable := Executable;
-    Process.Parameters.Add(Commands);
-    Process.Options := [poNewConsole]; // Open in a new console window
+    Process.Options := [poWaitOnExit, poNewConsole]; // Wait for the process to finish and open a new console
 
     // Start the process
     Process.Execute;
