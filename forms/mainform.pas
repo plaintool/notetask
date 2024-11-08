@@ -1733,7 +1733,7 @@ begin
     {$ENDIF}
 
     Process.Executable := Executable;
-    Process.Options := [poWaitOnExit, poNewConsole]; // Wait for the process to finish and open a new console
+    Process.Options := [poNewConsole]; // Wait for the process to finish and open a new console
 
     // Start the process
     Process.Execute;
