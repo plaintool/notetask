@@ -667,6 +667,7 @@ object formNotetask: TformNotetask
       Category = 'Task'
       Caption = 'Merge tasks'
       OnExecute = aMergeTasksExecute
+      ShortCut = 16461
     end
     object aDeleteTasks: TAction
       Category = 'Task'
@@ -726,6 +727,7 @@ object formNotetask: TformNotetask
       Category = 'Task'
       Caption = 'Run in terminal...'
       OnExecute = aRunTerminalExecute
+      ShortCut = 16466
     end
   end
   object openDialog: TOpenDialog
