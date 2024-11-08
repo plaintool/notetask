@@ -450,6 +450,10 @@ msgstr "طباعة..."
 msgid "Replace..."
 msgstr "استبدال..."
 
+#: tformnotetask.arunterminal.caption
+msgid "Run in terminal..."
+msgstr ""
+
 #: tformnotetask.asave.caption
 msgid "Save"
 msgstr "حفظ"
@@ -627,3 +631,4 @@ msgstr "ابحث عن ماذا:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "استبدال بـ:"
+

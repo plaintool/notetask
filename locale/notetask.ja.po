@@ -450,6 +450,10 @@ msgstr "印刷..."
 msgid "Replace..."
 msgstr "置換..."
 
+#: tformnotetask.arunterminal.caption
+msgid "Run in terminal..."
+msgstr ""
+
 #: tformnotetask.asave.caption
 msgid "Save"
 msgstr "保存"
@@ -627,3 +631,4 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
+

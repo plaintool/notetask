@@ -450,6 +450,10 @@ msgstr "प्रिंट करें..."
 msgid "Replace..."
 msgstr "बदलें..."
 
+#: tformnotetask.arunterminal.caption
+msgid "Run in terminal..."
+msgstr ""
+
 #: tformnotetask.asave.caption
 msgid "Save"
 msgstr "सहेजें"
@@ -627,3 +631,4 @@ msgstr "क्या खोजें:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "इसके साथ बदलें:"
+

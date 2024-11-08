@@ -15,6 +15,7 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
+  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -246,6 +247,9 @@ object formNotetask: TformNotetask
       end
       object menuChatGpt: TMenuItem
         Action = aChatGpt
+      end
+      object menuRunTerminal: TMenuItem
+        Action = aRunTerminal
       end
     end
     object menuFormat: TMenuItem
@@ -710,6 +714,11 @@ object formNotetask: TformNotetask
       Caption = 'Column fovorite'
       Checked = True
       OnExecute = aShowColumnFavoriteExecute
+    end
+    object aRunTerminal: TAction
+      Category = 'Task'
+      Caption = 'Run in terminal...'
+      OnExecute = aRunTerminalExecute
     end
   end
   object openDialog: TOpenDialog

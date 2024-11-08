@@ -450,6 +450,10 @@ msgstr "인쇄..."
 msgid "Replace..."
 msgstr "바꾸기..."
 
+#: tformnotetask.arunterminal.caption
+msgid "Run in terminal..."
+msgstr ""
+
 #: tformnotetask.asave.caption
 msgid "Save"
 msgstr "저장"
@@ -627,3 +631,4 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
+

@@ -13,7 +13,8 @@ interface
 
 uses
   Classes,
-  SysUtils;
+  SysUtils,
+  Process;
 
 function TextToStringList(const Content: string; TrimEnd: boolean = False): TStringList;
 
@@ -36,6 +37,8 @@ function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 4): string;
 function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;
 
 function EncodeUrl(const url: string): string;
+
+function GetConsoleEncoding: string;
 
 const
   Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
@@ -224,6 +227,43 @@ begin
   end;
 
   Result := sBuff;
+end;
+
+function GetConsoleEncoding: string;
+var
+  Output: TStringList;
+  Process: TProcess;
+  Encoding: string;
+begin
+  Result := 'utf-8'; // Default to UTF-8
+  Process := TProcess.Create(nil);
+  Output := TStringList.Create;
+  try
+    Process.Executable := 'cmd.exe';
+    Process.Parameters.Add('/C chcp'); // Execute the chcp command
+    Process.Options := [poUsePipes, poNoConsole];
+    Process.Execute;
+
+    Output.LoadFromStream(Process.Output);
+    // Check the output of chcp command
+    if Output.Count > 0 then
+    begin
+      if Pos('866', Output[0]) > 0 then
+        Encoding := 'CP866'
+      else if Pos('850', Output[0]) > 0 then
+        Encoding := 'CP850'
+      else if Pos('437', Output[0]) > 0 then
+        Encoding := 'CP437'
+      else if Pos('1252', Output[0]) > 0 then
+        Encoding := 'CP1252';
+    end;
+
+    if Encoding <> '' then
+      Result := Encoding;
+  finally
+    Output.Free;
+    Process.Free;
+  end;
 end;
 
 end.

@@ -450,6 +450,10 @@ msgstr "Печать..."
 msgid "Replace..."
 msgstr "Заменить..."
 
+#: tformnotetask.arunterminal.caption
+msgid "Run in terminal..."
+msgstr ""
+
 #: tformnotetask.asave.caption
 msgid "Save"
 msgstr "Сохранить"
@@ -627,3 +631,4 @@ msgstr "Что:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Чем:"
+

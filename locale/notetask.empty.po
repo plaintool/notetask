@@ -450,6 +450,10 @@ msgstr ""
 msgid "Replace..."
 msgstr ""
 
+#: tformnotetask.arunterminal.caption
+msgid "Run in terminal..."
+msgstr ""
+
 #: tformnotetask.asave.caption
 msgid "Save"
 msgstr ""
