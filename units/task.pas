@@ -25,11 +25,11 @@ type
   TTask = class
   private
     FDone: boolean; // Status of task completion
-    FArchive: boolean; // Archive task
-    FDate: TDateTime; // Date of task completion
-    FNote: string; // Note for the task
     FText: string; // Description of the task
-    FAmount: double; // Amount
+    FNote: string; // Note for the task
+    FAmount: double; // Amount for the task
+    FDate: TDateTime; // Date of task completion
+    FArchive: boolean; // Archive task
     FStar: boolean; // Starred
     FNoteItalic: boolean; // Note is italic
     FEmptyNote: boolean; // Has empty note symbols

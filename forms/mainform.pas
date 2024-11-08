@@ -201,6 +201,9 @@ type
     aRunTerminal: TAction;
     menuRunTerminal: TMenuItem;
     contextRunTerminal: TMenuItem;
+    aMergeTasks: TAction;
+    MenuItem1: TMenuItem;
+    contextMergeTasks: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -285,6 +288,7 @@ type
     procedure aIndentTasksExecute(Sender: TObject);
     procedure aOutdentTasksExecute(Sender: TObject);
     procedure aRunTerminalExecute(Sender: TObject);
+    procedure aMergeTasksExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -328,6 +332,7 @@ type
     procedure SetInfo;
     procedure SetCaption;
     procedure ClearSelected(ShowConfirm: boolean = True);
+    procedure MergeTasks;
     procedure DeleteTask(aRow: integer = 0; ShowConfirm: boolean = True);
     procedure DeleteTasks(ShowConfirm: boolean = True);
     procedure ArchiveTask(aRow: integer = 0);
@@ -415,6 +420,7 @@ resourcestring
   rfilenotfound = 'The requested file was not found on the disk.';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rdeletesconfirm = 'Are you sure you want to delete selected tasks?';
+  rmergesconfirm = 'Are you sure you want to merge selected tasks?';
   rarchiveconfirm = 'Are you sure you want to archive / unarchive this task?';
   rarchivesconfirm = 'Are you sure you want to archive / unarchive selected tasks?';
   rsavechanges = 'Do you want to save the changes?';
@@ -720,6 +726,8 @@ begin
       taskGrid.Row := index;
       taskGrid.Selection := TGridRect.Create(1, index, 6, index);
     end;
+    // Trigger event
+    taskGrid.OnSelection(taskGrid, taskGrid.Col, taskGrid.Row);
   end;
 end;
 
@@ -1132,6 +1140,13 @@ procedure TformNotetask.taskGridSelection(Sender: TObject; aCol, aRow: integer);
 begin
   if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
     SetInfo;
+
+  // Disable merge if no multiselect
+  if (taskGrid.Selection.Height > 0) then
+    aMergeTasks.Enabled := True
+  else
+    aMergeTasks.Enabled := False;
+
   FLastSelectionHeight := taskGrid.Selection.Height;
 end;
 
@@ -1315,6 +1330,22 @@ begin
   SetChanged;
 end;
 
+procedure TformNotetask.aMergeTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
+
+  MergeTasks;
+end;
+
+procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
+
+  DeleteTasks;
+end;
+
 procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
 var
   newRow, len: integer;
@@ -1426,14 +1457,6 @@ begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
   IndentTasks(True);
-end;
-
-procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  DeleteTasks;
 end;
 
 procedure TformNotetask.aArchiveTasksExecute(Sender: TObject);
@@ -1695,58 +1718,6 @@ begin
   ExecuteTerminal;
 end;
 
-procedure TformNotetask.ExecuteTerminal;
-var
-  Process: TProcess;
-  i: integer;
-  Executable, TempFile, EncodedText, ConsoleEncoding: string;
-begin
-  // Определяем временный файл для команд
-  {$IFDEF Windows}
-  TempFile := GetTempDir +'notetask.bat';  // Путь для Windows
-  {$ELSE}
-  TempFile := GetTempDir + 'notetask.sh';  // Путь для Linux
-  {$ENDIF}
-
-  // Открываем файл на запись
-  AssignFile(Output, TempFile);
-  Rewrite(Output);
-  try
-    // Получаем текущую кодировку консоли
-    ConsoleEncoding := GetConsoleEncoding;
-
-    // Записываем команды в файл с нужной кодировкой
-    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-    begin
-      EncodedText := ConvertEncoding(Tasks.GetTask(i).Text, 'utf-8', ConsoleEncoding);
-      WriteLn(Output, EncodedText);
-    end;
-  finally
-    CloseFile(Output);
-  end;
-
-  // Создаем новый процесс
-  Process := TProcess.Create(nil);
-  try
-    {$IFDEF Windows}
-    Executable := 'cmd.exe';  // Для Windows
-    Process.Parameters.Add('/K');
-    Process.Parameters.Add(TempFile);  // Запуск .bat файла
-    {$ELSE}
-    Executable := '/bin/bash';  // Для Linux
-    Process.Parameters.Add(TempFile);  // Запуск .sh файла
-    {$ENDIF}
-
-    Process.Executable := Executable;
-    Process.Options := [poNewConsole]; // Открываем новую консоль
-
-    // Запуск процесса
-    Process.Execute;
-  finally
-    Process.Free;
-  end;
-end;
-
 procedure TformNotetask.aGoToExecute(Sender: TObject);
 var
   rowNum: integer;
@@ -1950,6 +1921,58 @@ begin
   end;
 end;
 
+procedure TformNotetask.ExecuteTerminal;
+var
+  Process: TProcess;
+  i: integer;
+  Executable, TempFile, EncodedText, ConsoleEncoding: string;
+begin
+  // Определяем временный файл для команд
+  {$IFDEF Windows}
+  TempFile := GetTempDir +'notetask.bat';  // Путь для Windows
+  {$ELSE}
+  TempFile := GetTempDir + 'notetask.sh';  // Путь для Linux
+  {$ENDIF}
+
+  // Открываем файл на запись
+  AssignFile(Output, TempFile);
+  Rewrite(Output);
+  try
+    // Получаем текущую кодировку консоли
+    ConsoleEncoding := GetConsoleEncoding;
+
+    // Записываем команды в файл с нужной кодировкой
+    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+    begin
+      EncodedText := ConvertEncoding(Tasks.GetTask(i).Text, 'utf-8', ConsoleEncoding);
+      WriteLn(Output, EncodedText);
+    end;
+  finally
+    CloseFile(Output);
+  end;
+
+  // Создаем новый процесс
+  Process := TProcess.Create(nil);
+  try
+    {$IFDEF Windows}
+    Executable := 'cmd.exe';  // Для Windows
+    Process.Parameters.Add('/K');
+    Process.Parameters.Add(TempFile);  // Запуск .bat файла
+    {$ELSE}
+    Executable := '/bin/bash';  // Для Linux
+    Process.Parameters.Add(TempFile);  // Запуск .sh файла
+    {$ENDIF}
+
+    Process.Executable := Executable;
+    Process.Options := [poNewConsole]; // Открываем новую консоль
+
+    // Запуск процесса
+    Process.Execute;
+  finally
+    Process.Free;
+  end;
+end;
+
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
 var
   MyTextStyle: TTextStyle;
@@ -2065,6 +2088,63 @@ begin
   end;
 end;
 
+procedure TformNotetask.MergeTasks;
+var
+  i, Confirm: integer;
+  Task, Target: TTask;
+  Sel: TRect;
+  MaxDate: TDateTime;
+begin
+  // If multiple rows are selected
+  if (taskGrid.Selection.Height > 0) then
+  begin
+    Confirm := MessageDlg(rmergesconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+    if (Confirm = mrYes) then
+    begin
+      if (FBackup) then
+      begin
+        GridBackupSelection;
+        Tasks.CreateBackup;
+      end;
+
+      Task := Tasks.GetTask(taskGrid.Selection.Top);
+      MaxDate := Task.Date;
+      for i := taskGrid.Selection.Top + 1 to taskGrid.Selection.Bottom do
+      begin
+        Target := Tasks.GetTask(i);
+        Task.Text := task.Text + FLineEnding.Value + Target.Text;
+        Task.Note := task.Note + FLineEnding.Value + Target.Note;
+        Task.Amount := Task.Amount + Target.Amount;
+
+        if (Target.Date > MaxDate) then
+        begin
+          MaxDate := Target.Date;
+          Task.Date := MaxDate;
+        end;
+        if Target.Done = False then
+          Task.Done := False;
+        if Target.Archive = False then
+          Task.Archive := False;
+        if Target.Star = True then
+          Task.Star := True;
+      end;
+      for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top + 1 do
+        Tasks.DeleteTask(i);
+
+      // Mem selection
+      Sel := taskGrid.Selection;
+
+      FillGrid;
+      SetChanged; // Mark that data has changed
+
+      // Restore selection
+      taskGrid.Row := Sel.Top;
+      taskGrid.Selection := TGridRect.Create(Sel.Left, Sel.Top, Sel.Right, Sel.Top);
+    end;
+  end;
+end;
+
 procedure TformNotetask.DeleteTask(aRow: integer = 0; ShowConfirm: boolean = True);
 var
   RowIndex: integer;
@@ -2093,7 +2173,8 @@ begin
 
       // RemoveTask from collection
       taskGrid.DeleteRow(RowIndex);
-      SetChanged;
+
+      SetChanged; // Mark that data has changed
     end;
   end;
 end;
@@ -2103,7 +2184,7 @@ var
   i, RowIndex, Confirm: integer;
 begin
   // If multiple rows are selected
-  if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+  if (taskGrid.Selection.Height > 0) then
   begin
     Confirm := mrYes;
 

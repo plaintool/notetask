@@ -58,6 +58,10 @@ msgstr "هل أنت متأكد أنك تريد حذف المهام المحدد�
 msgid "The requested file was not found on the disk."
 msgstr "لم يتم العثور على الملف المطلوب على القرص."
 
+#: mainform.rmergesconfirm
+msgid "Are you sure you want to merge selected tasks?"
+msgstr "هل أنت متأكد أنك تريد دمج المهام المحددة؟"
+
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
 msgstr "رقم السطر خارج النطاق المسموح به."
@@ -402,6 +406,10 @@ msgstr "Spanish"
 msgid "Ukrainian"
 msgstr "Ukrainian"
 
+#: tformnotetask.amergetasks.caption
+msgid "Merge tasks"
+msgstr "دمج المهام"
+
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
 msgstr "نقل المهام إلى الأسفل"
@@ -452,7 +460,7 @@ msgstr "استبدال..."
 
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
-msgstr ""
+msgstr "تشغيل في الطرفية..."
 
 #: tformnotetask.asave.caption
 msgid "Save"
@@ -631,4 +639,3 @@ msgstr "ابحث عن ماذا:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "استبدال بـ:"
-

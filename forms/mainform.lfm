@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -211,6 +210,9 @@ object formNotetask: TformNotetask
       Caption = 'Task'
       object menuInsertTask: TMenuItem
         Action = aInsertTask
+      end
+      object MenuItem1: TMenuItem
+        Action = aMergeTasks
       end
       object menuDeleteTasks: TMenuItem
         Action = aDeleteTasks
@@ -435,42 +437,6 @@ object formNotetask: TformNotetask
       OnExecute = aInsertTaskExecute
       ShortCut = 45
     end
-    object aDeleteTasks: TAction
-      Category = 'Task'
-      Caption = 'Delete tasks'
-      OnExecute = aDeleteTasksExecute
-      ShortCut = 16430
-    end
-    object aArchiveTasks: TAction
-      Category = 'Task'
-      Caption = 'Archive tasks ↔'
-      OnExecute = aArchiveTasksExecute
-      ShortCut = 24641
-    end
-    object aMoveTaskTop: TAction
-      Category = 'Task'
-      Caption = 'Move tasks to top'
-      OnExecute = aMoveTaskTopExecute
-      ShortCut = 16417
-    end
-    object aMoveTaskUp: TAction
-      Category = 'Task'
-      Caption = 'Move tasks up'
-      OnExecute = aMoveTaskUpExecute
-      ShortCut = 16422
-    end
-    object aMoveTaskDown: TAction
-      Category = 'Task'
-      Caption = 'Move tasks down'
-      OnExecute = aMoveTaskDownExecute
-      ShortCut = 16424
-    end
-    object aMoveTaskBottom: TAction
-      Category = 'Task'
-      Caption = 'Move tasks to bottom'
-      OnExecute = aMoveTaskBottomExecute
-      ShortCut = 16418
-    end
     object aShowStatusBar: TAction
       Category = 'View'
       AutoCheck = True
@@ -663,24 +629,6 @@ object formNotetask: TformNotetask
       Checked = True
       OnExecute = aShowColumnDoneExecute
     end
-    object aIndentTasks: TAction
-      Category = 'Task'
-      Caption = 'Indent tasks'
-      OnExecute = aIndentTasksExecute
-      ShortCut = 16393
-    end
-    object aOutdentTasks: TAction
-      Category = 'Task'
-      Caption = 'Outdent tasks'
-      OnExecute = aOutdentTasksExecute
-      ShortCut = 24585
-    end
-    object aChatGpt: TAction
-      Category = 'Task'
-      Caption = 'Ask ChatGPT...'
-      OnExecute = aChatGptExecute
-      ShortCut = 16465
-    end
     object aShowColumnTask: TAction
       Category = 'View'
       AutoCheck = True
@@ -714,6 +662,65 @@ object formNotetask: TformNotetask
       Caption = 'Column fovorite'
       Checked = True
       OnExecute = aShowColumnFavoriteExecute
+    end
+    object aMergeTasks: TAction
+      Category = 'Task'
+      Caption = 'Merge tasks'
+      OnExecute = aMergeTasksExecute
+    end
+    object aDeleteTasks: TAction
+      Category = 'Task'
+      Caption = 'Delete tasks'
+      OnExecute = aDeleteTasksExecute
+      ShortCut = 16430
+    end
+    object aArchiveTasks: TAction
+      Category = 'Task'
+      Caption = 'Archive tasks ↔'
+      OnExecute = aArchiveTasksExecute
+      ShortCut = 24641
+    end
+    object aMoveTaskTop: TAction
+      Category = 'Task'
+      Caption = 'Move tasks to top'
+      OnExecute = aMoveTaskTopExecute
+      ShortCut = 16417
+    end
+    object aMoveTaskUp: TAction
+      Category = 'Task'
+      Caption = 'Move tasks up'
+      OnExecute = aMoveTaskUpExecute
+      ShortCut = 16422
+    end
+    object aMoveTaskDown: TAction
+      Category = 'Task'
+      Caption = 'Move tasks down'
+      OnExecute = aMoveTaskDownExecute
+      ShortCut = 16424
+    end
+    object aMoveTaskBottom: TAction
+      Category = 'Task'
+      Caption = 'Move tasks to bottom'
+      OnExecute = aMoveTaskBottomExecute
+      ShortCut = 16418
+    end
+    object aIndentTasks: TAction
+      Category = 'Task'
+      Caption = 'Indent tasks'
+      OnExecute = aIndentTasksExecute
+      ShortCut = 16393
+    end
+    object aOutdentTasks: TAction
+      Category = 'Task'
+      Caption = 'Outdent tasks'
+      OnExecute = aOutdentTasksExecute
+      ShortCut = 24585
+    end
+    object aChatGpt: TAction
+      Category = 'Task'
+      Caption = 'Ask ChatGPT...'
+      OnExecute = aChatGptExecute
+      ShortCut = 16465
     end
     object aRunTerminal: TAction
       Category = 'Task'
@@ -784,6 +791,9 @@ object formNotetask: TformNotetask
     end
     object Separator12: TMenuItem
       Caption = '-'
+    end
+    object contextMergeTasks: TMenuItem
+      Action = aMergeTasks
     end
     object contextDeleteTasks: TMenuItem
       Action = aDeleteTasks

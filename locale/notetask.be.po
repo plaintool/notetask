@@ -58,6 +58,10 @@ msgstr "Вы ўпэўненыя, што хочаце выдаліць выбра
 msgid "The requested file was not found on the disk."
 msgstr "Запытаны файл не знойдзены на дыску."
 
+#: mainform.rmergesconfirm
+msgid "Are you sure you want to merge selected tasks?"
+msgstr "Ці ўпэўнены вы, што хочаце аб'яднаць выбраныя задачы?"
+
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
 msgstr "Нумар радка выходзіць за дапушчальныя межы."
@@ -402,6 +406,10 @@ msgstr "Spanish"
 msgid "Ukrainian"
 msgstr "Ukrainian"
 
+#: tformnotetask.amergetasks.caption
+msgid "Merge tasks"
+msgstr "Аб'яднаць задачы"
+
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
 msgstr "Перанесці задачы ў канец"
@@ -452,7 +460,7 @@ msgstr "Замяніць..."
 
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
-msgstr ""
+msgstr "Выканаць у тэрмінале..."
 
 #: tformnotetask.asave.caption
 msgid "Save"
@@ -631,4 +639,3 @@ msgstr "Знайсці што:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Замяніць на:"
-

@@ -58,6 +58,10 @@ msgstr "Êtes-vous sûr de vouloir supprimer les tâches sélectionnées ?"
 msgid "The requested file was not found on the disk."
 msgstr "Le fichier demandé n'a pas été trouvé sur le disque."
 
+#: mainform.rmergesconfirm
+msgid "Are you sure you want to merge selected tasks?"
+msgstr "Êtes-vous sûr de vouloir fusionner les tâches sélectionnées ?"
+
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
 msgstr "Le numéro de ligne est en dehors de la plage autorisée."
@@ -402,6 +406,10 @@ msgstr "Spanish"
 msgid "Ukrainian"
 msgstr "Ukrainian"
 
+#: tformnotetask.amergetasks.caption
+msgid "Merge tasks"
+msgstr "Fusionner les tâches"
+
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
 msgstr "Déplacer les tâches vers le bas"
@@ -452,7 +460,7 @@ msgstr "Remplacer..."
 
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
-msgstr ""
+msgstr "Exécuter dans le terminal..."
 
 #: tformnotetask.asave.caption
 msgid "Save"
@@ -631,4 +639,3 @@ msgstr "Trouver quoi :"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Remplacer par :"
-

@@ -58,6 +58,10 @@ msgstr "선택한 작업을 삭제하시겠습니까?"
 msgid "The requested file was not found on the disk."
 msgstr "요청한 파일을 디스크에서 찾을 수 없습니다."
 
+#: mainform.rmergesconfirm
+msgid "Are you sure you want to merge selected tasks?"
+msgstr "선택한 작업을 병합하시겠습니까?"
+
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
 msgstr "라인 번호가 허용된 범위를 초과했습니다."
@@ -402,6 +406,10 @@ msgstr "Spanish"
 msgid "Ukrainian"
 msgstr "Ukrainian"
 
+#: tformnotetask.amergetasks.caption
+msgid "Merge tasks"
+msgstr "작업 병합"
+
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
 msgstr "작업을 맨 아래로 이동"
@@ -452,7 +460,7 @@ msgstr "바꾸기..."
 
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
-msgstr ""
+msgstr "터미널에서 실행..."
 
 #: tformnotetask.asave.caption
 msgid "Save"
@@ -631,4 +639,3 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
-

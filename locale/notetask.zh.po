@@ -58,6 +58,10 @@ msgstr "您确定要删除所选任务吗？"
 msgid "The requested file was not found on the disk."
 msgstr "在磁盘上找不到请求的文件。"
 
+#: mainform.rmergesconfirm
+msgid "Are you sure you want to merge selected tasks?"
+msgstr "您确定要合并选定的任务吗？"
+
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
 msgstr "行号超出允许范围。"
@@ -402,6 +406,10 @@ msgstr "Spanish"
 msgid "Ukrainian"
 msgstr "Ukrainian"
 
+#: tformnotetask.amergetasks.caption
+msgid "Merge tasks"
+msgstr "合并任务"
+
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
 msgstr "将任务移动到底部"
@@ -452,7 +460,7 @@ msgstr "替换..."
 
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
-msgstr ""
+msgstr "在终端中运行..."
 
 #: tformnotetask.asave.caption
 msgid "Save"
@@ -631,4 +639,3 @@ msgstr "查找内容："
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "替换为："
-

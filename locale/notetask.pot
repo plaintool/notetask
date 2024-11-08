@@ -48,6 +48,10 @@ msgstr ""
 msgid "The requested file was not found on the disk."
 msgstr ""
 
+#: mainform.rmergesconfirm
+msgid "Are you sure you want to merge selected tasks?"
+msgstr ""
+
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
 msgstr ""
@@ -390,6 +394,10 @@ msgstr ""
 
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
+msgstr ""
+
+#: tformnotetask.amergetasks.caption
+msgid "Merge tasks"
 msgstr ""
 
 #: tformnotetask.amovetaskbottom.caption
