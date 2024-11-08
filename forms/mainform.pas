@@ -2662,6 +2662,9 @@ begin
     ApplicationTranslate(Language);
   end;
 
+  openDialog.Filter := ropendialogfilter;
+  saveDialog.Filter := rsavedialogfilter;
+
   case Language of
     'en': aLangEnglish.Checked := True;
     'de': aLangGerman.Checked := True;
