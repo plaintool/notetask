@@ -1699,45 +1699,49 @@ procedure TformNotetask.ExecuteTerminal;
 var
   Process: TProcess;
   i: integer;
-  Executable, TempFile: string;
+  Executable, TempFile, EncodedText, ConsoleEncoding: string;
 begin
-  // Create a temporary file for commands
+  // Определяем временный файл для команд
   {$IFDEF Windows}
-  TempFile := GetTempDir +'notetask.bat';  // Path for Windows
+  TempFile := GetTempDir +'notetask.bat';  // Путь для Windows
   {$ELSE}
-  TempFile := GetTempDir + 'notetask.sh';  // Path for Linux
+  TempFile := GetTempDir + 'notetask.sh';  // Путь для Linux
   {$ENDIF}
 
-  // Write all commands to the file
+  // Открываем файл на запись
   AssignFile(Output, TempFile);
   Rewrite(Output);
   try
+    // Получаем текущую кодировку консоли
+    ConsoleEncoding := GetConsoleEncoding;
+
+    // Записываем команды в файл с нужной кодировкой
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
-      WriteLn(Output, Tasks.GetTask(i).Text);  // Write each command to the file
+      EncodedText := ConvertEncoding(Tasks.GetTask(i).Text, 'utf-8', ConsoleEncoding);
+      WriteLn(Output, EncodedText);
     end;
   finally
     CloseFile(Output);
   end;
 
-  // Create a new process
+  // Создаем новый процесс
   Process := TProcess.Create(nil);
   try
     {$IFDEF Windows}
-    Executable := 'cmd.exe';  // For Windows
+    Executable := 'cmd.exe';  // Для Windows
     Process.Parameters.Add('/K');
-    Process.Parameters.Add(TempFile);  // Run the .bat file
+    Process.Parameters.Add(TempFile);  // Запуск .bat файла
     {$ELSE}
-    Executable := '/bin/bash';  // For Linux
-    Process.Parameters.Add(TempFile);  // Run the .sh file
+    Executable := '/bin/bash';  // Для Linux
+    Process.Parameters.Add(TempFile);  // Запуск .sh файла
     {$ENDIF}
 
     Process.Executable := Executable;
-    Process.Options := [poNewConsole]; // Wait for the process to finish and open a new console
+    Process.Options := [poNewConsole]; // Открываем новую консоль
 
-    // Start the process
+    // Запуск процесса
     Process.Execute;
-
   finally
     Process.Free;
   end;

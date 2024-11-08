@@ -245,17 +245,30 @@ begin
     Process.Execute;
 
     Output.LoadFromStream(Process.Output);
+
     // Check the output of chcp command
     if Output.Count > 0 then
     begin
       if Pos('866', Output[0]) > 0 then
-        Encoding := 'CP866'
+        Encoding := 'CP866'           // Russian (Cyrillic)
       else if Pos('850', Output[0]) > 0 then
-        Encoding := 'CP850'
+        Encoding := 'CP850'           // Western European
       else if Pos('437', Output[0]) > 0 then
-        Encoding := 'CP437'
+        Encoding := 'CP437'           // United States
       else if Pos('1252', Output[0]) > 0 then
-        Encoding := 'CP1252';
+        Encoding := 'CP1252'          // Western European (Windows)
+      else if Pos('65001', Output[0]) > 0 then
+        Encoding := 'utf-8'           // UTF-8
+      else if Pos('936', Output[0]) > 0 then
+        Encoding := 'GB2312'          // Simplified Chinese
+      else if Pos('950', Output[0]) > 0 then
+        Encoding := 'Big5'            // Traditional Chinese
+      else if Pos('932', Output[0]) > 0 then
+        Encoding := 'Shift-JIS'       // Japanese
+      else if Pos('949', Output[0]) > 0 then
+        Encoding := 'CP949'           // Korean
+      else if Pos('1251', Output[0]) > 0 then
+        Encoding := 'CP1251';         // Cyrillic (Windows)
     end;
 
     if Encoding <> '' then
