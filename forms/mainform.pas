@@ -1925,48 +1925,75 @@ procedure TformNotetask.ExecuteTerminal;
 var
   Process: TProcess;
   i: integer;
-  Executable, TempFile, EncodedText, ConsoleEncoding: string;
+  TempFile, EncodedText, ConsoleEncoding: string;
 begin
-  // Определяем временный файл для команд
+  // Define the temporary file for commands
   {$IFDEF Windows}
-  TempFile := GetTempDir +'notetask.bat';  // Путь для Windows
+  TempFile := GetTempDir + 'notetask.bat';  // Path for Windows
   {$ELSE}
-  TempFile := GetTempDir + 'notetask.sh';  // Путь для Linux
+  TempFile := GetTempDir + 'notetask.sh';   // Path for Linux
   {$ENDIF}
 
-  // Открываем файл на запись
+  // Open file for writing
   AssignFile(Output, TempFile);
   Rewrite(Output);
   try
-    // Получаем текущую кодировку консоли
+    // Get the current console encoding
     ConsoleEncoding := GetConsoleEncoding;
 
-    // Записываем команды в файл с нужной кодировкой
+    {$IFDEF UNIX}
+    if FileExists(TempFile) then
+    begin
+      WriteLn(Output, '#!/bin/bash');
+    end;
+    {$ENDIF}
+
+    // Write commands to the file with the correct encoding
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
       EncodedText := ConvertEncoding(Tasks.GetTask(i).Text, 'utf-8', ConsoleEncoding);
       WriteLn(Output, EncodedText);
     end;
+
+    {$IFDEF UNIX}
+    if FileExists(TempFile) then
+    begin
+      WriteLn(Output, 'read -p "Press any key to continue..."');
+    end;
+    {$ENDIF}
   finally
     CloseFile(Output);
   end;
 
-  // Создаем новый процесс
+  {$IFDEF UNIX}
+  // Make the .sh file executable in Linux
+  Process := TProcess.Create(nil);
+  try
+    Process.Executable := '/bin/chmod';
+    Process.Parameters.Add('+x');
+    Process.Parameters.Add(TempFile);
+    Process.Options := [poWaitOnExit]; // Wait for the process to finish
+    Process.Execute;
+  finally
+    Process.Free;
+  end;
+  {$ENDIF}
+
+  // Create a new process to execute the script
   Process := TProcess.Create(nil);
   try
     {$IFDEF Windows}
-    Executable := 'cmd.exe';  // Для Windows
+    Process.Executable := 'cmd.exe';  // For Windows
     Process.Parameters.Add('/K');
-    Process.Parameters.Add(TempFile);  // Запуск .bat файла
+    Process.Parameters.Add(TempFile);  // Execute the .bat file
     {$ELSE}
-    Executable := '/bin/bash';  // Для Linux
-    Process.Parameters.Add(TempFile);  // Запуск .sh файла
+    Process.Executable := '/bin/bash';  // Use bash to execute the script
+    Process.Parameters.Add('-e');
+    Process.Parameters.Add(TempFile);
     {$ENDIF}
+    Process.Options := [poNewConsole]; // Open in a new console window
 
-    Process.Executable := Executable;
-    Process.Options := [poNewConsole]; // Открываем новую консоль
-
-    // Запуск процесса
+    // Execute the process
     Process.Execute;
   finally
     Process.Free;
