@@ -81,16 +81,16 @@ type
     menuInsertTask: TMenuItem;
     menuDeleteTasks: TMenuItem;
     menuArchiveTasks: TMenuItem;
-    MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
-    MenuItem3: TMenuItem;
-    MenuItem4: TMenuItem;
-    MenuItem5: TMenuItem;
+    contextUndo: TMenuItem;
+    contextCut: TMenuItem;
+    contextCopy: TMenuItem;
+    contextPaste: TMenuItem;
+    contextDelete: TMenuItem;
     menuUndoAll: TMenuItem;
     menuPaste: TMenuItem;
     menuCopy: TMenuItem;
     menuCut: TMenuItem;
-    MenuItem9: TMenuItem;
+    contextSelectAll: TMenuItem;
     menuShowArchived: TMenuItem;
     menuFindNext: TMenuItem;
     menuFindPrev: TMenuItem;
@@ -149,7 +149,7 @@ type
     Separator10: TMenuItem;
     menuChatGpt: TMenuItem;
     Separator11: TMenuItem;
-    MenuItem7: TMenuItem;
+    contextAskChatGPT: TMenuItem;
     aLangSpanish: TAction;
     aLangFrench: TAction;
     aLangItalian: TAction;
@@ -166,9 +166,9 @@ type
     menuChinese: TMenuItem;
     aDonate: TAction;
     menuDonate: TMenuItem;
-    MenuItem8: TMenuItem;
+    contextDeleteTasks: TMenuItem;
     Separator12: TMenuItem;
-    MenuItem10: TMenuItem;
+    contextArchiveTasks: TMenuItem;
     aShowDuration: TAction;
     menuShowDuration: TMenuItem;
     aLangArabic: TAction;
@@ -200,6 +200,7 @@ type
     TitleImages: TImageList;
     aRunTerminal: TAction;
     menuRunTerminal: TMenuItem;
+    contextRunTerminal: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -352,7 +353,6 @@ type
     procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     procedure ExecuteTerminal;
-    procedure ExecuteTerminalPipe;
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
     function IsCanClose: boolean;
@@ -1692,7 +1692,7 @@ procedure TformNotetask.aRunTerminalExecute(Sender: TObject);
 begin
   if taskGrid.RowCount < 2 then exit;
 
-  ExecuteTerminalPipe;
+  ExecuteTerminal;
 end;
 
 procedure TformNotetask.ExecuteTerminal;
@@ -1731,94 +1731,6 @@ begin
     Process.Execute;
 
   finally
-    Process.Free;
-  end;
-end;
-
-procedure TformNotetask.ExecuteTerminalPipe;
-var
-  Process: TProcess;
-  i: integer;
-  Command: string;
-  Buffer: array[0..1023] of byte; // Buffer for reading data
-  BytesRead: longint;
-  Output: TStringList;
-  OutputAll: TStringList;
-  OutputStr: string;
-  Executable: string;
-  Encoding: string;
-begin
-  // Create a new process
-  Process := TProcess.Create(nil);
-  Output := TStringList.Create;
-  OutputAll := TStringList.Create;
-  // Initialize
-  for i := Low(Buffer) to High(Buffer) do Buffer[i] := 0;
-
-  try
-    // Determine which command interpreter to use
-    {$IFDEF Windows}
-    Executable := 'cmd.exe';
-    {$ELSE}
-    Executable := '/bin/bash';
-    {$ENDIF}
-
-    // Get the current console encoding
-    Encoding := GetConsoleEncoding;
-
-    // Configure the process options
-    Process.Executable := Executable;
-    Process.Options := [poUsePipes, poNoConsole];  // Enable pipes for input/output
-
-    // Start the process
-    Process.Execute;
-
-    // Iterate through the list of commands
-    OutputAll.Clear;
-    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-    begin
-      Command := Tasks.GetTask(i).Text + sLineBreak; // Add line break to the command
-      if (Command.ToLower.StartsWith('pause')) then command += #27;
-
-      // Write the command to the input stream
-      Process.Input.WriteBuffer(Pointer(Command)^, Length(Command));
-
-      // Read the output of the command
-      Sleep(100);
-      OutputStr := string.Empty;
-      Output.Clear;
-      while Process.Output.NumBytesAvailable > 0 do
-      begin
-        BytesRead := Process.Output.Read(Buffer, SizeOf(Buffer));
-        if BytesRead > 0 then
-        begin
-          // Convert byte array to string
-          SetString(OutputStr, PChar(@Buffer[0]), BytesRead);
-
-          // Convert to UTF-8
-          OutputStr := ConvertEncoding(OutputStr, Encoding, 'UTF-8');
-          Output.Add(OutputStr);
-          OutputAll.Add(OutputStr);
-        end;
-        Sleep(100);
-      end;
-
-      if (Tasks.GetTask(i).Note = string.Empty) then
-      begin
-        Tasks.GetTask(i).Note := Output.Text;
-        taskGrid.Cells[3, i] := Output.Text;
-        SetChanged;
-        CalcRowHeights(i);
-      end;
-    end;
-    // Print the result of the command
-    ShowMessage(OutputAll.Text);
-
-    Process.Input.WriteBuffer(Pointer('exit' + sLineBreak)^, Length('exit' + sLineBreak));
-    Process.WaitOnExit;
-  finally
-    Output.Free;
-    OutputAll.Free;
     Process.Free;
   end;
 end;

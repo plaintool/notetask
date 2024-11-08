@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 490
@@ -758,44 +757,47 @@ object formNotetask: TformNotetask
   object Popup: TPopupMenu
     Left = 160
     Top = 184
-    object MenuItem1: TMenuItem
+    object contextUndo: TMenuItem
       Action = aUndo
     end
     object Separator8: TMenuItem
       Caption = '-'
     end
-    object MenuItem2: TMenuItem
+    object contextCut: TMenuItem
       Action = aCut
     end
-    object MenuItem3: TMenuItem
+    object contextCopy: TMenuItem
       Action = aCopy
     end
-    object MenuItem4: TMenuItem
+    object contextPaste: TMenuItem
       Action = aPaste
     end
-    object MenuItem5: TMenuItem
+    object contextDelete: TMenuItem
       Action = aDelete
     end
     object Separator6: TMenuItem
       Caption = '-'
     end
-    object MenuItem9: TMenuItem
+    object contextSelectAll: TMenuItem
       Action = aSelectAll
     end
     object Separator12: TMenuItem
       Caption = '-'
     end
-    object MenuItem8: TMenuItem
+    object contextDeleteTasks: TMenuItem
       Action = aDeleteTasks
     end
-    object MenuItem10: TMenuItem
+    object contextArchiveTasks: TMenuItem
       Action = aArchiveTasks
     end
     object Separator11: TMenuItem
       Caption = '-'
     end
-    object MenuItem7: TMenuItem
+    object contextAskChatGPT: TMenuItem
       Action = aChatGpt
+    end
+    object contextRunTerminal: TMenuItem
+      Action = aRunTerminal
     end
   end
   object TitleImages: TImageList
