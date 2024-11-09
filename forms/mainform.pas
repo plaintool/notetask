@@ -1325,6 +1325,7 @@ var
 begin
   if Screen.ActiveForm <> Self then exit;
 
+  EditComplite;
   GridBackupSelection;
   Ind := Tasks.InsertTask('[ ]', taskGrid.Row);
   FillGrid;
@@ -3128,7 +3129,7 @@ begin
     Counter := 0;
 
     repeat
-      if (Assigned(Memo)) then
+      if (CurCol < 5) and (Assigned(Memo)) then
       begin
         sValue := unicodestring(Memo.Text);
         sText := unicodestring(aText);
@@ -3143,10 +3144,28 @@ begin
           Counter := 0;
           Break;
         end;
+      end
+      else
+      if (CurCol = 5) and (Assigned(DatePicker)) then
+      begin
+        sValue := unicodestring(DateToString(DatePicker.DateTime));
+        sText := unicodestring(aText);
+        if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (taskGrid.Row <> FLastFoundRow) then
+        begin
+          taskGrid.Col:=5;
+          taskGrid.EditorMode := True;
+          FLastFoundRow := taskGrid.Row;
+          FLastFoundCol := taskGrid.Col;
+          FLastFoundSelStart := 0;
+          FLastFoundSelLength := Length(sValue);
+          FFoundText := aText;
+          Counter := 0;
+          Break;
+        end;
       end;
 
       // Move to col
-      if ((aDirectionDown) and (CurCol < 4)) or ((not aDirectionDown) and (CurCol > 2)) then
+      if ((aDirectionDown) and (CurCol < 5)) or ((not aDirectionDown) and (CurCol > 2)) then
       begin
         // Move to next col
         if (aDirectionDown) then
@@ -3184,9 +3203,9 @@ begin
             // Move to prev row
           begin
             Dec(CurRow);
-            CurCol := 4;
+            CurCol := 5;
             taskGrid.Row := taskGrid.Row - 1;
-            taskGrid.Col := 4;
+            taskGrid.Col := 5;
             Memo.SelStart := Length(unicodestring(Memo.Text)) - 1;
             Memo.SelLength := 0;
           end;
@@ -3212,8 +3231,8 @@ begin
           begin
             CurRow := taskGrid.RowCount - 1;
             taskGrid.Row := taskGrid.RowCount - 1;
-            CurCol := 4;
-            taskGrid.Col := 4;
+            CurCol := 5;
+            taskGrid.Col := 5;
           end;
           Inc(Counter);
         end
