@@ -187,7 +187,7 @@ begin
   FNoteItalic := False;
 
   PartNote := TaskString.Split(['//']);
-  if (Length(PartNote) >= 2) and (not PartNote[0].EndsWith(':')) then
+  if (Length(PartNote) >= 2) and (not PartNote[0].EndsWith(':')) then // Url protection
   begin
     CompletedStr := PartNote[0];
     if (Length(CompletedStr) > 0) and (CompletedStr.EndsWith(' ')) then
@@ -357,12 +357,12 @@ begin
   // Check notes
   if (NoteString <> string.Empty) or (EmptyNote) then
   begin
-    if (SpaceBeforeNote) then NoteString := ' ' + NoteString;
-    NoteString := '//' + NoteString;
-    if (SpaceAfterNote) then NoteString += ' ';
-
     if (NoteString <> string.Empty) and (NoteItalic) then
       NoteString := '*' + NoteString + '*';
+
+    if (SpaceAfterNote) then NoteString := ' ' + NoteString;
+    NoteString := '//' + NoteString;
+    if (SpaceBeforeNote) then NoteString := ' ' + NoteString;
   end
   else
     NoteString := string.Empty;
