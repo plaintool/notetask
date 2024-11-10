@@ -120,7 +120,7 @@ resourcestring
 
 implementation
 
-uses stringtool, lineending;
+uses stringtool;
 
   { TTask }
 
@@ -251,7 +251,10 @@ begin
       if (TryStrToFloat(PartDate[1].Trim, FAmount)) then
         FillText(2)
       else
+      begin
         FillText(1);
+        FAmount := 0;
+      end;
       if (Length(FText) > 0) and (FText.StartsWith(' ')) then
       begin
         Delete(FText, 1, 1);
@@ -260,6 +263,7 @@ begin
     else
     begin
       FText := CompletedStr;
+      FDate := 0;
     end;
   end
   else
@@ -290,12 +294,14 @@ begin
         FText := CompletedStr;
         FDate := 0;
       end;
+      FAmount := 0;
     end;
   end
   else
   begin
     FText := CompletedStr;
     FDate := 0;
+    FAmount := 0;
   end;
 
   FText := StringReplace(FText, '<br>', sLineBreak, [rfReplaceAll]);
