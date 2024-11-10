@@ -232,6 +232,8 @@ type
     procedure taskGridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
     procedure taskGridSelection(Sender: TObject; aCol, aRow: integer);
+    procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure memoNoteChange(Sender: TObject);
     procedure aArchiveTasksExecute(Sender: TObject);
     procedure aCopyExecute(Sender: TObject);
     procedure aCutExecute(Sender: TObject);
@@ -294,8 +296,6 @@ type
     procedure aRunTerminalExecute(Sender: TObject);
     procedure aMergeTasksExecute(Sender: TObject);
     procedure aShowNoteExecute(Sender: TObject);
-    procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure memoNoteChange(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -2444,6 +2444,8 @@ var
   Check: boolean;
   i: integer;
 begin
+  if (not ShowColumnDone) then exit;
+
   // If multiple rows are selected
   if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
   begin
