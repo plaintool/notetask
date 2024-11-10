@@ -507,6 +507,7 @@ begin
 
   // After load wordwrap setting
   aWordWrap.Checked := FWordWrap;
+  memoNote.WordWrap := FWordWrap;
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowArchived.Checked := FShowArchived;
   aShowNote.Checked := FShowNote;
@@ -1229,6 +1230,7 @@ begin
   taskGrid.Cells[3, taskGrid.Row] := memoNote.Text;
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
   CalcRowHeights(taskGrid.Row);
+  SetChanged;
 end;
 
 procedure TformNotetask.aUndoExecute(Sender: TObject);
@@ -1793,6 +1795,7 @@ begin
 
   EditComplite;
   FWordWrap := aWordWrap.Checked;
+  memoNote.WordWrap := FWordWrap;
   ResetRowHeight;
   Invalidate;
 end;
@@ -2622,12 +2625,18 @@ begin
     taskGrid.BiDiMode := bdRightToLeft;
     for i := 1 to taskGrid.Columns.Count - 1 do
       taskGrid.Columns[i].Alignment := taRightJustify;
+    memoNote.BiDiMode := bdRightToLeft;
+    memoNote.BorderSpacing.Left := 0;
+    memoNote.BorderSpacing.Right := 5;
   end
   else
   begin
     taskGrid.BiDiMode := bdLeftToRight;
     for i := 1 to taskGrid.Columns.Count - 1 do
       taskGrid.Columns[i].Alignment := taLeftJustify;
+    memoNote.BiDiMode := bdLeftToRight;
+    memoNote.BorderSpacing.Left := 5;
+    memoNote.BorderSpacing.Right := 0;
   end;
 end;
 
@@ -2680,12 +2689,14 @@ procedure TformNotetask.SetShowColumnTask(Value: boolean);
 begin
   FShowColumnTask := Value;
   taskGrid.Columns.Items[1].Visible := FShowColumnTask;
+  CalcRowHeights;
 end;
 
 procedure TformNotetask.SetShowColumnNote(Value: boolean);
 begin
   FShowColumnNote := Value;
   taskGrid.Columns.Items[2].Visible := FShowColumnNote;
+  CalcRowHeights;
 end;
 
 procedure TformNotetask.SetShowColumnAmount(Value: boolean);
@@ -2773,32 +2784,14 @@ end;
 
 procedure TformNotetask.CalcRowHeights(aRow: integer = 0);
 var
-  i, j: integer;
-  drawrect: TRect;
-  flags: cardinal;
   FromRow, ToRow: integer;
-  s: string;
-begin
-  SetLength(FLastRowHeights, taskGrid.RowCount);
 
-  if aRow = -1 then
-  begin
-    FromRow := taskGrid.Selection.Top;
-    ToRow := taskGrid.Selection.Bottom;
-  end
-  else
-  if aRow = 0 then
-  begin
-    FromRow := 1;
-    ToRow := taskGrid.RowCount - 1;
-  end
-  else
-  begin
-    FromRow := aRow;
-    ToRow := aRow;
-  end;
-
-  for j := 2 to 3 do
+  procedure CalcCol(j: integer);
+  var
+    i: integer;
+    drawrect: TRect;
+    s: string;
+    flags: cardinal;
   begin
     for i := FromRow to ToRow do
     begin
@@ -2826,6 +2819,29 @@ begin
         FLastRowHeights[i] := taskGrid.RowHeights[i];
     end;
   end;
+
+begin
+  SetLength(FLastRowHeights, taskGrid.RowCount);
+
+  if aRow = -1 then
+  begin
+    FromRow := taskGrid.Selection.Top;
+    ToRow := taskGrid.Selection.Bottom;
+  end
+  else
+  if aRow = 0 then
+  begin
+    FromRow := 1;
+    ToRow := taskGrid.RowCount - 1;
+  end
+  else
+  begin
+    FromRow := aRow;
+    ToRow := aRow;
+  end;
+
+  if (ShowColumnTask) then CalcCol(2);
+  if (ShowColumnNote) then CalcCol(3);
 end;
 
 procedure TformNotetask.ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
@@ -2946,7 +2962,9 @@ end;
 
 procedure TformNotetask.SetNote;
 begin
+  memoNote.OnChange := nil;
   memoNote.Text := Tasks.GetTask(taskGrid.Row).Note;
+  memoNote.OnChange := @memoNoteChange;
 end;
 
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);

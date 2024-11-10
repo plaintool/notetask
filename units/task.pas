@@ -120,7 +120,7 @@ resourcestring
 
 implementation
 
-uses stringtool;
+uses stringtool, lineending;
 
   { TTask }
 
@@ -332,7 +332,11 @@ var
 begin
   // Replace line breaks from task description and Note
   TextString := StringReplace(Text, sLineBreak, '<br>', [rfReplaceAll]);
-  Note := StringReplace(Note, sLineBreak, '<br>', [rfReplaceAll]);
+  TextString := StringReplace(TextString, #13, '<br>', [rfReplaceAll]);
+  TextString := StringReplace(TextString, #10, '<br>', [rfReplaceAll]);
+  NoteString := StringReplace(Note, sLineBreak, '<br>', [rfReplaceAll]);
+  NoteString := StringReplace(NoteString, #13, '<br>', [rfReplaceAll]);
+  NoteString := StringReplace(NoteString, #10, '<br>', [rfReplaceAll]);
 
   // Add '**' for starred tasks
   if FStar then
@@ -351,20 +355,14 @@ begin
     DoneString := string.Empty;
 
   // Check notes
-  if (Note <> string.Empty) or (EmptyNote) then
+  if (NoteString <> string.Empty) or (EmptyNote) then
   begin
-    NoteString := string.Empty;
-    if (SpaceBeforeNote) then NoteString += ' ';
-    NoteString += '//';
+    if (SpaceBeforeNote) then NoteString := ' ' + NoteString;
+    NoteString := '//' + NoteString;
     if (SpaceAfterNote) then NoteString += ' ';
 
-    if (Note <> string.Empty) then
-    begin
-      if NoteItalic then
-        NoteString += '*' + Note + '*'
-      else
-        NoteString += Note;
-    end;
+    if (NoteString <> string.Empty) and (NoteItalic) then
+      NoteString := '*' + NoteString + '*';
   end
   else
     NoteString := string.Empty;
@@ -624,8 +622,10 @@ begin
 
     // Reading data from the grid
     Task.Done := StrToBoolDef(Grid.Cells[1, Row], False); // Convert to boolean
-    Task.Text := Grid.Cells[2, Row];
-    Task.Note := Grid.Cells[3, Row];
+    Task.Text := Grid.Cells[2, Row].Replace(sLineBreak, '<br>').Replace(#10, string.Empty).Replace(
+      #13, string.Empty).Replace('<br>', sLineBreak);
+    Task.Note := Grid.Cells[3, Row].Replace(sLineBreak, '<br>').Replace(#10, string.Empty).Replace(
+      #13, string.Empty).Replace('<br>', sLineBreak);
     if not TryStrToFloat(Grid.Cells[4, Row], pAmount) then
     begin
       pAmount := 0; // If parsing the amount failed, set to 0

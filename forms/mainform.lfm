@@ -119,14 +119,17 @@ object formNotetask: TformNotetask
     SimplePanel = False
   end
   object memoNote: TMemo
-    Left = 0
+    Left = 5
     Height = 70
     Top = 420
-    Width = 851
+    Width = 846
     Align = alBottom
+    BorderSpacing.Left = 5
     BorderStyle = bsNone
-    TabOrder = 2
+    ScrollBars = ssAutoBoth
+    TabOrder = 1
     Visible = False
+    WordWrap = False
     OnChange = memoNoteChange
     OnKeyDown = memoNoteKeyDown
   end
