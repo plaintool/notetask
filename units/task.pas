@@ -397,7 +397,12 @@ begin
           if Date > 0 then
             Result := Format('%s, %s, %s%s', [DateStr, AmountStr, TextString, NoteString])
           else
-            Result := Format('%s, %s%s', [AmountStr, TextString, NoteString]);
+          begin
+            if (TextString + NoteString <> string.Empty) then
+              Result := Format('%s, %s%s', [AmountStr, TextString, NoteString])
+            else
+              Result := Format('%s', [AmountStr]);
+          end;
         end
         else
         begin
@@ -414,7 +419,12 @@ begin
           if Date > 0 then
             Result := Format('%s %s, %s, %s%s', [DoneString, DateStr, AmountStr, TextString, NoteString]).Trim
           else
-            Result := Format('%s %s, %s%s', [DoneString, AmountStr, TextString, NoteString]).Trim;
+          begin
+            if (TextString + NoteString <> string.Empty) then
+              Result := Format('%s %s, %s%s', [DoneString, AmountStr, TextString, NoteString]).Trim
+            else
+              Result := Format('%s %s', [DoneString, AmountStr]).Trim;
+          end;
         end
         else
         begin
