@@ -813,7 +813,8 @@ begin
     Tasks.AddMap(Tasks.AddTask('[ ]'));
     taskGrid.Cells[1, tIndex] := '0';
     SetInfo;
-    SetChanged();
+    SetChanged;
+    SetNote;
   end;
 end;
 
@@ -1417,6 +1418,7 @@ begin
     taskGrid.Row := taskGrid.Row + 1;
   SetInfo;
   SetChanged;
+  SetNote;
 end;
 
 procedure TformNotetask.aMergeTasksExecute(Sender: TObject);
@@ -2776,6 +2778,8 @@ begin
     taskGrid.Options := taskGrid.Options + [goRowMoving]
   else
     taskGrid.Options := taskGrid.Options - [goRowMoving];
+
+  SetNote;
 end;
 
 procedure TformNotetask.FillGrid;
@@ -2964,6 +2968,8 @@ end;
 
 procedure TformNotetask.SetNote;
 begin
+  if (not ShowNote) then exit;
+
   memoNote.OnChange := nil;
   memoNote.Text := Tasks.GetTask(taskGrid.Row).Note;
   memoNote.OnChange := @memoNoteChange;
