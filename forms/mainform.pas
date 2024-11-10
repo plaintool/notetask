@@ -3079,6 +3079,22 @@ var
     end;
   end;
 
+  procedure IncCurCol;
+  begin
+    Inc(CurCol);
+    taskGrid.Col := CurCol;
+    Memo.SelStart := 0;
+    Memo.SelLength := 0;
+  end;
+
+  procedure DecCurCol;
+  begin
+    Dec(CurCol);
+    taskGrid.Col := CurCol;
+    Memo.SelStart := Length(unicodestring(Memo.Text));
+    Memo.SelLength := 0;
+  end;
+
   procedure NotFound;
   begin
     if (aText = FFoundText) then
@@ -3129,11 +3145,11 @@ begin
     Counter := 0;
 
     repeat
-      if (CurCol < 5) and (Assigned(Memo)) then
+      if (CurCol < 5) and (CurCol > 1) and (Assigned(Memo)) then
       begin
         sValue := unicodestring(Memo.Text);
         sText := unicodestring(aText);
-        if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (FindMemo) then
+        if (Pos(UnicodeLowerCase(sText), UnicodeLowerCase(sValue)) > 0) and (FindMemo) then
         begin
           taskGrid.EditorMode := True;
           FLastFoundRow := taskGrid.Row;
@@ -3152,7 +3168,7 @@ begin
         sText := unicodestring(aText);
         if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (taskGrid.Row <> FLastFoundRow) then
         begin
-          taskGrid.Col:=5;
+          taskGrid.Col := 5;
           taskGrid.EditorMode := True;
           FLastFoundRow := taskGrid.Row;
           FLastFoundCol := taskGrid.Col;
@@ -3169,20 +3185,9 @@ begin
       begin
         // Move to next col
         if (aDirectionDown) then
-        begin
-          Inc(CurCol);
-          taskGrid.Col := taskGrid.Col + 1;
-          Memo.SelStart := 0;
-          Memo.SelLength := 0;
-        end
-        else
-          // Move to prev col
-        begin
-          Dec(CurCol);
-          taskGrid.Col := taskGrid.Col - 1;
-          Memo.SelStart := Length(unicodestring(Memo.Text));
-          Memo.SelLength := 0;
-        end;
+          IncCurCol
+        else // Move to prev col
+          DecCurCol;
       end
       else
       begin
@@ -3212,6 +3217,7 @@ begin
           Inc(Counter);
         end;
       end;
+
       // Move to begin
       if ((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow = 0)) then
       begin
@@ -3242,6 +3248,22 @@ begin
           Result := False;
           exit;
         end;
+      end;
+
+      // Skip hidden columns
+      if (aDirectionDown) then
+      begin
+        if (CurCol = 2) and (not ShowColumnTask) then IncCurCol;
+        if (CurCol = 3) and (not ShowColumnNote) then IncCurCol;
+        if (CurCol = 4) and (not ShowColumnAmount) then IncCurCol;
+        if (CurCol = 5) and (not ShowColumnDate) then IncCurCol;
+      end
+      else
+      begin
+        if (CurCol = 5) and (not ShowColumnDate) then DecCurCol;
+        if (CurCol = 4) and (not ShowColumnAmount) then DecCurCol;
+        if (CurCol = 3) and (not ShowColumnNote) then DecCurCol;
+        if (CurCol = 2) and (not ShowColumnTask) then DecCurCol;
       end;
 
     until ((not WrapAround) and (((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow = 0)))) or
