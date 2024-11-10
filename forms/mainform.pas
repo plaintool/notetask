@@ -3166,6 +3166,7 @@ begin
   ResetRowHeight;
   SetChanged(False);
   SetInfo;
+  SetNote;
   Result := True;
 end;
 
