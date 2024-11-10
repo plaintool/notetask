@@ -506,6 +506,10 @@ msgstr "عمود مهمة"
 msgid "Show duration"
 msgstr "مدة"
 
+#: tformnotetask.ashownote.caption
+msgid "Show note"
+msgstr "ملاحظة"
+
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "شريط الحالة"

@@ -506,6 +506,10 @@ msgstr "Colonne Tâche"
 msgid "Show duration"
 msgstr "Durée"
 
+#: tformnotetask.ashownote.caption
+msgid "Show note"
+msgstr "Note"
+
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "Barre d'état"

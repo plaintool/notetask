@@ -99,48 +99,48 @@ end;
 
 procedure TformFindText.editFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
-  Edit: TEdit;
+  Field: TEdit;
 begin
-  Edit := (Sender as TEdit);
+  Field := (Sender as TEdit);
 
   if Key = VK_DELETE then // Delete
   begin
-    if Edit.SelLength = 0 then
+    if Field.SelLength = 0 then
     begin
-      Edit.SelStart := editFind.SelStart;
-      Edit.SelLength := 1;
+      Field.SelStart := Field.SelStart;
+      Field.SelLength := 1;
     end;
-    Edit.ClearSelection;
+    Field.ClearSelection;
     Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
   begin
-    Edit.Undo;
+    Field.Undo;
     Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
   begin
-    Edit.CutToClipboard;
+    Field.CutToClipboard;
     Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
   begin
-    Edit.CopyToClipboard;
+    Field.CopyToClipboard;
     Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
   begin
-    Edit.PasteFromClipboard;
+    Field.PasteFromClipboard;
     Key := 0;
   end
   else
   if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
   begin
-    Edit.SelectAll;
+    Field.SelectAll;
     Key := 0;
   end;
 end;

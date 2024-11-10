@@ -27,7 +27,7 @@ uses
   DateTimePicker,
   Printers,
   LCLIntf,
-  LCLType,
+  LCLType, ExtCtrls,
   LConvEncoding,
   Process,
   StrUtils,
@@ -204,6 +204,10 @@ type
     aMergeTasks: TAction;
     MenuItem1: TMenuItem;
     contextMergeTasks: TMenuItem;
+    memoNote: TMemo;
+    Splitter: TSplitter;
+    aShowNote: TAction;
+    MenuItem2: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -289,6 +293,9 @@ type
     procedure aOutdentTasksExecute(Sender: TObject);
     procedure aRunTerminalExecute(Sender: TObject);
     procedure aMergeTasksExecute(Sender: TObject);
+    procedure aShowNoteExecute(Sender: TObject);
+    procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure memoNoteChange(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -317,6 +324,7 @@ type
     FLastSelectionHeight: integer;
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
     FLastRowHeights: array of integer;
+    FLastRow: integer;
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
     procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -331,6 +339,7 @@ type
     procedure EditCell(aCol, aRow: integer);
     procedure EditComplite;
     procedure SetInfo;
+    procedure SetNote;
     procedure SetCaption;
     procedure ClearSelected(ShowConfirm: boolean = True);
     procedure MergeTasks;
@@ -343,6 +352,7 @@ type
     procedure IndentTasks(Outdent: boolean = False);
     procedure SetBiDiRightToLeft(Value: boolean);
     procedure SetShowStatusBar(Value: boolean);
+    procedure SetShowNote(Value: boolean);
     procedure SetShowDuration(Value: boolean);
     procedure SetShowArchived(Value: boolean);
     procedure SetShowColumnDone(Value: boolean);
@@ -365,6 +375,7 @@ type
   public
     FShowArchived: boolean;
     FShowDuration: boolean;
+    FShowNote: boolean;
     FShowColumnDone: boolean;
     FShowColumnTask: boolean;
     FShowColumnNote: boolean;
@@ -385,15 +396,16 @@ type
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
     property BiDiRightToLeft: boolean read FBiDiRightToLeft write SetBiDiRightToLeft;
-    property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
+    property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property ShowDuration: boolean read FShowDuration write SetShowDuration;
+    property ShowNote: boolean read FShowNote write SetShowNote;
+    property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
     property ShowColumnDone: boolean read FShowColumnDone write SetShowColumnDone;
     property ShowColumnTask: boolean read FShowColumnTask write SetShowColumnTask;
     property ShowColumnNote: boolean read FShowColumnNote write SetShowColumnNote;
     property ShowColumnDate: boolean read FShowColumnDate write SetShowColumnDate;
     property ShowColumnAmount: boolean read FShowColumnAmount write SetShowColumnAmount;
     property ShowColumnFavorite: boolean read FShowColumnFavorite write SetShowColumnFavorite;
-    property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property SortOrder: TSortOrder read FSortOrder write FSortOrder;
     property SortColumn: integer read FSortColumn write FSortColumn;
     property IsEditing: boolean read GetIsEditing write FIsEditing;
@@ -448,6 +460,7 @@ begin
   FBackup := True;
   FWordWrap := True;
   FShowStatusBar := True;
+  FShowNote := False;
   FShowColumnDone := True;
   FShowColumnTask := True;
   FShowColumnNote := True;
@@ -495,8 +508,9 @@ begin
   // After load wordwrap setting
   aWordWrap.Checked := FWordWrap;
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
-  aShowStatusBar.Checked := FShowStatusBar;
   aShowArchived.Checked := FShowArchived;
+  aShowNote.Checked := FShowNote;
+  aShowStatusBar.Checked := FShowStatusBar;
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
@@ -531,6 +545,7 @@ end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
+  if memoNote.Focused then exit;
   if Screen.ActiveForm <> Self then
   begin
     Key := 0;
@@ -1148,6 +1163,9 @@ begin
   if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
     SetInfo;
 
+  if (aRow <> FLastRow) then SetNote;
+  FLastRow := aRow;
+
   // Disable merge if no multiselect
   if (taskGrid.Selection.Height > 0) then
     aMergeTasks.Enabled := True
@@ -1157,12 +1175,69 @@ begin
   FLastSelectionHeight := taskGrid.Selection.Height;
 end;
 
+procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  Field: TMemo;
+begin
+  Field := (Sender as TMemo);
+
+  if Key = VK_DELETE then // Delete
+  begin
+    if Field.SelLength = 0 then
+    begin
+      Field.SelStart := Field.SelStart;
+      Field.SelLength := 1;
+    end;
+    Field.ClearSelection;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
+  begin
+    Field.Undo;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
+  begin
+    Field.CutToClipboard;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
+  begin
+    Field.CopyToClipboard;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
+  begin
+    Field.PasteFromClipboard;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
+  begin
+    Field.SelectAll;
+    Key := 0;
+  end;
+
+end;
+
+procedure TformNotetask.memoNoteChange(Sender: TObject);
+begin
+  taskGrid.Cells[3, taskGrid.Row] := memoNote.Text;
+  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
+  CalcRowHeights(taskGrid.Row);
+end;
+
 procedure TformNotetask.aUndoExecute(Sender: TObject);
 var
   TempRect: TRect;
   TempLastRow, TempLastCol: integer;
   TempTopRow: integer;
 begin
+  if memoNote.Focused then exit;
   if Screen.ActiveForm <> Self then exit;
 
   if not IsEditing then
@@ -1216,6 +1291,7 @@ end;
 
 procedure TformNotetask.aCutExecute(Sender: TObject);
 begin
+  if memoNote.Focused then exit;
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
 
@@ -1248,6 +1324,7 @@ procedure TformNotetask.aPasteExecute(Sender: TObject);
 var
   Sel: TGridRect;
 begin
+  if memoNote.Focused then exit;
   if Screen.ActiveForm <> Self then exit;
 
   if not IsEditing then
@@ -1266,6 +1343,7 @@ end;
 
 procedure TformNotetask.aDeleteExecute(Sender: TObject);
 begin
+  if memoNote.Focused then exit;
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
 
@@ -1290,6 +1368,7 @@ end;
 
 procedure TformNotetask.aSelectAllExecute(Sender: TObject);
 begin
+  if memoNote.Focused then exit;
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
 
@@ -1483,19 +1562,28 @@ begin
   if Screen.ActiveForm <> Self then exit;
 
   CurrentDateTime := DateToString(Now);
+  if memoNote.Focused then
+  begin
+    PosStart := memoNote.SelStart;
+    memoNote.SelText := CurrentDateTime;
+    memoNote.SelStart := PosStart;
+    memoNote.SelLength := Length(CurrentDateTime);
+  end
+  else
   if IsEditing then
   begin
     if (taskGrid.Col = 5) then
     begin
       taskGrid.Cells[5, taskGrid.Row] := CurrentDateTime;
-      FillGrid;
+      DatePicker.DateTime := Now;
     end
     else
     if (taskGrid.Col in [2, 3]) then
     begin
       PosStart := Memo.SelStart;
       Memo.SelText := CurrentDateTime;
-      Memo.SelStart := PosStart + Length(CurrentDateTime);
+      Memo.SelStart := PosStart;
+      Memo.SelLength := Length(CurrentDateTime);
     end;
     Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
     SetChanged;
@@ -1507,7 +1595,7 @@ begin
     begin
       if (taskGrid.RowCount > 1) then
       begin
-        if taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim = string.Empty then
+        if (taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim = string.Empty) or (taskGrid.Col = 5) then
           taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
         else
           taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
@@ -1628,14 +1716,6 @@ begin
   end;
 end;
 
-procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowStatusBar := aShowStatusBar.Checked;
-  SetInfo;
-end;
-
 procedure TformNotetask.aShowArchivedExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -1648,6 +1728,21 @@ begin
   if Screen.ActiveForm <> Self then exit;
 
   ShowDuration := aShowDuration.Checked;
+end;
+
+procedure TformNotetask.aShowNoteExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowNote := aShowNote.Checked;
+end;
+
+procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowStatusBar := aShowStatusBar.Checked;
+  SetInfo;
 end;
 
 procedure TformNotetask.aShowColumnDoneExecute(Sender: TObject);
@@ -2051,6 +2146,8 @@ begin
   SetChanged;
   CalcRowHeights(taskGrid.Row);
   EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
+  if (taskGrid.Col = 3) then
+    SetNote;
   if (taskGrid.Col = 4) then
     SetInfo;
 end;
@@ -2561,6 +2658,18 @@ begin
   SetInfo;
 end;
 
+procedure TformNotetask.SetShowNote(Value: boolean);
+begin
+  FShowNote := Value;
+
+  aShowNote.Checked := FShowNote;
+  memoNote.Visible := FShowNote;
+  Splitter.Visible := FShowNote;
+  statusBar.Top := memoNote.Top + MemoNote.Height;
+
+  SetNote;
+end;
+
 procedure TformNotetask.SetShowColumnDone(Value: boolean);
 begin
   FShowColumnDone := Value;
@@ -2835,6 +2944,11 @@ begin
     statusBar.Panels[5].Text := string.empty;
 end;
 
+procedure TformNotetask.SetNote;
+begin
+  memoNote.Text := Tasks.GetTask(taskGrid.Row).Note;
+end;
+
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);
 begin
   aLangEnglish.Checked := False;
@@ -3016,6 +3130,7 @@ begin
 
   // Load saved settings for file
   LoadGridSettings(Self, taskGrid, FFileName);
+  ShowNote := FShowNote;
   ApplyColumnSetting;
 
   FillGrid;

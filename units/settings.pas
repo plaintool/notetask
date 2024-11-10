@@ -201,6 +201,8 @@ begin
     // Create a JSON object for the specified Item settings
     ItemSettings := TJSONObject.Create;
     ItemSettings.Add('ShowDuration', Form.ShowDuration);
+    ItemSettings.Add('ShowNote', Form.ShowNote);
+    ItemSettings.Add('NoteHeight', Form.memoNote.Height);
     ItemSettings.Add('ShowColumnDone', Form.ShowColumnDone);
     ItemSettings.Add('ShowColumnTask', Form.ShowColumnTask);
     ItemSettings.Add('ShowColumnNote', Form.ShowColumnNote);
@@ -275,6 +277,12 @@ begin
       // Load settings into the form and grid from the ItemSettings object
       if ItemSettings.FindPath('ShowDuration') <> nil then
         Form.FShowDuration := ItemSettings.FindPath('ShowDuration').AsBoolean;
+
+      if ItemSettings.FindPath('ShowNote') <> nil then
+        Form.FShowNote := ItemSettings.FindPath('ShowNote').AsBoolean;
+
+      if ItemSettings.FindPath('NoteHeight') <> nil then
+        Form.memoNote.Height := ItemSettings.FindPath('NoteHeight').AsInteger;
 
       if ItemSettings.FindPath('ShowColumnDone') <> nil then
         Form.FShowColumnDone := ItemSettings.FindPath('ShowColumnDone').AsBoolean;

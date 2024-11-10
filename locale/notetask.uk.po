@@ -506,6 +506,10 @@ msgstr "Стовпець завдання"
 msgid "Show duration"
 msgstr "Тривалість"
 
+#: tformnotetask.ashownote.caption
+msgid "Show note"
+msgstr "Нотатка"
+
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "Панель стану"

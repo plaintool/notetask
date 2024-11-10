@@ -15,10 +15,9 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
-    Height = 490
+    Height = 415
     Top = 0
     Width = 851
     Align = alClient
@@ -118,6 +117,31 @@ object formNotetask: TformNotetask
       end>
     ParentFont = False
     SimplePanel = False
+  end
+  object memoNote: TMemo
+    Left = 0
+    Height = 70
+    Top = 420
+    Width = 851
+    Align = alBottom
+    BorderStyle = bsNone
+    TabOrder = 2
+    Visible = False
+    OnChange = memoNoteChange
+    OnKeyDown = memoNoteKeyDown
+  end
+  object Splitter: TSplitter
+    Cursor = crVSplit
+    Left = 0
+    Height = 5
+    Top = 415
+    Width = 851
+    Align = alBottom
+    AutoSnap = False
+    Color = clBtnFace
+    ParentColor = False
+    ResizeAnchor = akBottom
+    Visible = False
   end
   object MainMenu: TMainMenu
     Left = 160
@@ -279,6 +303,10 @@ object formNotetask: TformNotetask
         Action = aShowDuration
         AutoCheck = True
       end
+      object MenuItem2: TMenuItem
+        Action = aShowNote
+        AutoCheck = True
+      end
       object menuShowStatusBar: TMenuItem
         Action = aShowStatusBar
         AutoCheck = True
@@ -438,19 +466,31 @@ object formNotetask: TformNotetask
       OnExecute = aInsertTaskExecute
       ShortCut = 45
     end
-    object aShowStatusBar: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Show status bar'
-      Checked = True
-      OnExecute = aShowStatusBarExecute
-    end
     object aShowArchived: TAction
       Category = 'View'
       AutoCheck = True
       Caption = 'Show archived tasks'
       OnExecute = aShowArchivedExecute
       ShortCut = 112
+    end
+    object aShowDuration: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Show duration'
+      OnExecute = aShowDurationExecute
+    end
+    object aShowNote: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Show note'
+      OnExecute = aShowNoteExecute
+    end
+    object aShowStatusBar: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Show status bar'
+      Checked = True
+      OnExecute = aShowStatusBarExecute
     end
     object aUndoAll: TAction
       Category = 'Edit'
@@ -547,12 +587,6 @@ object formNotetask: TformNotetask
       Caption = 'About...'
       OnExecute = aAboutExecute
     end
-    object aShowDuration: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Show duration'
-      OnExecute = aShowDurationExecute
-    end
     object aLangArabic: TAction
       Category = 'Language'
       Caption = 'Arabic'
@@ -623,47 +657,6 @@ object formNotetask: TformNotetask
       Caption = 'Ukrainian'
       OnExecute = aLangUkrainianExecute
     end
-    object aShowColumnDone: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column done'
-      Checked = True
-      OnExecute = aShowColumnDoneExecute
-    end
-    object aShowColumnTask: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column task'
-      Checked = True
-      OnExecute = aShowColumnTaskExecute
-    end
-    object aShowColumnNote: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column note'
-      Checked = True
-      OnExecute = aShowColumnNoteExecute
-    end
-    object aShowColumnAmount: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column amount'
-      OnExecute = aShowColumnAmountExecute
-    end
-    object aShowColumnDate: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column date'
-      Checked = True
-      OnExecute = aShowColumnDateExecute
-    end
-    object aShowColumnFavorite: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column fovorite'
-      Checked = True
-      OnExecute = aShowColumnFavoriteExecute
-    end
     object aMergeTasks: TAction
       Category = 'Task'
       Caption = 'Merge tasks'
@@ -729,6 +722,47 @@ object formNotetask: TformNotetask
       Caption = 'Run in terminal...'
       OnExecute = aRunTerminalExecute
       ShortCut = 16466
+    end
+    object aShowColumnDone: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column done'
+      Checked = True
+      OnExecute = aShowColumnDoneExecute
+    end
+    object aShowColumnTask: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column task'
+      Checked = True
+      OnExecute = aShowColumnTaskExecute
+    end
+    object aShowColumnNote: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column note'
+      Checked = True
+      OnExecute = aShowColumnNoteExecute
+    end
+    object aShowColumnAmount: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column amount'
+      OnExecute = aShowColumnAmountExecute
+    end
+    object aShowColumnDate: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column date'
+      Checked = True
+      OnExecute = aShowColumnDateExecute
+    end
+    object aShowColumnFavorite: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column fovorite'
+      Checked = True
+      OnExecute = aShowColumnFavoriteExecute
     end
   end
   object openDialog: TOpenDialog

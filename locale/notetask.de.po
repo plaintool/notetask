@@ -506,6 +506,10 @@ msgstr "Spalte Aufgabe"
 msgid "Show duration"
 msgstr "Dauer"
 
+#: tformnotetask.ashownote.caption
+msgid "Show note"
+msgstr "Notiz"
+
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "Statusleiste"

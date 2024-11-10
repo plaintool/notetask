@@ -506,6 +506,10 @@ msgstr "Столбец задача"
 msgid "Show duration"
 msgstr "Продолжительность"
 
+#: tformnotetask.ashownote.caption
+msgid "Show note"
+msgstr "Заметка"
+
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "Строка состояния"

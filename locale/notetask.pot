@@ -496,6 +496,10 @@ msgstr ""
 msgid "Show duration"
 msgstr ""
 
+#: tformnotetask.ashownote.caption
+msgid "Show note"
+msgstr ""
+
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr ""

@@ -506,6 +506,10 @@ msgstr "Слупок задача"
 msgid "Show duration"
 msgstr "Працягласць"
 
+#: tformnotetask.ashownote.caption
+msgid "Show note"
+msgstr "Нататка"
+
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "Панэль стану"

@@ -506,6 +506,10 @@ msgstr "列タスク"
 msgid "Show duration"
 msgstr "継続時間"
 
+#: tformnotetask.ashownote.caption
+msgid "Show note"
+msgstr "メモ"
+
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "ステータスバー"
