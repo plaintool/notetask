@@ -488,7 +488,7 @@ msgstr "Colonne date"
 
 #: tformnotetask.ashowcolumndone.caption
 msgid "Column done"
-msgstr "Colonne terminé"
+msgstr "Colonne fait"
 
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
@@ -500,7 +500,7 @@ msgstr "Colonne note"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
-msgstr "Colonne Tâche"
+msgstr "Colonne tâche"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"

@@ -488,7 +488,7 @@ msgstr "Spalte Datum"
 
 #: tformnotetask.ashowcolumndone.caption
 msgid "Column done"
-msgstr "Spalte erledigt"
+msgstr "Spalte Fertig"
 
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"

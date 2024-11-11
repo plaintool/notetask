@@ -488,7 +488,7 @@ msgstr "Coluna data"
 
 #: tformnotetask.ashowcolumndone.caption
 msgid "Column done"
-msgstr "Coluna concluído"
+msgstr "Coluna feito"
 
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
@@ -500,7 +500,7 @@ msgstr "Coluna nota"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
-msgstr "Coluna Tarefa"
+msgstr "Coluna tarefa"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
@@ -574,7 +574,7 @@ msgstr "Salvando"
 
 #: tformnotetask.taskgrid.columns[0].title.caption
 msgid "Done"
-msgstr "Concluído"
+msgstr "Feito"
 
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"

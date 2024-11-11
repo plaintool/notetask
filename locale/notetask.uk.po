@@ -488,7 +488,7 @@ msgstr "Стовпець дата"
 
 #: tformnotetask.ashowcolumndone.caption
 msgid "Column done"
-msgstr "Стовпець виконано"
+msgstr "Стовпець готово"
 
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
@@ -574,7 +574,7 @@ msgstr "Збереження"
 
 #: tformnotetask.taskgrid.columns[0].title.caption
 msgid "Done"
-msgstr "Виконано"
+msgstr "Готово"
 
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
