@@ -3059,6 +3059,10 @@ begin
     Memo.SetFocus;
     FMemoStartEdit := True;
   end;
+  if (Assigned(DatePicker)) and (DatePicker.Visible) then
+  begin
+    EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
+  end;
 end;
 
 procedure TformNotetask.EditComplite;
