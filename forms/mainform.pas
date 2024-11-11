@@ -3053,6 +3053,7 @@ begin
 
   if (Assigned(Memo)) and (Memo.Visible) then
   begin
+    EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
     Memo.Text := Tasks.GetTaskValue(aCol, aRow);
     Memo.SelectAll;
     Memo.SetFocus;
