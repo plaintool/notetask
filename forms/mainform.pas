@@ -1304,13 +1304,15 @@ begin
       if target > FDragTab then
       begin
         MoveTabRight(groupTabs.TabIndex);
-        //DisableDrag;
+        if (groupTabs.IndexOfTabAt(X, Y) <> groupTabs.TabIndex) then
+          DisableDrag;
       end
       else
       if target < FDragTab then
       begin
         MoveTabLeft(groupTabs.TabIndex);
-        //DisableDrag;
+        if (groupTabs.IndexOfTabAt(X, Y) <> groupTabs.TabIndex) then
+          DisableDrag;
       end;
     end;
   end;
