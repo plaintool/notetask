@@ -16,6 +16,7 @@ uses
   SysUtils,
   Grids,
   Clipbrd,
+  StrUtils,
   DateUtils;
 
 type
@@ -61,16 +62,18 @@ type
   // Class representing a collection of tasks
   TTasks = class
   private
-    FGroupList: array of array of TTask;
-    FGroupNameList: TStringList;
+    FGroupList: array of array of TTask; // Array of task groups
+    FGroupNameList: TStringList; // List of group names
     FTaskList: array of TTask; // Array of tasks
-    FMapGrid: TIntegerArray; // Map grid rows to tasks
-    FBackupTaskList: array of TTask; // Array of tasks
-    FInitGroupList: array of array of TTask; // Array of tasks
+    FMapGrid: TIntegerArray; // Maps grid rows to tasks
+    FBackupTaskList: array of TTask; // Backup array of tasks
+    FInitGroupList: array of array of TTask; // Initial array of task groups
+    FSelectedGroup: integer;
   public
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
     procedure AddGroup(const GroupName: string; const TaskStrings: TStringList = nil); // Add new group from a StringList
+    procedure UpdateGroup;
     procedure ChangeGroup(GroupIndex: integer);
     function ToStringList: TStringList;
     procedure InitMap(Length: integer);
@@ -111,6 +114,7 @@ type
     function GetCountArchive: integer;
     procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);
 
+    property SelectedGroup: integer read FSelectedGroup;
     property CountGroup: integer read GetGroupCount;
     property Count: integer read GetCount;
     property CountArhive: integer read GetCountArchive;
@@ -458,16 +462,18 @@ end;
 procedure TTask.Copy(Original: TTask);
 begin
   FDone := Original.FDone;
-  FArchive := Original.FArchive;
-  FDate := Original.FDate;
-  FAmount := Original.FAmount;
-  FNote := Original.FNote;
   FText := Original.FText;
+  FNote := Original.FNote;
+  FAmount := Original.FAmount;
+  FDate := Original.FDate;
+  FArchive := Original.FArchive;
   FStar := Original.FStar;
   FNoteItalic := Original.FNoteItalic;
   FEmptyNote := Original.FEmptyNote;
   FSpaceBeforeNote := Original.FSpaceBeforeNote;
   FSpaceAfterNote := Original.FSpaceAfterNote;
+  FDateStart := Original.FDateStart;
+  FDateEnd := Original.FDateEnd;
 end;
 
 function TTask.GetDate: string;
@@ -487,9 +493,9 @@ var
   i: integer; // Index for iteration
   Tab: TStringList;
   TabName, Value: string;
-  HasGroup: boolean;
 begin
   SetLength(FGroupList, 0); // Initialize group array
+  FSelectedGroup := -1;
   FGroupNameList := TStringList.Create;
   try
     // Iterate through the StringList to create tasks
@@ -497,7 +503,6 @@ begin
     begin
       Tab := TStringList.Create;
       TabName := rgroupuntitled;
-      HasGroup := False;
 
       for i := 0 to TaskStrings.Count - 1 do
       begin
@@ -512,7 +517,6 @@ begin
           end;
 
           TabName := Value;
-          HasGroup := True;
           Continue;
         end;
 
@@ -538,25 +542,42 @@ destructor TTasks.Destroy;
 var
   i, j: integer;
 begin
-  // Free each task in the arrays
+  UpdateGroup;
+
   if Assigned(FGroupList) then
     for i := 0 to High(FGroupList) do
+    begin
       for j := 0 to High(FGroupList[i]) do
         FGroupList[i, j].Free;
+      SetLength(FGroupList[i], 0);
+      FGroupList[i] := nil;
+    end;
+  SetLength(FGroupList, 0);
   FGroupList := nil;
+
   //if Assigned(FTaskList) then
   //  for i := 0 to High(FTaskList) do
   //    FTaskList[i].Free;
+  SetLength(FTaskList, 0);
   FTaskList := nil;
+
   if Assigned(FBackupTaskList) then
     for i := 0 to High(FBackupTaskList) do
       FBackupTaskList[i].Free;
+  SetLength(FBackupTaskList, 0);
   FBackupTaskList := nil;
+
   if Assigned(FInitGroupList) then
     for i := 0 to High(FInitGroupList) do
+    begin
       for j := 0 to High(FInitGroupList[i]) do
         FInitGroupList[i, j].Free;
+      SetLength(FInitGroupList[i], 0);
+      FInitGroupList[i] := nil;
+    end;
+  SetLength(FInitGroupList, 0);
   FInitGroupList := nil;
+
   if Assigned(FGroupNameList) then
     FGroupNameList.Free;
 
@@ -583,10 +604,29 @@ begin
   end;
 end;
 
+procedure TTasks.UpdateGroup;
+//var
+//  i: integer;
+begin
+  if (FSelectedGroup > -1) then
+    FGroupList[SelectedGroup] := FTaskList;
+  //if (FSelectedGroup > -1) and (Assigned(FTaskList)) then
+  //begin
+  //  SetLength(FGroupList[SelectedGroup], Count);
+  //  for i := 0 to Count - 1 do
+  //  begin
+  //    FGroupList[SelectedGroup, i] := TTask.Create;
+  //    FGroupList[SelectedGroup, i].Copy(FTaskList[i]);
+  //  end;
+  //end;
+end;
+
 procedure TTasks.ChangeGroup(GroupIndex: integer);
 begin
   SetLength(FMapGrid, 0); // Initialize task map
 
+  UpdateGroup;
+  FSelectedGroup := GroupIndex;
   FTaskList := FGroupList[GroupIndex];
 
   InitMap(Count + 1);
@@ -599,6 +639,7 @@ var
 begin
   Result := TStringList.Create;
   try
+    UpdateGroup;
     addCompleted := False;
     for i := 0 to CountGroup - 1 do
       for j := 0 to Length(FGroupList[i]) - 1 do
@@ -1139,6 +1180,10 @@ begin
         Row1 += pAmount + ', ';
 
       RowText := Row1 + Row2;
+
+      if (Grid.Selection.Width = 0) and (Grid.Selection.Height = 0) then
+        RowText := StringReplace(RowText, '<br>', sLineBreak, [rfReplaceAll]);
+
       SelectedText.Add(RowText.Trim);
     end;
 

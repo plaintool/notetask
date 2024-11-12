@@ -224,8 +224,11 @@ begin
     if Grid.Columns[5].Visible then
       ItemSettings.Add('ColumnFavorite', Grid.Columns[5].Width);
 
-    ItemSettings.Add('SortColumn', Form.SortColumn);
-    ItemSettings.Add('SortOrder', Ord(Form.SortOrder));
+    if (Item <> string.Empty) then
+    begin
+      ItemSettings.Add('SortColumn', Form.SortColumn);
+      ItemSettings.Add('SortOrder', Ord(Form.SortOrder));
+    end;
 
     ExistingItem := JSONFile.Find(Item); // Find the existing Item by key
     if Assigned(ExistingItem) then
@@ -320,12 +323,15 @@ begin
       if ItemSettings.FindPath('ColumnFavorite') <> nil then
         Grid.Columns[5].Width := ItemSettings.FindPath('ColumnFavorite').AsInteger;
 
-      if ItemSettings.FindPath('SortColumn') <> nil then
-        Form.SortColumn := ItemSettings.FindPath('SortColumn').AsInteger;
-
-      if ItemSettings.FindPath('SortOrder') <> nil then
+      if (Item <> string.Empty) then
       begin
-        Form.SortOrder := TSortOrder(ItemSettings.FindPath('SortOrder').AsInteger);
+        if ItemSettings.FindPath('SortColumn') <> nil then
+          Form.SortColumn := ItemSettings.FindPath('SortColumn').AsInteger;
+
+        if ItemSettings.FindPath('SortOrder') <> nil then
+        begin
+          Form.SortOrder := TSortOrder(ItemSettings.FindPath('SortOrder').AsInteger);
+        end;
       end;
     finally
       JSONData.Free;

@@ -2279,8 +2279,8 @@ begin
       for i := taskGrid.Selection.Top + 1 to taskGrid.Selection.Bottom do
       begin
         Target := Tasks.GetTask(i);
-        Task.Text := task.Text + FLineEnding.Value + Target.Text;
-        Task.Note := task.Note + FLineEnding.Value + Target.Note;
+        Task.Text := task.Text + IfThen(Target.Text <> string.Empty, FLineEnding.Value + Target.Text, string.Empty);
+        Task.Note := task.Note + IfThen(Target.Note <> string.Empty, FLineEnding.Value + Target.Note, string.Empty);
         Task.Amount := Task.Amount + Target.Amount;
 
         if (Target.Date > MaxDate) then
