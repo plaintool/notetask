@@ -99,7 +99,7 @@ msgstr "日"
 
 #: task.rgroupuntitled
 msgid "Ungrouped"
-msgstr ""
+msgstr "グループ化されていない"
 
 #: task.rhours
 msgid "h"
@@ -313,6 +313,10 @@ msgstr "日付 時間"
 msgid "Delete"
 msgstr "削除"
 
+#: tformnotetask.adeletegroup.caption
+msgid "Delete group"
+msgstr "グループを削除"
+
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
@@ -349,6 +353,10 @@ msgstr "移動..."
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "タスクのインデントを増やす"
+
+#: tformnotetask.ainsertgroup.caption
+msgid "Insert group"
+msgstr "グループを挿入"
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
@@ -422,6 +430,14 @@ msgstr "タスクを一番下に移動"
 msgid "Move tasks down"
 msgstr "タスクを下に移動"
 
+#: tformnotetask.amovetaskleft.caption
+msgid "Move tasks to left group"
+msgstr "タスクを左のグループに移動"
+
+#: tformnotetask.amovetaskright.caption
+msgid "Move tasks to right group"
+msgstr "タスクを右のグループに移動"
+
 #: tformnotetask.amovetasktop.caption
 msgid "Move tasks to top"
 msgstr "タスクを一番上に移動"
@@ -457,6 +473,10 @@ msgstr "貼り付け"
 #: tformnotetask.aprint.caption
 msgid "Print..."
 msgstr "印刷..."
+
+#: tformnotetask.arenamegroup.caption
+msgid "Rename group"
+msgstr "グループ名を変更"
 
 #: tformnotetask.areplace.caption
 msgid "Replace..."
@@ -550,6 +570,10 @@ msgstr "ファイル"
 #: tformnotetask.menuformat.caption
 msgid "Format"
 msgstr "フォーマット"
+
+#: tformnotetask.menugroup.caption
+msgid "Group"
+msgstr "グループ"
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
@@ -647,4 +671,3 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
-

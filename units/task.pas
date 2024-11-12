@@ -515,7 +515,7 @@ begin
 
         if (Value.TrimLeft.StartsWith('#')) then
         begin
-          if Tab.Count > 0 then
+          if (Tab.Count > 0) or (TabName <> rgroupuntitled) then
           begin
             AddGroup(TabName, Tab);
             Tab.Clear;
@@ -538,7 +538,6 @@ begin
   end;
 
   CreateBackupInit;
-
   ChangeGroup(0);
 end;
 

@@ -147,7 +147,6 @@ type
     aBidiRightToLeft: TAction;
     MenuItem6: TMenuItem;
     aChatGpt: TAction;
-    Separator10: TMenuItem;
     menuChatGpt: TMenuItem;
     Separator11: TMenuItem;
     contextAskChatGPT: TMenuItem;
@@ -210,6 +209,19 @@ type
     aShowNote: TAction;
     MenuItem2: TMenuItem;
     groupTabs: TTabControl;
+    aInsertGroup: TAction;
+    aDeleteGroup: TAction;
+    aRenameGroup: TAction;
+    aMoveTaskRight: TAction;
+    aMoveTaskLeft: TAction;
+    Separator15: TMenuItem;
+    menuGroup: TMenuItem;
+    menuInsertGroup: TMenuItem;
+    menuRenameGroup: TMenuItem;
+    menuDeleteGroup: TMenuItem;
+    menuMoveTasksLeft: TMenuItem;
+    Separator10: TMenuItem;
+    menuMoveTasksRight: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);

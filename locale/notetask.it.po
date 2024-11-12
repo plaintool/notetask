@@ -99,7 +99,7 @@ msgstr "g"
 
 #: task.rgroupuntitled
 msgid "Ungrouped"
-msgstr ""
+msgstr "Non raggruppato"
 
 #: task.rhours
 msgid "h"
@@ -313,6 +313,10 @@ msgstr "Data e ora"
 msgid "Delete"
 msgstr "Elimina"
 
+#: tformnotetask.adeletegroup.caption
+msgid "Delete group"
+msgstr "Elimina gruppo"
+
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
@@ -349,6 +353,10 @@ msgstr "Vai a..."
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "Aumenta rientro delle attività"
+
+#: tformnotetask.ainsertgroup.caption
+msgid "Insert group"
+msgstr "Inserisci gruppo"
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
@@ -422,6 +430,14 @@ msgstr "Sposta le attività in fondo"
 msgid "Move tasks down"
 msgstr "Sposta le attività giù"
 
+#: tformnotetask.amovetaskleft.caption
+msgid "Move tasks to left group"
+msgstr "Sposta attività nel gruppo a sinistra"
+
+#: tformnotetask.amovetaskright.caption
+msgid "Move tasks to right group"
+msgstr "Sposta attività nel gruppo a destra"
+
 #: tformnotetask.amovetasktop.caption
 msgid "Move tasks to top"
 msgstr "Sposta le attività in cima"
@@ -457,6 +473,10 @@ msgstr "Incolla"
 #: tformnotetask.aprint.caption
 msgid "Print..."
 msgstr "Stampa..."
+
+#: tformnotetask.arenamegroup.caption
+msgid "Rename group"
+msgstr "Rinomina gruppo"
 
 #: tformnotetask.areplace.caption
 msgid "Replace..."
@@ -550,6 +570,10 @@ msgstr "File"
 #: tformnotetask.menuformat.caption
 msgid "Format"
 msgstr "Formato"
+
+#: tformnotetask.menugroup.caption
+msgid "Group"
+msgstr "Gruppo"
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
@@ -647,4 +671,3 @@ msgstr "Trova cosa:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Sostituisci con:"
-

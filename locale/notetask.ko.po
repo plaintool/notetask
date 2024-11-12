@@ -99,7 +99,7 @@ msgstr "일"
 
 #: task.rgroupuntitled
 msgid "Ungrouped"
-msgstr ""
+msgstr "그룹화되지 않음"
 
 #: task.rhours
 msgid "h"
@@ -313,6 +313,10 @@ msgstr "날짜 시간"
 msgid "Delete"
 msgstr "삭제"
 
+#: tformnotetask.adeletegroup.caption
+msgid "Delete group"
+msgstr "그룹 삭제"
+
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
@@ -349,6 +353,10 @@ msgstr "이동하기..."
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "작업 들여쓰기 늘리기"
+
+#: tformnotetask.ainsertgroup.caption
+msgid "Insert group"
+msgstr "그룹 삽입"
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
@@ -422,6 +430,14 @@ msgstr "작업을 맨 아래로 이동"
 msgid "Move tasks down"
 msgstr "작업을 아래로 이동"
 
+#: tformnotetask.amovetaskleft.caption
+msgid "Move tasks to left group"
+msgstr "작업을 왼쪽 그룹으로 이동"
+
+#: tformnotetask.amovetaskright.caption
+msgid "Move tasks to right group"
+msgstr "작업을 오른쪽 그룹으로 이동"
+
 #: tformnotetask.amovetasktop.caption
 msgid "Move tasks to top"
 msgstr "작업을 맨 위로 이동"
@@ -457,6 +473,10 @@ msgstr "붙여넣기"
 #: tformnotetask.aprint.caption
 msgid "Print..."
 msgstr "인쇄..."
+
+#: tformnotetask.arenamegroup.caption
+msgid "Rename group"
+msgstr "그룹 이름 변경"
 
 #: tformnotetask.areplace.caption
 msgid "Replace..."
@@ -550,6 +570,10 @@ msgstr "파일"
 #: tformnotetask.menuformat.caption
 msgid "Format"
 msgstr "형식"
+
+#: tformnotetask.menugroup.caption
+msgid "Group"
+msgstr "그룹"
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
@@ -647,4 +671,3 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
-

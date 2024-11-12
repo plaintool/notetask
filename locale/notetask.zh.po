@@ -99,7 +99,7 @@ msgstr "日"
 
 #: task.rgroupuntitled
 msgid "Ungrouped"
-msgstr ""
+msgstr "未分组"
 
 #: task.rhours
 msgid "h"
@@ -313,6 +313,10 @@ msgstr "日期时间"
 msgid "Delete"
 msgstr "删除"
 
+#: tformnotetask.adeletegroup.caption
+msgid "Delete group"
+msgstr "删除组"
+
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
@@ -349,6 +353,10 @@ msgstr "转到..."
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "增加任务缩进"
+
+#: tformnotetask.ainsertgroup.caption
+msgid "Insert group"
+msgstr "插入组"
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
@@ -422,6 +430,14 @@ msgstr "将任务移动到底部"
 msgid "Move tasks down"
 msgstr "将任务向下移动"
 
+#: tformnotetask.amovetaskleft.caption
+msgid "Move tasks to left group"
+msgstr "移动任务到左边组"
+
+#: tformnotetask.amovetaskright.caption
+msgid "Move tasks to right group"
+msgstr "移动任务到右边组"
+
 #: tformnotetask.amovetasktop.caption
 msgid "Move tasks to top"
 msgstr "将任务移动到顶部"
@@ -457,6 +473,10 @@ msgstr "粘贴"
 #: tformnotetask.aprint.caption
 msgid "Print..."
 msgstr "打印..."
+
+#: tformnotetask.arenamegroup.caption
+msgid "Rename group"
+msgstr "重命名组"
 
 #: tformnotetask.areplace.caption
 msgid "Replace..."
@@ -550,6 +570,10 @@ msgstr "文件"
 #: tformnotetask.menuformat.caption
 msgid "Format"
 msgstr "格式"
+
+#: tformnotetask.menugroup.caption
+msgid "Group"
+msgstr "组"
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
@@ -647,4 +671,3 @@ msgstr "查找内容："
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "替换为："
-

@@ -303,6 +303,10 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+#: tformnotetask.adeletegroup.caption
+msgid "Delete group"
+msgstr ""
+
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
@@ -338,6 +342,10 @@ msgstr ""
 
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
+msgstr ""
+
+#: tformnotetask.ainsertgroup.caption
+msgid "Insert group"
 msgstr ""
 
 #: tformnotetask.ainserttask.caption
@@ -412,6 +420,14 @@ msgstr ""
 msgid "Move tasks down"
 msgstr ""
 
+#: tformnotetask.amovetaskleft.caption
+msgid "Move tasks to left group"
+msgstr ""
+
+#: tformnotetask.amovetaskright.caption
+msgid "Move tasks to right group"
+msgstr ""
+
 #: tformnotetask.amovetasktop.caption
 msgid "Move tasks to top"
 msgstr ""
@@ -446,6 +462,10 @@ msgstr ""
 
 #: tformnotetask.aprint.caption
 msgid "Print..."
+msgstr ""
+
+#: tformnotetask.arenamegroup.caption
+msgid "Rename group"
 msgstr ""
 
 #: tformnotetask.areplace.caption
@@ -539,6 +559,10 @@ msgstr ""
 
 #: tformnotetask.menuformat.caption
 msgid "Format"
+msgstr ""
+
+#: tformnotetask.menugroup.caption
+msgid "Group"
 msgstr ""
 
 #: tformnotetask.menuhelp.caption

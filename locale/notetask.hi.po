@@ -99,7 +99,7 @@ msgstr "द"
 
 #: task.rgroupuntitled
 msgid "Ungrouped"
-msgstr ""
+msgstr "असंगठित"
 
 #: task.rhours
 msgid "h"
@@ -313,6 +313,10 @@ msgstr "तारीख और समय"
 msgid "Delete"
 msgstr "हटाएं"
 
+#: tformnotetask.adeletegroup.caption
+msgid "Delete group"
+msgstr "समूह हटाएं"
+
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
@@ -349,6 +353,10 @@ msgstr "जाएं..."
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "कार्यों की इंडेंट बढ़ाएं"
+
+#: tformnotetask.ainsertgroup.caption
+msgid "Insert group"
+msgstr "समूह जोड़ें"
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
@@ -422,6 +430,14 @@ msgstr "कार्यों को नीचे ले जाएं"
 msgid "Move tasks down"
 msgstr "कार्यों को नीचे करें"
 
+#: tformnotetask.amovetaskleft.caption
+msgid "Move tasks to left group"
+msgstr "कार्यों को बाईं ओर के समूह में स्थानांतरित करें"
+
+#: tformnotetask.amovetaskright.caption
+msgid "Move tasks to right group"
+msgstr "कार्यों को दाईं ओर के समूह में स्थानांतरित करें"
+
 #: tformnotetask.amovetasktop.caption
 msgid "Move tasks to top"
 msgstr "कार्यों को ऊपर ले जाएं"
@@ -457,6 +473,10 @@ msgstr "पेस्ट"
 #: tformnotetask.aprint.caption
 msgid "Print..."
 msgstr "प्रिंट करें..."
+
+#: tformnotetask.arenamegroup.caption
+msgid "Rename group"
+msgstr "समूह का नाम बदलें"
 
 #: tformnotetask.areplace.caption
 msgid "Replace..."
@@ -550,6 +570,10 @@ msgstr "फाइल"
 #: tformnotetask.menuformat.caption
 msgid "Format"
 msgstr "फॉर्मेट"
+
+#: tformnotetask.menugroup.caption
+msgid "Group"
+msgstr "समूह"
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
@@ -647,4 +671,3 @@ msgstr "क्या खोजें:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "इसके साथ बदलें:"
-

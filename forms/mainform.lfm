@@ -287,7 +287,7 @@ object formNotetask: TformNotetask
       object menuOutdentTasks: TMenuItem
         Action = aOutdentTasks
       end
-      object Separator10: TMenuItem
+      object Separator15: TMenuItem
         Caption = '-'
       end
       object menuChatGpt: TMenuItem
@@ -295,6 +295,27 @@ object formNotetask: TformNotetask
       end
       object menuRunTerminal: TMenuItem
         Action = aRunTerminal
+      end
+    end
+    object menuGroup: TMenuItem
+      Caption = 'Group'
+      object menuInsertGroup: TMenuItem
+        Action = aInsertGroup
+      end
+      object menuRenameGroup: TMenuItem
+        Action = aRenameGroup
+      end
+      object menuDeleteGroup: TMenuItem
+        Action = aDeleteGroup
+      end
+      object Separator10: TMenuItem
+        Caption = '-'
+      end
+      object menuMoveTasksLeft: TMenuItem
+        Action = aMoveTaskLeft
+      end
+      object menuMoveTasksRight: TMenuItem
+        Action = aMoveTaskRight
       end
     end
     object menuFormat: TMenuItem
@@ -781,6 +802,26 @@ object formNotetask: TformNotetask
       Caption = 'Column fovorite'
       Checked = True
       OnExecute = aShowColumnFavoriteExecute
+    end
+    object aInsertGroup: TAction
+      Category = 'Group'
+      Caption = 'Insert group'
+    end
+    object aRenameGroup: TAction
+      Category = 'Group'
+      Caption = 'Rename group'
+    end
+    object aDeleteGroup: TAction
+      Category = 'Group'
+      Caption = 'Delete group'
+    end
+    object aMoveTaskLeft: TAction
+      Category = 'Group'
+      Caption = 'Move tasks to left group'
+    end
+    object aMoveTaskRight: TAction
+      Category = 'Group'
+      Caption = 'Move tasks to right group'
     end
   end
   object openDialog: TOpenDialog

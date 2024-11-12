@@ -99,7 +99,7 @@ msgstr "j"
 
 #: task.rgroupuntitled
 msgid "Ungrouped"
-msgstr ""
+msgstr "Non groupé"
 
 #: task.rhours
 msgid "h"
@@ -313,6 +313,10 @@ msgstr "Date et heure"
 msgid "Delete"
 msgstr "Supprimer"
 
+#: tformnotetask.adeletegroup.caption
+msgid "Delete group"
+msgstr "Supprimer le groupe"
+
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
@@ -349,6 +353,10 @@ msgstr "Aller à..."
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "Augmenter l'indentation des tâches"
+
+#: tformnotetask.ainsertgroup.caption
+msgid "Insert group"
+msgstr "Insérer un groupe"
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
@@ -416,19 +424,27 @@ msgstr "Fusionner les tâches"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
-msgstr "Déplacer les tâches vers le bas"
+msgstr "Mettre les tâches en bas"
 
 #: tformnotetask.amovetaskdown.caption
 msgid "Move tasks down"
-msgstr "Descendre les tâches"
+msgstr "Mettre les tâches plus bas"
+
+#: tformnotetask.amovetaskleft.caption
+msgid "Move tasks to left group"
+msgstr "Mettre les tâches dans le groupe de gauche"
+
+#: tformnotetask.amovetaskright.caption
+msgid "Move tasks to right group"
+msgstr "Mettre les tâches dans le groupe de droite"
 
 #: tformnotetask.amovetasktop.caption
 msgid "Move tasks to top"
-msgstr "Déplacer les tâches vers le haut"
+msgstr "Mettre les tâches en haut"
 
 #: tformnotetask.amovetaskup.caption
 msgid "Move tasks up"
-msgstr "Monter les tâches"
+msgstr "Mettre les tâches plus haut"
 
 #: tformnotetask.anew.caption
 msgid "New"
@@ -457,6 +473,10 @@ msgstr "Coller"
 #: tformnotetask.aprint.caption
 msgid "Print..."
 msgstr "Imprimer..."
+
+#: tformnotetask.arenamegroup.caption
+msgid "Rename group"
+msgstr "Renommer le groupe"
 
 #: tformnotetask.areplace.caption
 msgid "Replace..."
@@ -550,6 +570,10 @@ msgstr "Fichier"
 #: tformnotetask.menuformat.caption
 msgid "Format"
 msgstr "Format"
+
+#: tformnotetask.menugroup.caption
+msgid "Group"
+msgstr "Groupe"
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
@@ -647,4 +671,3 @@ msgstr "Trouver quoi :"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Remplacer par :"
-
