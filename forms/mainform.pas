@@ -299,6 +299,10 @@ type
     procedure aMergeTasksExecute(Sender: TObject);
     procedure aShowNoteExecute(Sender: TObject);
     procedure groupTabsChange(Sender: TObject);
+    procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure groupTabsMouseLeave(Sender: TObject);
+    procedure groupTabsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+    procedure groupTabsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -328,6 +332,7 @@ type
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
     FLastRowHeights: array of integer;
     FLastRow: integer;
+    FDragTab: integer;
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
     procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -341,6 +346,7 @@ type
     procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol, aRow: integer);
     procedure EditComplite;
+    procedure DisableDrag;
     procedure SetInfo;
     procedure SetNote;
     procedure SetTabs;
@@ -373,6 +379,8 @@ type
     procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     procedure ExecuteTerminal;
+    procedure MoveTabLeft(Index: integer);
+    procedure MoveTabRight(Index: integer);
     procedure CalcRowHeights(aRow: integer = 0);
     function LastRowHeight(aRow: integer): integer;
     function GetScrollPosition: integer;
@@ -473,6 +481,7 @@ begin
   FShowColumnAmount := False;
   FShowColumnFavorite := True;
   FBiDiRightToLeft := self.BiDiMode = bdRightToLeft;
+  FDragTab := -1;
   FSortColumn := 0;
   FSortOrder := soAscending;
   clRowHighlight := RGBToColor(220, 240, 255);
@@ -1261,6 +1270,48 @@ begin
   ResetRowHeight;
   SetNote;
   SetInfo;
+end;
+
+procedure TformNotetask.groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  if (Button = mbLeft) then
+    if (groupTabs.IndexOfTabAt(X, Y) = groupTabs.TabIndex) and not ((groupTabs.TabIndex = 0) and (groupTabs.Tabs[0] = rgroupuntitled)) then
+      FDragTab := groupTabs.TabIndex;
+end;
+
+procedure TformNotetask.groupTabsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+var
+  target: integer;
+begin
+  if FDragTab >= 0 then
+  begin
+    Screen.Cursor := crDrag;
+    target := groupTabs.IndexOfTabAt(X, Y);
+    if target >= 0 then
+    begin
+      if target > FDragTab then
+      begin
+        MoveTabRight(groupTabs.TabIndex);
+        //DisableDrag;
+      end
+      else
+      if target < FDragTab then
+      begin
+        MoveTabLeft(groupTabs.TabIndex);
+        //DisableDrag;
+      end;
+    end;
+  end;
+end;
+
+procedure TformNotetask.groupTabsMouseLeave(Sender: TObject);
+begin
+  DisableDrag;
+end;
+
+procedure TformNotetask.groupTabsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  DisableDrag;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
@@ -2211,6 +2262,40 @@ begin
     Process.Execute;
   finally
     Process.Free;
+  end;
+end;
+
+procedure TformNotetask.MoveTabLeft(Index: integer);
+var
+  Result: integer;
+begin
+  if (Index = 1) and (groupTabs.Tabs[0] = rgroupuntitled) then exit;
+
+  Result := Tasks.MoveGroupLeft(Index);
+  if (Result <> Index) then
+  begin
+    SetTabs;
+    groupTabs.TabIndex := Result;
+    if (FDragTab >= 0) then FDragTab := Result;
+    groupTabsChange(groupTabs);
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.MoveTabRight(Index: integer);
+var
+  Result: integer;
+begin
+  if (Index = 0) and (groupTabs.Tabs[0] = rgroupuntitled) then exit;
+
+  Result := Tasks.MoveGroupRight(Index);
+  if (Result <> Index) then
+  begin
+    SetTabs;
+    groupTabs.TabIndex := Result;
+    if (FDragTab >= 0) then FDragTab := Result;
+    groupTabsChange(groupTabs);
+    SetChanged;
   end;
 end;
 
@@ -3201,6 +3286,15 @@ begin
   begin
     taskGrid.EditorMode := False;
     FIsEditing := False;
+  end;
+end;
+
+procedure TformNotetask.DisableDrag;
+begin
+  if FDragTab >= 0 then
+  begin
+    FDragTab := -1;
+    Screen.Cursor := crDefault;
   end;
 end;
 

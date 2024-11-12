@@ -151,9 +151,13 @@ object formNotetask: TformNotetask
     Height = 24
     Top = 0
     Width = 851
-    HotTrack = True
     OnChange = groupTabsChange
     Align = alTop
+    OnMouseDown = groupTabsMouseDown
+    OnMouseLeave = groupTabsMouseLeave
+    OnMouseMove = groupTabsMouseMove
+    OnMouseUp = groupTabsMouseUp
+    Options = [nboDoChangeOnSetIndex]
     TabOrder = 4
     Visible = False
   end

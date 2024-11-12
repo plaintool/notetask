@@ -96,6 +96,8 @@ type
     procedure CompleteTask(Index: integer; Backup: boolean = True);
     procedure StarTask(Index: integer; Backup: boolean = True);
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
+    function MoveGroupLeft(Index: integer): integer;
+    function MoveGroupRight(Index: integer): integer;
     function MoveTasksTop(Index1, Index2: integer): integer;
     function MoveTasksBottom(Index1, Index2: integer): integer;
     function MoveTasksUp(Index1, Index2: integer): integer;
@@ -939,6 +941,48 @@ begin
         Grid.Cells[j, i] := string.Empty;
     end;
   end;
+end;
+
+function TTasks.MoveGroupLeft(Index: integer): integer;
+var
+  tempGroup: array of TTask;
+  tempName: string;
+begin
+  Result := Index;
+  if (Index < 1) then exit;
+
+  tempGroup := FGroupList[Index - 1];
+  FGroupList[Index - 1] := FGroupList[Index];
+  FGroupList[Index] := tempGroup;
+  SetLength(tempGroup, 0);
+  tempGroup := nil;
+
+  tempName := FGroupNameList[Index - 1];
+  FGroupNameList[Index - 1] := FGroupNameList[Index];
+  FGroupNameList[Index] := tempName;
+  Result := Index - 1;
+  FSelectedGroup := Result;
+end;
+
+function TTasks.MoveGroupRight(Index: integer): integer;
+var
+  tempGroup: array of TTask;
+  tempName: string;
+begin
+  Result := Index;
+  if (Index >= CountGroup - 1) then exit;
+
+  tempGroup := FGroupList[Index + 1];
+  FGroupList[Index + 1] := FGroupList[Index];
+  FGroupList[Index] := tempGroup;
+  SetLength(tempGroup, 0);
+  tempGroup := nil;
+
+  tempName := FGroupNameList[Index + 1];
+  FGroupNameList[Index + 1] := FGroupNameList[Index];
+  FGroupNameList[Index] := tempName;
+  Result := Index + 1;
+  FSelectedGroup := Result;
 end;
 
 function TTasks.MoveTasksTop(Index1, Index2: integer): integer;
