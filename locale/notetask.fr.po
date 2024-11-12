@@ -97,6 +97,10 @@ msgstr "Sans titre"
 msgid "d"
 msgstr "j"
 
+#: task.rgroupuntitled
+msgid "Ungrouped"
+msgstr ""
+
 #: task.rhours
 msgid "h"
 msgstr "h"
@@ -643,3 +647,4 @@ msgstr "Trouver quoi :"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Remplacer par :"
+

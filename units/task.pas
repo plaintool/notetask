@@ -61,20 +61,24 @@ type
   // Class representing a collection of tasks
   TTasks = class
   private
+    FGroupList: array of array of TTask;
+    FGroupNameList: TStringList;
     FTaskList: array of TTask; // Array of tasks
-    FBackupTaskList: array of TTask; // Array of tasks
-    FInitTaskList: array of TTask; // Array of tasks
     FMapGrid: TIntegerArray; // Map grid rows to tasks
-    FCount: integer; // Current count of tasks
+    FBackupTaskList: array of TTask; // Array of tasks
+    FInitGroupList: array of array of TTask; // Array of tasks
   public
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
+    procedure AddGroup(const GroupName: string; const TaskStrings: TStringList = nil); // Add new group from a StringList
+    procedure ChangeGroup(GroupIndex: integer);
     function ToStringList: TStringList;
     procedure InitMap(Length: integer);
     function Map(Index: integer): integer;
     function ReverseMap(Value: integer): integer;
     procedure AddMap(Value: integer);
     function AddTask(const TaskString: string): integer; // Method to add a task
+    function AddGroupTask(const GroupIndex: integer; const TaskString: string): integer;
     function GetTask(Index: integer): TTask; // Method to get a task by row index
     function GetTaskValue(ACol, ARow: integer): string; // Method to get a task value by row col
     function HasTask(Index: integer): boolean;
@@ -93,24 +97,28 @@ type
     procedure MoveTask(OldIndex, NewIndex: integer);
     procedure CopyToClipboard(Grid: TStringGrid);
     function PasteFromClipboard(Grid: TStringGrid): TGridRect;
-    procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);
     procedure CreateBackup;
     procedure UndoBackup;
     procedure CreateBackupInit;
     procedure UndoBackupInit;
-    function GetCountArchive: integer;
     function CalcDateDiff(const StartDate, EndDate: TDateTime): string;
     function CalcDateDiffAccuracy(const StartDate, EndDate: TDateTime): string;
     function CalcCount(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): integer;
     function CalcSum(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): double;
     function CalcDuration(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): string;
+    function GetGroupCount: integer;
+    function GetCount: integer;
+    function GetCountArchive: integer;
+    procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);
 
-    property Count: integer read FCount;
+    property CountGroup: integer read GetGroupCount;
+    property Count: integer read GetCount;
     property CountArhive: integer read GetCountArchive;
     property MapGrid: TIntegerArray read FMapGrid;
   end;
 
 resourcestring
+  rgroupuntitled = 'Ungrouped';
   rseconds = 'sec';
   rminutes = 'min';
   rhours = 'h';
@@ -477,38 +485,80 @@ end;
 constructor TTasks.Create(const TaskStrings: TStringList = nil);
 var
   i: integer; // Index for iteration
+  Tab: TStringList;
+  TabName, Value: string;
+  HasGroup: boolean;
 begin
-  SetLength(FTaskList, 0); // Initialize task array
-  SetLength(FMapGrid, 0); // Initialize task map
-  FCount := 0; // Initialize task count
-
-  // Iterate through the StringList to create tasks
-  if (Assigned(TaskStrings)) then
-  begin
-    for i := 0 to TaskStrings.Count - 1 do
+  SetLength(FGroupList, 0); // Initialize group array
+  FGroupNameList := TStringList.Create;
+  try
+    // Iterate through the StringList to create tasks
+    if (Assigned(TaskStrings)) then
     begin
-      AddTask(TaskStrings[i]); // Create a new task from the string and add to the list
+      Tab := TStringList.Create;
+      TabName := rgroupuntitled;
+      HasGroup := False;
+
+      for i := 0 to TaskStrings.Count - 1 do
+      begin
+        Value := TaskStrings[i];
+
+        if (Value.TrimLeft.StartsWith('#')) then
+        begin
+          if Tab.Count > 0 then
+          begin
+            AddGroup(TabName, Tab);
+            Tab.Clear;
+          end;
+
+          TabName := Value;
+          HasGroup := True;
+          Continue;
+        end;
+
+        Tab.Add(Value);
+      end;
+
+      // Add last group
+      AddGroup(TabName, Tab);
+
+      TaskStrings.Free;
     end;
-    TaskStrings.Free;
+  finally
+    Tab.Free;
   end;
-  InitMap(FCount + 1);
+
   CreateBackupInit;
+
+  ChangeGroup(0);
+
 end;
 
 destructor TTasks.Destroy;
 var
-  i: integer;
+  i, j: integer;
 begin
-  // Free each task in the array
-  if (Assigned(FTaskList)) then
-    for i := 0 to High(FTaskList) do
-      FTaskList[i].Free;
-  if (Assigned(FBackupTaskList)) then
+  // Free each task in the arrays
+  if Assigned(FGroupList) then
+    for i := 0 to High(FGroupList) do
+      for j := 0 to High(FGroupList[i]) do
+        FGroupList[i, j].Free;
+  FGroupList := nil;
+  //if Assigned(FTaskList) then
+  //  for i := 0 to High(FTaskList) do
+  //    FTaskList[i].Free;
+  FTaskList := nil;
+  if Assigned(FBackupTaskList) then
     for i := 0 to High(FBackupTaskList) do
       FBackupTaskList[i].Free;
-  if (Assigned(FInitTaskList)) then
-    for i := 0 to High(FInitTaskList) do
-      FInitTaskList[i].Free;
+  FBackupTaskList := nil;
+  if Assigned(FInitGroupList) then
+    for i := 0 to High(FInitGroupList) do
+      for j := 0 to High(FInitGroupList[i]) do
+        FInitGroupList[i, j].Free;
+  FInitGroupList := nil;
+  if Assigned(FGroupNameList) then
+    FGroupNameList.Free;
 
   SetLength(FMapGrid, 0);
   FMapGrid := nil;
@@ -516,22 +566,53 @@ begin
   inherited;
 end;
 
+procedure TTasks.AddGroup(const GroupName: string; const TaskStrings: TStringList = nil); // Add new group from a StringList
+var
+  i: integer; // Index for iteration
+begin
+  SetLength(FGroupList, CountGroup + 1);
+  FGroupNameList.Add(GroupName);
+
+  // Iterate through the StringList to create tasks
+  if (Assigned(TaskStrings)) then
+  begin
+    for i := 0 to TaskStrings.Count - 1 do
+    begin
+      AddGroupTask(CountGroup - 1, TaskStrings[i]); // Create a new task from the string and add to the list
+    end;
+  end;
+end;
+
+procedure TTasks.ChangeGroup(GroupIndex: integer);
+begin
+  SetLength(FMapGrid, 0); // Initialize task map
+
+  FTaskList := FGroupList[GroupIndex];
+
+  InitMap(Count + 1);
+end;
+
 function TTasks.ToStringList: TStringList;
 var
-  i: integer;
+  i, j: integer;
   addCompleted: boolean;
 begin
   Result := TStringList.Create;
   try
     addCompleted := False;
-    for i := 0 to FCount - 1 do
-      if FTaskList[i].Done then addCompleted := True;
-    //if (FCount = 1) and (FTaskList[0].Text = string.Empty) and (FTaskList[0].Note = string.Empty) and (FTaskList[0].Date = 0) then
-    //  addCompleted := True;
+    for i := 0 to CountGroup - 1 do
+      for j := 0 to Length(FGroupList[i]) - 1 do
+        if FGroupList[i, j].Done then addCompleted := True;
 
-    for i := 0 to FCount - 1 do
+    for i := 0 to CountGroup - 1 do
     begin
-      Result.Add(FTaskList[i].ToString(0, addCompleted)); // Add task string to TStringList
+      if (FGroupNameList[i] <> rgroupuntitled) then
+        Result.Add(FGroupNameList[i]);
+
+      for j := 0 to Length(FGroupList[i]) - 1 do
+      begin
+        Result.Add(FGroupList[i, j].ToString(0, addCompleted)); // Add task string to TStringList
+      end;
     end;
   except
     Result.Free;
@@ -586,10 +667,19 @@ var
   Task: TTask;
 begin
   Task := TTask.Create(TaskString); // Create a new task
-  SetLength(FTaskList, FCount + 1); // Resize the array
-  FTaskList[FCount] := Task; // Add the task to the list
-  Result := FCount;
-  Inc(FCount); // Increment the task count
+  SetLength(FTaskList, Count + 1); // Resize the array
+  FTaskList[Count - 1] := Task; // Add the task to the list
+  Result := Count;
+end;
+
+function TTasks.AddGroupTask(const GroupIndex: integer; const TaskString: string): integer;
+var
+  Task: TTask;
+begin
+  Task := TTask.Create(TaskString); // Create a new task
+  SetLength(FGroupList[GroupIndex], Length(FGroupList[GroupIndex]) + 1); // Resize the array
+  FGroupList[GroupIndex, Length(FGroupList[GroupIndex]) - 1] := Task; // Add the task to the list
+  Result := Length(FGroupList[GroupIndex]);
 end;
 
 function TTasks.GetTask(Index: integer): TTask;
@@ -597,7 +687,7 @@ var
   Ind: integer;
 begin
   Ind := Map(Index);
-  if (Ind < 0) or (Ind >= FCount) then
+  if (Ind < 0) or (Ind >= Count) then
     raise Exception.Create('Index out of bounds'); // Error handling for invalid index
   Result := FTaskList[Ind]; // Return the task by index
 end;
@@ -629,7 +719,7 @@ var
   Ind: integer;
 begin
   Ind := Map(Index);
-  Result := (Ind >= 0) and (Ind < FCount);
+  Result := (Ind >= 0) and (Ind < Count);
 end;
 
 procedure TTasks.SetTask(Grid: TStringGrid; Row: integer; Backup: boolean = True);
@@ -638,7 +728,7 @@ var
   pDate: TDateTime;
   pAmount: double;
 begin
-  if (Row > 0) and (Row <= FCount) then
+  if (Row > 0) and (Row <= Count) then
   begin
     if (Backup) then
       CreateBackup;
@@ -679,11 +769,11 @@ var
   i, Ind: integer;
 begin
   if (Index = 0) then
-    Ind := FCount - 1
+    Ind := Count - 1
   else
     Ind := Map(Index);
 
-  if (Ind < 0) and (Ind >= FCount) then
+  if (Ind < 0) and (Ind >= Count) then
     exit(-1);
 
   if (Backup) then
@@ -691,16 +781,15 @@ begin
 
   Ind := Ind + 1;
   Task := TTask.Create(TaskString); // Create a new task
-  SetLength(FTaskList, FCount + 1); // Resize the array
+  SetLength(FTaskList, Count + 1); // Resize the array
 
   // Shift tasks down to make space for the new task
-  for i := FCount downto Ind + 1 do
+  for i := Count - 1 downto Ind + 1 do
   begin
     FTaskList[i] := FTaskList[i - 1]; // Move tasks one position down
   end;
 
   FTaskList[Ind] := Task; // Insert the new task at the specified index
-  Inc(FCount); // Increment the task count
 
   Result := Ind;
 end;
@@ -710,7 +799,7 @@ var
   i, Ind: integer;
 begin
   Ind := Map(Index);
-  if (Ind < 0) or (Ind >= FCount) then
+  if (Ind < 0) or (Ind >= Count) then
     exit;
 
   // Free the task that is being removed
@@ -718,14 +807,13 @@ begin
     FTaskList[Ind].Free;
 
   // Shift tasks down to fill the gap
-  for i := Ind to FCount - 2 do
+  for i := Ind to Count - 2 do
   begin
     FTaskList[i] := FTaskList[i + 1]; // Move the next task to the current position
   end;
 
   // Resize the array to remove the last (now duplicate) element
-  SetLength(FTaskList, FCount - 1);
-  Dec(FCount); // Decrease the task count
+  SetLength(FTaskList, Count - 1);
 
   // Delete record from FMapGrid
   for i := Index to Length(FMapGrid) - 2 do
@@ -745,7 +833,7 @@ var
   Ind: integer;
 begin
   Ind := Map(Index);
-  if (Ind < 0) or (Ind >= FCount) then
+  if (Ind < 0) or (Ind >= Count) then
     exit;
 
   FTaskList[Ind].Archive := not FTaskList[Ind].Archive;
@@ -756,7 +844,7 @@ var
   Ind: integer;
 begin
   Ind := Map(Index);
-  if (Ind < 0) or (Ind >= FCount) then
+  if (Ind < 0) or (Ind >= Count) then
     exit;
 
   if Backup then CreateBackup;
@@ -769,7 +857,7 @@ var
   Ind: integer;
 begin
   Ind := Map(Index);
-  if (Ind < 0) or (Ind >= FCount) then
+  if (Ind < 0) or (Ind >= Count) then
     exit;
 
   if Backup then CreateBackup;
@@ -821,7 +909,7 @@ begin
   Len := IndEnd - IndStart + 1;
 
   // Check if the Index1 is valid and not already at the top
-  if (IndStart > 0) and (IndEnd <= FCount) then
+  if (IndStart > 0) and (IndEnd <= Count) then
   begin
     CreateBackup;
 
@@ -856,7 +944,7 @@ begin
   Len := IndEnd - IndStart + 1;
 
   // Check if the Index1 is valid and not already at the bottom
-  if (IndStart >= 0) and (IndEnd < FCount) then
+  if (IndStart >= 0) and (IndEnd < Count) then
   begin
     CreateBackup;
 
@@ -867,12 +955,12 @@ begin
       TempTasks[i - IndStart] := FTaskList[i];
 
     // Shift all tasks down to fill the gap
-    for i := IndStart to FCount - 1 - Len do
+    for i := IndStart to Count - 1 - Len do
       FTaskList[i] := FTaskList[i + Len];
 
     // Place the stored task at the end
     for i := 0 to High(TempTasks) do
-      FTaskList[FCount - len + i] := TempTasks[i];
+      FTaskList[Count - len + i] := TempTasks[i];
 
     Result := Length(MapGrid) - 1; //ReverseMap(FCount);
   end;
@@ -889,7 +977,7 @@ begin
   Len := IndEnd - IndStart + 1;
 
   // Check if the selection is not at the top and valid
-  if (IndStart > 0) and (IndEnd < FCount) then
+  if (IndStart > 0) and (IndEnd < Count) then
   begin
     CreateBackup;
 
@@ -923,7 +1011,7 @@ begin
   Len := IndEnd - IndStart + 1;
 
   // Check if the selection is not at the bottom and valid
-  if (IndEnd < FCount - 1) and (IndStart >= 0) then
+  if (IndEnd < Count - 1) and (IndStart >= 0) then
   begin
     CreateBackup;
 
@@ -935,7 +1023,7 @@ begin
 
     // Shift tasks down by one position to fill the gap
     for i := IndStart to IndEnd do
-      if (i + Len < FCount) then
+      if (i + Len < Count) then
       begin
         FTaskList[i] := FTaskList[i + Len];
       end;
@@ -958,7 +1046,7 @@ begin
   IndNew := Map(NewIndex);
 
   // Check if both indices are valid
-  if (IndOld < 0) or (IndNew < 0) or (IndOld >= FCount) or (IndNew >= FCount) then
+  if (IndOld < 0) or (IndNew < 0) or (IndOld >= Count) or (IndNew >= Count) then
     raise Exception.Create('Invalid index for swapping tasks');
 
   CreateBackup; // Backup the current state before swapping
@@ -982,7 +1070,7 @@ begin
   Ind := Map(OldIndex);
 
   // Validate the indices
-  if (Ind < 0) or (Ind >= FCount) or (NewIndex < 0) or (NewIndex > FCount) then
+  if (Ind < 0) or (Ind >= Count) or (NewIndex < 0) or (NewIndex > Count) then
     Exit;
 
   CreateBackup; // Backup the current state before moving
@@ -1097,7 +1185,7 @@ begin
         index := 1
       else
         index := Grid.Row;
-      for i := TempTasks.FCount - 1 downto 0 do
+      for i := TempTasks.Count - 1 downto 0 do
         InsertTask(TempTasks.GetTask(i + 1).ToString(), index, False);
     end
     else
@@ -1122,7 +1210,7 @@ begin
 
         for i := Rect.Top to Rect.Bottom do
         begin
-          if (index > TempTasks.FCount) then
+          if (index > TempTasks.Count) then
           begin
             Index := 1;
             DoInsert := False;
@@ -1228,9 +1316,9 @@ begin
       end;
 
       // Insert if clipboard is bigger than selection
-      if (DoInsert) and (index - 1 < TempTasks.FCount) then
+      if (DoInsert) and (index - 1 < TempTasks.Count) then
       begin
-        for i := TempTasks.FCount - 1 downto index - 1 do
+        for i := TempTasks.Count - 1 downto index - 1 do
         begin
           InsertTask(TempTasks.GetTask(i + 1).ToString(), Grid.Row, False);
         end;
@@ -1296,8 +1384,6 @@ begin
     FTaskList[i].Copy(FBackupTaskList[i]);
   end;
 
-  FCount := Length(FTaskList); // Restore the task count
-
   // Free old backup task list before resizing and replacing
   for i := 0 to High(FBackupTaskList) do
   begin
@@ -1330,50 +1416,58 @@ end;
 
 procedure TTasks.CreateBackupInit;
 var
-  i: integer;
+  i, j: integer;
 begin
   // Free old backup task list if it exists
-  for i := 0 to High(FInitTaskList) do
-  begin
-    if Assigned(FInitTaskList[i]) then
+  for i := 0 to High(FInitGroupList) do
+    for j := 0 to High(FInitGroupList[i]) do
     begin
-      FInitTaskList[i].Free; // Free the old task
-      FInitTaskList[i] := nil; // Set to nil after freeing
+      if Assigned(FInitGroupList[i, j]) then
+      begin
+        FInitGroupList[i, j].Free; // Free the old task
+        FInitGroupList[i, j] := nil; // Set to nil after freeing
+      end;
     end;
-  end;
-  SetLength(FInitTaskList, 0);
+  SetLength(FInitGroupList, 0);
 
   // Create a backup of the task list
-  SetLength(FInitTaskList, Length(FTaskList));
-  for i := 0 to High(FInitTaskList) do
+  SetLength(FInitGroupList, Length(FGroupList));
+  for i := 0 to High(FInitGroupList) do
   begin
-    FInitTaskList[i] := TTask.Create; // Create a new task
-    FInitTaskList[i].Copy(FTaskList[i]); // Copy the task data
+    SetLength(FInitGroupList[i], Length(FGroupList[i]));
+    for j := 0 to High(FInitGroupList[i]) do
+    begin
+      FInitGroupList[i, j] := TTask.Create; // Create a new task
+      FInitGroupList[i, j].Copy(FGroupList[i, j]); // Copy the task data
+    end;
   end;
 end;
 
 procedure TTasks.UndoBackupInit;
 var
-  i: integer;
+  i, j: integer;
 begin
   // Resize the task list to match the initial task list
-  SetLength(FTaskList, Length(FInitTaskList));
+  SetLength(FGroupList, Length(FInitGroupList));
 
-  for i := 0 to High(FInitTaskList) do
+  for i := 0 to High(FInitGroupList) do
   begin
-    // If there's already an object in FTaskList, free it
-    if Assigned(FTaskList[i]) then
+    SetLength(FGroupList[i], Length(FInitGroupList[i]));
+
+    for j := 0 to High(FInitGroupList[i]) do
     begin
-      FTaskList[i].Free;
-      FTaskList[i] := nil; // Set to nil after freeing
+      // If there's already an object in FTaskList, free it
+      if Assigned(FGroupList[i, j]) then
+      begin
+        FGroupList[i, j].Free;
+        FGroupList[i, j] := nil; // Set to nil after freeing
+      end;
+
+      // Create a new task and copy the initial task data
+      FGroupList[i, j] := TTask.Create;
+      FGroupList[i, j].Copy(FInitGroupList[i, j]);
     end;
-
-    // Create a new task and copy the initial task data
-    FTaskList[i] := TTask.Create;
-    FTaskList[i].Copy(FInitTaskList[i]);
   end;
-
-  FCount := Length(FTaskList); // Restore the task count
 end;
 
 function TTasks.CalcDateDiff(const StartDate, EndDate: TDateTime): string;
@@ -1611,6 +1705,16 @@ begin
     end;
   end;
   Result := CalcDateDiffAccuracy(0, TotalDuration).Replace('-', string.Empty);
+end;
+
+function TTasks.GetGroupCount: integer;
+begin
+  Result := Length(FGroupList);
+end;
+
+function TTasks.GetCount: integer;
+begin
+  Result := Length(FTaskList);
 end;
 
 function TTasks.GetCountArchive: integer;

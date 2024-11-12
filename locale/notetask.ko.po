@@ -97,6 +97,10 @@ msgstr "제목 없음"
 msgid "d"
 msgstr "일"
 
+#: task.rgroupuntitled
+msgid "Ungrouped"
+msgstr ""
+
 #: task.rhours
 msgid "h"
 msgstr "시"
@@ -643,3 +647,4 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
+

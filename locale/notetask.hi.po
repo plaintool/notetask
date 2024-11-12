@@ -97,6 +97,10 @@ msgstr "बिना शीर्षक"
 msgid "d"
 msgstr "द"
 
+#: task.rgroupuntitled
+msgid "Ungrouped"
+msgstr ""
+
 #: task.rhours
 msgid "h"
 msgstr "घ"
@@ -643,3 +647,4 @@ msgstr "क्या खोजें:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "इसके साथ बदलें:"
+

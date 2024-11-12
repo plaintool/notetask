@@ -97,6 +97,10 @@ msgstr "无标题"
 msgid "d"
 msgstr "日"
 
+#: task.rgroupuntitled
+msgid "Ungrouped"
+msgstr ""
+
 #: task.rhours
 msgid "h"
 msgstr "时"
@@ -643,3 +647,4 @@ msgstr "查找内容："
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "替换为："
+

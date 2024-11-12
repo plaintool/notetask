@@ -420,6 +420,7 @@ var
   clRowHighlight: TColor;
   clRowFocused: TColor;
   clRowExpired: TColor;
+  clDarkBlue: TColor;
   ResourceBitmapCheck: TBitmap;
   ResourceBitmapUncheck: TBitmap;
   ResourceBitmapStarGold: TBitmap;
@@ -473,6 +474,7 @@ begin
   clRowHighlight := RGBToColor(220, 240, 255);
   clRowFocused := RGBToColor(200, 220, 255);
   clRowExpired := RGBToColor(255, 220, 220);
+  clDarkBlue := RGBToColor(0, 0, 180);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
@@ -935,33 +937,43 @@ begin
     end
     else
     begin
-      task := Tasks.GetTask(ARow);
-      if (ShowColumnDate) and (not task.Done) and (task.Date > 0) and (task.Date < Now) then // Color expired task
+      if (Tasks.HasTask(ARow)) then
       begin
-        bgFill := clRowExpired; // Expired warning red
-        grid.Canvas.Font.Color := clBlack;
-      end
-      else
-      if (not task.Done) and (task.Archive) then
-      begin
-        bgFill := clWhite; // Not done but arhive warning color
-        grid.Canvas.Font.Color := clMaroon;
-      end
-      else
-      begin
-        bgFill := clWhite; // All other white
-        grid.Canvas.Font.Color := clBlack;
+        task := Tasks.GetTask(ARow);
+        if (ShowColumnDate) and (not task.Done) and (task.Date > 0) and (task.Date < Now) then // Color expired task
+        begin
+          bgFill := clRowExpired; // Expired warning red
+          grid.Canvas.Font.Color := clBlack;
+        end
+        else
+        if (not task.Done) and (task.Archive) then
+        begin
+          bgFill := clWhite; // Not done but arhive warning color
+          grid.Canvas.Font.Color := clMaroon;
+        end
+        else
+        begin
+          bgFill := clWhite; // All other white
+          grid.Canvas.Font.Color := clBlack;
+        end;
       end;
     end;
 
-    if (Tasks.HasTask(ARow)) and (Tasks.GetTask(ARow).Star) then
-      grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsBold];
+    if (Tasks.HasTask(ARow)) then
+    begin
+      task := Tasks.GetTask(ARow);
+      if task.Star then
+        grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsBold];
 
-    if (aCol = 2) and (Tasks.HasTask(ARow)) and (Tasks.GetTask(ARow).Archive) then
-      grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsStrikeOut];
+      if (aCol = 2) and (task.Archive) then
+        grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsStrikeOut];
 
-    if (aCol = 3) and (Tasks.HasTask(ARow) and Tasks.GetTask(ARow).NoteItalic) then
-      grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsItalic];
+      if (aCol = 3) and (task.NoteItalic) then
+        grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsItalic];
+
+      if (aCol = 5) and (task.Date > Now) then
+        grid.Canvas.Font.Color := clDarkBlue;
+    end;
 
     // Fill the cell background
     grid.Canvas.Brush.Color := bgFill;
@@ -2480,6 +2492,7 @@ begin
     if ShowDuration then FillGrid;
     SetChanged; // Mark that data has changed
     SetInfo;
+    Invalidate;
   end
   else
   begin
@@ -2513,6 +2526,7 @@ begin
       if (ShowDuration) and (Check) then FillGrid;
       SetChanged; // Mark that data has changed
       SetInfo;
+      Invalidate;
     end;
   end;
 end;

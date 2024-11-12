@@ -97,6 +97,10 @@ msgstr "Безымянный"
 msgid "d"
 msgstr "д"
 
+#: task.rgroupuntitled
+msgid "Ungrouped"
+msgstr ""
+
 #: task.rhours
 msgid "h"
 msgstr "ч"
@@ -643,3 +647,4 @@ msgstr "Что:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Чем:"
+

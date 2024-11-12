@@ -97,6 +97,10 @@ msgstr "بلا عنوان"
 msgid "d"
 msgstr "ي"
 
+#: task.rgroupuntitled
+msgid "Ungrouped"
+msgstr ""
+
 #: task.rhours
 msgid "h"
 msgstr "س"
@@ -643,3 +647,4 @@ msgstr "ابحث عن ماذا:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "استبدال بـ:"
+

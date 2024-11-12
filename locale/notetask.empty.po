@@ -97,6 +97,10 @@ msgstr ""
 msgid "d"
 msgstr ""
 
+#: task.rgroupuntitled
+msgid "Ungrouped"
+msgstr ""
+
 #: task.rhours
 msgid "h"
 msgstr ""
