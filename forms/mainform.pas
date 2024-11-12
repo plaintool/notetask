@@ -19,18 +19,19 @@ uses
   Graphics,
   Dialogs,
   StdCtrls,
+  StrUtils,
   ActnList,
   ComCtrls,
+  ExtCtrls,
   Grids,
   Menus,
   PrintersDlgs,
   DateTimePicker,
   Printers,
-  LCLIntf,
-  LCLType, ExtCtrls,
-  LConvEncoding,
   Process,
-  StrUtils,
+  LCLIntf,
+  LCLType,
+  LConvEncoding,
   GridPrn,
   task,
   lineending;
@@ -512,8 +513,9 @@ begin
   memoNote.WordWrap := FWordWrap;
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowArchived.Checked := FShowArchived;
-  aShowNote.Checked := FShowNote;
   aShowStatusBar.Checked := FShowStatusBar;
+  //aShowNote.Checked := FShowNote;
+  ShowNote := FShowNote;
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
@@ -2984,9 +2986,12 @@ procedure TformNotetask.SetNote;
 begin
   if (not ShowNote) then exit;
 
-  memoNote.OnChange := nil;
-  memoNote.Text := Tasks.GetTask(taskGrid.Row).Note;
-  memoNote.OnChange := @memoNoteChange;
+  if (Assigned(Tasks)) then
+  begin
+    memoNote.OnChange := nil;
+    memoNote.Text := Tasks.GetTask(taskGrid.Row).Note;
+    memoNote.OnChange := @memoNoteChange;
+  end;
 end;
 
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);
