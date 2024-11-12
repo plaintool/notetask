@@ -209,6 +209,7 @@ type
     Splitter: TSplitter;
     aShowNote: TAction;
     MenuItem2: TMenuItem;
+    groupTabs: TTabControl;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -297,6 +298,7 @@ type
     procedure aRunTerminalExecute(Sender: TObject);
     procedure aMergeTasksExecute(Sender: TObject);
     procedure aShowNoteExecute(Sender: TObject);
+    procedure groupTabsChange(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -341,6 +343,7 @@ type
     procedure EditComplite;
     procedure SetInfo;
     procedure SetNote;
+    procedure SetTabs;
     procedure SetCaption;
     procedure ClearSelected(ShowConfirm: boolean = True);
     procedure MergeTasks;
@@ -370,6 +373,8 @@ type
     procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     procedure ExecuteTerminal;
+    procedure CalcRowHeights(aRow: integer = 0);
+    function LastRowHeight(aRow: integer): integer;
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
     function IsCanClose: boolean;
@@ -386,8 +391,6 @@ type
 
     procedure SetLanguage(aLanguage: string = string.Empty);
     procedure FillGrid;
-    procedure CalcRowHeights(aRow: integer = 0);
-    function LastRowHeight(aRow: integer): integer;
     function SaveFileAs: boolean;
     function SaveFile(fileName: string = string.Empty): boolean;
     function OpenFile(fileName: string): boolean;
@@ -1248,6 +1251,83 @@ begin
   SetChanged;
 end;
 
+procedure TformNotetask.groupTabsChange(Sender: TObject);
+begin
+  Tasks.ChangeGroup(groupTabs.TabIndex);
+
+  FillGrid;
+  taskGrid.Row := 1;
+  taskGrid.Col := 2;
+  ResetRowHeight;
+  SetNote;
+  SetInfo;
+end;
+
+procedure TformNotetask.aNewExecute(Sender: TObject);
+var
+  new: TStringList;
+begin
+  if IsCanClose then
+  begin
+    new := TStringList.Create;
+    new.Add('[ ]');
+    Tasks := TTasks.Create(new);
+    SetChanged(False);
+    EditComplite;
+    FFileName := string.Empty;
+    FEncoding := TEncoding.UTF8;
+    FLineEnding := FLineEnding.WindowsCRLF;
+    taskGrid.Clean;
+    taskGrid.RowCount := 2;
+    taskGrid.Col := 2;
+    ResetRowHeight;
+    SetInfo;
+    SetTabs;
+  end;
+end;
+
+procedure TformNotetask.aNewWindowExecute(Sender: TObject);
+var
+  Process: TProcess;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  SaveFormSettings(self); // Save setting for new process
+
+  Process := TProcess.Create(nil); // Create a new process
+  try
+    Process.Executable := ParamStr(0); // Set the executable to the current application
+    Process.Options := []; // No wait, open and forget
+    Process.Execute; // Execute the new instance
+  finally
+    Process.Free; // Free the process object
+  end;
+end;
+
+procedure TformNotetask.aOpenExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if (IsCanClose) and (openDialog.Execute) then
+  begin
+    OpenFile(openDialog.FileName);
+  end;
+end;
+
+procedure TformNotetask.aSaveAsExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  SaveFileAs;
+end;
+
+procedure TformNotetask.aSaveExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  SaveFile(FFileName);
+end;
+
 procedure TformNotetask.aUndoExecute(Sender: TObject);
 var
   TempRect: TRect;
@@ -1633,69 +1713,6 @@ begin
   end;
 end;
 
-procedure TformNotetask.aNewExecute(Sender: TObject);
-var
-  new: TStringList;
-begin
-  if IsCanClose then
-  begin
-    new := TStringList.Create;
-    new.Add('[ ]');
-    Tasks := TTasks.Create(new);
-    SetChanged(False);
-    EditComplite;
-    FFileName := string.Empty;
-    FEncoding := TEncoding.UTF8;
-    FLineEnding := FLineEnding.WindowsCRLF;
-    taskGrid.Clean;
-    taskGrid.RowCount := 2;
-    taskGrid.Col := 2;
-    SetInfo;
-  end;
-end;
-
-procedure TformNotetask.aNewWindowExecute(Sender: TObject);
-var
-  Process: TProcess;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  SaveFormSettings(self); // Save setting for new process
-
-  Process := TProcess.Create(nil); // Create a new process
-  try
-    Process.Executable := ParamStr(0); // Set the executable to the current application
-    Process.Options := []; // No wait, open and forget
-    Process.Execute; // Execute the new instance
-  finally
-    Process.Free; // Free the process object
-  end;
-end;
-
-procedure TformNotetask.aOpenExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if (IsCanClose) and (openDialog.Execute) then
-  begin
-    OpenFile(openDialog.FileName);
-  end;
-end;
-
-procedure TformNotetask.aSaveAsExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  SaveFileAs;
-end;
-
-procedure TformNotetask.aSaveExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  SaveFile(FFileName);
-end;
-
 procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -2041,6 +2058,81 @@ begin
   finally
     formDonateNotetask.Free;
   end;
+end;
+
+function TformNotetask.OpenFile(fileName: string): boolean;
+var
+  Content: string;
+begin
+  Result := False;
+  if not FileExists(fileName) then
+  begin
+    ShowMessage(rfilenotfound);
+    exit;
+  end;
+  // Save settings for new file
+  //SaveGridSettings(Self, taskGrid, string.Empty);
+  // Save settings for current file
+  SaveGridSettings(Self, taskGrid, FFileName);
+
+  FFileName := fileName;
+  EditComplite;
+  ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
+
+  if Assigned(Tasks) then
+    Tasks.Free;
+  Tasks := TTasks.Create(TextToStringList(Content));
+
+  // Load saved settings for file
+  LoadGridSettings(Self, taskGrid, FFileName);
+
+  SetChanged(False);
+  ShowNote := FShowNote;
+  ApplyColumnSetting;
+
+  FillGrid;
+
+  taskGrid.Row := 1;
+  taskGrid.Col := 2;
+  ResetRowHeight;
+  SetInfo;
+  SetNote;
+  SetTabs;
+  Result := True;
+end;
+
+function TformNotetask.SaveFileAs: boolean;
+begin
+  if (saveDialog.Execute) then
+  begin
+    Result := SaveFile(saveDialog.FileName);
+  end
+  else
+    Result := False;
+end;
+
+function TformNotetask.SaveFile(fileName: string = string.Empty): boolean;
+begin
+  if (fileName = string.Empty) and (FFileName = string.Empty) then
+    Result := SaveFileAs;
+
+  if (fileName = string.Empty) then
+    fileName := FFileName
+  else
+    FFileName := fileName;
+
+  if (fileName <> string.Empty) then
+  begin
+    EditComplite;
+    SaveTextFile(fileName, Tasks.ToStringList, FEncoding, FLineEnding);
+    SetChanged(False);
+    Tasks.CreateBackupInit;
+    Result := True;
+  end
+  else
+    Result := False;
+
+  SetInfo;
 end;
 
 procedure TformNotetask.ExecuteTerminal;
@@ -2643,6 +2735,7 @@ begin
   if (Value) then
   begin
     taskGrid.BiDiMode := bdRightToLeft;
+    groupTabs.BiDiMode := bdRightToLeft;
     for i := 1 to taskGrid.Columns.Count - 1 do
       taskGrid.Columns[i].Alignment := taRightJustify;
     memoNote.BiDiMode := bdRightToLeft;
@@ -2652,6 +2745,7 @@ begin
   else
   begin
     taskGrid.BiDiMode := bdLeftToRight;
+    groupTabs.BiDiMode := bdLeftToRight;
     for i := 1 to taskGrid.Columns.Count - 1 do
       taskGrid.Columns[i].Alignment := taLeftJustify;
     memoNote.BiDiMode := bdLeftToRight;
@@ -2994,6 +3088,23 @@ begin
   end;
 end;
 
+procedure TformNotetask.SetTabs;
+var
+  Clean: TStringList;
+  i: integer;
+begin
+  Clean := TStringList.Create;
+  try
+    for i := 0 to Tasks.CountGroup - 1 do
+      Clean.Add(Tasks.GroupNames[i].TrimLeft([' ', '#']).Trim);
+
+    groupTabs.Tabs := Clean;
+    groupTabs.Visible := not ((groupTabs.Tabs.Count = 1) and (groupTabs.Tabs[0] = rgroupuntitled));
+  finally
+    Clean.Free;
+  end;
+end;
+
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);
 begin
   aLangEnglish.Checked := False;
@@ -3093,40 +3204,6 @@ begin
   end;
 end;
 
-function TformNotetask.SaveFileAs: boolean;
-begin
-  if (saveDialog.Execute) then
-  begin
-    Result := SaveFile(saveDialog.FileName);
-  end
-  else
-    Result := False;
-end;
-
-function TformNotetask.SaveFile(fileName: string = string.Empty): boolean;
-begin
-  if (fileName = string.Empty) and (FFileName = string.Empty) then
-    Result := SaveFileAs;
-
-  if (fileName = string.Empty) then
-    fileName := FFileName
-  else
-    FFileName := fileName;
-
-  if (fileName <> string.Empty) then
-  begin
-    EditComplite;
-    SaveTextFile(fileName, Tasks.ToStringList, FEncoding, FLineEnding);
-    SetChanged(False);
-    Tasks.CreateBackupInit;
-    Result := True;
-  end
-  else
-    Result := False;
-
-  SetInfo;
-end;
-
 function TformNotetask.IsCanClose: boolean;
 var
   UserResponse: integer;
@@ -3153,45 +3230,6 @@ begin
   end
   else
     Result := True; // No changes, just close the form
-end;
-
-function TformNotetask.OpenFile(fileName: string): boolean;
-var
-  Content: string;
-begin
-  Result := False;
-  if not FileExists(fileName) then
-  begin
-    ShowMessage(rfilenotfound);
-    exit;
-  end;
-  // Save settings for new file
-  //SaveGridSettings(Self, taskGrid, string.Empty);
-  // Save settings for current file
-  SaveGridSettings(Self, taskGrid, FFileName);
-
-  FFileName := fileName;
-  EditComplite;
-  ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
-
-  if Assigned(Tasks) then
-    Tasks.Free;
-  Tasks := TTasks.Create(TextToStringList(Content));
-
-  // Load saved settings for file
-  LoadGridSettings(Self, taskGrid, FFileName);
-  ShowNote := FShowNote;
-  ApplyColumnSetting;
-
-  FillGrid;
-
-  taskGrid.Row := 1;
-  taskGrid.Col := 2;
-  ResetRowHeight;
-  SetChanged(False);
-  SetInfo;
-  SetNote;
-  Result := True;
 end;
 
 function TformNotetask.GetIsEditing: boolean;

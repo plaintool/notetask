@@ -69,6 +69,10 @@ type
     FBackupTaskList: array of TTask; // Backup array of tasks
     FInitGroupList: array of array of TTask; // Initial array of task groups
     FSelectedGroup: integer;
+
+    function GetGroupCount: integer;
+    function GetCount: integer;
+    function GetCountArchive: integer;
   public
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
@@ -109,11 +113,10 @@ type
     function CalcCount(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): integer;
     function CalcSum(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): double;
     function CalcDuration(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): string;
-    function GetGroupCount: integer;
-    function GetCount: integer;
-    function GetCountArchive: integer;
+
     procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);
 
+    property GroupNames: TStringList read FGroupNameList;
     property SelectedGroup: integer read FSelectedGroup;
     property CountGroup: integer read GetGroupCount;
     property Count: integer read GetCount;
@@ -535,7 +538,6 @@ begin
   CreateBackupInit;
 
   ChangeGroup(0);
-
 end;
 
 destructor TTasks.Destroy;

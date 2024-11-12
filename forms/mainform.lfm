@@ -15,11 +15,10 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
-    Height = 415
-    Top = 0
+    Height = 391
+    Top = 24
     Width = 851
     Align = alClient
     BorderStyle = bsNone
@@ -145,6 +144,17 @@ object formNotetask: TformNotetask
     Color = clBtnFace
     ParentColor = False
     ResizeAnchor = akBottom
+    Visible = False
+  end
+  object groupTabs: TTabControl
+    Left = 0
+    Height = 24
+    Top = 0
+    Width = 851
+    HotTrack = True
+    OnChange = groupTabsChange
+    Align = alTop
+    TabOrder = 4
     Visible = False
   end
   object MainMenu: TMainMenu
