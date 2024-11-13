@@ -78,6 +78,7 @@
 {"hash":85122069,"name":"tformnotetask.ashowcolumnfavorite.caption","sourcebytes":[67,111,108,117,109,110,32,102,111,118,111,114,105,116,101],"value":"Column fovorite"},
 {"hash":57354832,"name":"tformnotetask.ainsertgroup.caption","sourcebytes":[73,110,115,101,114,116,32,103,114,111,117,112],"value":"Insert group"},
 {"hash":48422640,"name":"tformnotetask.arenamegroup.caption","sourcebytes":[82,101,110,97,109,101,32,103,114,111,117,112],"value":"Rename group"},
+{"hash":191508656,"name":"tformnotetask.acopygroup.caption","sourcebytes":[67,111,112,121,32,103,114,111,117,112],"value":"Copy group"},
 {"hash":63093344,"name":"tformnotetask.adeletegroup.caption","sourcebytes":[68,101,108,101,116,101,32,103,114,111,117,112],"value":"Delete group"},
 {"hash":11099920,"name":"tformnotetask.amovetaskleft.caption","sourcebytes":[77,111,118,101,32,116,97,115,107,115,32,116,111,32,108,101,102,116,32,103,114,111,117,112],"value":"Move tasks to left group"},
 {"hash":169372496,"name":"tformnotetask.amovetaskright.caption","sourcebytes":[77,111,118,101,32,116,97,115,107,115,32,116,111,32,114,105,103,104,116,32,103,114,111,117,112],"value":"Move tasks to right group"},

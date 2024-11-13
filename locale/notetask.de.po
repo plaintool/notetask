@@ -321,6 +321,10 @@ msgstr "Frag ChatGPT..."
 msgid "Copy"
 msgstr "Kopieren"
 
+#: tformnotetask.acopygroup.caption
+msgid "Copy group"
+msgstr ""
+
 #: tformnotetask.acut.caption
 msgid "Cut"
 msgstr "Ausschneiden"

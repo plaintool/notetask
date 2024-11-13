@@ -321,6 +321,10 @@ msgstr "Спытайцеся ў ChatGPT..."
 msgid "Copy"
 msgstr "Капіраваць"
 
+#: tformnotetask.acopygroup.caption
+msgid "Copy group"
+msgstr ""
+
 #: tformnotetask.acut.caption
 msgid "Cut"
 msgstr "Вырваць"

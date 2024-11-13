@@ -99,6 +99,7 @@ type
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
     function InsertGroup(aName: string): integer;
     function RenameGroup(aIndex: integer; aName: string): boolean;
+    function CopyGroup(aIndex: integer; aName: string): boolean;
     function DeleteGroup(aIndex: integer): boolean;
     function MoveGroupLeft(Index: integer): integer;
     function MoveGroupRight(Index: integer): integer;
@@ -980,8 +981,39 @@ end;
 function TTasks.RenameGroup(aIndex: integer; aName: string): boolean;
 begin
   Result := False;
-  if (aIndex < 0) or (aIndex > CountGroup - 1) then exit;
+  if (aIndex < 0) or (aIndex >= CountGroup) then exit;
   FGroupNameList[aIndex] := IfThen(aName = rgroupuntitled, aName, '## ' + aName);
+  Result := True;
+end;
+
+function TTasks.CopyGroup(aIndex: integer; aName: string): boolean;
+var
+  i: integer;
+begin
+  Result := False;
+  if (aIndex < 0) or (aIndex >= CountGroup) then exit;
+
+  FGroupNameList.Add(string.Empty);
+  SetLength(FGroupList, CountGroup + 1);
+
+  // Shift groups to the left, overwriting the group at aIndex
+  for i := CountGroup - 2 downto aIndex + 1 do
+  begin
+    FGroupList[i + 1] := FGroupList[i];
+    FGroupNameList[i + 1] := FGroupNameList[i];
+  end;
+
+  // Copy tasks
+  SetLength(FGroupList[aIndex + 1], Length(FGroupList[aIndex]));
+  for i := 0 to Length(FGroupList[aIndex + 1]) - 1 do
+  begin
+    FGroupList[aIndex + 1, i] := TTask.Create;
+    FGroupList[aIndex + 1, i].Copy(FGroupList[aIndex, i]);
+  end;
+
+  // Name new group
+  FGroupNameList[aIndex + 1] := IfThen(aName = rgroupuntitled, aName, '## ' + aName);
+
   Result := True;
 end;
 
@@ -993,9 +1025,9 @@ begin
   UpdateGroup;
 
   // Check if the index is within valid range
-  if (aIndex < 0) or (aIndex >= CountGroup) then
-    exit;
+  if (aIndex < 0) or (aIndex >= CountGroup) then exit;
 
+  // Remove task from deleting group
   for i := 0 to High(FGroupList[aIndex]) do
   begin
     FGroupList[aIndex, i].Free;

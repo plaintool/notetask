@@ -309,6 +309,10 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
+#: tformnotetask.acopygroup.caption
+msgid "Copy group"
+msgstr ""
+
 #: tformnotetask.acut.caption
 msgid "Cut"
 msgstr ""

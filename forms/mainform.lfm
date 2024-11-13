@@ -305,6 +305,9 @@ object formNotetask: TformNotetask
       object menuRenameGroup: TMenuItem
         Action = aRenameGroup
       end
+      object MenuItem3: TMenuItem
+        Action = aCopyGroup
+      end
       object menuDeleteGroup: TMenuItem
         Action = aDeleteGroup
       end
@@ -814,6 +817,12 @@ object formNotetask: TformNotetask
       Caption = 'Rename group'
       OnExecute = aRenameGroupExecute
       ShortCut = 16497
+    end
+    object aCopyGroup: TAction
+      Category = 'Group'
+      Caption = 'Copy group'
+      OnExecute = aCopyGroupExecute
+      ShortCut = 24643
     end
     object aDeleteGroup: TAction
       Category = 'Group'

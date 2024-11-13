@@ -321,6 +321,10 @@ msgstr "ChatGPT에게 질문하기..."
 msgid "Copy"
 msgstr "복사"
 
+#: tformnotetask.acopygroup.caption
+msgid "Copy group"
+msgstr ""
+
 #: tformnotetask.acut.caption
 msgid "Cut"
 msgstr "잘라내기"

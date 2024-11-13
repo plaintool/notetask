@@ -222,6 +222,8 @@ type
     menuMoveTasksLeft: TMenuItem;
     Separator10: TMenuItem;
     menuMoveTasksRight: TMenuItem;
+    aCopyGroup: TAction;
+    MenuItem3: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -320,6 +322,7 @@ type
     procedure aDeleteGroupExecute(Sender: TObject);
     procedure aMoveTaskLeftExecute(Sender: TObject);
     procedure aMoveTaskRightExecute(Sender: TObject);
+    procedure aCopyGroupExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -607,6 +610,12 @@ begin
   if (ssCtrl in Shift) and (Key = VK_INSERT) then // Ctrl + Insert
   begin
     aInsertGroup.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_C) then // Ctrl + Shift + C
+  begin
+    aCopyGroup.Execute;
     Key := 0;
   end
   else
@@ -1888,6 +1897,32 @@ begin
       if (Tasks.RenameGroup(groupTabs.TabIndex, editText.Text)) then
       begin
         SetTabs;
+        SetChanged;
+      end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aCopyGroupExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  // Create an instance of the form
+  with formInputText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    SetCaption(rgroup, rentergroupname, rOK, groupTabs.Tabs[groupTabs.TabIndex]);
+
+    // Show the form as a modal dialog
+    if (ShowModal = mrOk) then
+    begin
+      if (Tasks.CopyGroup(groupTabs.TabIndex, editText.Text)) then
+      begin
+        SetTabs;
+        ChangeGroup(groupTabs.TabIndex + 1);
         SetChanged;
       end;
     end;
