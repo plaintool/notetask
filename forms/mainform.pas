@@ -3467,7 +3467,7 @@ begin
 
     groupTabs.Tabs := Clean;
     groupTabs.Visible := not ((groupTabs.Tabs.Count = 1) and (groupTabs.Tabs[0] = rgroupuntitled));
-    if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count - 1) then
+    if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count) then
       groupTabs.TabIndex := LastIndex;
 
     // Set selected row memory for tabs
