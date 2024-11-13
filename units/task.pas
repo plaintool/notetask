@@ -68,6 +68,7 @@ type
     FMapGrid: TIntegerArray; // Maps grid rows to tasks
     FBackupTaskList: array of TTask; // Backup array of tasks
     FInitGroupList: array of array of TTask; // Initial array of task groups
+    FInitGroupNameList: TStringList; // List of group names
     FSelectedGroup: integer;
 
     function GetGroupCount: integer;
@@ -555,7 +556,10 @@ begin
     for i := 0 to High(FGroupList) do
     begin
       for j := 0 to High(FGroupList[i]) do
+      begin
         FGroupList[i, j].Free;
+        FGroupList[i, j] := nil;
+      end;
       SetLength(FGroupList[i], 0);
       FGroupList[i] := nil;
     end;
@@ -570,7 +574,10 @@ begin
 
   if Assigned(FBackupTaskList) then
     for i := 0 to High(FBackupTaskList) do
+    begin
       FBackupTaskList[i].Free;
+      FBackupTaskList[i] := nil;
+    end;
   SetLength(FBackupTaskList, 0);
   FBackupTaskList := nil;
 
@@ -578,7 +585,10 @@ begin
     for i := 0 to High(FInitGroupList) do
     begin
       for j := 0 to High(FInitGroupList[i]) do
+      begin
         FInitGroupList[i, j].Free;
+        FInitGroupList[i, j] := nil;
+      end;
       SetLength(FInitGroupList[i], 0);
       FInitGroupList[i] := nil;
     end;
@@ -587,6 +597,9 @@ begin
 
   if Assigned(FGroupNameList) then
     FGroupNameList.Free;
+
+  if Assigned(FInitGroupNameList) then
+    FInitGroupNameList.Free;
 
   SetLength(FMapGrid, 0);
   FMapGrid := nil;
@@ -709,12 +722,9 @@ begin
 end;
 
 function TTasks.AddGroupTask(const GroupIndex: integer; const TaskString: string): integer;
-var
-  Task: TTask;
 begin
-  Task := TTask.Create(TaskString); // Create a new task
   SetLength(FGroupList[GroupIndex], Length(FGroupList[GroupIndex]) + 1); // Resize the array
-  FGroupList[GroupIndex, Length(FGroupList[GroupIndex]) - 1] := Task; // Add the task to the list
+  FGroupList[GroupIndex, High(FGroupList[GroupIndex])] := TTask.Create(TaskString); // Add the task to the list
   Result := Length(FGroupList[GroupIndex]);
 end;
 
@@ -986,6 +996,13 @@ begin
   if (aIndex < 0) or (aIndex >= CountGroup) then
     exit;
 
+  for i := 0 to High(FGroupList[aIndex]) do
+  begin
+    FGroupList[aIndex, i].Free;
+    FGroupList[aIndex, i] := nil;
+  end;
+  FGroupList[aIndex] := nil;
+
   // Shift groups to the left, overwriting the group at aIndex
   for i := aIndex to CountGroup - 2 do
   begin
@@ -997,7 +1014,7 @@ begin
   FGroupNameList.Delete(CountGroup - 1);
   SetLength(FGroupList, CountGroup - 1);
 
-  // If not groups add new
+  // If groups don't exists then add new
   if (CountGroup = 0) then
   begin
     SetLength(FGroupList, CountGroup + 1);
@@ -1646,33 +1663,69 @@ begin
       FInitGroupList[i, j].Copy(FGroupList[i, j]); // Copy the task data
     end;
   end;
+
+  // Create a backup of tab names
+  if Assigned(FInitGroupNameList) then
+  begin
+    FInitGroupNameList.Free;
+    FInitGroupNameList := nil;
+  end;
+  if Assigned(FGroupNameList) then
+  begin
+    FInitGroupNameList := TStringList.Create;
+    FInitGroupNameList.Assign(FGroupNameList);
+  end;
 end;
 
 procedure TTasks.UndoBackupInit;
 var
   i, j: integer;
 begin
+  UpdateGroup;
+
+  // Free existing objects in FGroupList before resizing
+  for i := 0 to High(FGroupList) do
+  begin
+    for j := 0 to High(FGroupList[i]) do
+    begin
+      if Assigned(FGroupList[i, j]) then
+      begin
+        FGroupList[i, j].Free;
+        FGroupList[i, j] := nil;
+      end;
+    end;
+    SetLength(FGroupList[i], 0);
+    FGroupList[i] := nil;
+  end;
+  SetLength(FGroupList, 0);
+  FGroupList := nil;
+
   // Resize the task list to match the initial task list
   SetLength(FGroupList, Length(FInitGroupList));
-
   for i := 0 to High(FInitGroupList) do
   begin
     SetLength(FGroupList[i], Length(FInitGroupList[i]));
 
     for j := 0 to High(FInitGroupList[i]) do
     begin
-      // If there's already an object in FTaskList, free it
-      if Assigned(FGroupList[i, j]) then
-      begin
-        FGroupList[i, j].Free;
-        FGroupList[i, j] := nil; // Set to nil after freeing
-      end;
-
-      // Create a new task and copy the initial task data
       FGroupList[i, j] := TTask.Create;
       FGroupList[i, j].Copy(FInitGroupList[i, j]);
     end;
   end;
+
+  // Restore a backup of tab names
+  if Assigned(FGroupNameList) then
+  begin
+    FGroupNameList.Free;
+    FGroupNameList := nil;
+  end;
+  if Assigned(FInitGroupNameList) then
+  begin
+    FGroupNameList := TStringList.Create;
+    FGroupNameList.Assign(FInitGroupNameList);
+  end;
+
+  ChangeGroup(SelectedGroup);
 end;
 
 function TTasks.CalcDateDiff(const StartDate, EndDate: TDateTime): string;

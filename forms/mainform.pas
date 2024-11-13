@@ -1506,6 +1506,7 @@ begin
       FillGrid;
       ResetRowHeight;
       SetInfo;
+      SetTabs;
       GridClearSelection;
       Tasks.CreateBackup;
       SetChanged(False);
@@ -2504,9 +2505,13 @@ begin
 end;
 
 procedure TformNotetask.ChangeGroup(Index: integer);
+var
+  force: boolean;
 begin
   if (Index < 0) or (index > groupTabs.Tabs.Count - 1) then exit;
+  force := groupTabs.TabIndex = Index;
   groupTabs.TabIndex := Index;
+  if (force) then groupTabsChange(groupTabs);
 end;
 
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
