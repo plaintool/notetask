@@ -1912,12 +1912,13 @@ begin
   selleft := taskGrid.Selection.Left;
   selright := taskGrid.Selection.Right;
 
-  newRow := Tasks.MoveGroupTasksLeft(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.SelectedGroup - 1);
 
   if (newRow > -1) then
   begin
-    ChangeGroup(Tasks.SelectedGroup - 1);
-    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, sellen);
+    ChangeGroup(Tasks.SelectedGroup);
+    taskGrid.Row := newRow;
+    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, newRow + sellen - 1);
   end;
   SetChanged;
 end;
@@ -1935,12 +1936,13 @@ begin
   selleft := taskGrid.Selection.Left;
   selright := taskGrid.Selection.Right;
 
-  newRow := Tasks.MoveGroupTasksRight(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.SelectedGroup + 1);
 
   if (newRow > -1) then
   begin
-    ChangeGroup(Tasks.SelectedGroup + 1);
-    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, sellen);
+    ChangeGroup(Tasks.SelectedGroup);
+    taskGrid.Row := newRow;
+    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, newRow + sellen - 1);
   end;
   SetChanged;
 end;

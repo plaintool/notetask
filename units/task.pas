@@ -101,8 +101,7 @@ type
     function DeleteGroup(aIndex: integer): boolean;
     function MoveGroupLeft(Index: integer): integer;
     function MoveGroupRight(Index: integer): integer;
-    function MoveGroupTasksLeft(Index1, Index2: integer): integer;
-    function MoveGroupTasksRight(Index1, Index2: integer): integer;
+    function MoveGroupTasks(Index1, Index2, NewGroup: integer): integer;
     function MoveTasksTop(Index1, Index2: integer): integer;
     function MoveTasksBottom(Index1, Index2: integer): integer;
     function MoveTasksUp(Index1, Index2: integer): integer;
@@ -1056,24 +1055,41 @@ begin
   FSelectedGroup := Result;
 end;
 
-function TTasks.MoveGroupTasksLeft(Index1, Index2: integer): integer;
+function TTasks.MoveGroupTasks(Index1, Index2, NewGroup: integer): integer;
 var
-  i, IndStart, IndEnd: integer;
+  i, Len, Ind, IndStart, IndEnd, LastTask: integer;
 begin
   Result := -1;
+
+  // Map the start and end indexes of the task range
   IndStart := Map(Index1);
   IndEnd := Map(Index2);
 
-end;
+  // Calculate the number of tasks to move
+  Len := IndEnd - IndStart + 1;
 
-function TTasks.MoveGroupTasksRight(Index1, Index2: integer): integer;
-var
-  i, IndStart, IndEnd: integer;
-begin
-  Result := -1;
-  IndStart := Map(Index1);
-  IndEnd := Map(Index2);
+  // Get the last task index in the new group and resize the group array
+  LastTask := Length(FGroupList[NewGroup]);
+  SetLength(FGroupList[NewGroup], LastTask + Len);
 
+  // Copy tasks from the current list to the new group
+  Ind := IndStart;
+  for i := LastTask to LastTask + Len - 1 do
+  begin
+    FGroupList[NewGroup, i] := TTask.Create;
+    FGroupList[NewGroup, i].Copy(FTaskList[Ind]);
+    Inc(Ind);
+  end;
+
+  // Remove tasks from the original group in reverse order
+  for i := IndEnd downto IndStart do
+    DeleteTask(ReverseMap(i));
+
+  // Change the selected group to the new group
+  ChangeGroup(NewGroup, True);
+
+  // Return the index of the first moved task in the new group
+  Result := ReverseMap(LastTask);
 end;
 
 function TTasks.MoveTasksTop(Index1, Index2: integer): integer;
@@ -1360,8 +1376,9 @@ begin
   TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText, True));
   try
     // If the row is not empty and only it is selected, and the number of tasks to insert is more than one,
-    // or if the grid is empty, we insert as new tasks
-    if ((not IsRowEmpty) and (TempTasks.Count > 1) and (Grid.Selection.Height = 0)) or (Grid.Row = 0) then
+    // if the grid is empty or grid selection is entry row, we insert as new tasks
+    if ((not IsRowEmpty) and (TempTasks.Count > 1) and (Grid.Selection.Height = 0)) or (Grid.Row = 0) or
+      (Grid.Selection.Width = Grid.ColCount - 2) then
     begin
       if (Grid.Row = 0) then
         index := 1
