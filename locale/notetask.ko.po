@@ -52,7 +52,7 @@ msgstr "이 작업을 삭제하시겠습니까?"
 
 #: mainform.rdeletegroupconfirm
 msgid "Are you sure you want to delete this group? This will also delete all tasks within this group."
-msgstr ""
+msgstr "이 그룹을 삭제하시겠습니까? 이 그룹 내의 모든 작업도 삭제됩니다."
 
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
@@ -60,14 +60,13 @@ msgstr "선택한 작업을 삭제하시겠습니까?"
 
 #: mainform.rentergroupname
 msgid "Enter the group name:"
-msgstr ""
+msgstr "그룹 이름을 입력하세요:"
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "요청한 파일을 디스크에서 찾을 수 없습니다."
 
 #: mainform.rgroup
-#, fuzzy
 msgctxt "mainform.rgroup"
 msgid "Group"
 msgstr "그룹"
@@ -81,7 +80,6 @@ msgid "The line number is out of the allowed range."
 msgstr "라인 번호가 허용된 범위를 초과했습니다."
 
 #: mainform.rok
-#, fuzzy
 msgctxt "mainform.rok"
 msgid "OK"
 msgstr "확인"
@@ -323,7 +321,7 @@ msgstr "복사"
 
 #: tformnotetask.acopygroup.caption
 msgid "Copy group"
-msgstr ""
+msgstr "그룹 복사"
 
 #: tformnotetask.acut.caption
 msgid "Cut"
@@ -448,11 +446,11 @@ msgstr "작업 병합"
 
 #: tformnotetask.amovegroupleft.caption
 msgid "Move group left"
-msgstr ""
+msgstr "그룹을 왼쪽으로 이동"
 
 #: tformnotetask.amovegroupright.caption
 msgid "Move group right"
-msgstr ""
+msgstr "그룹을 오른쪽으로 이동"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
@@ -704,4 +702,3 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
-

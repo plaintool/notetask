@@ -52,7 +52,7 @@ msgstr "このタスクを削除してもよろしいですか？"
 
 #: mainform.rdeletegroupconfirm
 msgid "Are you sure you want to delete this group? This will also delete all tasks within this group."
-msgstr ""
+msgstr "このグループを削除してもよろしいですか？このグループ内のすべてのタスクも削除されます。"
 
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
@@ -60,14 +60,13 @@ msgstr "選択したタスクを削除してもよろしいですか？"
 
 #: mainform.rentergroupname
 msgid "Enter the group name:"
-msgstr ""
+msgstr "グループ名を入力してください:"
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "要求されたファイルはディスク上に見つかりませんでした。"
 
 #: mainform.rgroup
-#, fuzzy
 msgctxt "mainform.rgroup"
 msgid "Group"
 msgstr "グループ"
@@ -81,7 +80,6 @@ msgid "The line number is out of the allowed range."
 msgstr "行番号が許可された範囲外です。"
 
 #: mainform.rok
-#, fuzzy
 msgctxt "mainform.rok"
 msgid "OK"
 msgstr "OK"
@@ -323,7 +321,7 @@ msgstr "コピー"
 
 #: tformnotetask.acopygroup.caption
 msgid "Copy group"
-msgstr ""
+msgstr "グループをコピー"
 
 #: tformnotetask.acut.caption
 msgid "Cut"
@@ -448,11 +446,11 @@ msgstr "タスクを統合"
 
 #: tformnotetask.amovegroupleft.caption
 msgid "Move group left"
-msgstr ""
+msgstr "グループを左に移動"
 
 #: tformnotetask.amovegroupright.caption
 msgid "Move group right"
-msgstr ""
+msgstr "グループを右に移動"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
@@ -704,4 +702,3 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
-

@@ -52,7 +52,7 @@ msgstr "Sind Sie sicher, dass Sie diese Aufgabe löschen möchten?"
 
 #: mainform.rdeletegroupconfirm
 msgid "Are you sure you want to delete this group? This will also delete all tasks within this group."
-msgstr ""
+msgstr "Möchten Sie diese Gruppe wirklich löschen? Dies wird auch alle Aufgaben in dieser Gruppe löschen."
 
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
@@ -60,14 +60,13 @@ msgstr "Sind Sie sicher, dass Sie die ausgewählten Aufgaben löschen möchten?"
 
 #: mainform.rentergroupname
 msgid "Enter the group name:"
-msgstr ""
+msgstr "Geben Sie den Gruppennamen ein:"
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "Die angeforderte Datei wurde auf der Festplatte nicht gefunden."
 
 #: mainform.rgroup
-#, fuzzy
 msgctxt "mainform.rgroup"
 msgid "Group"
 msgstr "Gruppe"
@@ -81,7 +80,6 @@ msgid "The line number is out of the allowed range."
 msgstr "Die Zeilennummer liegt außerhalb des zulässigen Bereichs."
 
 #: mainform.rok
-#, fuzzy
 msgctxt "mainform.rok"
 msgid "OK"
 msgstr "OK"
@@ -323,7 +321,7 @@ msgstr "Kopieren"
 
 #: tformnotetask.acopygroup.caption
 msgid "Copy group"
-msgstr ""
+msgstr "Gruppe kopieren"
 
 #: tformnotetask.acut.caption
 msgid "Cut"
@@ -448,11 +446,11 @@ msgstr "Aufgaben zusammenführen"
 
 #: tformnotetask.amovegroupleft.caption
 msgid "Move group left"
-msgstr ""
+msgstr "Gruppe nach links verschieben"
 
 #: tformnotetask.amovegroupright.caption
 msgid "Move group right"
-msgstr ""
+msgstr "Gruppe nach rechts verschieben"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
@@ -704,4 +702,3 @@ msgstr "Was suchen:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Ersetzen durch:"
-

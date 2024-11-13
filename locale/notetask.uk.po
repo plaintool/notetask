@@ -52,7 +52,7 @@ msgstr "Ви впевнені, що хочете видалити це завд�
 
 #: mainform.rdeletegroupconfirm
 msgid "Are you sure you want to delete this group? This will also delete all tasks within this group."
-msgstr ""
+msgstr "Ви впевнені, що хочете видалити цю групу? Це також видалить усі завдання в групі."
 
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
@@ -60,14 +60,13 @@ msgstr "Ви впевнені, що хочете видалити вибрані
 
 #: mainform.rentergroupname
 msgid "Enter the group name:"
-msgstr ""
+msgstr "Введіть назву групи:"
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "Запитуваний файл не знайдено на диску."
 
 #: mainform.rgroup
-#, fuzzy
 msgctxt "mainform.rgroup"
 msgid "Group"
 msgstr "Група"
@@ -81,7 +80,6 @@ msgid "The line number is out of the allowed range."
 msgstr "Номер рядка виходить за межі допустимого діапазону."
 
 #: mainform.rok
-#, fuzzy
 msgctxt "mainform.rok"
 msgid "OK"
 msgstr "OK"
@@ -323,7 +321,7 @@ msgstr "Копіювати"
 
 #: tformnotetask.acopygroup.caption
 msgid "Copy group"
-msgstr ""
+msgstr "Скопіювати групу"
 
 #: tformnotetask.acut.caption
 msgid "Cut"
@@ -448,11 +446,11 @@ msgstr "Об'єднати завдання"
 
 #: tformnotetask.amovegroupleft.caption
 msgid "Move group left"
-msgstr ""
+msgstr "Перемістити групу вліво"
 
 #: tformnotetask.amovegroupright.caption
 msgid "Move group right"
-msgstr ""
+msgstr "Перемістити групу вправо"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
@@ -704,4 +702,3 @@ msgstr "Знайти що:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Замінити на:"
-
