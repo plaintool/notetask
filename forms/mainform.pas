@@ -349,6 +349,7 @@ type
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
     FLastRowHeights: array of integer;
     FLastRow: integer;
+    FLastRowMem: array of integer;
     FDragTab: integer;
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
@@ -1323,11 +1324,19 @@ end;
 
 procedure TformNotetask.groupTabsChange(Sender: TObject);
 begin
+  if (Length(FLastRowMem) > Tasks.SelectedGroup) then
+    FLastRowMem[Tasks.SelectedGroup] := taskGrid.Row;
+
   Tasks.ChangeGroup(groupTabs.TabIndex, True);
 
   FillGrid;
-  taskGrid.Row := 1;
+
   taskGrid.Col := 2;
+  if (Length(FLastRowMem) > Tasks.SelectedGroup) then
+    taskGrid.Row := FLastRowMem[Tasks.SelectedGroup]
+  else
+    taskGrid.Row := 1;
+
   ResetRowHeight;
   SetNote;
   SetInfo;
@@ -2484,7 +2493,6 @@ procedure TformNotetask.ChangeGroup(Index: integer);
 begin
   if (Index < 0) or (index > groupTabs.Tabs.Count - 1) then exit;
   groupTabs.TabIndex := Index;
-  //groupTabsChange(groupTabs);
 end;
 
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -3377,6 +3385,9 @@ begin
     groupTabs.Visible := not ((groupTabs.Tabs.Count = 1) and (groupTabs.Tabs[0] = rgroupuntitled));
     if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count - 1) then
       groupTabs.TabIndex := LastIndex;
+
+    // Set selected row memory for tabs
+    SetLength(FLastRowMem, groupTabs.Tabs.Count);
   finally
     Clean.Free;
   end;
