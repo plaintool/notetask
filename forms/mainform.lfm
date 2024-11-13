@@ -61,7 +61,7 @@ object formNotetask: TformNotetask
     ImageIndexSortAsc = 0
     ImageIndexSortDesc = 1
     MouseWheelOption = mwGrid
-    Options = [goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goRowMoving, goEditing, goTabs, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goAutoAddRowsSkipContentCheck, goRowHighlight]
+    Options = [goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goRowMoving, goEditing, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goAutoAddRowsSkipContentCheck, goRowHighlight]
     Options2 = [goEditorParentFont]
     RowCount = 2
     TabOrder = 0
