@@ -80,6 +80,8 @@
 {"hash":48422640,"name":"tformnotetask.arenamegroup.caption","sourcebytes":[82,101,110,97,109,101,32,103,114,111,117,112],"value":"Rename group"},
 {"hash":191508656,"name":"tformnotetask.acopygroup.caption","sourcebytes":[67,111,112,121,32,103,114,111,117,112],"value":"Copy group"},
 {"hash":63093344,"name":"tformnotetask.adeletegroup.caption","sourcebytes":[68,101,108,101,116,101,32,103,114,111,117,112],"value":"Delete group"},
+{"hash":5347028,"name":"tformnotetask.amovegroupleft.caption","sourcebytes":[77,111,118,101,32,103,114,111,117,112,32,108,101,102,116],"value":"Move group left"},
+{"hash":85143028,"name":"tformnotetask.amovegroupright.caption","sourcebytes":[77,111,118,101,32,103,114,111,117,112,32,114,105,103,104,116],"value":"Move group right"},
 {"hash":11099920,"name":"tformnotetask.amovetaskleft.caption","sourcebytes":[77,111,118,101,32,116,97,115,107,115,32,116,111,32,108,101,102,116,32,103,114,111,117,112],"value":"Move tasks to left group"},
 {"hash":169372496,"name":"tformnotetask.amovetaskright.caption","sourcebytes":[77,111,118,101,32,116,97,115,107,115,32,116,111,32,114,105,103,104,116,32,103,114,111,117,112],"value":"Move tasks to right group"},
 {"hash":107761687,"name":"tformnotetask.opendialog.title","sourcebytes":[79,112,101,110,105,110,103],"value":"Opening"},

@@ -446,6 +446,14 @@ msgstr "Ukrainian"
 msgid "Merge tasks"
 msgstr "合并任务"
 
+#: tformnotetask.amovegroupleft.caption
+msgid "Move group left"
+msgstr ""
+
+#: tformnotetask.amovegroupright.caption
+msgid "Move group right"
+msgstr ""
+
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
 msgstr "将任务移动到底部"

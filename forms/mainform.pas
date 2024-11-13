@@ -220,10 +220,14 @@ type
     menuRenameGroup: TMenuItem;
     menuDeleteGroup: TMenuItem;
     menuMoveTasksLeft: TMenuItem;
-    Separator10: TMenuItem;
     menuMoveTasksRight: TMenuItem;
     aCopyGroup: TAction;
     MenuItem3: TMenuItem;
+    aMoveGroupLeft: TAction;
+    aMoveGroupRight: TAction;
+    MenuItem4: TMenuItem;
+    Separator16: TMenuItem;
+    MenuItem5: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -323,6 +327,8 @@ type
     procedure aMoveTaskLeftExecute(Sender: TObject);
     procedure aMoveTaskRightExecute(Sender: TObject);
     procedure aCopyGroupExecute(Sender: TObject);
+    procedure aMoveGroupLeftExecute(Sender: TObject);
+    procedure aMoveGroupRightExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -595,7 +601,7 @@ begin
     Exit;
   end;
 
-  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_DELETE) then // Ctrl+Shift + Del
+  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_DELETE) then // Ctrl + Shift + Del
   begin
     aDeleteGroup.Execute;
     Key := 0;
@@ -626,7 +632,7 @@ begin
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key in [VK_1, VK_2, VK_3, VK_4, VK_5, VK_6, VK_7, VK_8, VK_9, VK_0]) then // Ctrl + Del
+  if (ssCtrl in Shift) and (Key in [VK_1, VK_2, VK_3, VK_4, VK_5, VK_6, VK_7, VK_8, VK_9, VK_0]) then // Ctrl + Number
   begin
     if (Key = VK_0) then
       ChangeGroup(9)
@@ -729,6 +735,18 @@ begin
   if ((Shift = [ssCtrl]) or (Shift = [ssAlt])) and (Key = VK_RIGHT) then // Ctrl || Alt + Right
   begin
     aMoveTaskRight.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl, ssShift]) and (Key = VK_LEFT) then // Ctrl + Shift + Left
+  begin
+    aMoveGroupLeft.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl, ssShift]) and (Key = VK_RIGHT) then // Ctrl + Shift + Right
+  begin
+    aMoveGroupRight.Execute;
     Key := 0;
   end
   else
@@ -1946,6 +1964,16 @@ begin
       SetChanged;
     end;
   end;
+end;
+
+procedure TformNotetask.aMoveGroupLeftExecute(Sender: TObject);
+begin
+  MoveTabLeft(groupTabs.TabIndex);
+end;
+
+procedure TformNotetask.aMoveGroupRightExecute(Sender: TObject);
+begin
+  MoveTabRight(groupTabs.TabIndex);
 end;
 
 procedure TformNotetask.aMoveTaskLeftExecute(Sender: TObject);

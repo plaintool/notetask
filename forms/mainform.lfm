@@ -311,8 +311,14 @@ object formNotetask: TformNotetask
       object menuDeleteGroup: TMenuItem
         Action = aDeleteGroup
       end
-      object Separator10: TMenuItem
+      object Separator16: TMenuItem
         Caption = '-'
+      end
+      object MenuItem4: TMenuItem
+        Action = aMoveGroupLeft
+      end
+      object MenuItem5: TMenuItem
+        Action = aMoveGroupRight
       end
       object menuMoveTasksLeft: TMenuItem
         Action = aMoveTaskLeft
@@ -829,6 +835,18 @@ object formNotetask: TformNotetask
       Caption = 'Delete group'
       OnExecute = aDeleteGroupExecute
       ShortCut = 24622
+    end
+    object aMoveGroupLeft: TAction
+      Category = 'Group'
+      Caption = 'Move group left'
+      OnExecute = aMoveGroupLeftExecute
+      ShortCut = 24613
+    end
+    object aMoveGroupRight: TAction
+      Category = 'Group'
+      Caption = 'Move group right'
+      OnExecute = aMoveGroupRightExecute
+      ShortCut = 24615
     end
     object aMoveTaskLeft: TAction
       Category = 'Group'
