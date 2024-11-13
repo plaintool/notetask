@@ -80,6 +80,7 @@ type
     procedure AddGroup(const GroupName: string; const TaskStrings: TStringList = nil); // Add new group from a StringList
     procedure UpdateGroup;
     procedure ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
+    function SetUngroupedName: boolean;
     function ToStringList: TStringList;
     procedure InitMap(Length: integer);
     function Map(Index: integer): integer;
@@ -639,6 +640,16 @@ begin
   FSelectedGroup := GroupIndex;
   FTaskList := FGroupList[GroupIndex];
   InitMap(Count + 1);
+end;
+
+function TTasks.SetUngroupedName: boolean;
+begin
+  Result := False;
+  if (Assigned(FGroupNameList)) and (FGroupNameList.Count > 0) and (not FGroupNameList[0].TrimLeft.StartsWith('#')) then
+  begin
+    FGroupNameList[0] := rgroupuntitled;
+    Result := True;
+  end;
 end;
 
 function TTasks.ToStringList: TStringList;
