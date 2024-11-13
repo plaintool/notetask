@@ -101,6 +101,8 @@ type
     function DeleteGroup(aIndex: integer): boolean;
     function MoveGroupLeft(Index: integer): integer;
     function MoveGroupRight(Index: integer): integer;
+    function MoveGroupTasksLeft(Index1, Index2: integer): integer;
+    function MoveGroupTasksRight(Index1, Index2: integer): integer;
     function MoveTasksTop(Index1, Index2: integer): integer;
     function MoveTasksBottom(Index1, Index2: integer): integer;
     function MoveTasksUp(Index1, Index2: integer): integer;
@@ -1052,6 +1054,26 @@ begin
   FGroupNameList[Index] := tempName;
   Result := Index + 1;
   FSelectedGroup := Result;
+end;
+
+function TTasks.MoveGroupTasksLeft(Index1, Index2: integer): integer;
+var
+  i, IndStart, IndEnd: integer;
+begin
+  Result := -1;
+  IndStart := Map(Index1);
+  IndEnd := Map(Index2);
+
+end;
+
+function TTasks.MoveGroupTasksRight(Index1, Index2: integer): integer;
+var
+  i, IndStart, IndEnd: integer;
+begin
+  Result := -1;
+  IndStart := Map(Index1);
+  IndEnd := Map(Index2);
+
 end;
 
 function TTasks.MoveTasksTop(Index1, Index2: integer): integer;

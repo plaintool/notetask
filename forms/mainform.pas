@@ -1900,13 +1900,49 @@ begin
 end;
 
 procedure TformNotetask.aMoveTaskLeftExecute(Sender: TObject);
+var
+  newRow, sellen, selleft, selright: integer;
 begin
+  if Screen.ActiveForm <> Self then exit;
+  if (groupTabs.TabIndex <= 0) then exit;
+  if taskGrid.RowCount < 2 then exit;
 
+  GridBackupSelection;
+  sellen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selleft := taskGrid.Selection.Left;
+  selright := taskGrid.Selection.Right;
+
+  newRow := Tasks.MoveGroupTasksLeft(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+
+  if (newRow > -1) then
+  begin
+    ChangeGroup(Tasks.SelectedGroup - 1);
+    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, sellen);
+  end;
+  SetChanged;
 end;
 
 procedure TformNotetask.aMoveTaskRightExecute(Sender: TObject);
+var
+  newRow, sellen, selleft, selright: integer;
 begin
+  if Screen.ActiveForm <> Self then exit;
+  if (groupTabs.TabIndex >= groupTabs.Tabs.Count - 1) then exit;
+  if taskGrid.RowCount < 2 then exit;
 
+  GridBackupSelection;
+  sellen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selleft := taskGrid.Selection.Left;
+  selright := taskGrid.Selection.Right;
+
+  newRow := Tasks.MoveGroupTasksRight(taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+
+  if (newRow > -1) then
+  begin
+    ChangeGroup(Tasks.SelectedGroup + 1);
+    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, sellen);
+  end;
+  SetChanged;
 end;
 
 procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
