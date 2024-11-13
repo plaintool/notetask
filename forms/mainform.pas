@@ -318,6 +318,8 @@ type
     procedure aInsertGroupExecute(Sender: TObject);
     procedure aRenameGroupExecute(Sender: TObject);
     procedure aDeleteGroupExecute(Sender: TObject);
+    procedure aMoveTaskLeftExecute(Sender: TObject);
+    procedure aMoveTaskRightExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -396,6 +398,7 @@ type
     procedure ExecuteTerminal;
     procedure MoveTabLeft(Index: integer);
     procedure MoveTabRight(Index: integer);
+    procedure ChangeGroup(Index: integer);
     procedure CalcRowHeights(aRow: integer = 0);
     function LastRowHeight(aRow: integer): integer;
     function GetScrollPosition: integer;
@@ -588,10 +591,37 @@ begin
     Exit;
   end;
 
+  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_DELETE) then // Ctrl+Shift + Del
+  begin
+    aDeleteGroup.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_F2) then // Ctrl + F2
+  begin
+    aRenameGroup.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_INSERT) then // Ctrl + Insert
+  begin
+    aInsertGroup.Execute;
+    Key := 0;
+  end
+  else
   if (ssCtrl in Shift) and (Key = VK_DELETE) then // Ctrl + Del
   begin
     if not IsEditing then
       DeleteTasks;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key in [VK_1, VK_2, VK_3, VK_4, VK_5, VK_6, VK_7, VK_8, VK_9, VK_0]) then // Ctrl + Del
+  begin
+    if (Key = VK_0) then
+      ChangeGroup(9)
+    else
+      ChangeGroup(Key - VK_0 - 1);
     Key := 0;
   end
   else
@@ -677,6 +707,18 @@ begin
   if ((Shift = [ssCtrl]) or (Shift = [ssAlt])) and (Key = VK_DOWN) then // Ctrl || Alt + Down
   begin
     aMoveTaskDown.Execute;
+    Key := 0;
+  end
+  else
+  if ((Shift = [ssCtrl]) or (Shift = [ssAlt])) and (Key = VK_LEFT) then // Ctrl || Alt + Left
+  begin
+    aMoveTaskLeft.Execute;
+    Key := 0;
+  end
+  else
+  if ((Shift = [ssCtrl]) or (Shift = [ssAlt])) and (Key = VK_RIGHT) then // Ctrl || Alt + Right
+  begin
+    aMoveTaskRight.Execute;
     Key := 0;
   end
   else
@@ -1281,7 +1323,7 @@ end;
 
 procedure TformNotetask.groupTabsChange(Sender: TObject);
 begin
-  Tasks.ChangeGroup(groupTabs.TabIndex);
+  Tasks.ChangeGroup(groupTabs.TabIndex, True);
 
   FillGrid;
   taskGrid.Row := 1;
@@ -1806,8 +1848,7 @@ begin
       if (Result <> groupTabs.TabIndex) then
       begin
         SetTabs;
-        groupTabs.TabIndex := Result;
-        groupTabsChange(groupTabs);
+        ChangeGroup(Result);
         SetChanged;
       end;
     end;
@@ -1852,11 +1893,20 @@ begin
     if (Tasks.DeleteGroup(groupTabs.TabIndex)) then
     begin
       SetTabs;
-      groupTabs.TabIndex := Tasks.SelectedGroup;
-      groupTabsChange(groupTabs);
+      ChangeGroup(Tasks.SelectedGroup);
       SetChanged;
     end;
   end;
+end;
+
+procedure TformNotetask.aMoveTaskLeftExecute(Sender: TObject);
+begin
+
+end;
+
+procedure TformNotetask.aMoveTaskRightExecute(Sender: TObject);
+begin
+
 end;
 
 procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
@@ -2370,9 +2420,8 @@ begin
   if (Result <> Index) then
   begin
     SetTabs;
-    groupTabs.TabIndex := Result;
     if (FDragTab >= 0) then FDragTab := Result;
-    groupTabsChange(groupTabs);
+    ChangeGroup(Result);
     SetChanged;
   end;
 end;
@@ -2387,11 +2436,17 @@ begin
   if (Result <> Index) then
   begin
     SetTabs;
-    groupTabs.TabIndex := Result;
     if (FDragTab >= 0) then FDragTab := Result;
-    groupTabsChange(groupTabs);
+    ChangeGroup(Result);
     SetChanged;
   end;
+end;
+
+procedure TformNotetask.ChangeGroup(Index: integer);
+begin
+  if (Index < 0) or (index > groupTabs.Tabs.Count - 1) then exit;
+  groupTabs.TabIndex := Index;
+  groupTabsChange(groupTabs);
 end;
 
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);

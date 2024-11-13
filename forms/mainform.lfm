@@ -15,7 +15,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 391
@@ -808,24 +807,31 @@ object formNotetask: TformNotetask
       Category = 'Group'
       Caption = 'Insert group'
       OnExecute = aInsertGroupExecute
+      ShortCut = 16429
     end
     object aRenameGroup: TAction
       Category = 'Group'
       Caption = 'Rename group'
       OnExecute = aRenameGroupExecute
+      ShortCut = 16497
     end
     object aDeleteGroup: TAction
       Category = 'Group'
       Caption = 'Delete group'
       OnExecute = aDeleteGroupExecute
+      ShortCut = 24622
     end
     object aMoveTaskLeft: TAction
       Category = 'Group'
       Caption = 'Move tasks to left group'
+      OnExecute = aMoveTaskLeftExecute
+      ShortCut = 16421
     end
     object aMoveTaskRight: TAction
       Category = 'Group'
       Caption = 'Move tasks to right group'
+      OnExecute = aMoveTaskRightExecute
+      ShortCut = 16423
     end
   end
   object openDialog: TOpenDialog
