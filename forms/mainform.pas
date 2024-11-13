@@ -1336,6 +1336,10 @@ begin
     taskGrid.Row := FLastRowMem[Tasks.SelectedGroup]
   else
     taskGrid.Row := 1;
+  taskGrid.ClearSelections;
+
+  Tasks.CreateBackup;
+  GridBackupSelection;
 
   ResetRowHeight;
   SetNote;
@@ -1910,7 +1914,7 @@ end;
 
 procedure TformNotetask.aMoveTaskLeftExecute(Sender: TObject);
 var
-  newRow, sellen, selleft, selright: integer;
+  newRow, sellen, selleft, selright, selend: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if (groupTabs.TabIndex <= 0) then exit;
@@ -1926,15 +1930,20 @@ begin
   if (newRow > -1) then
   begin
     ChangeGroup(Tasks.SelectedGroup);
+    newRow := Tasks.ReverseMap(newRow);
     taskGrid.Row := newRow;
-    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, newRow + sellen - 1);
+    if (SortOrder = soAscending) then
+      selend := newRow + sellen - 1
+    else
+      selend := newRow - sellen - 1;
+    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, selend);
   end;
   SetChanged;
 end;
 
 procedure TformNotetask.aMoveTaskRightExecute(Sender: TObject);
 var
-  newRow, sellen, selleft, selright: integer;
+  newRow, sellen, selleft, selright, selend: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if (groupTabs.TabIndex >= groupTabs.Tabs.Count - 1) then exit;
@@ -1950,8 +1959,13 @@ begin
   if (newRow > -1) then
   begin
     ChangeGroup(Tasks.SelectedGroup);
+    newRow := Tasks.ReverseMap(newRow);
     taskGrid.Row := newRow;
-    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, newRow + sellen - 1);
+    if (SortOrder = soAscending) then
+      selend := newRow + sellen - 1
+    else
+      selend := newRow - sellen - 1;
+    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, selend);
   end;
   SetChanged;
 end;
@@ -3165,6 +3179,8 @@ begin
   aMoveTaskBottom.Enabled := SortColumn = 0;
   aMoveTaskUp.Enabled := SortColumn = 0;
   aMoveTaskDown.Enabled := SortColumn = 0;
+  aMoveTaskLeft.Enabled := SortColumn = 0;
+  aMoveTaskRight.Enabled := SortColumn = 0;
   if (SortColumn = 0) then
     taskGrid.Options := taskGrid.Options + [goRowMoving]
   else

@@ -1064,6 +1064,12 @@ begin
   // Map the start and end indexes of the task range
   IndStart := Map(Index1);
   IndEnd := Map(Index2);
+  if (IndStart > IndEnd) then
+  begin
+    i := IndEnd;
+    IndEnd := IndStart;
+    IndStart := i;
+  end;
 
   // Calculate the number of tasks to move
   Len := IndEnd - IndStart + 1;
@@ -1089,7 +1095,7 @@ begin
   ChangeGroup(NewGroup, True);
 
   // Return the index of the first moved task in the new group
-  Result := ReverseMap(LastTask);
+  Result := LastTask;
 end;
 
 function TTasks.MoveTasksTop(Index1, Index2: integer): integer;

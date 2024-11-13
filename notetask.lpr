@@ -39,8 +39,8 @@ begin
   RequireDerivedFormResource := True;
   Language := GetOSLanguage;
   DefaultFormatSettings.DecimalSeparator := '.';
-  Application.Title := 'Notetask';
-  Application.Scaled := True;
+  Application.Title:='Notetask';
+  Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
   Application.CreateForm(TformInputText, formInputText);
