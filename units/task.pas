@@ -78,7 +78,7 @@ type
     destructor Destroy; override; // Destructor
     procedure AddGroup(const GroupName: string; const TaskStrings: TStringList = nil); // Add new group from a StringList
     procedure UpdateGroup;
-    procedure ChangeGroup(GroupIndex: integer);
+    procedure ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
     function ToStringList: TStringList;
     procedure InitMap(Length: integer);
     function Map(Index: integer): integer;
@@ -96,6 +96,9 @@ type
     procedure CompleteTask(Index: integer; Backup: boolean = True);
     procedure StarTask(Index: integer; Backup: boolean = True);
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
+    function InsertGroup(aName: string): integer;
+    function RenameGroup(aIndex: integer; aName: string): boolean;
+    function DeleteGroup(aIndex: integer): boolean;
     function MoveGroupLeft(Index: integer): integer;
     function MoveGroupRight(Index: integer): integer;
     function MoveTasksTop(Index1, Index2: integer): integer;
@@ -538,7 +541,7 @@ begin
   end;
 
   CreateBackupInit;
-  ChangeGroup(0);
+  ChangeGroup(0, True);
 end;
 
 destructor TTasks.Destroy;
@@ -608,30 +611,18 @@ begin
 end;
 
 procedure TTasks.UpdateGroup;
-//var
-//  i: integer;
 begin
   if (FSelectedGroup > -1) then
     FGroupList[SelectedGroup] := FTaskList;
-  //if (FSelectedGroup > -1) and (Assigned(FTaskList)) then
-  //begin
-  //  SetLength(FGroupList[SelectedGroup], Count);
-  //  for i := 0 to Count - 1 do
-  //  begin
-  //    FGroupList[SelectedGroup, i] := TTask.Create;
-  //    FGroupList[SelectedGroup, i].Copy(FTaskList[i]);
-  //  end;
-  //end;
 end;
 
-procedure TTasks.ChangeGroup(GroupIndex: integer);
+procedure TTasks.ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
 begin
-  SetLength(FMapGrid, 0); // Initialize task map
+  if (UpdateCurrent) then UpdateGroup;
 
-  UpdateGroup;
+  SetLength(FMapGrid, 0); // Initialize task map
   FSelectedGroup := GroupIndex;
   FTaskList := FGroupList[GroupIndex];
-
   InitMap(Count + 1);
 end;
 
@@ -940,6 +931,85 @@ begin
         Grid.Cells[j, i] := string.Empty;
     end;
   end;
+end;
+
+function TTasks.InsertGroup(aName: string): integer;
+var
+  i: integer;
+begin
+  UpdateGroup;
+
+  // Increase the size of the group array
+  SetLength(FGroupList, CountGroup + 1);
+  FGroupNameList.Add(string.Empty);
+
+  // Check if the selected group is within bounds and shift groups to the right
+  if (FSelectedGroup >= 0) and (FSelectedGroup < CountGroup - 2) then
+  begin
+    // Shift existing groups to the right to make space for the new group
+    for i := CountGroup - 1 downto FSelectedGroup + 1 do
+    begin
+      FGroupList[i] := FGroupList[i - 1];
+      FGroupNameList[i] := FGroupNameList[i - 1];
+    end;
+  end;
+
+  // Increment the selected group index and set the name of the new group
+  Inc(FSelectedGroup);
+  SetLength(FGroupList[FSelectedGroup], 0);
+  FGroupNameList[FSelectedGroup] := '## ' + aName;
+
+  // Change group to new one
+  ChangeGroup(SelectedGroup);
+
+  // Return the index of the newly inserted group
+  Result := FSelectedGroup;
+end;
+
+function TTasks.RenameGroup(aIndex: integer; aName: string): boolean;
+begin
+  Result := False;
+  if (aIndex < 0) or (aIndex > CountGroup - 1) then exit;
+  FGroupNameList[aIndex] := IfThen(aName = rgroupuntitled, aName, '## ' + aName);
+  Result := True;
+end;
+
+function TTasks.DeleteGroup(aIndex: integer): boolean;
+var
+  i: integer;
+begin
+  Result := False;
+  UpdateGroup;
+
+  // Check if the index is within valid range
+  if (aIndex < 0) or (aIndex >= CountGroup) then
+    exit;
+
+  // Shift groups to the left, overwriting the group at aIndex
+  for i := aIndex to CountGroup - 2 do
+  begin
+    FGroupList[i] := FGroupList[i + 1];
+    FGroupNameList[i] := FGroupNameList[i + 1];
+  end;
+
+  // Decrease the size of the group array and name list
+  FGroupNameList.Delete(CountGroup - 1);
+  SetLength(FGroupList, CountGroup - 1);
+
+  // If not groups add new
+  if (CountGroup = 0) then
+  begin
+    SetLength(FGroupList, CountGroup + 1);
+    FGroupNameList.Add(rgroupuntitled);
+  end;
+
+  // Update the selected group if needed
+  if FSelectedGroup >= CountGroup then
+    FSelectedGroup := CountGroup - 1;
+
+  ChangeGroup(FSelectedGroup);
+
+  Result := True;
 end;
 
 function TTasks.MoveGroupLeft(Index: integer): integer;

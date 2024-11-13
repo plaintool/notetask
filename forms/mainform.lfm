@@ -807,14 +807,17 @@ object formNotetask: TformNotetask
     object aInsertGroup: TAction
       Category = 'Group'
       Caption = 'Insert group'
+      OnExecute = aInsertGroupExecute
     end
     object aRenameGroup: TAction
       Category = 'Group'
       Caption = 'Rename group'
+      OnExecute = aRenameGroupExecute
     end
     object aDeleteGroup: TAction
       Category = 'Group'
       Caption = 'Delete group'
+      OnExecute = aDeleteGroupExecute
     end
     object aMoveTaskLeft: TAction
       Category = 'Group'

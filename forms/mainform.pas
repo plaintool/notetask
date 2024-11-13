@@ -315,6 +315,9 @@ type
     procedure groupTabsMouseLeave(Sender: TObject);
     procedure groupTabsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure groupTabsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure aInsertGroupExecute(Sender: TObject);
+    procedure aRenameGroupExecute(Sender: TObject);
+    procedure aDeleteGroupExecute(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -468,6 +471,10 @@ resourcestring
   rundoconfirm = 'Are you sure you want to discard all changes? This action cannot be undone.';
   rnumstringtoolarge = 'The line number is out of the allowed range.';
   rchatgpt = 'https://chatgpt.com?q=';
+  rdeletegroupconfirm = 'Are you sure you want to delete this group? This will also delete all tasks within this group.';
+  rentergroupname = 'Enter the group name:';
+  rgroup = 'Group';
+  rOK = 'OK';
 
 implementation
 
@@ -1774,6 +1781,80 @@ begin
       end;
       SetChanged;
       SetInfo;
+    end;
+  end;
+end;
+
+procedure TformNotetask.aInsertGroupExecute(Sender: TObject);
+var
+  Result: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  // Create an instance of the form
+  with formInputText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    SetCaption(rgroup, rentergroupname, rOK);
+
+    // Show the form as a modal dialog
+    if ShowModal = mrOk then
+    begin
+      Result := Tasks.InsertGroup(editText.Text);
+
+      if (Result <> groupTabs.TabIndex) then
+      begin
+        SetTabs;
+        groupTabs.TabIndex := Result;
+        groupTabsChange(groupTabs);
+        SetChanged;
+      end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aRenameGroupExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  // Create an instance of the form
+  with formInputText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    SetCaption(rgroup, rentergroupname, rOK, groupTabs.Tabs[groupTabs.TabIndex]);
+
+    // Show the form as a modal dialog
+    if (ShowModal = mrOk) and (editText.Text <> groupTabs.Tabs[groupTabs.TabIndex]) then
+    begin
+      if (Tasks.RenameGroup(groupTabs.TabIndex, editText.Text)) then
+      begin
+        SetTabs;
+        SetChanged;
+      end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aDeleteGroupExecute(Sender: TObject);
+var
+  Confirm: integer;
+begin
+  Confirm := MessageDlg(rdeletegroupconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+  if (Confirm = mrYes) then
+  begin
+    if (Tasks.DeleteGroup(groupTabs.TabIndex)) then
+    begin
+      SetTabs;
+      groupTabs.TabIndex := Tasks.SelectedGroup;
+      groupTabsChange(groupTabs);
+      SetChanged;
     end;
   end;
 end;
@@ -3191,7 +3272,9 @@ procedure TformNotetask.SetTabs;
 var
   Clean: TStringList;
   i: integer;
+  LastIndex: integer;
 begin
+  LastIndex := groupTabs.TabIndex;
   Clean := TStringList.Create;
   try
     for i := 0 to Tasks.CountGroup - 1 do
@@ -3199,6 +3282,8 @@ begin
 
     groupTabs.Tabs := Clean;
     groupTabs.Visible := not ((groupTabs.Tabs.Count = 1) and (groupTabs.Tabs[0] = rgroupuntitled));
+    if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count - 1) then
+      groupTabs.TabIndex := LastIndex;
   finally
     Clean.Free;
   end;

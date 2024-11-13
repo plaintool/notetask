@@ -50,12 +50,25 @@ msgstr ""
 msgid "Are you sure you want to delete this task?"
 msgstr ""
 
+#: mainform.rdeletegroupconfirm
+msgid "Are you sure you want to delete this group? This will also delete all tasks within this group."
+msgstr ""
+
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
 msgstr ""
 
+#: mainform.rentergroupname
+msgid "Enter the group name:"
+msgstr ""
+
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
+msgstr ""
+
+#: mainform.rgroup
+msgctxt "mainform.rgroup"
+msgid "Group"
 msgstr ""
 
 #: mainform.rmergesconfirm
@@ -64,6 +77,11 @@ msgstr ""
 
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
+msgstr ""
+
+#: mainform.rok
+msgctxt "mainform.rok"
+msgid "OK"
 msgstr ""
 
 #: mainform.ropendialogfilter
@@ -572,6 +590,7 @@ msgid "Format"
 msgstr ""
 
 #: tformnotetask.menugroup.caption
+msgctxt "tformnotetask.menugroup.caption"
 msgid "Group"
 msgstr ""
 

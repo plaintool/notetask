@@ -50,13 +50,27 @@ msgstr "Are you sure you want to clear the data in the selected area?"
 msgid "Are you sure you want to delete this task?"
 msgstr "Are you sure you want to delete this task?"
 
+#: mainform.rdeletegroupconfirm
+msgid "Are you sure you want to delete this group? This will also delete all tasks within this group."
+msgstr ""
+
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
 msgstr "Are you sure you want to delete selected tasks?"
 
+#: mainform.rentergroupname
+msgid "Enter the group name:"
+msgstr ""
+
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "The requested file was not found on the disk."
+
+#: mainform.rgroup
+#, fuzzy
+msgctxt "mainform.rgroup"
+msgid "Group"
+msgstr "Group"
 
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
@@ -65,6 +79,12 @@ msgstr "Are you sure you want to merge selected tasks?"
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
 msgstr "The line number is out of the allowed range."
+
+#: mainform.rok
+#, fuzzy
+msgctxt "mainform.rok"
+msgid "OK"
+msgstr "OK"
 
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
@@ -572,6 +592,7 @@ msgid "Format"
 msgstr "Format"
 
 #: tformnotetask.menugroup.caption
+msgctxt "tformnotetask.menugroup.caption"
 msgid "Group"
 msgstr "Group"
 
@@ -671,3 +692,4 @@ msgstr "Find what:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Replace with:"
+

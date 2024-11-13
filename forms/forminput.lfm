@@ -8,9 +8,9 @@ object formInputText: TformInputText
   Caption = 'Go to task'
   ClientHeight = 103
   ClientWidth = 250
+  OnCreate = FormCreate
   OnShow = FormShow
   ShowInTaskBar = stNever
-  LCLVersion = '3.6.0.0'
   object buttonOk: TButton
     Left = 85
     Height = 25

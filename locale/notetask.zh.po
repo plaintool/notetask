@@ -50,13 +50,27 @@ msgstr "您确定要清除所选区域中的数据吗？"
 msgid "Are you sure you want to delete this task?"
 msgstr "您确定要删除此任务吗？"
 
+#: mainform.rdeletegroupconfirm
+msgid "Are you sure you want to delete this group? This will also delete all tasks within this group."
+msgstr ""
+
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
 msgstr "您确定要删除所选任务吗？"
 
+#: mainform.rentergroupname
+msgid "Enter the group name:"
+msgstr ""
+
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "在磁盘上找不到请求的文件。"
+
+#: mainform.rgroup
+#, fuzzy
+msgctxt "mainform.rgroup"
+msgid "Group"
+msgstr "组"
 
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
@@ -65,6 +79,12 @@ msgstr "您确定要合并选定的任务吗？"
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
 msgstr "行号超出允许范围。"
+
+#: mainform.rok
+#, fuzzy
+msgctxt "mainform.rok"
+msgid "OK"
+msgstr "确定"
 
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
@@ -572,6 +592,7 @@ msgid "Format"
 msgstr "格式"
 
 #: tformnotetask.menugroup.caption
+msgctxt "tformnotetask.menugroup.caption"
 msgid "Group"
 msgstr "组"
 
@@ -671,3 +692,4 @@ msgstr "查找内容："
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "替换为："
+
