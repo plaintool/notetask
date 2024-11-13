@@ -2482,7 +2482,7 @@ procedure TformNotetask.ChangeGroup(Index: integer);
 begin
   if (Index < 0) or (index > groupTabs.Tabs.Count - 1) then exit;
   groupTabs.TabIndex := Index;
-  groupTabsChange(groupTabs);
+  //groupTabsChange(groupTabs);
 end;
 
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -3351,12 +3351,12 @@ procedure TformNotetask.SetNote;
 begin
   if (not ShowNote) then exit;
 
-  if (Assigned(Tasks)) then
-  begin
-    memoNote.OnChange := nil;
-    memoNote.Text := Tasks.GetTask(taskGrid.Row).Note;
-    memoNote.OnChange := @memoNoteChange;
-  end;
+  memoNote.OnChange := nil;
+  if (Assigned(Tasks)) and (taskGrid.RowCount > 1) then
+    memoNote.Text := Tasks.GetTask(taskGrid.Row).Note
+  else
+    memoNote.Text := string.Empty;
+  memoNote.OnChange := @memoNoteChange;
 end;
 
 procedure TformNotetask.SetTabs;
