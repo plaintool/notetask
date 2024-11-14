@@ -343,7 +343,6 @@ type
     FLineEnding: TLineEnding;
     FLineCount: integer;
     FWordWrap: boolean;
-    FShowStatusBar: boolean;
     FSortOrder: TSortOrder;
     FSortColumn: integer;
     FMatchCase: boolean;
@@ -418,6 +417,7 @@ type
     FShowArchived: boolean;
     FShowDuration: boolean;
     FShowNote: boolean;
+    FShowStatusBar: boolean;
     FShowColumnDone: boolean;
     FShowColumnTask: boolean;
     FShowColumnNote: boolean;
@@ -557,9 +557,9 @@ begin
   memoNote.WordWrap := FWordWrap;
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowArchived.Checked := FShowArchived;
-  aShowStatusBar.Checked := FShowStatusBar;
-  //aShowNote.Checked := FShowNote;
   ShowNote := FShowNote;
+  //aShowStatusBar.Checked := FShowStatusBar;
+  ShowStatusBar := FShowStatusBar;
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
@@ -2409,6 +2409,8 @@ begin
 
   SetChanged(False);
   ShowNote := FShowNote;
+  ShowStatusBar := FShowStatusBar;
+  ShowArchived := FShowArchived;
   ApplyColumnSetting;
 
   FillGrid;
@@ -3120,12 +3122,15 @@ end;
 procedure TformNotetask.SetShowStatusBar(Value: boolean);
 begin
   FShowStatusBar := Value;
+
+  aShowStatusBar.Checked := FShowStatusBar;
   StatusBar.Visible := FShowStatusBar;
 end;
 
 procedure TformNotetask.SetShowArchived(Value: boolean);
 begin
   FShowArchived := Value;
+  aShowArchived.Checked := FShowArchived;
   FillGrid;
   ResetRowHeight;
   SetInfo;
@@ -3151,7 +3156,7 @@ begin
   aShowNote.Checked := FShowNote;
   memoNote.Visible := FShowNote;
   Splitter.Visible := FShowNote;
-  statusBar.Top := memoNote.Top + MemoNote.Height;
+  StatusBar.Top := memoNote.Top + MemoNote.Height;
 
   SetNote;
 end;

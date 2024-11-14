@@ -74,8 +74,6 @@ begin
     JSONObj.Add('WindowState', Ord(Form.WindowState));
     JSONObj.Add('WordWrap', Form.WordWrap);
     JSONObj.Add('BidiRightToLeft', Form.BiDiRightToLeft);
-    JSONObj.Add('ShowStatusBar', Form.ShowStatusBar);
-    JSONObj.Add('ShowArchived', Form.ShowArchived);
     JSONObj.Add('Language', Language);
 
     // Save font
@@ -140,12 +138,6 @@ begin
       if JSONObj.FindPath('BidiRightToLeft') <> nil then
         Form.BiDiRightToLeft := JSONObj.FindPath('BidiRightToLeft').AsBoolean;
 
-      if JSONObj.FindPath('ShowArchived') <> nil then
-        Form.FShowArchived := JSONObj.FindPath('ShowArchived').AsBoolean;
-
-      if JSONObj.FindPath('ShowStatusBar') <> nil then
-        Form.ShowStatusBar := JSONObj.FindPath('ShowStatusBar').AsBoolean;
-
       if JSONObj.FindPath('Language') <> nil then
       begin
         if (JSONObj.FindPath('Language').AsString <> string.Empty) and (Language <> JSONObj.FindPath('Language').AsString) then
@@ -202,6 +194,8 @@ begin
     ItemSettings := TJSONObject.Create;
     ItemSettings.Add('ShowDuration', Form.ShowDuration);
     ItemSettings.Add('ShowNote', Form.ShowNote);
+    ItemSettings.Add('ShowStatusBar', Form.ShowStatusBar);
+    ItemSettings.Add('ShowArchived', Form.ShowArchived);
     ItemSettings.Add('NoteHeight', Form.memoNote.Height);
     ItemSettings.Add('ShowColumnDone', Form.ShowColumnDone);
     ItemSettings.Add('ShowColumnTask', Form.ShowColumnTask);
@@ -286,6 +280,12 @@ begin
 
       if ItemSettings.FindPath('NoteHeight') <> nil then
         Form.memoNote.Height := ItemSettings.FindPath('NoteHeight').AsInteger;
+
+      if ItemSettings.FindPath('ShowArchived') <> nil then
+        Form.FShowArchived := ItemSettings.FindPath('ShowArchived').AsBoolean;
+
+      if ItemSettings.FindPath('ShowStatusBar') <> nil then
+        Form.FShowStatusBar := ItemSettings.FindPath('ShowStatusBar').AsBoolean;
 
       if ItemSettings.FindPath('ShowColumnDone') <> nil then
         Form.FShowColumnDone := ItemSettings.FindPath('ShowColumnDone').AsBoolean;
