@@ -1466,8 +1466,21 @@ begin
     SetChanged(False);
     EditComplite;
     FFileName := string.Empty;
+
+    // Encoding of new file
     FEncoding := TEncoding.UTF8;
+
+    // Lineending
+    {$IFDEF Windows}
     FLineEnding := FLineEnding.WindowsCRLF;
+    {$ENDIF}
+    {$IFDEF Linux}
+    FLineEnding := FLineEnding.UnixLF;
+    {$ENDIF}
+    {$IFDEF MacOS}
+    FLineEnding := FLineEnding.MacintoshCR;
+    {$ENDIF}
+
     taskGrid.Clean;
     taskGrid.RowCount := 2;
     taskGrid.Col := 2;
