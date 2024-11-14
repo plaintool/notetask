@@ -157,7 +157,7 @@ object formNotetask: TformNotetask
     OnMouseLeave = groupTabsMouseLeave
     OnMouseMove = groupTabsMouseMove
     OnMouseUp = groupTabsMouseUp
-    Options = [nboDoChangeOnSetIndex]
+    Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
     TabOrder = 4
     Visible = False
   end
