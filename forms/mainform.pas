@@ -24,6 +24,7 @@ uses
   ComCtrls,
   ExtCtrls,
   Grids,
+  Math,
   Menus,
   PrintersDlgs,
   DateTimePicker,
@@ -228,6 +229,12 @@ type
     MenuItem4: TMenuItem;
     Separator16: TMenuItem;
     MenuItem5: TMenuItem;
+    PopupTabs: TPopupMenu;
+    MenuItem7: TMenuItem;
+    MenuItem8: TMenuItem;
+    MenuItem9: TMenuItem;
+    MenuItem10: TMenuItem;
+    MenuItem15: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -929,6 +936,7 @@ begin
   begin
     Tasks.DeleteTask(tIndex);
     SetInfo;
+    SetNote;
 
     if ShowDuration then FillGrid;
   end;
@@ -1295,6 +1303,7 @@ end;
 procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   Field: TMemo;
+  LinesPerPage: integer;
 begin
   Field := (Sender as TMemo);
 
@@ -1307,6 +1316,24 @@ begin
     end;
     Field.ClearSelection;
     Key := 0;
+  end
+  else
+  if Key = VK_PRIOR then
+  begin
+    LinesPerPage := Field.ClientHeight div Canvas.TextHeight('Wg');
+    Field.CaretPos := Point(0, Max(0, Field.CaretPos.Y - LinesPerPage));
+    Field.VertScrollBar.Position := Field.CaretPos.Y - (LinesPerPage div 2);
+    Field.Invalidate;
+    Key := 0;
+  end
+  else
+  if key = VK_NEXT then
+  begin
+    LinesPerPage := Field.ClientHeight div Canvas.TextHeight('Wg');
+    Field.CaretPos := Point(0, Min(Field.Lines.Count - 1, Field.CaretPos.Y + LinesPerPage));
+    Field.VertScrollBar.Position := Field.CaretPos.Y - (LinesPerPage div 2);
+    Field.Invalidate;
+    key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
@@ -1413,8 +1440,18 @@ begin
 end;
 
 procedure TformNotetask.groupTabsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+var
+  TabIndex: integer;
 begin
   DisableDrag;
+
+  if Button = mbRight then
+  begin
+    TabIndex := groupTabs.IndexOfTabAt(X, Y);
+    if TabIndex <> -1 then
+      groupTabs.TabIndex := TabIndex;
+    PopupTabs.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
+  end;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
@@ -1510,6 +1547,7 @@ begin
       taskGrid.Selection := TRect.Create(TempRect.Left, TempRect.Top, TempRect.Right, TempRect.Bottom);
     taskGrid.TopRow := TempTopRow;
     SetInfo;
+    SetNote;
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
@@ -1533,6 +1571,7 @@ begin
       FillGrid;
       ResetRowHeight;
       SetInfo;
+      SetNote;
       SetTabs;
       GridClearSelection;
       Tasks.CreateBackup;
@@ -2868,6 +2907,7 @@ begin
       FillGrid;
       ResetRowHeight;
       SetInfo;
+      SetNote;
       SetChanged;
     end;
   end;
@@ -2904,6 +2944,7 @@ begin
       FillGrid;
       ResetRowHeight;
       SetInfo;
+      SetNote;
       SetChanged; // Mark that data has changed
     end;
   end
@@ -3134,6 +3175,7 @@ begin
   FillGrid;
   ResetRowHeight;
   SetInfo;
+  SetNote;
 end;
 
 procedure TformNotetask.SetShowDuration(Value: boolean);
