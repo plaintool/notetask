@@ -3581,7 +3581,7 @@ begin
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
-  if (Assigned(Tasks)) and (Tasks.SetUngroupedName) then
+  if (Assigned(Tasks)) then
     groupTabs.Tabs[0] := rgroupuntitled;
 
   case Language of
