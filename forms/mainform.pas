@@ -1298,9 +1298,8 @@ begin
   if (not IsColumn) then
   begin
     Tasks.MoveTask(sIndex, tIndex);
+    FillGrid;
     SetChanged;
-
-    if ShowDuration then FillGrid;
   end;
 end;
 

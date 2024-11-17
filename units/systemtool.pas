@@ -180,6 +180,7 @@ var
   ValueSize: DWORD;
 begin
   Result := False;
+  Key:=HKEY_CURRENT_USER;
   if RegOpenKeyEx(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Themes\Personalize', 0, KEY_READ, Key) = ERROR_SUCCESS then
   begin
     ValueSize := SizeOf(Value);
