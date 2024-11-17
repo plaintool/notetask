@@ -478,6 +478,7 @@ resourcestring
   runtitled = 'Untitled';
   rrows = ' tasks';
   rcantfind = 'Can''t find';
+  rgroupuntitled = 'Ungrouped';
   rfilenotfound = 'The requested file was not found on the disk.';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rdeletesconfirm = 'Are you sure you want to delete selected tasks?';

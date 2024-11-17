@@ -133,7 +133,6 @@ type
   end;
 
 resourcestring
-  rgroupuntitled = 'Ungrouped';
   rseconds = 'sec';
   rminutes = 'min';
   rhours = 'h';

@@ -71,6 +71,11 @@ msgctxt "mainform.rgroup"
 msgid "Group"
 msgstr "グループ"
 
+#: mainform.rgroupuntitled
+msgctxt "mainform.rgroupuntitled"
+msgid "Ungrouped"
+msgstr "グループ化されていない"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "選択したタスクを統合してもよろしいですか？"
@@ -114,10 +119,6 @@ msgstr "無題"
 #: task.rdays
 msgid "d"
 msgstr "日"
-
-#: task.rgroupuntitled
-msgid "Ungrouped"
-msgstr "グループ化されていない"
 
 #: task.rhours
 msgid "h"

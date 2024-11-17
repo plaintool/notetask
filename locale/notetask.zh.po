@@ -71,6 +71,11 @@ msgctxt "mainform.rgroup"
 msgid "Group"
 msgstr "组"
 
+#: mainform.rgroupuntitled
+msgctxt "mainform.rgroupuntitled"
+msgid "Ungrouped"
+msgstr "未分组"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "您确定要合并选定的任务吗？"
@@ -114,10 +119,6 @@ msgstr "无标题"
 #: task.rdays
 msgid "d"
 msgstr "日"
-
-#: task.rgroupuntitled
-msgid "Ungrouped"
-msgstr "未分组"
 
 #: task.rhours
 msgid "h"

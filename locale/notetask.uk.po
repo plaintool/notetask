@@ -71,6 +71,11 @@ msgctxt "mainform.rgroup"
 msgid "Group"
 msgstr "Група"
 
+#: mainform.rgroupuntitled
+msgctxt "mainform.rgroupuntitled"
+msgid "Ungrouped"
+msgstr "Без групи"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "Ви впевнені, що хочете об'єднати вибрані завдання?"
@@ -114,10 +119,6 @@ msgstr "Без назви"
 #: task.rdays
 msgid "d"
 msgstr "д"
-
-#: task.rgroupuntitled
-msgid "Ungrouped"
-msgstr "Без групи"
 
 #: task.rhours
 msgid "h"

@@ -71,6 +71,11 @@ msgctxt "mainform.rgroup"
 msgid "Group"
 msgstr "그룹"
 
+#: mainform.rgroupuntitled
+msgctxt "mainform.rgroupuntitled"
+msgid "Ungrouped"
+msgstr "그룹화되지 않음"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "선택한 작업을 병합하시겠습니까?"
@@ -114,10 +119,6 @@ msgstr "제목 없음"
 #: task.rdays
 msgid "d"
 msgstr "일"
-
-#: task.rgroupuntitled
-msgid "Ungrouped"
-msgstr "그룹화되지 않음"
 
 #: task.rhours
 msgid "h"

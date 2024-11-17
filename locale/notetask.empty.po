@@ -71,6 +71,11 @@ msgctxt "mainform.rgroup"
 msgid "Group"
 msgstr ""
 
+#: mainform.rgroupuntitled
+msgctxt "mainform.rgroupuntitled"
+msgid "Ungrouped"
+msgstr ""
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr ""
@@ -113,10 +118,6 @@ msgstr ""
 
 #: task.rdays
 msgid "d"
-msgstr ""
-
-#: task.rgroupuntitled
-msgid "Ungrouped"
 msgstr ""
 
 #: task.rhours
