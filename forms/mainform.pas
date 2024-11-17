@@ -507,6 +507,7 @@ uses filemanager, settings, stringtool, systemtool, forminput, formfind, formrep
 procedure TformNotetask.FormCreate(Sender: TObject);
 var
   FilePath: string;
+  FileOpened: boolean;
 begin
   // Initialize variables
   FBackup := True;
@@ -556,9 +557,6 @@ begin
   LoadFormSettings(Self);
   LoadGridSettings(Self, taskGrid, string.Empty);
 
-  // Set language
-  SetLanguage;
-
   // After load wordwrap setting
   aWordWrap.Checked := FWordWrap;
   memoNote.WordWrap := FWordWrap;
@@ -571,18 +569,20 @@ begin
   // Apply loaded settings to columns
   ApplyColumnSetting;
 
+  FileOpened := False;
+
   // Check if a command line argument is passed
   if ParamCount > 0 then
   begin
     FilePath := ParamStr(1); // Get the file path
     if (not FilePath.StartsWith('--')) then
-    begin
-      if OpenFile(FilePath) then // Function to load a task from the file
-        exit;
-    end;
+      FileOpened := OpenFile(FilePath); // Function to load a task from the file
   end;
 
-  aNew.Execute;
+  if not FileOpened then aNew.Execute;
+
+  // Set language
+  SetLanguage;
 end;
 
 procedure TformNotetask.FormDestroy(Sender: TObject);
@@ -3581,7 +3581,7 @@ begin
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
-  if (Assigned(Tasks)) then
+  if (Assigned(Tasks)) and (Tasks.GroupNames[0] = string.Empty) and (groupTabs.Tabs.Count > 0) then
     groupTabs.Tabs[0] := rgroupuntitled;
 
   case Language of
