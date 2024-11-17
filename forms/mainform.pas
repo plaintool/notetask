@@ -3239,14 +3239,14 @@ procedure TformNotetask.SetShowColumnTask(Value: boolean);
 begin
   FShowColumnTask := Value;
   taskGrid.Columns.Items[1].Visible := FShowColumnTask;
-  CalcRowHeights;
+  ResetRowHeight;
 end;
 
 procedure TformNotetask.SetShowColumnNote(Value: boolean);
 begin
   FShowColumnNote := Value;
   taskGrid.Columns.Items[2].Visible := FShowColumnNote;
-  CalcRowHeights;
+  ResetRowHeight;
 end;
 
 procedure TformNotetask.SetShowColumnAmount(Value: boolean);
