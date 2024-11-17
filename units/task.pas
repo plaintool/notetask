@@ -517,7 +517,7 @@ begin
     if (Assigned(TaskStrings)) then
     begin
       Tab := TStringList.Create;
-      TabName := rgroupuntitled;
+      TabName := string.Empty;
 
       for i := 0 to TaskStrings.Count - 1 do
       begin
@@ -525,7 +525,7 @@ begin
 
         if (Value.TrimLeft.StartsWith('#')) then
         begin
-          if (Tab.Count > 0) or (TabName <> rgroupuntitled) then
+          if (Tab.Count > 0) or (TabName <> string.Empty) then
           begin
             AddGroup(TabName, Tab);
             Tab.Clear;
@@ -650,7 +650,7 @@ begin
   Result := False;
   if (Assigned(FGroupNameList)) and (FGroupNameList.Count > 0) and (not FGroupNameList[0].TrimLeft.StartsWith('#')) then
   begin
-    FGroupNameList[0] := rgroupuntitled;
+    FGroupNameList[0] := string.Empty;
     Result := True;
   end;
 end;
@@ -670,7 +670,7 @@ begin
 
     for i := 0 to CountGroup - 1 do
     begin
-      if (FGroupNameList[i] <> rgroupuntitled) then
+      if (FGroupNameList[i] <> string.Empty) then
         Result.Add(FGroupNameList[i]);
 
       for j := 0 to Length(FGroupList[i]) - 1 do
@@ -996,7 +996,7 @@ function TTasks.RenameGroup(aIndex: integer; aName: string): boolean;
 begin
   Result := False;
   if (aIndex < 0) or (aIndex >= CountGroup) then exit;
-  FGroupNameList[aIndex] := IfThen(aName = rgroupuntitled, aName, '## ' + aName);
+  FGroupNameList[aIndex] := IfThen(aName = string.Empty, aName, '## ' + aName);
   Result := True;
 end;
 
@@ -1026,7 +1026,7 @@ begin
   end;
 
   // Name new group
-  FGroupNameList[aIndex + 1] := IfThen(aName = rgroupuntitled, aName, '## ' + aName);
+  FGroupNameList[aIndex + 1] := IfThen(aName = string.Empty, aName, '## ' + aName);
 
   Result := True;
 end;
@@ -1064,7 +1064,7 @@ begin
   if (CountGroup = 0) then
   begin
     SetLength(FGroupList, CountGroup + 1);
-    FGroupNameList.Add(rgroupuntitled);
+    FGroupNameList.Add(string.Empty);
   end;
 
   // Update the selected group if needed

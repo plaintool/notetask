@@ -1414,7 +1414,7 @@ end;
 procedure TformNotetask.groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   if (Button = mbLeft) then
-    if (groupTabs.IndexOfTabAt(X, Y) = groupTabs.TabIndex) and not ((groupTabs.TabIndex = 0) and (groupTabs.Tabs[0] = rgroupuntitled)) then
+    if (groupTabs.IndexOfTabAt(X, Y) = groupTabs.TabIndex) and not ((groupTabs.TabIndex = 0) and (groupTabs.Tabs[0] = string.Empty)) then
       FDragTab := groupTabs.TabIndex;
 end;
 
@@ -2607,7 +2607,7 @@ procedure TformNotetask.MoveTabLeft(Index: integer);
 var
   Result: integer;
 begin
-  if (Index = 1) and (groupTabs.Tabs[0] = rgroupuntitled) then exit;
+  if (Index = 1) and (groupTabs.Tabs[0] = string.Empty) then exit;
 
   Result := Tasks.MoveGroupLeft(Index);
   if (Result <> Index) then
@@ -2623,7 +2623,7 @@ procedure TformNotetask.MoveTabRight(Index: integer);
 var
   Result: integer;
 begin
-  if (Index = 0) and (groupTabs.Tabs[0] = rgroupuntitled) then exit;
+  if (Index = 0) and (groupTabs.Tabs[0] = string.Empty) then exit;
 
   Result := Tasks.MoveGroupRight(Index);
   if (Result <> Index) then
@@ -3536,10 +3536,15 @@ begin
   Clean := TStringList.Create;
   try
     for i := 0 to Tasks.CountGroup - 1 do
-      Clean.Add(Tasks.GroupNames[i].TrimLeft([' ', '#']).Trim);
+    begin
+      if Tasks.GroupNames[i] = string.Empty then
+        Clean.Add(rgroupuntitled)
+      else
+        Clean.Add(Tasks.GroupNames[i].TrimLeft([' ', '#']).Trim);
+    end;
 
     groupTabs.Tabs := Clean;
-    groupTabs.Visible := not ((groupTabs.Tabs.Count = 1) and (groupTabs.Tabs[0] = rgroupuntitled));
+    groupTabs.Visible := not ((groupTabs.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty));
     if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count) then
       groupTabs.TabIndex := LastIndex;
 
