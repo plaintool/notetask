@@ -3,6 +3,7 @@ object formNotetask: TformNotetask
   Height = 513
   Top = 154
   Width = 851
+  AllowDropFiles = True
   Caption = 'Notetask'
   ClientHeight = 513
   ClientWidth = 851
@@ -12,10 +13,10 @@ object formNotetask: TformNotetask
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnDropFiles = FormDropFiles
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 391

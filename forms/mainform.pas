@@ -336,6 +336,7 @@ type
     procedure aCopyGroupExecute(Sender: TObject);
     procedure aMoveGroupLeftExecute(Sender: TObject);
     procedure aMoveGroupRightExecute(Sender: TObject);
+    procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -2039,6 +2040,15 @@ end;
 procedure TformNotetask.aMoveGroupRightExecute(Sender: TObject);
 begin
   MoveTabRight(groupTabs.TabIndex);
+end;
+
+procedure TformNotetask.FormDropFiles(Sender: TObject; const FileNames: array of string);
+begin
+  if Length(FileNames) > 0 then
+  begin
+    if IsCanClose then
+      OpenFile(FileNames[0]);
+  end;
 end;
 
 procedure TformNotetask.aMoveTaskLeftExecute(Sender: TObject);
