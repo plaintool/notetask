@@ -34,6 +34,9 @@ uses
 
 function GetOSLanguage: string;
 function ApplicationTranslate(const Language: string; AForm: TCustomForm = nil): boolean;
+{$IFDEF Windows}
+function IsWindowsDarkThemeEnabled: Boolean;
+{$ENDIF}
 function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;
 
 var
@@ -168,6 +171,26 @@ begin
       Res.Free;
   end;
 end;
+
+{$IFDEF Windows}
+function IsWindowsDarkThemeEnabled: Boolean;
+var
+  Key: HKEY;
+  Value: DWORD;
+  ValueSize: DWORD;
+begin
+  Result := False;
+  if RegOpenKeyEx(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Themes\Personalize', 0, KEY_READ, Key) = ERROR_SUCCESS then
+  begin
+    ValueSize := SizeOf(Value);
+    if RegQueryValueEx(Key, 'AppsUseLightTheme', nil, nil, @Value, @ValueSize) = ERROR_SUCCESS then
+    begin
+      Result := Value = 0; // 0 - тёмная тема, 1 - светлая тема
+    end;
+    RegCloseKey(Key);
+  end;
+end;
+{$ENDIF}
 
 function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;
 var
