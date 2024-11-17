@@ -280,14 +280,21 @@ begin
         FAmount := 0;
       end;
       if (Length(FText) > 0) and (FText.StartsWith(' ')) then
-      begin
-        Delete(FText, 1, 1);
-      end;
+        Delete(FText, 1, 1); // Delete space in begining
+    end
+    else
+    // Extract and trim the amount string
+    if (TryStrToFloat(PartDate[0].Trim, FAmount)) then
+    begin
+      FillText(1);
+      if (Length(FText) > 0) and (FText.StartsWith(' ')) then
+        Delete(FText, 1, 1); // Delete space in begining
     end
     else
     begin
       FText := CompletedStr;
       FDate := 0;
+      FAmount := 0;
     end;
   end
   else
@@ -298,9 +305,7 @@ begin
     begin
       FillText(1);
       if (Length(FText) > 0) and (FText.StartsWith(' ')) then
-      begin
-        Delete(FText, 1, 1);
-      end;
+        Delete(FText, 1, 1); // Delete space in begining
     end
     else
     begin
@@ -309,9 +314,7 @@ begin
       begin
         FillText(1);
         if (Length(FText) > 0) and (FText.StartsWith(' ')) then
-        begin
-          Delete(FText, 1, 1);
-        end;
+          Delete(FText, 1, 1); // Delete space in begining
       end
       else
       begin
