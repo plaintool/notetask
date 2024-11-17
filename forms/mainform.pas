@@ -1414,7 +1414,7 @@ end;
 procedure TformNotetask.groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   if (Button = mbLeft) then
-    if (groupTabs.IndexOfTabAt(X, Y) = groupTabs.TabIndex) and not ((groupTabs.TabIndex = 0) and (groupTabs.Tabs[0] = string.Empty)) then
+    if (groupTabs.IndexOfTabAt(X, Y) = groupTabs.TabIndex) and not ((groupTabs.TabIndex = 0) and (Tasks.GroupNames[0] = string.Empty)) then
       FDragTab := groupTabs.TabIndex;
 end;
 
@@ -2607,7 +2607,7 @@ procedure TformNotetask.MoveTabLeft(Index: integer);
 var
   Result: integer;
 begin
-  if (Index = 1) and (groupTabs.Tabs[0] = string.Empty) then exit;
+  if (Index = 1) and (Tasks.GroupNames[0] = string.Empty) then exit;
 
   Result := Tasks.MoveGroupLeft(Index);
   if (Result <> Index) then
@@ -2623,7 +2623,7 @@ procedure TformNotetask.MoveTabRight(Index: integer);
 var
   Result: integer;
 begin
-  if (Index = 0) and (groupTabs.Tabs[0] = string.Empty) then exit;
+  if (Index = 0) and (Tasks.GroupNames[0] = string.Empty) then exit;
 
   Result := Tasks.MoveGroupRight(Index);
   if (Result <> Index) then
