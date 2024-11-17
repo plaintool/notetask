@@ -564,15 +564,16 @@ begin
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowArchived.Checked := FShowArchived;
   ShowNote := FShowNote;
-  //aShowStatusBar.Checked := FShowStatusBar;
   ShowStatusBar := FShowStatusBar;
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
 
-  FileOpened := False;
+  // Set language
+  SetLanguage(Language);
 
   // Check if a command line argument is passed
+  FileOpened := False;
   if ParamCount > 0 then
   begin
     FilePath := ParamStr(1); // Get the file path
@@ -581,9 +582,6 @@ begin
   end;
 
   if not FileOpened then aNew.Execute;
-
-  // Set language
-  SetLanguage;
 end;
 
 procedure TformNotetask.FormDestroy(Sender: TObject);
