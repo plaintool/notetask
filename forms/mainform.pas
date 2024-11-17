@@ -241,6 +241,7 @@ type
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
+    procedure OnQueryEndSession(var CanEnd: boolean);
     procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
     procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
@@ -532,6 +533,8 @@ begin
   clDarkBlue := RGBToColor(0, 0, 180);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
+
+  Application.OnQueryEndSession := @OnQueryEndSession;
 
   {$IFDEF Windows}
   taskGrid.DefaultRowHeight := 22;
@@ -834,6 +837,13 @@ end;
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
   CanClose := IsCanClose;
+end;
+
+procedure TformNotetask.OnQueryEndSession(var CanEnd: boolean);
+begin
+  CanEnd := IsCanClose;
+  if (CanEnd) then
+    Application.Terminate;
 end;
 
 procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
@@ -1701,7 +1711,8 @@ procedure TformNotetask.aExitExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  Application.Terminate;
+  if IsCanClose then
+    Application.Terminate;
 end;
 
 procedure TformNotetask.aFontExecute(Sender: TObject);
