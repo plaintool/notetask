@@ -779,7 +779,7 @@ begin
     end;
   end
   else
-  if (Key = VK_SPACE) then // Space
+  if (Key in [VK_SPACE]) then // Space
   begin
     if not IsEditing then
     begin
@@ -800,12 +800,23 @@ begin
     Key := 0;
   end
   else
-  if (Shift = [ssCtrl]) and (Key = VK_RETURN) then // Ctrl + Enter
+  if (Key = VK_RETURN) then // Ctrl + Enter
   begin
     if IsEditing then
     begin
-      EditComplite;
-      Key := 0;
+      if (Shift = [ssCtrl]) or (taskGrid.Col in [4, 5]) then
+      begin
+        EditComplite;
+        Key := 0;
+      end;
+    end
+    else
+    begin
+      if (taskGrid.Col = 6) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
+        StarTask
+      else
+      if (taskGrid.Col = 1) then
+        CompleteTasks;
     end;
   end;
 end;
@@ -1677,7 +1688,10 @@ begin
   if taskGrid.RowCount < 2 then exit;
 
   if not IsEditing then
-    taskGrid.Selection := TGridRect.Create(0, 0, 6, taskGrid.RowCount)
+  begin
+    taskGrid.Selection := TGridRect.Create(0, 0, 6, taskGrid.RowCount);
+    SetInfo;
+  end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
     (taskGrid.InplaceEditor as TCustomEdit).SelectAll;
@@ -2705,8 +2719,7 @@ end;
 
 procedure TformNotetask.DatePickerChange(Sender: TObject);
 begin
-  taskGrid.Cells[taskGrid.Col, taskGrid.Row] :=
-    FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, TDateTimePicker(Sender).DateTime);
+  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateToString(TDateTimePicker(Sender).DateTime);
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
   if (FShowDuration) then FillGrid;
@@ -3634,6 +3647,12 @@ procedure TformNotetask.EditComplite;
 begin
   if taskGrid.EditorMode then
   begin
+    if (taskGrid.Col = 5) and (Assigned(DatePicker)) then
+    begin
+      if taskGrid.Cells[taskGrid.Col, taskGrid.Row] = string.empty then
+        DatePickerChange(DatePicker);
+    end;
+
     taskGrid.EditorMode := False;
     FIsEditing := False;
   end;
