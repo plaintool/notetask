@@ -1435,7 +1435,7 @@ begin
     // If the row is not empty and only it is selected, and the number of tasks to insert is more than one,
     // if the grid is empty or grid selection is entry row, we insert as new tasks
     if ((not IsRowEmpty) and (TempTasks.Count > 1) and (Grid.Selection.Height = 0)) or (Grid.Row = 0) or
-      (Grid.Selection.Width = Grid.ColCount - 2) then
+      ((Grid.Selection.Width = Grid.ColCount - 2) and (Grid.Selection.Height = 0)) then
     begin
       if (Grid.Row = 0) then
         index := 1
