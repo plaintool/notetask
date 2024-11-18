@@ -1482,6 +1482,7 @@ begin
               begin
                 GetTask(i).Text := CleanString(TempTasks.GetTask(index).Text);
                 GetTask(i).Archive := TempTasks.GetTask(index).Archive;
+                GetTask(i).Star := TempTasks.GetTask(index).Star;
               end
               else
               if Rect.Width = 0 then
@@ -1565,6 +1566,11 @@ begin
               end
               else
                 GetTask(i).Date := 0;
+            end
+            else
+            if j = 6 then
+            begin
+              GetTask(i).Star := TempTasks.GetTask(index).Star;
             end;
           end;
           Inc(index);
