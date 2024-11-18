@@ -803,11 +803,11 @@ begin
     Key := 0;
   end
   else
-  if (Key = VK_RETURN) then // Ctrl + Enter
+  if (Key = VK_RETURN) then // Enter
   begin
     if IsEditing then
     begin
-      if (Shift = [ssCtrl]) or (taskGrid.Col in [4, 5]) then
+      if (Shift = [ssCtrl]) or (taskGrid.Col in [4, 5]) then // + Ctrl
       begin
         EditComplite;
         Key := 0;
@@ -1654,6 +1654,8 @@ begin
   if not IsEditing then
   begin
     Sel := Tasks.PasteFromClipboard(taskGrid);
+    if (Assigned(DatePicker)) then
+      DatePicker.DateTime := Tasks.GetTask(taskGrid.Row).Date;
     FillGrid;
     if (SortColumn = 0) then
       taskGrid.Selection := Sel;
@@ -1929,6 +1931,8 @@ begin
         else
           taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
         Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
+        if (Assigned(DatePicker)) then
+          DatePicker.DateTime := Now;
         if (FShowDuration) and (taskGrid.Col = 5) then
           FillGrid;
       end
