@@ -157,8 +157,8 @@ begin
   FStar := False;
   FNoteItalic := True;
   FEmptyNote := False;
-  FSpaceAfterNote := False;
-  FSpaceBeforeNote := False;
+  FSpaceBeforeNote := True;
+  FSpaceAfterNote := True;
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -204,10 +204,11 @@ var
 
 begin
   // Format: - [x] 01.01.2000, 123, ~~Task~~ // Note
-
-  // Split the task string into PartNote
+  FSpaceBeforeNote := True;
+  FSpaceAfterNote := True;
   FNoteItalic := False;
 
+  // Split the task string into PartNote
   PartNote := TaskString.Split(['//']);
   if (Length(PartNote) >= 2) and (not PartNote[0].EndsWith(':')) then // Url protection
   begin
@@ -216,7 +217,18 @@ begin
     begin
       Delete(CompletedStr, Length(CompletedStr), 1);
       SpaceBeforeNote := True;
-    end;
+    end
+    else
+      SpaceBeforeNote := False;
+
+    if (Length(PartNote[1]) > 0) and (PartNote[1].StartsWith(' ')) then
+    begin
+      Delete(PartNote[1], 0, 1);
+      SpaceAfterNote := True;
+    end
+    else
+      SpaceAfterNote := False;
+
     FillNote;
 
     // Test for empty Note symbols
