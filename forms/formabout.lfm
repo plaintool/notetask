@@ -201,10 +201,10 @@ object formAboutNotetask: TformAboutNotetask
     Lines.Strings = (
       'A simple application for creating and organizing task lists, offering essential features for efficient task management, similar to Notepad in its simplicity and functionality.'
       ''
-      'Main icon made by Freepik'
+      'Main icon designed by Freepik'
       'https://www.freepik.com/icon/tasks_906334'
       ''
-      'Document icon designed by zerode'
+      'Document icon designed by Zerode'
       'https://www.iconarchive.com/show/plump-icons-by-zerode/Document-scheduled-tasks-icon.html'
     )
     ScrollBars = ssVertical
