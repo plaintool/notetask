@@ -380,7 +380,7 @@ type
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol, aRow: integer);
-    procedure EditComplite;
+    procedure EditComplite(aEnter: boolean = False);
     procedure DisableDrag;
     procedure SetInfo;
     procedure SetNote;
@@ -809,7 +809,7 @@ begin
     begin
       if (Shift = [ssCtrl]) or (taskGrid.Col in [4, 5]) then // + Ctrl
       begin
-        EditComplite;
+        EditComplite(True);
         Key := 0;
       end;
     end
@@ -3671,11 +3671,11 @@ begin
   end;
 end;
 
-procedure TformNotetask.EditComplite;
+procedure TformNotetask.EditComplite(aEnter: boolean = False);
 begin
   if taskGrid.EditorMode then
   begin
-    if (taskGrid.Col = 5) and (Assigned(DatePicker)) then
+    if (aEnter) and (taskGrid.Col = 5) and (Assigned(DatePicker)) then
     begin
       if taskGrid.Cells[taskGrid.Col, taskGrid.Row] = string.empty then
         DatePickerChange(DatePicker);
