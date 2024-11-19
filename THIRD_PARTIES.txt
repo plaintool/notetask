@@ -1,0 +1,9 @@
+THIRD-PARTY RESOURCES
+
+This application uses third-party resources under the following licenses:
+
+1. Main icon made by Freepik
+https://www.freepik.com/icon/tasks_906334
+
+2. Document icon designed by zerode
+https://www.iconarchive.com/show/plump-icons-by-zerode/Document-scheduled-tasks-icon.html
