@@ -203,7 +203,7 @@ var
   end;
 
 begin
-  // Format: - [x] 01.01.2000, 123, ~~Task~~ // Note
+  // Format: - [x] 01.01.2000, 123, ~~**Task**~~ // Note
   FSpaceBeforeNote := True;
   FSpaceAfterNote := True;
   FNoteItalic := False;
