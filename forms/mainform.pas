@@ -1103,7 +1103,7 @@ begin
       if (aCol = 3) and (task.NoteItalic) then
         grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsItalic];
 
-      if (aCol = 5) and (task.Date > Now) then
+      if (aCol = 5) and (task.Date > Now) and (not (gdSelected in aState)) then
         grid.Canvas.Font.Color := clDarkBlue;
     end;
 
