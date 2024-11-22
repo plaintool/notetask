@@ -1654,9 +1654,9 @@ begin
   if not IsEditing then
   begin
     Sel := Tasks.PasteFromClipboard(taskGrid);
+    FillGrid;
     if (Assigned(DatePicker)) then
       DatePicker.DateTime := Tasks.GetTask(taskGrid.Row).Date;
-    FillGrid;
     if (SortColumn = 0) then
       taskGrid.Selection := Sel;
     SetChanged;
