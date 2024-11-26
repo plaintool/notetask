@@ -17,7 +17,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 391
@@ -900,7 +899,7 @@ object formNotetask: TformNotetask
   end
   object Popup: TPopupMenu
     Left = 160
-    Top = 184
+    Top = 180
     object contextUndo: TMenuItem
       Action = aUndo
     end
@@ -963,7 +962,7 @@ object formNotetask: TformNotetask
   end
   object PopupTabs: TPopupMenu
     Left = 160
-    Top = 248
+    Top = 252
     object MenuItem7: TMenuItem
       Action = aInsertGroup
     end

@@ -2257,7 +2257,10 @@ procedure TformNotetask.aChatGptExecute(Sender: TObject);
 begin
   if taskGrid.RowCount < 2 then exit;
 
-  OpenURL(rchatgpt + EncodeUrl(Tasks.GetTaskValue(2, taskGrid.Row)));
+  if (taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3) then
+    OpenURL(rchatgpt + EncodeUrl(Tasks.GetTaskValue(3, taskGrid.Row)))
+  else
+    OpenURL(rchatgpt + EncodeUrl(Tasks.GetTaskValue(2, taskGrid.Row)));
 end;
 
 procedure TformNotetask.aRunTerminalExecute(Sender: TObject);
@@ -2577,7 +2580,10 @@ begin
     // Write commands to the file with the correct encoding
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
-      EncodedText := ConvertEncoding(Tasks.GetTask(i).Text, 'utf-8', ConsoleEncoding);
+      if (taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right > 3) then
+        EncodedText := ConvertEncoding(Tasks.GetTask(i).Note, 'utf-8', ConsoleEncoding)
+      else
+        EncodedText := ConvertEncoding(Tasks.GetTask(i).Text, 'utf-8', ConsoleEncoding);
       WriteLn(Output, EncodedText);
     end;
 
