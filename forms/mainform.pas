@@ -2580,7 +2580,8 @@ begin
     // Write commands to the file with the correct encoding
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
-      if (taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3) then
+      // If note column is selected or note panel visible
+      if ((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or (FShowNote) then
         EncodedText := ConvertEncoding(Tasks.GetTask(i).Note, 'utf-8', ConsoleEncoding)
       else
         EncodedText := ConvertEncoding(Tasks.GetTask(i).Text, 'utf-8', ConsoleEncoding);
