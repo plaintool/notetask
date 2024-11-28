@@ -956,10 +956,10 @@ begin
   if (not IsColumn) then
   begin
     Tasks.DeleteTask(tIndex);
+    if (taskGrid.RowCount > 0) and (taskGrid.Row > 0) then taskGrid.Row := taskGrid.Row - 1;
+    if ShowDuration then FillGrid;
     SetInfo;
     SetNote;
-
-    if ShowDuration then FillGrid;
   end;
 end;
 
@@ -3549,7 +3549,7 @@ begin
   if (not ShowNote) then exit;
 
   memoNote.OnChange := nil;
-  if (Assigned(Tasks)) and (taskGrid.RowCount > 1) then
+  if (Assigned(Tasks)) and (taskGrid.RowCount > 1) and (Tasks.Map(taskGrid.Row) > -1) then
     memoNote.Text := Tasks.GetTask(taskGrid.Row).Note
   else
     memoNote.Text := string.Empty;
