@@ -623,6 +623,18 @@ begin
     Key := 0;
   end
   else
+  if (Key = VK_F2) then // F2
+  begin
+    if ActiveControl is TCustomTabControl then
+      aRenameGroup.Execute
+    else
+    begin
+      EditComplite;
+      EditCell(taskGrid.Col, taskGrid.Row);
+    end;
+    Key := 0;
+  end
+  else
   if (ssCtrl in Shift) and (Key = VK_INSERT) then // Ctrl + Insert
   begin
     aInsertGroup.Execute;
@@ -648,13 +660,6 @@ begin
       ChangeGroup(9)
     else
       ChangeGroup(Key - VK_0 - 1);
-    Key := 0;
-  end
-  else
-  if (Key = VK_F2) then // F2
-  begin
-    EditComplite;
-    EditCell(taskGrid.Col, taskGrid.Row);
     Key := 0;
   end
   else

@@ -160,7 +160,7 @@ object formNotetask: TformNotetask
     OnMouseMove = groupTabsMouseMove
     OnMouseUp = groupTabsMouseUp
     Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
-    TabOrder = 4
+    TabOrder = 2
     Visible = False
   end
   object MainMenu: TMainMenu
