@@ -1956,6 +1956,7 @@ end;
 procedure TformNotetask.aInsertGroupExecute(Sender: TObject);
 var
   Result: integer;
+  newName: string;
 begin
   if Screen.ActiveForm <> Self then exit;
 
@@ -1969,8 +1970,10 @@ begin
     // Show the form as a modal dialog
     if ShowModal = mrOk then
     begin
-      Result := Tasks.InsertGroup(editText.Text);
+      newName := editText.Text;
+      if (newName = rgroupuntitled) and (groupTabs.TabIndex = 0) then newName := string.Empty;
 
+      Result := Tasks.InsertGroup(newName);
       if (Result <> groupTabs.TabIndex) then
       begin
         SetTabs;
@@ -1984,6 +1987,8 @@ begin
 end;
 
 procedure TformNotetask.aRenameGroupExecute(Sender: TObject);
+var
+  newName: string;
 begin
   if Screen.ActiveForm <> Self then exit;
 
@@ -1995,9 +2000,12 @@ begin
     SetCaption(rgroup, rentergroupname, rOK, groupTabs.Tabs[groupTabs.TabIndex]);
 
     // Show the form as a modal dialog
-    if (ShowModal = mrOk) and (editText.Text <> groupTabs.Tabs[groupTabs.TabIndex]) then
+    if (ShowModal = mrOk) {and (editText.Text <> groupTabs.Tabs[groupTabs.TabIndex])} then
     begin
-      if (Tasks.RenameGroup(groupTabs.TabIndex, editText.Text)) then
+      newName := editText.Text;
+      if (newName = rgroupuntitled) and (groupTabs.TabIndex = 0) then newName := string.Empty;
+
+      if (Tasks.RenameGroup(groupTabs.TabIndex, newName)) then
       begin
         SetTabs;
         SetChanged;
