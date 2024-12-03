@@ -1971,7 +1971,7 @@ begin
     if ShowModal = mrOk then
     begin
       newName := editText.Text;
-      if (newName = rgroupuntitled) and (groupTabs.TabIndex = 0) then newName := string.Empty;
+      if (newName = rgroupuntitled) then newName := string.Empty;
 
       Result := Tasks.InsertGroup(newName);
       if (Result <> groupTabs.TabIndex) then

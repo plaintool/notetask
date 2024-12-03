@@ -983,7 +983,7 @@ begin
   // Increment the selected group index and set the name of the new group
   Inc(FSelectedGroup);
   SetLength(FGroupList[FSelectedGroup], 0);
-  FGroupNameList[FSelectedGroup] := '## ' + aName;
+  FGroupNameList[FSelectedGroup] := IfThen(aName = string.Empty, aName, '## ' + aName);
 
   // Change group to new one
   ChangeGroup(SelectedGroup);
