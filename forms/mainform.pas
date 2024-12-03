@@ -1007,6 +1007,8 @@ begin
         taskGrid.Row := Cell.Y;
       if (Cell.X > 0) and (Cell.X < 5) then
         taskGrid.Col := Cell.X;
+
+      if (taskGrid.CanFocus and taskGrid.Visible) then taskGrid.SetFocus;
     end;
     Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
   end;
