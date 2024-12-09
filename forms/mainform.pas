@@ -2596,7 +2596,8 @@ begin
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
       // If note column is selected or note panel visible
-      if ((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or (FShowNote) then
+      if (((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or (FShowNote)) and
+        (Tasks.GetTask(i).Note <> string.Empty) then
         EncodedText := ConvertEncoding(Tasks.GetTask(i).Note, 'utf-8', ConsoleEncoding)
       else
         EncodedText := ConvertEncoding(Tasks.GetTask(i).Text, 'utf-8', ConsoleEncoding);
