@@ -1437,7 +1437,7 @@ begin
   if (Grid.Row > 0) then
   begin
     RowTask := GetTask(Grid.Row);
-    IsRowEmpty := (RowTask.Text = string.Empty) and (RowTask.Note = string.Empty) and (RowTask.Date = 0);
+    IsRowEmpty := (RowTask.Text = string.Empty) and (RowTask.Note = string.Empty) and (RowTask.Amount = 0) and (RowTask.Date = 0);
   end
   else
     IsRowEmpty := False;
