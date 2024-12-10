@@ -2350,6 +2350,12 @@ procedure TformNotetask.aFindNextExecute(Sender: TObject);
 begin
   if taskGrid.RowCount < 2 then exit;
 
+  if (assigned(formFindText)) and (formFindText.Visible) then
+  begin
+    MatchCase := formFindText.checkMatchCase.Checked;
+    WrapAround := formFindText.checkWrapAround.Checked;
+  end;
+
   if (FindText <> string.Empty) then
     Find(FindText, MatchCase, WrapAround, True)
   else
