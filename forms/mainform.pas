@@ -4039,6 +4039,7 @@ end;
 function TformNotetask.ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
 var
   Row, Col: integer;
+  sValue, sText: unicodestring;
 begin
   FBackup := False;
   Row := taskGrid.Row;
@@ -4046,6 +4047,14 @@ begin
   GridBackupSelection;
   Tasks.CreateBackup; // FBackup = false here
   try
+    // Replace current selection
+    sValue := unicodestring(Memo.SelText);
+    sText := unicodestring(aText);
+    if not ((FFoundText = string.Empty) or ((aMatchCase) and (sValue <> sText)) or
+      ((not aMatchCase) and (UnicodeLowerCase(sValue) <> UnicodeLowerCase(sText)))) then
+      Memo.SelText := aToText;
+
+    // Replace all
     while (Find(aText, aMatchCase, aWrapAround, True, True)) do
     begin
       Memo.SelText := aToText;
