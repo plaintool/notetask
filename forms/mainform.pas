@@ -344,6 +344,7 @@ type
     FChanged: boolean;
     FBackup: boolean;
     FMemoStartEdit: boolean;
+    FMemoOldText: TCaption;
     FIsEditing: boolean;
     FIsSelecting: boolean;
     FDisableCheckToggle: boolean;
@@ -380,7 +381,7 @@ type
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol, aRow: integer);
-    procedure EditComplite(aEnter: boolean = False);
+    procedure EditComplite(aEnter: boolean = False; aEscape: boolean = False);
     procedure DisableDrag;
     procedure SetInfo;
     procedure SetNote;
@@ -802,7 +803,7 @@ begin
   if (Key = VK_ESCAPE) then // Escape
   begin
     if IsEditing then
-      EditComplite
+      EditComplite(False, True)
     else
       taskGrid.ClearSelections;
     Key := 0;
@@ -2720,6 +2721,12 @@ end;
 procedure TformNotetask.MemoEnter(Sender: TObject);
 begin
   FMemoStartEdit := True;
+  FMemoOldText := Memo.Text;
+
+  // If amount column selected then clean when edit
+  if (taskGrid.Col = 4) then
+    Memo.SelectAll;
+
   if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
   begin
     Memo.Color := clHighlight;
@@ -3700,7 +3707,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.EditComplite(aEnter: boolean = False);
+procedure TformNotetask.EditComplite(aEnter: boolean = False; aEscape: boolean = False);
 begin
   if taskGrid.EditorMode then
   begin
@@ -3709,6 +3716,10 @@ begin
       if taskGrid.Cells[taskGrid.Col, taskGrid.Row] = string.empty then
         DatePickerChange(DatePicker);
     end;
+
+    // Pressing the Escape key on the amount column cancels editing
+    if (aEscape) and (taskGrid.Col = 4) then
+      Memo.Text := FMemoOldText;
 
     taskGrid.EditorMode := False;
     FIsEditing := False;
@@ -4050,8 +4061,8 @@ begin
     // Replace current selection
     sValue := unicodestring(Memo.SelText);
     sText := unicodestring(aText);
-    if not ((FFoundText = string.Empty) or ((aMatchCase) and (sValue <> sText)) or
-      ((not aMatchCase) and (UnicodeLowerCase(sValue) <> UnicodeLowerCase(sText)))) then
+    if not ((FFoundText = string.Empty) or ((aMatchCase) and (sValue <> sText)) or ((not aMatchCase) and
+      (UnicodeLowerCase(sValue) <> UnicodeLowerCase(sText)))) then
       Memo.SelText := aToText;
 
     // Replace all
