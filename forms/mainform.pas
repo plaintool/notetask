@@ -591,7 +591,7 @@ end;
 procedure TformNotetask.FormDestroy(Sender: TObject);
 begin
   SaveFormSettings(Self);
-  SaveGridSettings(Self, taskGrid, FFileName);
+  SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
   // Free allocated resources
   FLineEnding.Free;
@@ -2507,7 +2507,7 @@ begin
   // Save settings for new file
   //SaveGridSettings(Self, taskGrid, string.Empty);
   // Save settings for current file
-  SaveGridSettings(Self, taskGrid, FFileName);
+  SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
   FFileName := fileName;
   EditComplite;
@@ -2518,7 +2518,7 @@ begin
   Tasks := TTasks.Create(TextToStringList(Content));
 
   // Load saved settings for file
-  LoadGridSettings(Self, taskGrid, FFileName);
+  LoadGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
   SetChanged(False);
   ShowNote := FShowNote;
