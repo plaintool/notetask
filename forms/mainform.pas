@@ -2605,7 +2605,17 @@ begin
       // If note column is selected or note panel visible
       if (((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or (FShowNote)) and
         (Tasks.GetTask(i).Note <> string.Empty) then
-        EncodedText := ConvertEncoding(Tasks.GetTask(i).Note, 'utf-8', ConsoleEncoding)
+      begin
+        if (memoNote.Visible) and (memoNote.SelLength > 0) then
+          EncodedText := ConvertEncoding(memoNote.SelText, 'utf-8', ConsoleEncoding)
+        else
+        begin
+          if (Memo.Visible) and (Memo.SelLength > 0) then
+            EncodedText := ConvertEncoding(Memo.SelText, 'utf-8', ConsoleEncoding)
+          else
+            EncodedText := ConvertEncoding(Tasks.GetTask(i).Note, 'utf-8', ConsoleEncoding);
+        end;
+      end
       else
         EncodedText := ConvertEncoding(Tasks.GetTask(i).Text, 'utf-8', ConsoleEncoding);
       WriteLn(Output, EncodedText);
