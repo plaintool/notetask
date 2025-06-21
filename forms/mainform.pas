@@ -414,6 +414,8 @@ type
     procedure GridClearSelection;
     procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
+    function GetExecuteValue(aRow: integer): string;
+    procedure ExecuteChatGpt;
     procedure ExecuteTerminal;
     procedure MoveTabLeft(Index: integer);
     procedure MoveTabRight(Index: integer);
@@ -2273,10 +2275,7 @@ procedure TformNotetask.aChatGptExecute(Sender: TObject);
 begin
   if taskGrid.RowCount < 2 then exit;
 
-  if (taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3) then
-    OpenURL(rchatgpt + EncodeUrl(Tasks.GetTaskValue(3, taskGrid.Row)))
-  else
-    OpenURL(rchatgpt + EncodeUrl(Tasks.GetTaskValue(2, taskGrid.Row)));
+  ExecuteChatGpt;
 end;
 
 procedure TformNotetask.aRunTerminalExecute(Sender: TObject);
@@ -2572,6 +2571,36 @@ begin
   SetInfo;
 end;
 
+function TformNotetask.GetExecuteValue(aRow: integer): string;
+begin
+  // If note column is selected or note panel visible
+  if (((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or ((memoNote.Visible) and
+    ((memoNote.SelLength > 0) or (memoNote.Focused)))) then
+  begin
+    if (memoNote.Visible) and (memoNote.SelLength > 0) then
+      Result := memoNote.SelText
+    else
+    begin
+      if (Memo.Visible) and (Memo.SelLength > 0) then
+        Result := Memo.SelText
+      else
+        Result := Tasks.GetTask(aRow).Note;
+    end;
+  end
+  else
+  begin
+    if (Memo.Visible) and (Memo.SelLength > 0) then
+      Result := Memo.SelText
+    else
+      Result := Tasks.GetTask(aRow).Text;
+  end;
+end;
+
+procedure TformNotetask.ExecuteChatGpt;
+begin
+  OpenURL(rchatgpt + EncodeUrl(GetExecuteValue(taskGrid.Row)));
+end;
+
 procedure TformNotetask.ExecuteTerminal;
 var
   Process: TProcess;
@@ -2602,22 +2631,7 @@ begin
     // Write commands to the file with the correct encoding
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
-      // If note column is selected or note panel visible
-      if (((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or (FShowNote)) and
-        (Tasks.GetTask(i).Note <> string.Empty) then
-      begin
-        if (memoNote.Visible) and (memoNote.SelLength > 0) then
-          EncodedText := ConvertEncoding(memoNote.SelText, 'utf-8', ConsoleEncoding)
-        else
-        begin
-          if (Memo.Visible) and (Memo.SelLength > 0) then
-            EncodedText := ConvertEncoding(Memo.SelText, 'utf-8', ConsoleEncoding)
-          else
-            EncodedText := ConvertEncoding(Tasks.GetTask(i).Note, 'utf-8', ConsoleEncoding);
-        end;
-      end
-      else
-        EncodedText := ConvertEncoding(Tasks.GetTask(i).Text, 'utf-8', ConsoleEncoding);
+      EncodedText := ConvertEncoding(GetExecuteValue(i), 'utf-8', ConsoleEncoding);
       WriteLn(Output, EncodedText);
     end;
 
