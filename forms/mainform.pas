@@ -414,7 +414,7 @@ type
     procedure GridClearSelection;
     procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
-    function GetExecuteValue(aRow: integer): string;
+    function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
     procedure ExecuteTerminal;
     procedure MoveTabLeft(Index: integer);
@@ -2571,11 +2571,11 @@ begin
   SetInfo;
 end;
 
-function TformNotetask.GetExecuteValue(aRow: integer): string;
+function TformNotetask.GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
 begin
   // If note column is selected or note panel visible
   if (((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or ((memoNote.Visible) and
-    ((memoNote.SelLength > 0) or (memoNote.Focused)))) then
+    ((memoPriority) or (memoNote.SelLength > 0) or (memoNote.Focused)))) then
   begin
     if (memoNote.Visible) and (memoNote.SelLength > 0) then
       Result := memoNote.SelText
@@ -2631,7 +2631,7 @@ begin
     // Write commands to the file with the correct encoding
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
-      EncodedText := ConvertEncoding(GetExecuteValue(i), 'utf-8', ConsoleEncoding);
+      EncodedText := ConvertEncoding(GetExecuteValue(i, True), 'utf-8', ConsoleEncoding);
       WriteLn(Output, EncodedText);
     end;
 
