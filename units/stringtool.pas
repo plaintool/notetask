@@ -95,7 +95,11 @@ begin
   FS.TimeSeparator := ':';
   FS.ShortDateFormat := 'yyyy-mm-dd';
   FS.ShortTimeFormat := 'hh:nn:ss';
-  Result := FormatDateTime('yyyy"-"mm"-"dd"T"hh":"nn":"ss', Value, FS);
+
+  if Frac(Value) = 0 then
+    Result := FormatDateTime('yyyy"-"mm"-"dd', Value, FS)
+  else
+    Result := FormatDateTime('yyyy"-"mm"-"dd"T"hh":"nn":"ss', Value, FS);
 end;
 
 function DateTimeToString(Value: TDateTime): string;
