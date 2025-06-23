@@ -18,7 +18,11 @@ uses
 
 function TextToStringList(const Content: string; TrimEnd: boolean = False): TStringList;
 
-function DateToString(Value: TDateTime): string;
+function TryStrToDateTimeISO(const S: string; out ADateTime: TDateTime): boolean;
+
+function DateTimeToStringISO(Value: TDateTime): string;
+
+function DateTimeToString(Value: TDateTime): string;
 
 function FloatToString(Value: double): string;
 
@@ -68,7 +72,33 @@ begin
   end;
 end;
 
-function DateToString(Value: TDateTime): string;
+function TryStrToDateTimeISO(const S: string; out ADateTime: TDateTime): boolean;
+var
+  FS: TFormatSettings;
+  SFixed: string;
+begin
+  SFixed := StringReplace(S, 'T', ' ', []);
+  FS := DefaultFormatSettings;
+  FS.DateSeparator := '-';
+  FS.TimeSeparator := ':';
+  FS.ShortDateFormat := 'yyyy-mm-dd';
+  FS.ShortTimeFormat := 'hh:nn:ss';
+  Result := TryStrToDateTime(SFixed, ADateTime, FS);
+end;
+
+function DateTimeToStringISO(Value: TDateTime): string;
+var
+  FS: TFormatSettings;
+begin
+  FS := DefaultFormatSettings;
+  FS.DateSeparator := '-';
+  FS.TimeSeparator := ':';
+  FS.ShortDateFormat := 'yyyy-mm-dd';
+  FS.ShortTimeFormat := 'hh:nn:ss';
+  Result := FormatDateTime('yyyy"-"mm"-"dd"T"hh":"nn":"ss', Value, FS);
+end;
+
+function DateTimeToString(Value: TDateTime): string;
 begin
   Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Value);
 end;

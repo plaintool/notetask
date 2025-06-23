@@ -38,6 +38,7 @@ type
     FSpaceAfterNote: boolean; // Space after note in file
     FDateStart, FDateEnd: TDateTime; // Calculated time interval
     function GetDate: string;
+    function GetDateISO: string;
     function GetAmount: string;
   public
     constructor Create;
@@ -46,6 +47,7 @@ type
     property Done: boolean read FDone write FDone;
     property Archive: boolean read FArchive write FArchive;
     property Date: TDateTime read FDate write FDate;
+    property DateStrISO: string read GetDateISO;
     property DateStr: string read GetDate;
     property Note: string read FNote write FNote;
     property Text: string read FText write FText;
@@ -274,12 +276,12 @@ begin
 
   if (TryStrToFloat(CleanAmount(CompletedStr), FAmount)) then
   else
-  if (TryStrToDateTime(CompletedStr, FDate)) then
+  if (TryStrToDateTimeISO(CompletedStr, FDate)) then
   else
   if Length(PartDate) > 2 then
   begin
     // Extract and trim the date string
-    if (TryStrToDateTime(PartDate[0].Trim, FDate)) then
+    if (TryStrToDateTimeISO(PartDate[0].Trim, FDate)) then
     begin
       // Extract and trim the amount string
       if (TryStrToFloat(PartDate[1].Trim, FAmount)) then
@@ -320,7 +322,7 @@ begin
     else
     begin
       // Extract and trim the date string
-      if (TryStrToDateTime(PartDate[0].Trim, FDate)) then
+      if (TryStrToDateTimeISO(PartDate[0].Trim, FDate)) then
       begin
         FillText(1);
         if (Length(FText) > 0) and (FText.StartsWith(' ')) then
@@ -422,7 +424,7 @@ begin
         Result := string.Empty;
     5:
       if FDate > 0 then
-        Result := DateStr.Trim
+        Result := DateStrISO.Trim
       else
         Result := string.Empty; // If the completion date is missing, return an empty string
     else
@@ -432,7 +434,7 @@ begin
         if Amount <> 0 then
         begin
           if Date > 0 then
-            Result := Format('%s, %s, %s%s', [DateStr, AmountStr, TextString, NoteString])
+            Result := Format('%s, %s, %s%s', [DateStrISO, AmountStr, TextString, NoteString])
           else
           begin
             if (TextString + NoteString <> string.Empty) then
@@ -446,9 +448,9 @@ begin
           if Date > 0 then
           begin
             if (TextString + NoteString <> string.Empty) then
-              Result := Format('%s, %s%s', [DateStr, TextString, NoteString])
+              Result := Format('%s, %s%s', [DateStrISO, TextString, NoteString])
             else
-              Result := Format('%s', [DateStr]);
+              Result := Format('%s', [DateStrISO]);
           end
           else
             Result := Format('%s%s', [TextString, NoteString]);
@@ -459,7 +461,7 @@ begin
         if Amount <> 0 then
         begin
           if Date > 0 then
-            Result := Format('%s %s, %s, %s%s', [DoneString, DateStr, AmountStr, TextString, NoteString]).Trim
+            Result := Format('%s %s, %s, %s%s', [DoneString, DateStrISO, AmountStr, TextString, NoteString]).Trim
           else
           begin
             if (TextString + NoteString <> string.Empty) then
@@ -473,9 +475,9 @@ begin
           if Date > 0 then
           begin
             if (TextString + NoteString <> string.Empty) then
-              Result := Format('%s %s, %s%s', [DoneString, DateStr, TextString, NoteString]).Trim
+              Result := Format('%s %s, %s%s', [DoneString, DateStrISO, TextString, NoteString]).Trim
             else
-              Result := Format('%s %s', [DoneString, DateStr]).Trim;
+              Result := Format('%s %s', [DoneString, DateStrISO]).Trim;
           end
           else
             Result := Format('%s %s%s', [DoneString, TextString, NoteString]).Trim;
@@ -503,7 +505,12 @@ end;
 
 function TTask.GetDate: string;
 begin
-  Result := DateToString(FDate);
+  Result := DateTimeToString(FDate);
+end;
+
+function TTask.GetDateISO: string;
+begin
+  Result := DateTimeToStringISO(FDate);
 end;
 
 function TTask.GetAmount: string;
@@ -767,7 +774,7 @@ begin
   else
   if ACol = 4 then Result := GetTask(aRow).AmountStr
   else
-  if ACol = 5 then Result := GetTask(aRow).DateStr
+  if ACol = 5 then Result := GetTask(aRow).DateStrISO
   else
   if ACol = 6 then
     if GetTask(aRow).FStar then Result := '1'
@@ -817,7 +824,7 @@ begin
       Grid.Cells[5, Row] := '';
     end
     else
-      Grid.Cells[5, Row] := DateToString(pDate);
+      Grid.Cells[5, Row] := DateTimeToString(pDate);
     Task.Date := pDate;
   end
   else
@@ -1503,7 +1510,7 @@ begin
                   GetTask(i).Text := CleanString(TempTasks.GetTask(index).Note)
                 else
                 if (TempTasks.GetTask(index).Date <> 0) then
-                  GetTask(i).Text := DateToString(TempTasks.GetTask(index).Date)
+                  GetTask(i).Text := DateTimeToStringISO(TempTasks.GetTask(index).Date)
                 else
                 if (TempTasks.GetTask(index).Amount <> 0) then
                   GetTask(i).Text := FloatToString(TempTasks.GetTask(index).Amount)
@@ -1528,7 +1535,7 @@ begin
                   GetTask(i).Note := CleanString(TempTasks.GetTask(index).Text)
                 else
                 if (TempTasks.GetTask(index).Date <> 0) then
-                  GetTask(i).Note := DateToString(TempTasks.GetTask(index).Date)
+                  GetTask(i).Note := DateTimeToStringISO(TempTasks.GetTask(index).Date)
                 else
                 if (TempTasks.GetTask(index).Amount <> 0) then
                   GetTask(i).Note := FloatToString(TempTasks.GetTask(index).Amount)
@@ -1567,11 +1574,11 @@ begin
               else
               if Rect.Width = 0 then
               begin
-                if (TempTasks.GetTask(index).Text <> string.Empty) and (TryStrToDateTime(TempTasks.GetTask(index).Text, TempDate)) then
+                if (TempTasks.GetTask(index).Text <> string.Empty) and (TryStrToDateTimeISO(TempTasks.GetTask(index).Text, TempDate)) then
                   GetTask(i).Date := TempDate
                 else
                 if (TempTasks.GetTask(index).Note <> string.Empty) and
-                  (TryStrToDateTime(TempTasks.GetTask(index).Note, TempDate)) then
+                  (TryStrToDateTimeISO(TempTasks.GetTask(index).Note, TempDate)) then
                   GetTask(i).Date := TempDate
                 else
                   GetTask(i).Date := 0;

@@ -241,6 +241,7 @@ type
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
+    procedure ApplicationException(Sender: TObject; E: Exception);
     procedure OnQueryEndSession(var CanEnd: boolean);
     procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
     procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
@@ -537,6 +538,7 @@ begin
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
+  Application.OnException := @ApplicationException;
   Application.OnQueryEndSession := @OnQueryEndSession;
 
   {$IFDEF Windows}
@@ -845,6 +847,11 @@ end;
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
   CanClose := IsCanClose;
+end;
+
+procedure TformNotetask.ApplicationException(Sender: TObject; E: Exception);
+begin
+  MessageDlg('Notetask', E.Message, mtWarning, [mbOK], 0);
 end;
 
 procedure TformNotetask.OnQueryEndSession(var CanEnd: boolean);
@@ -1898,11 +1905,14 @@ end;
 procedure TformNotetask.aDateTimeExecute(Sender: TObject);
 var
   PosStart: integer;
+  CurrentDateTimeISO: string;
   CurrentDateTime: string;
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  CurrentDateTime := DateToString(Now);
+  CurrentDateTime := DateTimeToString(Now);
+  CurrentDateTimeISO := DateTimeToStringISO(Now);
+
   if memoNote.Focused then
   begin
     PosStart := memoNote.SelStart;
@@ -1937,9 +1947,9 @@ begin
       if (taskGrid.RowCount > 1) then
       begin
         if (taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim = string.Empty) or (taskGrid.Col = 5) then
-          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
+          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTimeISO
         else
-          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
+          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTimeISO;
         Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
         if (Assigned(DatePicker)) then
           DatePicker.DateTime := Now;
@@ -1948,7 +1958,7 @@ begin
       end
       else
       begin
-        Tasks.InsertTask('- [ ] ' + CurrentDateTime + ',', taskGrid.Row);
+        Tasks.InsertTask('- [ ] ' + CurrentDateTimeISO + ',', taskGrid.Row);
         FillGrid;
         taskGrid.Row := taskGrid.Row + 1;
       end;
@@ -2802,7 +2812,7 @@ end;
 
 procedure TformNotetask.DatePickerChange(Sender: TObject);
 begin
-  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateToString(TDateTimePicker(Sender).DateTime);
+  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime);
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
   if (FShowDuration) then FillGrid;
@@ -3090,7 +3100,7 @@ begin
         begin
           taskGrid.Cells[1, RowIndex] := '1';
           if (taskGrid.Cells[5, RowIndex] = '') then
-            taskGrid.Cells[5, RowIndex] := DateToString(Now);
+            taskGrid.Cells[5, RowIndex] := DateTimeToString(Now);
         end
         else
           taskGrid.Cells[1, RowIndex] := '0';
@@ -3126,7 +3136,7 @@ begin
         Check := True;
         taskGrid.Cells[1, RowIndex] := '1';
         if (taskGrid.Cells[5, RowIndex] = '') then
-          taskGrid.Cells[5, RowIndex] := DateToString(Now);
+          taskGrid.Cells[5, RowIndex] := DateTimeToString(Now);
       end
       else
         taskGrid.Cells[1, RowIndex] := '0';
@@ -3884,6 +3894,8 @@ begin
     WrapAround := aWrapAround;
     StartRow := taskGrid.Row;
     StartCol := taskGrid.Col;
+    FLastFoundRow := 0;
+    FLastFoundCol := 0;
 
     if taskGrid.Col = 1 then taskGrid.Col := 2;
     taskGrid.EditorMode := True;
@@ -3923,11 +3935,10 @@ begin
       else
       if (CurCol = 5) and (Assigned(DatePicker)) then
       begin
-        sValue := unicodestring(DateToString(DatePicker.DateTime));
+        sValue := unicodestring(DateTimeToString(DatePicker.DateTime));
         sText := unicodestring(aText);
         if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (taskGrid.Row <> FLastFoundRow) then
         begin
-          taskGrid.Col := 5;
           taskGrid.EditorMode := True;
           FLastFoundRow := taskGrid.Row;
           FLastFoundCol := taskGrid.Col;

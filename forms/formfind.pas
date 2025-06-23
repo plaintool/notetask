@@ -74,6 +74,7 @@ begin
   radioDirection.Items.Add(rdirectiondown);
   radioDirection.ItemIndex := ind;
 
+  editFind.SelectAll;
   editFind.SetFocus;
   formReplaceText.Hide;
 end;
