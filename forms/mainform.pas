@@ -1947,9 +1947,9 @@ begin
       if (taskGrid.RowCount > 1) then
       begin
         if (taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim = string.Empty) or (taskGrid.Col = 5) then
-          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTimeISO
+          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
         else
-          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTimeISO;
+          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
         Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
         if (Assigned(DatePicker)) then
           DatePicker.DateTime := Now;
@@ -3806,6 +3806,7 @@ function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDo
 var
   sValue, sText: unicodestring;
   Counter, CurRow, CurCol, StartRow, StartCol: integer;
+  LastDate: boolean;
 
   function FindMemo: boolean;
   var
@@ -3882,7 +3883,7 @@ var
       taskGrid.Col := FLastFoundCol;
     end;
     if (not Silent) then
-      ShowMessage(rcantfind + ' "' + string(sText) + '"');
+      ShowMessage(rcantfind + ' "' + string(aText) + '"');
   end;
 
 begin
@@ -3894,8 +3895,7 @@ begin
     WrapAround := aWrapAround;
     StartRow := taskGrid.Row;
     StartCol := taskGrid.Col;
-    FLastFoundRow := 0;
-    FLastFoundCol := 0;
+    LastDate := False;
 
     if taskGrid.Col = 1 then taskGrid.Col := 2;
     taskGrid.EditorMode := True;
@@ -3914,6 +3914,15 @@ begin
     CurRow := taskGrid.Row;
     CurCol := taskGrid.Col;
     Counter := 0;
+
+    // For the date, we move to the next line if on the found one
+    if (FLastFoundCol = 5) and (taskGrid.Col = 5) then
+    begin
+      if (taskGrid.Row < taskGrid.RowCount - 1) then
+        taskGrid.Row := taskGrid.Row + 1
+      else
+        LastDate := True;
+    end;
 
     repeat
       if (CurCol < 5) and (CurCol > 1) and (Assigned(Memo)) then
@@ -3937,7 +3946,8 @@ begin
       begin
         sValue := unicodestring(DateTimeToString(DatePicker.DateTime));
         sText := unicodestring(aText);
-        if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (taskGrid.Row <> FLastFoundRow) then
+        if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (taskGrid.Cells[taskGrid.Col, taskGrid.Row] <>
+          string.Empty) and (not LastDate) then
         begin
           taskGrid.EditorMode := True;
           FLastFoundRow := taskGrid.Row;
