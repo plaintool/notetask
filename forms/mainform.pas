@@ -3911,18 +3911,32 @@ begin
     end;
     Memo.SelLength := 0;
 
-    CurRow := taskGrid.Row;
-    CurCol := taskGrid.Col;
-    Counter := 0;
-
-    // For the date, we move to the next line if on the found one
-    if (FLastFoundCol = 5) and (taskGrid.Col = 5) then
+    // For the date, we move to the next or prev line if on the found one
+    if (aDirectionDown) and (FLastFoundCol = 5) and (taskGrid.Col = 5) then
     begin
       if (taskGrid.Row < taskGrid.RowCount - 1) then
-        taskGrid.Row := taskGrid.Row + 1
+      begin
+        taskGrid.Row := taskGrid.Row + 1;
+        taskGrid.Col := 1;
+      end
+      else
+        LastDate := True;
+    end
+    else
+    if (not aDirectionDown) and (FLastFoundCol = 5) and (taskGrid.Col = 5) then
+    begin
+      if (taskGrid.Row > 1) then
+      begin
+        taskGrid.Row := taskGrid.Row - 1;
+        taskGrid.Col := 5;
+      end
       else
         LastDate := True;
     end;
+
+    CurRow := taskGrid.Row;
+    CurCol := taskGrid.Col;
+    Counter := 0;
 
     repeat
       if (CurCol < 5) and (CurCol > 1) and (Assigned(Memo)) then
