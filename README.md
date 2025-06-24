@@ -16,29 +16,31 @@ A simple application for creating and organizing task lists, offering essential 
 
 ## Description
 
-Notetask is a cross-platform application to manage task lists with completion status, text, and comments. Each task can have a due date and be marked as a favorite with a star.
+**Notetask** is a cross-platform application to manage task lists with *completion status*, *text*, and *comments*. Each task can have a due *date* and be marked as a favorite with a *star*.
 
 ![sample1](samples/sample1.png)
 
-### Tasks:
-- Automatic task numbering
-- Moving tasks (single or multiple, within or between groups)
-- Archiving of tasks (archived tasks are crossed out and can be hidden or shown)
-- Task grouping (each group shown on a separate page, with support for group management)
-- Duration tracking per task (can be turned on or off)
-- Total duration calculation (all or selected tasks)
-- Time summary in status bar (separate for completed and incomplete tasks)
-- Automatic highlighting of overdue tasks
+### Features:
+- **Automatic numbering** of tasks  
+- **Task moving** — move one or multiple tasks, within or between groups  
+- **Archiving** — archived tasks are crossed out and can be **hidden or shown**  
+- **Grouping** — each group is displayed on a **separate page**, with **group management** support  
+- **Duration tracking** for each task (can be **enabled or disabled**)  
+- **Total duration calculation** — for all or selected tasks  
+- **Status bar summary** — shows time separately for **completed** and **incomplete** tasks  
+- **Overdue tasks highlighting** — overdue tasks are **automatically marked**  
+- **Merging** — combine multiple tasks into a single one  
+- **Indent** — create subtasks and **task trees**
+
+### Shoping list
+Notetask allows you to keep a shopping list with item prices and see the total cost in the status bar, including purchased items.
+
+![sample2](samples/sample2.png)
 
 ### Notes
 Suitable for note-taking with an optional general note field at the bottom of the application window, as well as support for paged grouping and all task management features.
 
 ![sample3](samples/sample3.png)
-
-### Shoping list
-Notetask allows you to keep a shopping list with a price for each item, as well as the cost of purchased items and the total cost.
-
-![sample2](samples/sample2.png)
 
 Supports advanced features, such as running selected comments directly from the notes as console commands.
 
