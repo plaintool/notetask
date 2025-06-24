@@ -99,6 +99,8 @@ Nearly all major features can be accessed through convenient keyboard shortcuts.
 
 ## Installation
 
+[![latest version](https://img.shields.io/github/v/release/astverskoy/Notetask?color=blue&label=Latest%20release&style=for-the-badge)](https://github.com/astverskoy/Notetask/releases/latest)
+
 ### Windows
 
 Download the installer executable from the [releases page](https://github.com/astverskoy/Notetask/releases). Run the installer and follow the on-screen instructions to complete the installation. After installation, you can launch Notetask from the Start menu or desktop shortcut.
