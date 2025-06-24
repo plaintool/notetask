@@ -54,13 +54,14 @@ Supports advanced features, such as running selected comments directly from the 
 
 ![sample4](samples/sample4.png)
 
-All main functions are accessible via keyboard shortcuts.
+### Shortcuts
+Nearly all major features can be accessed through convenient keyboard shortcuts.
  
  ![menu](samples/menu.png)
 
 ## File Format
 
-Notetask uses a simple Markdown-based format (file extension .tsk) where each line represents a single task with the following structure:
+**Notetask** uses a simple *plain text* format based on *Markdown* (file extension .tsk), where **each line represents a single task** with the following structure:
 
 ```md
 ## Group
