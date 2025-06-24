@@ -77,12 +77,16 @@ var
   FS: TFormatSettings;
   SFixed: string;
 begin
-  SFixed := StringReplace(S, 'T', ' ', []);
+  SFixed := StringReplace(S, 'T', ' ', [rfReplaceAll]);
+  SFixed := StringReplace(SFixed, 'Z', '', [rfReplaceAll]);
+  SFixed := StringReplace(SFixed, '.', '-', [rfReplaceAll]);
+
   FS := DefaultFormatSettings;
   FS.DateSeparator := '-';
   FS.TimeSeparator := ':';
   FS.ShortDateFormat := 'yyyy-mm-dd';
   FS.ShortTimeFormat := 'hh:nn:ss';
+
   Result := TryStrToDateTime(SFixed, ADateTime, FS);
 end;
 
