@@ -12,27 +12,35 @@ A simple application for creating and organizing task lists, offering essential 
 >- [File Format](#file-format)
 >   - [Legend](#legend)
 >   - [Example](#example)
+> - [Installation](#installation)
+>   - [Windows](#windows)
+>   - [Linux](#linux)
 >- [Licensing](#licensing)
 
-## Description
+## What is it?
 
-**Notetask** is a cross-platform application to manage task lists with *completion status*, *text*, and *comments*. Each task can have a due *date* and be marked as a favorite with a *star*.
+**Notetask** is a cross-platform application to manage task lists with *completion status*, *task*, and *note*. Each task can have a due *date* and be marked as a favorite with a *star*. It uses its own storage format based on Markdown.
 
 ![sample1](samples/sample1.png)
 
-### Features:
-- **Automatic numbering** of tasks  
-- **Task moving** — move one or multiple tasks, within or between groups  
-- **Archiving** — archived tasks are crossed out and can be **hidden or shown**  
-- **Grouping** — each group is displayed on a **separate page**, with **group management** support  
-- **Duration tracking** for each task (can be **enabled or disabled**)  
-- **Total duration calculation** — for all or selected tasks  
-- **Status bar summary** — shows time separately for **completed** and **incomplete** tasks  
-- **Overdue tasks highlighting** — overdue tasks are **automatically marked**  
-- **Merging** — combine multiple tasks into a single one  
-- **Indent** — create subtasks and **task trees**
+It is designed to help you quickly organize a large number of small routine tasks. You can paste raw text directly from the clipboard — such as a list of requirements or ideas — then sort them into groups, set durations or amounts, and start working right away. Ideal for managing project todos, bug lists, feature requests, and other ongoing tasks.
 
-### Shoping list
+### Features:
+- **Automatic numbering** of tasks
+- **Move tasks** — single or multiple, within or between groups
+- **Archive tasks** — cross out archived items, hide or show as needed
+- **Grouping** — each group on its own page, with full group management
+- **Track duration** — per-task (on/off) and **total duration** for all or selected tasks
+- **Track amount** — per-task quantities or prices and **total amount** for all or selected tasks
+- **Status bar summary** — separate time totals for **completed** and **incomplete** tasks
+- **Customize columns** — toggle visibility of any column (e.g. duration, status bar)
+- **Highlight overdue** — automatic marking of overdue tasks
+- **Merge tasks** — combine multiple tasks into one
+- **Indent tasks** — create subtasks and task hierarchies
+- **Copy tasks** — copy selected tasks or fields in Markdown format
+- **Paste tasks** — insert individual fields or entire tasks from clipboard
+
+### Shopping list
 Notetask allows you to keep a shopping list with item prices and see the total cost in the status bar, including purchased items.
 
 ![sample2](samples/sample2.png)
@@ -62,11 +70,10 @@ Notetask uses a simple Markdown-based format (file extension .tsk) where each li
 
 - `## Group` — the group title, marking the start of a set of related tasks  
 - `- [x] or - [ ]` — task completion status ([x] = done, [ ] = pending)
-- `Date` — task date in format dd.mm.yyyy or similar
-- `Amount` — numeric value related to the task (e.g., duration, cost, quantity)
-- `~~**Text**~~` — task description, crossed out if archived, bold if marked as favorite with a star
+- `Date` — task date and *optional* timestamp in ISO 8601 format `yyyy-MM-ddTHH:mm:ss`
+- `Amount` — numeric value related to the task (e.g. cost, quantity)
+- `~~**Text**~~` — task description, crossed out if archived (inactive regardless of completion), bold if marked as favorite with a star
 - `// Note` — optional comment or additional information about the task
-
 
 ### Example
 
@@ -88,6 +95,31 @@ Notetask uses a simple Markdown-based format (file extension .tsk) where each li
 >- [ ] 2024-07-25, Repair cracked bathroom tiles // Awaiting tile delivery.
 >- [ ] 2024-07-30, Service heating system before winter // Book technician.
 >- [ ] 2024-08-05, Paint front door and touch up exterior walls // Prepare paint and materials.
+
+## Installation
+
+### Windows
+
+Download the installer executable from the [releases page](https://github.com/astverskoy/Notetask/releases). Run the installer and follow the on-screen instructions to complete the installation. After installation, you can launch Notetask from the Start menu or desktop shortcut.
+
+---
+
+### Linux
+
+Download the appropriate `.deb` package for your system from the [releases page](https://github.com/astverskoy/Notetask/releases). To install the package, open a terminal and run:
+
+```bash
+sudo dpkg -i /path/to/notetask.deb
+```
+If there are missing dependencies, fix them by running:
+```bash
+sudo apt-get install -f
+```
+To remove Notetask from your system, use:
+
+```bash
+sudo dpkg -r notetask
+```
 
 ## Licensing
 
