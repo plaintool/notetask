@@ -23,7 +23,7 @@ A simple application for creating and organizing task lists, offering essential 
 
 ![sample1](samples/sample1.png)
 
-It is designed to help you quickly organize a large number of small routine tasks. You can paste raw text directly from the clipboard — such as a list of requirements or ideas — then sort them into groups, set durations or amounts, and start working right away. Ideal for managing project todos, bug lists, feature requests, and other ongoing tasks.
+It is designed to help you quickly organize a large number of small routine tasks. You can enter tasks directly in the app or paste raw text from the clipboard — such as a list of requirements or ideas — then sort them into groups, set durations or amounts, and start working right away. Ideal for managing project todos, bug lists, feature requests, and other ongoing tasks.
 
 ### Features:
 - **Automatic numbering** of tasks
