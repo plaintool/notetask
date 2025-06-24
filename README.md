@@ -33,7 +33,7 @@ It is designed to help you quickly organize a large number of small routine task
 - **Track duration** — per-task (on/off) and **total duration** for all or selected tasks
 - **Track amount** — per-task quantities or prices and **total amount** for all or selected tasks
 - **Status bar summary** — separate time totals for **completed** and **incomplete** tasks
-- **Customize columns** — toggle visibility of any column (e.g. duration, status bar)
+- **Customize columns** — toggle visibility of columns and interface elements (e.g., duration, note field, status bar)
 - **Highlight overdue** — automatic marking of overdue tasks
 - **Merge tasks** — combine multiple tasks into one
 - **Indent tasks** — create subtasks and task hierarchies
@@ -68,13 +68,13 @@ Nearly all major features can be accessed through convenient keyboard shortcuts.
 - [x] Date, Amount, ~~**Text**~~ // Note   
 ```
 ### Legend
-
+*All fields are optional. A task line may include any combination of them.*
 - `## Group` — the group title, marking the start of a set of related tasks  
 - `- [x] or - [ ]` — task completion status ([x] = done, [ ] = pending)
-- `Date` — task date and *optional* timestamp in ISO 8601 format `yyyy-MM-ddTHH:mm:ss`
-- `Amount` — numeric value related to the task (e.g. cost, quantity)
+- `Date` — task date and optional timestamp in ISO 8601 format `yyyy-MM-ddTHH:mm:ss`
+- `Amount` — numeric value related to the task (e.g., cost, quantity)
 - `~~**Text**~~` — task description, crossed out if archived (inactive regardless of completion), bold if marked as favorite with a star
-- `// Note` — optional comment or additional information about the task
+- `// Note` — comment or additional information about the task
 
 ### Example
 
