@@ -2316,10 +2316,10 @@ begin
       if TryStrToInt(editText.Text, rowNum) then
       begin
         // Ensure the entered row is within the valid range
-        if (rowNum >= 1) and (rowNum <= taskGrid.RowCount - 1) then
+        if (rowNum >= 1) and (rowNum <= Tasks.Count) then
         begin
           // Move to the specified row
-          taskGrid.Row := rowNum;
+          taskGrid.Row := Tasks.ReverseMap(rowNum - 1);
         end
         else
           ShowMessage(rnumstringtoolarge);

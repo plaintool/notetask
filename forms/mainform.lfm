@@ -17,7 +17,6 @@ object formNotetask: TformNotetask
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.6.0.0'
   object taskGrid: TStringGrid
     Left = 0
     Height = 391
@@ -156,13 +155,13 @@ object formNotetask: TformNotetask
     Width = 851
     OnChange = groupTabsChange
     Align = alTop
+    Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
+    TabOrder = 2
+    Visible = False
     OnMouseDown = groupTabsMouseDown
     OnMouseLeave = groupTabsMouseLeave
     OnMouseMove = groupTabsMouseMove
     OnMouseUp = groupTabsMouseUp
-    Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
-    TabOrder = 2
-    Visible = False
   end
   object MainMenu: TMainMenu
     Left = 160
@@ -454,45 +453,45 @@ object formNotetask: TformNotetask
     object aNew: TAction
       Category = 'File'
       Caption = 'New'
-      OnExecute = aNewExecute
       ShortCut = 16462
+      OnExecute = aNewExecute
     end
     object aNewWindow: TAction
       Category = 'File'
       Caption = 'New window'
-      OnExecute = aNewWindowExecute
       ShortCut = 24654
+      OnExecute = aNewWindowExecute
     end
     object aOpen: TAction
       Category = 'File'
       Caption = 'Open...'
-      OnExecute = aOpenExecute
       ShortCut = 16463
+      OnExecute = aOpenExecute
     end
     object aSave: TAction
       Category = 'File'
       Caption = 'Save'
       Enabled = False
-      OnExecute = aSaveExecute
       ShortCut = 16467
+      OnExecute = aSaveExecute
     end
     object aSaveAs: TAction
       Category = 'File'
       Caption = 'Save as...'
-      OnExecute = aSaveAsExecute
       ShortCut = 24659
+      OnExecute = aSaveAsExecute
     end
     object aPageProperties: TAction
       Category = 'File'
       Caption = 'Page properties...'
-      OnExecute = aPagePropertiesExecute
       ShortCut = 24656
+      OnExecute = aPagePropertiesExecute
     end
     object aPrint: TAction
       Category = 'File'
       Caption = 'Print...'
-      OnExecute = aPrintExecute
       ShortCut = 16464
+      OnExecute = aPrintExecute
     end
     object aExit: TAction
       Category = 'File'
@@ -502,27 +501,27 @@ object formNotetask: TformNotetask
     object aFont: TAction
       Category = 'Format'
       Caption = 'Font...'
-      OnExecute = aFontExecute
       ShortCut = 16468
+      OnExecute = aFontExecute
     end
     object aUndo: TAction
       Category = 'Edit'
       Caption = 'Undo'
-      OnExecute = aUndoExecute
       ShortCut = 16474
+      OnExecute = aUndoExecute
     end
     object aInsertTask: TAction
       Category = 'Task'
       Caption = 'Insert task'
-      OnExecute = aInsertTaskExecute
       ShortCut = 45
+      OnExecute = aInsertTaskExecute
     end
     object aShowArchived: TAction
       Category = 'View'
       AutoCheck = True
       Caption = 'Show archived tasks'
-      OnExecute = aShowArchivedExecute
       ShortCut = 112
+      OnExecute = aShowArchivedExecute
     end
     object aShowDuration: TAction
       Category = 'View'
@@ -546,74 +545,74 @@ object formNotetask: TformNotetask
     object aUndoAll: TAction
       Category = 'Edit'
       Caption = 'Undo all changes'
-      OnExecute = aUndoAllExecute
       ShortCut = 24666
+      OnExecute = aUndoAllExecute
     end
     object aCut: TAction
       Category = 'Edit'
       Caption = 'Cut'
-      OnExecute = aCutExecute
       ShortCut = 16472
+      OnExecute = aCutExecute
     end
     object aCopy: TAction
       Category = 'Edit'
       Caption = 'Copy'
-      OnExecute = aCopyExecute
       ShortCut = 16451
+      OnExecute = aCopyExecute
     end
     object aPaste: TAction
       Category = 'Edit'
       Caption = 'Paste'
-      OnExecute = aPasteExecute
       ShortCut = 16470
+      OnExecute = aPasteExecute
     end
     object aDelete: TAction
       Category = 'Edit'
       Caption = 'Delete'
-      OnExecute = aDeleteExecute
       ShortCut = 46
+      OnExecute = aDeleteExecute
     end
     object aFind: TAction
       Category = 'Edit'
       Caption = 'Find...'
-      OnExecute = aFindExecute
       ShortCut = 16454
+      OnExecute = aFindExecute
     end
     object aFindNext: TAction
       Category = 'Edit'
       Caption = 'Find next'
-      OnExecute = aFindNextExecute
       ShortCut = 114
+      OnExecute = aFindNextExecute
     end
     object aFindPrev: TAction
       Category = 'Edit'
       Caption = 'Find previous'
-      OnExecute = aFindPrevExecute
       ShortCut = 8306
+      OnExecute = aFindPrevExecute
     end
     object aReplace: TAction
       Category = 'Edit'
       Caption = 'Replace...'
-      OnExecute = aReplaceExecute
       ShortCut = 16456
+      OnExecute = aReplaceExecute
     end
     object aGoTo: TAction
       Category = 'Edit'
       Caption = 'Go to...'
-      OnExecute = aGoToExecute
       ShortCut = 16455
+      OnExecute = aGoToExecute
     end
     object aSelectAll: TAction
       Category = 'Edit'
       Caption = 'Select all'
-      OnExecute = aSelectAllExecute
       ShortCut = 16449
+      OnExecute = aSelectAllExecute
     end
     object aDateTime: TAction
       Category = 'Edit'
       Caption = 'Date time'
-      OnExecute = aDateTimeExecute
       ShortCut = 116
+      OnExecute = aDateTimeExecute
     end
     object aBidiRightToLeft: TAction
       Category = 'Format'
@@ -711,68 +710,68 @@ object formNotetask: TformNotetask
     object aMergeTasks: TAction
       Category = 'Task'
       Caption = 'Merge tasks'
-      OnExecute = aMergeTasksExecute
       ShortCut = 16461
+      OnExecute = aMergeTasksExecute
     end
     object aDeleteTasks: TAction
       Category = 'Task'
       Caption = 'Delete tasks'
-      OnExecute = aDeleteTasksExecute
       ShortCut = 16430
+      OnExecute = aDeleteTasksExecute
     end
     object aArchiveTasks: TAction
       Category = 'Task'
       Caption = 'Archive tasks ↔'
-      OnExecute = aArchiveTasksExecute
       ShortCut = 24641
+      OnExecute = aArchiveTasksExecute
     end
     object aMoveTaskTop: TAction
       Category = 'Task'
       Caption = 'Move tasks to top'
-      OnExecute = aMoveTaskTopExecute
       ShortCut = 16417
+      OnExecute = aMoveTaskTopExecute
     end
     object aMoveTaskUp: TAction
       Category = 'Task'
       Caption = 'Move tasks up'
-      OnExecute = aMoveTaskUpExecute
       ShortCut = 16422
+      OnExecute = aMoveTaskUpExecute
     end
     object aMoveTaskDown: TAction
       Category = 'Task'
       Caption = 'Move tasks down'
-      OnExecute = aMoveTaskDownExecute
       ShortCut = 16424
+      OnExecute = aMoveTaskDownExecute
     end
     object aMoveTaskBottom: TAction
       Category = 'Task'
       Caption = 'Move tasks to bottom'
-      OnExecute = aMoveTaskBottomExecute
       ShortCut = 16418
+      OnExecute = aMoveTaskBottomExecute
     end
     object aIndentTasks: TAction
       Category = 'Task'
       Caption = 'Indent tasks'
-      OnExecute = aIndentTasksExecute
       ShortCut = 16393
+      OnExecute = aIndentTasksExecute
     end
     object aOutdentTasks: TAction
       Category = 'Task'
       Caption = 'Outdent tasks'
-      OnExecute = aOutdentTasksExecute
       ShortCut = 24585
+      OnExecute = aOutdentTasksExecute
     end
     object aChatGpt: TAction
       Category = 'Task'
       Caption = 'Ask ChatGPT...'
-      OnExecute = aChatGptExecute
       ShortCut = 16465
+      OnExecute = aChatGptExecute
     end
     object aRunTerminal: TAction
       Category = 'Task'
       Caption = 'Run in terminal...'
-      OnExecute = aRunTerminalExecute
       ShortCut = 16466
+      OnExecute = aRunTerminalExecute
     end
     object aShowColumnDone: TAction
       Category = 'View'
@@ -818,50 +817,50 @@ object formNotetask: TformNotetask
     object aInsertGroup: TAction
       Category = 'Group'
       Caption = 'Insert group'
-      OnExecute = aInsertGroupExecute
       ShortCut = 16429
+      OnExecute = aInsertGroupExecute
     end
     object aRenameGroup: TAction
       Category = 'Group'
       Caption = 'Rename group'
-      OnExecute = aRenameGroupExecute
       ShortCut = 16497
+      OnExecute = aRenameGroupExecute
     end
     object aCopyGroup: TAction
       Category = 'Group'
       Caption = 'Copy group'
-      OnExecute = aCopyGroupExecute
       ShortCut = 24643
+      OnExecute = aCopyGroupExecute
     end
     object aDeleteGroup: TAction
       Category = 'Group'
       Caption = 'Delete group'
-      OnExecute = aDeleteGroupExecute
       ShortCut = 24622
+      OnExecute = aDeleteGroupExecute
     end
     object aMoveGroupLeft: TAction
       Category = 'Group'
       Caption = 'Move group left'
-      OnExecute = aMoveGroupLeftExecute
       ShortCut = 24613
+      OnExecute = aMoveGroupLeftExecute
     end
     object aMoveGroupRight: TAction
       Category = 'Group'
       Caption = 'Move group right'
-      OnExecute = aMoveGroupRightExecute
       ShortCut = 24615
+      OnExecute = aMoveGroupRightExecute
     end
     object aMoveTaskLeft: TAction
       Category = 'Group'
       Caption = 'Move tasks to left group'
-      OnExecute = aMoveTaskLeftExecute
       ShortCut = 16421
+      OnExecute = aMoveTaskLeftExecute
     end
     object aMoveTaskRight: TAction
       Category = 'Group'
       Caption = 'Move tasks to right group'
-      OnExecute = aMoveTaskRightExecute
       ShortCut = 16423
+      OnExecute = aMoveTaskRightExecute
     end
   end
   object openDialog: TOpenDialog
