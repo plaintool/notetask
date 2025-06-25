@@ -41,7 +41,7 @@ It is designed to help you quickly organize a large number of small routine task
 - **Paste tasks** — insert individual fields or entire tasks from clipboard
 
 ### Shopping list
-Notetask allows you to keep a shopping list with item prices and see the total cost in the status bar, including purchased items.
+**Notetask** allows you to keep a shopping list with item prices and see the total cost in the status bar, including purchased items.
 
 ![sample2](samples/sample2.png)
 
