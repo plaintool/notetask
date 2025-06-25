@@ -3429,6 +3429,8 @@ begin
   aMoveTaskBottom.Enabled := SortColumn = 0;
   aMoveTaskUp.Enabled := SortColumn = 0;
   aMoveTaskDown.Enabled := SortColumn = 0;
+  aMoveTaskLeft.Enabled := SortColumn = 0;
+  aMoveTaskRight.Enabled := SortColumn = 0;
 
   if (SortColumn = 0) then
     taskGrid.Options := taskGrid.Options + [goRowMoving]
