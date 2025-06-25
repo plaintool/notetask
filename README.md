@@ -34,9 +34,9 @@ It is designed to help you quickly organize a large number of small routine task
 - **Track amount** — per-task quantities or prices and **total amount** for all or selected tasks
 - **Status bar summary** — separate time totals for **completed** and **incomplete** tasks
 - **Customize columns** — toggle visibility of columns and interface elements (e.g., duration, note field, status bar)
-- **Highlight overdue** — automatic marking of overdue tasks
 - **Merge tasks** — combine multiple tasks into one
 - **Indent tasks** — create subtasks and task hierarchies
+- **Highlight** — automatic background highlighting of overdue tasks, text highlighting of archived but incomplete tasks and blue text for tasks with a future due date
 - **Copy tasks** — copy selected tasks or fields in Markdown format
 - **Paste tasks** — insert individual fields or entire tasks from clipboard
 
