@@ -3196,7 +3196,10 @@ begin
     if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
     begin
       if (not Outdent) then
-        taskGrid.Cells[2, RowIndex] := '    ' + taskGrid.Cells[2, RowIndex]
+      begin
+        taskGrid.Cells[2, RowIndex] := '    ' + taskGrid.Cells[2, RowIndex];
+        CalcRowHeights();
+      end
       else
         taskGrid.Cells[2, RowIndex] := TrimLeadingSpaces(taskGrid.Cells[2, RowIndex]);
 
