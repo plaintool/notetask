@@ -17,7 +17,7 @@ A simple application for creating and organizing task lists, offering essential 
 >   - [Linux](#linux)
 >- [Licensing](#licensing)
 
-## What is it?
+## What is that?
 
 **Notetask** is a cross-platform application to manage task lists with *completion status*, *task*, and *note*. Each task can have a due *date* and be marked as a favorite with a *star*. It uses its own storage format based on Markdown.
 
@@ -91,10 +91,10 @@ Nearly all major features can be accessed through convenient keyboard shortcuts.
 >- [x] 2024-10-05, Organize bookshelves // Sorted by category and frequency of use.
 >- [x] 2024-10-12, Sort holiday decorations // Separated outdated items for donation.
 >## Repair
->- [ ] 2024-07-15, Replace leaking kitchen faucet // Scheduled plumber visit.
->- [ ] 2024-07-20, Fix broken garage door opener // Order replacement parts.
+>- [x] 2024-07-15, ~~Replace leaking kitchen faucet~~ // Scheduled plumber visit.
+>- [x] 2024-07-20, Fix broken garage door opener // Order replacement parts.
 >- [ ] 2024-07-25, Repair cracked bathroom tiles // Awaiting tile delivery.
->- [ ] 2024-07-30, Service heating system before winter // Book technician.
+>- [x] 2024-07-30, Service heating system before winter // Book technician.
 >- [ ] 2024-08-05, Paint front door and touch up exterior walls // Prepare paint and materials.
 
 ## Installation
