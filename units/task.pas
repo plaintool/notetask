@@ -1436,7 +1436,7 @@ var
   RowTask: TTask;
   IsRowEmpty, DoInsert: boolean;
 begin
-  Result := Grid.Selection;
+  Result:= Grid.Selection;
   DoInsert := True;
   if Clipboard.AsText = string.Empty then exit;
   CreateBackup;
@@ -1604,9 +1604,7 @@ begin
           InsertTask(TempTasks.GetTask(i + 1).ToString(), Grid.Row, False);
         end;
         Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom + (TempTasks.Count - Index) + 1);
-      end
-      else
-        Result := Rect;
+      end;
     end;
   finally
     TempTasks.Free; // Free the temporary TTasks object
