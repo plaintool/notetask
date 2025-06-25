@@ -411,6 +411,7 @@ type
     procedure ApplyColumnSetting;
     procedure ApplySortArrow;
     procedure ApplySorting;
+    procedure ApplySortingActions;
     procedure GridBackupSelection;
     procedure GridClearSelection;
     procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
@@ -577,6 +578,7 @@ begin
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
+  ApplySortingActions;
 
   // Set language
   SetLanguage(Language);
@@ -661,6 +663,7 @@ begin
   else
   if (ssCtrl in Shift) and (Key in [VK_1, VK_2, VK_3, VK_4, VK_5, VK_6, VK_7, VK_8, VK_9, VK_0]) then // Ctrl + Number
   begin
+    EditComplite;
     if (Key = VK_0) then
       ChangeGroup(9)
     else
@@ -2534,7 +2537,10 @@ begin
   ShowNote := FShowNote;
   ShowStatusBar := FShowStatusBar;
   ShowArchived := FShowArchived;
+
+  // Apply loaded settings to columns
   ApplyColumnSetting;
+  ApplySortingActions;
 
   FillGrid;
 
@@ -3412,18 +3418,22 @@ begin
   for i := 0 to taskGrid.Columns.Count - 1 do
     taskGrid.Columns[i].Title.ImageIndex := -1;
 
+  ApplySortingActions;
+
+  SetNote;
+end;
+
+procedure TformNotetask.ApplySortingActions;
+begin
   aMoveTaskTop.Enabled := SortColumn = 0;
   aMoveTaskBottom.Enabled := SortColumn = 0;
   aMoveTaskUp.Enabled := SortColumn = 0;
   aMoveTaskDown.Enabled := SortColumn = 0;
-  aMoveTaskLeft.Enabled := SortColumn = 0;
-  aMoveTaskRight.Enabled := SortColumn = 0;
+
   if (SortColumn = 0) then
     taskGrid.Options := taskGrid.Options + [goRowMoving]
   else
     taskGrid.Options := taskGrid.Options - [goRowMoving];
-
-  SetNote;
 end;
 
 procedure TformNotetask.FillGrid;
