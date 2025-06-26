@@ -1392,17 +1392,17 @@ var
 begin
   SelectedText := TStringList.Create;
   try
-    Rect := Grid.Selection;     // Get grid selection rect
+    Rect := Grid.Selection; // Get grid selection rect
 
     for i := Rect.Top to Rect.Bottom do
     begin
       for j := Rect.Left to Rect.Right do
       begin
-        if (j = 1) then pDone := GetTask(i).ToString(j).Trim;
-        if (j = 2) then pText := GetTask(i).ToString(j).Trim;
-        if (j = 3) then pNote := GetTask(i).ToString(j).Trim;
-        if (j = 4) then pAmount := GetTask(i).ToString(j).Trim;
-        if (j = 5) then pDate := GetTask(i).ToString(j).Trim;
+        if (j = 1) and (Grid.Columns[j - 1].Visible) then pDone := GetTask(i).ToString(j).Trim;
+        if (j = 2) and (Grid.Columns[j - 1].Visible) then pText := GetTask(i).ToString(j).Trim;
+        if (j = 3) and (Grid.Columns[j - 1].Visible) then pNote := GetTask(i).ToString(j).Trim;
+        if (j = 4) and (Grid.Columns[j - 1].Visible) then pAmount := GetTask(i).ToString(j).Trim;
+        if (j = 5) and (Grid.Columns[j - 1].Visible) then pDate := GetTask(i).ToString(j).Trim;
       end;
       Row1 := (pDone + ' ' + pDate).Trim;
       Row2 := (pText + ' ' + pNote).Trim;

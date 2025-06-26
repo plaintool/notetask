@@ -352,6 +352,7 @@ type
     FIsEditing: boolean;
     FIsSelecting: boolean;
     FDisableCheckToggle: boolean;
+    FDisableStarToggle: boolean;
     FFileName: string;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
@@ -941,8 +942,26 @@ begin
       exit;
     end;
     FDisableCheckToggle := False;
+    exit;
   end;
-  taskGrid.Cells[ACol, ARow] := IfThen(Value = cbChecked, '1', '0');
+  if (aCol = 6) then
+  begin
+    // Get mouse position in screen coordinates
+    MousePosScreen := Mouse.CursorPos;
+
+    // Convert screen coordinates to client coordinates (relative to the form)
+    MousePosClient := taskGrid.ScreenToClient(MousePosScreen);
+
+    // Check if the mouse is within the 16x16 checkbox area
+    if not PtInRect(taskGrid.CellRect(ACol, ARow), MousePosClient) then
+    begin
+      // If the mouse is outside the checkbox, prevent the state from being changed
+      FDisableStarToggle := True;
+      exit;
+    end;
+    FDisableStarToggle := False;
+    exit;
+  end;
 end;
 
 procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
@@ -956,6 +975,8 @@ begin
   else
   if (aCol = 6) then
   begin
+    if (FDisableStarToggle) then exit;
+
     StarTask(aRow);
   end;
 end;
