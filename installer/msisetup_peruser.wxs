@@ -2,8 +2,8 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product Id="*" Name="Notetask" Language="1033" Version="1.0.0.0" Manufacturer="Alexander Tverskoy" UpgradeCode="45C75BC5-3DDC-453B-A7AB-7E2AE0D88699">
         <Package Description="Notetask" Comments="Notetask" Platform="x64" InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
-        <Property Id="MSIFASTINSTALL" Value="1" />
         <Property Id="MSIINSTALLPERUSER" Value="1" />
+        <Property Id="MSIFASTINSTALL" Value="1" />
         <WixVariable Id="WixUILicenseRtf" Value="D:\Lazarus\Notetask\installer\LICENSE.rtf" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Upgrade Id="45C75BC5-3DDC-453B-A7AB-7E2AE0D88699">
