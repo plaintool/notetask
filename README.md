@@ -69,16 +69,17 @@ Nearly all major features can be accessed through convenient keyboard shortcuts.
 
 ```md
 ## Group
-- [x] Date, Amount, ~~**Text**~~ // Note   
+- [x] Date, Amount, ~~**Text**~~ // Note <br>
 ```
 ### Legend
 *All fields are optional. A task line may include any combination of them.*
 - `## Group` — the group title, marking the start of a set of related tasks  
 - `- [x] or - [ ]` — task completion status ([x] = done, [ ] = pending)
 - `Date` — task date and optional timestamp in ISO 8601 format `yyyy-MM-ddTHH:mm:ss`
-- `Amount` — numeric value related to the task (e.g., cost, quantity)
+- `Amount` — numeric value related to the task (e.g., cost, quantity), using a dot `.` as the decimal separator
 - `~~**Text**~~` — task description, bold if marked as favorite with a star, and crossed out if archived (inactive regardless of completion)
 - `// Note` — comment or additional information about the task
+- `<br>` — line break in a note or task
 
 ### Example
 
