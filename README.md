@@ -19,6 +19,10 @@ A simple application for creating and organizing task lists, offering essential 
 
 ## What is that?
 
+Do you often save important thoughts, ideas, lists, or reminders in random text files, hoping to find them later… only to forget where exactly you put them? No more wasted time searching — **Notetask** helps bring order to the chaos!  
+All your notes can be stored locally on your device — no clouds, no third parties.  
+This handy desktop app helps you organize your tasks, capture ideas, and manage your lists — with no more confusion!
+
 **Notetask** is a cross-platform application to manage task lists with *completion status*, *task*, and *note*. Each task can have a due *date* and be marked as a favorite with a *star*. It uses its own storage format based on Markdown.
 
 ![sample1](samples/sample1.png)
