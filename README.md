@@ -17,22 +17,22 @@ A simple application for creating and organizing task lists, offering essential 
 >   - [Linux](#linux)
 >- [Licensing](#licensing)
 
-## What is that?
+## What is it?
 
 Do you often save important thoughts, ideas, lists, or reminders in random text files, hoping to find them later… only to forget where exactly you put them? No more wasted time searching — **Notetask** helps bring order to the chaos!  
 All your notes can be stored locally on your device — no clouds, no third parties.  
 This handy desktop app helps you organize your tasks, capture ideas, and manage your lists — with no more confusion!
 
-**Notetask** is a cross-platform application to manage task lists with *completion status*, *task*, and *note*. Each task can have a due *date* and be marked as a favorite with a *star*. It uses its own storage format based on Markdown.
+**Notetask** is a cross-platform application for managing task lists that include *completion status*, *task description*, and *notes*. Each task can have a due *date* and be marked as a favorite with a *star*. It uses its own storage text format based on Markdown.
 
 ![sample1](samples/sample1.png)
 
-It is designed to help you quickly organize a large number of small routine tasks. You can enter tasks directly in the app or paste raw text from the clipboard — such as a list of requirements or ideas — then sort them into groups, set durations or amounts, and start working right away. Ideal for managing project todos, bug lists, feature requests, and other ongoing tasks.
+It is designed to help you quickly organize a large number of small routine tasks. You can enter tasks directly in the app or paste raw text from the clipboard — such as a list of requirements or ideas — then sort them into groups, set durations or amounts, and start working right away. Perfect for managing project to-dos, bug lists, feature requests, and other ongoing tasks.
 
 ### Features:
 - **Automatic numbering** of tasks
 - **Move tasks** — single or multiple, within or between groups
-- **Archive tasks** — cross out archived items, hide or show as needed
+- **Archive tasks** — cross out archived items, which can be hidden or shown as needed
 - **Grouping** — each group on its own page, with full group management
 - **Track duration** — per-task (on/off) and **total duration** for all or selected tasks
 - **Track amount** — per-task quantities or prices and **total amount** for all or selected tasks
@@ -45,7 +45,7 @@ It is designed to help you quickly organize a large number of small routine task
 - **Paste tasks** — insert individual fields or entire tasks from clipboard
 
 ### Shopping list
-**Notetask** allows you to keep a shopping list with item prices and see the total cost in the status bar, including purchased items.
+**Notetask** allows you to keep a shopping list with item prices and see the total cost in the status bar, including the cost of purchased items.
 
 ![sample2](samples/sample2.png)
 
@@ -54,7 +54,7 @@ Suitable for note-taking with an optional general note field at the bottom of th
 
 ![sample3](samples/sample3.png)
 
-Supports advanced features, such as running selected comments directly from the notes as console commands.
+Supports advanced features such as executing selected comments from notes as console commands.
 
 ![sample4](samples/sample4.png)
 
@@ -77,7 +77,7 @@ Nearly all major features can be accessed through convenient keyboard shortcuts.
 - `- [x] or - [ ]` — task completion status ([x] = done, [ ] = pending)
 - `Date` — task date and optional timestamp in ISO 8601 format `yyyy-MM-ddTHH:mm:ss`
 - `Amount` — numeric value related to the task (e.g., cost, quantity)
-- `~~**Text**~~` — task description, crossed out if archived (inactive regardless of completion), bold if marked as favorite with a star
+- `~~**Text**~~` — task description, bold if marked as favorite with a star, and crossed out if archived (inactive regardless of completion)
 - `// Note` — comment or additional information about the task
 
 ### Example
