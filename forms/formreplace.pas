@@ -37,7 +37,6 @@ type
     procedure buttonReplaceClick(Sender: TObject);
     procedure buttonReplaceAllClick(Sender: TObject);
     procedure buttonCancelClick(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure editFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure editFindChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -83,15 +82,6 @@ end;
 procedure TformReplaceText.buttonCancelClick(Sender: TObject);
 begin
   Close;
-end;
-
-procedure TformReplaceText.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-begin
-  //if Key = VK_ESCAPE then
-  //  Close;
-
-  //if Key = VK_RETURN then
-  //  buttonFind.Click;
 end;
 
 procedure TformReplaceText.editFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);

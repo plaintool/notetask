@@ -1056,6 +1056,7 @@ var
   amount: double;
 begin
   grid := Sender as TStringGrid;
+  bgFill := clWhite;
 
   // Border for fixed cells
   if (aRow < grid.FixedRows) or (aCol < grid.FixedCols) then

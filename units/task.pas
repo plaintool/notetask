@@ -209,6 +209,7 @@ begin
   FSpaceBeforeNote := True;
   FSpaceAfterNote := True;
   FNoteItalic := False;
+  CompletedStr := string.Empty;
 
   // Split the task string into PartNote
   PartNote := TaskString.Split(['//']);
@@ -1436,7 +1437,7 @@ var
   RowTask: TTask;
   IsRowEmpty, DoInsert: boolean;
 begin
-  Result:= Grid.Selection;
+  Result := Grid.Selection;
   DoInsert := True;
   if Clipboard.AsText = string.Empty then exit;
   CreateBackup;

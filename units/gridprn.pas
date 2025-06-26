@@ -2,7 +2,7 @@
 //  GridPrn originally © by Werner Pamler
 //  License: Modified LGPL-2 (with linking exception, like Lazarus LCL).
 //  https://wiki.freepascal.org/GridPrinter
-//
+
 //  Modified for use in Notetask © 2024 by Alexander Tverskoy
 //  This version includes minor compatibility fixes for modern FPC/Lazarus
 //-----------------------------------------------------------------------------------
@@ -413,6 +413,8 @@ begin
   case AIndex of
     0..3: Result := FMargins[AIndex] <> 20.0;
     4..5: Result := FMargins[AIndex] <> 10.0;
+    else
+      Result := False;
   end;
 end;
 
@@ -485,6 +487,8 @@ const
         '$FULL_FILENAME': s := ExpandFileName(FOwner.FileName);
         '$FILENAME': s := ExtractFileName(FOwner.FileName);
         '$PATH': s := ExtractFilePath(ExpandFileName(FOwner.FileName));
+        else
+          s := UNKNOWN;
       end
     else
       s := UNKNOWN;
@@ -797,10 +801,11 @@ begin
   case FPrintOrder of
     poRowsFirst: PrintByRows(ACanvas);
     poColsFirst: PrintByCols(ACanvas);
+    else
+      FPrinting := False;
   end;
   if Assigned(FOnAfterPrint) then
     FOnAfterPrint(Self);
-  FPrinting := False;
 end;
 
 function TGridPrinter.GetBorderLineWidthHor: integer;
@@ -852,6 +857,8 @@ begin
     case FOutputDevice of
       odPrinter: Result := Printer.Canvas;
       odPreview: Result := FPreviewBitmap.Canvas;
+      else
+        Result := nil;
     end
   else
     Result := nil;
@@ -1093,6 +1100,8 @@ begin
       // the "real" ppi of the preview.
       Measure(FPageWidth, FPageHeight, FPixelsPerInchX, FPixelsPerInchY);
     end;
+    else
+      ;
   end;
 
   // Stores the current date/time so that all pages have the same date/time
@@ -1243,16 +1252,14 @@ begin
     begin
       prnSetupDlg := TPrinterSetupDialog.Create(nil);
       try
-        if prnSetupDlg.Execute then
-        begin
-
-        end
-        else
+        if not prnSetupDlg.Execute then
           exit;
       finally
         prnSetupDlg.Free;
       end;
     end;
+    else
+      ;
   end;
 
   FOutputDevice := odPrinter;
@@ -1425,15 +1432,20 @@ begin
   cSize.cx := {%H-}ScaleX(cSize.cx);
   cSize.cy := {%H-}ScaleY(cSize.cy);
   // Position the checkbox within the given rectangle, ARect.
+  R := ARect;
   case ACanvas.TextStyle.Alignment of
     taLeftJustify: R.Left := ARect.Left + FPadding;
     taCenter: R.Left := (ARect.Left + ARect.Right - cSize.cx) div 2;
     taRightJustify: R.Left := ARect.Right - cSize.cx - FPadding;
+    else
+      ;
   end;
   case ACanvas.TextStyle.Layout of
     tlTop: R.Top := ARect.Top + FPadding;
     tlCenter: R.Top := (ARect.Top + ARect.Bottom - cSize.cy) div 2;
     tlBottom: R.Top := ARect.Bottom - cSize.cy - FPadding;
+    else
+      ;
   end;
   R.BottomRight := Point(R.Left + cSize.cx, R.Top + cSize.cy);
   // Prepare pen and brush
@@ -1779,6 +1791,8 @@ begin
   PrintColHeaders(ACanvas, AStartCol, AEndCol, fixedRowsTop);
 
   // Print grid cells
+  x2 := 0;
+  y2 := 0;
   y := fixedRowsBottom;
   for row := AStartRow to AEndRow do
   begin
