@@ -2175,15 +2175,15 @@ begin
       gridPrinter.OnGetCellText := @PrinterGetCellText;
       gridPrinter.OnPrepareCanvas := @PrinterPrepareCanvas;
       gridPrinter.Orientation := Printer.Orientation;
-      gridPrinter.Margins.LeftMargin := pageSetupDialog.MarginLeft / 100;
-      gridPrinter.Margins.RightMargin := pageSetupDialog.MarginRight / 100;
-      gridPrinter.Margins.TopMargin := pageSetupDialog.MarginTop / 100;
-      gridPrinter.Margins.BottomMargin := pageSetupDialog.MarginBottom / 100;
+      gridPrinter.Margins.Left := pageSetupDialog.MarginLeft / 100;
+      gridPrinter.Margins.Right := pageSetupDialog.MarginRight / 100;
+      gridPrinter.Margins.Top := pageSetupDialog.MarginTop / 100;
+      gridPrinter.Margins.Bottom := pageSetupDialog.MarginBottom / 100;
       gridPrinter.FixedLineColor := clSilver;
       gridPrinter.BorderLineColor := clSilver;
-      gridPrinter.FooterLineColor := clSilver;
       gridPrinter.GridLineColor := clSilver;
-      gridPrinter.HeaderLineColor := clSilver;
+      gridPrinter.Footer.LineColor := clSilver;
+      gridPrinter.Header.LineColor := clSilver;
 
       gridPrinter.Print;
     finally
@@ -2740,15 +2740,42 @@ end;
 
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
 var
-  MyTextStyle: TTextStyle;
+  prncanvas: TCanvas;
+  task: TTask;
 begin
-  if (aCol in [2, 3]) then;
+  if not Tasks.HasTask(aRow) then exit;
+
+  prncanvas := TGridPrinter(Sender).Canvas;
+  task := Tasks.GetTask(aRow);
+
+  // Default text color
+  prncanvas.Font.Color := clBlack;
+  prncanvas.Font.Style := [];
+
+  // Color and style
+  if (ShowColumnDate) and (not task.Done) and (task.Date > 0) and (task.Date < Now) then
+    prncanvas.Font.Color := clRed
+  else if (not task.Done) and task.Archive then
+    prncanvas.Font.Color := clMaroon;
+
+  if task.Star then
+    prncanvas.Font.Style := prncanvas.Font.Style + [fsBold];
+
+  if (aCol = 2) and task.Archive then
+    prncanvas.Font.Style := prncanvas.Font.Style + [fsStrikeOut];
+
+  if (aCol = 3) and task.NoteItalic then
+    prncanvas.Font.Style := prncanvas.Font.Style + [fsItalic];
+
+  if (aCol = 5) and (task.Date > Now) then
+    prncanvas.Font.Color := clDarkBlue;
+
+  // Text styles
+  with prncanvas.TextStyle do
   begin
-    MyTextStyle := TGridPrinter(Sender).Canvas.TextStyle;
-    MyTextStyle.SingleLine := not FWordWrap;
-    MyTextStyle.Wordbreak := WordWrap;
-    MyTextStyle.RightToLeft := BiDiRightToLeft;
-    TGridPrinter(Sender).Canvas.TextStyle := MyTextStyle;
+    SingleLine := not FWordWrap;
+    WordBreak := FWordWrap;
+    RightToLeft := FBiDiRightToLeft;
   end;
 end;
 

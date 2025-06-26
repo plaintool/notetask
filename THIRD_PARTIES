@@ -2,8 +2,12 @@ THIRD-PARTY RESOURCES
 
 This application uses third-party resources under the following licenses:
 
-1. Main icon designed by Freepik
+1. Module GridPrn by Werner Pamler
+License: Modified LGPL-2 (with linking exception, like Lazarus LCL).
+https://wiki.freepascal.org/GridPrinter
+
+2. Main icon designed by Freepik
 https://www.freepik.com/icon/tasks_906334
 
-2. Document icon designed by Zerode
+3. Document icon designed by Zerode
 https://www.iconarchive.com/show/plump-icons-by-zerode/Document-scheduled-tasks-icon.html
