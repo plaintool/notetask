@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product Id="*" Name="Notetask" Language="1033" Version="1.0.0.0" Manufacturer="Alexander Tverskoy" UpgradeCode="45C75BC5-3DDC-453B-A7AB-7E2AE0D88699">
-        <Package Description="Notetask" Comments="Notetask" Platform="x64" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
-        <!-- <Property Id="ALLUSERS" Value="1"/>-->
+        <Package Description="Notetask" Comments="Notetask" Platform="x64" InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
         <Property Id="MSIFASTINSTALL" Value="1" />
         <Property Id="MSIINSTALLPERUSER" Value="1" />
         <WixVariable Id="WixUILicenseRtf" Value="D:\Lazarus\Notetask\installer\LICENSE.rtf" />
@@ -15,14 +14,14 @@
         </InstallExecuteSequence>
         <Directory Id="TARGETDIR" Name="SourceDir">
             <!-- <Directory Id="LocalAppDataFolder"> -->
-            <Directory Id="ProgramFiles64Folder">
+            <Directory Id="LocalAppDataFolder">
                 <Directory Id="INSTALLDIR" Name="Notetask">
                     <Component Id="NotetaskFiles" DiskId="1" Guid="2cf58c8a-ad81-49e9-acbc-b1a3262acfc6" Win64="yes">
                         <!-- Files to be installed -->
                         <File Id="NOTETASK.EXE" Name="notetask.exe" Source="D:\Lazarus\Notetask\notetask.exe" />
                         <File Id="LICENSE" Name="LICENSE" Source="D:\Lazarus\Notetask\LICENSE" />
                         <!-- Registry KeyPath to satisfy ICE38 -->
-                        <RegistryValue Root="HKLM" Key="Software\Alexander Tverskoy\Notetask" Name="InstallPath" Type="string" Value="[INSTALLDIR]" KeyPath="yes" />
+                        <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="InstallPath" Type="string" Value="[INSTALLDIR]" KeyPath="yes" />
                         <!-- Remove INSTALLDIR on uninstall -->
                         <RemoveFolder Id="RemoveINSTALLDIR" Directory="INSTALLDIR" On="uninstall" />
                     </Component>
@@ -46,7 +45,7 @@
         </Directory>
         <Component Id="NotetaskRegistry" Directory="INSTALLDIR" Guid="4A5B87A9-6F9F-4AD4-A9AB-4D3D9DAB4FC8" Win64="yes">
             <!-- Add .tsk extension association -->
-            <RegistryKey Root="HKLM" Key="Software\Classes\.tsk" Action="createAndRemoveOnUninstall">
+            <RegistryKey Root="HKCU" Key="Software\Classes\.tsk" Action="createAndRemoveOnUninstall">
                 <RegistryValue Type="string" Value="notetask" KeyPath="yes" />
 					<!-- Add "New → TSK File" to context menu -->
 				 <RegistryKey Key="ShellNew" Action="createAndRemoveOnUninstall">
@@ -54,7 +53,7 @@
 				</RegistryKey>
             </RegistryKey>
             <!-- Define the notetask file association -->
-            <RegistryKey Root="HKLM" Key="Software\Classes\notetask" Action="createAndRemoveOnUninstall">
+            <RegistryKey Root="HKCU" Key="Software\Classes\notetask" Action="createAndRemoveOnUninstall">
                 <RegistryKey Key="DefaultIcon">
                     <RegistryValue Type="string" Value="[INSTALLDIR]notetask.exe,1" />
                 </RegistryKey>
@@ -63,7 +62,7 @@
                 </RegistryKey>
             </RegistryKey>
             <!-- Add application association in the registry -->
-            <RegistryKey Root="HKLM" Key="Software\Classes\Applications\notetask.exe" Action="createAndRemoveOnUninstall">
+            <RegistryKey Root="HKCU" Key="Software\Classes\Applications\notetask.exe" Action="createAndRemoveOnUninstall">
                 <RegistryKey Key="shell\open\command">
                     <RegistryValue Type="string" Value="&quot;[INSTALLDIR]notetask.exe&quot; &quot;%1&quot;" />
                 </RegistryKey>
