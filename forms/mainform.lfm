@@ -336,10 +336,6 @@ object formNotetask: TformNotetask
         Action = aWordWrap
         AutoCheck = True
       end
-      object menuDisplayTime: TMenuItem
-        Action = aDisplayTime
-        AutoCheck = True
-      end
       object MenuItem6: TMenuItem
         Action = aBidiRightToLeft
         AutoCheck = True
@@ -360,6 +356,10 @@ object formNotetask: TformNotetask
       end
       object MenuItem2: TMenuItem
         Action = aShowNote
+        AutoCheck = True
+      end
+      object MenuShowTime: TMenuItem
+        Action = aShowTime
         AutoCheck = True
       end
       object menuShowStatusBar: TMenuItem
@@ -527,25 +527,6 @@ object formNotetask: TformNotetask
       Caption = 'Show archived tasks'
       ShortCut = 112
       OnExecute = aShowArchivedExecute
-    end
-    object aShowDuration: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Show duration'
-      OnExecute = aShowDurationExecute
-    end
-    object aShowNote: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Show note'
-      OnExecute = aShowNoteExecute
-    end
-    object aShowStatusBar: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Show status bar'
-      Checked = True
-      OnExecute = aShowStatusBarExecute
     end
     object aUndoAll: TAction
       Category = 'Edit'
@@ -778,47 +759,6 @@ object formNotetask: TformNotetask
       ShortCut = 16466
       OnExecute = aRunTerminalExecute
     end
-    object aShowColumnDone: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column done'
-      Checked = True
-      OnExecute = aShowColumnDoneExecute
-    end
-    object aShowColumnTask: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column task'
-      Checked = True
-      OnExecute = aShowColumnTaskExecute
-    end
-    object aShowColumnNote: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column note'
-      Checked = True
-      OnExecute = aShowColumnNoteExecute
-    end
-    object aShowColumnAmount: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column amount'
-      OnExecute = aShowColumnAmountExecute
-    end
-    object aShowColumnDate: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column date'
-      Checked = True
-      OnExecute = aShowColumnDateExecute
-    end
-    object aShowColumnFavorite: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column fovorite'
-      Checked = True
-      OnExecute = aShowColumnFavoriteExecute
-    end
     object aInsertGroup: TAction
       Category = 'Group'
       Caption = 'Insert group'
@@ -867,12 +807,72 @@ object formNotetask: TformNotetask
       ShortCut = 16423
       OnExecute = aMoveTaskRightExecute
     end
-    object aDisplayTime: TAction
-      Category = 'Format'
+    object aShowDuration: TAction
+      Category = 'View'
       AutoCheck = True
-      Caption = 'Display time'
+      Caption = 'Show duration'
+      OnExecute = aShowDurationExecute
+    end
+    object aShowNote: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Show note'
+      OnExecute = aShowNoteExecute
+    end
+    object aShowTime: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Show time'
       Checked = True
-      OnExecute = aDisplayTimeExecute
+      OnExecute = aShowTimeExecute
+    end
+    object aShowStatusBar: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Show status bar'
+      Checked = True
+      OnExecute = aShowStatusBarExecute
+    end
+    object aShowColumnDone: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column done'
+      Checked = True
+      OnExecute = aShowColumnDoneExecute
+    end
+    object aShowColumnTask: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column task'
+      Checked = True
+      OnExecute = aShowColumnTaskExecute
+    end
+    object aShowColumnNote: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column note'
+      Checked = True
+      OnExecute = aShowColumnNoteExecute
+    end
+    object aShowColumnAmount: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column amount'
+      OnExecute = aShowColumnAmountExecute
+    end
+    object aShowColumnDate: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column date'
+      Checked = True
+      OnExecute = aShowColumnDateExecute
+    end
+    object aShowColumnFavorite: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column fovorite'
+      Checked = True
+      OnExecute = aShowColumnFavoriteExecute
     end
   end
   object openDialog: TOpenDialog

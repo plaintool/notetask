@@ -345,10 +345,6 @@ msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
 msgstr "Выдаліць задачы"
 
-#: tformnotetask.adisplaytime.caption
-msgid "Display time"
-msgstr "Адлюстроўваць час"
-
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
 msgstr "Купіце мне каву..."
@@ -572,6 +568,10 @@ msgstr "Нататка"
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "Панэль стану"
+
+#: tformnotetask.ashowtime.caption
+msgid "Show time"
+msgstr "Адлюстроўваць час"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

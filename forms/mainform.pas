@@ -44,7 +44,6 @@ type
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
-    aDisplayTime: TAction;
     aUndoAll: TAction;
     aDelete: TAction;
     aDateTime: TAction;
@@ -89,7 +88,7 @@ type
     contextCopy: TMenuItem;
     contextPaste: TMenuItem;
     contextDelete: TMenuItem;
-    menuDisplayTime: TMenuItem;
+    MenuShowTime: TMenuItem;
     menuUndoAll: TMenuItem;
     menuPaste: TMenuItem;
     menuCopy: TMenuItem;
@@ -173,6 +172,7 @@ type
     Separator12: TMenuItem;
     contextArchiveTasks: TMenuItem;
     aShowDuration: TAction;
+    aShowTime: TAction;
     menuShowDuration: TMenuItem;
     aLangArabic: TAction;
     aLangUkrainian: TAction;
@@ -237,7 +237,6 @@ type
     MenuItem9: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem15: TMenuItem;
-    procedure aDisplayTimeExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -313,6 +312,7 @@ type
     procedure aLangChineseExecute(Sender: TObject);
     procedure aDonateExecute(Sender: TObject);
     procedure aShowDurationExecute(Sender: TObject);
+    procedure aShowTimeExecute(Sender: TObject);
     procedure aLangUkrainianExecute(Sender: TObject);
     procedure aLangBelarusianExecute(Sender: TObject);
     procedure aLangHindiExecute(Sender: TObject);
@@ -357,7 +357,6 @@ type
     FLineEnding: TLineEnding;
     FLineCount: integer;
     FWordWrap: boolean;
-    FDisplayTime: boolean;
     FSortOrder: TSortOrder;
     FSortColumn: integer;
     FMatchCase: boolean;
@@ -405,6 +404,7 @@ type
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowNote(Value: boolean);
     procedure SetShowDuration(Value: boolean);
+    procedure SetShowTime(Value: boolean);
     procedure SetShowArchived(Value: boolean);
     procedure SetShowColumnDone(Value: boolean);
     procedure SetShowColumnTask(Value: boolean);
@@ -434,6 +434,7 @@ type
   public
     FShowArchived: boolean;
     FShowDuration: boolean;
+    FShowTime: boolean;
     FShowNote: boolean;
     FShowStatusBar: boolean;
     FShowColumnDone: boolean;
@@ -453,10 +454,10 @@ type
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
-    property DisplayTime: boolean read FDisplayTime write FDisplayTime;
     property BiDiRightToLeft: boolean read FBiDiRightToLeft write SetBiDiRightToLeft;
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property ShowDuration: boolean read FShowDuration write SetShowDuration;
+    property ShowTime: boolean read FShowTime write SetShowTime;
     property ShowNote: boolean read FShowNote write SetShowNote;
     property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
     property ShowColumnDone: boolean read FShowColumnDone write SetShowColumnDone;
@@ -525,7 +526,7 @@ begin
   // Initialize variables
   FBackup := True;
   FWordWrap := True;
-  FDisplayTime := True;
+  FShowTime := True;
   FShowStatusBar := True;
   FShowNote := False;
   FShowColumnDone := True;
@@ -577,11 +578,11 @@ begin
   // After load settings
   aWordWrap.Checked := FWordWrap;
   memoNote.WordWrap := FWordWrap;
-  aDisplayTime.Checked := FDisplayTime;
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowArchived.Checked := FShowArchived;
   ShowNote := FShowNote;
   ShowStatusBar := FShowStatusBar;
+  ShowTime := FShowTime;
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
@@ -1263,7 +1264,7 @@ begin
     DatePicker.ParentFont := True;
     DatePicker.ArrowShape := asClassicSmaller;
     DatePicker.Options := [dtpoFlatButton];
-    if (DisplayTime) then
+    if (FShowTime) then
       DatePicker.Kind := dtkDateTime
     else
       DatePicker.Kind := dtkDate;
@@ -1924,8 +1925,8 @@ var
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  CurrentDateTime := DateTimeToString(Now, FDisplayTime);
-  CurrentDateTimeISO := DateTimeToStringISO(Now, DisplayTime);
+  CurrentDateTime := DateTimeToString(Now, FShowTime);
+  CurrentDateTimeISO := DateTimeToStringISO(Now, FShowTime);
 
   if memoNote.Focused then
   begin
@@ -1964,7 +1965,7 @@ begin
           taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
         else
           taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
-        Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FDisplayTime);
+        Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
         if (Assigned(DatePicker)) then
           DatePicker.DateTime := Now;
         if (FShowDuration) and (taskGrid.Col = 5) then
@@ -2217,6 +2218,15 @@ begin
   ShowDuration := aShowDuration.Checked;
 end;
 
+procedure TformNotetask.aShowTimeExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  EditComplite;
+  ShowTime := aShowTime.Checked;
+  FillGrid;
+end;
+
 procedure TformNotetask.aShowNoteExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -2283,15 +2293,6 @@ begin
   memoNote.WordWrap := FWordWrap;
   ResetRowHeight;
   Invalidate;
-end;
-
-procedure TformNotetask.aDisplayTimeExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  EditComplite;
-  FDisplayTime := aDisplayTime.Checked;
-  FillGrid;
 end;
 
 procedure TformNotetask.aBidiRightToLeftExecute(Sender: TObject);
@@ -2557,6 +2558,7 @@ begin
   ShowNote := FShowNote;
   ShowStatusBar := FShowStatusBar;
   ShowArchived := FShowArchived;
+  Showtime := FShowTime;
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
@@ -3366,6 +3368,12 @@ begin
   SetInfo;
 end;
 
+procedure TformNotetask.SetShowTime(Value: boolean);
+begin
+  aShowTime.Checked := Value;
+  FShowTime := Value;
+end;
+
 procedure TformNotetask.SetShowNote(Value: boolean);
 begin
   FShowNote := Value;
@@ -3487,7 +3495,7 @@ end;
 
 procedure TformNotetask.FillGrid;
 begin
-  Tasks.FillGrid(taskGrid, FShowArchived, FShowDuration, FDisplayTime, SortOrder, SortColumn);
+  Tasks.FillGrid(taskGrid, FShowArchived, FShowDuration, FShowTime, SortOrder, SortColumn);
   CalcRowHeights;
 end;
 

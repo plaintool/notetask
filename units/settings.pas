@@ -73,7 +73,6 @@ begin
     end;
     JSONObj.Add('WindowState', Ord(Form.WindowState));
     JSONObj.Add('WordWrap', Form.WordWrap);
-    JSONObj.Add('DisplayTime', Form.DisplayTime);
     JSONObj.Add('BidiRightToLeft', Form.BiDiRightToLeft);
     JSONObj.Add('Language', Language);
 
@@ -136,9 +135,6 @@ begin
       if JSONObj.FindPath('WordWrap') <> nil then
         Form.WordWrap := JSONObj.FindPath('WordWrap').AsBoolean;
 
-      if JSONObj.FindPath('DisplayTime') <> nil then
-        Form.DisplayTime := JSONObj.FindPath('DisplayTime').AsBoolean;
-
       if JSONObj.FindPath('BidiRightToLeft') <> nil then
         Form.BiDiRightToLeft := JSONObj.FindPath('BidiRightToLeft').AsBoolean;
 
@@ -194,6 +190,7 @@ begin
     // Create a JSON object for the specified Item settings
     ItemSettings := TJSONObject.Create;
     ItemSettings.Add('ShowDuration', Form.ShowDuration);
+    ItemSettings.Add('ShowTime', Form.ShowTime);
     ItemSettings.Add('ShowNote', Form.ShowNote);
     ItemSettings.Add('ShowStatusBar', Form.ShowStatusBar);
     ItemSettings.Add('ShowArchived', Form.ShowArchived);
@@ -275,6 +272,9 @@ begin
       // Load settings into the form and grid from the ItemSettings object
       if ItemSettings.FindPath('ShowDuration') <> nil then
         Form.FShowDuration := ItemSettings.FindPath('ShowDuration').AsBoolean;
+
+      if ItemSettings.FindPath('ShowTime') <> nil then
+        Form.FShowTime := ItemSettings.FindPath('ShowTime').AsBoolean;
 
       if ItemSettings.FindPath('ShowNote') <> nil then
         Form.FShowNote := ItemSettings.FindPath('ShowNote').AsBoolean;

@@ -345,10 +345,6 @@ msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
 msgstr "कार्य हटाएं"
 
-#: tformnotetask.adisplaytime.caption
-msgid "Display time"
-msgstr "समय दिखाएँ"
-
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
 msgstr "मुझे एक कॉफी खरीदें..."
@@ -572,6 +568,10 @@ msgstr "नोट"
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "स्थिति पट्टी"
+
+#: tformnotetask.ashowtime.caption
+msgid "Show time"
+msgstr "समय दिखाएँ"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"
