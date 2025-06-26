@@ -38,7 +38,8 @@ type
     FSpaceAfterNote: boolean; // Space after note in file
     FDateStart, FDateEnd: TDateTime; // Calculated time interval
     function GetDate: string;
-    function GetDateISO: string;
+    function GetDateTime: string;
+    function GetDateTimeISO: string;
     function GetAmount: string;
   public
     constructor Create;
@@ -47,8 +48,9 @@ type
     property Done: boolean read FDone write FDone;
     property Archive: boolean read FArchive write FArchive;
     property Date: TDateTime read FDate write FDate;
-    property DateStrISO: string read GetDateISO;
     property DateStr: string read GetDate;
+    property DateTimeStr: string read GetDateTime;
+    property DateTimeStrISO: string read GetDateTimeISO;
     property Note: string read FNote write FNote;
     property Text: string read FText write FText;
     property Amount: double read FAmount write FAmount;
@@ -124,7 +126,7 @@ type
     function CalcSum(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): double;
     function CalcDuration(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): string;
 
-    procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);
+    procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder; SortColumn: integer);
 
     property GroupNames: TStringList read FGroupNameList;
     property SelectedGroup: integer read FSelectedGroup;
@@ -425,7 +427,7 @@ begin
         Result := string.Empty;
     5:
       if FDate > 0 then
-        Result := DateStrISO.Trim
+        Result := DateTimeStrISO.Trim
       else
         Result := string.Empty; // If the completion date is missing, return an empty string
     else
@@ -435,7 +437,7 @@ begin
         if Amount <> 0 then
         begin
           if Date > 0 then
-            Result := Format('%s, %s, %s%s', [DateStrISO, AmountStr, TextString, NoteString])
+            Result := Format('%s, %s, %s%s', [DateTimeStrISO, AmountStr, TextString, NoteString])
           else
           begin
             if (TextString + NoteString <> string.Empty) then
@@ -449,9 +451,9 @@ begin
           if Date > 0 then
           begin
             if (TextString + NoteString <> string.Empty) then
-              Result := Format('%s, %s%s', [DateStrISO, TextString, NoteString])
+              Result := Format('%s, %s%s', [DateTimeStrISO, TextString, NoteString])
             else
-              Result := Format('%s', [DateStrISO]);
+              Result := Format('%s', [DateTimeStrISO]);
           end
           else
             Result := Format('%s%s', [TextString, NoteString]);
@@ -462,7 +464,7 @@ begin
         if Amount <> 0 then
         begin
           if Date > 0 then
-            Result := Format('%s %s, %s, %s%s', [DoneString, DateStrISO, AmountStr, TextString, NoteString]).Trim
+            Result := Format('%s %s, %s, %s%s', [DoneString, DateTimeStrISO, AmountStr, TextString, NoteString]).Trim
           else
           begin
             if (TextString + NoteString <> string.Empty) then
@@ -476,9 +478,9 @@ begin
           if Date > 0 then
           begin
             if (TextString + NoteString <> string.Empty) then
-              Result := Format('%s %s, %s%s', [DoneString, DateStrISO, TextString, NoteString]).Trim
+              Result := Format('%s %s, %s%s', [DoneString, DateTimeStrISO, TextString, NoteString]).Trim
             else
-              Result := Format('%s %s', [DoneString, DateStrISO]).Trim;
+              Result := Format('%s %s', [DoneString, DateTimeStrISO]).Trim;
           end
           else
             Result := Format('%s %s%s', [DoneString, TextString, NoteString]).Trim;
@@ -506,10 +508,15 @@ end;
 
 function TTask.GetDate: string;
 begin
+  Result := DateTimeToString(FDate, False);
+end;
+
+function TTask.GetDateTime: string;
+begin
   Result := DateTimeToString(FDate);
 end;
 
-function TTask.GetDateISO: string;
+function TTask.GetDateTimeISO: string;
 begin
   Result := DateTimeToStringISO(FDate);
 end;
@@ -775,7 +782,7 @@ begin
   else
   if ACol = 4 then Result := GetTask(aRow).AmountStr
   else
-  if ACol = 5 then Result := GetTask(aRow).DateStrISO
+  if ACol = 5 then Result := GetTask(aRow).DateTimeStrISO
   else
   if ACol = 6 then
     if GetTask(aRow).FStar then Result := '1'
@@ -2042,7 +2049,7 @@ begin
     if FTaskList[I].Archive then Result += 1;
 end;
 
-procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration: boolean; SortOrder: TSortOrder; SortColumn: integer);
+procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder; SortColumn: integer);
 var
   I, J, ArhCount, RowIndex: integer;
   LastDate, MinDate, MaxDate: TDateTime;
@@ -2313,7 +2320,10 @@ begin
 
         if FTaskList[I].Date > 0 then
         begin
-          Grid.Cells[5, RowIndex] := FTaskList[I].DateStr;
+          if (DisplayTime) then
+            Grid.Cells[5, RowIndex] := FTaskList[I].DateTimeStr
+          else
+            Grid.Cells[5, RowIndex] := FTaskList[I].DateStr;
         end
         else
           Grid.Cells[5, RowIndex] := string.Empty;

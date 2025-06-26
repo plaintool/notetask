@@ -44,6 +44,7 @@ type
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
+    aDisplayTime: TAction;
     aUndoAll: TAction;
     aDelete: TAction;
     aDateTime: TAction;
@@ -88,6 +89,7 @@ type
     contextCopy: TMenuItem;
     contextPaste: TMenuItem;
     contextDelete: TMenuItem;
+    menuDisplayTime: TMenuItem;
     menuUndoAll: TMenuItem;
     menuPaste: TMenuItem;
     menuCopy: TMenuItem;
@@ -235,6 +237,7 @@ type
     MenuItem9: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem15: TMenuItem;
+    procedure aDisplayTimeExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -354,6 +357,7 @@ type
     FLineEnding: TLineEnding;
     FLineCount: integer;
     FWordWrap: boolean;
+    FDisplayTime: boolean;
     FSortOrder: TSortOrder;
     FSortColumn: integer;
     FMatchCase: boolean;
@@ -449,6 +453,7 @@ type
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
+    property DisplayTime: boolean read FDisplayTime write FDisplayTime;
     property BiDiRightToLeft: boolean read FBiDiRightToLeft write SetBiDiRightToLeft;
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property ShowDuration: boolean read FShowDuration write SetShowDuration;
@@ -520,6 +525,7 @@ begin
   // Initialize variables
   FBackup := True;
   FWordWrap := True;
+  FDisplayTime := True;
   FShowStatusBar := True;
   FShowNote := False;
   FShowColumnDone := True;
@@ -568,9 +574,10 @@ begin
   LoadFormSettings(Self);
   LoadGridSettings(Self, taskGrid, string.Empty);
 
-  // After load wordwrap setting
+  // After load settings
   aWordWrap.Checked := FWordWrap;
   memoNote.WordWrap := FWordWrap;
+  aDisplayTime.Checked := FDisplayTime;
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowArchived.Checked := FShowArchived;
   ShowNote := FShowNote;
@@ -1255,9 +1262,12 @@ begin
     DatePicker.BorderStyle := bsNone;
     DatePicker.ParentFont := True;
     DatePicker.ArrowShape := asClassicSmaller;
-    DatePicker.Kind := dtkDateTime;
-    DatePicker.TimeDisplay := tdHMS;
     DatePicker.Options := [dtpoFlatButton];
+    if (DisplayTime) then
+      DatePicker.Kind := dtkDateTime
+    else
+      DatePicker.Kind := dtkDate;
+    DatePicker.TimeDisplay := tdHMS;
     if (FBiDiRightToLeft) then
       DatePicker.BiDiMode := bdRightToLeft
     else
@@ -1914,8 +1924,8 @@ var
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  CurrentDateTime := DateTimeToString(Now);
-  CurrentDateTimeISO := DateTimeToStringISO(Now);
+  CurrentDateTime := DateTimeToString(Now, FDisplayTime);
+  CurrentDateTimeISO := DateTimeToStringISO(Now, DisplayTime);
 
   if memoNote.Focused then
   begin
@@ -2273,6 +2283,15 @@ begin
   memoNote.WordWrap := FWordWrap;
   ResetRowHeight;
   Invalidate;
+end;
+
+procedure TformNotetask.aDisplayTimeExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  EditComplite;
+  FDisplayTime := aDisplayTime.Checked;
+  FillGrid;
 end;
 
 procedure TformNotetask.aBidiRightToLeftExecute(Sender: TObject);
@@ -3468,7 +3487,7 @@ end;
 
 procedure TformNotetask.FillGrid;
 begin
-  Tasks.FillGrid(taskGrid, FShowArchived, FShowDuration, SortOrder, SortColumn);
+  Tasks.FillGrid(taskGrid, FShowArchived, FShowDuration, FDisplayTime, SortOrder, SortColumn);
   CalcRowHeights;
 end;
 

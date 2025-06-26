@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -334,6 +333,10 @@ object formNotetask: TformNotetask
       Caption = 'Format'
       object menuWordWrap: TMenuItem
         Action = aWordWrap
+        AutoCheck = True
+      end
+      object menuDisplayTime: TMenuItem
+        Action = aDisplayTime
         AutoCheck = True
       end
       object MenuItem6: TMenuItem
@@ -862,6 +865,13 @@ object formNotetask: TformNotetask
       Caption = 'Move tasks to right group'
       ShortCut = 16423
       OnExecute = aMoveTaskRightExecute
+    end
+    object aDisplayTime: TAction
+      Category = 'Format'
+      AutoCheck = True
+      Caption = 'Display time'
+      Checked = True
+      OnExecute = aDisplayTimeExecute
     end
   end
   object openDialog: TOpenDialog

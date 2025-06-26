@@ -20,9 +20,9 @@ function TextToStringList(const Content: string; TrimEnd: boolean = False): TStr
 
 function TryStrToDateTimeISO(const S: string; out ADateTime: TDateTime): boolean;
 
-function DateTimeToStringISO(Value: TDateTime): string;
+function DateTimeToStringISO(Value: TDateTime; ADisplayTime: boolean = True): string;
 
-function DateTimeToString(Value: TDateTime): string;
+function DateTimeToString(Value: TDateTime; ADisplayTime: boolean = True): string;
 
 function FloatToString(Value: double): string;
 
@@ -90,7 +90,7 @@ begin
   Result := TryStrToDateTime(SFixed, ADateTime, FS);
 end;
 
-function DateTimeToStringISO(Value: TDateTime): string;
+function DateTimeToStringISO(Value: TDateTime; ADisplayTime: boolean = True): string;
 var
   FS: TFormatSettings;
 begin
@@ -100,15 +100,18 @@ begin
   FS.ShortDateFormat := 'yyyy-mm-dd';
   FS.ShortTimeFormat := 'hh:nn:ss';
 
-  if Frac(Value) = 0 then
+  if (Frac(Value) = 0) or (not ADisplayTime) then
     Result := FormatDateTime('yyyy"-"mm"-"dd', Value, FS)
   else
     Result := FormatDateTime('yyyy"-"mm"-"dd"T"hh":"nn":"ss', Value, FS);
 end;
 
-function DateTimeToString(Value: TDateTime): string;
+function DateTimeToString(Value: TDateTime; ADisplayTime: boolean = True): string;
 begin
-  Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Value);
+  if (Frac(Value) = 0) or (not ADisplayTime) then
+    Result := FormatDateTime(FormatSettings.ShortDateFormat, Value)
+  else
+    Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Value);
 end;
 
 function FloatToString(Value: double): string;
@@ -281,9 +284,9 @@ begin
         Process.Executable := 'cmd.exe';
         Process.Parameters.Add('/C chcp'); // Execute the chcp command
     {$ELSE}
-        Process.Executable := '/bin/bash';
-        Process.Parameters.Add('-c');
-        Process.Parameters.Add('locale charmap'); // Check the character encoding
+    Process.Executable := '/bin/bash';
+    Process.Parameters.Add('-c');
+    Process.Parameters.Add('locale charmap'); // Check the character encoding
     {$ENDIF}
 
     Process.Options := [poUsePipes, poNoConsole];
@@ -316,8 +319,8 @@ begin
         else if Pos('1251', Output[0]) > 0 then
           Encoding := 'CP1251';         // Cyrillic (Windows)
       {$ELSE}
-        // For Linux and macOS, check the output of `locale charmap`
-        Encoding := Trim(Output[0]);
+      // For Linux and macOS, check the output of `locale charmap`
+      Encoding := Trim(Output[0]);
       {$ENDIF}
     end;
 

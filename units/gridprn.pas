@@ -2,7 +2,6 @@
 //  GridPrn originally © by Werner Pamler
 //  License: Modified LGPL-2 (with linking exception, like Lazarus LCL).
 //  https://wiki.freepascal.org/GridPrinter
-
 //  Modified for use in Notetask © 2024 by Alexander Tverskoy
 //  This version includes minor compatibility fixes for modern FPC/Lazarus
 //-----------------------------------------------------------------------------------

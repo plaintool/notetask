@@ -345,6 +345,10 @@ msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
 msgstr "작업 삭제"
 
+#: tformnotetask.adisplaytime.caption
+msgid "Display time"
+msgstr "시간 표시"
+
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
 msgstr "커피 한 잔 주세요..."

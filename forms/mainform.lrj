@@ -84,6 +84,7 @@
 {"hash":85143028,"name":"tformnotetask.amovegroupright.caption","sourcebytes":[77,111,118,101,32,103,114,111,117,112,32,114,105,103,104,116],"value":"Move group right"},
 {"hash":11099920,"name":"tformnotetask.amovetaskleft.caption","sourcebytes":[77,111,118,101,32,116,97,115,107,115,32,116,111,32,108,101,102,116,32,103,114,111,117,112],"value":"Move tasks to left group"},
 {"hash":169372496,"name":"tformnotetask.amovetaskright.caption","sourcebytes":[77,111,118,101,32,116,97,115,107,115,32,116,111,32,114,105,103,104,116,32,103,114,111,117,112],"value":"Move tasks to right group"},
+{"hash":201787669,"name":"tformnotetask.adisplaytime.caption","sourcebytes":[68,105,115,112,108,97,121,32,116,105,109,101],"value":"Display time"},
 {"hash":107761687,"name":"tformnotetask.opendialog.title","sourcebytes":[79,112,101,110,105,110,103],"value":"Opening"},
 {"hash":93900871,"name":"tformnotetask.savedialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
 {"hash":131550916,"name":"tformnotetask.fontdialog.title","sourcebytes":[70,111,110,116,32,115,101,108,101,99,116],"value":"Font select"}

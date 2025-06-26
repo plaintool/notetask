@@ -345,6 +345,10 @@ msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
 msgstr "حذف المهام"
 
+#: tformnotetask.adisplaytime.caption
+msgid "Display time"
+msgstr "عرض الوقت"
+
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
 msgstr "اشتري لي قهوة..."
