@@ -94,7 +94,7 @@ type
     function GetTask(Index: integer): TTask; // Method to get a task by row index
     function GetTaskValue(ACol, ARow: integer): string; // Method to get a task value by row col
     function HasTask(Index: integer): boolean;
-    procedure SetTask(Grid: TStringGrid; Row: integer; Backup: boolean = True);
+    procedure SetTask(Grid: TStringGrid; Row: integer; Backup: boolean = True; DisplayTime: boolean = True);
     function InsertTask(const TaskString: string; Index: integer; Backup: boolean = True): integer;
     procedure DeleteTask(Index: integer);
     procedure ArchiveTask(Index: integer);
@@ -798,7 +798,7 @@ begin
   Result := (Ind >= 0) and (Ind < Count);
 end;
 
-procedure TTasks.SetTask(Grid: TStringGrid; Row: integer; Backup: boolean = True);
+procedure TTasks.SetTask(Grid: TStringGrid; Row: integer; Backup: boolean = True; DisplayTime: boolean = True);
 var
   Task: TTask;
   pDate: TDateTime;
@@ -832,7 +832,7 @@ begin
       Grid.Cells[5, Row] := '';
     end
     else
-      Grid.Cells[5, Row] := DateTimeToString(pDate);
+      Grid.Cells[5, Row] := DateTimeToString(pDate, DisplayTime);
     Task.Date := pDate;
   end
   else

@@ -108,7 +108,7 @@ end;
 
 function DateTimeToString(Value: TDateTime; ADisplayTime: boolean = True): string;
 begin
-  if (Frac(Value) = 0) or (not ADisplayTime) then
+  if (not ADisplayTime) then
     Result := FormatDateTime(FormatSettings.ShortDateFormat, Value)
   else
     Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Value);

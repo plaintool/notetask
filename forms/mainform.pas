@@ -1964,7 +1964,7 @@ begin
           taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
         else
           taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
-        Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
+        Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FDisplayTime);
         if (Assigned(DatePicker)) then
           DatePicker.DateTime := Now;
         if (FShowDuration) and (taskGrid.Col = 5) then
