@@ -262,8 +262,8 @@ type
     function GetCellText(ACol, ARow: integer): string; virtual;
     procedure Print;
     procedure ScaleToPages(NumHor, NumVert: integer);
-    function ScaleX(AValue: integer): integer; inline;
-    function ScaleY(AValue: integer): integer; inline;
+    function ScaleX(AValue: integer): integer;
+    function ScaleY(AValue: integer): integer;
     procedure UpdatePreview;
     property Canvas: TCanvas read GetCanvas;
     property ColCount: integer read FColCount;

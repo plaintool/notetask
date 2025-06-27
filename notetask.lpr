@@ -20,18 +20,12 @@ uses
   Forms,
   SysUtils,
   DateTimeCtrls,
-  lineending,
-  filemanager,
-  task,
-  settings,
   systemtool,
   stringtool,
   mainform,
   forminput,
   formfind,
-  formreplace,
-  formabout,
-  formdonate;
+  formreplace;
 
   {$R *.res}
 
@@ -39,8 +33,8 @@ begin
   RequireDerivedFormResource := True;
   Language := GetOSLanguage;
   DefaultFormatSettings.DecimalSeparator := '.';
-  Application.Title:='Notetask';
-  Application.Scaled:=True;
+  Application.Title := 'Notetask';
+  Application.Scaled := True;
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
   Application.CreateForm(TformInputText, formInputText);
