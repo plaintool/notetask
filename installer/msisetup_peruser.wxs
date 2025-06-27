@@ -53,7 +53,8 @@
             </RegistryKey>
             <!-- Define the notetask file association -->
             <RegistryKey Root="HKCU" Key="Software\Classes\notetask" Action="createAndRemoveOnUninstall">
-                <RegistryKey Key="DefaultIcon">
+                 <RegistryValue Type="string" Value="Notetask new tasks" />
+				<RegistryKey Key="DefaultIcon">
                     <RegistryValue Type="string" Value="[INSTALLDIR]notetask.exe,1" />
                 </RegistryKey>
                 <RegistryKey Key="shell\open\command">
