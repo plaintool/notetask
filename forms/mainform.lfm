@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -354,12 +353,12 @@ object formNotetask: TformNotetask
         Action = aShowDuration
         AutoCheck = True
       end
-      object MenuItem2: TMenuItem
-        Action = aShowNote
-        AutoCheck = True
-      end
       object MenuShowTime: TMenuItem
         Action = aShowTime
+        AutoCheck = True
+      end
+      object MenuItem2: TMenuItem
+        Action = aShowNote
         AutoCheck = True
       end
       object menuShowStatusBar: TMenuItem
