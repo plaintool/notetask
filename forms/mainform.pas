@@ -3789,14 +3789,19 @@ begin
 end;
 
 procedure TformNotetask.SetCaption;
+var
+  NewCaption: string;
 begin
-  if (FFileName <> string.Empty) then
-    Caption := ExtractFileName(FFileName) + ' - ' + rapp
+  if (FFileName <> '') then
+    NewCaption := ExtractFileName(FFileName) + ' - ' + rapp
   else
-    Caption := runtitled + ' - ' + rapp;
+    NewCaption := runtitled + ' - ' + rapp;
 
-  if (FChanged) then
-    Caption := '*' + Caption;
+  if FChanged then
+    NewCaption := '*' + NewCaption;
+
+  if Caption <> NewCaption then
+    Caption := NewCaption;
 end;
 
 procedure TformNotetask.SetChanged(aChanged: boolean = True);
