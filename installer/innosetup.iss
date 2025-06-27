@@ -45,7 +45,7 @@ ArchitecturesAllowed=x64compatible
 ; the 64-bit view of the registry.
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
-LicenseFile=D:\Lazarus\Notetask\LICENSE.txt
+LicenseFile=D:\Lazarus\Notetask\LICENSE
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
@@ -76,7 +76,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "D:\Lazarus\Notetask\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\Lazarus\Notetask\LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\Lazarus\Notetask\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
