@@ -2,13 +2,16 @@
 ;Registry data from file notetask.reg
 Root: HKA; Subkey: "Software\Classes\.tsk"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\.tsk"; ValueType: string; ValueName: ""; ValueData: "notetask"; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\.tsk\ShellNew"; ValueType: string; ValueName: "NullFile"; ValueData: ""
 Root: HKA; Subkey: "Software\Classes\notetask"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\notetask"; ValueType: string; ValueName: ""; ValueData: "Notetask Tasks"; Flags: uninsdeletevalue
 Root: HKA; Subkey: "Software\Classes\notetask\DefaultIcon"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\notetask\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\notetask.exe,1"; Flags: uninsdeletevalue
 Root: HKA; Subkey: "Software\Classes\notetask\shell"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\notetask\shell\open"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\notetask\shell\open\command"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\notetask\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\notetask.exe"" ""%1"""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\notetask\ShellNew"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\Applications\notetask.exe"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\Applications\notetask.exe\shell"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\Applications\notetask.exe\shell\open"; Flags: uninsdeletekey
