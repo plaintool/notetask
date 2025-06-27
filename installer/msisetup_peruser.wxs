@@ -13,7 +13,6 @@
             <RemoveExistingProducts After="InstallInitialize" />
         </InstallExecuteSequence>
         <Directory Id="TARGETDIR" Name="SourceDir">
-            <!-- <Directory Id="LocalAppDataFolder"> -->
             <Directory Id="LocalAppDataFolder">
                 <Directory Id="INSTALLDIR" Name="Notetask">
                     <Component Id="NotetaskFiles" DiskId="1" Guid="2cf58c8a-ad81-49e9-acbc-b1a3262acfc6" Win64="yes">
