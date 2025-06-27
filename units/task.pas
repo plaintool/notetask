@@ -114,7 +114,7 @@ type
     function MoveTasksDown(Index1, Index2: integer): integer;
     procedure SwapTasks(OldIndex, NewIndex: integer);
     procedure MoveTask(OldIndex, NewIndex: integer);
-    procedure CopyToClipboard(Grid: TStringGrid);
+    procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False);
     function PasteFromClipboard(Grid: TStringGrid): TGridRect;
     procedure CreateBackup;
     procedure UndoBackup;
@@ -1382,7 +1382,7 @@ begin
   // This may require additional logic depending on how you want to track indices.
 end;
 
-procedure TTasks.CopyToClipboard(Grid: TStringGrid);
+procedure TTasks.CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False);
 var
   SelectedText: TStringList;
   Rect: TGridRect;
@@ -1400,7 +1400,7 @@ begin
       begin
         if (j = 1) and (Grid.Columns[j - 1].Visible) then pDone := GetTask(i).ToString(j).Trim;
         if (j = 2) and (Grid.Columns[j - 1].Visible) then pText := GetTask(i).ToString(j).Trim;
-        if (j = 3) and (Grid.Columns[j - 1].Visible) then pNote := GetTask(i).ToString(j).Trim;
+        if (j = 3) and ((Grid.Columns[j - 1].Visible) or NoteVisible) then pNote := GetTask(i).ToString(j).Trim;
         if (j = 4) and (Grid.Columns[j - 1].Visible) then pAmount := GetTask(i).ToString(j).Trim;
         if (j = 5) and (Grid.Columns[j - 1].Visible) then pDate := GetTask(i).ToString(j).Trim;
       end;

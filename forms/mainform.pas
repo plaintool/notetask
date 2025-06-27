@@ -1691,7 +1691,7 @@ begin
   if taskGrid.RowCount < 2 then exit;
 
   if not IsEditing then
-    Tasks.CopyToClipboard(taskGrid)
+    Tasks.CopyToClipboard(taskGrid, FShowNote)
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
     (taskGrid.InplaceEditor as TCustomEdit).CopyToClipboard;
