@@ -19,7 +19,7 @@ A simple application for creating and organizing task lists, offering essential 
 
 ## What is it?
 
-Do you often save important thoughts, ideas, lists, or reminders in random text files, hoping to find them later… only to forget where exactly you put them? No more wasted time searching — **Notetask** helps bring order to the chaos!  
+Do you often save important ideas, to-do lists, phone numbers, or command-line snippets in random text files, hoping to find them later… only to forget where exactly you put them? No more wasted time searching — **Notetask** helps bring order to the chaos!  
 All your notes can be stored locally on your device — no clouds, no third parties.  
 This handy desktop app helps you organize your tasks, capture ideas, and manage your lists — with no more confusion!
 
