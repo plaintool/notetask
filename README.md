@@ -31,7 +31,7 @@ It is designed to help you quickly organize a large number of small routine task
 
 ### Features:
 - **Automatic numbering** of tasks
-- **Move tasks** — single or multiple, within or between groups
+- **Move tasks** — single or multiple, within or between groups; task priority is set simply by its position in the list
 - **Archive tasks** — cross out archived items, which can be hidden or shown as needed
 - **Grouping** — each group on its own page, with full group management
 - **Track duration** — per-task (on/off) and **total duration** for all or selected tasks
