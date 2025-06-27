@@ -59,7 +59,8 @@ Supports advanced features such as executing selected comments from notes as con
 ![sample4](samples/sample4.png)
 
 ### Shortcuts
-Nearly all major features can be accessed through convenient keyboard shortcuts.
+Nearly all major features can be accessed through convenient keyboard shortcuts.  
+View menu settings are saved individually based on filename.
  
  ![menu](samples/menu.png)
 
