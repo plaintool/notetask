@@ -54,7 +54,7 @@
             </RegistryKey>
             <!-- Define the notetask file association -->
             <RegistryKey Root="HKLM" Key="Software\Classes\notetask" Action="createAndRemoveOnUninstall">
-                <RegistryValue Type="string" Value="Notetask new tasks" />
+                <RegistryValue Type="string" Value="Notetask Tasks" />
 				<RegistryKey Key="DefaultIcon">
                     <RegistryValue Type="string" Value="[INSTALLDIR]notetask.exe,1" />
                 </RegistryKey>
