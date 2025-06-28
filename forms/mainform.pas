@@ -1714,6 +1714,7 @@ begin
       taskGrid.Selection := Sel;
     SetChanged;
     SetInfo;
+    SetNote;
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
