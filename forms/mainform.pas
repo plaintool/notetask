@@ -1086,6 +1086,7 @@ var
   flags: cardinal;
   task: TTask;
   amount: double;
+  FS: TFormatSettings;
 begin
   grid := Sender as TStringGrid;
   bgFill := clWhite;
@@ -1172,7 +1173,11 @@ begin
     end;
 
     if (aCol = 4) and (TryStrToFloat(grid.Cells[ACol, ARow], amount)) then
-      S := FormatFloat('#,##0.##########', StrToFloat(grid.Cells[ACol, ARow]))
+    begin
+      FS := DefaultFormatSettings;
+      FS.ThousandSeparator := ' ';
+      S := FormatFloat('#,##0.##########', StrToFloat(grid.Cells[ACol, ARow]), FS);
+    end
     else
       S := grid.Cells[ACol, ARow];
 
