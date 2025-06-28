@@ -13,5 +13,4 @@ IF %ERRORLEVEL% NEQ 0 (
     exit /b %ERRORLEVEL%
 )
 
-echo Build completed successfully.
-pause
+echo Build completed successfully
