@@ -25,7 +25,7 @@ This handy desktop app helps you organize your tasks, capture ideas, and manage 
 
 **Notetask** is a cross-platform application for managing task lists that include *completion status*, *task description*, and *notes*. Each task can have a due *date* and be marked as a favorite with a *star*. It uses its own storage text format based on Markdown.
 
-![sample1](samples/sample1.png)
+![sample1](examples/sample1.png)
 
 It is designed to help you quickly organize a large number of small routine tasks. You can enter tasks directly in the app or paste raw text from the clipboard — such as a list of requirements or ideas — then sort them into groups, set durations or amounts, and start working right away. Perfect for managing project to-dos, bug lists, feature requests, and other ongoing tasks.
 
@@ -47,22 +47,22 @@ It is designed to help you quickly organize a large number of small routine task
 ### Shopping list
 **Notetask** allows you to keep a shopping list with item prices and see the total cost in the status bar, including the cost of purchased items.
 
-![sample2](samples/sample2.png)
+![sample2](examples/sample2.png)
 
 ### Notes
 Suitable for note-taking with an optional general note field at the bottom of the application window, as well as support for paged grouping and all task management features.
 
-![sample3](samples/sample3.png)
+![sample3](examples/sample3.png)
 
 Supports advanced features such as executing selected comments from notes as console commands.
 
-![sample4](samples/sample4.png)
+![sample4](examples/sample4.png)
 
 ### Shortcuts
 Nearly all major features can be accessed through convenient keyboard shortcuts.  
 View menu settings are saved individually based on filename.
  
- ![menu](samples/menu.png)
+ ![menu](examples/menu.png)
 
 ## File Format
 
