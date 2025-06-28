@@ -419,15 +419,16 @@ type
     procedure ApplySortingActions;
     procedure GridBackupSelection;
     procedure GridClearSelection;
-    procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
-    procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
     procedure ExecuteTerminal;
     procedure MoveTabLeft(Index: integer);
     procedure MoveTabRight(Index: integer);
     procedure ChangeGroup(Index: integer);
+    procedure CalcDefaultColWidth;
     procedure CalcRowHeights(aRow: integer = 0; aForce: boolean = False);
+    procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
+    procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     function LastRowHeight(aRow: integer): integer;
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
@@ -486,6 +487,14 @@ var
   ResourceBitmapUncheck: TBitmap;
   ResourceBitmapStarGold: TBitmap;
   ResourceBitmapStarGray: TBitmap;
+
+const
+  {$IFDEF Windows}
+  DefRowHeight = 22;
+  {$ENDIF}
+  {$IFDEF Linux}
+  DefRowHeight = 33;
+  {$ENDIF}
 
 resourcestring
   rapp = 'Notetask';
@@ -550,12 +559,7 @@ begin
   Application.OnException := @ApplicationException;
   Application.OnQueryEndSession := @OnQueryEndSession;
 
-  {$IFDEF Windows}
-  taskGrid.DefaultRowHeight := 22;
-  {$ENDIF}
-  {$IFDEF Linux}
-  taskGrid.DefaultRowHeight := 33;
-  {$ENDIF}
+  taskGrid.DefaultRowHeight := DefRowHeight;
 
   // Create TBitmap objects
   ResourceBitmapCheck := TBitmap.Create;
@@ -3391,11 +3395,7 @@ procedure TformNotetask.SetShowDuration(Value: boolean);
 begin
   FShowDuration := Value;
 
-  if (FShowDuration) then
-    taskGrid.DefaultColWidth := 55
-  else
-    taskGrid.DefaultColWidth := 40;
-
+  CalcDefaultColWidth;
   FillGrid;
   SetInfo;
 end;
@@ -3460,10 +3460,7 @@ end;
 procedure TformNotetask.ApplyColumnSetting;
 begin
   aShowDuration.Checked := FShowDuration;
-  if (FShowDuration) then
-    taskGrid.DefaultColWidth := 55
-  else
-    taskGrid.DefaultColWidth := 40;
+  CalcDefaultColWidth;
   aShowColumnDone.Checked := FShowColumnDone;
   aShowColumnTask.Checked := FShowColumnTask;
   aShowColumnNote.Checked := FShowColumnNote;
@@ -3531,6 +3528,14 @@ begin
   CalcRowHeights;
 end;
 
+procedure TformNotetask.CalcDefaultColWidth;
+begin
+  if (FShowDuration) then
+    taskGrid.DefaultColWidth := Canvas.TextWidth('10.10sec') + 10
+  else
+    taskGrid.DefaultColWidth := Canvas.TextWidth('10000');
+end;
+
 procedure TformNotetask.CalcRowHeights(aRow: integer = 0; aForce: boolean = False);
 var
   FromRow, ToRow: integer;
@@ -3541,7 +3546,7 @@ var
     drawrect: TRect;
     s: string;
     flags: cardinal;
-    Value: integer;
+    NewHeight: integer;
   begin
     for i := FromRow to ToRow do
     begin
@@ -3562,11 +3567,11 @@ var
 
       if (force) or ((drawrect.bottom - drawrect.top) > taskGrid.RowHeights[i]) then
       begin
-        Value := (drawrect.bottom - drawrect.top + 2);
-        if (Value <= taskGrid.DefaultRowHeight) then
-          Value := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
-        FLastRowHeights[i] := Value;
-        taskGrid.RowHeights[i] := Value;
+        NewHeight := (drawrect.bottom - drawrect.top + 2);
+        if (NewHeight <= taskGrid.DefaultRowHeight) then
+          NewHeight := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
+        FLastRowHeights[i] := NewHeight;
+        taskGrid.RowHeights[i] := NewHeight;
       end
       else
         FLastRowHeights[i] := taskGrid.RowHeights[i];
@@ -3598,6 +3603,7 @@ begin
   begin
     taskGrid.RowHeights[0] := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
     groupTabs.Height := taskGrid.RowHeights[0] + 2;
+    CalcDefaultColWidth;
   end;
 
   if (ShowColumnTask) then CalcCol(2, aForce);
@@ -3607,25 +3613,28 @@ end;
 procedure TformNotetask.ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
 var
   i: integer;
+  NewHeight: integer;
 begin
+  NewHeight := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
+
   // if -1 only selection
   if (aRow = -1) then
   begin
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-      taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight;
+      taskGrid.RowHeights[i] := NewHeight;
   end
   else
   // if 0 for all rows
   if (aRow = 0) then
   begin
     for i := 1 to taskGrid.RowCount - 1 do
-      taskGrid.RowHeights[i] := taskGrid.DefaultRowHeight;
+      taskGrid.RowHeights[i] := NewHeight;
   end
   else // if valid row just that row
     taskGrid.RowHeights[aRow] := taskGrid.DefaultRowHeight;
 
   if (Assigned(Memo)) and ((aRow = 0) or (aRow = taskGrid.Row)) then
-    Memo.Height := taskGrid.DefaultRowHeight;
+    Memo.Height := NewHeight;
 
   if (aCalcRowHeight) then
     CalcRowHeights(aRow);
