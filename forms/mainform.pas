@@ -858,9 +858,6 @@ end;
 procedure TformNotetask.FormShow(Sender: TObject);
 begin
   SetCaption;
-
-  // Force row heights
-  CalcRowHeights(0, True);
 end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -3540,20 +3537,20 @@ procedure TformNotetask.CalcRowHeights(aRow: integer = 0; aForce: boolean = Fals
 var
   FromRow, ToRow: integer;
 
-  procedure CalcCol(j: integer; force: boolean = False);
+  procedure CalcCol(col: integer; force: boolean = False);
   var
-    i: integer;
+    row: integer;
     drawrect: TRect;
-    s: string;
+    Text: string;
     flags: cardinal;
-    NewHeight: integer;
+    h: integer;
   begin
-    for i := FromRow to ToRow do
+    for row := FromRow to ToRow do
     begin
-      drawrect := taskGrid.CellRect(j, i);
+      drawrect := taskGrid.CellRect(col, row);
       drawrect.Inflate(-4, 0);
 
-      s := taskGrid.Cells[j, i];
+      Text := taskGrid.Cells[col, row];
 
       flags := DT_CALCRECT;
       if FBiDiRightToLeft then
@@ -3563,18 +3560,18 @@ var
       if FWordWrap then
         flags := flags or DT_WORDBREAK;
 
-      DrawText(taskGrid.canvas.handle, PChar(S), Length(S), drawrect, flags);
+      DrawText(taskGrid.canvas.handle, PChar(Text), Length(Text), drawrect, flags);
 
-      if (force) or ((drawrect.bottom - drawrect.top) > taskGrid.RowHeights[i]) then
+      if (force) or ((drawrect.bottom - drawrect.top) > taskGrid.RowHeights[row]) then
       begin
-        NewHeight := (drawrect.bottom - drawrect.top + 2);
-        if (NewHeight <= taskGrid.DefaultRowHeight) then
-          NewHeight := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
-        FLastRowHeights[i] := NewHeight;
-        taskGrid.RowHeights[i] := NewHeight;
+        h := drawrect.bottom - drawrect.top + 2;
+        if (force) and (h < taskGrid.DefaultRowHeight) then
+          h := Max(taskGrid.Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
+        FLastRowHeights[row] := h;
+        taskGrid.RowHeights[row] := h;
       end
       else
-        FLastRowHeights[i] := taskGrid.RowHeights[i];
+        FLastRowHeights[row] := taskGrid.RowHeights[row];
     end;
   end;
 
@@ -3597,44 +3594,43 @@ begin
     FromRow := aRow;
     ToRow := aRow;
   end;
+  if (ShowColumnTask) then CalcCol(2, aForce);
+  if (ShowColumnNote) then CalcCol(3);
 
-  // Header only in force mode
+  // Header, tabs, first col
+  taskGrid.RowHeights[0] := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
   if (aForce) then
   begin
-    taskGrid.RowHeights[0] := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
     groupTabs.Height := taskGrid.RowHeights[0] + 2;
     CalcDefaultColWidth;
   end;
-
-  if (ShowColumnTask) then CalcCol(2, aForce);
-  if (ShowColumnNote) then CalcCol(3, aForce);
 end;
 
 procedure TformNotetask.ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
 var
   i: integer;
-  NewHeight: integer;
+  h: integer;
 begin
-  NewHeight := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
+  h := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
 
   // if -1 only selection
   if (aRow = -1) then
   begin
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-      taskGrid.RowHeights[i] := NewHeight;
+      taskGrid.RowHeights[i] := h;
   end
   else
   // if 0 for all rows
   if (aRow = 0) then
   begin
     for i := 1 to taskGrid.RowCount - 1 do
-      taskGrid.RowHeights[i] := NewHeight;
+      taskGrid.RowHeights[i] := h;
   end
   else // if valid row just that row
     taskGrid.RowHeights[aRow] := taskGrid.DefaultRowHeight;
 
   if (Assigned(Memo)) and ((aRow = 0) or (aRow = taskGrid.Row)) then
-    Memo.Height := NewHeight;
+    Memo.Height := h;
 
   if (aCalcRowHeight) then
     CalcRowHeights(aRow);
