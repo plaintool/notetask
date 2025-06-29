@@ -128,6 +128,10 @@ begin
   ContentBuffer := [];
   FileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
   try
+    // If the file is empty, treat it as UTF-8
+    if FileStream.Size = 0 then
+      Exit(TEncoding.UTF8);
+
     // Read the first 4 bytes to check for BOM
     BytesRead := FileStream.Read(Buffer, SizeOf(Buffer));
 
