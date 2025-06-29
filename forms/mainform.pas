@@ -3659,6 +3659,7 @@ var
   SumDone: double;
   DurationAll: string;
   DurationCurrent: string;
+  FS: TFormatSettings;
 begin
   SetCaption;
   if (not ShowStatusBar) then exit;
@@ -3699,10 +3700,12 @@ begin
     end;
     if (SumAll <> 0) then
     begin
+      FS := DefaultFormatSettings;
+      FS.ThousandSeparator := ' ';
       if (SumAll = SumDone) or (SumDone = 0) then
-        statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumAll)
+        statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumAll, FS)
       else
-        statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumDone) + ' / ' + FormatFloat('#,##0.00', SumAll);
+        statusBar.Panels[4].Text := FormatFloat('#,##0.00', SumDone, FS) + ' / ' + FormatFloat('#,##0.00', SumAll, FS);
     end
     else
       statusBar.Panels[4].Text := string.empty;
