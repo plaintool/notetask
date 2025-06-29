@@ -1833,13 +1833,17 @@ end;
 
 procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
 var
-  newRow, len: integer;
+  newRow, selLen, selCol, selLeft, selRight: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
   GridBackupSelection;
-  Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selLeft := taskGrid.Selection.Left;
+  selRight := taskGrid.Selection.Right;
+  selCol := taskGrid.Col;
+
   if (SortOrder = soAscending) then
     newRow := Tasks.MoveTasksTop(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
   else
@@ -1850,7 +1854,8 @@ begin
   begin
     ResetRowHeight;
     taskGrid.Row := 0;
-    taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, 0, taskGrid.Selection.Right, Len);
+    taskGrid.Col := selCol;
+    taskGrid.Selection := TGridRect.Create(selLeft, 0, selRight, selLen);
   end;
   SetChanged;
   SetInfo;
@@ -1858,13 +1863,17 @@ end;
 
 procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
 var
-  newRow, Len: integer;
+  newRow, selLen, selCol, selLeft, selRight: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
   GridBackupSelection;
-  Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selLeft := taskGrid.Selection.Left;
+  selRight := taskGrid.Selection.Right;
+  selCol := taskGrid.Col;
+
   if (SortOrder = soAscending) then
     newRow := Tasks.MoveTasksBottom(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
   else
@@ -1874,9 +1883,9 @@ begin
   if (newRow > -1) then
   begin
     ResetRowHeight;
-    taskGrid.Row := taskGrid.RowCount - Len;
-    taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, taskGrid.RowCount - Len, taskGrid.Selection.Right,
-      taskGrid.RowCount);
+    taskGrid.Row := taskGrid.RowCount - selLen;
+    taskGrid.Col := selCol;
+    taskGrid.Selection := TGridRect.Create(selLeft, taskGrid.RowCount - selLen, selRight, taskGrid.RowCount);
   end;
   SetChanged;
   SetInfo;
@@ -1884,13 +1893,17 @@ end;
 
 procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
 var
-  newRow, Len: integer;
+  newRow, selLen, selCol, selLeft, selRight: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
   GridBackupSelection;
-  Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selLeft := taskGrid.Selection.Left;
+  selRight := taskGrid.Selection.Right;
+  selCol := taskGrid.Col;
+
   if (SortOrder = soAscending) then
     newRow := Tasks.MoveTasksUp(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
   else
@@ -1901,7 +1914,8 @@ begin
   begin
     ResetRowHeight(-1);
     taskGrid.Row := newRow;
-    taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, newRow, taskGrid.Selection.Right, newRow + Len - 1);
+    taskGrid.Col := selCol;
+    taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
     ResetRowHeight(-1);
   end;
   SetChanged;
@@ -1910,13 +1924,17 @@ end;
 
 procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
 var
-  newRow, Len: integer;
+  newRow, selLen, selCol, selLeft, selRight: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 3 then exit;
 
   GridBackupSelection;
-  Len := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selLeft := taskGrid.Selection.Left;
+  selRight := taskGrid.Selection.Right;
+  selCol := taskGrid.Col;
+
   if (SortOrder = soAscending) then
     newRow := Tasks.MoveTasksDown(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
   else
@@ -1927,7 +1945,8 @@ begin
   begin
     ResetRowHeight(-1);
     taskGrid.Row := newRow;
-    taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, newRow - Len + 1, taskGrid.Selection.Right, newRow);
+    taskGrid.Col := selCol;
+    taskGrid.Selection := TGridRect.Create(selLeft, newRow - selLen + 1, selRight, newRow);
     ResetRowHeight(-1);
   end;
   SetChanged;
