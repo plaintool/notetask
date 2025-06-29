@@ -1853,6 +1853,7 @@ begin
     taskGrid.Selection := TGridRect.Create(taskGrid.Selection.Left, 0, taskGrid.Selection.Right, Len);
   end;
   SetChanged;
+  SetInfo;
 end;
 
 procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
@@ -1878,6 +1879,7 @@ begin
       taskGrid.RowCount);
   end;
   SetChanged;
+  SetInfo;
 end;
 
 procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
@@ -1903,6 +1905,7 @@ begin
     ResetRowHeight(-1);
   end;
   SetChanged;
+  SetInfo;
 end;
 
 procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
@@ -1928,6 +1931,71 @@ begin
     ResetRowHeight(-1);
   end;
   SetChanged;
+  SetInfo;
+end;
+
+procedure TformNotetask.aMoveTaskLeftExecute(Sender: TObject);
+var
+  newRow, selCol, selLen, selLeft, selRight, selEnd: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if (groupTabs.TabIndex <= 0) then exit;
+  if taskGrid.RowCount < 2 then exit;
+
+  GridBackupSelection;
+  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selLeft := taskGrid.Selection.Left;
+  selRight := taskGrid.Selection.Right;
+  selCol := taskGrid.Col;
+
+  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.SelectedGroup - 1);
+
+  if (newRow > -1) then
+  begin
+    ChangeGroup(Tasks.SelectedGroup);
+    newRow := Tasks.ReverseMap(newRow);
+    taskGrid.Row := newRow;
+    if (SortOrder = soAscending) then
+      selEnd := newRow + selLen - 1
+    else
+      selEnd := newRow - selLen - 1;
+    taskGrid.Col := selCol;
+    taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
+  end;
+  SetChanged;
+  SetInfo;
+end;
+
+procedure TformNotetask.aMoveTaskRightExecute(Sender: TObject);
+var
+  newRow, selCol, selLen, selLeft, selRight, selEnd: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if (groupTabs.TabIndex >= groupTabs.Tabs.Count - 1) then exit;
+  if taskGrid.RowCount < 2 then exit;
+
+  GridBackupSelection;
+  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
+  selLeft := taskGrid.Selection.Left;
+  selRight := taskGrid.Selection.Right;
+  selCol := taskGrid.Col;
+
+  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.SelectedGroup + 1);
+
+  if (newRow > -1) then
+  begin
+    ChangeGroup(Tasks.SelectedGroup);
+    newRow := Tasks.ReverseMap(newRow);
+    taskGrid.Row := newRow;
+    if (SortOrder = soAscending) then
+      selEnd := newRow + selLen - 1
+    else
+      selEnd := newRow - selLen - 1;
+    taskGrid.Col := selCol;
+    taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
+  end;
+  SetChanged;
+  SetInfo;
 end;
 
 procedure TformNotetask.aIndentTasksExecute(Sender: TObject);
@@ -2141,64 +2209,6 @@ begin
     if IsCanClose then
       OpenFile(FileNames[0]);
   end;
-end;
-
-procedure TformNotetask.aMoveTaskLeftExecute(Sender: TObject);
-var
-  newRow, sellen, selleft, selright, selend: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if (groupTabs.TabIndex <= 0) then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  GridBackupSelection;
-  sellen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
-  selleft := taskGrid.Selection.Left;
-  selright := taskGrid.Selection.Right;
-
-  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.SelectedGroup - 1);
-
-  if (newRow > -1) then
-  begin
-    ChangeGroup(Tasks.SelectedGroup);
-    newRow := Tasks.ReverseMap(newRow);
-    taskGrid.Row := newRow;
-    if (SortOrder = soAscending) then
-      selend := newRow + sellen - 1
-    else
-      selend := newRow - sellen - 1;
-    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, selend);
-  end;
-  SetChanged;
-end;
-
-procedure TformNotetask.aMoveTaskRightExecute(Sender: TObject);
-var
-  newRow, sellen, selleft, selright, selend: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if (groupTabs.TabIndex >= groupTabs.Tabs.Count - 1) then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  GridBackupSelection;
-  sellen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
-  selleft := taskGrid.Selection.Left;
-  selright := taskGrid.Selection.Right;
-
-  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.SelectedGroup + 1);
-
-  if (newRow > -1) then
-  begin
-    ChangeGroup(Tasks.SelectedGroup);
-    newRow := Tasks.ReverseMap(newRow);
-    taskGrid.Row := newRow;
-    if (SortOrder = soAscending) then
-      selend := newRow + sellen - 1
-    else
-      selend := newRow - sellen - 1;
-    taskGrid.Selection := TGridRect.Create(selleft, newRow, selright, selend);
-  end;
-  SetChanged;
 end;
 
 procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
