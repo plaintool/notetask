@@ -349,6 +349,10 @@ msgstr "Выдаліць задачы"
 msgid "Buy me a coffee..."
 msgstr "Купіце мне каву..."
 
+#: tformnotetask.aentersubmit.caption
+msgid "Enter submit"
+msgstr "Enter пацвярджае"
+
 #: tformnotetask.aexit.caption
 msgid "Exit"
 msgstr "Выход"

@@ -349,6 +349,10 @@ msgstr "タスクを削除"
 msgid "Buy me a coffee..."
 msgstr "コーヒーを支援する..."
 
+#: tformnotetask.aentersubmit.caption
+msgid "Enter submit"
+msgstr "Enter 送信"
+
 #: tformnotetask.aexit.caption
 msgid "Exit"
 msgstr "終了"

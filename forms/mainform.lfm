@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -336,7 +335,12 @@ object formNotetask: TformNotetask
         Action = aWordWrap
         AutoCheck = True
       end
-      object MenuItem6: TMenuItem
+      object menuEnterSubmit: TMenuItem
+        Action = aEnterSubmit
+        AutoCheck = True
+        Checked = True
+      end
+      object menuBidiRightToLeft: TMenuItem
         Action = aBidiRightToLeft
         AutoCheck = True
       end
@@ -873,6 +877,12 @@ object formNotetask: TformNotetask
       Caption = 'Column fovorite'
       Checked = True
       OnExecute = aShowColumnFavoriteExecute
+    end
+    object aEnterSubmit: TAction
+      Category = 'Format'
+      AutoCheck = True
+      Caption = 'Enter submit'
+      OnExecute = aEnterSubmitExecute
     end
   end
   object openDialog: TOpenDialog

@@ -349,6 +349,10 @@ msgstr "작업 삭제"
 msgid "Buy me a coffee..."
 msgstr "커피 한 잔 주세요..."
 
+#: tformnotetask.aentersubmit.caption
+msgid "Enter submit"
+msgstr "Enter 제출"
+
 #: tformnotetask.aexit.caption
 msgid "Exit"
 msgstr "종료"

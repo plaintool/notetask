@@ -73,6 +73,7 @@ begin
     end;
     JSONObj.Add('WindowState', Ord(Form.WindowState));
     JSONObj.Add('WordWrap', Form.WordWrap);
+    JSONObj.Add('EnterSubmit', Form.EnterSubmit);
     JSONObj.Add('BidiRightToLeft', Form.BiDiRightToLeft);
     JSONObj.Add('Language', Language);
 
@@ -134,6 +135,9 @@ begin
 
       if JSONObj.FindPath('WordWrap') <> nil then
         Form.WordWrap := JSONObj.FindPath('WordWrap').AsBoolean;
+
+      if JSONObj.FindPath('EnterSubmit') <> nil then
+        Form.EnterSubmit := JSONObj.FindPath('EnterSubmit').AsBoolean;
 
       if JSONObj.FindPath('BidiRightToLeft') <> nil then
         Form.BiDiRightToLeft := JSONObj.FindPath('BidiRightToLeft').AsBoolean;

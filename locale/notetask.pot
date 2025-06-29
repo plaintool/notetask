@@ -339,6 +339,10 @@ msgstr ""
 msgid "Buy me a coffee..."
 msgstr ""
 
+#: tformnotetask.aentersubmit.caption
+msgid "Enter submit"
+msgstr ""
+
 #: tformnotetask.aexit.caption
 msgid "Exit"
 msgstr ""

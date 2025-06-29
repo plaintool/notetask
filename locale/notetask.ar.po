@@ -349,6 +349,10 @@ msgstr "حذف المهام"
 msgid "Buy me a coffee..."
 msgstr "اشتري لي قهوة..."
 
+#: tformnotetask.aentersubmit.caption
+msgid "Enter submit"
+msgstr "Enter إرسال"
+
 #: tformnotetask.aexit.caption
 msgid "Exit"
 msgstr "خروج"

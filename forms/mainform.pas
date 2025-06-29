@@ -44,6 +44,7 @@ type
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
+    aEnterSubmit: TAction;
     aUndoAll: TAction;
     aDelete: TAction;
     aDateTime: TAction;
@@ -88,6 +89,7 @@ type
     contextCopy: TMenuItem;
     contextPaste: TMenuItem;
     contextDelete: TMenuItem;
+    menuEnterSubmit: TMenuItem;
     MenuShowTime: TMenuItem;
     menuUndoAll: TMenuItem;
     menuPaste: TMenuItem;
@@ -147,7 +149,7 @@ type
     aLangGerman: TAction;
     menuGerman: TMenuItem;
     aBidiRightToLeft: TAction;
-    MenuItem6: TMenuItem;
+    menuBidiRightToLeft: TMenuItem;
     aChatGpt: TAction;
     menuChatGpt: TMenuItem;
     Separator11: TMenuItem;
@@ -237,6 +239,7 @@ type
     MenuItem9: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem15: TMenuItem;
+    procedure aEnterSubmitExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -349,6 +352,7 @@ type
     FBackup: boolean;
     FMemoStartEdit: boolean;
     FMemoOldText: TCaption;
+    FDatePickerOldDate: TDateTime;
     FIsEditing: boolean;
     FIsSelecting: boolean;
     FDisableCheckToggle: boolean;
@@ -358,6 +362,7 @@ type
     FLineEnding: TLineEnding;
     FLineCount: integer;
     FWordWrap: boolean;
+    FEnterSubmit: boolean;
     FSortOrder: TSortOrder;
     FSortColumn: integer;
     FMatchCase: boolean;
@@ -456,6 +461,7 @@ type
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
 
     property WordWrap: boolean read FWordWrap write FWordWrap;
+    property EnterSubmit: boolean read FEnterSubmit write FEnterSubmit;
     property BiDiRightToLeft: boolean read FBiDiRightToLeft write SetBiDiRightToLeft;
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property ShowDuration: boolean read FShowDuration write SetShowDuration;
@@ -536,6 +542,7 @@ begin
   // Initialize variables
   FBackup := True;
   FWordWrap := True;
+  FEnterSubmit := True;
   FShowTime := True;
   FShowStatusBar := True;
   FShowNote := False;
@@ -583,6 +590,7 @@ begin
   // After load settings
   aWordWrap.Checked := FWordWrap;
   memoNote.WordWrap := FWordWrap;
+  aEnterSubmit.Checked := FEnterSubmit;
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowArchived.Checked := FShowArchived;
   ShowNote := FShowNote;
@@ -833,7 +841,8 @@ begin
   begin
     if IsEditing then
     begin
-      if (Shift = [ssCtrl]) or (taskGrid.Col in [4, 5]) then // + Ctrl
+      if (taskGrid.Col in [4, 5]) or ((taskGrid.Col in [2, 3]) and ((FEnterSubmit and (Shift = [])) or
+        (not FEnterSubmit and ((Shift = [ssCtrl]) or (Shift = [ssShift]))))) then
       begin
         EditComplite(True);
         Key := 0;
@@ -2359,6 +2368,13 @@ begin
   Invalidate;
 end;
 
+procedure TformNotetask.aEnterSubmitExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  FEnterSubmit := aEnterSubmit.Checked;
+end;
+
 procedure TformNotetask.aBidiRightToLeftExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -2929,18 +2945,9 @@ begin
     Key := #0; // Block second decimal point
 end;
 
-procedure TformNotetask.DatePickerChange(Sender: TObject);
-begin
-  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime);
-  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
-  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
-  if (FShowDuration) then FillGrid;
-  SetChanged;
-  SetInfo;
-end;
-
 procedure TformNotetask.DatePickerEnter(Sender: TObject);
 begin
+  FDatePickerOldDate := DatePicker.DateTime;
   if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
   begin
     DatePicker.Color := clHighlight;
@@ -2951,6 +2958,16 @@ begin
     DatePicker.Color := clRowFocused;
     DatePicker.Font.Color := clBlack;
   end;
+end;
+
+procedure TformNotetask.DatePickerChange(Sender: TObject);
+begin
+  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime);
+  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
+  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
+  if (FShowDuration) then FillGrid;
+  SetChanged;
+  SetInfo;
 end;
 
 procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer;
@@ -3907,15 +3924,28 @@ procedure TformNotetask.EditComplite(aEnter: boolean = False; aEscape: boolean =
 begin
   if taskGrid.EditorMode then
   begin
-    if (aEnter) and (taskGrid.Col = 5) and (Assigned(DatePicker)) then
+    if (taskGrid.Col = 5) and (Assigned(DatePicker)) then
     begin
-      if taskGrid.Cells[taskGrid.Col, taskGrid.Row] = string.empty then
+      if (aEnter) then
+      begin
+        if taskGrid.Cells[taskGrid.Col, taskGrid.Row] = string.empty then
+          DatePickerChange(DatePicker);
+      end
+      else
+      // Pressing the Escape key on the date column cancels editing
+      if (aEscape) then
+      begin
+        DatePicker.DateTime := FDatePickerOldDate;
         DatePickerChange(DatePicker);
+      end;
     end;
 
-    // Pressing the Escape key on the amount column cancels editing
-    if (aEscape) and (taskGrid.Col = 4) then
-      Memo.Text := FMemoOldText;
+    if (taskGrid.Col = 4) and (Assigned(Memo)) then
+    begin
+      // Pressing the Escape key on the amount column cancels editing
+      if (aEscape) then
+        Memo.Text := FMemoOldText;
+    end;
 
     taskGrid.EditorMode := False;
     FIsEditing := False;
