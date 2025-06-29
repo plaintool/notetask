@@ -858,6 +858,8 @@ end;
 procedure TformNotetask.FormShow(Sender: TObject);
 begin
   SetCaption;
+
+  CalcRowHeights(0, True);
 end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -1453,7 +1455,7 @@ end;
 procedure TformNotetask.memoNoteChange(Sender: TObject);
 begin
   taskGrid.Cells[3, taskGrid.Row] := memoNote.Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
+  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
   CalcRowHeights(taskGrid.Row);
   SetChanged;
 end;
@@ -1984,7 +1986,7 @@ begin
       Memo.SelStart := PosStart;
       Memo.SelLength := Length(CurrentDateTime);
     end;
-    Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
+    Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
     SetChanged;
     SetInfo;
   end
@@ -2864,7 +2866,7 @@ end;
 procedure TformNotetask.MemoChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit and FBackup); // Backup only on begin edit
+  Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
   FMemoStartEdit := False;
   SetChanged;
   CalcRowHeights(taskGrid.Row);
@@ -2901,7 +2903,7 @@ end;
 procedure TformNotetask.DatePickerChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime);
-  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup);
+  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
   if (FShowDuration) then FillGrid;
   SetChanged;
@@ -3193,7 +3195,7 @@ begin
         else
           taskGrid.Cells[1, RowIndex] := '0';
 
-        Tasks.SetTask(taskGrid, RowIndex, False); // Backup created on start
+        Tasks.SetTask(taskGrid, RowIndex, False, FShowTime); // Backup created on start
       end;
     end;
     if ShowDuration then FillGrid;
@@ -3229,7 +3231,7 @@ begin
       else
         taskGrid.Cells[1, RowIndex] := '0';
 
-      Tasks.SetTask(taskGrid, RowIndex, False);
+      Tasks.SetTask(taskGrid, RowIndex, False, FShowTime);
       if (ShowDuration) and (Check) then FillGrid;
       SetChanged; // Mark that data has changed
       SetInfo;
@@ -3261,7 +3263,7 @@ begin
     else
       taskGrid.Cells[6, RowIndex] := '0';
 
-    Tasks.SetTask(taskGrid, RowIndex, False);
+    Tasks.SetTask(taskGrid, RowIndex, False, FShowTime);
     SetChanged; // Mark that data has changed
     Invalidate;
   end;
@@ -3291,7 +3293,7 @@ begin
       else
         taskGrid.Cells[2, RowIndex] := TrimLeadingSpaces(taskGrid.Cells[2, RowIndex]);
 
-      Tasks.SetTask(taskGrid, RowIndex, False); // Backup created on start
+      Tasks.SetTask(taskGrid, RowIndex, False, FShowTime); // Backup created on start
     end;
   end;
   SetChanged; // Mark that data has changed
@@ -3601,7 +3603,12 @@ begin
   taskGrid.RowHeights[0] := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
   if (aForce) then
   begin
+    {$IFDEF Windows}
     groupTabs.Height := taskGrid.RowHeights[0] + 2;
+    {$ENDIF}
+    {$IFDEF Linux}
+    groupTabs.Height := taskGrid.RowHeights[0] - 10;
+    {$ENDIF}
     CalcDefaultColWidth;
   end;
 end;
