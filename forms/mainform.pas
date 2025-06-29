@@ -492,7 +492,7 @@ const
   {$IFDEF Windows}
   DefRowHeight = 22;
   {$ENDIF}
-  {$IFDEF Linux}
+  {$IFDEF UNIX}
   DefRowHeight = 33;
   {$ENDIF}
 
@@ -1203,7 +1203,7 @@ begin
       //begin
       //  // Changing the row height fires the event again!
       //  grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2);
-      //  {$IFDEF Linux}
+      //  {$IFDEF UNIX}
       //  grid.Invalidate;
       //  {$ENDIF}
       //end
@@ -1558,7 +1558,7 @@ begin
     {$IFDEF Windows}
     FLineEnding := FLineEnding.WindowsCRLF;
     {$ENDIF}
-    {$IFDEF Linux}
+    {$IFDEF UNIX}
     FLineEnding := FLineEnding.UnixLF;
     {$ENDIF}
     {$IFDEF MacOS}
@@ -3604,10 +3604,10 @@ begin
   if (aForce) then
   begin
     {$IFDEF Windows}
-    groupTabs.Height := taskGrid.RowHeights[0] + 2;
+    groupTabs.Height := Canvas.TextHeight('A') + 7;
     {$ENDIF}
-    {$IFDEF Linux}
-    groupTabs.Height := taskGrid.RowHeights[0] - 10;
+    {$IFDEF UNIX}
+    groupTabs.Height := Canvas.TextHeight('A') + 10;
     {$ENDIF}
     CalcDefaultColWidth;
   end;
