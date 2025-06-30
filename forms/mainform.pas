@@ -851,7 +851,7 @@ begin
     end
     else
     begin
-      if (taskGrid.Col in [2, 3]) then
+      if (taskGrid.Col in [2, 3, 4]) then
         FMemoNeedSelectAll := False
       else
       if (taskGrid.Col = 1) then
