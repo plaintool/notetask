@@ -3940,9 +3940,9 @@ begin
       end;
     end;
 
-    if (taskGrid.Col = 4) and (Assigned(Memo)) then
+    if (taskGrid.Col in [2, 3, 4]) and (Assigned(Memo)) then
     begin
-      // Pressing the Escape key on the amount column cancels editing
+      // Pressing the Escape key cancels editing
       if (aEscape) then
         Memo.Text := FMemoOldText;
     end;
