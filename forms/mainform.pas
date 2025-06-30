@@ -495,11 +495,10 @@ var
   ResourceBitmapStarGray: TBitmap;
 
 const
-  {$IFDEF Windows}
-  DefRowHeight = 22;
-  {$ENDIF}
   {$IFDEF UNIX}
   DefRowHeight = 33;
+  {$ELSE}
+  DefRowHeight = 22;
   {$ENDIF}
 
 resourcestring
@@ -1208,16 +1207,6 @@ begin
 
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
 
-      //if (drawrect.bottom - drawrect.top) > grid.RowHeights[ARow] then
-      //begin
-      //  // Changing the row height fires the event again!
-      //  grid.RowHeights[ARow] := (drawrect.bottom - drawrect.top + 2);
-      //  {$IFDEF UNIX}
-      //  grid.Invalidate;
-      //  {$ENDIF}
-      //end
-      //else
-      //begin
       drawrect.Right := aRect.Right - 4;
       if FBiDiRightToLeft then
         flags := DT_RIGHT
@@ -1226,7 +1215,6 @@ begin
       if FWordWrap then
         flags := flags or DT_WORDBREAK;
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
-      //end;
     end;
   end;
 end;
@@ -1564,14 +1552,10 @@ begin
     FEncoding := TEncoding.UTF8;
 
     // Lineending
-    {$IFDEF Windows}
-    FLineEnding := FLineEnding.WindowsCRLF;
-    {$ENDIF}
     {$IFDEF UNIX}
     FLineEnding := FLineEnding.UnixLF;
-    {$ENDIF}
-    {$IFDEF MacOS}
-    FLineEnding := FLineEnding.MacintoshCR;
+    {$ELSE}
+    FLineEnding := FLineEnding.WindowsCRLF;
     {$ENDIF}
 
     taskGrid.Clean;
@@ -2726,10 +2710,10 @@ var
   TempFile, EncodedText, ConsoleEncoding: string;
 begin
   // Define the temporary file for commands
-  {$IFDEF Windows}
-  TempFile := GetTempDir + 'notetask.bat';  // Path for Windows
-  {$ELSE}
+  {$IFDEF UNIX}
   TempFile := GetTempDir + 'notetask.sh';   // Path for Linux
+  {$ELSE}
+  TempFile := GetTempDir + 'notetask.bat';  // Path for Windows
   {$ENDIF}
 
   // Open file for writing
@@ -2780,14 +2764,14 @@ begin
   // Create a new process to execute the script
   Process := TProcess.Create(nil);
   try
-    {$IFDEF Windows}
-    Process.Executable := 'cmd.exe';  // For Windows
-    Process.Parameters.Add('/K');
-    Process.Parameters.Add(TempFile);  // Execute the .bat file
-    {$ELSE}
+    {$IFDEF UNIX}
     Process.Executable := '/bin/bash';  // Use bash to execute the script
     Process.Parameters.Add('-e');
     Process.Parameters.Add(TempFile);
+    {$ELSE}
+    Process.Executable := 'cmd.exe';  // For Windows
+    Process.Parameters.Add('/K');
+    Process.Parameters.Add(TempFile);  // Execute the .bat file
     {$ENDIF}
     Process.Options := [poNewConsole]; // Open in a new console window
 
