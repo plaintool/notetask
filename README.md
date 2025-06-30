@@ -7,8 +7,8 @@ A simple application for creating and organizing task lists, offering essential 
 [![Languages: ar be zh en fr de hi it ja ko pt ru es uk](https://img.shields.io/badge/Lang-ar_be_zh_en_fr_de_hi_it_ja_ko_pt_ru_es_uk-green)](https://www.ethnologue.com)
 
 >- [Notetask](#notetask)
->   - [Description](#description)
->   - [Features:](#features)
+>   - [What is it?](#whatisit)
+>   - [Features](#features)
 >- [File Format](#file-format)
 >   - [Legend](#legend)
 >   - [Example](#example)
@@ -29,7 +29,7 @@ This handy desktop app helps you organize your tasks, capture ideas, and manage 
 
 It is designed to help you quickly organize a large number of small routine tasks. You can enter tasks directly in the app or paste raw text from the clipboard — such as a list of requirements or ideas — then sort them into groups, set durations or amounts, and start working right away. Perfect for managing project to-dos, bug lists, feature requests, and other ongoing tasks.
 
-### Features:
+## Features:
 - **Automatic numbering** of tasks
 - **Move tasks** — single or multiple, within or between groups; task priority is set simply by its position in the list
 - **Archive tasks** — cross out archived items, which can be hidden or shown as needed
@@ -63,6 +63,16 @@ Nearly all major features can be accessed through convenient keyboard shortcuts.
 View menu settings are saved individually based on filename.
  
  ![menu](samples/menu.png)
+
+### Summary
+
+The status bar provides a concise, real-time overview of the current task list. These values are dynamically calculated based on either the full list of the current group or the currently selected tasks. It displays:
+- **Text encoding** (e.g., UTF-8) and **line ending** style (e.g., CRLF)  
+- **Completed tasks / Total tasks**  
+- **Total amount spent / Total amount for all tasks** — useful for shopping lists or financial tracking  
+- **Elapsed time / Estimated total time** — helps monitor progress on timed tasks.
+
+![statusbar](samples/statusbar.png)
 
 ## File Format
 
