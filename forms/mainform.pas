@@ -352,6 +352,7 @@ type
     FBackup: boolean;
     FMemoStartEdit: boolean;
     FMemoOldText: TCaption;
+    FMemoNeedSelectAll: boolean;
     FDatePickerOldDate: TDateTime;
     FIsEditing: boolean;
     FIsSelecting: boolean;
@@ -545,6 +546,7 @@ begin
   FShowTime := True;
   FShowStatusBar := True;
   FShowNote := False;
+  FMemoNeedSelectAll := True;
   FShowColumnDone := True;
   FShowColumnTask := True;
   FShowColumnNote := True;
@@ -849,11 +851,14 @@ begin
     end
     else
     begin
-      if (taskGrid.Col = 6) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
-        StarTask
+      if (taskGrid.Col in [2, 3]) then
+        FMemoNeedSelectAll := False
       else
       if (taskGrid.Col = 1) then
-        CompleteTasks;
+        CompleteTasks
+      else
+      if (taskGrid.Col = 6) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
+        StarTask;
     end;
   end;
 end;
@@ -2877,8 +2882,9 @@ begin
   FMemoOldText := Memo.Text;
 
   // If amount column selected then clean when edit
-  if (taskGrid.Col = 4) then
+  if (FMemoNeedSelectAll) and (taskGrid.Col in [2, 3, 4]) then
     Memo.SelectAll;
+  FMemoNeedSelectAll := True;
 
   if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
   begin
