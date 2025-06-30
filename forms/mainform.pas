@@ -656,8 +656,8 @@ begin
       aRenameGroup.Execute
     else
     begin
-      EditComplite;
-      EditCell(taskGrid.Col, taskGrid.Row);
+      if (not FIsEditing) then
+        EditCell(taskGrid.Col, taskGrid.Row);
     end;
     Key := 0;
   end

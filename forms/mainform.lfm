@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -339,7 +338,6 @@ object formNotetask: TformNotetask
       object menuEnterSubmit: TMenuItem
         Action = aEnterSubmit
         AutoCheck = True
-        Checked = True
       end
       object menuBidiRightToLeft: TMenuItem
         Action = aBidiRightToLeft
@@ -883,6 +881,7 @@ object formNotetask: TformNotetask
       Category = 'Format'
       AutoCheck = True
       Caption = 'Enter submit'
+      Checked = True
       OnExecute = aEnterSubmitExecute
     end
   end
