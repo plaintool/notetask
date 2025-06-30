@@ -3640,10 +3640,10 @@ begin
   if (aForce) then
   begin
     {$IFDEF Windows}
-    groupTabs.Height := Canvas.TextHeight('A') + 7;
+    groupTabs.Height := Canvas.TextHeight('A') + 8;
     {$ENDIF}
     {$IFDEF UNIX}
-    groupTabs.Height := Canvas.TextHeight('A') + 10;
+    groupTabs.Height := Canvas.TextHeight('A') + 11;
     {$ENDIF}
     CalcDefaultColWidth;
   end;
