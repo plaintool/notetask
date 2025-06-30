@@ -2879,7 +2879,7 @@ end;
 procedure TformNotetask.MemoEnter(Sender: TObject);
 begin
   FMemoStartEdit := True;
-  FMemoOldText := Memo.Text;
+  FMemoOldText := taskGrid.Cells[TaskGrid.Col, TaskGrid.Row];
 
   // If amount column selected then clean when edit
   if (FMemoNeedSelectAll) and (taskGrid.Col in [2, 3, 4]) then
