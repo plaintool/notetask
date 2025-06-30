@@ -20,6 +20,8 @@ function GetEncodingName(Encoding: TEncoding): string;
 
 function IsBOMEncoding(Encoding: TEncoding): boolean;
 
+function IsValidUTF8(var Buffer: array of byte; BytesRead: integer): boolean;
+
 function IsValidAscii(var Buffer: array of byte; BytesRead: integer): boolean;
 
 function IsValidAnsi(var Buffer: array of byte; BytesRead: integer): boolean;
