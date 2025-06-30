@@ -80,6 +80,108 @@ begin
     exit(True);
 end;
 
+function IsValidUTF8(var Buffer: array of byte; BytesRead: integer): boolean;
+var
+  i: integer;
+  remaining: integer;
+  codePoint: longword;
+  minCode: longword;
+begin
+  Result := True;
+  remaining := 0;
+  codePoint := 0;
+  minCode := 0;
+
+  for i := 0 to BytesRead - 1 do
+  begin
+    if remaining = 0 then
+    begin
+      // Handling new character
+      if Buffer[i] <= $7F then
+      begin
+        // Valid ASCII character (0xxxxxxx)
+        continue;
+      end
+      else if (Buffer[i] >= $C0) and (Buffer[i] <= $DF) then
+      begin
+        // 2-byte sequence (110xxxxx)
+        remaining := 1;
+        codePoint := Buffer[i] and $1F; // Extract 5 bits
+        minCode := $80; // Min value for 2-byte seq
+      end
+      else if (Buffer[i] >= $E0) and (Buffer[i] <= $EF) then
+      begin
+        // 3-byte sequence (1110xxxx)
+        remaining := 2;
+        codePoint := Buffer[i] and $0F; // Extract 4 bits
+        minCode := $800; // Min value for 3-byte seq
+      end
+      else if (Buffer[i] >= $F0) and (Buffer[i] <= $F7) then
+      begin
+        // 4-byte sequence (11110xxx)
+        remaining := 3;
+        codePoint := Buffer[i] and $07; // Extract 3 bits
+        minCode := $10000; // Min value for 4-byte seq
+      end
+      else
+      begin
+        // Invalid starting byte
+        Result := False;
+        Exit;
+      end;
+    end
+    else
+    begin
+      // Handling continuation byte (must be 10xxxxxx)
+      if (Buffer[i] < $80) or (Buffer[i] > $BF) then
+      begin
+        Result := False;
+        Exit;
+      end;
+
+      // Add 6 bits to code point
+      codePoint := (codePoint shl 6) or (Buffer[i] and $3F);
+      Dec(remaining);
+
+      // If sequence complete, validate code point
+      if remaining = 0 then
+      begin
+        // Check minimal encoding length
+        if codePoint < minCode then
+        begin
+          Result := False;
+          Exit;
+        end;
+
+        // Special checks for 3-byte sequences
+        if minCode = $800 then
+        begin
+          // Forbidden surrogate pairs (U+D800..U+DFFF)
+          if (codePoint >= $D800) and (codePoint <= $DFFF) then
+          begin
+            Result := False;
+            Exit;
+          end;
+        end
+        // Special checks for 4-byte sequences
+        else if minCode = $10000 then
+        begin
+          // Maximum Unicode value (U+10FFFF)
+          if codePoint > $10FFFF then
+          begin
+            Result := False;
+            Exit;
+          end;
+        end;
+      end;
+    end;
+  end;
+
+  // Check for incomplete sequence at end
+  if remaining > 0 then
+    Result := False;
+end;
+
 function IsValidAscii(var Buffer: array of byte; BytesRead: integer): boolean;
 var
   i: integer;
@@ -157,12 +259,15 @@ begin
     BytesRead := FileStream.Read(ContentBuffer[0], Length(ContentBuffer));
 
     // Check if the file content could be ANSI
-    if IsValidAnsi(ContentBuffer, BytesRead) then
+
+    if IsValidUtf8(ContentBuffer, BytesRead) then
+      Result := TEncoding.UTF8
+    else if IsValidAnsi(ContentBuffer, BytesRead) then
       Result := TEncoding.ANSI
     else if IsValidAscii(ContentBuffer, BytesRead) then
       Result := TEncoding.ASCII
     else
-      Result := TEncoding.UTF8; // If neither ANSI nor ASCII, assume UTF-8
+      Result := TEncoding.UTF8; // If not detected, assume UTF-8
   finally
     FileStream.Free;
   end;
