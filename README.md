@@ -115,17 +115,17 @@ The status bar provides a concise, real-time overview of the current task list. 
 
 ## Installation
 
-[![latest version](https://img.shields.io/github/v/release/astverskoy/Notetask?color=blue&label=Latest%20release&style=for-the-badge)](https://github.com/astverskoy/Notetask/releases/latest)
+[![latest version](https://img.shields.io/github/v/release/nextwordis/Notetask?color=blue&label=Latest%20release&style=for-the-badge)](https://github.com/nextwordis/Notetask/releases/latest)
 
 ### Windows
 
-Download the installer executable from the [releases page](https://github.com/astverskoy/Notetask/releases). Run the installer and follow the on-screen instructions to complete the installation. After installation, you can launch Notetask from the Start menu or desktop shortcut.
+Download the installer executable from the [releases page](https://github.com/nextwordis/Notetask/releases). Run the installer and follow the on-screen instructions to complete the installation. After installation, you can launch Notetask from the Start menu or desktop shortcut.
 
 ---
 
 ### Linux
 
-Download the appropriate `.deb` package for your system from the [releases page](https://github.com/astverskoy/Notetask/releases). To install the package, open a terminal and run:
+Download the appropriate `.deb` package for your system from the [releases page](https://github.com/nextwordis/Notetask/releases). To install the package, open a terminal and run:
 
 ```bash
 sudo dpkg -i /path/to/notetask.deb
