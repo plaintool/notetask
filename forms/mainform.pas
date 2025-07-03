@@ -2711,8 +2711,10 @@ end;
 procedure TformNotetask.ExecuteTerminal;
 var
   Process: TProcess;
-  i: integer;
-  TempFile, EncodedText, ConsoleEncoding: string;
+  i, k, maxPreview: integer;
+  TempFile, Value, EncodedValue, ConsoleEncoding: string;
+  ScriptPreview: TStringList;
+  Overflow: boolean;
 begin
   // Define the temporary file for commands
   {$IFDEF UNIX}
@@ -2727,6 +2729,9 @@ begin
   try
     // Get the current console encoding
     ConsoleEncoding := GetConsoleEncoding;
+    ScriptPreview := TStringList.Create;
+    Overflow := False;
+    maxPreview := 30;
 
     {$IFDEF UNIX}
     if FileExists(TempFile) then
@@ -2738,8 +2743,34 @@ begin
     // Write commands to the file with the correct encoding
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
-      EncodedText := ConvertEncoding(GetExecuteValue(i, True), 'utf-8', ConsoleEncoding);
-      WriteLn(Output, EncodedText);
+      Value := GetExecuteValue(i, True);
+      EncodedValue := ConvertEncoding(Value, 'utf-8', ConsoleEncoding);
+      WriteLn(Output, EncodedValue);
+
+      if ScriptPreview.Count < maxPreview then
+      begin
+        with TStringList.Create do
+        try
+          Text := Value;
+          for k := 0 to Min(maxPreview, Count - 1) do
+            if ScriptPreview.Count < maxPreview then
+              ScriptPreview.Add(Strings[k])
+            else
+            if (not Overflow) then
+            begin
+              ScriptPreview.Add('...');
+              Overflow := True;
+            end;
+        finally
+          Free;
+        end;
+      end
+      else
+      if (not Overflow) then
+      begin
+        ScriptPreview.Add('...');
+        Overflow := True;
+      end;
     end;
 
     {$IFDEF UNIX}
@@ -2751,6 +2782,10 @@ begin
   finally
     CloseFile(Output);
   end;
+
+  // Message to confirm
+  if (MessageDlg(ReplaceStr(aRunTerminal.Caption, '...', '?') + sLineBreak + sLineBreak + ScriptPreview.Text,
+    mtConfirmation, [mbYes, mbNo], 0, mbNo) <> mrYes) then exit;
 
   {$IFDEF UNIX}
   // Make the .sh file executable in Linux
