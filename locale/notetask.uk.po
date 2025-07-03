@@ -517,6 +517,10 @@ msgstr "Перейменувати групу"
 msgid "Replace..."
 msgstr "Замінити..."
 
+#: tformnotetask.arunpowershell.caption
+msgid "Run in PowerShell..."
+msgstr "Виконати в PowerShell..."
+
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
 msgstr "Виконати в терміналі..."

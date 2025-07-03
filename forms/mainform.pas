@@ -44,6 +44,7 @@ type
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
+    aRunPowershell: TAction;
     aEnterSubmit: TAction;
     aUndoAll: TAction;
     aDelete: TAction;
@@ -90,6 +91,7 @@ type
     contextPaste: TMenuItem;
     contextDelete: TMenuItem;
     menuEnterSubmit: TMenuItem;
+    menuRunPowershell: TMenuItem;
     MenuShowTime: TMenuItem;
     menuUndoAll: TMenuItem;
     menuPaste: TMenuItem;
@@ -240,6 +242,7 @@ type
     MenuItem10: TMenuItem;
     MenuItem15: TMenuItem;
     procedure aEnterSubmitExecute(Sender: TObject);
+    procedure aRunPowershellExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -427,7 +430,7 @@ type
     procedure GridClearSelection;
     function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
-    procedure ExecuteTerminal;
+    procedure ExecuteTerminal(usePowershell: boolean = True);
     procedure MoveTabLeft(Index: integer);
     procedure MoveTabRight(Index: integer);
     procedure ChangeGroup(Index: integer);
@@ -604,6 +607,12 @@ begin
 
   // Set language
   SetLanguage(Language);
+
+  // Menu access
+  {$IFDEF UNIX}
+  aRunPowershell.Visible := False;
+  aRunPowershell.Enabled := False;
+  {$ENDIF}
 
   // Check if a command line argument is passed
   FileOpened := False;
@@ -2385,6 +2394,13 @@ procedure TformNotetask.aRunTerminalExecute(Sender: TObject);
 begin
   if taskGrid.RowCount < 2 then exit;
 
+  ExecuteTerminal(False);
+end;
+
+procedure TformNotetask.aRunPowershellExecute(Sender: TObject);
+begin
+  if taskGrid.RowCount < 2 then exit;
+
   ExecuteTerminal;
 end;
 
@@ -2708,7 +2724,7 @@ begin
   OpenURL(rchatgpt + EncodeUrl(GetExecuteValue(taskGrid.Row)));
 end;
 
-procedure TformNotetask.ExecuteTerminal;
+procedure TformNotetask.ExecuteTerminal(usePowershell: boolean = True);
 var
   Process: TProcess;
   i, k, maxPreview: integer;
@@ -2720,7 +2736,10 @@ begin
   {$IFDEF UNIX}
   TempFile := GetTempDir + 'notetask.sh';   // Path for Linux
   {$ELSE}
-  TempFile := GetTempDir + 'notetask.bat';  // Path for Windows
+  if usePowershell then
+    TempFile := GetTempDir + 'notetask.ps1' // PowerShell script
+  else
+    TempFile := GetTempDir + 'notetask.bat'; // CMD script
   {$ENDIF}
 
   // Open file for writing
@@ -2744,7 +2763,10 @@ begin
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
       Value := GetExecuteValue(i, True);
-      EncodedValue := ConvertEncoding(Value, 'utf-8', ConsoleEncoding);
+      if (usePowershell) then
+        EncodedValue := Value
+      else
+        EncodedValue := ConvertEncoding(Value, 'utf-8', ConsoleEncoding);
       WriteLn(Output, EncodedValue);
 
       if ScriptPreview.Count < maxPreview then
@@ -2784,8 +2806,12 @@ begin
   end;
 
   // Message to confirm
-  if (MessageDlg(ReplaceStr(aRunTerminal.Caption, '...', '?') + sLineBreak + sLineBreak + ScriptPreview.Text,
-    mtConfirmation, [mbYes, mbNo], 0, mbNo) <> mrYes) then exit;
+  if usePowershell then
+    Value := aRunPowershell.Caption
+  else
+    Value := aRunTerminal.Caption;
+  if (MessageDlg(ReplaceStr(Value, '...', '?') + sLineBreak + sLineBreak + ScriptPreview.Text, mtConfirmation,
+    [mbYes, mbNo], 0, mbNo) <> mrYes) then exit;
 
   {$IFDEF UNIX}
   // Make the .sh file executable in Linux
@@ -2809,9 +2835,21 @@ begin
     Process.Parameters.Add('-e');
     Process.Parameters.Add(TempFile);
     {$ELSE}
-    Process.Executable := 'cmd.exe';  // For Windows
-    Process.Parameters.Add('/K');
-    Process.Parameters.Add(TempFile);  // Execute the .bat file
+    if usePowershell then
+    begin
+      Process.Executable := 'powershell.exe';
+      Process.Parameters.Add('-NoExit');
+      Process.Parameters.Add('-ExecutionPolicy');
+      Process.Parameters.Add('Bypass');
+      Process.Parameters.Add('-File');
+      Process.Parameters.Add(TempFile);
+    end
+    else
+    begin
+      Process.Executable := 'cmd.exe';
+      Process.Parameters.Add('/K');
+      Process.Parameters.Add(TempFile);
+    end;
     {$ENDIF}
     Process.Options := [poNewConsole]; // Open in a new console window
 

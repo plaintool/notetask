@@ -517,9 +517,13 @@ msgstr "إعادة تسمية المجموعة"
 msgid "Replace..."
 msgstr "استبدال..."
 
+#: tformnotetask.arunpowershell.caption
+msgid "Run in PowerShell..."
+msgstr "التشغيل في PowerShell..."
+
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
-msgstr "تشغيل في الطرفية..."
+msgstr "التشغيل في الطرفية..."
 
 #: tformnotetask.asave.caption
 msgid "Save"

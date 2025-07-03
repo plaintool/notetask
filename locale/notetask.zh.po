@@ -517,6 +517,10 @@ msgstr "重命名组"
 msgid "Replace..."
 msgstr "替换..."
 
+#: tformnotetask.arunpowershell.caption
+msgid "Run in PowerShell..."
+msgstr "在 PowerShell 中运行..."
+
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
 msgstr "在终端中运行..."

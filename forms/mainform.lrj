@@ -86,6 +86,7 @@
 {"hash":72141669,"name":"tformnotetask.ashowcolumndate.caption","sourcebytes":[67,111,108,117,109,110,32,100,97,116,101],"value":"Column date"},
 {"hash":85122069,"name":"tformnotetask.ashowcolumnfavorite.caption","sourcebytes":[67,111,108,117,109,110,32,102,111,118,111,114,105,116,101],"value":"Column fovorite"},
 {"hash":57557060,"name":"tformnotetask.aentersubmit.caption","sourcebytes":[69,110,116,101,114,32,115,117,98,109,105,116],"value":"Enter submit"},
+{"hash":99103582,"name":"tformnotetask.arunpowershell.caption","sourcebytes":[82,117,110,32,105,110,32,80,111,119,101,114,83,104,101,108,108,46,46,46],"value":"Run in PowerShell..."},
 {"hash":107761687,"name":"tformnotetask.opendialog.title","sourcebytes":[79,112,101,110,105,110,103],"value":"Opening"},
 {"hash":93900871,"name":"tformnotetask.savedialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
 {"hash":131550916,"name":"tformnotetask.fontdialog.title","sourcebytes":[70,111,110,116,32,115,101,108,101,99,116],"value":"Font select"}

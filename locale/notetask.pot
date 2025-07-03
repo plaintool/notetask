@@ -507,6 +507,10 @@ msgstr ""
 msgid "Replace..."
 msgstr ""
 
+#: tformnotetask.arunpowershell.caption
+msgid "Run in PowerShell..."
+msgstr ""
+
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
 msgstr ""

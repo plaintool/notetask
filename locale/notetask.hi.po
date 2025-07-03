@@ -517,6 +517,10 @@ msgstr "समूह का नाम बदलें"
 msgid "Replace..."
 msgstr "बदलें..."
 
+#: tformnotetask.arunpowershell.caption
+msgid "Run in PowerShell..."
+msgstr "PowerShell में चलाएं..."
+
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
 msgstr "टर्मिनल में चलाएं..."

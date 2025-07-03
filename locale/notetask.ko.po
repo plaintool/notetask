@@ -517,6 +517,10 @@ msgstr "그룹 이름 변경"
 msgid "Replace..."
 msgstr "바꾸기..."
 
+#: tformnotetask.arunpowershell.caption
+msgid "Run in PowerShell..."
+msgstr "PowerShell에서 실행..."
+
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
 msgstr "터미널에서 실행..."

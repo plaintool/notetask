@@ -10,6 +10,7 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
+  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -297,6 +298,9 @@ object formNotetask: TformNotetask
       end
       object menuRunTerminal: TMenuItem
         Action = aRunTerminal
+      end
+      object menuRunPowershell: TMenuItem
+        Action = aRunPowershell
       end
     end
     object menuGroup: TMenuItem
@@ -883,6 +887,12 @@ object formNotetask: TformNotetask
       Caption = 'Enter submit'
       Checked = True
       OnExecute = aEnterSubmitExecute
+    end
+    object aRunPowershell: TAction
+      Category = 'Task'
+      Caption = 'Run in PowerShell...'
+      ShortCut = 16453
+      OnExecute = aRunPowershellExecute
     end
   end
   object openDialog: TOpenDialog
