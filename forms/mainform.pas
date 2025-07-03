@@ -2741,7 +2741,8 @@ procedure TformNotetask.ExecuteTerminal(usePowershell: boolean = True);
 var
   Process: TProcess;
   Script, ScriptPreview: TStringList;
-  TempFile, Value, EncodedValue, ConsoleEncoding: string;
+  TempFile, PwshPath: string;
+  Value, EncodedValue, ConsoleEncoding: string;
   ScriptEncoding: TEncoding;
   Overflow: boolean;
   maxPreview: integer;
@@ -2860,7 +2861,11 @@ begin
     {$ELSE}
     if usePowershell then
     begin
-      Process.Executable := 'powershell.exe';
+      PwshPath := FindPowerShellCore; // Search for pwsh.exe
+      if PwshPath <> '' then
+        Process.Executable := PwshPath
+      else
+        Process.Executable := 'powershell.exe';
       Process.Parameters.Add('-NoExit');
       Process.Parameters.Add('-ExecutionPolicy');
       Process.Parameters.Add('Bypass');

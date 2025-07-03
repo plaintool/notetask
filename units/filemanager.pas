@@ -14,6 +14,7 @@ interface
 uses
   Classes,
   SysUtils,
+  StrUtils,
   lineending;
 
 function GetEncodingName(Encoding: TEncoding): string;
@@ -34,6 +35,8 @@ procedure ReadTextFile(const FileName: string; out Content: string; out FileEnco
   out LineEnding: TLineEnding; out LineCount: integer);
 
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
+
+function FindPowerShellCore: string;
 
 implementation
 
@@ -408,6 +411,41 @@ begin
   finally
     // Free resources
     FileStream.Free;
+  end;
+end;
+
+function FindPowerShellCore: string;
+var
+  SearchPaths: array of string;
+  PathEnv, PathPart, TrimmedPath: string;
+  I: integer;
+  Paths: array of string;
+begin
+  Result := string.Empty;
+
+  // Common install locations for PowerShell 7 and 6
+  SearchPaths := ['C:\Program Files\PowerShell\6\pwsh.exe', 'C:\Program Files\PowerShell\7\pwsh.exe',
+    'C:\Program Files\PowerShell\8\pwsh.exe', 'C:\Program Files\PowerShell\9\pwsh.exe',
+    'C:\Program Files\PowerShell\10\pwsh.exe'];
+
+  // Check known fixed locations first
+  for I := Low(SearchPaths) to High(SearchPaths) do
+    if FileExists(SearchPaths[I]) then
+      Exit(SearchPaths[I]);
+
+  // Check all folders in PATH environment variable
+  PathEnv := GetEnvironmentVariable('PATH');
+  Paths := SplitString(PathEnv, ';');
+
+  for I := 0 to Length(Paths) - 1 do
+  begin
+    TrimmedPath := Trim(Paths[I]);
+    if TrimmedPath <> '' then
+    begin
+      PathPart := IncludeTrailingPathDelimiter(TrimmedPath) + 'pwsh.exe';
+      if FileExists(PathPart) then
+        Exit(PathPart);
+    end;
   end;
 end;
 
