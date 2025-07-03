@@ -2747,8 +2747,8 @@ begin
   {$ENDIF}
 
   Script := TStringList.Create;
+  ScriptPreview := TStringList.Create;
   try
-    ScriptPreview := TStringList.Create;
     Overflow := False;
     maxPreview := 30;
 
@@ -2759,37 +2759,35 @@ begin
     Script.Add('#!/bin/bash');
     {$ENDIF}
 
-    // Write commands to the file with the correct encoding
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
       Value := GetExecuteValue(i, True);
-      if (usePowershell) then
+      if usePowershell then
         EncodedValue := Value
       else
         EncodedValue := ConvertEncoding(Value, 'utf-8', ConsoleEncoding);
       Script.Add(EncodedValue);
 
-      // Add script preview maxPreview lines
       if ScriptPreview.Count < maxPreview then
       begin
         with TStringList.Create do
         try
           Text := Value;
           for k := 0 to Min(maxPreview, Count - 1) do
+          begin
             if ScriptPreview.Count < maxPreview then
               ScriptPreview.Add(Strings[k])
-            else
-            if (not Overflow) then
+            else if not Overflow then
             begin
               ScriptPreview.Add('...');
               Overflow := True;
             end;
+          end;
         finally
           Free;
         end;
       end
-      else
-      if (not Overflow) then
+      else if not Overflow then
       begin
         ScriptPreview.Add('...');
         Overflow := True;
@@ -2800,25 +2798,27 @@ begin
     Script.Add('read -p "Press any key to continue..."');
     {$ENDIF}
 
-    if (Script.Count = 0) or ((Script.Count = 1) and (Trim(Script[0]) = string.Empty)) then
-      exit;
-  finally
-    if not ((Script.Count = 0) or ((Script.Count = 1) and (Trim(Script[0]) = string.Empty))) then
-    begin
-      if usePowershell then
-        SaveTextFile(TempFile, Script, TEncoding.GetEncoding(65001), TLineEnding.WindowsCRLF)
-      else
-        Script.SaveToFile(TempFile); // default (ANSI)
-    end;
-  end;
+    if (Script.Count = 0) or ((Script.Count = 1) and (Trim(Script[0]) = '')) then
+      Exit;
 
-  // Message to confirm
-  if usePowershell then
-    Value := aRunPowershell.Caption
-  else
-    Value := aRunTerminal.Caption;
-  if (MessageDlg(ReplaceStr(Value, '...', '?') + sLineBreak + sLineBreak + ScriptPreview.Text, mtConfirmation,
-    [mbYes, mbNo], 0, mbNo) <> mrYes) then exit;
+    if usePowershell then
+      SaveTextFile(TempFile, Script, TEncoding.GetEncoding(65001), TLineEnding.WindowsCRLF)
+    else
+    begin
+      Script.SaveToFile(TempFile); // default ANSI
+      Script.Free;
+    end;
+
+    // Message to confirm
+    if usePowershell then
+      Value := aRunPowershell.Caption
+    else
+      Value := aRunTerminal.Caption;
+    if (MessageDlg(ReplaceStr(Value, '...', '?') + sLineBreak + sLineBreak + ScriptPreview.Text, mtConfirmation,
+      [mbYes, mbNo], 0, mbNo) <> mrYes) then exit;
+  finally
+    ScriptPreview.Free;
+  end;
 
   {$IFDEF UNIX}
   // Make the .sh file executable in Linux
