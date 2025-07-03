@@ -2727,10 +2727,11 @@ end;
 procedure TformNotetask.ExecuteTerminal(usePowershell: boolean = True);
 var
   Process: TProcess;
-  i, k, maxPreview: integer;
+  Script, ScriptPreview: TStringList;
   TempFile, Value, EncodedValue, ConsoleEncoding: string;
-  ScriptPreview: TStringList;
   Overflow: boolean;
+  maxPreview: integer;
+  i, k: integer;
 begin
   // Define the temporary file for commands
   {$IFDEF UNIX}
@@ -2742,21 +2743,17 @@ begin
     TempFile := GetTempDir + 'notetask.bat'; // CMD script
   {$ENDIF}
 
-  // Open file for writing
-  AssignFile(Output, TempFile);
-  Rewrite(Output);
   try
-    // Get the current console encoding
-    ConsoleEncoding := GetConsoleEncoding;
+    Script := TStringList.Create;
     ScriptPreview := TStringList.Create;
     Overflow := False;
     maxPreview := 30;
 
+    // Get the current console encoding
+    ConsoleEncoding := GetConsoleEncoding;
+
     {$IFDEF UNIX}
-    if FileExists(TempFile) then
-    begin
-      WriteLn(Output, '#!/bin/bash');
-    end;
+    Script.Add('#!/bin/bash');
     {$ENDIF}
 
     // Write commands to the file with the correct encoding
@@ -2767,8 +2764,9 @@ begin
         EncodedValue := Value
       else
         EncodedValue := ConvertEncoding(Value, 'utf-8', ConsoleEncoding);
-      WriteLn(Output, EncodedValue);
+      Script.Add(EncodedValue);
 
+      // Add script preview maxPreview lines
       if ScriptPreview.Count < maxPreview then
       begin
         with TStringList.Create do
@@ -2796,13 +2794,13 @@ begin
     end;
 
     {$IFDEF UNIX}
-    if FileExists(TempFile) then
-    begin
-      WriteLn(Output, 'read -p "Press any key to continue..."');
-    end;
+    Script.Add('read -p "Press any key to continue..."');
     {$ENDIF}
   finally
-    CloseFile(Output);
+    if usePowershell then
+      SaveTextFile(TempFile, Script, TEncoding.GetEncoding(65001), TLineEnding.WindowsCRLF)
+    else
+      Script.SaveToFile(TempFile); // default (ANSI)
   end;
 
   // Message to confirm
