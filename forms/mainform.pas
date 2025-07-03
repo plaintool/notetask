@@ -2707,7 +2707,10 @@ begin
       if (Memo.Visible) and (Memo.SelLength > 0) then
         Result := Memo.SelText
       else
-        Result := Tasks.GetTask(aRow).Note;
+      if (not string.IsNullOrEmpty(Tasks.GetTask(aRow).Note)) then
+        Result := Tasks.GetTask(aRow).Note
+      else
+        Result := Tasks.GetTask(aRow).Text;
     end;
   end
   else
@@ -2743,8 +2746,8 @@ begin
     TempFile := GetTempDir + 'notetask.bat'; // CMD script
   {$ENDIF}
 
+  Script := TStringList.Create;
   try
-    Script := TStringList.Create;
     ScriptPreview := TStringList.Create;
     Overflow := False;
     maxPreview := 30;
@@ -2796,11 +2799,17 @@ begin
     {$IFDEF UNIX}
     Script.Add('read -p "Press any key to continue..."');
     {$ENDIF}
+
+    if (Script.Count = 0) or ((Script.Count = 1) and (Trim(Script[0]) = string.Empty)) then
+      exit;
   finally
-    if usePowershell then
-      SaveTextFile(TempFile, Script, TEncoding.GetEncoding(65001), TLineEnding.WindowsCRLF)
-    else
-      Script.SaveToFile(TempFile); // default (ANSI)
+    if not ((Script.Count = 0) or ((Script.Count = 1) and (Trim(Script[0]) = string.Empty))) then
+    begin
+      if usePowershell then
+        SaveTextFile(TempFile, Script, TEncoding.GetEncoding(65001), TLineEnding.WindowsCRLF)
+      else
+        Script.SaveToFile(TempFile); // default (ANSI)
+    end;
   end;
 
   // Message to confirm
