@@ -17,7 +17,7 @@
         <TextDesc Value=""/>
       </XPManifest>
       <Icon Value="0"/>
-      <Resources Count="19">
+      <Resources Count="20">
         <Resource_0 FileName="img\check.bmp" Type="BITMAP" ResourceName="CHECK"/>
         <Resource_1 FileName="img\uncheck.bmp" Type="BITMAP" ResourceName="UNCHECK"/>
         <Resource_2 FileName="img\taskdoc.ico" Type="ICON" ResourceName="TASKDOC"/>
@@ -37,6 +37,7 @@
         <Resource_16 FileName="locale\notetask.uk.po" Type="RCDATA" ResourceName="NOTETASK.UK"/>
         <Resource_17 FileName="img\stargray.bmp" Type="BITMAP" ResourceName="STARGRAY"/>
         <Resource_18 FileName="img\stargold.bmp" Type="BITMAP" ResourceName="STARGOLD"/>
+        <Resource_19 FileName="img\leftarrow.cur" Type="RCDATA" ResourceName="LEFTARROW"/>
       </Resources>
     </General>
     <i18n>

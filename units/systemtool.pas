@@ -15,11 +15,14 @@ uses
   Forms,
   Classes,
   SysUtils,
+  Controls,
+  Graphics,
   gettext,
   DefaultTranslator,
   Translations,
   LResources,
   LCLTranslator
+
   {$IFDEF Windows}
   ,Windows
   ,Registry
@@ -33,10 +36,17 @@ uses
   ;
 
 function GetOSLanguage: string;
+
 function ApplicationTranslate(const Language: string; AForm: TCustomForm = nil): boolean;
+
 {$IFDEF Windows}
+
 function IsWindowsDarkThemeEnabled: Boolean;
+
 {$ENDIF}
+
+function SetCursorTo(Control: TControl; const ResName: string; CursorIndex: integer = 1001): boolean;
+
 function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;
 
 var
@@ -173,6 +183,7 @@ begin
 end;
 
 {$IFDEF Windows}
+
 function IsWindowsDarkThemeEnabled: Boolean;
 var
   Key: HKEY;
@@ -191,7 +202,35 @@ begin
     RegCloseKey(Key);
   end;
 end;
+
 {$ENDIF}
+
+function SetCursorTo(Control: TControl; const ResName: string; CursorIndex: integer = 1001): boolean;
+var
+  ResStream: TResourceStream;
+  Curs: TCursorImage;
+begin
+  Result := False;
+  if not Assigned(Control) then Exit;
+
+  ResStream := nil;
+  Curs := TCursorImage.Create;
+  try
+    try
+      ResStream := TResourceStream.Create(HInstance, ResName, RT_RCDATA);
+      ResStream.Position := 0;
+      Curs.LoadFromStream(ResStream);
+      Screen.Cursors[CursorIndex] := Curs.ReleaseHandle;
+      Control.Cursor := CursorIndex;
+      Result := True;
+    except
+      Result := False;
+    end;
+  finally
+    ResStream.Free;
+    Curs.Free;
+  end;
+end;
 
 function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;
 var

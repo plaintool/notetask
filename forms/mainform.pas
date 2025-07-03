@@ -567,6 +567,8 @@ begin
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
+  //SetCursorTo(memoNote, 'LEFTARROW');
+
   Application.OnException := @ApplicationException;
   Application.OnQueryEndSession := @OnQueryEndSession;
 
