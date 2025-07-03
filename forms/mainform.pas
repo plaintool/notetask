@@ -2671,6 +2671,8 @@ begin
 end;
 
 function TformNotetask.SaveFile(fileName: string = string.Empty): boolean;
+var
+  TaskList: TStringList;
 begin
   if (fileName = string.Empty) and (FFileName = string.Empty) then
     Result := SaveFileAs;
@@ -2682,11 +2684,19 @@ begin
 
   if (fileName <> string.Empty) then
   begin
-    EditComplite;
-    SaveTextFile(fileName, Tasks.ToStringList, FEncoding, FLineEnding);
-    SetChanged(False);
-    Tasks.CreateBackupInit;
-    Result := True;
+    TaskList := Tasks.ToStringList;
+    if Assigned(TaskList) and (TaskList <> nil) then
+    begin
+      try
+        EditComplite;
+        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding);
+        SetChanged(False);
+        Tasks.CreateBackupInit;
+        Result := True;
+      finally
+        TaskList.Free;
+      end;
+    end;
   end
   else
     Result := False;
@@ -2732,6 +2742,7 @@ var
   Process: TProcess;
   Script, ScriptPreview: TStringList;
   TempFile, Value, EncodedValue, ConsoleEncoding: string;
+  ScriptEncoding: TEncoding;
   Overflow: boolean;
   maxPreview: integer;
   i, k: integer;
@@ -2802,12 +2813,16 @@ begin
       Exit;
 
     if usePowershell then
-      SaveTextFile(TempFile, Script, TEncoding.GetEncoding(65001), TLineEnding.WindowsCRLF)
-    else
     begin
+      ScriptEncoding := TEncoding.GetEncoding(65001); // UTF-8 BOM
+      try
+        SaveTextFile(TempFile, Script, ScriptEncoding, TLineEnding.WindowsCRLF);
+      finally
+        ScriptEncoding.Free;
+      end;
+    end
+    else
       Script.SaveToFile(TempFile); // default ANSI
-      Script.Free;
-    end;
 
     // Message to confirm
     if usePowershell then
@@ -2818,6 +2833,7 @@ begin
       [mbYes, mbNo], 0, mbNo) <> mrYes) then exit;
   finally
     ScriptPreview.Free;
+    Script.Free;
   end;
 
   {$IFDEF UNIX}

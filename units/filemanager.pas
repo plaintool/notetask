@@ -408,7 +408,6 @@ begin
   finally
     // Free resources
     FileStream.Free;
-    StringList.Free;
   end;
 end;
 
