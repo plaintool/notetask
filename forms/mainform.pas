@@ -79,6 +79,7 @@ type
     ActionList: TActionList;
     fontDialog: TFontDialog;
     MainMenu: TMainMenu;
+    memoNote: TMemo;
     menuFile: TMenuItem;
     menuFormat: TMenuItem;
     menuFont: TMenuItem;
@@ -127,6 +128,7 @@ type
     menuNew: TMenuItem;
     openDialog: TOpenDialog;
     pageSetupDialog: TPageSetupDialog;
+    panelNote: TPanel;
     Popup: TPopupMenu;
     printDialog: TPrintDialog;
     saveDialog: TSaveDialog;
@@ -211,7 +213,6 @@ type
     aMergeTasks: TAction;
     MenuItem1: TMenuItem;
     contextMergeTasks: TMenuItem;
-    memoNote: TMemo;
     Splitter: TSplitter;
     aShowNote: TAction;
     MenuItem2: TMenuItem;
@@ -251,6 +252,10 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure ApplicationException(Sender: TObject; E: Exception);
     procedure OnQueryEndSession(var CanEnd: boolean);
+    procedure panelNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure panelNoteMouseLeave(Sender: TObject);
+    procedure panelNoteMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+    procedure panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
     procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
@@ -383,16 +388,21 @@ type
     FLastRow: integer;
     FLastRowMem: array of integer;
     FDragTab: integer;
+    FNoteSelecting: boolean;
+    FNoteLastIndex, FNoteSelStart, FNoteSelLength: integer;
+    procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
+      OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
+    procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
+    procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
+    function GetLineAtEnd: integer;
+    function GetLineAtPos(Y: integer): integer;
+    procedure SelectMemoLine(LineIndex: integer; Move: boolean = False);
     procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
     procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure MemoKeyPress(Sender: TObject; var Key: char);
     procedure DatePickerChange(Sender: TObject);
     procedure DatePickerEnter(Sender: TObject);
-    procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
-      OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
-    procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
-    procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol, aRow: integer);
     procedure EditComplite(aEnter: boolean = False; aEscape: boolean = False);
@@ -567,7 +577,7 @@ begin
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
-  //SetCursorTo(memoNote, 'LEFTARROW');
+  SetCursorTo(panelNote, 'LEFTARROW');
 
   Application.OnException := @ApplicationException;
   Application.OnQueryEndSession := @OnQueryEndSession;
@@ -1549,6 +1559,72 @@ begin
       groupTabs.TabIndex := TabIndex;
     PopupTabs.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
   end;
+end;
+
+procedure TformNotetask.panelNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  if Button = mbLeft then
+  begin
+    if not memoNote.Focused then memoNote.SetFocus;
+    FNoteSelecting := True;
+    SelectMemoLine(GetLineAtPos(Y));
+  end;
+end;
+
+procedure TformNotetask.panelNoteMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+var
+  Index: integer;
+  IndexEnd: integer;
+begin
+  if (FNoteSelecting) then
+  begin
+    Index := Self.GetLineAtPos(Y);
+    IndexEnd := Self.GetLineAtEnd;
+    if (Index <> FNoteLastIndex) then
+    begin
+      if (Index >= 0) and (Index <= IndexEnd) then
+      begin
+        SelectMemoLine(Index, True);
+        FNoteLastIndex := Index;
+      end;
+
+      // Scroll
+      //if (Index < 0) then
+      //begin
+      //  {$IFDEF UNIX}
+      //  if (memoNote.VertScrollBar.Position > 0) then
+      //  begin
+      //    Application.ProcessMessages;
+      //    memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + Canvas.TextHeight('Th');
+      //  end;
+      //  {$ELSE}
+      //  if (memoNote.VertScrollBar.Position > 0) then
+      //    memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position - 1;
+      //  {$ENDIF}
+      //end
+      //else
+      //if (Index > IndexEnd) then
+      //begin
+      //  {$IFDEF UNIX}
+      //  Application.ProcessMessages;
+      //  memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + Canvas.TextHeight('Th');
+      //  {$ELSE}
+      //  memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + 1;
+      //  {$ENDIF}
+      //end;
+    end;
+  end;
+
+end;
+
+procedure TformNotetask.panelNoteMouseLeave(Sender: TObject);
+begin
+  FNoteSelecting := False;
+end;
+
+procedure TformNotetask.panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  FNoteSelecting := False;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
@@ -2979,6 +3055,107 @@ begin
     AText := TStringGrid(AGrid).Cells[ACol, ARow];
 end;
 
+function TformNotetask.GetLineAtEnd: integer;
+var
+  LineHeight: integer;
+  FirstVisibleLine: integer;
+begin
+  LineHeight := Canvas.TextHeight('Th');
+  if LineHeight <= 0 then Exit(0);
+  {$IFDEF UNIX}
+  FirstVisibleLine := memoNote.VertScrollBar.Position div LineHeight;
+  {$ELSE}
+  FirstVisibleLine := memoNote.VertScrollBar.Position;
+  {$ENDIF}
+  Result := FirstVisibleLine + (memoNote.ClientHeight - memoNote.ClientHeight mod LineHeight) div LineHeight - 1;
+
+  if Result < 0 then Result := 0;
+  if Result >= memoNote.Lines.Count then Result := memoNote.Lines.Count - 1;
+end;
+
+function TformNotetask.GetLineAtPos(Y: integer): integer;
+var
+  LineHeight: integer;
+  FirstVisibleLine: integer;
+  {$IFDEF UNIX}
+  PixelOffset: integer;
+  {$ENDIF}
+begin
+  LineHeight := Canvas.TextHeight('Th');
+  if LineHeight <= 0 then Exit(0);
+  {$IFDEF UNIX}
+  FirstVisibleLine := memoNote.VertScrollBar.Position div LineHeight;
+  PixelOffset := memoNote.VertScrollBar.Position mod LineHeight;
+  Result := FirstVisibleLine + (Y + PixelOffset) div LineHeight;
+  {$ELSE}
+  FirstVisibleLine := memoNote.VertScrollBar.Position;
+  Result := FirstVisibleLine + Y div LineHeight;
+  {$ENDIF}
+
+  if (Y <= 0) then Result := -1
+  else
+  if Result < 0 then Result := 0
+  else
+  if Result >= memoNote.Lines.Count then Result := memoNote.Lines.Count;
+end;
+
+
+procedure TformNotetask.SelectMemoLine(LineIndex: integer; Move: boolean = False);
+var
+  newStart, newLength: integer;
+begin
+  {$IFDEF UNIX}
+  memoNote.Tag := memoNote.VertScrollBar.Position;
+  {$ENDIF}
+  memoNote.CaretPos := Point(0, LineIndex);
+  memoNote.SelLength := Length(unicodestring(memoNote.Lines[LineIndex]));
+
+  if (not Move) then
+  begin
+    FNoteSelStart := memoNote.SelStart;
+    FNoteSelLength := memoNote.SelLength;
+  end;
+
+  if (Move) then
+  begin
+    newStart := memoNote.SelStart;
+    newLength := memoNote.SelLength;
+
+    if (newStart > FNoteSelStart) then
+    begin
+      memoNote.SelStart := FNoteSelStart;
+      memoNote.SelLength := newStart + newLength - FNoteSelStart;
+    end
+    else
+      memoNote.SelLength := FNoteSelStart + FNoteSelLength - newStart;
+  end;
+
+  {$IFDEF UNIX}
+  if (memoNote.Tag > 0) then
+  begin
+    memoNote.Visible := False;
+    Application.ProcessMessages;
+    memoNote.VertScrollBar.Position;
+    memoNote.VertScrollBar.Position := memoNote.Tag;
+    memoNote.Visible := True;
+  end;
+  {$ENDIF}
+end;
+
+procedure TformNotetask.MemoChange(Sender: TObject);
+begin
+  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
+  Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
+  FMemoStartEdit := False;
+  SetChanged;
+  CalcRowHeights(taskGrid.Row);
+  EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
+  if (taskGrid.Col = 3) then
+    SetNote;
+  if (taskGrid.Col = 4) then
+    SetInfo;
+end;
+
 procedure TformNotetask.MemoEnter(Sender: TObject);
 begin
   FMemoStartEdit := True;
@@ -2999,20 +3176,6 @@ begin
     Memo.Color := clRowFocused;
     Memo.Font.Color := clBlack;
   end;
-end;
-
-procedure TformNotetask.MemoChange(Sender: TObject);
-begin
-  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
-  FMemoStartEdit := False;
-  SetChanged;
-  CalcRowHeights(taskGrid.Row);
-  EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
-  if (taskGrid.Col = 3) then
-    SetNote;
-  if (taskGrid.Col = 4) then
-    SetInfo;
 end;
 
 procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -3497,7 +3660,7 @@ begin
       taskGrid.Columns[i].Alignment := taRightJustify;
     memoNote.BiDiMode := bdRightToLeft;
     memoNote.BorderSpacing.Left := 0;
-    memoNote.BorderSpacing.Right := 5;
+    memoNote.BorderSpacing.Right := 10;
   end
   else
   begin
@@ -3506,7 +3669,7 @@ begin
     for i := 1 to taskGrid.Columns.Count - 1 do
       taskGrid.Columns[i].Alignment := taLeftJustify;
     memoNote.BiDiMode := bdLeftToRight;
-    memoNote.BorderSpacing.Left := 5;
+    memoNote.BorderSpacing.Left := 10;
     memoNote.BorderSpacing.Right := 0;
   end;
 end;
@@ -3551,7 +3714,7 @@ begin
   aShowNote.Checked := FShowNote;
   memoNote.Visible := FShowNote;
   Splitter.Visible := FShowNote;
-  StatusBar.Top := memoNote.Top + MemoNote.Height;
+  StatusBar.Top := panelNote.Top + panelNote.Height;
 
   SetNote;
 end;

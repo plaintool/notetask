@@ -198,7 +198,7 @@ begin
     ItemSettings.Add('ShowNote', Form.ShowNote);
     ItemSettings.Add('ShowStatusBar', Form.ShowStatusBar);
     ItemSettings.Add('ShowArchived', Form.ShowArchived);
-    ItemSettings.Add('NoteHeight', Form.memoNote.Height);
+    ItemSettings.Add('NoteHeight', Form.panelNote.Height);
     ItemSettings.Add('ShowColumnDone', Form.ShowColumnDone);
     ItemSettings.Add('ShowColumnTask', Form.ShowColumnTask);
     ItemSettings.Add('ShowColumnNote', Form.ShowColumnNote);
@@ -284,7 +284,7 @@ begin
         Form.FShowNote := ItemSettings.FindPath('ShowNote').AsBoolean;
 
       if ItemSettings.FindPath('NoteHeight') <> nil then
-        Form.memoNote.Height := ItemSettings.FindPath('NoteHeight').AsInteger;
+        Form.panelNote.Height := ItemSettings.FindPath('NoteHeight').AsInteger;
 
       if ItemSettings.FindPath('ShowArchived') <> nil then
         Form.FShowArchived := ItemSettings.FindPath('ShowArchived').AsBoolean;

@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -20,7 +19,7 @@ object formNotetask: TformNotetask
   OnShow = FormShow
   object taskGrid: TStringGrid
     Left = 0
-    Height = 391
+    Height = 358
     Top = 24
     Width = 851
     Align = alClient
@@ -121,26 +120,11 @@ object formNotetask: TformNotetask
     ParentFont = False
     SimplePanel = False
   end
-  object memoNote: TMemo
-    Left = 5
-    Height = 70
-    Top = 420
-    Width = 846
-    Align = alBottom
-    BorderSpacing.Left = 5
-    BorderStyle = bsNone
-    ScrollBars = ssAutoBoth
-    TabOrder = 1
-    Visible = False
-    WordWrap = False
-    OnChange = memoNoteChange
-    OnKeyDown = memoNoteKeyDown
-  end
   object Splitter: TSplitter
     Cursor = crVSplit
     Left = 0
     Height = 5
-    Top = 415
+    Top = 382
     Width = 851
     Align = alBottom
     AutoSnap = False
@@ -157,12 +141,45 @@ object formNotetask: TformNotetask
     OnChange = groupTabsChange
     Align = alTop
     Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
-    TabOrder = 2
+    TabOrder = 1
     Visible = False
     OnMouseDown = groupTabsMouseDown
     OnMouseLeave = groupTabsMouseLeave
     OnMouseMove = groupTabsMouseMove
     OnMouseUp = groupTabsMouseUp
+  end
+  object panelNote: TPanel
+    Left = 0
+    Height = 103
+    Top = 387
+    Width = 851
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 103
+    ClientWidth = 851
+    Color = 16119285
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 4
+    OnMouseDown = panelNoteMouseDown
+    OnMouseLeave = panelNoteMouseLeave
+    OnMouseMove = panelNoteMouseMove
+    OnMouseUp = panelNoteMouseUp
+    object memoNote: TMemo
+      Left = 10
+      Height = 103
+      Top = 0
+      Width = 841
+      Align = alClient
+      BorderSpacing.Left = 10
+      BorderStyle = bsNone
+      ScrollBars = ssAutoBoth
+      TabOrder = 0
+      Visible = False
+      WordWrap = False
+      OnChange = memoNoteChange
+      OnKeyDown = memoNoteKeyDown
+    end
   end
   object MainMenu: TMainMenu
     Left = 160
