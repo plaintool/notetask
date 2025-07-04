@@ -2819,12 +2819,15 @@ procedure TformNotetask.ExecuteTerminal(usePowershell: boolean = True);
 var
   Process: TProcess;
   Script, ScriptPreview: TStringList;
-  TempFile, PwshPath: string;
+  TempFile: string;
   Value, EncodedValue, ConsoleEncoding: string;
   ScriptEncoding: TEncoding;
   Overflow: boolean;
   maxPreview: integer;
   i, k: integer;
+  {$IFNDEF UNIX}
+  PwshPath:string;
+  {$ENDIF}
 begin
   // Define the temporary file for commands
   {$IFDEF UNIX}
