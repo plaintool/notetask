@@ -3102,7 +3102,6 @@ begin
   if Result >= memoNote.Lines.Count then Result := memoNote.Lines.Count;
 end;
 
-
 procedure TformNotetask.SelectMemoLine(LineIndex: integer; Move: boolean = False);
 var
   newStart, newLength: integer;
