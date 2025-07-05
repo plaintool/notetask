@@ -3070,7 +3070,7 @@ begin
   {$ELSE}
   FirstVisibleLine := memoNote.VertScrollBar.Position;
   {$ENDIF}
-  Result := FirstVisibleLine + (memoNote.ClientHeight - memoNote.ClientHeight mod LineHeight) div LineHeight - 1;
+  Result := FirstVisibleLine + (memoNote.ClientHeight - memoNote.ClientHeight mod LineHeight) div LineHeight;
 
   if Result < 0 then Result := 0;
   if Result >= memoNote.Lines.Count then Result := memoNote.Lines.Count - 1;
