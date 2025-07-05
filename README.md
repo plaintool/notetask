@@ -30,7 +30,7 @@ This handy desktop app helps you organize your tasks, capture ideas, and manage 
 It is designed to help you quickly organize a large number of small routine tasks. You can enter tasks directly in the app or paste raw text from the clipboard — such as a list of requirements or ideas — then sort them into groups, set durations or amounts, and start working right away. Perfect for managing project to-dos, bug lists, feature requests, and other ongoing tasks.
 
 ## Features:
-- **Automatic numbering** of tasks
+- **Numbering** — Tasks are numbered automatically based on their order of appearance in the file.
 - **Move tasks** — single or multiple, within or between groups; task priority is set simply by its position in the list
 - **Archive tasks** — cross out archived items, which can be hidden or shown as needed
 - **Grouping** — each group on its own page, with full group management
