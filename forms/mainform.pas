@@ -2824,7 +2824,7 @@ var
   maxPreview: integer;
   i, k: integer;
   {$IFNDEF UNIX}
-  PwshPath:string;
+  PwshPath: string;
   {$ENDIF}
 begin
   // Define the temporary file for commands
@@ -3659,6 +3659,7 @@ begin
     for i := 1 to taskGrid.Columns.Count - 1 do
       taskGrid.Columns[i].Alignment := taRightJustify;
     memoNote.BiDiMode := bdRightToLeft;
+    memoNote.Alignment := taRightJustify;
     memoNote.BorderSpacing.Left := 0;
     memoNote.BorderSpacing.Right := 10;
     SetCursorTo(panelNote, 'RIGHTARROW');
@@ -3670,6 +3671,7 @@ begin
     for i := 1 to taskGrid.Columns.Count - 1 do
       taskGrid.Columns[i].Alignment := taLeftJustify;
     memoNote.BiDiMode := bdLeftToRight;
+    memoNote.Alignment := taLeftJustify;
     memoNote.BorderSpacing.Left := 10;
     memoNote.BorderSpacing.Right := 0;
     SetCursorTo(panelNote, 'LEFTARROW');
