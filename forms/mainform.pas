@@ -577,8 +577,6 @@ begin
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
-  SetCursorTo(panelNote, 'LEFTARROW');
-
   Application.OnException := @ApplicationException;
   Application.OnQueryEndSession := @OnQueryEndSession;
 
@@ -2785,10 +2783,10 @@ end;
 function TformNotetask.GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
 begin
   // If note column is selected or note panel visible
-  if (((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or ((memoNote.Visible) and
+  if (((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or ((panelNote.Visible) and
     ((memoPriority) or (memoNote.SelLength > 0) or (memoNote.Focused)))) then
   begin
-    if (memoNote.Visible) and (memoNote.SelLength > 0) then
+    if (panelNote.Visible) and (memoNote.SelLength > 0) then
       Result := memoNote.SelText
     else
     begin
@@ -3663,6 +3661,7 @@ begin
     memoNote.BiDiMode := bdRightToLeft;
     memoNote.BorderSpacing.Left := 0;
     memoNote.BorderSpacing.Right := 10;
+    SetCursorTo(panelNote, 'RIGHTARROW');
   end
   else
   begin
@@ -3673,6 +3672,7 @@ begin
     memoNote.BiDiMode := bdLeftToRight;
     memoNote.BorderSpacing.Left := 10;
     memoNote.BorderSpacing.Right := 0;
+    SetCursorTo(panelNote, 'LEFTARROW');
   end;
 end;
 
@@ -3714,7 +3714,7 @@ begin
   FShowNote := Value;
 
   aShowNote.Checked := FShowNote;
-  memoNote.Visible := FShowNote;
+  panelNote.Visible := FShowNote;
   Splitter.Visible := FShowNote;
   StatusBar.Top := panelNote.Top + panelNote.Height;
 

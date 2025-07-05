@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -162,6 +161,7 @@ object formNotetask: TformNotetask
     ParentBackground = False
     ParentColor = False
     TabOrder = 4
+    Visible = False
     OnMouseDown = panelNoteMouseDown
     OnMouseLeave = panelNoteMouseLeave
     OnMouseMove = panelNoteMouseMove
@@ -177,7 +177,6 @@ object formNotetask: TformNotetask
       HideSelection = False
       ScrollBars = ssAutoBoth
       TabOrder = 0
-      Visible = False
       WordWrap = False
       OnChange = memoNoteChange
       OnKeyDown = memoNoteKeyDown
