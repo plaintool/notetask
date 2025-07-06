@@ -2736,6 +2736,7 @@ begin
 
   taskGrid.Row := 1;
   taskGrid.Col := 2;
+  groupTabs.TabIndex := 0;
   ResetRowHeight;
   SetInfo;
   SetNote;
