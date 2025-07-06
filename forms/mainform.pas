@@ -4370,7 +4370,16 @@ begin
         else
         if (WrapAround) then
         begin
-          memoNote.CaretPos := Point(0, 0);
+          if (aDirectionDown) then
+          begin
+            memoNote.SelStart := 0;
+            memoNote.SelLength := 0;
+          end
+          else
+          begin
+            memoNote.SelStart := Length(memoNote.Text);
+            memoNote.SelLength := 0;
+          end;
           FindMemo(memoNote);
           FFoundText := aText;
           Result := True;
@@ -4387,6 +4396,7 @@ begin
     StartCol := taskGrid.Col;
     LastDate := False;
     if taskGrid.Col = 1 then taskGrid.Col := 2;
+    FMemoNeedSelectAll := False;
     taskGrid.EditorMode := True;
     if (Memo.SelStart > Length(unicodestring(Memo.Text)) - 1) then
     begin
@@ -4434,6 +4444,7 @@ begin
         sText := unicodestring(aText);
         if (Pos(UnicodeLowerCase(sText), UnicodeLowerCase(sValue)) > 0) and (FindMemo(Memo)) then
         begin
+          FMemoNeedSelectAll := False;
           taskGrid.EditorMode := True;
           FLastFoundRow := taskGrid.Row;
           FLastFoundCol := taskGrid.Col;
@@ -4452,6 +4463,7 @@ begin
         if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (taskGrid.Cells[taskGrid.Col, taskGrid.Row] <>
           string.Empty) and (not LastDate) then
         begin
+          FMemoNeedSelectAll := False;
           taskGrid.EditorMode := True;
           FLastFoundRow := taskGrid.Row;
           FLastFoundCol := taskGrid.Col;
