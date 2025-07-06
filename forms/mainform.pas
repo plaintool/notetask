@@ -622,6 +622,8 @@ begin
   {$IFDEF UNIX}
   aRunPowershell.Visible := False;
   aRunPowershell.Enabled := False;
+  aPageProperties.Visible := False;
+  aPageProperties.Enabled := False;
   {$ENDIF}
 
   // Check if a command line argument is passed
