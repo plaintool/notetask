@@ -1469,8 +1469,13 @@ begin
   begin
     Field.SelectAll;
     Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_F) then // Ctrl + F
+  begin
+    aFind.Execute;
+    Key := 0;
   end;
-
 end;
 
 procedure TformNotetask.memoNoteChange(Sender: TObject);
@@ -4260,7 +4265,7 @@ var
   Counter, CurRow, CurCol, StartRow, StartCol: integer;
   LastDate: boolean;
 
-  function FindMemo: boolean;
+  function FindMemo(Memo: TMemo): boolean;
   var
     SelEnd, FindPos: integer;
   begin
@@ -4317,25 +4322,29 @@ var
     Memo.SelLength := 0;
   end;
 
-  procedure NotFound;
+  function NotFound(messageOnly: boolean = False): boolean;
   begin
-    if (aText = FFoundText) then
+    if (not messageOnly) then
     begin
-      taskGrid.Row := FLastFoundRow;
-      taskGrid.Col := FLastFoundCol;
-      taskGrid.EditorMode := True;
-      Memo.SelStart := FLastFoundSelStart;
-      Memo.SelLength := FLastFoundSelLength;
-    end
-    else
-    begin
-      FLastFoundRow := StartRow;
-      FLastFoundCol := StartCol;
-      taskGrid.Row := FLastFoundRow;
-      taskGrid.Col := FLastFoundCol;
+      if (aText = FFoundText) then
+      begin
+        taskGrid.Row := FLastFoundRow;
+        taskGrid.Col := FLastFoundCol;
+        taskGrid.EditorMode := True;
+        Memo.SelStart := FLastFoundSelStart;
+        Memo.SelLength := FLastFoundSelLength;
+      end
+      else
+      begin
+        FLastFoundRow := StartRow;
+        FLastFoundCol := StartCol;
+        taskGrid.Row := FLastFoundRow;
+        taskGrid.Col := FLastFoundCol;
+      end;
     end;
     if (not Silent) then
       ShowMessage(rcantfind + ' "' + string(aText) + '"');
+    Result := False;
   end;
 
 begin
@@ -4345,10 +4354,38 @@ begin
     FindText := aText;
     MatchCase := aMatchCase;
     WrapAround := aWrapAround;
+
+    // Search in Note if selected
+    if self.ActiveControl = memoNote then
+    begin
+      sValue := unicodestring(MemoNote.Text);
+      sText := unicodestring(aText);
+      if (Pos(UnicodeLowerCase(sText), UnicodeLowerCase(sValue)) > 0) then
+      begin
+        if (FindMemo(memoNote)) then
+        begin
+          FFoundText := aText;
+          Result := True;
+        end
+        else
+        if (WrapAround) then
+        begin
+          memoNote.CaretPos := Point(0, 0);
+          FindMemo(memoNote);
+          FFoundText := aText;
+          Result := True;
+        end
+        else
+          Result := NotFound(True);
+      end
+      else
+        Result := NotFound(True);
+      exit;
+    end;
+
     StartRow := taskGrid.Row;
     StartCol := taskGrid.Col;
     LastDate := False;
-
     if taskGrid.Col = 1 then taskGrid.Col := 2;
     taskGrid.EditorMode := True;
     if (Memo.SelStart > Length(unicodestring(Memo.Text)) - 1) then
@@ -4395,7 +4432,7 @@ begin
       begin
         sValue := unicodestring(Memo.Text);
         sText := unicodestring(aText);
-        if (Pos(UnicodeLowerCase(sText), UnicodeLowerCase(sValue)) > 0) and (FindMemo) then
+        if (Pos(UnicodeLowerCase(sText), UnicodeLowerCase(sValue)) > 0) and (FindMemo(Memo)) then
         begin
           taskGrid.EditorMode := True;
           FLastFoundRow := taskGrid.Row;
@@ -4489,11 +4526,7 @@ begin
           Inc(Counter);
         end
         else
-        begin
-          NotFound;
-          Result := False;
-          exit;
-        end;
+          exit(NotFound);
       end;
 
       // Skip hidden columns
@@ -4516,11 +4549,7 @@ begin
       (WrapAround and (Counter > taskGrid.RowCount));
 
     if (WrapAround and (Counter > taskGrid.RowCount)) then
-    begin
-      NotFound;
-      Result := False;
-      exit;
-    end;
+      exit(NotFound);
 
     Result := True;
   finally
@@ -4531,6 +4560,7 @@ end;
 function TformNotetask.Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
 var
   sValue, sText: unicodestring;
+  Target: TMemo;
 
   procedure FindNextExecute;
   begin
@@ -4541,7 +4571,12 @@ var
   end;
 
 begin
-  sValue := unicodestring(Memo.SelText);
+  if self.ActiveControl = memoNote then
+    Target := memoNote
+  else
+    Target := Memo;
+
+  sValue := unicodestring(Target.SelText);
   sText := unicodestring(aText);
 
   if (FFoundText = string.Empty) or ((aMatchCase) and (sValue <> sText)) or ((not aMatchCase) and
@@ -4551,7 +4586,7 @@ begin
   begin
     GridBackupSelection;
     Tasks.CreateBackup;
-    Memo.SelText := aToText;
+    Target.SelText := aToText;
     FindNextExecute;
   end;
 
@@ -4562,7 +4597,13 @@ function TformNotetask.ReplaceAll(aText, aToText: string; aMatchCase, aWrapAroun
 var
   Row, Col: integer;
   sValue, sText: unicodestring;
+  Target: TMemo;
 begin
+  if self.ActiveControl = memoNote then
+    Target := memoNote
+  else
+    Target := Memo;
+
   FBackup := False;
   Row := taskGrid.Row;
   Col := taskGrid.Col;
@@ -4570,21 +4611,21 @@ begin
   Tasks.CreateBackup; // FBackup = false here
   try
     // Replace current selection
-    sValue := unicodestring(Memo.SelText);
+    sValue := unicodestring(Target.SelText);
     sText := unicodestring(aText);
     if not ((FFoundText = string.Empty) or ((aMatchCase) and (sValue <> sText)) or ((not aMatchCase) and
       (UnicodeLowerCase(sValue) <> UnicodeLowerCase(sText)))) then
-      Memo.SelText := aToText;
+      Target.SelText := aToText;
 
     // Replace all
     while (Find(aText, aMatchCase, aWrapAround, True, True)) do
     begin
-      Memo.SelText := aToText;
+      Target.SelText := aToText;
     end;
 
     taskGrid.Row := Row;
     taskGrid.Col := Col;
-    Memo.SelLength := 0;
+    Target.SelLength := 0;
     Result := True;
   finally
     FBackup := True;
