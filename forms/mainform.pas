@@ -3363,8 +3363,12 @@ begin
   FillGrid;
   if (SortColumn = 0) then
   begin
-    taskGrid.Row := Sel.Top;
+    if (SortOrder = soAscending) then
+      taskGrid.Row := Sel.Top
+    else
+      taskGrid.Row := Sel.Bottom;
     taskGrid.Selection := Sel;
+    FLastSelectionHeight := Sel.Height;
   end;
   CalcRowHeights(0, True);
   SetInfo;
@@ -3400,8 +3404,9 @@ begin
       // RemoveTask from collection
       taskGrid.DeleteRow(RowIndex);
 
-      SetChanged; // Mark that data has changed
       FillGrid;
+      SetInfo;
+      SetChanged; // Mark that data has changed
     end;
   end;
 end;
@@ -3437,8 +3442,9 @@ begin
           taskGrid.DeleteRow(RowIndex);
         end;
       end;
-      SetChanged; // Mark that data has changed
       FillGrid;
+      SetInfo;
+      SetChanged; // Mark that data has changed
     end;
   end
   else
