@@ -3347,7 +3347,10 @@ begin
   Back := taskGrid.Selection;
   taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Bottom, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
   Tasks.PasteFromClipboard(taskGrid);
-  Sel := TGridRect.Create(0, Back.Bottom + 1, taskGrid.Columns.Count, Back.Bottom + Back.Height + 1);
+  if (SortOrder = soAscending) then
+    Sel := TGridRect.Create(0, Back.Bottom + 1, taskGrid.Columns.Count, Back.Bottom + Back.Height + 1)
+  else
+    Sel := TGridRect.Create(0, Back.Top, taskGrid.Columns.Count, Back.Bottom);
   FillGrid;
   if (SortColumn = 0) then
   begin
