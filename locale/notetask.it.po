@@ -349,6 +349,10 @@ msgstr "Elimina compiti"
 msgid "Buy me a coffee..."
 msgstr "Dona per un caffè..."
 
+#: tformnotetask.aduplicatetasks.caption
+msgid "Duplicate tasks"
+msgstr "Duplica attività"
+
 #: tformnotetask.aentersubmit.caption
 msgid "Enter submit"
 msgstr "Enter invia"

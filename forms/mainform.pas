@@ -44,6 +44,7 @@ type
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
+    aDuplicateTasks: TAction;
     aRunPowershell: TAction;
     aEnterSubmit: TAction;
     aUndoAll: TAction;
@@ -92,6 +93,7 @@ type
     contextPaste: TMenuItem;
     contextDelete: TMenuItem;
     menuEnterSubmit: TMenuItem;
+    MenuItem6: TMenuItem;
     menuRunPowershell: TMenuItem;
     MenuShowTime: TMenuItem;
     menuUndoAll: TMenuItem;
@@ -242,6 +244,7 @@ type
     MenuItem9: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem15: TMenuItem;
+    procedure aDuplicateTasksExecute(Sender: TObject);
     procedure aEnterSubmitExecute(Sender: TObject);
     procedure aRunPowershellExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -413,6 +416,7 @@ type
     procedure SetCaption;
     procedure ClearSelected(ShowConfirm: boolean = True);
     procedure MergeTasks;
+    procedure DuplicateTasks;
     procedure DeleteTask(aRow: integer = 0; ShowConfirm: boolean = True);
     procedure DeleteTasks(ShowConfirm: boolean = True);
     procedure ArchiveTask(aRow: integer = 0);
@@ -1913,6 +1917,14 @@ begin
   MergeTasks;
 end;
 
+procedure TformNotetask.aDuplicateTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
+
+  DuplicateTasks;
+end;
+
 procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -3326,6 +3338,27 @@ begin
   end;
 end;
 
+procedure TformNotetask.DuplicateTasks;
+var
+  Sel, Back: TGridRect;
+begin
+  taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
+  Tasks.CopyToClipboard(taskGrid, FShowNote);
+  Back := taskGrid.Selection;
+  taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Bottom, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
+  Tasks.PasteFromClipboard(taskGrid);
+  Sel := TGridRect.Create(0, Back.Bottom + 1, taskGrid.Columns.Count, Back.Bottom + Back.Height + 1);
+  FillGrid;
+  if (SortColumn = 0) then
+  begin
+    taskGrid.Row := Sel.Top;
+    taskGrid.Selection := Sel;
+  end;
+  CalcRowHeights(0, True);
+  SetInfo;
+  SetChanged;
+end;
+
 procedure TformNotetask.DeleteTask(aRow: integer = 0; ShowConfirm: boolean = True);
 var
   RowIndex: integer;
@@ -3356,6 +3389,7 @@ begin
       taskGrid.DeleteRow(RowIndex);
 
       SetChanged; // Mark that data has changed
+      FillGrid;
     end;
   end;
 end;
@@ -3392,6 +3426,7 @@ begin
         end;
       end;
       SetChanged; // Mark that data has changed
+      FillGrid;
     end;
   end
   else

@@ -349,6 +349,10 @@ msgstr "कार्य हटाएं"
 msgid "Buy me a coffee..."
 msgstr "मुझे एक कॉफी खरीदें..."
 
+#: tformnotetask.aduplicatetasks.caption
+msgid "Duplicate tasks"
+msgstr "कार्यों को डुप्लिकेट करें"
+
 #: tformnotetask.aentersubmit.caption
 msgid "Enter submit"
 msgstr "Enter पुष्टि करता है"

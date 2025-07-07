@@ -349,6 +349,10 @@ msgstr ""
 msgid "Buy me a coffee..."
 msgstr ""
 
+#: tformnotetask.aduplicatetasks.caption
+msgid "Duplicate tasks"
+msgstr ""
+
 #: tformnotetask.aentersubmit.caption
 msgid "Enter submit"
 msgstr ""

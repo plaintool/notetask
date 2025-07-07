@@ -349,6 +349,10 @@ msgstr "Удалить задачи"
 msgid "Buy me a coffee..."
 msgstr "Дать на кофе..."
 
+#: tformnotetask.aduplicatetasks.caption
+msgid "Duplicate tasks"
+msgstr "Дублировать задачи"
+
 #: tformnotetask.aentersubmit.caption
 msgid "Enter submit"
 msgstr "Enter подтверждает"
