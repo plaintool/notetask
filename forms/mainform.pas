@@ -649,6 +649,7 @@ begin
 
   // Free allocated resources
   FLineEnding.Free;
+  FEncoding.Free;
   Tasks.Free;
   ResourceBitmapCheck.Free;
   ResourceBitmapUncheck.Free;
@@ -3436,7 +3437,7 @@ begin
       for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
       begin
         RowIndex := i;
-        if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+        if (RowIndex > 0) and (RowIndex <= Tasks.Count) and (taskGrid.RowCount > RowIndex) then
         begin
           // Remove the task from the collection
           taskGrid.DeleteRow(RowIndex);
