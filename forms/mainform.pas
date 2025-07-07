@@ -1811,7 +1811,7 @@ begin
 
   if not IsEditing then
   begin
-    Sel := Tasks.PasteFromClipboard(taskGrid);
+    Sel := Tasks.PasteFromClipboard(taskGrid, SortOrder);
     FillGrid;
     if (Assigned(DatePicker)) then
       DatePicker.DateTime := Tasks.GetTask(taskGrid.Row).Date;
@@ -3345,8 +3345,17 @@ begin
   taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
   Tasks.CopyToClipboard(taskGrid, FShowNote);
   Back := taskGrid.Selection;
-  taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Bottom, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
-  Tasks.PasteFromClipboard(taskGrid);
+  if (SortOrder = soAscending) then
+  begin
+    taskGrid.Row := taskGrid.Selection.Bottom;
+    taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Bottom, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
+  end
+  else
+  begin
+    taskGrid.Row := taskGrid.Selection.Top;
+    taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Top);
+  end;
+  Tasks.PasteFromClipboard(taskGrid, SortOrder);
   if (SortOrder = soAscending) then
     Sel := TGridRect.Create(0, Back.Bottom + 1, taskGrid.Columns.Count, Back.Bottom + Back.Height + 1)
   else

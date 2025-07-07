@@ -115,7 +115,7 @@ type
     procedure SwapTasks(OldIndex, NewIndex: integer);
     procedure MoveTask(OldIndex, NewIndex: integer);
     procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False);
-    function PasteFromClipboard(Grid: TStringGrid): TGridRect;
+    function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder): TGridRect;
     procedure CreateBackup;
     procedure UndoBackup;
     procedure CreateBackupInit;
@@ -1434,9 +1434,10 @@ begin
   end;
 end;
 
-function TTasks.PasteFromClipboard(Grid: TStringGrid): TGridRect;
+function TTasks.PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder): TGridRect;
 var
   TempTasks: TTasks;
+  ListTasks: TStringList;
   TempDate: TDateTime;
   TempAmount: double;
   Rect: TGridRect;
@@ -1457,7 +1458,14 @@ begin
   else
     IsRowEmpty := False;
 
-  TempTasks := TTasks.Create(TextToStringList(Clipboard.AsText, True));
+  ListTasks := TextToStringList(Clipboard.AsText, True);
+
+  // Handle SortOrder: reverse the list for descending order
+  if (Grid.Selection.Height = 0) and (SortOrder = soDescending) then
+    for i := 0 to ListTasks.Count div 2 - 1 do
+      ListTasks.Exchange(i, ListTasks.Count - 1 - i);
+
+  TempTasks := TTasks.Create(ListTasks);
   try
     // If the row is not empty and only it is selected, and the number of tasks to insert is more than one,
     // if the grid is empty or grid selection is entry row, we insert as new tasks
