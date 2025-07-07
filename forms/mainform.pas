@@ -3443,6 +3443,7 @@ begin
           taskGrid.DeleteRow(RowIndex);
         end;
       end;
+      taskGrid.ClearSelections;
       FillGrid;
       SetInfo;
       SetChanged; // Mark that data has changed
