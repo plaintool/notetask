@@ -649,7 +649,8 @@ begin
 
   // Free allocated resources
   FLineEnding.Free;
-  FEncoding.Free;
+  if (IsUserEncoding(FEncoding)) then
+    FEncoding.Free;
   Tasks.Free;
   ResourceBitmapCheck.Free;
   ResourceBitmapUncheck.Free;

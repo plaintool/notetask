@@ -19,6 +19,8 @@ uses
 
 function GetEncodingName(Encoding: TEncoding): string;
 
+function IsUserEncoding(Enc: TEncoding): Boolean;
+
 function IsBOMEncoding(Encoding: TEncoding): boolean;
 
 function IsValidUTF8(var Buffer: array of byte; BytesRead: integer): boolean;
@@ -64,6 +66,16 @@ begin
     Result := 'Default'
   else
     Result := 'Unknown';
+end;
+
+function IsUserEncoding(Enc: TEncoding): Boolean;
+begin
+  Result := Assigned(Enc) and
+            (Enc <> TEncoding.UTF8) and
+            (Enc <> TEncoding.Unicode) and
+            (Enc <> TEncoding.BigEndianUnicode) and
+            (Enc <> TEncoding.ASCII) and
+            (Enc <> TEncoding.Default);
 end;
 
 function IsBOMEncoding(Encoding: TEncoding): boolean;
