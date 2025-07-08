@@ -4106,16 +4106,45 @@ begin
 end;
 
 procedure TformNotetask.SetNote;
+var
+  i: integer;
+  notes: TStringList;
 begin
   if (not ShowNote) then exit;
 
   memoNote.OnChange := nil;
-  if (Assigned(Tasks)) and (taskGrid.RowCount > 1) and (Tasks.Map(taskGrid.Row) > -1) then
-    memoNote.Text := Tasks.GetTask(taskGrid.Row).Note
-  else
-    memoNote.Text := string.Empty;
-  memoNote.OnChange := @memoNoteChange;
+  notes := TStringList.Create;
+  try
+    if Assigned(Tasks) and (taskGrid.RowCount > 1) then
+    begin
+      if taskGrid.Selection.Height > 0 then
+      begin
+        // Multiple rows selected — concatenate notes and set read-only
+        for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+          if Tasks.Map(i) > -1 then
+            notes.Add(Tasks.GetTask(i).Note);
+        memoNote.Lines.Text := notes.Text;
+        memoNote.ReadOnly := True;
+        memoNote.Color := $00F5F5F5;
+      end
+      else if Tasks.Map(taskGrid.Row) > -1 then
+      begin
+        // Single row selected — set editable note
+        memoNote.Text := Tasks.GetTask(taskGrid.Row).Note;
+        memoNote.ReadOnly := False;
+        memoNote.Color := clWhite;
+      end
+      else
+        memoNote.Text := string.Empty;
+    end
+    else
+      memoNote.Text := string.Empty;
+  finally
+    notes.Free;
+    memoNote.OnChange := @memoNoteChange;
+  end;
 end;
+
 
 procedure TformNotetask.SetTabs;
 var
