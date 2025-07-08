@@ -256,6 +256,7 @@ type
     procedure ApplicationException(Sender: TObject; E: Exception);
     procedure OnQueryEndSession(var CanEnd: boolean);
     procedure panelNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure panelNoteMouseEnter(Sender: TObject);
     procedure panelNoteMouseLeave(Sender: TObject);
     procedure panelNoteMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -1630,9 +1631,15 @@ begin
 
 end;
 
+procedure TformNotetask.panelNoteMouseEnter(Sender: TObject);
+begin
+  panelNote.Color := $E3E3E3;
+end;
+
 procedure TformNotetask.panelNoteMouseLeave(Sender: TObject);
 begin
   FNoteSelecting := False;
+  panelNote.Color := $00F5F5F5;
 end;
 
 procedure TformNotetask.panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
