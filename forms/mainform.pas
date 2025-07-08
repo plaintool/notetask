@@ -442,6 +442,7 @@ type
     procedure ApplySortingActions;
     procedure GridBackupSelection;
     procedure GridClearSelection;
+    function IsExecuteValueNote(memoPriority: boolean = False): boolean;
     function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
     procedure ExecuteTerminal(usePowershell: boolean = True);
@@ -1401,7 +1402,8 @@ begin
   if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
     SetInfo;
 
-  if (aRow <> FLastRow) then SetNote;
+  if (aRow <> FLastRow) or (taskGrid.Selection.Height <> FLastSelectionHeight) then
+    SetNote;
   FLastRow := aRow;
 
   // Disable merge if no multiselect
@@ -2802,6 +2804,12 @@ begin
   SetInfo;
 end;
 
+function TformNotetask.IsExecuteValueNote(memoPriority: boolean = False): boolean;
+begin
+  Result := (((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or ((panelNote.Visible) and
+    ((memoPriority) or (memoNote.SelLength > 0) or (memoNote.Focused)))) and (panelNote.Visible) and (memoNote.SelLength > 0);
+end;
+
 function TformNotetask.GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
 begin
   // If note column is selected or note panel visible
@@ -2844,10 +2852,48 @@ var
   ScriptEncoding: TEncoding;
   Overflow: boolean;
   maxPreview: integer;
-  i, k: integer;
+  i: integer;
   {$IFNDEF UNIX}
   PwshPath: string;
   {$ENDIF}
+
+  procedure AddLine(index: integer);
+  var
+    k: integer;
+  begin
+    Value := GetExecuteValue(index, True);
+    if usePowershell then
+      EncodedValue := Value
+    else
+      EncodedValue := ConvertEncoding(Value, 'utf-8', ConsoleEncoding);
+    Script.Add(EncodedValue);
+
+    if ScriptPreview.Count < maxPreview then
+    begin
+      with TStringList.Create do
+      try
+        Text := Value;
+        for k := 0 to Min(maxPreview, Count - 1) do
+        begin
+          if ScriptPreview.Count < maxPreview then
+            ScriptPreview.Add(Strings[k])
+          else if not Overflow then
+          begin
+            ScriptPreview.Add('...');
+            Overflow := True;
+          end;
+        end;
+      finally
+        Free;
+      end;
+    end
+    else if not Overflow then
+    begin
+      ScriptPreview.Add('...');
+      Overflow := True;
+    end;
+  end;
+
 begin
   // Define the temporary file for commands
   {$IFDEF UNIX}
@@ -2874,37 +2920,8 @@ begin
 
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     begin
-      Value := GetExecuteValue(i, True);
-      if usePowershell then
-        EncodedValue := Value
-      else
-        EncodedValue := ConvertEncoding(Value, 'utf-8', ConsoleEncoding);
-      Script.Add(EncodedValue);
-
-      if ScriptPreview.Count < maxPreview then
-      begin
-        with TStringList.Create do
-        try
-          Text := Value;
-          for k := 0 to Min(maxPreview, Count - 1) do
-          begin
-            if ScriptPreview.Count < maxPreview then
-              ScriptPreview.Add(Strings[k])
-            else if not Overflow then
-            begin
-              ScriptPreview.Add('...');
-              Overflow := True;
-            end;
-          end;
-        finally
-          Free;
-        end;
-      end
-      else if not Overflow then
-      begin
-        ScriptPreview.Add('...');
-        Overflow := True;
-      end;
+      AddLine(i);
+      if (IsExecuteValueNote(True)) then break;
     end;
 
     {$IFDEF UNIX}
