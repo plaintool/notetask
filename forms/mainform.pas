@@ -1864,7 +1864,9 @@ begin
   if not IsEditing then
   begin
     taskGrid.Selection := TGridRect.Create(0, 0, 6, taskGrid.RowCount);
+    FLastSelectionHeight := taskGrid.Selection.Height;
     SetInfo;
+    SetNote;
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
@@ -4161,7 +4163,6 @@ begin
     memoNote.OnChange := @memoNoteChange;
   end;
 end;
-
 
 procedure TformNotetask.SetTabs;
 var
