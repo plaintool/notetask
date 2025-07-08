@@ -231,7 +231,7 @@ type
     menuDeleteGroup: TMenuItem;
     menuMoveTasksLeft: TMenuItem;
     menuMoveTasksRight: TMenuItem;
-    aCopyGroup: TAction;
+    aDuplicateGroup: TAction;
     MenuItem3: TMenuItem;
     aMoveGroupLeft: TAction;
     aMoveGroupRight: TAction;
@@ -353,7 +353,7 @@ type
     procedure aDeleteGroupExecute(Sender: TObject);
     procedure aMoveTaskLeftExecute(Sender: TObject);
     procedure aMoveTaskRightExecute(Sender: TObject);
-    procedure aCopyGroupExecute(Sender: TObject);
+    procedure aDuplicateGroupExecute(Sender: TObject);
     procedure aMoveGroupLeftExecute(Sender: TObject);
     procedure aMoveGroupRightExecute(Sender: TObject);
     procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
@@ -699,9 +699,9 @@ begin
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_C) then // Ctrl + Shift + C
+  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_D) then // Ctrl + Shift + D
   begin
-    aCopyGroup.Execute;
+    aDuplicateGroup.Execute;
     Key := 0;
   end
   else
@@ -2283,7 +2283,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.aCopyGroupExecute(Sender: TObject);
+procedure TformNotetask.aDuplicateGroupExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 

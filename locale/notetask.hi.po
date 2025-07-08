@@ -320,10 +320,6 @@ msgstr "ChatGPT से पूछें..."
 msgid "Copy"
 msgstr "कॉपी"
 
-#: tformnotetask.acopygroup.caption
-msgid "Copy group"
-msgstr "समूह की कॉपी करें"
-
 #: tformnotetask.acut.caption
 msgid "Cut"
 msgstr "कट"
@@ -348,6 +344,10 @@ msgstr "कार्य हटाएं"
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
 msgstr "मुझे एक कॉफी खरीदें..."
+
+#: tformnotetask.aduplicategroup.caption
+msgid "Duplicate group"
+msgstr "समूह डुप्लिकेट करना"
 
 #: tformnotetask.aduplicatetasks.caption
 msgid "Duplicate tasks"

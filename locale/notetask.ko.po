@@ -320,10 +320,6 @@ msgstr "ChatGPT에게 질문하기..."
 msgid "Copy"
 msgstr "복사"
 
-#: tformnotetask.acopygroup.caption
-msgid "Copy group"
-msgstr "그룹 복사"
-
 #: tformnotetask.acut.caption
 msgid "Cut"
 msgstr "잘라내기"
@@ -348,6 +344,10 @@ msgstr "작업 삭제"
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
 msgstr "커피 한 잔 주세요..."
+
+#: tformnotetask.aduplicategroup.caption
+msgid "Duplicate group"
+msgstr "그룹을 복제하다"
 
 #: tformnotetask.aduplicatetasks.caption
 msgid "Duplicate tasks"

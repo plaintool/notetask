@@ -320,10 +320,6 @@ msgstr "Спытайцеся ў ChatGPT..."
 msgid "Copy"
 msgstr "Капіраваць"
 
-#: tformnotetask.acopygroup.caption
-msgid "Copy group"
-msgstr "Скапіраваць групу"
-
 #: tformnotetask.acut.caption
 msgid "Cut"
 msgstr "Вырваць"
@@ -348,6 +344,10 @@ msgstr "Выдаліць задачы"
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
 msgstr "Купіце мне каву..."
+
+#: tformnotetask.aduplicategroup.caption
+msgid "Duplicate group"
+msgstr "Дубляваць групу"
 
 #: tformnotetask.aduplicatetasks.caption
 msgid "Duplicate tasks"

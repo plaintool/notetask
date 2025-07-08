@@ -320,10 +320,6 @@ msgstr "ChatGPTに聞く..."
 msgid "Copy"
 msgstr "コピー"
 
-#: tformnotetask.acopygroup.caption
-msgid "Copy group"
-msgstr "グループをコピー"
-
 #: tformnotetask.acut.caption
 msgid "Cut"
 msgstr "切り取り"
@@ -348,6 +344,10 @@ msgstr "タスクを削除"
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
 msgstr "コーヒーを支援する..."
+
+#: tformnotetask.aduplicategroup.caption
+msgid "Duplicate group"
+msgstr "グループを複製する"
 
 #: tformnotetask.aduplicatetasks.caption
 msgid "Duplicate tasks"

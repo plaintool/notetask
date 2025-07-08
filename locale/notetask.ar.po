@@ -320,10 +320,6 @@ msgstr "اسأل ChatGPT..."
 msgid "Copy"
 msgstr "نسخ"
 
-#: tformnotetask.acopygroup.caption
-msgid "Copy group"
-msgstr "نسخ المجموعة"
-
 #: tformnotetask.acut.caption
 msgid "Cut"
 msgstr "قص"
@@ -348,6 +344,10 @@ msgstr "حذف المهام"
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
 msgstr "اشتري لي قهوة..."
+
+#: tformnotetask.aduplicategroup.caption
+msgid "Duplicate group"
+msgstr "تكرار المجموعة"
 
 #: tformnotetask.aduplicatetasks.caption
 msgid "Duplicate tasks"

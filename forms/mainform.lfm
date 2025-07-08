@@ -330,14 +330,15 @@ object formNotetask: TformNotetask
       object menuInsertGroup: TMenuItem
         Action = aInsertGroup
       end
-      object menuRenameGroup: TMenuItem
-        Action = aRenameGroup
-      end
       object MenuItem3: TMenuItem
-        Action = aCopyGroup
+        Action = aDuplicateGroup
+        ShortCut = 24644
       end
       object menuDeleteGroup: TMenuItem
         Action = aDeleteGroup
+      end
+      object menuRenameGroup: TMenuItem
+        Action = aRenameGroup
       end
       object Separator16: TMenuItem
         Caption = '-'
@@ -740,11 +741,11 @@ object formNotetask: TformNotetask
       ShortCut = 16497
       OnExecute = aRenameGroupExecute
     end
-    object aCopyGroup: TAction
+    object aDuplicateGroup: TAction
       Category = 'Group'
-      Caption = 'Copy group'
+      Caption = 'Duplicate group'
       ShortCut = 24643
-      OnExecute = aCopyGroupExecute
+      OnExecute = aDuplicateGroupExecute
     end
     object aDeleteGroup: TAction
       Category = 'Group'
@@ -1030,7 +1031,7 @@ object formNotetask: TformNotetask
       Action = aRenameGroup
     end
     object MenuItem10: TMenuItem
-      Action = aCopyGroup
+      Action = aDuplicateGroup
     end
     object MenuItem15: TMenuItem
       Action = aDeleteGroup

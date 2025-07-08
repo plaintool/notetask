@@ -320,10 +320,6 @@ msgstr "Demander à ChatGPT..."
 msgid "Copy"
 msgstr "Copier"
 
-#: tformnotetask.acopygroup.caption
-msgid "Copy group"
-msgstr "Copier le groupe"
-
 #: tformnotetask.acut.caption
 msgid "Cut"
 msgstr "Couper"
@@ -348,6 +344,10 @@ msgstr "Supprimer les tâches"
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
 msgstr "Offrir un café..."
+
+#: tformnotetask.aduplicategroup.caption
+msgid "Duplicate group"
+msgstr "Dupliquer le groupe"
 
 #: tformnotetask.aduplicatetasks.caption
 msgid "Duplicate tasks"
@@ -463,27 +463,27 @@ msgstr "Déplacer le groupe à droite"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
-msgstr "Mettre les tâches en bas"
+msgstr "Déplacer les tâches en bas"
 
 #: tformnotetask.amovetaskdown.caption
 msgid "Move tasks down"
-msgstr "Mettre les tâches plus bas"
+msgstr "Déplacer les tâches vers le bas"
 
 #: tformnotetask.amovetaskleft.caption
 msgid "Move tasks to left group"
-msgstr "Mettre les tâches dans le groupe de gauche"
+msgstr "Déplacer les tâches vers le groupe de gauche"
 
 #: tformnotetask.amovetaskright.caption
 msgid "Move tasks to right group"
-msgstr "Mettre les tâches dans le groupe de droite"
+msgstr "Déplacer les tâches vers le groupe de droite"
 
 #: tformnotetask.amovetasktop.caption
 msgid "Move tasks to top"
-msgstr "Mettre les tâches en haut"
+msgstr "Déplacer les tâches en haut"
 
 #: tformnotetask.amovetaskup.caption
 msgid "Move tasks up"
-msgstr "Mettre les tâches plus haut"
+msgstr "Déplacer les tâches vers le haut"
 
 #: tformnotetask.anew.caption
 msgid "New"
