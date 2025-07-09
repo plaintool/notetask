@@ -2958,7 +2958,7 @@ begin
     else
       Value := aRunTerminal.Caption;
     if (MessageDlg(ReplaceStr(Value, '...', '?') + sLineBreak + sLineBreak + ScriptPreview.Text, mtConfirmation,
-      [mbYes, mbNo], 0, mbNo) <> mrYes) then exit;
+      [mbYes, mbNo], 0, mbYes) <> mrYes) then exit;
   finally
     ScriptPreview.Free;
     Script.Free;
