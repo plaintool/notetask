@@ -141,7 +141,7 @@ object formNotetask: TformNotetask
     OnChange = groupTabsChange
     Align = alTop
     Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
-    TabOrder = 1
+    TabOrder = 2
     Visible = False
     OnMouseDown = groupTabsMouseDown
     OnMouseLeave = groupTabsMouseLeave
@@ -160,7 +160,7 @@ object formNotetask: TformNotetask
     Color = 16119285
     ParentBackground = False
     ParentColor = False
-    TabOrder = 4
+    TabOrder = 1
     Visible = False
     OnMouseDown = panelNoteMouseDown
     OnMouseEnter = panelNoteMouseEnter
