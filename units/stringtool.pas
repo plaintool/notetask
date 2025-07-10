@@ -34,6 +34,8 @@ function CleanString(const Value: string): string;
 
 function CleanNumeric(Value: string): string;
 
+function CleanAmount(const Value: string): string;
+
 function DetectDone(const Input: string): boolean;
 
 function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 4): string;
@@ -182,6 +184,11 @@ begin
     else if C = ',' then
       Result := Result + '.'; // replace comma with dot
   end;
+end;
+
+function CleanAmount(const Value: string): string;
+begin
+  Result := Value.Replace(' ', string.empty).Replace(',', '.').Trim;
 end;
 
 function DetectDone(const Input: string): boolean;

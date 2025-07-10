@@ -277,7 +277,7 @@ begin
   // Checks if the task is completed
   CompletedStr := RemoveBrackets(CompletedStr);
 
-  if (TryStrToFloat(CleanNumeric(CompletedStr), FAmount)) then
+  if (TryStrToFloat(CleanAmount(CompletedStr), FAmount)) then
   else
   if (TryStrToDateTimeISO(CompletedStr, FDate)) then
   else
