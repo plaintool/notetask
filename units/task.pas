@@ -1418,7 +1418,10 @@ begin
         Row1 += ' ';
 
       if (pAmount <> string.Empty) then
-        Row1 += pAmount + ', ';
+      begin
+        Row1 += pAmount;
+        if (Row2 <> string.Empty) then Row1 += ', ';
+      end;
 
       RowText := Row1 + Row2;
 
