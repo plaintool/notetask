@@ -91,6 +91,12 @@ begin
   FS.ShortTimeFormat := 'hh:nn:ss';
 
   Result := TryStrToDateTime(SFixed, ADateTime, FS);
+  if not Result then
+  begin
+    // If ISO parsing fails, try using local format
+    FS := DefaultFormatSettings;
+    Result := TryStrToDateTime(S, ADateTime, FS);
+  end;
 end;
 
 function DateTimeToStringISO(Value: TDateTime; ADisplayTime: boolean = True): string;
