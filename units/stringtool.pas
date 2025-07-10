@@ -32,7 +32,7 @@ function RemoveBrackets(const S: string): string;
 
 function CleanString(const Value: string): string;
 
-function CleanNumeric(const Value: string): string;
+function CleanNumeric(Value: string): string;
 
 function DetectDone(const Input: string): boolean;
 
@@ -46,6 +46,7 @@ function GetConsoleEncoding: string;
 
 const
   Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
+  UnicodeMinusUTF8 = #$E2#$88#$92;
 
 implementation
 
@@ -165,12 +166,13 @@ begin
   Result := Value.Replace(#9, ' ');
 end;
 
-function CleanNumeric(const Value: string): string;
+function CleanNumeric(Value: string): string;
 var
-  i: Integer;
-  C: Char;
+  i: integer;
+  C: char;
 begin
   Result := '';
+  Value := Value.Replace(UnicodeMinusUTF8, '-');
   for i := 1 to Length(Value) do
   begin
     C := Value[i];
@@ -178,9 +180,7 @@ begin
     if C in ['0'..'9', '-', '.'] then
       Result := Result + C
     else if C = ',' then
-      Result := Result + '.' // replace comma with dot
-    else if C = #$E2 then
-      Result := Result + '-'; // replace unicode minus with ASCII
+      Result := Result + '.'; // replace comma with dot
   end;
 end;
 
