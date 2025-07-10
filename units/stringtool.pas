@@ -32,7 +32,7 @@ function RemoveBrackets(const S: string): string;
 
 function CleanString(const Value: string): string;
 
-function CleanAmount(const Value: string): string;
+function CleanNumeric(const Value: string): string;
 
 function DetectDone(const Input: string): boolean;
 
@@ -165,9 +165,23 @@ begin
   Result := Value.Replace(#9, ' ');
 end;
 
-function CleanAmount(const Value: string): string;
+function CleanNumeric(const Value: string): string;
+var
+  i: Integer;
+  C: Char;
 begin
-  Result := Value.Replace(' ', string.empty).Replace(',', '.').Trim;
+  Result := '';
+  for i := 1 to Length(Value) do
+  begin
+    C := Value[i];
+    // allow digits and ASCII minus
+    if C in ['0'..'9', '-', '.'] then
+      Result := Result + C
+    else if C = ',' then
+      Result := Result + '.' // replace comma with dot
+    else if C = #$E2 then
+      Result := Result + '-'; // replace unicode minus with ASCII
+  end;
 end;
 
 function DetectDone(const Input: string): boolean;

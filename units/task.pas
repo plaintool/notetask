@@ -277,7 +277,7 @@ begin
   // Checks if the task is completed
   CompletedStr := RemoveBrackets(CompletedStr);
 
-  if (TryStrToFloat(CleanAmount(CompletedStr), FAmount)) then
+  if (TryStrToFloat(CleanNumeric(CompletedStr), FAmount)) then
   else
   if (TryStrToDateTimeISO(CompletedStr, FDate)) then
   else
@@ -803,6 +803,7 @@ var
   Task: TTask;
   pDate: TDateTime;
   pAmount: double;
+  FS: TFormatSettings;
 begin
   if (Row > 0) and (Row <= Count) then
   begin
@@ -818,7 +819,10 @@ begin
       #13, string.Empty).Replace('<br>', sLineBreak);
     Task.Note := Grid.Cells[3, Row].Replace(sLineBreak, '<br>').Replace(#10, string.Empty).Replace(
       #13, string.Empty).Replace('<br>', sLineBreak);
-    if not TryStrToFloat(Grid.Cells[4, Row], pAmount) then
+
+    FS := DefaultFormatSettings;
+    FS.DecimalSeparator := '.';
+    if not TryStrToFloat(CleanNumeric(Grid.Cells[4, Row]), pAmount, FS) then
     begin
       pAmount := 0; // If parsing the amount failed, set to 0
       Grid.Cells[4, Row] := '';
@@ -1570,11 +1574,11 @@ begin
               if Rect.Width = 0 then
               begin
                 if (TempTasks.GetTask(index).Text <> string.Empty) and
-                  (TryStrToFloat(CleanAmount(TempTasks.GetTask(index).Text), TempAmount)) then
+                  (TryStrToFloat(CleanNumeric(TempTasks.GetTask(index).Text), TempAmount)) then
                   GetTask(i).Amount := TempAmount
                 else
                 if (TempTasks.GetTask(index).Note <> string.Empty) and
-                  (TryStrToFloat(CleanAmount(TempTasks.GetTask(index).Note), TempAmount)) then
+                  (TryStrToFloat(CleanNumeric(TempTasks.GetTask(index).Note), TempAmount)) then
                   GetTask(i).Amount := TempAmount
                 else
                   GetTask(i).Amount := 0;
