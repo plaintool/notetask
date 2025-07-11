@@ -407,6 +407,7 @@ type
     procedure MemoKeyPress(Sender: TObject; var Key: char);
     procedure DatePickerChange(Sender: TObject);
     procedure DatePickerEnter(Sender: TObject);
+    procedure DatePickerKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol, aRow: integer);
     procedure EditComplite(aEnter: boolean = False; aEscape: boolean = False);
@@ -766,7 +767,10 @@ begin
   else
   if (Shift = [ssCtrl]) and (Key = VK_TAB) then // Ctrl + Tab
   begin
-    aIndentTasks.Execute;
+    if (IsEditing) and (Memo.Focused) then
+      Memo.SelText := '    '
+    else
+      aIndentTasks.Execute;
     Key := 0;
   end
   else
@@ -1349,6 +1353,7 @@ begin
 
     DatePicker.OnChange := @DatePickerChange; // Event Change
     DatePicker.OnEnter := @DatePickerEnter; // Event Enter
+    DatePicker.OnKeyDown := @DatePickerKeyDown; // Event KeyDown
 
     Editor := DatePicker;
     if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
@@ -3227,12 +3232,33 @@ begin
 end;
 
 procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  nextCol: integer;
 begin
-  if Key = VK_TAB then
+  if (Key = VK_TAB) then
   begin
-    // Insert spaces
-    Memo.SelText := '    ';
     Key := 0;
+    EditComplite(True);
+
+    with taskGrid do
+    begin
+      nextCol := Col + 1;
+      while (nextCol < ColCount) and (not Columns.Items[nextCol - 1].Visible) do
+        Inc(nextCol);
+
+      if nextCol < ColCount - 1 then
+        Col := nextCol
+      else
+      if Row < RowCount - 1 then
+      begin
+        Row := Row + 1;
+        nextCol := 2;
+        while (nextCol < ColCount) and (not Columns[nextCol - 1].Visible) do
+          Inc(nextCol);
+        if nextCol < ColCount then
+          Col := nextCol;
+      end;
+    end;
   end;
 end;
 
@@ -3272,6 +3298,31 @@ begin
   if (FShowDuration) then FillGrid;
   SetChanged;
   SetInfo;
+end;
+
+procedure TformNotetask.DatePickerKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  nextCol: integer;
+begin
+  if (Key = VK_TAB) then
+  begin
+    Key := 0;
+    EditComplite(True);
+
+    with taskGrid do
+    begin
+      if Row < RowCount - 1 then
+      begin
+        Row := Row + 1;
+        nextCol := 2;
+        while (nextCol < ColCount) and (not Columns[nextCol - 1].Visible) do
+          Inc(nextCol);
+        if nextCol < ColCount then
+          Col := nextCol;
+      end;
+
+    end;
+  end;
 end;
 
 procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer;
