@@ -170,6 +170,18 @@ var
   PartNote, PartDate: TStringArray; // Use TStringArray for compatibility
   CompletedStr: string;
 
+  procedure FillText(start: integer = 1);
+  var
+    i: integer;
+  begin
+    FText := string.Empty;
+    for i := start to High(PartDate) do
+    begin
+      FText += PartDate[i];
+      if (i < High(PartDate)) then FText += ',';
+    end;
+  end;
+
   procedure FillNote(start: integer = 1);
   var
     i: integer;
@@ -191,18 +203,6 @@ var
     begin
       CompletedStr += PartNote[i];
       if (i < High(PartNote)) then CompletedStr += '//';
-    end;
-  end;
-
-  procedure FillText(start: integer = 1);
-  var
-    i: integer;
-  begin
-    FText := string.Empty;
-    for i := start to High(PartDate) do
-    begin
-      FText += PartDate[i];
-      if (i < High(PartDate)) then FText += ',';
     end;
   end;
 
@@ -307,7 +307,7 @@ begin
     end
     else
     begin
-      FText := CompletedStr;
+      FText := CleanString(CompletedStr);
       FDate := 0;
       FAmount := 0;
     end;
@@ -333,7 +333,7 @@ begin
       end
       else
       begin
-        FText := CompletedStr;
+        FText := CleanString(CompletedStr);
         FDate := 0;
       end;
       FAmount := 0;
@@ -341,7 +341,7 @@ begin
   end
   else
   begin
-    FText := CompletedStr;
+    FText := CleanString(CompletedStr);
     FDate := 0;
     FAmount := 0;
   end;
