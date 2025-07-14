@@ -1684,7 +1684,7 @@ begin
     taskGrid.RowCount := 2;
 
     // Load saved settings for new file
-    LoadGridSettings(Self, taskGrid, string.Empty);
+    //LoadGridSettings(Self, taskGrid, string.Empty);
     ApplyGridSettings;
   end;
 end;
