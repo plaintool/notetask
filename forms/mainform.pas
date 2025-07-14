@@ -366,6 +366,7 @@ type
     FMemoOldText: TCaption;
     FMemoNeedSelectAll: boolean;
     FDatePickerOldDate: TDateTime;
+    FDatePickerDateSet: boolean;
     FIsEditing: boolean;
     FIsSelecting: boolean;
     FDisableCheckToggle: boolean;
@@ -409,7 +410,7 @@ type
     procedure DatePickerEnter(Sender: TObject);
     procedure DatePickerKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure SetChanged(aChanged: boolean = True);
-    procedure EditCell(aCol, aRow: integer);
+    procedure EditCell(aCol: integer = -1; aRow: integer = -1);
     procedure EditComplite(aEnter: boolean = False; aEscape: boolean = False);
     procedure DisableDrag;
     procedure SetInfo;
@@ -3259,6 +3260,7 @@ begin
           Col := nextCol;
       end;
     end;
+    EditCell;
   end;
 end;
 
@@ -3277,7 +3279,9 @@ end;
 
 procedure TformNotetask.DatePickerEnter(Sender: TObject);
 begin
-  FDatePickerOldDate := DatePicker.DateTime;
+  FDatePickerOldDate := Tasks.GetTask(taskGrid.Row).Date;
+  FDatePickerDateSet := False;
+  if (DatePicker.DateTime = 0) then DatePicker.DateTime := Now;
   if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
   begin
     DatePicker.Color := clHighlight;
@@ -3292,11 +3296,15 @@ end;
 
 procedure TformNotetask.DatePickerChange(Sender: TObject);
 begin
+  //if (TDateTimePicker(Sender).DateTime <> 0) then
+  //begin
+  FDatePickerDateSet := True;
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime);
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
+  SetChanged;
+  //  end;
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
   if (FShowDuration) then FillGrid;
-  SetChanged;
   SetInfo;
 end;
 
@@ -3307,7 +3315,7 @@ begin
   if (Key = VK_TAB) then
   begin
     Key := 0;
-    EditComplite(True);
+    EditComplite(FDatePickerDateSet, not FDatePickerDateSet);
 
     with taskGrid do
     begin
@@ -3320,8 +3328,8 @@ begin
         if nextCol < ColCount then
           Col := nextCol;
       end;
-
     end;
+    EditCell;
   end;
 end;
 
@@ -4328,10 +4336,10 @@ begin
   SetCaption;
 end;
 
-procedure TformNotetask.EditCell(aCol, aRow: integer);
+procedure TformNotetask.EditCell(aCol: integer = -1; aRow: integer = -1);
 begin
-  taskGrid.Row := aRow;
-  taskGrid.Col := aCol;
+  if (aCol >= 0) then  taskGrid.Col := aCol;
+  if (aRow >= 0) then taskGrid.Row := aRow;
   FIsEditing := True;
   taskGrid.EditorMode := True; //Set editing mode
 
@@ -4364,8 +4372,11 @@ begin
       // Pressing the Escape key on the date column cancels editing
       if (aEscape) then
       begin
-        DatePicker.DateTime := FDatePickerOldDate;
-        DatePickerChange(DatePicker);
+        if (FDatePickerDateSet) then
+        begin
+          DatePicker.DateTime := FDatePickerOldDate;
+          DatePickerChange(DatePicker);
+        end;
       end;
     end;
 

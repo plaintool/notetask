@@ -103,24 +103,34 @@ function DateTimeToStringISO(Value: TDateTime; ADisplayTime: boolean = True): st
 var
   FS: TFormatSettings;
 begin
-  FS := DefaultFormatSettings;
-  FS.DateSeparator := '-';
-  FS.TimeSeparator := ':';
-  FS.ShortDateFormat := 'yyyy-mm-dd';
-  FS.ShortTimeFormat := 'hh:nn:ss';
+  if (Value <> 0) then
+  begin
+    FS := DefaultFormatSettings;
+    FS.DateSeparator := '-';
+    FS.TimeSeparator := ':';
+    FS.ShortDateFormat := 'yyyy-mm-dd';
+    FS.ShortTimeFormat := 'hh:nn:ss';
 
-  if (Frac(Value) = 0) or (not ADisplayTime) then
-    Result := FormatDateTime('yyyy"-"mm"-"dd', Value, FS)
+    if (Frac(Value) = 0) or (not ADisplayTime) then
+      Result := FormatDateTime('yyyy"-"mm"-"dd', Value, FS)
+    else
+      Result := FormatDateTime('yyyy"-"mm"-"dd"T"hh":"nn":"ss', Value, FS);
+  end
   else
-    Result := FormatDateTime('yyyy"-"mm"-"dd"T"hh":"nn":"ss', Value, FS);
+    Result := string.Empty;
 end;
 
 function DateTimeToString(Value: TDateTime; ADisplayTime: boolean = True): string;
 begin
-  if (not ADisplayTime) then
-    Result := FormatDateTime(FormatSettings.ShortDateFormat, Value)
+  if (Value <> 0) then
+  begin
+    if (not ADisplayTime) then
+      Result := FormatDateTime(FormatSettings.ShortDateFormat, Value)
+    else
+      Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Value);
+  end
   else
-    Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Value);
+    Result := string.Empty;
 end;
 
 function FloatToString(Value: double): string;
