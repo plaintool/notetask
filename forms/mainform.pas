@@ -478,6 +478,7 @@ type
     function SaveFileAs: boolean;
     function SaveFile(fileName: string = string.Empty): boolean;
     function OpenFile(fileName: string): boolean;
+    procedure ApplyGridSettings;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
     function Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
@@ -1659,11 +1660,14 @@ var
 begin
   if IsCanClose then
   begin
+    EditComplite;
+
+    // Save settings for current file
+    SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+
     new := TStringList.Create;
     new.Add('[ ]');
     Tasks := TTasks.Create(new);
-    SetChanged(False);
-    EditComplite;
     FFileName := string.Empty;
 
     // Encoding of new file
@@ -1678,10 +1682,10 @@ begin
 
     taskGrid.Clean;
     taskGrid.RowCount := 2;
-    taskGrid.Col := 2;
-    ResetRowHeight;
-    SetInfo;
-    SetTabs;
+
+    // Load saved settings for new file
+    LoadGridSettings(Self, taskGrid, string.Empty);
+    ApplyGridSettings;
   end;
 end;
 
@@ -2737,8 +2741,6 @@ begin
     ShowMessage(rfilenotfound);
     exit;
   end;
-  // Save settings for new file
-  //SaveGridSettings(Self, taskGrid, string.Empty);
   // Save settings for current file
   SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
@@ -2753,7 +2755,15 @@ begin
   // Load saved settings for file
   LoadGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
+  ApplyGridSettings;
+
+  Result := True;
+end;
+
+procedure TformNotetask.ApplyGridSettings;
+begin
   SetChanged(False);
+
   ShowNote := FShowNote;
   ShowStatusBar := FShowStatusBar;
   ShowArchived := FShowArchived;
@@ -2772,7 +2782,6 @@ begin
   SetInfo;
   SetNote;
   SetTabs;
-  Result := True;
 end;
 
 function TformNotetask.SaveFileAs: boolean;
