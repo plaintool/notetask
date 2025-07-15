@@ -307,7 +307,7 @@ begin
     end
     else
     begin
-      FText := CleanString(CompletedStr);
+      FText := CompletedStr;
       FDate := 0;
       FAmount := 0;
     end;
@@ -333,7 +333,7 @@ begin
       end
       else
       begin
-        FText := CleanString(CompletedStr);
+        FText := CompletedStr;
         FDate := 0;
       end;
       FAmount := 0;
@@ -341,7 +341,7 @@ begin
   end
   else
   begin
-    FText := CleanString(CompletedStr);
+    FText := CompletedStr;
     FDate := 0;
     FAmount := 0;
   end;
@@ -1451,6 +1451,8 @@ var
   Index, i, j: integer;
   RowTask: TTask;
   IsRowEmpty, DoInsert: boolean;
+  line: string;
+  tabpos: integer;
 begin
   Result := Grid.Selection;
   DoInsert := True;
@@ -1471,6 +1473,10 @@ begin
   if (Grid.Selection.Height = 0) and (SortOrder = soDescending) then
     for i := 0 to ListTasks.Count div 2 - 1 do
       ListTasks.Exchange(i, ListTasks.Count - 1 - i);
+
+  // Replace tabs in strings
+  for i := 0 to ListTasks.Count - 1 do
+    ListTasks[i] := CleanString(ListTasks[i]);
 
   TempTasks := TTasks.Create(ListTasks);
   try
