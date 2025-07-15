@@ -3205,6 +3205,72 @@ begin
   {$ENDIF}
 end;
 
+procedure TformNotetask.EditCell(aCol: integer = -1; aRow: integer = -1);
+var
+  Value: string;
+begin
+  if (aCol >= 0) then
+    taskGrid.Col := aCol
+  else
+    aCol := taskGrid.Col;
+  if (aRow >= 0) then
+    taskGrid.Row := aRow
+  else
+    aRow := taskGrid.Row;
+  FIsEditing := True;
+  taskGrid.EditorMode := True; //Set editing mode
+
+  if (Assigned(Memo)) and (Memo.Visible) then
+  begin
+    EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
+    Value := Tasks.GetTaskValue(aCol, aRow);
+    if (aCol <> 4) or (Value <> '0') then
+      Memo.Text := Value;
+    Memo.SelectAll;
+    Memo.SetFocus;
+    FMemoStartEdit := True;
+  end;
+  if (Assigned(DatePicker)) and (DatePicker.Visible) then
+  begin
+    EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
+  end;
+end;
+
+procedure TformNotetask.EditComplite(aEnter: boolean = False; aEscape: boolean = False);
+begin
+  if taskGrid.EditorMode then
+  begin
+    if (taskGrid.Col = 5) and (Assigned(DatePicker)) then
+    begin
+      if (aEnter) then
+      begin
+        if taskGrid.Cells[taskGrid.Col, taskGrid.Row] = string.empty then
+          DatePickerChange(DatePicker);
+      end
+      else
+      // Pressing the Escape key on the date column cancels editing
+      if (aEscape) then
+      begin
+        if (FDatePickerDateSet) then
+        begin
+          DatePicker.DateTime := FDatePickerOldDate;
+          DatePickerChange(DatePicker);
+        end;
+      end;
+    end;
+
+    if (taskGrid.Col in [2, 3, 4]) and (Assigned(Memo)) then
+    begin
+      // Pressing the Escape key cancels editing
+      if (aEscape) then
+        Memo.Text := FMemoOldText;
+    end;
+
+    taskGrid.EditorMode := False;
+    FIsEditing := False;
+  end;
+end;
+
 procedure TformNotetask.MemoChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
@@ -4343,62 +4409,6 @@ begin
   aUndo.Enabled := FChanged;
   aUndoAll.Enabled := FChanged;
   SetCaption;
-end;
-
-procedure TformNotetask.EditCell(aCol: integer = -1; aRow: integer = -1);
-begin
-  if (aCol >= 0) then  taskGrid.Col := aCol;
-  if (aRow >= 0) then taskGrid.Row := aRow;
-  FIsEditing := True;
-  taskGrid.EditorMode := True; //Set editing mode
-
-  if (Assigned(Memo)) and (Memo.Visible) then
-  begin
-    EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
-    Memo.Text := Tasks.GetTaskValue(aCol, aRow);
-    Memo.SelectAll;
-    Memo.SetFocus;
-    FMemoStartEdit := True;
-  end;
-  if (Assigned(DatePicker)) and (DatePicker.Visible) then
-  begin
-    EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
-  end;
-end;
-
-procedure TformNotetask.EditComplite(aEnter: boolean = False; aEscape: boolean = False);
-begin
-  if taskGrid.EditorMode then
-  begin
-    if (taskGrid.Col = 5) and (Assigned(DatePicker)) then
-    begin
-      if (aEnter) then
-      begin
-        if taskGrid.Cells[taskGrid.Col, taskGrid.Row] = string.empty then
-          DatePickerChange(DatePicker);
-      end
-      else
-      // Pressing the Escape key on the date column cancels editing
-      if (aEscape) then
-      begin
-        if (FDatePickerDateSet) then
-        begin
-          DatePicker.DateTime := FDatePickerOldDate;
-          DatePickerChange(DatePicker);
-        end;
-      end;
-    end;
-
-    if (taskGrid.Col in [2, 3, 4]) and (Assigned(Memo)) then
-    begin
-      // Pressing the Escape key cancels editing
-      if (aEscape) then
-        Memo.Text := FMemoOldText;
-    end;
-
-    taskGrid.EditorMode := False;
-    FIsEditing := False;
-  end;
 end;
 
 procedure TformNotetask.DisableDrag;
