@@ -1,4 +1,10 @@
 *.exe
 *.res
 *.lps
-lib/
+*.dbg
+*.msi
+/lib
+/installer/debsetup/notetask.deb
+/installer/debsetup/DATA/usr/bin/notetask
+/installer/*.wixobj
+/installer/*.wixpdb

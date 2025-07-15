@@ -1451,8 +1451,6 @@ var
   Index, i, j: integer;
   RowTask: TTask;
   IsRowEmpty, DoInsert: boolean;
-  line: string;
-  tabpos: integer;
 begin
   Result := Grid.Selection;
   DoInsert := True;
