@@ -7,7 +7,7 @@ A simple application for creating and organizing task lists, offering essential 
 [![Languages: ar be zh en fr de hi it ja ko pt ru es uk](https://img.shields.io/badge/Lang-ar_be_zh_en_fr_de_hi_it_ja_ko_pt_ru_es_uk-green)](https://www.ethnologue.com)
 
 >- [Notetask](#notetask)
->   - [What is it?](#whatisit)
+>   - [What is it?](#what-is-it)
 >   - [Features](#features)
 >- [File Format](#file-format)
 >   - [Legend](#legend)
