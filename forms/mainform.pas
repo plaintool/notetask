@@ -710,8 +710,7 @@ begin
   else
   if (ssCtrl in Shift) and (Key = VK_DELETE) then // Ctrl + Del
   begin
-    if not IsEditing then
-      DeleteTasks;
+    DeleteTasks;
     Key := 0;
   end
   else
