@@ -1440,6 +1440,19 @@ begin
     Key := 0;
   end
   else
+  if (Shift = [ssCtrl]) and (Key = VK_TAB) then // Ctrl + Tab
+  begin
+    SelectNext(ActiveControl, True, True);
+    Key := 0;
+  end
+  else
+  if (Key = VK_TAB) then // Tab
+  begin
+    if (Field.Focused) then
+      Field.SelText := '    ';
+    Key := 0;
+  end
+  else
   if Key = VK_PRIOR then
   begin
     LinesPerPage := Field.ClientHeight div Canvas.TextHeight('Wg');
@@ -1456,6 +1469,12 @@ begin
     Field.VertScrollBar.Position := Field.CaretPos.Y - (LinesPerPage div 2);
     Field.Invalidate;
     key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_Z) then // Ctrl + Shift + Z
+  begin
+    aUndoAll.Execute;
+    Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
@@ -2145,6 +2164,7 @@ procedure TformNotetask.aIndentTasksExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
+  EditComplite;
   IndentTasks;
 end;
 
@@ -2152,6 +2172,7 @@ procedure TformNotetask.aOutdentTasksExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
+  EditComplite;
   IndentTasks(True);
 end;
 
