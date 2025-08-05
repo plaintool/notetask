@@ -180,6 +180,7 @@ object formNotetask: TformNotetask
       TabOrder = 0
       WordWrap = False
       OnChange = memoNoteChange
+      OnContextPopup = memoNoteContextPopup
       OnKeyDown = memoNoteKeyDown
     end
   end

@@ -35,7 +35,7 @@ uses
   LConvEncoding,
   GridPrn,
   task,
-  lineending;
+  lineending, Types;
 
 type
 
@@ -254,6 +254,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure ApplicationException(Sender: TObject; E: Exception);
+    procedure memoNoteContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
     procedure OnQueryEndSession(var CanEnd: boolean);
     procedure panelNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure panelNoteMouseEnter(Sender: TObject);
@@ -365,6 +366,8 @@ type
     FMemoStartEdit: boolean;
     FMemoOldText: TCaption;
     FMemoNeedSelectAll: boolean;
+    FMemoNoteBackup: TCaption;
+    FMemoNoteSelStartBackup: integer;
     FDatePickerOldDate: TDateTime;
     FDatePickerDateSet: boolean;
     FIsEditing: boolean;
@@ -445,6 +448,8 @@ type
     procedure ApplySortingActions;
     procedure GridBackupSelection;
     procedure GridClearSelection;
+    procedure MemoNoteBackup;
+    procedure MemoNoteUndo;
     function IsExecuteValueNote(memoPriority: boolean = False): boolean;
     function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
@@ -1424,19 +1429,41 @@ end;
 
 procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
-  Field: TMemo;
   LinesPerPage: integer;
 begin
-  Field := (Sender as TMemo);
-
-  if Key = VK_DELETE then // Delete
+  if (not (ssShift in Shift)) and (Key = VK_PRIOR) then
   begin
-    if Field.SelLength = 0 then
-    begin
-      Field.SelStart := Field.SelStart;
-      Field.SelLength := 1;
-    end;
-    Field.ClearSelection;
+    LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
+    memoNote.CaretPos := Point(0, Max(0, memoNote.CaretPos.Y - LinesPerPage));
+    memoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
+    memoNote.Invalidate;
+    Key := 0;
+  end
+  else
+  if (not (ssShift in Shift)) and (Key = VK_NEXT) then
+  begin
+    LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
+    memoNote.CaretPos := Point(0, Min(memoNote.Lines.Count - 1, memoNote.CaretPos.Y + LinesPerPage));
+    memoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
+    memoNote.Invalidate;
+    key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
+  begin
+    memoNote.CopyToClipboard;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
+  begin
+    memoNote.SelectAll;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_F) then // Ctrl + F
+  begin
+    aFind.Execute;
     Key := 0;
   end
   else
@@ -1446,29 +1473,32 @@ begin
     Key := 0;
   end
   else
+  if memoNote.ReadOnly then exit
+  else
+  if Key = VK_DELETE then // Delete
+  begin
+    if memoNote.SelLength = 0 then
+    begin
+      memoNote.SelStart := memoNote.SelStart;
+      memoNote.SelLength := 1;
+    end
+    else
+      MemoNoteBackup;
+    memoNote.ClearSelection;
+    Key := 0;
+  end
+  else
+  if (Key = VK_BACK) then
+  begin
+    if memoNote.SelLength > 0 then
+      MemoNoteBackup;
+  end
+  else
   if (Key = VK_TAB) then // Tab
   begin
-    if (Field.Focused) then
-      Field.SelText := '    ';
+    MemoNoteBackup;
+    memoNote.SelText := '    ';
     Key := 0;
-  end
-  else
-  if Key = VK_PRIOR then
-  begin
-    LinesPerPage := Field.ClientHeight div Canvas.TextHeight('Wg');
-    Field.CaretPos := Point(0, Max(0, Field.CaretPos.Y - LinesPerPage));
-    Field.VertScrollBar.Position := Field.CaretPos.Y - (LinesPerPage div 2);
-    Field.Invalidate;
-    Key := 0;
-  end
-  else
-  if key = VK_NEXT then
-  begin
-    LinesPerPage := Field.ClientHeight div Canvas.TextHeight('Wg');
-    Field.CaretPos := Point(0, Min(Field.Lines.Count - 1, Field.CaretPos.Y + LinesPerPage));
-    Field.VertScrollBar.Position := Field.CaretPos.Y - (LinesPerPage div 2);
-    Field.Invalidate;
-    key := 0;
   end
   else
   if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_Z) then // Ctrl + Shift + Z
@@ -1479,37 +1509,21 @@ begin
   else
   if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
   begin
-    Field.Undo;
+    MemoNoteUndo;
     Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
   begin
-    Field.CutToClipboard;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
-  begin
-    Field.CopyToClipboard;
+    MemoNoteBackup;
+    memoNote.CutToClipboard;
     Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
   begin
-    Field.PasteFromClipboard;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
-  begin
-    Field.SelectAll;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_F) then // Ctrl + F
-  begin
-    aFind.Execute;
+    MemoNoteBackup;
+    memoNote.PasteFromClipboard;
     Key := 0;
   end;
 end;
@@ -1520,6 +1534,11 @@ begin
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
   CalcRowHeights(taskGrid.Row);
   SetChanged;
+end;
+
+procedure TformNotetask.memoNoteContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
+begin
+  MemoNoteBackup;
 end;
 
 procedure TformNotetask.groupTabsChange(Sender: TObject);
@@ -3862,6 +3881,25 @@ begin
   taskGrid.Col := 2;
 end;
 
+procedure TformNotetask.MemoNoteBackup;
+begin
+  FMemoNoteBackup := memoNote.Text;
+  FMemoNoteSelStartBackup := memoNote.SelStart;
+end;
+
+procedure TformNotetask.MemoNoteUndo;
+var
+  newBackup: TCaption;
+  SelStart: integer;
+begin
+  newBackup := MemoNote.Text;
+  SelStart := memoNote.SelStart;
+  memoNote.Text := FMemoNoteBackup;
+  memoNote.SelStart := FMemoNoteSelStartBackup;
+  FMemoNotebackup := newBackup;
+  FMemoNoteSelStartBackup := SelStart;
+end;
+
 function TformNotetask.GetScrollPosition: integer;
 var
   i: integer;
@@ -4321,6 +4359,7 @@ begin
       memoNote.Text := string.Empty;
   finally
     notes.Free;
+    MemoNoteBackup;
     memoNote.OnChange := @memoNoteChange;
   end;
 end;
