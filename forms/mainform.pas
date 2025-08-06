@@ -409,6 +409,7 @@ type
     procedure SelectMemoLine(LineIndex: integer; Move: boolean = False);
     procedure MemoEnter(Sender: TObject);
     procedure MemoChange(Sender: TObject);
+    procedure MemoContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
     procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure MemoKeyPress(Sender: TObject; var Key: char);
     procedure DatePickerEnter(Sender: TObject);
@@ -1307,8 +1308,9 @@ begin
 
     EditControlSetBounds(Memo, aCol, aRow);
     Memo.Parent := taskGrid;
-    Memo.OnChange := @MemoChange; // Event Change
     Memo.OnEnter := @MemoEnter; // Event Enter
+    Memo.OnChange := @MemoChange; // Event Change
+    Memo.OnContextPopup := @MemoContextPopup; // Event ContextPopup
     Memo.OnKeyDown := @MemoKeyDown; // Event KeyDown
     if (aCol = 4) then
       Memo.OnKeyPress := @MemoKeyPress; // Event KeyPress for amount column only
@@ -1805,7 +1807,7 @@ begin
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-    MemoUndo; //  (taskGrid.InplaceEditor as TCustomEdit).Undo;
+    MemoUndo; //(taskGrid.InplaceEditor as TCustomEdit).Undo;
 end;
 
 procedure TformNotetask.aUndoAllExecute(Sender: TObject);
@@ -1850,7 +1852,10 @@ begin
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+  begin
+    MemoBackup;
     (taskGrid.InplaceEditor as TCustomEdit).CutToClipboard;
+  end;
 end;
 
 procedure TformNotetask.aCopyExecute(Sender: TObject);
@@ -1886,7 +1891,10 @@ begin
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+  begin
+    MemoBackup;
     (taskGrid.InplaceEditor as TCustomEdit).PasteFromClipboard;
+  end;
 end;
 
 procedure TformNotetask.aDeleteExecute(Sender: TObject);
@@ -1909,7 +1917,9 @@ begin
       begin
         SelStart := SelStart;
         SelLength := 1;
-      end;
+      end
+      else
+        MemoBackup;
       ClearSelection;
     end;
 end;
@@ -3351,6 +3361,11 @@ begin
     SetInfo;
 end;
 
+procedure TformNotetask.MemoContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
+begin
+  MemoBackup;
+end;
+
 procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   nextCol: integer;
@@ -3380,6 +3395,12 @@ begin
       end;
     end;
     EditCell;
+  end
+  else
+  if (Key = VK_BACK) then
+  begin
+    if Memo.SelLength > 0 then
+      MemoBackup;
   end;
 end;
 
