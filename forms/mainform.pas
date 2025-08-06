@@ -366,6 +366,8 @@ type
     FMemoStartEdit: boolean;
     FMemoOldText: TCaption;
     FMemoNeedSelectAll: boolean;
+    FMemoBackup: TCaption;
+    FMemoSelStartBackup: integer;
     FMemoNoteBackup: TCaption;
     FMemoNoteSelStartBackup: integer;
     FDatePickerOldDate: TDateTime;
@@ -405,12 +407,12 @@ type
     function GetLineAtEnd: integer;
     function GetLineAtPos(Y: integer): integer;
     procedure SelectMemoLine(LineIndex: integer; Move: boolean = False);
-    procedure MemoChange(Sender: TObject);
     procedure MemoEnter(Sender: TObject);
+    procedure MemoChange(Sender: TObject);
     procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure MemoKeyPress(Sender: TObject; var Key: char);
-    procedure DatePickerChange(Sender: TObject);
     procedure DatePickerEnter(Sender: TObject);
+    procedure DatePickerChange(Sender: TObject);
     procedure DatePickerKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol: integer = -1; aRow: integer = -1);
@@ -450,6 +452,8 @@ type
     procedure GridClearSelection;
     procedure MemoNoteBackup;
     procedure MemoNoteUndo;
+    procedure MemoBackup;
+    procedure MemoUndo;
     function IsExecuteValueNote(memoPriority: boolean = False): boolean;
     function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
@@ -1311,6 +1315,7 @@ begin
     Memo.Text := taskGrid.Cells[aCol, aRow];
     Memo.SelStart := Length(Memo.Text);
     Memo.SelLength := 0;
+    MemoBackup;
 
     Editor := Memo;
 
@@ -1800,7 +1805,7 @@ begin
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-    (taskGrid.InplaceEditor as TCustomEdit).Undo;
+    MemoUndo; //  (taskGrid.InplaceEditor as TCustomEdit).Undo;
 end;
 
 procedure TformNotetask.aUndoAllExecute(Sender: TObject);
@@ -3310,20 +3315,6 @@ begin
   end;
 end;
 
-procedure TformNotetask.MemoChange(Sender: TObject);
-begin
-  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
-  FMemoStartEdit := False;
-  SetChanged;
-  CalcRowHeights(taskGrid.Row);
-  EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
-  if (taskGrid.Col = 3) then
-    SetNote;
-  if (taskGrid.Col = 4) then
-    SetInfo;
-end;
-
 procedure TformNotetask.MemoEnter(Sender: TObject);
 begin
   FMemoStartEdit := True;
@@ -3344,6 +3335,20 @@ begin
     Memo.Color := clRowFocused;
     Memo.Font.Color := clBlack;
   end;
+end;
+
+procedure TformNotetask.MemoChange(Sender: TObject);
+begin
+  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
+  Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
+  FMemoStartEdit := False;
+  SetChanged;
+  CalcRowHeights(taskGrid.Row);
+  EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
+  if (taskGrid.Col = 3) then
+    SetNote;
+  if (taskGrid.Col = 4) then
+    SetInfo;
 end;
 
 procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -3380,6 +3385,7 @@ end;
 
 procedure TformNotetask.MemoKeyPress(Sender: TObject; var Key: char);
 begin
+  // Event KeyPress for Amount column only
   // Replace comma with dot for decimal input
   if Key = ',' then
     Key := '.';
@@ -3395,6 +3401,7 @@ procedure TformNotetask.DatePickerEnter(Sender: TObject);
 begin
   FDatePickerOldDate := Tasks.GetTask(taskGrid.Row).Date;
   FDatePickerDateSet := False;
+  if (FBackup) then Tasks.CreateBackup;
   if (DatePicker.DateTime = 0) then DatePicker.DateTime := Now;
   if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
   begin
@@ -3410,13 +3417,10 @@ end;
 
 procedure TformNotetask.DatePickerChange(Sender: TObject);
 begin
-  //if (TDateTimePicker(Sender).DateTime <> 0) then
-  //begin
   FDatePickerDateSet := True;
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime);
-  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
+  Tasks.SetTask(taskGrid, taskGrid.Row, False, FShowTime);
   SetChanged;
-  //  end;
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
   if (FShowDuration) then FillGrid;
   SetInfo;
@@ -3898,6 +3902,25 @@ begin
   memoNote.SelStart := FMemoNoteSelStartBackup;
   FMemoNotebackup := newBackup;
   FMemoNoteSelStartBackup := SelStart;
+end;
+
+procedure TformNotetask.MemoBackup;
+begin
+  FMemoBackup := Memo.Text;
+  FMemoSelStartBackup := Memo.SelStart;
+end;
+
+procedure TformNotetask.MemoUndo;
+var
+  newBackup: TCaption;
+  SelStart: integer;
+begin
+  newBackup := Memo.Text;
+  SelStart := Memo.SelStart;
+  Memo.Text := FMemoBackup;
+  Memo.SelStart := FMemoSelStartBackup;
+  FMemobackup := newBackup;
+  FMemoSelStartBackup := SelStart;
 end;
 
 function TformNotetask.GetScrollPosition: integer;
