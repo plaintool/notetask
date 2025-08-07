@@ -4,7 +4,7 @@
         <Package Description="Notetask" Comments="Notetask" Platform="x64" InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
         <Property Id="MSIINSTALLPERUSER" Value="1" />
         <Property Id="MSIFASTINSTALL" Value="1" />
-        <WixVariable Id="WixUILicenseRtf" Value="D:\Lazarus\Notetask\installer\LICENSE.rtf" />
+        <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Upgrade Id="45C75BC5-3DDC-453B-A7AB-7E2AE0D88699">
             <UpgradeVersion Minimum="0.0.0.0" IncludeMinimum="yes" Maximum="1.0.0.0" IncludeMaximum="yes" Property="PREVIOUSFOUND" />
@@ -17,8 +17,8 @@
                 <Directory Id="INSTALLDIR" Name="Notetask">
                     <Component Id="NotetaskFiles" DiskId="1" Guid="2cf58c8a-ad81-49e9-acbc-b1a3262acfc6" Win64="yes">
                         <!-- Files to be installed -->
-                        <File Id="NOTETASK.EXE" Name="notetask.exe" Source="D:\Lazarus\Notetask\notetask.exe" />
-                        <File Id="LICENSE" Name="LICENSE" Source="D:\Lazarus\Notetask\LICENSE" />
+                        <File Id="NOTETASK.EXE" Name="notetask.exe" Source="..\notetask.exe" />
+                        <File Id="LICENSE" Name="LICENSE" Source="..\LICENSE" />
                         <!-- Registry KeyPath to satisfy ICE38 -->
                         <RegistryValue Root="HKCU" Key="Software\Alexander Tverskoy\Notetask" Name="InstallPath" Type="string" Value="[INSTALLDIR]" KeyPath="yes" />
                         <!-- Remove INSTALLDIR on uninstall -->
@@ -77,7 +77,7 @@
         <UI>
             <UIRef Id="WixUI_Minimal" />
         </UI>
-        <Icon Id="DesktopIcon.exe" SourceFile="D:\Lazarus\Notetask\notetask.exe" />
-        <Icon Id="StartMenuIcon.exe" SourceFile="D:\Lazarus\Notetask\notetask.exe" />
+        <Icon Id="DesktopIcon.exe" SourceFile="..\notetask.exe" />
+        <Icon Id="StartMenuIcon.exe" SourceFile="..\notetask.exe" />
     </Product>
 </Wix>
