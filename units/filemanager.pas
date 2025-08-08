@@ -19,7 +19,7 @@ uses
 
 function GetEncodingName(Encoding: TEncoding): string;
 
-function IsUserEncoding(Enc: TEncoding): Boolean;
+function IsUserEncoding(Enc: TEncoding): boolean;
 
 function IsBOMEncoding(Encoding: TEncoding): boolean;
 
@@ -68,14 +68,9 @@ begin
     Result := 'Unknown';
 end;
 
-function IsUserEncoding(Enc: TEncoding): Boolean;
+function IsUserEncoding(Enc: TEncoding): boolean;
 begin
-  Result := Assigned(Enc) and
-            (Enc <> TEncoding.UTF8) and
-            (Enc <> TEncoding.Unicode) and
-            (Enc <> TEncoding.BigEndianUnicode) and
-            (Enc <> TEncoding.ASCII) and
-            (Enc <> TEncoding.Default);
+  Result := Assigned(Enc) and not TEncoding.IsStandardEncoding(Enc);
 end;
 
 function IsBOMEncoding(Encoding: TEncoding): boolean;
@@ -437,8 +432,7 @@ begin
 
   // Common install locations for PowerShell 7 and 6
   SearchPaths := ['C:\Program Files\PowerShell\6\pwsh.exe', 'C:\Program Files\PowerShell\7\pwsh.exe',
-    'C:\Program Files\PowerShell\8\pwsh.exe', 'C:\Program Files\PowerShell\9\pwsh.exe',
-    'C:\Program Files\PowerShell\10\pwsh.exe'];
+    'C:\Program Files\PowerShell\8\pwsh.exe', 'C:\Program Files\PowerShell\9\pwsh.exe', 'C:\Program Files\PowerShell\10\pwsh.exe'];
 
   // Check known fixed locations first
   for I := Low(SearchPaths) to High(SearchPaths) do
