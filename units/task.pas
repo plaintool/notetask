@@ -277,7 +277,7 @@ begin
   // Checks if the task is completed
   CompletedStr := RemoveBrackets(CompletedStr);
 
-  if (TryStrToFloat(CleanAmount(CompletedStr), FAmount)) then
+  if (TryStrToFloatLimited(CleanAmount(CompletedStr), FAmount)) then
   else
   if (TryStrToDateTimeISO(CompletedStr, FDate)) then
   else
@@ -287,7 +287,7 @@ begin
     if (TryStrToDateTimeISO(PartDate[0].Trim, FDate)) then
     begin
       // Extract and trim the amount string
-      if (TryStrToFloat(PartDate[1].Trim, FAmount)) then
+      if (TryStrToFloatLimited(PartDate[1].Trim, FAmount)) then
         FillText(2)
       else
       begin
@@ -299,7 +299,7 @@ begin
     end
     else
     // Extract and trim the amount string
-    if (TryStrToFloat(PartDate[0].Trim, FAmount)) then
+    if (TryStrToFloatLimited(PartDate[0].Trim, FAmount)) then
     begin
       FillText(1);
       if (Length(FText) > 0) and (FText.StartsWith(' ')) then
@@ -316,7 +316,7 @@ begin
   if Length(PartDate) > 1 then
   begin
     // Extract and trim the amount string
-    if (TryStrToFloat(PartDate[0].Trim, FAmount)) then
+    if (TryStrToFloatLimited(PartDate[0].Trim, FAmount)) then
     begin
       FillText(1);
       if (Length(FText) > 0) and (FText.StartsWith(' ')) then

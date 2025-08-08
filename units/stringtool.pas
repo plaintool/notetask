@@ -24,6 +24,8 @@ function DateTimeToStringISO(Value: TDateTime; ADisplayTime: boolean = True): st
 
 function DateTimeToString(Value: TDateTime; ADisplayTime: boolean = True): string;
 
+function TryStrToFloatLimited(const S: string; out Value: double): boolean;
+
 function FloatToString(Value: double): string;
 
 function IsBracket(const Input: string): boolean;
@@ -49,6 +51,7 @@ function GetConsoleEncoding: string;
 const
   Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
   UnicodeMinusUTF8 = #$E2#$88#$92;
+  MaxFloatStringLength = 17;
 
 implementation
 
@@ -131,6 +134,13 @@ begin
   end
   else
     Result := string.Empty;
+end;
+
+function TryStrToFloatLimited(const S: string; out Value: double): boolean;
+begin
+  if Length(S) > MaxFloatStringLength then
+    Exit(False);
+  Result := TryStrToFloat(S, Value);
 end;
 
 function FloatToString(Value: double): string;
