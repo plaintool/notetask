@@ -49,6 +49,8 @@ function SetCursorTo(Control: TControl; const ResName: string; CursorIndex: inte
 
 function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;
 
+function IsSystemKey(Key: word): boolean;
+
 var
   Language: string;
 
@@ -447,6 +449,42 @@ begin
     end;
   end;
   {$ENDIF}
+end;
+
+function IsSystemKey(Key: word): boolean;
+begin
+  case Key of
+    // Navigation keys
+    VK_TAB, VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT,
+    VK_HOME, VK_END, VK_PRIOR, VK_NEXT,
+    // Function keys
+    VK_F1..VK_F24,
+    // Modifiers
+    VK_SHIFT, VK_CONTROL, VK_MENU, VK_LSHIFT, VK_RSHIFT,
+    VK_LCONTROL, VK_RCONTROL, VK_LMENU, VK_RMENU,
+    // Special keys
+    VK_ESCAPE, VK_INSERT, VK_DELETE, VK_SCROLL, VK_PAUSE,
+    VK_CAPITAL, VK_NUMLOCK, VK_SNAPSHOT, VK_CANCEL,
+    VK_BACK, VK_SPACE, VK_RETURN, VK_CLEAR,
+    // Windows keys
+    VK_LWIN, VK_RWIN, VK_APPS, VK_SLEEP,
+    // Numpad keys
+    VK_ADD, VK_SUBTRACT, VK_MULTIPLY, VK_DIVIDE, VK_DECIMAL,
+    VK_NUMPAD0..VK_NUMPAD9,
+    // Multimedia keys
+    VK_BROWSER_BACK, VK_BROWSER_FORWARD, VK_BROWSER_REFRESH,
+    VK_BROWSER_STOP, VK_BROWSER_SEARCH, VK_BROWSER_FAVORITES,
+    VK_BROWSER_HOME, VK_VOLUME_MUTE, VK_VOLUME_DOWN, VK_VOLUME_UP,
+    VK_MEDIA_NEXT_TRACK, VK_MEDIA_PREV_TRACK, VK_MEDIA_STOP,
+    VK_MEDIA_PLAY_PAUSE, VK_LAUNCH_MAIL, VK_LAUNCH_MEDIA_SELECT,
+    VK_LAUNCH_APP1, VK_LAUNCH_APP2,
+    // IME keys
+    VK_KANA, VK_JUNJA, VK_FINAL, VK_HANJA,
+    VK_CONVERT, VK_NONCONVERT, VK_ACCEPT, VK_MODECHANGE:
+      Result := True;
+    else
+      Result := False;
+  end;
 end;
 
 end.

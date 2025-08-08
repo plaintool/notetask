@@ -16,6 +16,7 @@ uses
   SysUtils,
   Forms,
   Controls,
+  Types,
   Graphics,
   Dialogs,
   StdCtrls,
@@ -35,7 +36,7 @@ uses
   LConvEncoding,
   GridPrn,
   task,
-  lineending, Types;
+  lineending;
 
 type
 
@@ -244,18 +245,20 @@ type
     MenuItem9: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem15: TMenuItem;
-    procedure aDuplicateTasksExecute(Sender: TObject);
-    procedure aEnterSubmitExecute(Sender: TObject);
-    procedure aRunPowershellExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
+    procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
     procedure ApplicationException(Sender: TObject; E: Exception);
-    procedure memoNoteContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
     procedure OnQueryEndSession(var CanEnd: boolean);
+    procedure groupTabsChange(Sender: TObject);
+    procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure groupTabsMouseLeave(Sender: TObject);
+    procedure groupTabsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+    procedure groupTabsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure panelNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure panelNoteMouseEnter(Sender: TObject);
     procedure panelNoteMouseLeave(Sender: TObject);
@@ -279,8 +282,9 @@ type
     procedure taskGridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
     procedure taskGridSelection(Sender: TObject; aCol, aRow: integer);
-    procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure memoNoteChange(Sender: TObject);
+    procedure aDuplicateTasksExecute(Sender: TObject);
+    procedure aEnterSubmitExecute(Sender: TObject);
+    procedure aRunPowershellExecute(Sender: TObject);
     procedure aArchiveTasksExecute(Sender: TObject);
     procedure aCopyExecute(Sender: TObject);
     procedure aCutExecute(Sender: TObject);
@@ -344,11 +348,6 @@ type
     procedure aRunTerminalExecute(Sender: TObject);
     procedure aMergeTasksExecute(Sender: TObject);
     procedure aShowNoteExecute(Sender: TObject);
-    procedure groupTabsChange(Sender: TObject);
-    procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure groupTabsMouseLeave(Sender: TObject);
-    procedure groupTabsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
-    procedure groupTabsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure aInsertGroupExecute(Sender: TObject);
     procedure aRenameGroupExecute(Sender: TObject);
     procedure aDeleteGroupExecute(Sender: TObject);
@@ -357,7 +356,9 @@ type
     procedure aDuplicateGroupExecute(Sender: TObject);
     procedure aMoveGroupLeftExecute(Sender: TObject);
     procedure aMoveGroupRightExecute(Sender: TObject);
-    procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
+    procedure memoNoteContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
+    procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure memoNoteChange(Sender: TObject);
   private
     Memo: TMemo;
     DatePicker: TDateTimePicker;
@@ -368,8 +369,10 @@ type
     FMemoNeedSelectAll: boolean;
     FMemoBackup: TCaption;
     FMemoSelStartBackup: integer;
+    FMemoFirstKey: boolean;
     FMemoNoteBackup: TCaption;
     FMemoNoteSelStartBackup: integer;
+    FMemoNoteFirstKey: boolean;
     FDatePickerOldDate: TDateTime;
     FDatePickerDateSet: boolean;
     FIsEditing: boolean;
@@ -924,6 +927,15 @@ begin
   CanClose := IsCanClose;
 end;
 
+procedure TformNotetask.FormDropFiles(Sender: TObject; const FileNames: array of string);
+begin
+  if Length(FileNames) > 0 then
+  begin
+    if IsCanClose then
+      OpenFile(FileNames[0]);
+  end;
+end;
+
 procedure TformNotetask.ApplicationException(Sender: TObject; E: Exception);
 begin
   MessageDlg('Notetask', E.Message, mtWarning, [mbOK], 0);
@@ -1432,120 +1444,6 @@ begin
     aMergeTasks.Enabled := False;
 
   FLastSelectionHeight := taskGrid.Selection.Height;
-end;
-
-procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-var
-  LinesPerPage: integer;
-begin
-  if (not (ssShift in Shift)) and (Key = VK_PRIOR) then
-  begin
-    LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
-    memoNote.CaretPos := Point(0, Max(0, memoNote.CaretPos.Y - LinesPerPage));
-    memoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
-    memoNote.Invalidate;
-    Key := 0;
-  end
-  else
-  if (not (ssShift in Shift)) and (Key = VK_NEXT) then
-  begin
-    LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
-    memoNote.CaretPos := Point(0, Min(memoNote.Lines.Count - 1, memoNote.CaretPos.Y + LinesPerPage));
-    memoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
-    memoNote.Invalidate;
-    key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
-  begin
-    memoNote.CopyToClipboard;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
-  begin
-    memoNote.SelectAll;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_F) then // Ctrl + F
-  begin
-    aFind.Execute;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_TAB) then // Ctrl + Tab
-  begin
-    SelectNext(ActiveControl, True, True);
-    Key := 0;
-  end
-  else
-  if memoNote.ReadOnly then exit
-  else
-  if Key = VK_DELETE then // Delete
-  begin
-    if memoNote.SelLength = 0 then
-    begin
-      memoNote.SelStart := memoNote.SelStart;
-      memoNote.SelLength := 1;
-    end
-    else
-      MemoNoteBackup;
-    memoNote.ClearSelection;
-    Key := 0;
-  end
-  else
-  if (Key = VK_BACK) then
-  begin
-    if memoNote.SelLength > 0 then
-      MemoNoteBackup;
-  end
-  else
-  if (Key = VK_TAB) then // Tab
-  begin
-    MemoNoteBackup;
-    memoNote.SelText := '    ';
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_Z) then // Ctrl + Shift + Z
-  begin
-    aUndoAll.Execute;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
-  begin
-    MemoNoteUndo;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
-  begin
-    MemoNoteBackup;
-    memoNote.CutToClipboard;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
-  begin
-    MemoNoteBackup;
-    memoNote.PasteFromClipboard;
-    Key := 0;
-  end;
-end;
-
-procedure TformNotetask.memoNoteChange(Sender: TObject);
-begin
-  taskGrid.Cells[3, taskGrid.Row] := memoNote.Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
-  CalcRowHeights(taskGrid.Row);
-  SetChanged;
-end;
-
-procedure TformNotetask.memoNoteContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
-begin
-  MemoNoteBackup;
 end;
 
 procedure TformNotetask.groupTabsChange(Sender: TObject);
@@ -2400,15 +2298,6 @@ begin
   MoveTabRight(groupTabs.TabIndex);
 end;
 
-procedure TformNotetask.FormDropFiles(Sender: TObject; const FileNames: array of string);
-begin
-  if Length(FileNames) > 0 then
-  begin
-    if IsCanClose then
-      OpenFile(FileNames[0]);
-  end;
-end;
-
 procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -2783,6 +2672,132 @@ begin
   finally
     formDonateNotetask.Free;
   end;
+end;
+
+procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  LinesPerPage: integer;
+begin
+  // Test for letter, number, space or back key for backup
+  if (Shift * [ssCtrl, ssAlt] = []) and (not IsSystemKey(Key) or (Key = VK_SPACE) or (Key = VK_BACK)) then
+  begin
+    if (not FMemoNoteFirstKey) then
+    begin
+      FMemoNoteFirstKey := True;
+      MemoNoteBackup;
+    end;
+  end
+  else
+    FMemoNoteFirstKey := False;
+
+  if (not (ssShift in Shift)) and (Key = VK_PRIOR) then
+  begin
+    LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
+    memoNote.CaretPos := Point(0, Max(0, memoNote.CaretPos.Y - LinesPerPage));
+    memoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
+    memoNote.Invalidate;
+    Key := 0;
+  end
+  else
+  if (not (ssShift in Shift)) and (Key = VK_NEXT) then
+  begin
+    LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
+    memoNote.CaretPos := Point(0, Min(memoNote.Lines.Count - 1, memoNote.CaretPos.Y + LinesPerPage));
+    memoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
+    memoNote.Invalidate;
+    key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
+  begin
+    memoNote.CopyToClipboard;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
+  begin
+    memoNote.SelectAll;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_F) then // Ctrl + F
+  begin
+    aFind.Execute;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_TAB) then // Ctrl + Tab
+  begin
+    SelectNext(ActiveControl, True, True);
+    Key := 0;
+  end
+  else
+  if memoNote.ReadOnly then exit
+  else
+  if Key = VK_DELETE then // Delete
+  begin
+    if memoNote.SelLength = 0 then
+    begin
+      memoNote.SelStart := memoNote.SelStart;
+      memoNote.SelLength := 1;
+    end
+    else
+      MemoNoteBackup;
+    memoNote.ClearSelection;
+    Key := 0;
+  end
+  else
+  if (Key = VK_BACK) then
+  begin
+    if memoNote.SelLength > 0 then
+      MemoNoteBackup;
+  end
+  else
+  if (Key = VK_TAB) then // Tab
+  begin
+    MemoNoteBackup;
+    memoNote.SelText := '    ';
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_Z) then // Ctrl + Shift + Z
+  begin
+    aUndoAll.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
+  begin
+    MemoNoteUndo;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
+  begin
+    MemoNoteBackup;
+    memoNote.CutToClipboard;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
+  begin
+    MemoNoteBackup;
+    memoNote.PasteFromClipboard;
+    Key := 0;
+  end;
+end;
+
+procedure TformNotetask.memoNoteChange(Sender: TObject);
+begin
+  taskGrid.Cells[3, taskGrid.Row] := memoNote.Text;
+  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
+  CalcRowHeights(taskGrid.Row);
+  SetChanged;
+end;
+
+procedure TformNotetask.memoNoteContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
+begin
+  MemoNoteBackup;
 end;
 
 function TformNotetask.OpenFile(fileName: string): boolean;
@@ -3370,6 +3385,18 @@ procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShif
 var
   nextCol: integer;
 begin
+  // Test for letter, number, space or back key for backup
+  if (Shift * [ssCtrl, ssAlt] = []) and (not IsSystemKey(Key) or (Key = VK_SPACE) or (Key = VK_BACK)) then
+  begin
+    if (not FMemoFirstKey) then
+    begin
+      FMemoFirstKey := True;
+      MemoBackup;
+    end;
+  end
+  else
+    FMemoFirstKey := False;
+
   if (Key = VK_TAB) then
   begin
     Key := 0;
