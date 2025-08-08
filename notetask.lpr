@@ -18,7 +18,7 @@ uses
   SysUtils,
   DateTimeCtrls,
   systemtool,
-  stringtool,
+  stringtool, mdformat,
   mainform,
   forminput,
   formfind,

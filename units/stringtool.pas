@@ -52,6 +52,7 @@ const
   Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
   UnicodeMinusUTF8 = #$E2#$88#$92;
   MaxFloatStringLength = 17;
+  MaxDT: TDateTime = 2958465.999988426; // 31.12.9999 23:59:59
 
 implementation
 
@@ -83,6 +84,7 @@ var
   FS: TFormatSettings;
   SFixed: string;
 begin
+  ADateTime := 0;
   SFixed := StringReplace(S, 'T', ' ', [rfReplaceAll]);
   SFixed := StringReplace(SFixed, 'Z', '', [rfReplaceAll]);
   SFixed := StringReplace(SFixed, '.', '-', [rfReplaceAll]);
@@ -106,6 +108,9 @@ function DateTimeToStringISO(Value: TDateTime; ADisplayTime: boolean = True): st
 var
   FS: TFormatSettings;
 begin
+  if (Value > MaxDT) then
+    Value := 0;
+
   if (Value <> 0) then
   begin
     FS := DefaultFormatSettings;

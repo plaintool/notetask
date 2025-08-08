@@ -80,6 +80,7 @@
           <Linking>
             <Debugging>
               <DebugInfoType Value="dsDwarf3"/>
+              <UseHeaptrc Value="True"/>
               <TrashVariables Value="True"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
@@ -234,6 +235,10 @@
       </Unit>
       <Unit>
         <Filename Value="THIRD_PARTIES"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="units\mdformat.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>

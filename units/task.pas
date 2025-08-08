@@ -24,7 +24,7 @@ type
 
   // Class representing a single task
   TTask = class
-  private
+  public
     FDone: boolean; // Status of task completion
     FText: string; // Description of the task
     FNote: string; // Note for the task
@@ -36,31 +36,36 @@ type
     FEmptyNote: boolean; // Has empty note symbols
     FSpaceBeforeNote: boolean; // Space before note in file
     FSpaceAfterNote: boolean; // Space after note in file
-    FDateStart, FDateEnd: TDateTime; // Calculated time interval
+    FDateStart: TDateTime; // Calculated start time interval
+    FDateEnd: TDateTime; // Calculated end time interval
+
+    constructor Create;
+    procedure Assign(Source: TTask);
+    constructor Create(const TaskString: string); // Constructor that takes a task string
+    function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string; reintroduce;
+    //constructor Create2(const TaskString: string); // Constructor that takes a task string
+    //function ToString2(Col: integer = 0; AddEmptyCompletion: boolean = True): string;
+    procedure Copy(Original: TTask);
     function GetDate: string;
     function GetDateTime: string;
     function GetDateTimeISO: string;
     function GetAmount: string;
-  public
-    constructor Create;
-    constructor Create(const TaskString: string); // Constructor that takes a task string
-    procedure Copy(Original: TTask);
+
     property Done: boolean read FDone write FDone;
-    property Archive: boolean read FArchive write FArchive;
-    property Date: TDateTime read FDate write FDate;
-    property DateStr: string read GetDate;
-    property DateTimeStr: string read GetDateTime;
-    property DateTimeStrISO: string read GetDateTimeISO;
-    property Note: string read FNote write FNote;
     property Text: string read FText write FText;
+    property Note: string read FNote write FNote;
     property Amount: double read FAmount write FAmount;
-    property AmountStr: string read GetAmount;
+    property Date: TDateTime read FDate write FDate;
+    property Archive: boolean read FArchive write FArchive;
     property Star: boolean read FStar write FStar;
     property NoteItalic: boolean read FNoteItalic write FNoteItalic;
     property EmptyNote: boolean read FEmptyNote write FEmptyNote;
     property SpaceBeforeNote: boolean read FSpaceBeforeNote write FSpaceBeforeNote;
     property SpaceAfterNote: boolean read FSpaceAfterNote write FSpaceAfterNote;
-    function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string; reintroduce;
+    property AmountStr: string read GetAmount;
+    property DateStr: string read GetDate;
+    property DateTimeStr: string read GetDateTime;
+    property DateTimeStrISO: string read GetDateTimeISO;
   end;
 
   // Class representing a collection of tasks
@@ -146,7 +151,7 @@ resourcestring
 
 implementation
 
-uses stringtool;
+uses stringtool, mdformat;
 
   { TTask }
 
@@ -163,330 +168,39 @@ begin
   FEmptyNote := False;
   FSpaceBeforeNote := True;
   FSpaceAfterNote := True;
+  FDateStart := 0;
+  FDateEnd := 0;
+end;
+
+procedure TTask.Assign(Source: TTask);
+begin
+  FDone := Source.FDone;
+  FText := Source.FText;
+  FNote := Source.FNote;
+  FAmount := Source.FAmount;
+  FDate := Source.FDate;
+  FArchive := Source.FArchive;
+  FStar := Source.FStar;
+  FNoteItalic := Source.FNoteItalic;
+  EmptyNote := Source.EmptyNote;
+  FSpaceBeforeNote := Source.FSpaceBeforeNote;
+  FSpaceAfterNote := Source.FSpaceAfterNote;
+  FDateStart := Source.FDateStart;
+  FDateEnd := Source.FDateEnd;
 end;
 
 constructor TTask.Create(const TaskString: string);
 var
-  PartNote, PartDate: TStringArray; // Use TStringArray for compatibility
-  CompletedStr: string;
-
-  procedure FillText(start: integer = 1);
-  var
-    i: integer;
-  begin
-    FText := string.Empty;
-    for i := start to High(PartDate) do
-    begin
-      FText += PartDate[i];
-      if (i < High(PartDate)) then FText += ',';
-    end;
-  end;
-
-  procedure FillNote(start: integer = 1);
-  var
-    i: integer;
-  begin
-    FNote := string.Empty;
-    for i := start to High(PartNote) do
-    begin
-      FNote += PartNote[i];
-      if (i < High(PartNote)) then FNote += '//';
-    end;
-  end;
-
-  procedure FillCompletedStr(start: integer = 0);
-  var
-    i: integer;
-  begin
-    CompletedStr := string.Empty;
-    for i := start to High(PartNote) do
-    begin
-      CompletedStr += PartNote[i];
-      if (i < High(PartNote)) then CompletedStr += '//';
-    end;
-  end;
-
+  Temp: TTask;
 begin
-  // Format: - [x] 01.01.2000, 123, ~~**Task**~~ // Note
-  FSpaceBeforeNote := True;
-  FSpaceAfterNote := True;
-  FNoteItalic := False;
-  CompletedStr := string.Empty;
-
-  // Split the task string into PartNote
-  PartNote := TaskString.Split(['//']);
-  if (Length(PartNote) >= 2) and (not PartNote[0].EndsWith(':')) then // Url protection
-  begin
-    CompletedStr := PartNote[0];
-    if (Length(CompletedStr) > 0) and (CompletedStr.EndsWith(' ')) then
-    begin
-      Delete(CompletedStr, Length(CompletedStr), 1);
-      SpaceBeforeNote := True;
-    end
-    else
-      SpaceBeforeNote := False;
-
-    if (Length(PartNote[1]) > 0) and (PartNote[1].StartsWith(' ')) then
-    begin
-      Delete(PartNote[1], 0, 1);
-      SpaceAfterNote := True;
-    end
-    else
-      SpaceAfterNote := False;
-
-    FillNote;
-
-    // Test for empty Note symbols
-    if (FNote.Trim = string.empty) then
-      EmptyNote := True;
-  end
-  else
-    FillCompletedStr;
-
-  // Remove star in start and end of Note
-  if (FNote.TrimLeft.StartsWith('*')) and (FNote.TrimRight.EndsWith('*')) then
-  begin
-    FNoteItalic := True;
-    if (Length(FNote) > 0) and (FNote.StartsWith(' ')) then
-    begin
-      FNote := TrimLeft(FNote);
-      SpaceAfterNote := True;
-    end;
-    Delete(FNote, 1, 1);
-    if (TrimRight(FNote).EndsWith('*')) then
-    begin
-      FNote := TrimRight(FNote);
-      Delete(FNote, Length(FNote), 1);
-    end;
-  end
-  else
-  begin
-    if (Length(FNote) > 0) and (FNote.StartsWith(' ')) then
-    begin
-      SpaceAfterNote := True;
-      Delete(FNote, 1, 1);
-    end;
-  end;
-
-  PartDate := CompletedStr.Split([',']);
-
-  // Check completion status based on the first character in the string
-  FDone := DetectDone(PartDate[0]);
-  PartDate[0] := RemoveBrackets(PartDate[0]);
-
-  // Checks if the task is completed
-  CompletedStr := RemoveBrackets(CompletedStr);
-
-  if (TryStrToFloatLimited(CleanAmount(CompletedStr), FAmount)) then
-  else
-  if (TryStrToDateTimeISO(CompletedStr, FDate)) then
-  else
-  if Length(PartDate) > 2 then
-  begin
-    // Extract and trim the date string
-    if (TryStrToDateTimeISO(PartDate[0].Trim, FDate)) then
-    begin
-      // Extract and trim the amount string
-      if (TryStrToFloatLimited(PartDate[1].Trim, FAmount)) then
-        FillText(2)
-      else
-      begin
-        FillText(1);
-        FAmount := 0;
-      end;
-      if (Length(FText) > 0) and (FText.StartsWith(' ')) then
-        Delete(FText, 1, 1); // Delete space in begining
-    end
-    else
-    // Extract and trim the amount string
-    if (TryStrToFloatLimited(PartDate[0].Trim, FAmount)) then
-    begin
-      FillText(1);
-      if (Length(FText) > 0) and (FText.StartsWith(' ')) then
-        Delete(FText, 1, 1); // Delete space in begining
-    end
-    else
-    begin
-      FText := CompletedStr;
-      FDate := 0;
-      FAmount := 0;
-    end;
-  end
-  else
-  if Length(PartDate) > 1 then
-  begin
-    // Extract and trim the amount string
-    if (TryStrToFloatLimited(PartDate[0].Trim, FAmount)) then
-    begin
-      FillText(1);
-      if (Length(FText) > 0) and (FText.StartsWith(' ')) then
-        Delete(FText, 1, 1); // Delete space in begining
-    end
-    else
-    begin
-      // Extract and trim the date string
-      if (TryStrToDateTimeISO(PartDate[0].Trim, FDate)) then
-      begin
-        FillText(1);
-        if (Length(FText) > 0) and (FText.StartsWith(' ')) then
-          Delete(FText, 1, 1); // Delete space in begining
-      end
-      else
-      begin
-        FText := CompletedStr;
-        FDate := 0;
-      end;
-      FAmount := 0;
-    end;
-  end
-  else
-  begin
-    FText := CompletedStr;
-    FDate := 0;
-    FAmount := 0;
-  end;
-
-  FText := StringReplace(FText, '<br>', sLineBreak, [rfReplaceAll]);
-  FNote := StringReplace(FNote, '<br>', sLineBreak, [rfReplaceAll]);
-
-  // Check if Text starts and ends with '~~'
-  if FText.TrimLeft.StartsWith('~~') and FText.TrimRight.EndsWith('~~') then
-  begin
-    FArchive := True;
-    FText := Trim(FText);
-    // Remove '~~' from the start and end of the Text
-    FText := FText.Substring(2, Length(FText) - 4);
-  end
-  else
-    FArchive := False;
-
-  // Check if Text starts and ends with '**'
-  if FText.TrimLeft.StartsWith('**') and FText.TrimRight.EndsWith('**') then
-  begin
-    FStar := True;
-    FText := Trim(FText);
-    // Remove '**' from the start and end of the Text
-    FText := FText.Substring(2, Length(FText) - 4);
-  end
-  else
-    FStar := False;
+  Temp := ParseTaskString(TaskString);
+  Self.Assign(Temp); // Copy fields to new task
+  Temp.Free;
 end;
 
 function TTask.ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string;
-var
-  TextString: string;
-  DoneString: string;
-  NoteString: string;
 begin
-  // Replace line breaks from task description and Note
-  TextString := StringReplace(Text, sLineBreak, '<br>', [rfReplaceAll]);
-  TextString := StringReplace(TextString, #13, '<br>', [rfReplaceAll]);
-  TextString := StringReplace(TextString, #10, '<br>', [rfReplaceAll]);
-  NoteString := StringReplace(Note, sLineBreak, '<br>', [rfReplaceAll]);
-  NoteString := StringReplace(NoteString, #13, '<br>', [rfReplaceAll]);
-  NoteString := StringReplace(NoteString, #10, '<br>', [rfReplaceAll]);
-
-  // Add '**' for starred tasks
-  if FStar then
-    TextString := '**' + TextString + '**';
-
-  // Add '~~' for archived tasks
-  if FArchive then
-    TextString := '~~' + TextString + '~~';
-
-  // Check completion
-  if Done then
-    DoneString := '- [x]'
-  else if AddEmptyCompletion then
-    DoneString := '- [ ]'
-  else
-    DoneString := string.Empty;
-
-  // Check notes
-  if (NoteString <> string.Empty) or (EmptyNote) then
-  begin
-    if (NoteString <> string.Empty) and (NoteItalic) then
-      NoteString := '*' + NoteString + '*';
-
-    if (SpaceAfterNote) then NoteString := ' ' + NoteString;
-    NoteString := '//' + NoteString;
-    if (SpaceBeforeNote) then NoteString := ' ' + NoteString;
-  end
-  else
-    NoteString := string.Empty;
-
-  // Form the task string based on the provided Col
-  case Col of
-    1: Result := DoneString; // Returning only the completion status
-    2: Result := TextString; // Returning only the task string
-    3: Result := NoteString; // Returning only the Note
-    4:
-      if Amount <> 0 then
-        Result := FloatToString(Amount)
-      else
-        Result := string.Empty;
-    5:
-      if FDate > 0 then
-        Result := DateTimeStrISO.Trim
-      else
-        Result := string.Empty; // If the completion date is missing, return an empty string
-    else
-      // Forming the task string considering the completion date and Note
-      if (DoneString = string.Empty) then
-      begin
-        if Amount <> 0 then
-        begin
-          if Date > 0 then
-            Result := Format('%s, %s, %s%s', [DateTimeStrISO, AmountStr, TextString, NoteString])
-          else
-          begin
-            if (TextString + NoteString <> string.Empty) then
-              Result := Format('%s, %s%s', [AmountStr, TextString, NoteString])
-            else
-              Result := Format('%s', [AmountStr]);
-          end;
-        end
-        else
-        begin
-          if Date > 0 then
-          begin
-            if (TextString + NoteString <> string.Empty) then
-              Result := Format('%s, %s%s', [DateTimeStrISO, TextString, NoteString])
-            else
-              Result := Format('%s', [DateTimeStrISO]);
-          end
-          else
-            Result := Format('%s%s', [TextString, NoteString]);
-        end;
-      end
-      else
-      begin
-        if Amount <> 0 then
-        begin
-          if Date > 0 then
-            Result := Format('%s %s, %s, %s%s', [DoneString, DateTimeStrISO, AmountStr, TextString, NoteString]).Trim
-          else
-          begin
-            if (TextString + NoteString <> string.Empty) then
-              Result := Format('%s %s, %s%s', [DoneString, AmountStr, TextString, NoteString]).Trim
-            else
-              Result := Format('%s %s', [DoneString, AmountStr]).Trim;
-          end;
-        end
-        else
-        begin
-          if Date > 0 then
-          begin
-            if (TextString + NoteString <> string.Empty) then
-              Result := Format('%s %s, %s%s', [DoneString, DateTimeStrISO, TextString, NoteString]).Trim
-            else
-              Result := Format('%s %s', [DoneString, DateTimeStrISO]).Trim;
-          end
-          else
-            Result := Format('%s %s%s', [DoneString, TextString, NoteString]).Trim;
-        end;
-      end;
-  end;
+  Result := TaskToString(Self, Col, AddEmptyCompletion);
 end;
 
 procedure TTask.Copy(Original: TTask);
