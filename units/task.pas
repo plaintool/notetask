@@ -40,7 +40,6 @@ type
     FDateEnd: TDateTime; // Calculated end time interval
 
     constructor Create;
-    procedure Assign(Source: TTask);
     constructor Create(const TaskString: string); // Constructor that takes a task string
     function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string; reintroduce;
     //constructor Create2(const TaskString: string); // Constructor that takes a task string
@@ -172,29 +171,12 @@ begin
   FDateEnd := 0;
 end;
 
-procedure TTask.Assign(Source: TTask);
-begin
-  FDone := Source.FDone;
-  FText := Source.FText;
-  FNote := Source.FNote;
-  FAmount := Source.FAmount;
-  FDate := Source.FDate;
-  FArchive := Source.FArchive;
-  FStar := Source.FStar;
-  FNoteItalic := Source.FNoteItalic;
-  EmptyNote := Source.EmptyNote;
-  FSpaceBeforeNote := Source.FSpaceBeforeNote;
-  FSpaceAfterNote := Source.FSpaceAfterNote;
-  FDateStart := Source.FDateStart;
-  FDateEnd := Source.FDateEnd;
-end;
-
 constructor TTask.Create(const TaskString: string);
 var
   Temp: TTask;
 begin
   Temp := ParseTaskString(TaskString);
-  Self.Assign(Temp); // Copy fields to new task
+  Self.Copy(Temp); // Copy fields to new task
   Temp.Free;
 end;
 
