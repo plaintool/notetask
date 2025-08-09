@@ -666,7 +666,7 @@ begin
   SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
   // Free allocated resources
-  FLineEnding.Free;
+  //FLineEnding.Free;
   if (IsUserEncoding(FEncoding)) then
     FEncoding.Free;
   Tasks.Free;

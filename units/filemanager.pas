@@ -31,6 +31,8 @@ function IsValidAnsi(var Buffer: array of byte; BytesRead: integer): boolean;
 
 function DetectEncoding(const FileName: string): TEncoding;
 
+function DetectLineEnding(const FileName: string; MaxLines: integer = 100): TLineEnding;
+
 function EndsWithLineBreak(const FileName: string): boolean;
 
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
@@ -285,6 +287,63 @@ begin
   end;
 end;
 
+function DetectLineEnding(const FileName: string; MaxLines: integer = 100): TLineEnding;
+type
+  TBuffer = array[0..4095] of byte;
+var
+  FileStream: TFileStream;
+  Buffer: TBuffer;
+  BytesRead, I: integer;
+  CountCRLF, CountLF, CountCR, LinesChecked: integer;
+begin
+  Buffer := Default(TBuffer);
+  CountCRLF := 0;
+  CountLF := 0;
+  CountCR := 0;
+  LinesChecked := 0;
+
+  FileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
+  try
+    while (LinesChecked < MaxLines) and (FileStream.Position < FileStream.Size) do
+    begin
+      BytesRead := FileStream.Read(Buffer, SizeOf(Buffer));
+      I := 0;
+      while (I < BytesRead) and (LinesChecked < MaxLines) do
+      begin
+        if (Buffer[I] = 13) and (I + 1 < BytesRead) and (Buffer[I + 1] = 10) then
+        begin
+          Inc(CountCRLF);
+          Inc(LinesChecked);
+          Inc(I, 2);
+          Continue;
+        end
+        else if Buffer[I] = 10 then
+        begin
+          Inc(CountLF);
+          Inc(LinesChecked);
+        end
+        else if Buffer[I] = 13 then
+        begin
+          Inc(CountCR);
+          Inc(LinesChecked);
+        end;
+        Inc(I);
+      end;
+    end;
+  finally
+    FileStream.Free;
+  end;
+
+  if (CountCRLF >= CountLF) and (CountCRLF >= CountCR) and (CountCRLF > 0) then
+    Result := TLineEnding.WindowsCRLF
+  else if (CountLF >= CountCR) and (CountLF > 0) then
+    Result := TLineEnding.UnixLF
+  else if CountCR > 0 then
+    Result := TLineEnding.MacintoshCR
+  else
+    Result := TLineEnding.Unknown;
+end;
+
 function EndsWithLineBreak(const FileName: string): boolean;
 var
   FileStream: TFileStream;
@@ -320,6 +379,7 @@ var
 begin
   // Determine the encoding
   FileEncoding := DetectEncoding(FileName);
+  LineEnding := DetectLineEnding(FileName);
 
   // Read the file content using TStringList
   StringList := TStringList.Create;
@@ -330,14 +390,14 @@ begin
     Content := StringList.Text;
 
     // Determine the line ending type
-    if Pos(#13#10, Content) > 0 then
-      LineEnding := TLineEnding.WindowsCRLF
-    else if Pos(#10, Content) > 0 then
-      LineEnding := TLineEnding.UnixLF
-    else if Pos(#13, Content) > 0 then
-      LineEnding := TLineEnding.MacintoshCR
-    else
-      LineEnding := TLineEnding.Unknown;
+    //if Pos(#13#10, Content) > 0 then
+    //  LineEnding := TLineEnding.WindowsCRLF
+    //else if Pos(#10, Content) > 0 then
+    //  LineEnding := TLineEnding.UnixLF
+    //else if Pos(#13, Content) > 0 then
+    //  LineEnding := TLineEnding.MacintoshCR
+    //else
+    //  LineEnding := TLineEnding.Unknown;
 
     if Content = string.Empty then
     begin

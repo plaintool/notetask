@@ -23,6 +23,7 @@ type
     class function GetMacintoshCR: TLineEnding; static;
     class function GetUnknown: TLineEnding; static;
   public
+    class destructor Destroy;
     class property WindowsCRLF: TLineEnding read GetWindowsCRLF;
     class property UnixLF: TLineEnding read GetUnixLF;
     class property MacintoshCR: TLineEnding read GetMacintoshCR;
@@ -32,6 +33,33 @@ type
   end;
 
 implementation
+
+class destructor TLineEnding.Destroy;
+begin
+  if TLineEnding.FWindowsCRLF <> nil then
+  begin
+    TLineEnding.FWindowsCRLF.Free;
+    TLineEnding.FWindowsCRLF := nil;
+  end;
+
+  if TLineEnding.FUnixLF <> nil then
+  begin
+    TLineEnding.FUnixLF.Free;
+    TLineEnding.FUnixLF := nil;
+  end;
+
+  if TLineEnding.FMacintoshCR <> nil then
+  begin
+    TLineEnding.FMacintoshCR.Free;
+    TLineEnding.FMacintoshCR := nil;
+  end;
+
+  if TLineEnding.FUnknown <> nil then
+  begin
+    TLineEnding.FUnknown.Free;
+    TLineEnding.FUnknown := nil;
+  end;
+end;
 
 class function TLineEnding.GetWindowsCRLF: TLineEnding;
 begin
