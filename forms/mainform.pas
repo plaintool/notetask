@@ -1090,7 +1090,7 @@ begin
   taskGridResize(Sender);
   CalcRowHeights;
   EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
-  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
+  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, -2, 0, 0);
 end;
 
 procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
@@ -1366,7 +1366,7 @@ begin
     else
       DatePicker.BiDiMode := bdLeftToRight;
 
-    EditControlSetBounds(DatePicker, aCol, aRow, 0, 0, 0, 0);
+    EditControlSetBounds(DatePicker, aCol, aRow, 0, -2, 0, 0);
 
     if (taskGrid.Cells[aCol, aRow] = string.Empty) then
       DatePicker.DateTime := Now
@@ -3301,7 +3301,7 @@ begin
   end;
   if (Assigned(DatePicker)) and (DatePicker.Visible) then
   begin
-    EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
+    EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, -2, 0, 0);
   end;
 end;
 
@@ -3469,7 +3469,7 @@ begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime);
   Tasks.SetTask(taskGrid, taskGrid.Row, False, FShowTime);
   SetChanged;
-  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, 0, 0, 0);
+  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 0, -2, 0, 0);
   if (FShowDuration) then FillGrid;
   SetInfo;
 end;
