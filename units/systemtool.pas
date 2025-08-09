@@ -456,8 +456,8 @@ begin
   {$IFDEF UNIX}
   {$IFDEF MACOS}
     case Key of
-      // Common macOS virtual key codes (from Macapi.AppKit)
-      $30,   // Tab key
+      // Navigation keys
+      $30,   // Tab
       $7E,   // Up arrow
       $7D,   // Down arrow
       $7B,   // Left arrow
@@ -466,33 +466,41 @@ begin
       $77,   // End
       $74,   // Page Up
       $79,   // Page Down
-      $7A..$87, // F1..F24 (F1=0x7A, F12=0x87)
+
+      // Function keys (F1-F20)
+      $7A, $78, $63, $76, $60, $61, $62, $64, $65, $6D, // F1-F10
+      $67, $6F, $69, $6B, $71, $6A, $40, $4F, $50, $5A, // F11-F20
+
+      // Modifiers
       $38, $3C, // Shift left/right
       $3B, $3E, // Control left/right
       $3A, $3D, // Option (Alt) left/right
-      $35,       // Escape
-      $72,       // Insert (Help)
-      $75,       // Delete (Forward Delete)
-      $47,       // Scroll Lock (less common)
-      $71,       // Pause (less common)
-      $39,       // Caps Lock
-      $7F,       // Num Lock (less common)
-      $3F,       // Print Screen (not typical on Mac)
-      $75,       // Cancel (Break)
-      $33,       // Backspace (Delete)
-      $31,       // Space
-      $24,       // Return (Enter)
-      $47,       // Clear (less common)
-      // Numpad keys (keypad)
-      $45, $4B, $43, $4E, $4C, // +, -, *, /, .
-      $52..$5B:                // Numpad 0..9
+      $36, $37, // Command left/right
+
+      // Special keys
+      $35,    // Escape
+      $72,    // Insert (Help)
+      $75,    // Delete (Forward Delete)
+      $33,    // Backspace
+      $31,    // Space
+      $24,    // Return (Enter)
+      $39,    // Caps Lock
+
+      // Numpad keys
+      $45,    // Numpad = (Clear)
+      $4E,    // Numpad /
+      $4B,    // Numpad *
+      $43,    // Numpad -
+      $4C,    // Numpad +
+      $41,    // Numpad Decimal (.)
+      $52..$5B: // Numpad 0-9
         Result := True;
       else
         Result := False;
     end;
-  {$ELSE}
+  {$ELSE} // Linux/X11
     case Key of
-      // X11 keysym equivalents (integer values from X11/keysym.h)
+      // Navigation keys
       $FF09, // XK_Tab
       $FF52, // XK_Up
       $FF54, // XK_Down
@@ -502,60 +510,67 @@ begin
       $FF57, // XK_End
       $FF55, // XK_Page_Up
       $FF56, // XK_Page_Down
+
+      // Function keys
       $FFBE..$FFD7, // XK_F1..XK_F24
-      $FFE1, $FFE2, // Shift_L, Shift_R
-      $FFE3, $FFE4, // Control_L, Control_R
-      $FFAA,       // Alt_L (example for Alt keys)
-      $FF1B,       // XK_Escape
-      $FF63,       // XK_Insert
-      $FFFF,       // XK_Delete
-      $FF14,       // XK_Scroll_Lock
-      $FF13,       // XK_Pause
-      $FFE5,       // Caps Lock (XK_Caps_Lock)
-      $FF7F,       // Num Lock (XK_Num_Lock)
-      $FF61,       // Print Screen (XK_Sys_Req)
-      $FF69,       // Cancel (Break)
-      $FF08,       // BackSpace
-      $0020,       // Space
-      $FF0D,       // Return
-      $FF0C,       // Clear
-      $FFEB, $FFEC, $FFED, $FFEE, // Windows keys and others may not be defined in X11, skipping
-      $FFAB, $FFAD, $FFAF, $FFAE, // Numpad +, -, *, /, .
-      $FFB0..$FFB9:                 // Numpad 0..9
+
+      // Modifiers
+      $FFE1, $FFE2, // Shift left/right
+      $FFE3, $FFE4, // Control left/right
+      $FFE9, $FFEA, // Alt left/right
+      $FFEB, $FFEC, // Super (Windows) left/right
+
+      // Special keys
+      $FF1B, // XK_Escape
+      $FF63, // XK_Insert
+      $FFFF, // XK_Delete
+      $FF08, // XK_BackSpace
+      $0020, // Space
+      $FF0D, // XK_Return
+      $FFE5, // Caps Lock
+      $FF14, // Scroll Lock
+      $FF13, // Pause
+      $FF7F, // Num Lock
+      $FF61, // Print Screen
+
+      // Numpad keys
+      $FFAB, // Numpad +
+      $FFAD, // Numpad -
+      $FFAA, // Numpad *
+      $FFAF, // Numpad /
+      $FFAE, // Numpad Decimal (.)
+      $FFB0..$FFB9: // Numpad 0-9
         Result := True;
       else
         Result := False;
     end;
   {$ENDIF}
-  {$ELSE}
+  {$ELSE}// Windows
   case Key of
     // Navigation keys
     VK_TAB, VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT,
     VK_HOME, VK_END, VK_PRIOR, VK_NEXT,
+
     // Function keys
     VK_F1..VK_F24,
-    // Modifier keys
-    VK_SHIFT, VK_CONTROL, VK_MENU, VK_LSHIFT, VK_RSHIFT,
-    VK_LCONTROL, VK_RCONTROL, VK_LMENU, VK_RMENU,
+
+    // Modifiers
+    VK_SHIFT, VK_CONTROL, VK_MENU,
+    VK_LSHIFT, VK_RSHIFT, VK_LCONTROL, VK_RCONTROL,
+    VK_LMENU, VK_RMENU, VK_LWIN, VK_RWIN,
+
     // Special keys
     VK_ESCAPE, VK_INSERT, VK_DELETE, VK_SCROLL, VK_PAUSE,
     VK_CAPITAL, VK_NUMLOCK, VK_SNAPSHOT, VK_CANCEL,
     VK_BACK, VK_SPACE, VK_RETURN, VK_CLEAR,
-    // Windows-specific keys
-    VK_LWIN, VK_RWIN, VK_APPS, VK_SLEEP,
+
     // Numpad keys
     VK_ADD, VK_SUBTRACT, VK_MULTIPLY, VK_DIVIDE, VK_DECIMAL,
     VK_NUMPAD0..VK_NUMPAD9,
-    // Multimedia keys
-    VK_BROWSER_BACK, VK_BROWSER_FORWARD, VK_BROWSER_REFRESH,
-    VK_BROWSER_STOP, VK_BROWSER_SEARCH, VK_BROWSER_FAVORITES,
-    VK_BROWSER_HOME, VK_VOLUME_MUTE, VK_VOLUME_DOWN, VK_VOLUME_UP,
-    VK_MEDIA_NEXT_TRACK, VK_MEDIA_PREV_TRACK, VK_MEDIA_STOP,
-    VK_MEDIA_PLAY_PAUSE, VK_LAUNCH_MAIL, VK_LAUNCH_MEDIA_SELECT,
-    VK_LAUNCH_APP1, VK_LAUNCH_APP2,
-    // IME keys
-    VK_KANA, VK_JUNJA, VK_FINAL, VK_HANJA,
-    VK_CONVERT, VK_NONCONVERT, VK_ACCEPT, VK_MODECHANGE:
+
+    // Extended keys (multimedia/browser)
+    VK_BROWSER_BACK..VK_LAUNCH_APP2,
+    VK_KANA..VK_MODECHANGE:
       Result := True;
     else
       Result := False;
