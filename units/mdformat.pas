@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------------------
+//  Notetask © 2024 by Alexander Tverskoy
+//  Licensed under the GNU General Public License, Version 3 (GPL-3.0)
+//  You may obtain a copy of the License at https://www.gnu.org/licenses/gpl-3.0.html
+//-----------------------------------------------------------------------------------
+
 unit mdformat;
 
 {$mode ObjFPC}{$H+}
@@ -5,16 +11,27 @@ unit mdformat;
 interface
 
 uses
-  Classes, SysUtils, Task;
+  Classes,
+  SysUtils,
+  Task;
 
-function ParseTaskString(const TaskString: string): TTask;
+type
+  TAddGroupProc = procedure(const GroupName: string; const Lines: TStringList) of object;
+  TGetGroupNameFunc = function(Index: integer): string of object;
+  TGetTaskCountFunc = function(GroupIndex: integer): integer of object;
+  TGetTaskFunc = function(GroupIndex, TaskIndex: integer): TTask of object;
+
+function TaskFromString(const TaskString: string): TTask;
 function TaskToString(Task: TTask; Col: integer = 0; AddEmptyCompletion: boolean = True): string;
+procedure TasksFromStringList(const TaskStrings: TStringList; AddGroup: TAddGroupProc);
+function TasksToStringList(GroupCount: integer; AddCompleted: boolean; GetGroupName: TGetGroupNameFunc;
+  GetTaskCount: TGetTaskCountFunc; GetTask: TGetTaskFunc): TStringList;
 
 implementation
 
 uses stringtool;
 
-function ParseTaskString(const TaskString: string): TTask;
+function TaskFromString(const TaskString: string): TTask;
 var
   PartNote, PartDate: TStringArray; // Use TStringArray for compatibility
   CompletedStr: string;
@@ -337,6 +354,59 @@ begin
             Result := Format('%s %s%s', [DoneString, TextString, NoteString]).Trim;
         end;
       end;
+  end;
+end;
+
+procedure TasksFromStringList(const TaskStrings: TStringList; AddGroup: TAddGroupProc);
+var
+  i: integer; // Index for iteration
+  TabName, Value: string;
+  TabContent: TStringList;
+begin
+  // Iterate through the StringList to create tasks
+  TabContent := TStringList.Create;
+  try
+    TabName := string.Empty;
+
+    for i := 0 to TaskStrings.Count - 1 do
+    begin
+      Value := TaskStrings[i];
+
+      if (Value.TrimLeft.StartsWith('#')) then
+      begin
+        if (TabContent.Count > 0) or (TabName <> string.Empty) then
+        begin
+          AddGroup(TabName, TabContent);
+          TabContent.Clear;
+        end;
+
+        TabName := Value;
+        Continue;
+      end;
+
+      TabContent.Add(Value);
+    end;
+
+    // Add last group
+    AddGroup(TabName, TabContent);
+  finally
+    TabContent.Free;
+  end;
+end;
+
+function TasksToStringList(GroupCount: integer; AddCompleted: boolean; GetGroupName: TGetGroupNameFunc;
+  GetTaskCount: TGetTaskCountFunc; GetTask: TGetTaskFunc): TStringList;
+var
+  i, j: integer;
+begin
+  Result := TStringList.Create;
+  for i := 0 to GroupCount - 1 do
+  begin
+    if (GetGroupName(i) <> '') then
+      Result.Add(GetGroupName(i));
+
+    for j := 0 to GetTaskCount(i) - 1 do
+      Result.Add(TaskToString(GetTask(i, j), 0, AddCompleted));
   end;
 end;
 

@@ -85,10 +85,13 @@ type
   public
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
+    function ToStringList: TStringList;
     procedure AddGroup(const GroupName: string; const TaskStrings: TStringList = nil); // Add new group from a StringList
     procedure UpdateGroup;
     procedure ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
-    function ToStringList: TStringList;
+    function GetGroupName(Index: integer): string;
+    function GetTaskCount(GroupIndex: integer): integer;
+    function GetTaskInGroup(GroupIndex, TaskIndex: integer): TTask;
     procedure InitMap(Length: integer);
     function Map(Index: integer): integer;
     function ReverseMap(Value: integer): integer;
@@ -175,14 +178,14 @@ constructor TTask.Create(const TaskString: string);
 var
   Temp: TTask;
 begin
-  Temp := ParseTaskString(TaskString);
+  Temp := mdformat.TaskFromString(TaskString);
   Self.Copy(Temp); // Copy fields to new task
   Temp.Free;
 end;
 
 function TTask.ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string;
 begin
-  Result := TaskToString(Self, Col, AddEmptyCompletion);
+  Result := mdformat.TaskToString(Self, Col, AddEmptyCompletion);
 end;
 
 procedure TTask.Copy(Original: TTask);
@@ -225,47 +228,15 @@ end;
 { TTasks }
 
 constructor TTasks.Create(const TaskStrings: TStringList = nil);
-var
-  i: integer; // Index for iteration
-  Tab: TStringList;
-  TabName, Value: string;
 begin
   SetLength(FGroupList, 0); // Initialize group array
   FSelectedGroup := -1;
   FGroupNameList := TStringList.Create;
-  try
-    // Iterate through the StringList to create tasks
-    if (Assigned(TaskStrings)) then
-    begin
-      Tab := TStringList.Create;
-      TabName := string.Empty;
 
-      for i := 0 to TaskStrings.Count - 1 do
-      begin
-        Value := TaskStrings[i];
-
-        if (Value.TrimLeft.StartsWith('#')) then
-        begin
-          if (Tab.Count > 0) or (TabName <> string.Empty) then
-          begin
-            AddGroup(TabName, Tab);
-            Tab.Clear;
-          end;
-
-          TabName := Value;
-          Continue;
-        end;
-
-        Tab.Add(Value);
-      end;
-
-      // Add last group
-      AddGroup(TabName, Tab);
-
-      TaskStrings.Free;
-    end;
-  finally
-    Tab.Free;
+  if Assigned(TaskStrings) then
+  begin
+    mdformat.TasksFromStringList(TaskStrings, @AddGroup);
+    TaskStrings.Free;
   end;
 
   CreateBackupInit;
@@ -333,6 +304,26 @@ begin
   inherited;
 end;
 
+function TTasks.ToStringList: TStringList;
+var
+  i, j: integer;
+  addCompleted: boolean;
+begin
+  //Result := TStringList.Create;
+  try
+    UpdateGroup;
+    addCompleted := False;
+    for i := 0 to CountGroup - 1 do
+      for j := 0 to Length(FGroupList[i]) - 1 do
+        if FGroupList[i, j].Done then addCompleted := True;
+
+    Result := mdformat.TasksToStringList(CountGroup, addCompleted, @GetGroupName, @GetTaskCount, @GetTaskInGroup);
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
 procedure TTasks.AddGroup(const GroupName: string; const TaskStrings: TStringList = nil); // Add new group from a StringList
 var
   i: integer; // Index for iteration
@@ -366,33 +357,19 @@ begin
   InitMap(Count + 1);
 end;
 
-function TTasks.ToStringList: TStringList;
-var
-  i, j: integer;
-  addCompleted: boolean;
+function TTasks.GetGroupName(Index: integer): string;
 begin
-  Result := TStringList.Create;
-  try
-    UpdateGroup;
-    addCompleted := False;
-    for i := 0 to CountGroup - 1 do
-      for j := 0 to Length(FGroupList[i]) - 1 do
-        if FGroupList[i, j].Done then addCompleted := True;
+  Result := FGroupNameList[Index];
+end;
 
-    for i := 0 to CountGroup - 1 do
-    begin
-      if (FGroupNameList[i] <> string.Empty) then
-        Result.Add(FGroupNameList[i]);
+function TTasks.GetTaskCount(GroupIndex: integer): integer;
+begin
+  Result := Length(FGroupList[GroupIndex]);
+end;
 
-      for j := 0 to Length(FGroupList[i]) - 1 do
-      begin
-        Result.Add(FGroupList[i, j].ToString(0, addCompleted)); // Add task string to TStringList
-      end;
-    end;
-  except
-    Result.Free;
-    raise;
-  end;
+function TTasks.GetTaskInGroup(GroupIndex, TaskIndex: integer): TTask;
+begin
+  Result := FGroupList[GroupIndex, TaskIndex];
 end;
 
 procedure TTasks.InitMap(Length: integer);
