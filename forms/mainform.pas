@@ -532,7 +532,7 @@ var
 
 const
   {$IFDEF UNIX}
-  DefRowHeight = 33;
+  DefRowHeight = 22; //33;
   {$ELSE}
   DefRowHeight = 22;
   {$ENDIF}
