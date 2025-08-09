@@ -453,20 +453,95 @@ end;
 
 function IsSystemKey(Key: word): boolean;
 begin
+  {$IFDEF UNIX}
+  {$IFDEF MACOS}
+    case Key of
+      // Common macOS virtual key codes (from Macapi.AppKit)
+      $30,   // Tab key
+      $7E,   // Up arrow
+      $7D,   // Down arrow
+      $7B,   // Left arrow
+      $7C,   // Right arrow
+      $73,   // Home
+      $77,   // End
+      $74,   // Page Up
+      $79,   // Page Down
+      $7A..$87, // F1..F24 (F1=0x7A, F12=0x87)
+      $38, $3C, // Shift left/right
+      $3B, $3E, // Control left/right
+      $3A, $3D, // Option (Alt) left/right
+      $35,       // Escape
+      $72,       // Insert (Help)
+      $75,       // Delete (Forward Delete)
+      $47,       // Scroll Lock (less common)
+      $71,       // Pause (less common)
+      $39,       // Caps Lock
+      $7F,       // Num Lock (less common)
+      $3F,       // Print Screen (not typical on Mac)
+      $75,       // Cancel (Break)
+      $33,       // Backspace (Delete)
+      $31,       // Space
+      $24,       // Return (Enter)
+      $47,       // Clear (less common)
+      // Numpad keys (keypad)
+      $45, $4B, $43, $4E, $4C, // +, -, *, /, .
+      $52..$5B:                // Numpad 0..9
+        Result := True;
+      else
+        Result := False;
+    end;
+  {$ELSE}
+    case Key of
+      // X11 keysym equivalents (integer values from X11/keysym.h)
+      $FF09, // XK_Tab
+      $FF52, // XK_Up
+      $FF54, // XK_Down
+      $FF51, // XK_Left
+      $FF53, // XK_Right
+      $FF50, // XK_Home
+      $FF57, // XK_End
+      $FF55, // XK_Page_Up
+      $FF56, // XK_Page_Down
+      $FFBE..$FFD7, // XK_F1..XK_F24
+      $FFE1, $FFE2, // Shift_L, Shift_R
+      $FFE3, $FFE4, // Control_L, Control_R
+      $FFAA,       // Alt_L (example for Alt keys)
+      $FF1B,       // XK_Escape
+      $FF63,       // XK_Insert
+      $FFFF,       // XK_Delete
+      $FF14,       // XK_Scroll_Lock
+      $FF13,       // XK_Pause
+      $FFE5,       // Caps Lock (XK_Caps_Lock)
+      $FF7F,       // Num Lock (XK_Num_Lock)
+      $FF61,       // Print Screen (XK_Sys_Req)
+      $FF69,       // Cancel (Break)
+      $FF08,       // BackSpace
+      $0020,       // Space
+      $FF0D,       // Return
+      $FF0C,       // Clear
+      $FFEB, $FFEC, $FFED, $FFEE, // Windows keys and others may not be defined in X11, skipping
+      $FFAB, $FFAD, $FFAF, $FFAE, // Numpad +, -, *, /, .
+      $FFB0..$FFB9:                 // Numpad 0..9
+        Result := True;
+      else
+        Result := False;
+    end;
+  {$ENDIF}
+  {$ELSE}
   case Key of
     // Navigation keys
     VK_TAB, VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT,
     VK_HOME, VK_END, VK_PRIOR, VK_NEXT,
     // Function keys
     VK_F1..VK_F24,
-    // Modifiers
+    // Modifier keys
     VK_SHIFT, VK_CONTROL, VK_MENU, VK_LSHIFT, VK_RSHIFT,
     VK_LCONTROL, VK_RCONTROL, VK_LMENU, VK_RMENU,
     // Special keys
     VK_ESCAPE, VK_INSERT, VK_DELETE, VK_SCROLL, VK_PAUSE,
     VK_CAPITAL, VK_NUMLOCK, VK_SNAPSHOT, VK_CANCEL,
     VK_BACK, VK_SPACE, VK_RETURN, VK_CLEAR,
-    // Windows keys
+    // Windows-specific keys
     VK_LWIN, VK_RWIN, VK_APPS, VK_SLEEP,
     // Numpad keys
     VK_ADD, VK_SUBTRACT, VK_MULTIPLY, VK_DIVIDE, VK_DECIMAL,
@@ -485,6 +560,7 @@ begin
     else
       Result := False;
   end;
+  {$ENDIF}
 end;
 
 end.
