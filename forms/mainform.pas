@@ -94,7 +94,11 @@ type
     contextPaste: TMenuItem;
     contextDelete: TMenuItem;
     menuEnterSubmit: TMenuItem;
+    contextDuplicateTasks: TMenuItem;
+    contextOutdentTasks: TMenuItem;
     MenuItem6: TMenuItem;
+    contextRunPowershell: TMenuItem;
+    contextIndentTasks: TMenuItem;
     menuRunPowershell: TMenuItem;
     MenuShowTime: TMenuItem;
     menuUndoAll: TMenuItem;
@@ -137,6 +141,7 @@ type
     saveDialog: TSaveDialog;
     Separator1: TMenuItem;
     menuExit: TMenuItem;
+    Separator10: TMenuItem;
     Separator2: TMenuItem;
     Separator3: TMenuItem;
     Separator4: TMenuItem;
@@ -241,7 +246,7 @@ type
     MenuItem5: TMenuItem;
     PopupTabs: TPopupMenu;
     MenuItem7: TMenuItem;
-    MenuItem8: TMenuItem;
+    contextInsertTask: TMenuItem;
     MenuItem9: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem15: TMenuItem;
@@ -4421,7 +4426,7 @@ begin
         // Single row selected — set editable note
         memoNote.Text := Tasks.GetTask(taskGrid.Row).Note;
         memoNote.ReadOnly := False;
-        memoNote.Color := clWhite;
+        memoNote.Color := clDefault;
       end
       else
         memoNote.Text := string.Empty;

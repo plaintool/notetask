@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -990,8 +989,11 @@ object formNotetask: TformNotetask
     object Separator12: TMenuItem
       Caption = '-'
     end
-    object MenuItem8: TMenuItem
+    object contextInsertTask: TMenuItem
       Action = aInsertTask
+    end
+    object contextDuplicateTasks: TMenuItem
+      Action = aDuplicateTasks
     end
     object contextMergeTasks: TMenuItem
       Action = aMergeTasks
@@ -1002,6 +1004,15 @@ object formNotetask: TformNotetask
     object contextArchiveTasks: TMenuItem
       Action = aArchiveTasks
     end
+    object Separator10: TMenuItem
+      Caption = '-'
+    end
+    object contextIndentTasks: TMenuItem
+      Action = aIndentTasks
+    end
+    object contextOutdentTasks: TMenuItem
+      Action = aOutdentTasks
+    end
     object Separator11: TMenuItem
       Caption = '-'
     end
@@ -1011,10 +1022,13 @@ object formNotetask: TformNotetask
     object contextRunTerminal: TMenuItem
       Action = aRunTerminal
     end
+    object contextRunPowershell: TMenuItem
+      Action = aRunPowershell
+    end
   end
   object TitleImages: TImageList
     Left = 240
-    Top = 184
+    Top = 180
     Bitmap = {
       4C7A020000001000000010000000870000000000000078DA5BB66C19C3B2514C
       0BCC09C48781F80010B393A8970988D702F17F285E01C48C24E8EF45D20BC31D
