@@ -366,6 +366,7 @@ type
     procedure memoNoteChange(Sender: TObject);
   private
     Memo: TMemo;
+    PanelMemo: TPanel;
     DatePicker: TDateTimePicker;
     FChanged: boolean;
     FBackup: boolean;
@@ -415,6 +416,8 @@ type
     function GetLineAtEnd: integer;
     function GetLineAtPos(Y: integer): integer;
     procedure SelectMemoLine(LineIndex: integer; Move: boolean = False);
+    procedure PanelMemoEnter(Sender: TObject);
+    procedure PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure MemoEnter(Sender: TObject);
     procedure MemoChange(Sender: TObject);
     procedure MemoContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
@@ -1094,7 +1097,7 @@ procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; 
 begin
   taskGridResize(Sender);
   CalcRowHeights;
-  EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
+  EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 2, -2, -2, 0);
 end;
 
@@ -1150,8 +1153,8 @@ begin
   Rect := taskGrid.CellRect(taskGrid.Col, taskGrid.Row);
 
   // Update the size and position of the Memo
-  if Assigned(taskGrid.Editor) and (taskGrid.Editor is TMemo) then
-    TMemo(taskGrid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
+  if Assigned(taskGrid.Editor) and (taskGrid.Editor is TPanel) then
+    TPanel(taskGrid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
 end;
 
 procedure TformNotetask.taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
@@ -1291,8 +1294,18 @@ var
 begin
   if (aCol in [2, 3, 4]) then
   begin
+    PanelMemo := TPanel.Create(Self);
+    PanelMemo.Parent := taskGrid;
+    PanelMemo.BorderStyle := bsNone;
+    PanelMemo.Caption := string.Empty;
+    PanelMemo.BevelOuter := bvNone;
+    PanelMemo.TabStop := False;
+    PanelMemo.Visible := False;
+    PanelMemo.OnEnter := @PanelMemoEnter; // Event Enter
+    PanelMemo.OnUTF8KeyPress := @PanelMemoUTF8KeyPress; // Event UTF8KeyPress
     Memo := TMemo.Create(Self);
-    Memo.Visible := False;
+    Memo.Parent := PanelMemo;
+    Memo.Align := alClient;
     if (taskGrid.IsCellSelected[aCol, aRow]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
     begin
       Memo.Color := clHighlight;
@@ -1322,9 +1335,7 @@ begin
       Memo.BiDiMode := bdLeftToRight;
       Memo.Alignment := taLeftJustify;
     end;
-
-    EditControlSetBounds(Memo, aCol, aRow);
-    Memo.Parent := taskGrid;
+    EditControlSetBounds(PanelMemo, aCol, aRow);
     Memo.OnEnter := @MemoEnter; // Event Enter
     Memo.OnChange := @MemoChange; // Event Change
     Memo.OnContextPopup := @MemoContextPopup; // Event ContextPopup
@@ -1336,17 +1347,17 @@ begin
     Memo.SelLength := 0;
     MemoBackup;
 
-    Editor := Memo;
+    Editor := PanelMemo;
 
     if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
     begin
-      Memo.Visible := False;
+      PanelMemo.Visible := False;
       FIsSelecting := False;
       FIsEditing := False;
     end
     else
     begin
-      Memo.Visible := True;
+      PanelMemo.Visible := True;
       FIsEditing := True;
       FMemoStartEdit := True;
     end;
@@ -1709,7 +1720,7 @@ begin
     SetNote;
   end
   else
-  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+  if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
     MemoUndo; //(taskGrid.InplaceEditor as TCustomEdit).Undo;
 end;
 
@@ -1754,10 +1765,10 @@ begin
       DeleteTasks(False);
   end
   else
-  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+  if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
   begin
     MemoBackup;
-    (taskGrid.InplaceEditor as TCustomEdit).CutToClipboard;
+    Memo.CutToClipboard;
   end;
 end;
 
@@ -1769,8 +1780,8 @@ begin
   if not IsEditing then
     Tasks.CopyToClipboard(taskGrid, FShowNote)
   else
-  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-    (taskGrid.InplaceEditor as TCustomEdit).CopyToClipboard;
+  if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
+    Memo.CopyToClipboard;
 end;
 
 procedure TformNotetask.aPasteExecute(Sender: TObject);
@@ -1793,10 +1804,10 @@ begin
     SetNote;
   end
   else
-  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
+  if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
   begin
     MemoBackup;
-    (taskGrid.InplaceEditor as TCustomEdit).PasteFromClipboard;
+    Memo.PasteFromClipboard;
   end;
 end;
 
@@ -1813,8 +1824,8 @@ begin
     SetInfo;
   end
   else
-  if (taskGrid.InplaceEditor is TCustomEdit) then
-    with taskGrid.InplaceEditor as TCustomEdit do
+  if (taskGrid.InplaceEditor is TPanel) then
+    with Memo do
     begin
       if SelLength = 0 then
       begin
@@ -1841,8 +1852,8 @@ begin
     SetNote;
   end
   else
-  if (taskGrid.InplaceEditor.InheritsFrom(TCustomEdit)) then
-    (taskGrid.InplaceEditor as TCustomEdit).SelectAll;
+  if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
+    Memo.SelectAll;
 end;
 
 procedure TformNotetask.aExitExecute(Sender: TObject);
@@ -2918,7 +2929,7 @@ begin
       Result := memoNote.SelText
     else
     begin
-      if (Memo.Visible) and (Memo.SelLength > 0) then
+      if (PanelMemo.Visible) and (Memo.SelLength > 0) then
         Result := Memo.SelText
       else
       if (not string.IsNullOrEmpty(Tasks.GetTask(aRow).Note)) then
@@ -2929,7 +2940,7 @@ begin
   end
   else
   begin
-    if (Memo.Visible) and (Memo.SelLength > 0) then
+    if (PanelMemo.Visible) and (Memo.SelLength > 0) then
       Result := Memo.SelText
     else
       Result := Tasks.GetTask(aRow).Text;
@@ -3294,9 +3305,9 @@ begin
   FIsEditing := True;
   taskGrid.EditorMode := True; //Set editing mode
 
-  if (Assigned(Memo)) and (Memo.Visible) then
+  if (Assigned(PanelMemo)) and (PanelMemo.Visible) then
   begin
-    EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
+    EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
     Value := Tasks.GetTaskValue(aCol, aRow);
     if (aCol <> 4) or (Value <> '0') then
       Memo.Text := Value;
@@ -3345,6 +3356,16 @@ begin
   end;
 end;
 
+procedure TformNotetask.PanelMemoEnter(Sender: TObject);
+begin
+  if (Assigned(Memo)) and (Memo.Visible) and (Memo.CanFocus) then Memo.SetFocus;
+end;
+
+procedure TformNotetask.PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
+begin
+  Memo.SelText := UTF8Key;
+end;
+
 procedure TformNotetask.MemoEnter(Sender: TObject);
 begin
   FMemoStartEdit := True;
@@ -3374,7 +3395,7 @@ begin
   FMemoStartEdit := False;
   SetChanged;
   CalcRowHeights(taskGrid.Row);
-  EditControlSetBounds(Memo, taskGrid.Col, taskGrid.Row);
+  EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
   if (taskGrid.Col = 3) then
     SetNote;
   if (taskGrid.Col = 4) then
