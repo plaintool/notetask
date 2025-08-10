@@ -4,7 +4,8 @@
 *.dbg
 *.msi
 /lib
-/installer/debsetup/notetask.deb
+/installer/debsetup/*.deb
 /installer/debsetup/DATA/usr/bin/notetask
+/installer/rpmsetup/*.rpm
 /installer/*.wixobj
 /installer/*.wixpdb
