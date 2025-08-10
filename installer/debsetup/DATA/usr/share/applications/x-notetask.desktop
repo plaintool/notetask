@@ -6,3 +6,4 @@ MimeType=application/x-notetask
 Terminal=false
 Icon=x-notetask
 Categories=TextEditor;Office;Development;
+StartupWMClass=Notetask
