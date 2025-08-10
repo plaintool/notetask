@@ -13,7 +13,10 @@ interface
 
 uses
   Forms,
-  StdCtrls, Classes;
+  StdCtrls,
+  Classes,
+  Controls,
+  LCLType;
 
 type
 
@@ -25,6 +28,7 @@ type
     editText: TEdit;
     LabelCaption: TLabel;
     procedure editTextKeyPress(Sender: TObject; var Key: char);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -59,6 +63,22 @@ begin
   // Allow only numeric characters and control characters (like Backspace)
   if (FNumbersOnly) and (not (Key in ['0'..'9', #8])) then
     Key := #0; // Block other characters
+end;
+
+procedure TformInputText.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+begin
+  if Key = VK_RETURN then
+  begin
+    if buttonOk.Default then
+      buttonOk.Click;
+    Key := 0;
+  end
+  else
+  if Key = VK_ESCAPE then
+  begin
+    buttonCancel.Click;
+    Key := 0;
+  end;
 end;
 
 procedure TformInputText.SetCaption(aCaption, aPrompt, aButtonOk: string; aDefault: string = ''; aNumbersOnly: boolean = False);

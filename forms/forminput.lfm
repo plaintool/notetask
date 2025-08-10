@@ -8,13 +8,16 @@ object formInputText: TformInputText
   Caption = 'Go to task'
   ClientHeight = 103
   ClientWidth = 250
-  OnCreate = FormCreate
-  OnShow = FormShow
+  KeyPreview = True
   ShowInTaskBar = stNever
+  LCLVersion = '4.0.0.4'
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  OnShow = FormShow
   object buttonOk: TButton
     Left = 85
     Height = 25
-    Top = 67
+    Top = 72
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = 'Go to'
@@ -25,7 +28,7 @@ object formInputText: TformInputText
   object buttonCancel: TButton
     Left = 165
     Height = 25
-    Top = 67
+    Top = 72
     Width = 75
     Anchors = [akLeft, akBottom]
     Cancel = True
