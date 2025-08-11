@@ -4074,6 +4074,7 @@ begin
   memoNote.SelLength := SelEndPos - SelStartPos;
 
   // Remove 4 spaces at the start of each selected line if present
+  Offset := 0;
   for i := StartLine to EndLine do
   begin
     line := memoNote.Lines[i];
@@ -4083,12 +4084,12 @@ begin
       begin
         Delete(line, 1, 4);
         memoNote.Lines[i] := line;
+        Offset += 4;
       end;
     end;
   end;
 
   // Adjust selection length to account for removed spaces
-  Offset := 4 * (EndLine - StartLine + 1);
   memoNote.SelStart := SelStartPos;
   memoNote.SelLength := SelEndPos - SelStartPos - Offset;
 end;
