@@ -364,6 +364,7 @@ type
     procedure memoNoteContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
     procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure memoNoteChange(Sender: TObject);
+    procedure taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
   private
     Memo: TMemo;
     PanelMemo: TPanel;
@@ -409,6 +410,7 @@ type
     FDragTab: integer;
     FNoteSelecting: boolean;
     FNoteLastIndex, FNoteSelStart, FNoteSelLength: integer;
+    FKeyPressed: TUTF8Char;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -416,6 +418,7 @@ type
     function GetLineAtEnd: integer;
     function GetLineAtPos(Y: integer): integer;
     procedure SelectMemoLine(LineIndex: integer; Move: boolean = False);
+    procedure SetMemoFocusDelayed(Data: PtrInt);
     procedure PanelMemoEnter(Sender: TObject);
     procedure PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure MemoEnter(Sender: TObject);
@@ -3353,17 +3356,35 @@ begin
 
     taskGrid.EditorMode := False;
     FIsEditing := False;
+    if taskGrid.CanFocus then taskGrid.SetFocus;
+  end;
+end;
+
+procedure TformNotetask.SetMemoFocusDelayed(Data: PtrInt);
+begin
+  if Assigned(Memo) and (Memo.CanFocus) then
+  begin
+    Memo.SetFocus;
+    if (Memo.SelLength = 0) then
+      Memo.SelStart := Length(Memo.Text);
   end;
 end;
 
 procedure TformNotetask.PanelMemoEnter(Sender: TObject);
 begin
-  if (Assigned(Memo)) and (Memo.Visible) and (Memo.CanFocus) then Memo.SetFocus;
+  Application.QueueAsyncCall(@SetMemoFocusDelayed, 0);
 end;
 
 procedure TformNotetask.PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
 begin
   Memo.SelText := UTF8Key;
+end;
+
+procedure TformNotetask.taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
+begin
+  {$IFDEF UNIX}
+  FKeyPressed := UTF8Key;
+  {$ENDIF}
 end;
 
 procedure TformNotetask.MemoEnter(Sender: TObject);
@@ -3375,6 +3396,12 @@ begin
   if (FMemoNeedSelectAll) and (taskGrid.Col in [2, 3, 4]) then
     Memo.SelectAll;
   FMemoNeedSelectAll := True;
+
+  if (FKeyPressed <> '') and (FKeyPressed <> #13) then
+  begin
+    Memo.SelText := FKeyPressed;
+    FKeyPressed := '';
+  end;
 
   if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
   begin

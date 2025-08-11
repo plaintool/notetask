@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -87,6 +86,7 @@ object formNotetask: TformNotetask
     OnSelectCell = taskGridSelectCell
     OnSetCheckboxState = taskGridSetCheckboxState
     OnUserCheckboxBitmap = taskGridUserCheckboxBitmap
+    OnUTF8KeyPress = taskGridUTF8KeyPress
     RowHeights = (
       22
       27
