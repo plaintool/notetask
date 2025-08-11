@@ -467,6 +467,8 @@ type
     procedure GridClearSelection;
     procedure MemoNoteBackup;
     procedure MemoNoteUndo;
+    procedure MemoNoteIndent;
+    procedure MemoNoteOutdent;
     procedure MemoBackup;
     procedure MemoUndo;
     function IsExecuteValueNote(memoPriority: boolean = False): boolean;
@@ -2695,6 +2697,7 @@ end;
 
 procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
+
   LinesPerPage: integer;
 begin
   // Test for letter, number, space or back key for backup
@@ -2769,13 +2772,20 @@ begin
   if (Key = VK_BACK) then
   begin
     if memoNote.SelLength > 0 then
+    begin
       MemoNoteBackup;
+    end;
+  end
+  else
+  if (ssShift in Shift) and (Key = VK_TAB) then // Shift + Tab
+  begin
+    MemoNoteOutdent;
+    Key := 0;
   end
   else
   if (Key = VK_TAB) then // Tab
   begin
-    MemoNoteBackup;
-    memoNote.SelText := '    ';
+    MemoNoteIndent;
     Key := 0;
   end
   else
@@ -4003,6 +4013,84 @@ begin
   memoNote.SelStart := FMemoNoteSelStartBackup;
   FMemoNotebackup := newBackup;
   FMemoNoteSelStartBackup := SelStart;
+end;
+
+procedure TformNotetask.MemoNoteIndent;
+var
+  SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
+  Offset: integer;
+begin
+  MemoNoteBackup;
+  if (memoNote.SelLength > 0) then
+  begin
+    SelStartPos := memoNote.SelStart;
+    SelEndPos := SelStartPos + memoNote.SelLength;
+
+    // Calculate start line number of selection
+    memoNote.SelStart := SelStartPos;
+    StartLine := memoNote.CaretPos.Y;
+
+    // Calculate end line number of selection
+    memoNote.SelStart := SelEndPos;
+    EndLine := memoNote.CaretPos.Y;
+
+    // Restore selection
+    memoNote.SelStart := SelStartPos;
+    memoNote.SelLength := SelEndPos - SelStartPos;
+
+    // Add 4 spaces at the start of each selected line
+    for i := StartLine to EndLine do
+      memoNote.Lines[i] := '    ' + memoNote.Lines[i];
+
+    // Adjust selection length to include inserted spaces
+    Offset := 4 * (EndLine - StartLine + 1);
+    memoNote.SelStart := SelStartPos;
+    memoNote.SelLength := SelEndPos - SelStartPos + Offset;
+  end
+  else
+    memoNote.SelText := '    ';
+end;
+
+procedure TformNotetask.MemoNoteOutdent;
+var
+  SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
+  Offset: integer;
+  line: string;
+begin
+  MemoNoteBackup;
+  SelStartPos := memoNote.SelStart;
+  SelEndPos := SelStartPos + memoNote.SelLength;
+
+  // Calculate start line number of selection
+  memoNote.SelStart := SelStartPos;
+  StartLine := memoNote.CaretPos.Y;
+
+  // Calculate end line number of selection
+  memoNote.SelStart := SelEndPos;
+  EndLine := memoNote.CaretPos.Y;
+
+  // Restore selection
+  memoNote.SelStart := SelStartPos;
+  memoNote.SelLength := SelEndPos - SelStartPos;
+
+  // Remove 4 spaces at the start of each selected line if present
+  for i := StartLine to EndLine do
+  begin
+    line := memoNote.Lines[i];
+    if Length(line) >= 4 then
+    begin
+      if Copy(line, 1, 4) = '    ' then
+      begin
+        Delete(line, 1, 4);
+        memoNote.Lines[i] := line;
+      end;
+    end;
+  end;
+
+  // Adjust selection length to account for removed spaces
+  Offset := 4 * (EndLine - StartLine + 1);
+  memoNote.SelStart := SelStartPos;
+  memoNote.SelLength := SelEndPos - SelStartPos - Offset;
 end;
 
 procedure TformNotetask.MemoBackup;
