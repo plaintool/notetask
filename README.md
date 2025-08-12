@@ -54,7 +54,7 @@ Suitable for note-taking with an optional general note field at the bottom of th
 
 ![sample3](samples/sample3.png)
 
-Supports advanced features such as executing selected comments from notes as console commands.
+Supports advanced features such as executing selected comments, tasks, or the entire script from notes as console commands.
 
 ![sample4](samples/sample4.png)
 
@@ -115,7 +115,7 @@ The status bar provides a concise, real-time overview of the current task list. 
 
 ## Installation
 
-[![latest version](https://img.shields.io/github/v/release/nextwordis/Notetask?color=blue&label=Latest%20release&style=for-the-badge)](https://github.com/nextwordis/Notetask/releases/latest)
+[![latest version](https://img.shields.io/github/v/release/nextwordis/notetask?color=blue&label=Latest%20release&style=for-the-badge)](https://github.com/nextwordis/notetask/releases/latest)
 
 ### Windows
 
