@@ -1,7 +1,8 @@
 Package: Notetask
-Version: 1.0
+Version: 1.0.0
 Section: base
 Priority: optional
 Architecture: all
+Depends: libc6 (>= 2.28), libgtk2.0-0 (>= 2.24)
 Maintainer: Alexander Tverskoy <astverskoy@gmail.com>
 Description: A simple application for creating and organizing task lists
