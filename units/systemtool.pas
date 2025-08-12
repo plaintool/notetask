@@ -17,6 +17,7 @@ uses
   SysUtils,
   Controls,
   Graphics,
+  FileInfo,
   gettext,
   DefaultTranslator,
   Translations,
@@ -50,6 +51,8 @@ function SetCursorTo(Control: TControl; const ResName: string; CursorIndex: inte
 function SetFileTypeIcon(const Ext: string; IconIndex: integer): boolean;
 
 function IsSystemKey(Key: word): boolean;
+
+function GetAppVersion: string;
 
 var
   Language: string;
@@ -576,6 +579,20 @@ begin
       Result := False;
   end;
   {$ENDIF}
+end;
+
+function GetAppVersion: string;
+var
+  Info: TFileVersionInfo;
+begin
+  Info := TFileVersionInfo.Create(nil);
+  try
+    Info.FileName := ParamStr(0);
+    Info.ReadFileInfo;
+    Result := Info.VersionStrings.Values['ProductVersion'];
+  finally
+    Info.Free;
+  end;
 end;
 
 end.

@@ -11,18 +11,10 @@ unit formabout;
 interface
 
 uses
-  SysUtils,
   Forms,
-  Controls,
-  Graphics,
-  Dialogs,
   StdCtrls,
   ExtCtrls,
-  Menus,
-  Classes,
-  LCLIntf,
-  LCLType,
-  LCLProc;
+  LCLIntf;
 
 type
 
@@ -37,6 +29,7 @@ type
     LabelLicUrl: TLabel;
     Memo1: TMemo;
     labelBy1: TLabel;
+    procedure FormCreate(Sender: TObject);
     procedure LabelLicUrlClick(Sender: TObject);
   private
 
@@ -49,13 +42,20 @@ var
 
 implementation
 
-{$R *.lfm}
+uses systemtool;
 
-{ TformAboutNotetask }
+  {$R *.lfm}
+
+  { TformAboutNotetask }
 
 procedure TformAboutNotetask.LabelLicUrlClick(Sender: TObject);
 begin
   OpenUrl(labelLicUrl.Caption);
+end;
+
+procedure TformAboutNotetask.FormCreate(Sender: TObject);
+begin
+  labelName.Caption := 'Notetask © ' + GetAppVersion;
 end;
 
 end.

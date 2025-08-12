@@ -10,6 +10,7 @@ object formAboutNotetask: TformAboutNotetask
   ClientWidth = 466
   Color = clWhite
   Scaled = False
+  OnCreate = FormCreate
   object buttonOk: TButton
     Left = 381
     Height = 25
