@@ -1189,7 +1189,9 @@ begin
   else
   begin
     // Determine background color
-    if (gdFocused in aState) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
+    if (gdFocused in aState) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) and
+      ((IsEditing and ((Assigned(TaskGrid.Editor) and taskGrid.Editor.Focused) or (Assigned(Memo) and Memo.Focused))) or
+      (not IsEditing)) then
     begin
       bgFill := clRowFocused;    // Focused
       grid.Canvas.Font.Color := clBlack;
