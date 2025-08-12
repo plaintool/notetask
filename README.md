@@ -124,6 +124,7 @@ Download the installer executable from the [releases page](https://github.com/ne
 ---
 
 ### Linux
+*Debian-like systems*
 
 Download the appropriate `.deb` package for your system from the [releases page](https://github.com/nextwordis/Notetask/releases). To install the package, open a terminal and run:
 
@@ -138,6 +139,22 @@ To remove Notetask from your system, use:
 
 ```bash
 sudo dpkg -r notetask
+```
+
+*Fedora-like systems*
+
+Download the appropriate .rpm package for your system. To install the package, open a terminal and run:
+```bash
+sudo dnf install /path/to/notetask.rpm
+```
+If there are missing dependencies, fix them by running:
+```bash
+sudo dnf install -y gtk2
+```
+To remove Notetask from your system, use:
+
+```bash
+sudo dnf remove notetask
 ```
 
 ## Licensing
