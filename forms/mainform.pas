@@ -3567,10 +3567,12 @@ procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: in
 var
   Rect: TRect;
 begin
-  Rect := taskGrid.CellRect(aCol, aRow);
   if Assigned(Sender) then
+  begin
+    Rect := taskGrid.CellRect(aCol, aRow);
     Sender.SetBounds(Rect.Left + OffsetLeft, Rect.Top + OffsetTop, Rect.Right - Rect.Left + OffsetRight,
       Rect.Bottom - Rect.Top + OffsetBottom);
+  end;
 end;
 
 procedure TformNotetask.ClearSelected(ShowConfirm: boolean = True);
@@ -4415,6 +4417,8 @@ begin
     {$ENDIF}
     CalcDefaultColWidth;
   end;
+
+  EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
 end;
 
 procedure TformNotetask.ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
