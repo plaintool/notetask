@@ -4363,6 +4363,10 @@ var
       if FWordWrap then
         flags := flags or DT_WORDBREAK;
 
+      {$IFDEF UNIX}
+      Text := StringReplace(Text, #$0A, #$0A+ '+', [rfReplaceAll]);
+      {$ENDIF}
+
       DrawText(taskGrid.canvas.handle, PChar(Text), Length(Text), drawrect, flags);
 
       if (force) or ((drawrect.bottom - drawrect.top) > taskGrid.RowHeights[row]) then
@@ -4404,11 +4408,10 @@ begin
   taskGrid.RowHeights[0] := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
   if (aForce) then
   begin
-    {$IFDEF Windows}
-    groupTabs.Height := Canvas.TextHeight('A') + 8;
-    {$ENDIF}
     {$IFDEF UNIX}
     groupTabs.Height := Canvas.TextHeight('A') + 11;
+    {$ELSE}
+    groupTabs.Height := Canvas.TextHeight('A') + 8;
     {$ENDIF}
     CalcDefaultColWidth;
   end;
