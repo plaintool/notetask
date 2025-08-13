@@ -23,13 +23,13 @@ uses
   Translations,
   LResources,
   LCLTranslator
-
   {$IFDEF Windows}
   ,Windows
   ,Registry
   {$ENDIF}
   {$IFDEF Linux}
   ,Unix
+  ,LCLType
   {$ENDIF}
   {$IFDEF MacOS}
   ,MacOSAll
@@ -456,99 +456,6 @@ end;
 
 function IsSystemKey(Key: word): boolean;
 begin
-  {$IFDEF UNIX}
-  {$IFDEF MACOS}
-    case Key of
-      // Navigation keys
-      $30,   // Tab
-      $7E,   // Up arrow
-      $7D,   // Down arrow
-      $7B,   // Left arrow
-      $7C,   // Right arrow
-      $73,   // Home
-      $77,   // End
-      $74,   // Page Up
-      $79,   // Page Down
-
-      // Function keys (F1-F20)
-      $7A, $78, $63, $76, $60, $61, $62, $64, $65, $6D, // F1-F10
-      $67, $6F, $69, $6B, $71, $6A, $40, $4F, $50, $5A, // F11-F20
-
-      // Modifiers
-      $38, $3C, // Shift left/right
-      $3B, $3E, // Control left/right
-      $3A, $3D, // Option (Alt) left/right
-      $36, $37, // Command left/right
-
-      // Special keys
-      $35,    // Escape
-      $72,    // Insert (Help)
-      $75,    // Delete (Forward Delete)
-      $33,    // Backspace
-      $31,    // Space
-      $24,    // Return (Enter)
-      $39,    // Caps Lock
-
-      // Numpad keys
-      $45,    // Numpad = (Clear)
-      $4E,    // Numpad /
-      $4B,    // Numpad *
-      $43,    // Numpad -
-      $4C,    // Numpad +
-      $41,    // Numpad Decimal (.)
-      $52..$5B: // Numpad 0-9
-        Result := True;
-      else
-        Result := False;
-    end;
-  {$ELSE} // Linux/X11
-    case Key of
-      // Navigation keys
-      $FF09, // XK_Tab
-      $FF52, // XK_Up
-      $FF54, // XK_Down
-      $FF51, // XK_Left
-      $FF53, // XK_Right
-      $FF50, // XK_Home
-      $FF57, // XK_End
-      $FF55, // XK_Page_Up
-      $FF56, // XK_Page_Down
-
-      // Function keys
-      $FFBE..$FFD7, // XK_F1..XK_F24
-
-      // Modifiers
-      $FFE1, $FFE2, // Shift left/right
-      $FFE3, $FFE4, // Control left/right
-      $FFE9, $FFEA, // Alt left/right
-      $FFEB, $FFEC, // Super (Windows) left/right
-
-      // Special keys
-      $FF1B, // XK_Escape
-      $FF63, // XK_Insert
-      $FFFF, // XK_Delete
-      $FF08, // XK_BackSpace
-      $0020, // Space
-      $FF0D, // XK_Return
-      $FFE5, // Caps Lock
-      $FF14, // Scroll Lock
-      $FF13, // Pause
-      $FF7F, // Num Lock
-      $FF61, // Print Screen
-
-      // Numpad keys
-      $FFAB, // Numpad +
-      $FFAD, // Numpad -
-      $FFAA, // Numpad *
-      $FFAF, // Numpad /
-      $FFAE, // Numpad Decimal (.)
-      $FFB0..$FFB9: // Numpad 0-9
-        Result := True;
-      else
-        Result := False;
-    end;
-  {$ENDIF}
-  {$ELSE}// Windows
   case Key of
     // Navigation keys
     VK_TAB, VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT,
@@ -565,7 +472,7 @@ begin
     // Special keys
     VK_ESCAPE, VK_INSERT, VK_DELETE, VK_SCROLL, VK_PAUSE,
     VK_CAPITAL, VK_NUMLOCK, VK_SNAPSHOT, VK_CANCEL,
-    VK_BACK, VK_SPACE, VK_RETURN, VK_CLEAR,
+    VK_BACK, VK_RETURN, VK_CLEAR,
 
     // Numpad keys
     VK_ADD, VK_SUBTRACT, VK_MULTIPLY, VK_DIVIDE, VK_DECIMAL,
@@ -578,7 +485,6 @@ begin
     else
       Result := False;
   end;
-  {$ENDIF}
 end;
 
 function GetAppVersion: string;

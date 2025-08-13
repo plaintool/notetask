@@ -2699,7 +2699,6 @@ end;
 
 procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
-
   LinesPerPage: integer;
 begin
   // Test for letter, number, space or back key for backup
