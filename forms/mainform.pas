@@ -3530,7 +3530,7 @@ end;
 procedure TformNotetask.DatePickerChange(Sender: TObject);
 begin
   FDatePickerDateSet := True;
-  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime);
+  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime, FShowTime);
   Tasks.SetTask(taskGrid, taskGrid.Row, False, FShowTime);
   SetChanged;
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 2, -2, -2, 0);
@@ -3873,7 +3873,7 @@ begin
         begin
           taskGrid.Cells[1, RowIndex] := '1';
           if (taskGrid.Cells[5, RowIndex] = '') then
-            taskGrid.Cells[5, RowIndex] := DateTimeToString(Now);
+            taskGrid.Cells[5, RowIndex] := DateTimeToString(Now, FShowTime);
         end
         else
           taskGrid.Cells[1, RowIndex] := '0';
@@ -3909,7 +3909,7 @@ begin
         Check := True;
         taskGrid.Cells[1, RowIndex] := '1';
         if (taskGrid.Cells[5, RowIndex] = '') then
-          taskGrid.Cells[5, RowIndex] := DateTimeToString(Now);
+          taskGrid.Cells[5, RowIndex] := DateTimeToString(Now, FShowTime);
       end
       else
         taskGrid.Cells[1, RowIndex] := '0';
