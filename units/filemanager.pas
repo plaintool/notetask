@@ -15,6 +15,12 @@ uses
   Classes,
   SysUtils,
   StrUtils,
+  {$IFDEF UNIX}
+  BaseUnix,
+  DateUtils,
+  {$ELSE}
+  Windows,
+  {$ENDIF}
   lineending;
 
 function GetEncodingName(Encoding: TEncoding): string;
@@ -41,6 +47,8 @@ procedure ReadTextFile(const FileName: string; out Content: string; out FileEnco
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
 
 function FindPowerShellCore: string;
+
+procedure UpdateFileReadAccess(const FileName: string);
 
 implementation
 
@@ -389,6 +397,8 @@ begin
     StringList.LoadFromFile(FileName, FileEncoding);
     Content := StringList.Text;
 
+    UpdateFileReadAccess(FileName);
+
     // Determine the line ending type
     //if Pos(#13#10, Content) > 0 then
     //  LineEnding := TLineEnding.WindowsCRLF
@@ -500,7 +510,7 @@ begin
       Exit(SearchPaths[I]);
 
   // Check all folders in PATH environment variable
-  PathEnv := GetEnvironmentVariable('PATH');
+  PathEnv := SysUtils.GetEnvironmentVariable('PATH');
   Paths := SplitString(PathEnv, ';');
 
   for I := 0 to Length(Paths) - 1 do
@@ -513,6 +523,44 @@ begin
         Exit(PathPart);
     end;
   end;
+end;
+
+procedure UpdateFileReadAccess(const FileName: string);
+var
+  {$IFDEF UNIX}
+  t: utimbuf;
+  {$ELSE}
+  h: THandle;
+  ft: TFileTime;
+  {$ENDIF}
+begin
+  {$IFDEF UNIX}
+  // Convert local time to UTC and update only access time (atime) on UNIX
+  t.actime := DateTimeToUnix(Now, False);
+  // Keep the modification time (mtime) unchanged
+  t.modtime := FileAge(FileName);
+  // Apply the updated times to the file
+  fpUTime(FileName, @t);
+  {$ELSE}
+  // Zero initialize FILETIME
+  ft.dwLowDateTime := 0;
+  ft.dwHighDateTime := 0;
+
+  // Open the file handle for writing to update LastAccessTime
+  h := CreateFile(PChar(FileName), GENERIC_WRITE, FILE_SHARE_READ or FILE_SHARE_WRITE, nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+  if h <> INVALID_HANDLE_VALUE then
+  begin
+    try
+      // Get the current system time as FILETIME
+      GetSystemTimeAsFileTime(ft);
+      // Set only the LastAccessTime of the file
+      SetFileTime(h, nil, @ft, nil);
+    finally
+      // Close the file handle
+      CloseHandle(h);
+    end;
+  end;
+  {$ENDIF}
 end;
 
 end.
