@@ -376,9 +376,11 @@ type
     FMemoNeedSelectAll: boolean;
     FMemoBackup: TCaption;
     FMemoSelStartBackup: integer;
+    FMemoSelLengthBackup: integer;
     FMemoFirstKey: boolean;
     FMemoNoteBackup: TCaption;
     FMemoNoteSelStartBackup: integer;
+    FMemoNoteSelLengthBackup: integer;
     FMemoNoteFirstKey: boolean;
     FDatePickerOldDate: TDateTime;
     FDatePickerDateSet: boolean;
@@ -4003,19 +4005,23 @@ procedure TformNotetask.MemoNoteBackup;
 begin
   FMemoNoteBackup := memoNote.Text;
   FMemoNoteSelStartBackup := memoNote.SelStart;
+  FMemoNoteSelLengthBackup := memoNote.SelLength;
 end;
 
 procedure TformNotetask.MemoNoteUndo;
 var
   newBackup: TCaption;
-  SelStart: integer;
+  SelStart, SelLength: integer;
 begin
   newBackup := MemoNote.Text;
   SelStart := memoNote.SelStart;
+  SelLength := memoNote.SelLength;
   memoNote.Text := FMemoNoteBackup;
   memoNote.SelStart := FMemoNoteSelStartBackup;
+  memoNote.SelLength := FMemoNoteSelLengthBackup;
   FMemoNotebackup := newBackup;
   FMemoNoteSelStartBackup := SelStart;
+  FMemoNoteSelLengthBackup := SelLength;
 end;
 
 procedure TformNotetask.MemoNoteIndent;
@@ -4101,19 +4107,23 @@ procedure TformNotetask.MemoBackup;
 begin
   FMemoBackup := Memo.Text;
   FMemoSelStartBackup := Memo.SelStart;
+  FMemoSelLengthBackup := Memo.SelLength;
 end;
 
 procedure TformNotetask.MemoUndo;
 var
   newBackup: TCaption;
-  SelStart: integer;
+  SelStart, SelLength: integer;
 begin
   newBackup := Memo.Text;
   SelStart := Memo.SelStart;
+  SelLength := Memo.SelLength;
   Memo.Text := FMemoBackup;
   Memo.SelStart := FMemoSelStartBackup;
+  Memo.SelLength := FMemoSelLengthBackup;
   FMemobackup := newBackup;
   FMemoSelStartBackup := SelStart;
+  FMemoSelLengthBackup := SelLength;
 end;
 
 function TformNotetask.GetScrollPosition: integer;
