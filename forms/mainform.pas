@@ -5089,7 +5089,8 @@ begin
     GridBackupSelection;
     Tasks.CreateBackup;
     Target.SelText := aToText;
-    FLastFoundSelLength := Length(aToText);
+    FLastFoundSelLength := Length(unicodestring(aToText));
+    Target.SelLength := FLastFoundSelLength;
     FindNextExecute;
   end;
 
@@ -5098,13 +5099,14 @@ end;
 
 function TformNotetask.ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
 var
-  Row, Col: integer;
   sValue, sText: unicodestring;
   Target: TMemo;
+  sShowNote: boolean;
 begin
   FBackup := False;
-  Row := taskGrid.Row;
-  Col := taskGrid.Col;
+  sShowNote := FShowNote;
+  if self.ActiveControl <> memoNote then
+    FShowNote := False;
   GridBackupSelection;
   Tasks.CreateBackup; // FBackup = false here
   try
@@ -5128,15 +5130,14 @@ begin
       else
         Target := Memo;
       Target.SelText := aToText;
-      FLastFoundSelLength := Length(aToText);
+      FLastFoundSelLength := Length(unicodestring(aToText));
+      Target.SelLength := FLastFoundSelLength;
     end;
 
-    taskGrid.Row := Row;
-    taskGrid.Col := Col;
-    Target.SelLength := 0;
     Result := True;
   finally
     FBackup := True;
+    FShowNote := sShowNote;
   end;
 end;
 
