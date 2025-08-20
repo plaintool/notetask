@@ -682,8 +682,6 @@ begin
 
   // Free allocated resources
   //FLineEnding.Free;
-  if (IsUserEncoding(FEncoding)) then
-    FEncoding.Free;
   Tasks.Free;
   ResourceBitmapCheck.Free;
   ResourceBitmapUncheck.Free;
@@ -1631,6 +1629,9 @@ begin
 
     // Save settings for current file
     SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+
+    if Assigned(Tasks) then
+      Tasks.Free;
 
     new := TStringList.Create;
     new.Add('[ ]');

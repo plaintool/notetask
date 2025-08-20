@@ -50,6 +50,10 @@ function FindPowerShellCore: string;
 
 procedure UpdateFileReadAccess(const FileName: string);
 
+var
+  UTF8BOMEncoding: TEncoding;
+  UTF16LEBOMEncoding, UTF16BEBOMEncoding: TEncoding;
+
 implementation
 
 function GetEncodingName(Encoding: TEncoding): string;
@@ -264,13 +268,13 @@ begin
     begin
       // Check for UTF-8 BOM
       if (Buffer[0] = $EF) and (Buffer[1] = $BB) and (Buffer[2] = $BF) then
-        exit(TEncoding.GetEncoding(65001)) // UTF-8 BOM
+        exit(UTF8BOMEncoding)// UTF-8 BOM
       // Check for UTF-16 LE BOM
       else if (Buffer[0] = $FF) and (Buffer[1] = $FE) then
-        exit(TEncoding.GetEncoding(1200)) // UTF-16 LE BOM
+        exit(UTF16LEBOMEncoding) // UTF-16 LE BOM
       // Check for UTF-16 BE BOM
       else if (Buffer[0] = $FE) and (Buffer[1] = $FF) then
-        exit(TEncoding.GetEncoding(1201)); // UTF-16 BE BOM
+        exit(UTF16BEBOMEncoding); // UTF-16 BE BOM
     end;
 
     // If no BOM is found, check the content for text patterns
@@ -562,5 +566,18 @@ begin
   end;
   {$ENDIF}
 end;
+
+initialization
+  UTF8BOMEncoding := TEncoding.GetEncoding(65001);
+  UTF16LEBOMEncoding := TEncoding.GetEncoding(1200);
+  UTF16BEBOMEncoding := TEncoding.GetEncoding(1201);
+
+finalization
+  if (Assigned(UTF8BOMEncoding)) then
+    UTF8BOMEncoding.Free;
+  if (Assigned(UTF16LEBOMEncoding)) then
+    UTF16LEBOMEncoding.Free;
+  if (Assigned(UTF16BEBOMEncoding)) then
+    UTF16BEBOMEncoding.Free;
 
 end.
