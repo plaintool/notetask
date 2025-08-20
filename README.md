@@ -161,4 +161,4 @@ sudo dnf remove notetask
 
 Notetask is licensed under the GPL v3 license. See the LICENSE file for details.
 
-The Notetask application uses third-party resources licensed as described in the THIRD_PARTIES file.
+The Notetask application uses third-party resources licensed as described in the [THIRD_PARTIES](THIRD_PARTIES) file.
