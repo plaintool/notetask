@@ -5081,9 +5081,15 @@ begin
     FindNextExecute
   else
   begin
+    if self.ActiveControl = memoNote then
+      Target := memoNote
+    else
+      Target := Memo;
+
     GridBackupSelection;
     Tasks.CreateBackup;
     Target.SelText := aToText;
+    FLastFoundSelLength := Length(aToText);
     FindNextExecute;
   end;
 
@@ -5096,17 +5102,17 @@ var
   sValue, sText: unicodestring;
   Target: TMemo;
 begin
-  if self.ActiveControl = memoNote then
-    Target := memoNote
-  else
-    Target := Memo;
-
   FBackup := False;
   Row := taskGrid.Row;
   Col := taskGrid.Col;
   GridBackupSelection;
   Tasks.CreateBackup; // FBackup = false here
   try
+    if self.ActiveControl = memoNote then
+      Target := memoNote
+    else
+      Target := Memo;
+
     // Replace current selection
     sValue := unicodestring(Target.SelText);
     sText := unicodestring(aText);
@@ -5117,7 +5123,12 @@ begin
     // Replace all
     while (Find(aText, aMatchCase, aWrapAround, True, True)) do
     begin
+      if self.ActiveControl = memoNote then
+        Target := memoNote
+      else
+        Target := Memo;
       Target.SelText := aToText;
+      FLastFoundSelLength := Length(aToText);
     end;
 
     taskGrid.Row := Row;
