@@ -507,7 +507,9 @@ type
     function SaveFile(fileName: string = string.Empty): boolean;
     function OpenFile(fileName: string): boolean;
     procedure ApplyGridSettings;
-    function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
+    function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean; overload;
+    function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; out aRowsChanged: integer; Silent: boolean): boolean;
+      overload;
     function Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
 
@@ -4746,6 +4748,14 @@ end;
 
 function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
 var
+  rowsChanged: integer;
+begin
+  Result := Find(aText, aMatchCase, aWrapAround, aDirectionDown, rowsChanged, Silent);
+end;
+
+function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; out aRowsChanged: integer;
+  Silent: boolean): boolean;
+var
   sValue, sText: unicodestring;
   Counter, CurRow, CurCol, StartRow, StartCol: integer;
   LastDate: boolean;
@@ -4835,6 +4845,7 @@ var
 begin
   if (FFindActive) or (taskGrid.RowCount = 0) then exit;
   FFindActive := True;
+  aRowsChanged := 0;
   try
     FindText := aText;
     MatchCase := aMatchCase;
@@ -4901,6 +4912,7 @@ begin
       if (taskGrid.Row < taskGrid.RowCount - 1) then
       begin
         taskGrid.Row := taskGrid.Row + 1;
+        Inc(aRowsChanged);
         taskGrid.Col := 1;
       end
       else
@@ -4912,6 +4924,7 @@ begin
       if (taskGrid.Row > 1) then
       begin
         taskGrid.Row := taskGrid.Row - 1;
+        Inc(aRowsChanged);
         taskGrid.Col := 5;
       end
       else
@@ -4980,6 +4993,7 @@ begin
             Inc(CurRow);
             CurCol := 1;
             taskGrid.Row := taskGrid.Row + 1;
+            Inc(aRowsChanged);
             taskGrid.Col := 2;
             Memo.SelStart := 0;
             Memo.SelLength := 0;
@@ -4990,6 +5004,7 @@ begin
             Dec(CurRow);
             CurCol := 5;
             taskGrid.Row := taskGrid.Row - 1;
+            Inc(aRowsChanged);
             taskGrid.Col := 5;
             Memo.SelStart := Length(unicodestring(Memo.Text)) - 1;
             Memo.SelLength := 0;
@@ -5008,6 +5023,7 @@ begin
           begin
             CurRow := 1;
             taskGrid.Row := 1;
+            Inc(aRowsChanged);
             CurCol := 2;
             taskGrid.Col := 2;
             Memo.SelStart := 0;
@@ -5017,6 +5033,7 @@ begin
           begin
             CurRow := taskGrid.RowCount - 1;
             taskGrid.Row := taskGrid.RowCount - 1;
+            Inc(aRowsChanged);
             CurCol := 5;
             taskGrid.Col := 5;
           end;
@@ -5090,7 +5107,9 @@ begin
     Tasks.CreateBackup;
     Target.SelText := aToText;
     FLastFoundSelLength := Length(unicodestring(aToText));
+    Target.SelStart := Max(Target.SelStart - FLastFoundSelLength, 0);
     Target.SelLength := FLastFoundSelLength;
+
     FindNextExecute;
   end;
 
@@ -5102,6 +5121,8 @@ var
   sValue, sText: unicodestring;
   Target: TMemo;
   sShowNote: boolean;
+  CounterRow, CounterPos: integer;
+  RowsChanged, LastPos: integer;
 begin
   FBackup := False;
   sShowNote := FShowNote;
@@ -5111,19 +5132,26 @@ begin
   Tasks.CreateBackup; // FBackup = false here
   try
     if self.ActiveControl = memoNote then
-      Target := memoNote
+    begin
+      Target := memoNote;
+      MemoNoteBackup;
+    end
     else
       Target := Memo;
 
     // Replace current selection
     sValue := unicodestring(Target.SelText);
     sText := unicodestring(aText);
+    CounterRow := 0;
+    CounterPos := 0;
+    LastPos := 0;
+    RowsChanged := 0;
     if not ((FFoundText = string.Empty) or ((aMatchCase) and (sValue <> sText)) or ((not aMatchCase) and
       (UnicodeLowerCase(sValue) <> UnicodeLowerCase(sText)))) then
       Target.SelText := aToText;
 
     // Replace all
-    while (Find(aText, aMatchCase, aWrapAround, True, True)) do
+    while (Find(aText, aMatchCase, aWrapAround, True, RowsChanged, True)) do
     begin
       if self.ActiveControl = memoNote then
         Target := memoNote
@@ -5131,7 +5159,27 @@ begin
         Target := Memo;
       Target.SelText := aToText;
       FLastFoundSelLength := Length(unicodestring(aToText));
+      Target.SelStart := Max(Target.SelStart - FLastFoundSelLength, 0);
       Target.SelLength := FLastFoundSelLength;
+
+      // Safeguard to prevent infinite loop
+      if aWrapAround then
+      begin
+        if self.ActiveControl = memoNote then
+        begin
+          if (Target.SelStart > LastPos) then CounterPos += Target.SelStart - LastPos
+          else
+            CounterPos += Target.SelStart;
+          LastPos := Target.SelStart;
+          if (CounterPos > Length(unicodestring(Target.Text))) then
+            break;
+        end
+        else
+        begin
+          if (RowsChanged > 0) then CounterRow += RowsChanged;
+          if (CounterRow > taskGrid.RowCount - 1) then break;
+        end;
+      end;
     end;
 
     Result := True;
