@@ -471,6 +471,7 @@ type
     procedure MemoNoteUndo;
     procedure MemoNoteIndent;
     procedure MemoNoteOutdent;
+    procedure MemoNoteToggleComment(aComment: string);
     procedure MemoBackup;
     procedure MemoUndo;
     function IsExecuteValueNote(memoPriority: boolean = False): boolean;
@@ -548,11 +549,9 @@ var
   ResourceBitmapStarGray: TBitmap;
 
 const
-  {$IFDEF UNIX}
-  DefRowHeight = 22; //33;
-  {$ELSE}
   DefRowHeight = 22;
-  {$ENDIF}
+  IndentStr = '  ';
+  CommentStr = '//';
 
 resourcestring
   rapp = 'Notetask';
@@ -797,7 +796,7 @@ begin
   if (Shift = [ssCtrl]) and (Key = VK_TAB) then // Ctrl + Tab
   begin
     if (IsEditing) and (Memo.Focused) then
-      Memo.SelText := '    '
+      Memo.SelText := IndentStr
     else
       aIndentTasks.Execute;
     Key := 0;
@@ -2795,6 +2794,12 @@ begin
     Key := 0;
   end
   else
+  if (ssCtrl in Shift) and (Key = VK_OEM_2) then // Ctrl + /
+  begin
+    MemoNoteToggleComment(CommentStr);
+    Key := 0;
+  end
+  else
   if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_Z) then // Ctrl + Shift + Z
   begin
     aUndoAll.Execute;
@@ -3975,7 +3980,7 @@ begin
     begin
       if (not Outdent) then
       begin
-        taskGrid.Cells[2, RowIndex] := '    ' + taskGrid.Cells[2, RowIndex];
+        taskGrid.Cells[2, RowIndex] := IndentStr + taskGrid.Cells[2, RowIndex];
         CalcRowHeights();
       end
       else
@@ -4050,17 +4055,17 @@ begin
     memoNote.SelStart := SelStartPos;
     memoNote.SelLength := SelEndPos - SelStartPos;
 
-    // Add 4 spaces at the start of each selected line
+    // Add IndentStr at the start of each selected line
     for i := StartLine to EndLine do
-      memoNote.Lines[i] := '    ' + memoNote.Lines[i];
+      memoNote.Lines[i] := IndentStr + memoNote.Lines[i];
 
     // Adjust selection length to include inserted spaces
-    Offset := 4 * (EndLine - StartLine + 1);
+    Offset := Length(IndentStr) * (EndLine - StartLine + 1);
     memoNote.SelStart := SelStartPos;
     memoNote.SelLength := SelEndPos - SelStartPos + Offset;
   end
   else
-    memoNote.SelText := '    ';
+    memoNote.SelText := IndentStr;
 end;
 
 procedure TformNotetask.MemoNoteOutdent;
@@ -4085,18 +4090,18 @@ begin
   memoNote.SelStart := SelStartPos;
   memoNote.SelLength := SelEndPos - SelStartPos;
 
-  // Remove 4 spaces at the start of each selected line if present
+  // Remove IndentStr at the start of each selected line if present
   Offset := 0;
   for i := StartLine to EndLine do
   begin
     line := memoNote.Lines[i];
-    if Length(line) >= 4 then
+    if Length(line) >= Length(IndentStr) then
     begin
-      if Copy(line, 1, 4) = '    ' then
+      if Copy(line, 1, Length(IndentStr)) = IndentStr then
       begin
-        Delete(line, 1, 4);
+        Delete(line, 1, Length(IndentStr));
         memoNote.Lines[i] := line;
-        Offset += 4;
+        Offset += Length(IndentStr);
       end;
     end;
   end;
@@ -4104,6 +4109,95 @@ begin
   // Adjust selection length to account for removed spaces
   memoNote.SelStart := SelStartPos;
   memoNote.SelLength := SelEndPos - SelStartPos - Offset;
+end;
+
+procedure TformNotetask.MemoNoteToggleComment(aComment: string);
+var
+  SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
+  line, trimmed: string;
+  AllCommented: boolean;
+  MinIndent, CurrentIndent: integer;
+  CommentOffset: integer;
+begin
+  MemoNoteBackup;
+
+  SelStartPos := memoNote.SelStart;
+  SelEndPos := SelStartPos + memoNote.SelLength;
+
+  // Calculate start and end lines of selection
+  memoNote.SelStart := SelStartPos;
+  StartLine := memoNote.CaretPos.Y;
+
+  memoNote.SelStart := SelEndPos;
+  EndLine := memoNote.CaretPos.Y;
+
+  // Restore selection
+  memoNote.SelStart := SelStartPos;
+  memoNote.SelLength := SelEndPos - SelStartPos;
+
+  // Find minimum IndentStr among non-empty lines
+  MinIndent := MaxInt;
+  for i := StartLine to EndLine do
+  begin
+    line := memoNote.Lines[i];
+    trimmed := TrimLeft(line);
+    if trimmed <> '' then
+    begin
+      CurrentIndent := Length(line) - Length(trimmed);
+      if CurrentIndent < MinIndent then
+        MinIndent := CurrentIndent;
+    end;
+  end;
+  if MinIndent = MaxInt then
+    MinIndent := 0;
+
+  // Determine if all non-empty lines are already commented
+  AllCommented := True;
+  for i := StartLine to EndLine do
+  begin
+    trimmed := TrimLeft(memoNote.Lines[i]);
+    if (trimmed <> '') and (Copy(trimmed, 1, Length(CommentStr)) <> CommentStr) then
+    begin
+      AllCommented := False;
+      Break;
+    end;
+  end;
+
+  CommentOffset := 0;
+
+  // Add or remove CommentStr for each line
+  for i := StartLine to EndLine do
+  begin
+    line := memoNote.Lines[i];
+    trimmed := TrimLeft(line);
+
+    if trimmed = '' then
+      Continue; // skip empty lines
+
+    if AllCommented then
+    begin
+      // Remove CommentStr, keep spaces after it
+      if Copy(trimmed, 1, Length(CommentStr)) = CommentStr then
+      begin
+        Delete(trimmed, 1, Length(CommentStr));
+        memoNote.Lines[i] := StringOfChar(' ', Length(line) - Length(TrimLeft(line))) + trimmed;
+        CommentOffset -= Length(CommentStr);
+      end;
+    end
+    else
+    begin
+      // Add CommentStr at MinIndent, keep extra spaces
+      if Length(line) > MinIndent then
+        memoNote.Lines[i] := Copy(line, 1, MinIndent) + CommentStr + Copy(line, MinIndent + 1, MaxInt)
+      else
+        memoNote.Lines[i] := StringOfChar(' ', MinIndent) + CommentStr;
+      CommentOffset += Length(CommentStr);
+    end;
+  end;
+
+  // Restore original selection with offset
+  memoNote.SelStart := SelStartPos;
+  memoNote.SelLength := (SelEndPos - SelStartPos) + CommentOffset;
 end;
 
 procedure TformNotetask.MemoBackup;
