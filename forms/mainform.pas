@@ -2709,7 +2709,7 @@ end;
 
 procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
-  LinesPerPage: integer;
+  LinesPerPage, NewPos: integer;
 begin
   // Test for letter, number, space or back key for backup
   if (Shift * [ssCtrl, ssAlt] = []) and (not IsSystemKey(Key) or (Key = VK_SPACE) or (Key = VK_BACK)) then
@@ -2726,7 +2726,11 @@ begin
   if (not (ssShift in Shift)) and (Key = VK_PRIOR) then
   begin
     LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
-    memoNote.CaretPos := Point(0, Max(0, memoNote.CaretPos.Y - LinesPerPage));
+    NewPos := Max(0, memoNote.CaretPos.Y - LinesPerPage);
+    if (NewPos = 0) then
+      memoNote.SelStart := 0
+    else
+      memoNote.CaretPos := Point(0, NewPos);
     memoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
     memoNote.Invalidate;
     Key := 0;
@@ -2735,7 +2739,11 @@ begin
   if (not (ssShift in Shift)) and (Key = VK_NEXT) then
   begin
     LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
-    memoNote.CaretPos := Point(0, Min(memoNote.Lines.Count - 1, memoNote.CaretPos.Y + LinesPerPage));
+    NewPos := Min(memoNote.Lines.Count - 1, memoNote.CaretPos.Y + LinesPerPage);
+    if NewPos >= memoNote.Lines.Count - 1 then
+      memoNote.SelStart := memoNote.GetTextLen - Length(unicodestring(memoNote.Lines[memoNote.Lines.Count - 1]))
+    else
+      memoNote.CaretPos := Point(0, NewPos);
     memoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
     memoNote.Invalidate;
     key := 0;
