@@ -551,7 +551,12 @@ var
 const
   DefRowHeight = 22;
   IndentStr = '  ';
-  CommentStr = '//';
+  CommentSlashStr = '//';
+  CommentMinusStr = '--';
+  CommentHashStr = '#';
+  CommentSemicolonStr = ';';
+  CommentAsteriskStr = '*';
+  CommentPercentStr = '%';
 
 resourcestring
   rapp = 'Notetask';
@@ -2796,7 +2801,37 @@ begin
   else
   if (ssCtrl in Shift) and (Key = VK_OEM_2) then // Ctrl + /
   begin
-    MemoNoteToggleComment(CommentStr);
+    MemoNoteToggleComment(CommentSlashStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_OEM_MINUS) then // Ctrl + -
+  begin
+    MemoNoteToggleComment(CommentMinusStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_3) then // Ctrl + #
+  begin
+    MemoNoteToggleComment(CommentHashStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_OEM_1) then // Ctrl + ;
+  begin
+    MemoNoteToggleComment(CommentSemicolonStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_8) then // Ctrl + *
+  begin
+    MemoNoteToggleComment(CommentAsteriskStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_5) then // Ctrl + %
+  begin
+    MemoNoteToggleComment(CommentPercentStr);
     Key := 0;
   end
   else
@@ -4156,7 +4191,7 @@ begin
   for i := StartLine to EndLine do
   begin
     trimmed := TrimLeft(memoNote.Lines[i]);
-    if (trimmed <> '') and (Copy(trimmed, 1, Length(CommentStr)) <> CommentStr) then
+    if (trimmed <> '') and (Copy(trimmed, 1, Length(aComment)) <> aComment) then
     begin
       AllCommented := False;
       Break;
@@ -4165,7 +4200,7 @@ begin
 
   CommentOffset := 0;
 
-  // Add or remove CommentStr for each line
+  // Add or remove aComment for each line
   for i := StartLine to EndLine do
   begin
     line := memoNote.Lines[i];
@@ -4176,22 +4211,22 @@ begin
 
     if AllCommented then
     begin
-      // Remove CommentStr, keep spaces after it
-      if Copy(trimmed, 1, Length(CommentStr)) = CommentStr then
+      // Remove aComment, keep spaces after it
+      if Copy(trimmed, 1, Length(aComment)) = aComment then
       begin
-        Delete(trimmed, 1, Length(CommentStr));
+        Delete(trimmed, 1, Length(aComment));
         memoNote.Lines[i] := StringOfChar(' ', Length(line) - Length(TrimLeft(line))) + trimmed;
-        CommentOffset -= Length(CommentStr);
+        CommentOffset -= Length(aComment);
       end;
     end
     else
     begin
-      // Add CommentStr at MinIndent, keep extra spaces
+      // Add aComment at MinIndent, keep extra spaces
       if Length(line) > MinIndent then
-        memoNote.Lines[i] := Copy(line, 1, MinIndent) + CommentStr + Copy(line, MinIndent + 1, MaxInt)
+        memoNote.Lines[i] := Copy(line, 1, MinIndent) + aComment + Copy(line, MinIndent + 1, MaxInt)
       else
-        memoNote.Lines[i] := StringOfChar(' ', MinIndent) + CommentStr;
-      CommentOffset += Length(CommentStr);
+        memoNote.Lines[i] := StringOfChar(' ', MinIndent) + aComment;
+      CommentOffset += Length(aComment);
     end;
   end;
 
