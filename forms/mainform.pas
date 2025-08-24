@@ -552,11 +552,12 @@ const
   DefRowHeight = 22;
   IndentStr = '  ';
   CommentSlashStr = '//';
-  CommentMinusStr = '--';
   CommentHashStr = '#';
+  CommentMinusStr = '--';
   CommentSemicolonStr = ';';
-  CommentAsteriskStr = '*';
-  CommentPercentStr = '%';
+  CommentTwoColonStr = '::';
+  CommentREMStr = 'REM ';
+  CommentApostropheStr = '''';
 
 resourcestring
   rapp = 'Notetask';
@@ -2817,21 +2818,27 @@ begin
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key = VK_OEM_1) then // Ctrl + ;
+  if (ssCtrl in Shift) and (Key = VK_OEM_1) then // Ctrl + :
+  begin
+    MemoNoteToggleComment(CommentREMStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_4) then // Ctrl + 4
   begin
     MemoNoteToggleComment(CommentSemicolonStr);
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key = VK_8) then // Ctrl + *
+  if (ssCtrl in Shift) and (Key = VK_6) then // Ctrl + 6
   begin
-    MemoNoteToggleComment(CommentAsteriskStr);
+    MemoNoteToggleComment(CommentTwocolonStr);
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key = VK_5) then // Ctrl + %
+  if (ssCtrl in Shift) and (Key = VK_OEM_7) then // Ctrl + '
   begin
-    MemoNoteToggleComment(CommentPercentStr);
+    MemoNoteToggleComment(CommentApostropheStr);
     Key := 0;
   end
   else
@@ -4056,12 +4063,17 @@ var
   newBackup: TCaption;
   SelStart, SelLength: integer;
 begin
+  // Save current selection and text
   newBackup := MemoNote.Text;
   SelStart := memoNote.SelStart;
   SelLength := memoNote.SelLength;
+
+  // Restore from backup
   memoNote.Text := FMemoNoteBackup;
   memoNote.SelStart := FMemoNoteSelStartBackup;
   memoNote.SelLength := FMemoNoteSelLengthBackup;
+
+  // Update backup
   FMemoNotebackup := newBackup;
   FMemoNoteSelStartBackup := SelStart;
   FMemoNoteSelLengthBackup := SelLength;
@@ -4153,9 +4165,11 @@ var
   AllCommented: boolean;
   MinIndent, CurrentIndent: integer;
   CommentOffset: integer;
+  FirstCommentPos, j: integer;
 begin
   MemoNoteBackup;
 
+  FirstCommentPos := -1;
   SelStartPos := memoNote.SelStart;
   SelEndPos := SelStartPos + memoNote.SelLength;
 
@@ -4191,7 +4205,7 @@ begin
   for i := StartLine to EndLine do
   begin
     trimmed := TrimLeft(memoNote.Lines[i]);
-    if (trimmed <> '') and (Copy(trimmed, 1, Length(aComment)) <> aComment) then
+    if (trimmed <> '') and (UpperCase(Copy(trimmed, 1, Length(aComment))) <> UpperCase(aComment)) then
     begin
       AllCommented := False;
       Break;
@@ -4212,7 +4226,7 @@ begin
     if AllCommented then
     begin
       // Remove aComment, keep spaces after it
-      if Copy(trimmed, 1, Length(aComment)) = aComment then
+      if UpperCase(Copy(trimmed, 1, Length(aComment))) = UpperCase(aComment) then
       begin
         Delete(trimmed, 1, Length(aComment));
         memoNote.Lines[i] := StringOfChar(' ', Length(line) - Length(TrimLeft(line))) + trimmed;
@@ -4227,11 +4241,25 @@ begin
       else
         memoNote.Lines[i] := StringOfChar(' ', MinIndent) + aComment;
       CommentOffset += Length(aComment);
+
+      // Calculate first comment position
+      if (i = startline) then
+      begin
+        FirstCommentPos := 0;
+        for j := 0 to i - 1 do
+        begin
+          FirstCommentPos := FirstCommentPos + Length(unicodestring(memoNote.Lines[j])) + 1;
+          if (FLineEnding = TLineEnding.WindowsCRLF) then Inc(FirstCommentPos);
+        end;
+      end;
     end;
   end;
 
   // Restore original selection with offset
-  memoNote.SelStart := SelStartPos;
+  if FirstCommentPos > -1 then
+    memoNote.SelStart := FirstCommentPos
+  else
+    memoNote.SelStart := SelStartPos;
   memoNote.SelLength := (SelEndPos - SelStartPos) + CommentOffset;
 end;
 
