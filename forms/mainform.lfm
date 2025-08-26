@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -178,11 +177,11 @@ object formNotetask: TformNotetask
       BorderSpacing.Left = 10
       BorderStyle = bsNone
       HideSelection = False
+      PopupMenu = PopupMemo
       ScrollBars = ssAutoBoth
       TabOrder = 0
       WordWrap = False
       OnChange = memoNoteChange
-      OnContextPopup = memoNoteContextPopup
       OnKeyDown = memoNoteKeyDown
     end
   end
@@ -948,7 +947,7 @@ object formNotetask: TformNotetask
     MarginRight = 500
     MarginBottom = 500
     Left = 488
-    Top = 184
+    Top = 176
   end
   object printDialog: TPrintDialog
     Left = 488
@@ -963,32 +962,11 @@ object formNotetask: TformNotetask
   end
   object Popup: TPopupMenu
     Left = 160
-    Top = 180
+    Top = 176
     object contextUndo: TMenuItem
       Action = aUndo
     end
     object Separator8: TMenuItem
-      Caption = '-'
-    end
-    object contextCut: TMenuItem
-      Action = aCut
-    end
-    object contextCopy: TMenuItem
-      Action = aCopy
-    end
-    object contextPaste: TMenuItem
-      Action = aPaste
-    end
-    object contextDelete: TMenuItem
-      Action = aDelete
-    end
-    object Separator6: TMenuItem
-      Caption = '-'
-    end
-    object contextSelectAll: TMenuItem
-      Action = aSelectAll
-    end
-    object Separator12: TMenuItem
       Caption = '-'
     end
     object contextInsertTask: TMenuItem
@@ -1018,6 +996,27 @@ object formNotetask: TformNotetask
     object Separator11: TMenuItem
       Caption = '-'
     end
+    object contextCut: TMenuItem
+      Action = aCut
+    end
+    object contextCopy: TMenuItem
+      Action = aCopy
+    end
+    object contextPaste: TMenuItem
+      Action = aPaste
+    end
+    object contextDelete: TMenuItem
+      Action = aDelete
+    end
+    object Separator12: TMenuItem
+      Caption = '-'
+    end
+    object contextSelectAll: TMenuItem
+      Action = aSelectAll
+    end
+    object Separator6: TMenuItem
+      Caption = '-'
+    end
     object contextAskChatGPT: TMenuItem
       Action = aChatGpt
     end
@@ -1030,7 +1029,7 @@ object formNotetask: TformNotetask
   end
   object TitleImages: TImageList
     Left = 240
-    Top = 180
+    Top = 176
     Bitmap = {
       4C7A020000001000000010000000870000000000000078DA5BB66C19C3B2514C
       0BCC09C48781F80010B393A8970988D702F17F285E01C48C24E8EF45D20BC31D
@@ -1041,7 +1040,7 @@ object formNotetask: TformNotetask
   end
   object PopupTabs: TPopupMenu
     Left = 160
-    Top = 252
+    Top = 240
     object MenuItem7: TMenuItem
       Action = aInsertGroup
     end
@@ -1053,6 +1052,46 @@ object formNotetask: TformNotetask
     end
     object MenuItem15: TMenuItem
       Action = aDeleteGroup
+    end
+  end
+  object PopupMemo: TPopupMenu
+    Left = 160
+    Top = 312
+    object contextUndo1: TMenuItem
+      Action = aUndo
+    end
+    object Separator17: TMenuItem
+      Caption = '-'
+    end
+    object contextCut1: TMenuItem
+      Action = aCut
+    end
+    object contextCopy1: TMenuItem
+      Action = aCopy
+    end
+    object contextPaste1: TMenuItem
+      Action = aPaste
+    end
+    object contextDelete1: TMenuItem
+      Action = aDelete
+    end
+    object Separator18: TMenuItem
+      Caption = '-'
+    end
+    object contextSelectAll1: TMenuItem
+      Action = aSelectAll
+    end
+    object Separator21: TMenuItem
+      Caption = '-'
+    end
+    object contextAskChatGPT1: TMenuItem
+      Action = aChatGpt
+    end
+    object contextRunTerminal1: TMenuItem
+      Action = aRunTerminal
+    end
+    object contextRunPowershell1: TMenuItem
+      Action = aRunPowershell
     end
   end
 end

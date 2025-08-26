@@ -31,6 +31,7 @@ uses
   DateTimePicker,
   Printers,
   Process,
+  Clipbrd,
   LCLIntf,
   LCLType,
   LConvEncoding,
@@ -79,6 +80,15 @@ type
     aNewWindow: TAction;
     aOpen: TAction;
     ActionList: TActionList;
+    contextAskChatGPT1: TMenuItem;
+    contextCopy1: TMenuItem;
+    contextCut1: TMenuItem;
+    contextDelete1: TMenuItem;
+    contextPaste1: TMenuItem;
+    contextRunPowershell1: TMenuItem;
+    contextRunTerminal1: TMenuItem;
+    contextSelectAll1: TMenuItem;
+    contextUndo1: TMenuItem;
     fontDialog: TFontDialog;
     MainMenu: TMainMenu;
     memoNote: TMemo;
@@ -137,12 +147,16 @@ type
     pageSetupDialog: TPageSetupDialog;
     panelNote: TPanel;
     Popup: TPopupMenu;
+    PopupMemo: TPopupMenu;
     printDialog: TPrintDialog;
     saveDialog: TSaveDialog;
     Separator1: TMenuItem;
     menuExit: TMenuItem;
     Separator10: TMenuItem;
+    Separator17: TMenuItem;
+    Separator18: TMenuItem;
     Separator2: TMenuItem;
+    Separator21: TMenuItem;
     Separator3: TMenuItem;
     Separator4: TMenuItem;
     Separator5: TMenuItem;
@@ -361,7 +375,6 @@ type
     procedure aDuplicateGroupExecute(Sender: TObject);
     procedure aMoveGroupLeftExecute(Sender: TObject);
     procedure aMoveGroupRightExecute(Sender: TObject);
-    procedure memoNoteContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
     procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure memoNoteChange(Sender: TObject);
     procedure taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
@@ -419,13 +432,13 @@ type
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
     function GetLineAtEnd: integer;
     function GetLineAtPos(Y: integer): integer;
+    procedure PasteWithLineEnding(AMemo: TMemo);
     procedure SelectMemoLine(LineIndex: integer; Move: boolean = False);
     procedure SetMemoFocusDelayed(Data: PtrInt);
     procedure PanelMemoEnter(Sender: TObject);
     procedure PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure MemoEnter(Sender: TObject);
     procedure MemoChange(Sender: TObject);
-    procedure MemoContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
     procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure MemoKeyPress(Sender: TObject; var Key: char);
     procedure DatePickerEnter(Sender: TObject);
@@ -1350,9 +1363,9 @@ begin
       Memo.Alignment := taLeftJustify;
     end;
     EditControlSetBounds(PanelMemo, aCol, aRow);
+    Memo.PopupMenu := PopupMemo;
     Memo.OnEnter := @MemoEnter; // Event Enter
     Memo.OnChange := @MemoChange; // Event Change
-    Memo.OnContextPopup := @MemoContextPopup; // Event ContextPopup
     Memo.OnKeyDown := @MemoKeyDown; // Event KeyDown
     if (aCol = 4) then
       Memo.OnKeyPress := @MemoKeyPress; // Event KeyPress for amount column only
@@ -1712,7 +1725,11 @@ var
   TempLastRow, TempLastCol: integer;
   TempTopRow: integer;
 begin
-  if memoNote.Focused then exit;
+  if memoNote.Focused then
+  begin
+    MemoNoteUndo;
+    exit;
+  end;
   if Screen.ActiveForm <> Self then exit;
 
   if not IsEditing then
@@ -1769,7 +1786,13 @@ end;
 
 procedure TformNotetask.aCutExecute(Sender: TObject);
 begin
-  if memoNote.Focused then exit;
+  if memoNote.Focused then
+  begin
+    MemoNoteBackup;
+    memoNote.CutToClipboard;
+    exit;
+  end;
+
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
 
@@ -1791,6 +1814,12 @@ end;
 
 procedure TformNotetask.aCopyExecute(Sender: TObject);
 begin
+  if memoNote.Focused then
+  begin
+    memoNote.CopyToClipboard;
+    exit;
+  end;
+
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
 
@@ -1805,7 +1834,13 @@ procedure TformNotetask.aPasteExecute(Sender: TObject);
 var
   Sel: TGridRect;
 begin
-  if memoNote.Focused then exit;
+  if memoNote.Focused then
+  begin
+    MemoNoteBackup;
+    PasteWithLineEnding(memoNote);
+    exit;
+  end;
+
   if Screen.ActiveForm <> Self then exit;
 
   if not IsEditing then
@@ -1824,13 +1859,19 @@ begin
   if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
   begin
     MemoBackup;
-    Memo.PasteFromClipboard;
+    PasteWithLineEnding(Memo);
   end;
 end;
 
 procedure TformNotetask.aDeleteExecute(Sender: TObject);
 begin
-  if memoNote.Focused then exit;
+  if memoNote.Focused then
+  begin
+    MemoNoteBackup;
+    MemoNote.ClearSelection;
+    exit;
+  end;
+
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
 
@@ -1857,7 +1898,12 @@ end;
 
 procedure TformNotetask.aSelectAllExecute(Sender: TObject);
 begin
-  if memoNote.Focused then exit;
+  if memoNote.Focused then
+  begin
+    memoNote.SelectAll;
+    exit;
+  end;
+
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
 
@@ -2751,7 +2797,7 @@ begin
   else
   if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
   begin
-    memoNote.CopyToClipboard;
+    MemoNote.CopyToClipboard;
     Key := 0;
   end
   else
@@ -2784,7 +2830,7 @@ begin
     end
     else
       MemoNoteBackup;
-    memoNote.ClearSelection;
+    MemoNote.ClearSelection;
     Key := 0;
   end
   else
@@ -2865,14 +2911,14 @@ begin
   if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
   begin
     MemoNoteBackup;
-    memoNote.CutToClipboard;
+    memoNote.CopyToClipboard;
     Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
   begin
     MemoNoteBackup;
-    memoNote.PasteFromClipboard;
+    PasteWithLineEnding(memoNote);
     Key := 0;
   end;
 end;
@@ -2883,11 +2929,6 @@ begin
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
   CalcRowHeights(taskGrid.Row);
   SetChanged;
-end;
-
-procedure TformNotetask.memoNoteContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
-begin
-  MemoNoteBackup;
 end;
 
 function TformNotetask.OpenFile(fileName: string): boolean;
@@ -3322,48 +3363,6 @@ begin
   if Result >= memoNote.Lines.Count then Result := memoNote.Lines.Count;
 end;
 
-procedure TformNotetask.SelectMemoLine(LineIndex: integer; Move: boolean = False);
-var
-  newStart, newLength: integer;
-begin
-  {$IFDEF UNIX}
-  memoNote.Tag := memoNote.VertScrollBar.Position;
-  {$ENDIF}
-  memoNote.CaretPos := Point(0, LineIndex);
-  memoNote.SelLength := Length(unicodestring(memoNote.Lines[LineIndex]));
-
-  if (not Move) then
-  begin
-    FNoteSelStart := memoNote.SelStart;
-    FNoteSelLength := memoNote.SelLength;
-  end;
-
-  if (Move) then
-  begin
-    newStart := memoNote.SelStart;
-    newLength := memoNote.SelLength;
-
-    if (newStart > FNoteSelStart) then
-    begin
-      memoNote.SelStart := FNoteSelStart;
-      memoNote.SelLength := newStart + newLength - FNoteSelStart;
-    end
-    else
-      memoNote.SelLength := FNoteSelStart + FNoteSelLength - newStart;
-  end;
-
-  {$IFDEF UNIX}
-  if (memoNote.Tag > 0) then
-  begin
-    memoNote.Visible := False;
-    Application.ProcessMessages;
-    memoNote.VertScrollBar.Position;
-    memoNote.VertScrollBar.Position := memoNote.Tag;
-    memoNote.Visible := True;
-  end;
-  {$ENDIF}
-end;
-
 procedure TformNotetask.EditCell(aCol: integer = -1; aRow: integer = -1);
 var
   Value: string;
@@ -3429,6 +3428,66 @@ begin
     FIsEditing := False;
     if taskGrid.CanFocus then taskGrid.SetFocus;
   end;
+end;
+
+procedure TformNotetask.PasteWithLineEnding(AMemo: TMemo);
+var
+  s: string;
+begin
+  if Clipboard.HasFormat(CF_TEXT) then
+  begin
+    s := Clipboard.AsText;
+
+    s := StringReplace(s, #13#10, #10, [rfReplaceAll]); // Windows CRLF -> LF
+    s := StringReplace(s, #13, #10, [rfReplaceAll]);   // Macintosh CR -> LF
+
+    s := StringReplace(s, #10, FLineEnding.Value, [rfReplaceAll]);
+    s := StringReplace(s, #9, IndentStr, [rfReplaceAll]);
+
+    AMemo.SelText := s;
+  end;
+end;
+
+procedure TformNotetask.SelectMemoLine(LineIndex: integer; Move: boolean = False);
+var
+  newStart, newLength: integer;
+begin
+  {$IFDEF UNIX}
+  memoNote.Tag := memoNote.VertScrollBar.Position;
+  {$ENDIF}
+  memoNote.CaretPos := Point(0, LineIndex);
+  memoNote.SelLength := Length(unicodestring(memoNote.Lines[LineIndex]));
+
+  if (not Move) then
+  begin
+    FNoteSelStart := memoNote.SelStart;
+    FNoteSelLength := memoNote.SelLength;
+  end;
+
+  if (Move) then
+  begin
+    newStart := memoNote.SelStart;
+    newLength := memoNote.SelLength;
+
+    if (newStart > FNoteSelStart) then
+    begin
+      memoNote.SelStart := FNoteSelStart;
+      memoNote.SelLength := newStart + newLength - FNoteSelStart;
+    end
+    else
+      memoNote.SelLength := FNoteSelStart + FNoteSelLength - newStart;
+  end;
+
+  {$IFDEF UNIX}
+  if (memoNote.Tag > 0) then
+  begin
+    memoNote.Visible := False;
+    Application.ProcessMessages;
+    memoNote.VertScrollBar.Position;
+    memoNote.VertScrollBar.Position := memoNote.Tag;
+    memoNote.Visible := True;
+  end;
+  {$ENDIF}
 end;
 
 procedure TformNotetask.SetMemoFocusDelayed(Data: PtrInt);
@@ -3498,11 +3557,6 @@ begin
     SetNote;
   if (taskGrid.Col = 4) then
     SetInfo;
-end;
-
-procedure TformNotetask.MemoContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
-begin
-  MemoBackup;
 end;
 
 procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
