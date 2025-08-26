@@ -4223,13 +4223,37 @@ end;
 procedure TformNotetask.MemoNoteToggleComment(aComment: string);
 var
   SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
-  line, trimmed: string;
+  line, trimmed, resultStr: string;
   AllCommented: boolean;
   MinIndent, CurrentIndent: integer;
   CommentOffset: integer;
-  FirstCommentPos, j: integer;
+  FirstCommentPos, j, wordWidth, Count: integer;
 begin
   MemoNoteBackup;
+
+  // If no selection and the cursor is on an empty line -> insert a line of the comment character
+  if (memoNote.SelLength = 0) then
+  begin
+    line := Trim(memoNote.Lines[memoNote.CaretPos.Y]);
+    if line = '' then
+    begin
+      // Create a string of the comment character, approximate length to fit the editor width
+      // Calculate how many times we can repeat the full word
+      wordWidth := Canvas.TextWidth(aComment);
+      if wordWidth > 0 then
+        Count := Min(memoNote.ClientWidth, 800) div wordWidth
+      else
+        Count := 60; // fallback value
+
+      // Build the repeated string
+      resultStr := '';
+      for j := 1 to Count do
+        resultStr := resultStr + aComment;
+
+      memoNote.Lines[memoNote.CaretPos.Y] := resultStr;
+      Exit; // Stop method execution, nothing else to do
+    end;
+  end;
 
   FirstCommentPos := -1;
   SelStartPos := memoNote.SelStart;
