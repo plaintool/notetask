@@ -2911,7 +2911,7 @@ begin
   if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
   begin
     MemoNoteBackup;
-    memoNote.CopyToClipboard;
+    memoNote.CutToClipboard;
     Key := 0;
   end
   else
