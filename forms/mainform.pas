@@ -454,7 +454,7 @@ type
     procedure DisableDrag;
     procedure SetInfo;
     procedure SetNote;
-    procedure SetTabs;
+    procedure SetTabs(Change: boolean = True);
     procedure SetCaption;
     procedure ClearSelected(ShowConfirm: boolean = True);
     procedure MergeTasks;
@@ -3247,7 +3247,7 @@ begin
   begin
     FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
     FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
-    SetTabs;
+    SetTabs(False);
     if (FDragTab >= 0) then FDragTab := Result;
     ChangeGroup(Result);
     SetChanged;
@@ -3267,7 +3267,7 @@ begin
   begin
     FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
     FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
-    SetTabs;
+    SetTabs(False);
     if (FDragTab >= 0) then FDragTab := Result;
     ChangeGroup(Result);
     SetChanged;
@@ -3535,7 +3535,10 @@ end;
 
 procedure TformNotetask.PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
 begin
-  Memo.SelText := UTF8Key;
+  if UTF8Key = #8 then  // backspace
+    Memo.SelText := string.Empty
+  else
+    Memo.SelText := UTF8Key;
 end;
 
 procedure TformNotetask.taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
@@ -4873,11 +4876,12 @@ begin
   end;
 end;
 
-procedure TformNotetask.SetTabs;
+procedure TformNotetask.SetTabs(Change: boolean = True);
 var
   Clean: TStringList;
   i: integer;
   LastIndex, LastRealIndex: integer;
+  FoundTab: boolean;
 begin
   LastRealIndex := FindGroupRealIndex(groupTabs.TabIndex);
   SetLength(FGroupIndexMap, 0);
@@ -4901,28 +4905,36 @@ begin
     groupTabs.Tabs := Clean;
     groupTabs.Visible := not ((groupTabs.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty));
 
-    LastIndex := FindGroupTabIndex(LastRealIndex);
-    if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count) then
-      groupTabs.TabIndex := LastIndex
-    else
-    if (LastIndex >= groupTabs.Tabs.Count) then
-      groupTabs.TabIndex := groupTabs.Tabs.Count - 1
-    else
-    if (LastIndex < 0) then
+    if (Change) then
     begin
-      while (LastRealIndex < Tasks.CountGroup) do
+      FoundTab := False;
+      LastIndex := FindGroupTabIndex(LastRealIndex);
+      if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count) then
+        groupTabs.TabIndex := LastIndex
+      else
+      if (LastIndex >= groupTabs.Tabs.Count) then
+        groupTabs.TabIndex := groupTabs.Tabs.Count - 1
+      else
+      if (LastIndex < 0) then
       begin
-        Inc(LastRealIndex);
-        LastIndex := FindGroupTabIndex(LastRealIndex);
-        if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count) then
+        while (LastRealIndex < Tasks.CountGroup) do
         begin
-          groupTabs.TabIndex := LastIndex;
-          LastRealIndex := -1;
-          break;
+          Inc(LastRealIndex);
+          LastIndex := FindGroupTabIndex(LastRealIndex);
+          if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count) then
+          begin
+            groupTabs.TabIndex := LastIndex;
+            FoundTab := True;
+            break;
+          end;
         end;
+        if (not FoundTab) then
+          groupTabs.TabIndex := groupTabs.Tabs.Count - 1;
       end;
-      if (LastRealIndex >= 0) then
-        groupTabs.TabIndex := groupTabs.Tabs.Count - 1;
+
+      // Change group if tab was changed
+      if (LastRealIndex <> FindGroupRealIndex(groupTabs.TabIndex)) then
+        groupTabsChange(groupTabs);
     end;
 
     // Set selected row memory for tabs
