@@ -422,14 +422,18 @@ type
     FLastRowHeights: array of integer;
     FLastRow: integer;
     FLastRowMem: array of integer;
+    FGroupIndexMap: array of integer;
     FDragTab: integer;
     FNoteSelecting: boolean;
     FNoteLastIndex, FNoteSelStart, FNoteSelLength: integer;
     FKeyPressed: TUTF8Char;
+    FLastTabMouseX: integer;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
+    function FindGroupTabIndex(Value: integer): integer;
+    function FindGroupRealIndex(Value: integer): integer;
     function GetLineAtEnd: integer;
     function GetLineAtPos(Y: integer): integer;
     procedure PasteWithLineEnding(AMemo: TMemo);
@@ -1491,10 +1495,12 @@ end;
 
 procedure TformNotetask.groupTabsChange(Sender: TObject);
 begin
+  if FIsEditing then EditComplite;
+
   if (Length(FLastRowMem) > Tasks.SelectedGroup) then
     FLastRowMem[Tasks.SelectedGroup] := taskGrid.Row;
 
-  Tasks.ChangeGroup(groupTabs.TabIndex, True);
+  Tasks.ChangeGroup(FindGroupRealIndex(groupTabs.TabIndex), True);
 
   FillGrid;
 
@@ -1517,7 +1523,10 @@ procedure TformNotetask.groupTabsMouseDown(Sender: TObject; Button: TMouseButton
 begin
   if (Button = mbLeft) then
     if (groupTabs.IndexOfTabAt(X, Y) = groupTabs.TabIndex) and not ((groupTabs.TabIndex = 0) and (Tasks.GroupNames[0] = string.Empty)) then
+    begin
       FDragTab := groupTabs.TabIndex;
+      FLastTabMouseX := 0;
+    end;
 end;
 
 procedure TformNotetask.groupTabsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
@@ -1526,29 +1535,23 @@ var
 begin
   if FDragTab >= 0 then
   begin
-    Screen.Cursor := crDrag;
     target := groupTabs.IndexOfTabAt(X, Y);
     if target >= 0 then
     begin
-      if target > FDragTab then
-      begin
-        MoveTabRight(groupTabs.TabIndex);
-        if (groupTabs.IndexOfTabAt(X, Y) <> groupTabs.TabIndex) then
-          DisableDrag;
-      end
+      if (FLastTabMouseX <> X) and (FLastTabMouseX > 0) then  Screen.Cursor := crDrag;
+      if (target > FDragTab) and (FLastTabMouseX < X) then
+        MoveTabRight(groupTabs.TabIndex)
       else
-      if target < FDragTab then
-      begin
+      if (target < FDragTab) and (FLastTabMouseX > X) then
         MoveTabLeft(groupTabs.TabIndex);
-        if (groupTabs.IndexOfTabAt(X, Y) <> groupTabs.TabIndex) then
-          DisableDrag;
-      end;
     end;
   end;
+  FLastTabMouseX := X;
 end;
 
 procedure TformNotetask.groupTabsMouseLeave(Sender: TObject);
 begin
+  FLastTabMouseX := 0;
   DisableDrag;
 end;
 
@@ -1556,6 +1559,7 @@ procedure TformNotetask.groupTabsMouseUp(Sender: TObject; Button: TMouseButton; 
 var
   TabIndex: integer;
 begin
+  FLastTabMouseX := 0;
   DisableDrag;
 
   if Button = mbRight then
@@ -3232,13 +3236,17 @@ end;
 
 procedure TformNotetask.MoveTabLeft(Index: integer);
 var
-  Result: integer;
+  Result, RowMem: integer;
 begin
   if (Index = 1) and (Tasks.GroupNames[0] = string.Empty) then exit;
 
-  Result := Tasks.MoveGroupLeft(Index);
+  Result := Tasks.MoveGroupLeft(FindGroupRealIndex(Index), ShowArchived);
+  RowMem := FLastRowMem[Result];
+  Result := FindGroupTabIndex(Result);
   if (Result <> Index) then
   begin
+    FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
+    FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
     SetTabs;
     if (FDragTab >= 0) then FDragTab := Result;
     ChangeGroup(Result);
@@ -3248,13 +3256,17 @@ end;
 
 procedure TformNotetask.MoveTabRight(Index: integer);
 var
-  Result: integer;
+  Result, RowMem: integer;
 begin
   if (Index = 0) and (Tasks.GroupNames[0] = string.Empty) then exit;
 
-  Result := Tasks.MoveGroupRight(Index);
+  Result := Tasks.MoveGroupRight(FindGroupRealIndex(Index), ShowArchived);
+  RowMem := FLastRowMem[Result];
+  Result := FindGroupTabIndex(Result);
   if (Result <> Index) then
   begin
+    FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
+    FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
     SetTabs;
     if (FDragTab >= 0) then FDragTab := Result;
     ChangeGroup(Result);
@@ -3317,6 +3329,22 @@ procedure TformNotetask.PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; 
 begin
   if AGrid is TStringGrid then
     AText := TStringGrid(AGrid).Cells[ACol, ARow];
+end;
+
+function TformNotetask.FindGroupTabIndex(Value: integer): integer;
+var
+  i: integer;
+begin
+  for i := 0 to High(FGroupIndexMap) do
+    if FGroupIndexMap[i] = Value then
+      Exit(i);
+  Result := -1;
+end;
+
+function TformNotetask.FindGroupRealIndex(Value: integer): integer;
+begin
+  if (Value >= 0) and (Value < Length(FGroupIndexMap)) then
+    Result := FGroupIndexMap[Value];
 end;
 
 function TformNotetask.GetLineAtEnd: integer;
@@ -3396,7 +3424,7 @@ end;
 
 procedure TformNotetask.EditComplite(aEnter: boolean = False; aEscape: boolean = False);
 begin
-  if taskGrid.EditorMode then
+  if IsEditing then
   begin
     if (taskGrid.Col = 5) and (Assigned(DatePicker)) then
     begin
@@ -3902,6 +3930,7 @@ begin
 
     if Confirm = mrYes then
     begin
+      EditComplite;
       if (FBackup) then
       begin
         GridBackupSelection;
@@ -3931,6 +3960,7 @@ begin
 
     if Confirm = mrYes then
     begin
+      EditComplite;
       if (FBackup) then
       begin
         GridBackupSelection;
@@ -3947,6 +3977,7 @@ begin
           Tasks.ArchiveTask(RowIndex);
         end;
       end;
+      SetTabs;
       FillGrid;
       ResetRowHeight;
       SetInfo;
@@ -4444,6 +4475,7 @@ procedure TformNotetask.SetShowArchived(Value: boolean);
 begin
   FShowArchived := Value;
   aShowArchived.Checked := FShowArchived;
+  SetTabs;
   FillGrid;
   ResetRowHeight;
   SetInfo;
@@ -4845,9 +4877,10 @@ procedure TformNotetask.SetTabs;
 var
   Clean: TStringList;
   i: integer;
-  LastIndex: integer;
+  LastIndex, LastRealIndex: integer;
 begin
-  LastIndex := groupTabs.TabIndex;
+  LastRealIndex := FindGroupRealIndex(groupTabs.TabIndex);
+  SetLength(FGroupIndexMap, 0);
   Clean := TStringList.Create;
   try
     for i := 0 to Tasks.CountGroup - 1 do
@@ -4855,16 +4888,45 @@ begin
       if Tasks.GroupNames[i] = string.Empty then
         Clean.Add(rgroupuntitled)
       else
-        Clean.Add(Tasks.GroupNames[i].TrimLeft([' ', '#']).Trim);
+      begin
+        if (ShowArchived) or (not Tasks.GetGroupArchived(i)) then
+        begin
+          Clean.Add(Tasks.GroupNames[i].TrimLeft([' ', '#']).Trim);
+          SetLength(FGroupIndexMap, Length(FGroupIndexMap) + 1);
+          FGroupIndexMap[High(FGroupIndexMap)] := i;
+        end;
+      end;
     end;
 
     groupTabs.Tabs := Clean;
     groupTabs.Visible := not ((groupTabs.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty));
+
+    LastIndex := FindGroupTabIndex(LastRealIndex);
     if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count) then
-      groupTabs.TabIndex := LastIndex;
+      groupTabs.TabIndex := LastIndex
+    else
+    if (LastIndex >= groupTabs.Tabs.Count) then
+      groupTabs.TabIndex := groupTabs.Tabs.Count - 1
+    else
+    if (LastIndex < 0) then
+    begin
+      while (LastRealIndex < Tasks.CountGroup) do
+      begin
+        Inc(LastRealIndex);
+        LastIndex := FindGroupTabIndex(LastRealIndex);
+        if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count) then
+        begin
+          groupTabs.TabIndex := LastIndex;
+          LastRealIndex := -1;
+          break;
+        end;
+      end;
+      if (LastRealIndex >= 0) then
+        groupTabs.TabIndex := groupTabs.Tabs.Count - 1;
+    end;
 
     // Set selected row memory for tabs
-    SetLength(FLastRowMem, groupTabs.Tabs.Count);
+    SetLength(FLastRowMem, Tasks.CountGroup);
   finally
     Clean.Free;
   end;

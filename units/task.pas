@@ -90,6 +90,7 @@ type
     procedure UpdateGroup;
     procedure ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
     function GetGroupName(Index: integer): string;
+    function GetGroupArchived(Index: integer): boolean;
     function GetTaskCount(GroupIndex: integer): integer;
     function GetTaskInGroup(GroupIndex, TaskIndex: integer): TTask;
     procedure InitMap(Length: integer);
@@ -112,8 +113,8 @@ type
     function RenameGroup(aIndex: integer; aName: string): boolean;
     function CopyGroup(aIndex: integer; aName: string): boolean;
     function DeleteGroup(aIndex: integer): boolean;
-    function MoveGroupLeft(Index: integer): integer;
-    function MoveGroupRight(Index: integer): integer;
+    function MoveGroupLeft(Index: integer; aShowArchived: boolean): integer;
+    function MoveGroupRight(Index: integer; aShowArchived: boolean): integer;
     function MoveGroupTasks(Index1, Index2, NewGroup: integer): integer;
     function MoveTasksTop(Index1, Index2: integer): integer;
     function MoveTasksBottom(Index1, Index2: integer): integer;
@@ -360,6 +361,32 @@ end;
 function TTasks.GetGroupName(Index: integer): string;
 begin
   Result := FGroupNameList[Index];
+end;
+
+function TTasks.GetGroupArchived(Index: integer): boolean;
+var
+  i: integer;
+begin
+  if (Index = SelectedGroup) then
+  begin
+    if Length(FTaskList) = 0 then
+      Exit(False);
+
+    for i := 0 to High(FTaskList) do
+      if not FTaskList[i].Archive then
+        Exit(False);
+  end
+  else
+  begin
+    if Length(FGroupList[Index]) = 0 then
+      Exit(False);
+
+    for i := 0 to High(FGroupList[Index]) do
+      if not FGroupList[Index][i].Archive then
+        Exit(False);
+  end;
+
+  Result := True;
 end;
 
 function TTasks.GetTaskCount(GroupIndex: integer): integer;
@@ -768,45 +795,75 @@ begin
   Result := True;
 end;
 
-function TTasks.MoveGroupLeft(Index: integer): integer;
+function TTasks.MoveGroupLeft(Index: integer; aShowArchived: boolean): integer;
 var
   tempGroup: array of TTask;
   tempName: string;
+  i, target: integer;
 begin
   Result := Index;
   if (Index < 1) then exit;
 
-  tempGroup := FGroupList[Index - 1];
-  FGroupList[Index - 1] := FGroupList[Index];
+  if (aShowArchived) then
+    target := Index - 1
+  else
+  begin
+    target := -1;
+    for i := Index - 1 downto 0 do
+      if (not GetGroupArchived(i)) then
+      begin
+        target := i;
+        break;
+      end;
+    if target < 0 then exit;
+  end;
+
+  tempGroup := FGroupList[target];
+  FGroupList[target] := FGroupList[Index];
   FGroupList[Index] := tempGroup;
   SetLength(tempGroup, 0);
   tempGroup := nil;
 
-  tempName := FGroupNameList[Index - 1];
-  FGroupNameList[Index - 1] := FGroupNameList[Index];
+  tempName := FGroupNameList[target];
+  FGroupNameList[target] := FGroupNameList[Index];
   FGroupNameList[Index] := tempName;
-  Result := Index - 1;
+  Result := target;
   FSelectedGroup := Result;
 end;
 
-function TTasks.MoveGroupRight(Index: integer): integer;
+function TTasks.MoveGroupRight(Index: integer; aShowArchived: boolean): integer;
 var
   tempGroup: array of TTask;
   tempName: string;
+  i, target: integer;
 begin
   Result := Index;
   if (Index >= CountGroup - 1) then exit;
 
-  tempGroup := FGroupList[Index + 1];
-  FGroupList[Index + 1] := FGroupList[Index];
+  if (aShowArchived) then
+    target := Index + 1
+  else
+  begin
+    target := -1;
+    for i := Index + 1 to CountGroup - 1 do
+      if (not GetGroupArchived(i)) then
+      begin
+        target := i;
+        break;
+      end;
+    if target < 0 then exit;
+  end;
+
+  tempGroup := FGroupList[target];
+  FGroupList[target] := FGroupList[Index];
   FGroupList[Index] := tempGroup;
   SetLength(tempGroup, 0);
   tempGroup := nil;
 
-  tempName := FGroupNameList[Index + 1];
-  FGroupNameList[Index + 1] := FGroupNameList[Index];
+  tempName := FGroupNameList[target];
+  FGroupNameList[target] := FGroupNameList[Index];
   FGroupNameList[Index] := tempName;
-  Result := Index + 1;
+  Result := target;
   FSelectedGroup := Result;
 end;
 
