@@ -350,8 +350,9 @@ end;
 
 procedure TTasks.ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
 begin
-  if (UpdateCurrent) then UpdateGroup;
+//  if (GroupIndex < 0) or (GroupIndex > CountGroup) then exit;
 
+  if (UpdateCurrent) then UpdateGroup;
   SetLength(FMapGrid, 0); // Initialize task map
   FSelectedGroup := GroupIndex;
   FTaskList := FGroupList[GroupIndex];

@@ -1502,6 +1502,9 @@ begin
 
   Tasks.ChangeGroup(FindGroupRealIndex(groupTabs.TabIndex), True);
 
+  if (groupTabs.TabIndex >= 0) then
+    Tasks.ChangeGroup(FindGroupRealIndex(groupTabs.TabIndex), True);
+
   FillGrid;
 
   taskGrid.Col := 2;
@@ -1960,6 +1963,8 @@ begin
     taskGrid.Row := Tasks.ReverseMap(Ind)
   else
     taskGrid.Row := taskGrid.Row + 1;
+
+  if (taskGrid.CanFocus) then taskGrid.SetFocus;
   SetInfo;
   SetChanged;
   SetNote;
@@ -3343,6 +3348,7 @@ end;
 
 function TformNotetask.FindGroupRealIndex(Value: integer): integer;
 begin
+  Result := -1;
   if (Value >= 0) and (Value < Length(FGroupIndexMap)) then
     Result := FGroupIndexMap[Value];
 end;
@@ -4868,7 +4874,10 @@ begin
         memoNote.Text := string.Empty;
     end
     else
+    begin
       memoNote.Text := string.Empty;
+      memoNote.ReadOnly := True;
+    end;
   finally
     notes.Free;
     MemoNoteBackup;
@@ -4890,7 +4899,11 @@ begin
     for i := 0 to Tasks.CountGroup - 1 do
     begin
       if Tasks.GroupNames[i] = string.Empty then
-        Clean.Add(rgroupuntitled)
+      begin
+        Clean.Add(rgroupuntitled);
+        SetLength(FGroupIndexMap, Length(FGroupIndexMap) + 1);
+        FGroupIndexMap[High(FGroupIndexMap)] := i;
+      end
       else
       begin
         if (ShowArchived) or (not Tasks.GetGroupArchived(i)) then
@@ -4905,7 +4918,7 @@ begin
     groupTabs.Tabs := Clean;
     groupTabs.Visible := not ((groupTabs.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty));
 
-    if (Change) then
+    if (Change) and (groupTabs.Visible) then
     begin
       FoundTab := False;
       LastIndex := FindGroupTabIndex(LastRealIndex);
