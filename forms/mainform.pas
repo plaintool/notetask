@@ -2209,6 +2209,33 @@ var
   PosStart: integer;
   CurrentDateTimeISO: string;
   CurrentDateTime: string;
+
+  procedure InsertDateToCell(ACol, ARow: integer);
+  begin
+    if (taskGrid.RowCount > 1) then
+    begin
+      if (taskGrid.Cells[ACol, ARow].Trim = string.Empty) or (ACol = 5) then
+        taskGrid.Cells[ACol, ARow] := CurrentDateTime
+      else
+        taskGrid.Cells[ACol, ARow] := taskGrid.Cells[ACol, ARow].Trim + ' ' + CurrentDateTime;
+      Tasks.SetTask(taskGrid, ARow, False, FShowTime);
+      if Assigned(DatePicker) then
+        DatePicker.DateTime := Now;
+      if (FShowDuration) and (ACol = 5) then
+        FillGrid;
+    end
+    else
+    begin
+      Tasks.InsertTask('- [ ] ' + CurrentDateTimeISO + ',', ARow);
+      FillGrid;
+      taskGrid.Row := taskGrid.Row + 1;
+    end;
+    SetChanged;
+    SetInfo;
+  end;
+
+var
+  c, r: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
 
@@ -2244,29 +2271,11 @@ begin
   end
   else
   begin
-    if (taskGrid.Col > 0) then
-    begin
-      if (taskGrid.RowCount > 1) then
-      begin
-        if (taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim = string.Empty) or (taskGrid.Col = 5) then
-          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := CurrentDateTime
-        else
-          taskGrid.Cells[taskGrid.Col, taskGrid.Row] := taskGrid.Cells[taskGrid.Col, taskGrid.Row].Trim + ' ' + CurrentDateTime;
-        Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
-        if (Assigned(DatePicker)) then
-          DatePicker.DateTime := Now;
-        if (FShowDuration) and (taskGrid.Col = 5) then
-          FillGrid;
-      end
-      else
-      begin
-        Tasks.InsertTask('- [ ] ' + CurrentDateTimeISO + ',', taskGrid.Row);
-        FillGrid;
-        taskGrid.Row := taskGrid.Row + 1;
-      end;
-      SetChanged;
-      SetInfo;
-    end;
+    Tasks.CreateBackup;
+    for r := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+      for c := taskGrid.Selection.Left to taskGrid.Selection.Right do
+        if (c > 0) then
+          InsertDateToCell(c, r);
   end;
 end;
 
