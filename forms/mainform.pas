@@ -2456,6 +2456,7 @@ begin
   EditComplite;
   ShowTime := aShowTime.Checked;
   FillGrid;
+  SetInfo;
 end;
 
 procedure TformNotetask.aShowNoteExecute(Sender: TObject);

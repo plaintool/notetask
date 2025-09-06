@@ -14,6 +14,7 @@ interface
 uses
   Classes,
   SysUtils,
+  Math,
   Grids,
   Clipbrd,
   StrUtils,
@@ -1850,7 +1851,7 @@ var
   eventOnColRowInserted: TGridOperationEvent;
   eventOnColRowDeleted: TGridOperationEvent;
 
-// Compare tasks for soring
+  // Compare tasks for soring
   function CompareTasks(Index1, Index2: integer): integer;
   var
     Task1, Task2: TTask;
@@ -1989,7 +1990,7 @@ var
   begin
     TotalDuration := 0;
 
-    // Проходим по каждому интервалу
+    // We go through each interval
     for i := Low(StartDates) to High(StartDates) do
     begin
       TotalDuration += (EndDates[i] - StartDates[i]);
@@ -2005,8 +2006,8 @@ begin
     eventOnColRowDeleted := Grid.OnColRowDeleted;
     Grid.OnColRowInserted := nil;
     Grid.OnColRowDeleted := nil;
-    LastDate := Now;
-    MinDate := Now;
+    LastDate := IfThen(displaytime, Now, Date);
+    MinDate := IfThen(displaytime, Now, Date);
     MaxDate := 0;
     StartDate := 0;
     EndDate := 0;
@@ -2073,7 +2074,7 @@ begin
             DateDiff := CalcDateDiff(StartDate, EndDate);
 
             // If the date difference is invalid, recalculate with the minimum date
-            if (DateDiff = '-') and (MinDate > 0) and (LastDate <> Now) then
+            if (DateDiff = '-') and (MinDate > 0) and (LastDate <> IfThen(displaytime, Now, Date)) then
             begin
               StartDate := FTaskList[I].Date;
               EndDate := MinDate;
