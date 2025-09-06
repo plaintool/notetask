@@ -113,6 +113,8 @@ type
     function RenameGroup(aIndex: integer; aName: string): boolean;
     function CopyGroup(aIndex: integer; aName: string): boolean;
     function DeleteGroup(aIndex: integer): boolean;
+    function GetLeftGroup(aIndex: integer; aShowArchived: boolean): integer;
+    function GetRightGroup(aIndex: integer; aShowArchived: boolean): integer;
     function MoveGroupLeft(Index: integer; aShowArchived: boolean): integer;
     function MoveGroupRight(Index: integer; aShowArchived: boolean): integer;
     function MoveGroupTasks(Index1, Index2, NewGroup: integer): integer;
@@ -350,7 +352,7 @@ end;
 
 procedure TTasks.ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
 begin
-//  if (GroupIndex < 0) or (GroupIndex > CountGroup) then exit;
+  //  if (GroupIndex < 0) or (GroupIndex > CountGroup) then exit;
 
   if (UpdateCurrent) then UpdateGroup;
   SetLength(FMapGrid, 0); // Initialize task map
@@ -796,38 +798,81 @@ begin
   Result := True;
 end;
 
-function TTasks.MoveGroupLeft(Index: integer; aShowArchived: boolean): integer;
+function TTasks.GetLeftGroup(aIndex: integer; aShowArchived: boolean): integer;
 var
-  tempGroup: array of TTask;
-  tempName: string;
   i, target: integer;
 begin
-  Result := Index;
-  if (Index < 1) then exit;
-
   if (aShowArchived) then
-    target := Index - 1
+  begin
+    if (aIndex > 0) then
+      target := aIndex - 1
+    else
+      target := -1;
+  end
   else
   begin
     target := -1;
-    for i := Index - 1 downto 0 do
+    for i := aIndex - 1 downto 0 do
       if (not GetGroupArchived(i)) then
       begin
         target := i;
         break;
       end;
-    if target < 0 then exit;
+  end;
+  Result := target;
+end;
+
+function TTasks.GetRightGroup(aIndex: integer; aShowArchived: boolean): integer;
+var
+  i, target: integer;
+begin
+  if (aShowArchived) then
+  begin
+    if (aIndex < CountGroup - 1) then
+      target := aIndex + 1
+    else
+      target := -1;
+  end
+  else
+  begin
+    target := -1;
+    for i := aIndex + 1 to CountGroup - 1 do
+      if (not GetGroupArchived(i)) then
+      begin
+        target := i;
+        break;
+      end;
+  end;
+  Result := target;
+end;
+
+function TTasks.MoveGroupLeft(Index: integer; aShowArchived: boolean): integer;
+var
+  tempGroup: array of TTask;
+  tempName: string;
+  target, i: integer;
+begin
+  Result := Index;
+  if (Index < 1) then exit;
+
+  target := GetLeftGroup(Index, aShowArchived);
+  if target < 0 then exit;
+
+  // Save the group that will be moved
+  tempGroup := FGroupList[Index];
+  tempName := FGroupNameList[Index];
+
+  // Shift all groups one position to the right (from target to Index-1)
+  for i := Index downto target + 1 do
+  begin
+    FGroupList[i] := FGroupList[i - 1];
+    FGroupNameList[i] := FGroupNameList[i - 1];
   end;
 
-  tempGroup := FGroupList[target];
-  FGroupList[target] := FGroupList[Index];
-  FGroupList[Index] := tempGroup;
-  SetLength(tempGroup, 0);
-  tempGroup := nil;
+  // Place the saved group at the target position
+  FGroupList[target] := tempGroup;
+  FGroupNameList[target] := tempName;
 
-  tempName := FGroupNameList[target];
-  FGroupNameList[target] := FGroupNameList[Index];
-  FGroupNameList[Index] := tempName;
   Result := target;
   FSelectedGroup := Result;
 end;
@@ -836,34 +881,29 @@ function TTasks.MoveGroupRight(Index: integer; aShowArchived: boolean): integer;
 var
   tempGroup: array of TTask;
   tempName: string;
-  i, target: integer;
+  target, i: integer;
 begin
   Result := Index;
   if (Index >= CountGroup - 1) then exit;
 
-  if (aShowArchived) then
-    target := Index + 1
-  else
+  target := GetRightGroup(Index, aShowArchived);
+  if target < 0 then exit;
+
+  // Save the group that will be moved
+  tempGroup := FGroupList[Index];
+  tempName := FGroupNameList[Index];
+
+  // Shift all groups one position to the left (from Index+1 to target)
+  for i := Index to target - 1 do
   begin
-    target := -1;
-    for i := Index + 1 to CountGroup - 1 do
-      if (not GetGroupArchived(i)) then
-      begin
-        target := i;
-        break;
-      end;
-    if target < 0 then exit;
+    FGroupList[i] := FGroupList[i + 1];
+    FGroupNameList[i] := FGroupNameList[i + 1];
   end;
 
-  tempGroup := FGroupList[target];
-  FGroupList[target] := FGroupList[Index];
-  FGroupList[Index] := tempGroup;
-  SetLength(tempGroup, 0);
-  tempGroup := nil;
+  // Place the saved group at the target position
+  FGroupList[target] := tempGroup;
+  FGroupNameList[target] := tempName;
 
-  tempName := FGroupNameList[target];
-  FGroupNameList[target] := FGroupNameList[Index];
-  FGroupNameList[Index] := tempName;
   Result := target;
   FSelectedGroup := Result;
 end;
@@ -873,6 +913,7 @@ var
   i, Len, Ind, IndStart, IndEnd, LastTask: integer;
 begin
   Result := -1;
+  if (NewGroup < 0) then exit;
 
   // Map the start and end indexes of the task range
   IndStart := Map(Index1);

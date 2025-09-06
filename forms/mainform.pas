@@ -2130,11 +2130,12 @@ begin
   selRight := taskGrid.Selection.Right;
   selCol := taskGrid.Col;
 
-  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.SelectedGroup - 1);
+  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.GetLeftGroup(
+    Tasks.SelectedGroup, FShowArchived));
 
   if (newRow > -1) then
   begin
-    ChangeGroup(Tasks.SelectedGroup);
+    ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
     newRow := Tasks.ReverseMap(newRow);
     taskGrid.Row := newRow;
     if (SortOrder = soAscending) then
@@ -2162,11 +2163,12 @@ begin
   selRight := taskGrid.Selection.Right;
   selCol := taskGrid.Col;
 
-  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.SelectedGroup + 1);
+  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.GetRightGroup(
+    Tasks.SelectedGroup, FShowArchived));
 
   if (newRow > -1) then
   begin
-    ChangeGroup(Tasks.SelectedGroup);
+    ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
     newRow := Tasks.ReverseMap(newRow);
     taskGrid.Row := newRow;
     if (SortOrder = soAscending) then
@@ -2303,7 +2305,7 @@ begin
       if (Result <> groupTabs.TabIndex) then
       begin
         SetTabs;
-        ChangeGroup(Result);
+        ChangeGroup(FindGroupTabIndex(Result));
         SetChanged;
       end;
     end;
@@ -2356,7 +2358,7 @@ begin
     // Show the form as a modal dialog
     if (ShowModal = mrOk) then
     begin
-      if (Tasks.CopyGroup(groupTabs.TabIndex, editText.Text)) then
+      if (Tasks.CopyGroup(FindGroupRealIndex(groupTabs.TabIndex), editText.Text)) then
       begin
         SetTabs;
         ChangeGroup(groupTabs.TabIndex + 1);
@@ -2376,10 +2378,10 @@ begin
 
   if (Confirm = mrYes) then
   begin
-    if (Tasks.DeleteGroup(groupTabs.TabIndex)) then
+    if (Tasks.DeleteGroup(FindGroupRealIndex(groupTabs.TabIndex))) then
     begin
       SetTabs;
-      ChangeGroup(Tasks.SelectedGroup);
+      ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
       SetChanged;
     end;
   end;
@@ -3257,7 +3259,7 @@ begin
   Result := Tasks.MoveGroupLeft(FindGroupRealIndex(Index), ShowArchived);
   RowMem := FLastRowMem[Result];
   Result := FindGroupTabIndex(Result);
-  if (Result <> Index) then
+  if (Result >= 0) and (Result <> Index) then
   begin
     FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
     FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
@@ -3277,7 +3279,7 @@ begin
   Result := Tasks.MoveGroupRight(FindGroupRealIndex(Index), ShowArchived);
   RowMem := FLastRowMem[Result];
   Result := FindGroupTabIndex(Result);
-  if (Result <> Index) then
+  if (Result >= 0) and (Result <> Index) then
   begin
     FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
     FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
