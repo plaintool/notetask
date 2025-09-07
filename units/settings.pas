@@ -172,6 +172,8 @@ var
   ExistingItem: TJSONData;
   FileName: string;
   FileStream: TFileStream;
+  RowsArray: TJSONArray;
+  i: integer;
 begin
   FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
   Item := Item.ToLower;
@@ -226,6 +228,18 @@ begin
       ItemSettings.Add('SortOrder', Ord(Form.SortOrder));
     end;
 
+    // Save selected Tab
+    ItemSettings.Add('SelectedTab', Form.SelectedTab);
+
+    // Save selected Row
+    ItemSettings.Add('SelectedRow', Form.SelectedRow);
+
+    // Save selected Rows
+    RowsArray := TJSONArray.Create;
+    for i := Low(Form.SelectedRows) to High(Form.SelectedRows) do
+      RowsArray.Add(Form.SelectedRows[i]);
+    ItemSettings.Add('SelectedRows', RowsArray);
+
     ExistingItem := JSONFile.Find(Item); // Find the existing Item by key
     if Assigned(ExistingItem) then
       JSONFile.Remove(ExistingItem); // Remove the existing Item if found
@@ -251,6 +265,9 @@ var
   FileContent: string;
   FileStream: TFileStream;
   FileName: string;
+  RowsArrayJSON: TJSONArray;
+  TempArr: array of integer;
+  i: integer;
 begin
   Result := False;
   FileContent := '';
@@ -327,6 +344,25 @@ begin
 
       if ItemSettings.FindPath('ColumnFavorite') <> nil then
         Grid.Columns[5].Width := ItemSettings.FindPath('ColumnFavorite').AsInteger;
+
+      // Load selected Tab
+      if ItemSettings.FindPath('SelectedTab') <> nil then
+        Form.SelectedTab := ItemSettings.FindPath('SelectedTab').AsInteger;
+
+      // Load selected Row
+      if ItemSettings.FindPath('SelectedRow') <> nil then
+        Form.SelectedRow := ItemSettings.FindPath('SelectedRow').AsInteger;
+
+      // Load selected Rows
+      if ItemSettings.FindPath('SelectedRows') <> nil then
+      begin
+        TempArr := [];
+        RowsArrayJSON := ItemSettings.FindPath('SelectedRows') as TJSONArray;
+        SetLength(TempArr, RowsArrayJSON.Count);
+        for i := 0 to RowsArrayJSON.Count - 1 do
+          TempArr[i] := RowsArrayJSON.Items[i].AsInteger;
+        Form.SelectedRows := TempArr;
+      end;
 
       if (Item <> string.Empty) then
       begin

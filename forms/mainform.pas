@@ -40,7 +40,6 @@ uses
   lineending;
 
 type
-
   { TformNotetask }
   TformNotetask = class(TForm)
     aArchiveTasks: TAction;
@@ -428,6 +427,7 @@ type
     FNoteLastIndex, FNoteSelStart, FNoteSelLength: integer;
     FKeyPressed: TUTF8Char;
     FLastTabMouseX: integer;
+    FLoadedSelectedTab, FLoadedSelectedRow: integer;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -506,6 +506,9 @@ type
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
     function IsCanClose: boolean;
+    function GetSelectedTab: integer;
+    function GetSelectedRow: integer;
+    function GetSelectedRows: TIntegerArray;
   public
     FShowArchived: boolean;
     FShowDuration: boolean;
@@ -530,7 +533,6 @@ type
       overload;
     function Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
-
     property WordWrap: boolean read FWordWrap write FWordWrap;
     property EnterSubmit: boolean read FEnterSubmit write FEnterSubmit;
     property BiDiRightToLeft: boolean read FBiDiRightToLeft write SetBiDiRightToLeft;
@@ -551,6 +553,9 @@ type
     property FindText: string read FFindText write FFindText;
     property MatchCase: boolean read FMatchCase write FMatchCase;
     property WrapAround: boolean read FWrapAround write FWrapAround;
+    property SelectedTab: integer read GetSelectedTab write FLoadedSelectedTab;
+    property SelectedRow: integer read GetSelectedRow write FLoadedSelectedRow;
+    property SelectedRows: TIntegerArray read GetSelectedRows write FLastRowMem;
   end;
 
 var
@@ -2982,6 +2987,8 @@ begin
 end;
 
 procedure TformNotetask.ApplyGridSettings;
+var
+  FirstTabRow: integer;
 begin
   SetChanged(False);
 
@@ -3003,6 +3010,25 @@ begin
   SetInfo;
   SetNote;
   SetTabs;
+
+  // Restore last open tab and rows
+  if (FLoadedSelectedTab >= 0) then
+  begin
+    if (Length(FLastRowMem) > 0) then
+      FirstTabRow := FLastRowMem[FindGroupRealIndex(0)];
+    if (FLoadedSelectedTab > 0) then
+      groupTabs.TabIndex := FLoadedSelectedTab;
+    if (FloadedSelectedRow > 0) then
+      taskGrid.Row := FLoadedSelectedRow;
+
+    // Set currect row to mem
+    if (Length(FLastRowMem) > 0) then
+    begin
+      FLastRowMem[FindGroupRealIndex(0)] := FirstTabRow;
+      FLastRowMem[FindGroupRealIndex(FLoadedSelectedTab)] := FLoadedSelectedRow;
+    end;
+    FLoadedSelectedTab := -1;
+  end;
 end;
 
 function TformNotetask.SaveFileAs: boolean;
@@ -4903,6 +4929,7 @@ var
   i: integer;
   LastIndex, LastRealIndex: integer;
   FoundTab: boolean;
+  test: integer;
 begin
   LastRealIndex := FindGroupRealIndex(groupTabs.TabIndex);
   SetLength(FGroupIndexMap, 0);
@@ -4930,7 +4957,7 @@ begin
     groupTabs.Tabs := Clean;
     groupTabs.Visible := not ((groupTabs.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty));
 
-    if (Change) and (groupTabs.Visible) then
+    if (Change) and (groupTabs.Visible) and (LastRealIndex >= 0) then
     begin
       FoundTab := False;
       LastIndex := FindGroupTabIndex(LastRealIndex);
@@ -5081,6 +5108,21 @@ begin
   end
   else
     Result := True; // No changes, just close the form
+end;
+
+function TformNotetask.GetSelectedTab: integer;
+begin
+  Result := groupTabs.TabIndex;
+end;
+
+function TformNotetask.GetSelectedRow: integer;
+begin
+  Result := taskGrid.Row;
+end;
+
+function TformNotetask.GetSelectedRows: TIntegerArray;
+begin
+  Result := FLastRowMem;
 end;
 
 function TformNotetask.GetIsEditing: boolean;
