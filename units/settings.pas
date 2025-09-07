@@ -222,6 +222,7 @@ begin
     if Grid.Columns[5].Visible then
       ItemSettings.Add('ColumnFavorite', Grid.Columns[5].Width);
 
+    // Sorting
     if (Item <> string.Empty) then
     begin
       ItemSettings.Add('SortColumn', Form.SortColumn);
@@ -239,6 +240,9 @@ begin
     for i := Low(Form.SelectedRows) to High(Form.SelectedRows) do
       RowsArray.Add(Form.SelectedRows[i]);
     ItemSettings.Add('SelectedRows', RowsArray);
+
+    // Save memo note scroll position
+    ItemSettings.Add('MemoNoteScroll', Form.MemoNoteScroll);
 
     ExistingItem := JSONFile.Find(Item); // Find the existing Item by key
     if Assigned(ExistingItem) then
@@ -363,6 +367,10 @@ begin
           TempArr[i] := RowsArrayJSON.Items[i].AsInteger;
         Form.SelectedRows := TempArr;
       end;
+
+      // Load memo note scroll position
+      if ItemSettings.FindPath('MemoNoteScroll') <> nil then
+        Form.MemoNoteScroll := ItemSettings.FindPath('MemoNoteScroll').AsInteger;
 
       if (Item <> string.Empty) then
       begin

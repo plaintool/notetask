@@ -427,7 +427,7 @@ type
     FNoteLastIndex, FNoteSelStart, FNoteSelLength: integer;
     FKeyPressed: TUTF8Char;
     FLastTabMouseX: integer;
-    FLoadedSelectedTab, FLoadedSelectedRow: integer;
+    FLoadedSelectedTab, FLoadedSelectedRow, FLoadedMemoNoteScroll: integer;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -509,6 +509,7 @@ type
     function GetSelectedTab: integer;
     function GetSelectedRow: integer;
     function GetSelectedRows: TIntegerArray;
+    function GetMemoNoteScroll: integer;
   public
     FShowArchived: boolean;
     FShowDuration: boolean;
@@ -556,6 +557,7 @@ type
     property SelectedTab: integer read GetSelectedTab write FLoadedSelectedTab;
     property SelectedRow: integer read GetSelectedRow write FLoadedSelectedRow;
     property SelectedRows: TIntegerArray read GetSelectedRows write FLastRowMem;
+    property MemoNoteScroll: integer read GetMemoNoteScroll write FLoadedMemoNoteScroll;
   end;
 
 var
@@ -965,6 +967,13 @@ begin
   SetCaption;
 
   CalcRowHeights(0, True);
+
+  // Restore memo note scroll position
+  if (FLoadedMemoNoteScroll > 0) and (memoNote.Visible) then
+  begin
+    memoNote.VertScrollBar.Position := FLoadedMemoNoteScroll;
+    FLoadedMemoNoteScroll := 0;
+  end;
 end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -3021,7 +3030,7 @@ begin
       FirstTabRow := FLastRowMem[FindGroupRealIndex(0)];
     if (FLoadedSelectedTab > 0) then
       groupTabs.TabIndex := FLoadedSelectedTab;
-    if (FloadedSelectedRow > 0) then
+    if (FLoadedSelectedRow > 0) then
       taskGrid.Row := FLoadedSelectedRow;
 
     // Set currect row to mem
@@ -5125,6 +5134,11 @@ end;
 function TformNotetask.GetSelectedRows: TIntegerArray;
 begin
   Result := FLastRowMem;
+end;
+
+function TformNotetask.GetMemoNoteScroll: integer;
+begin
+  Result := memoNote.VertScrollBar.Position;
 end;
 
 function TformNotetask.GetIsEditing: boolean;
