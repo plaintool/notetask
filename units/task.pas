@@ -1590,10 +1590,10 @@ var
   YearsDiff, MonthsDiff, DaysDiff, HoursDiff, MinutesDiff, SecondsDiff: integer;
 begin
   // Calculate difference in yeard
-  YearsDiff := YearsBetween(EndDate, StartDate, True);
+  YearsDiff := YearsBetween(StartDate, EndDate, True);
   if YearsDiff <> 0 then
   begin
-    if (StartDate > EndDate) then
+    if (StartDate < EndDate) then
       Result := IntToStr(YearsDiff) + ryears
     else
       Result := '-';
@@ -1601,10 +1601,12 @@ begin
   end;
 
   // Calculate difference in months
-  MonthsDiff := MonthsBetween(EndDate, StartDate);
+  MonthsDiff := MonthsBetween(StartDate, EndDate);
+  if (MonthsDiff = 0) and (IncMonth(StartDate) <= EndDate) then
+    MonthsDiff := 1;
   if MonthsDiff <> 0 then
   begin
-    if (StartDate > EndDate) then
+    if (StartDate < EndDate) then
       Result := IntToStr(MonthsDiff) + rmonths
     else
       Result := '-';
@@ -1612,10 +1614,10 @@ begin
   end;
 
   // Calculate difference in days
-  DaysDiff := DaysBetween(EndDate, StartDate);
+  DaysDiff := DaysBetween(StartDate, EndDate);
   if DaysDiff <> 0 then
   begin
-    if (StartDate > EndDate) then
+    if (StartDate < EndDate) then
       Result := IntToStr(DaysDiff) + rdays
     else
       Result := '-';
@@ -1623,10 +1625,10 @@ begin
   end;
 
   // Calculate difference in hours
-  HoursDiff := HoursBetween(EndDate, StartDate);
+  HoursDiff := HoursBetween(StartDate, EndDate);
   if HoursDiff <> 0 then
   begin
-    if (StartDate > EndDate) then
+    if (StartDate < EndDate) then
       Result := IntToStr(HoursDiff) + rhours
     else
       Result := '-';
@@ -1634,10 +1636,10 @@ begin
   end;
 
   // Calculate difference in minutes
-  MinutesDiff := MinutesBetween(EndDate, StartDate);
+  MinutesDiff := MinutesBetween(StartDate, EndDate);
   if MinutesDiff <> 0 then
   begin
-    if (StartDate > EndDate) then
+    if (StartDate < EndDate) then
       Result := IntToStr(MinutesDiff) + rminutes
     else
       Result := '-';
@@ -1645,10 +1647,10 @@ begin
   end;
 
   // Calculate difference in seconds
-  SecondsDiff := SecondsBetween(EndDate, StartDate);
+  SecondsDiff := SecondsBetween(StartDate, EndDate);
   if SecondsDiff <> 0 then
   begin
-    if (StartDate > EndDate) then
+    if (StartDate < EndDate) then
       Result := IntToStr(SecondsDiff) + rseconds
     else
       Result := '-';
@@ -1851,7 +1853,7 @@ var
   eventOnColRowInserted: TGridOperationEvent;
   eventOnColRowDeleted: TGridOperationEvent;
 
-  // Compare tasks for soring
+// Compare tasks for soring
   function CompareTasks(Index1, Index2: integer): integer;
   var
     Task1, Task2: TTask;
@@ -2069,15 +2071,15 @@ begin
         begin
           if (LastDate > 0) then
           begin
-            StartDate := FTaskList[I].Date;
-            EndDate := LastDate;
+            StartDate := LastDate;
+            EndDate := FTaskList[I].Date;
             DateDiff := CalcDateDiff(StartDate, EndDate);
 
             // If the date difference is invalid, recalculate with the minimum date
             if (DateDiff = '-') and (MinDate > 0) and (LastDate <> IfThen(displaytime, Now, Date)) then
             begin
-              StartDate := FTaskList[I].Date;
-              EndDate := MinDate;
+              StartDate := MinDate;
+              EndDate := FTaskList[I].Date;
               DateDiff := CalcDateDiff(StartDate, EndDate);
 
               MinDate := FTaskList[I].Date;
