@@ -602,8 +602,11 @@ resourcestring
   rchatgpt = 'https://chatgpt.com?q=';
   rdeletegroupconfirm = 'Are you sure you want to delete this group? This will also delete all tasks within this group.';
   rentergroupname = 'Enter the group name:';
+  rConfirmation = 'Confirmation';
   rgroup = 'Group';
   rOK = 'OK';
+  rYes = '&Yes';
+  rNo = '&No';
 
 implementation
 
@@ -4929,7 +4932,6 @@ var
   i: integer;
   LastIndex, LastRealIndex: integer;
   FoundTab: boolean;
-  test: integer;
 begin
   LastRealIndex := FindGroupRealIndex(groupTabs.TabIndex);
   SetLength(FGroupIndexMap, 0);

@@ -3,6 +3,7 @@
 *.lps
 *.dbg
 *.msi
+*.mo
 /lib
 /installer/debsetup/*.deb
 /installer/debsetup/DATA/usr/bin/notetask

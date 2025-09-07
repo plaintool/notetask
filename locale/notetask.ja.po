@@ -46,6 +46,10 @@ msgstr ""
 msgid "Are you sure you want to clear the data in the selected area?"
 msgstr "選択したエリアのデータをクリアしてもよろしいですか？"
 
+#: mainform.rconfirmation
+msgid "Confirmation"
+msgstr "確認"
+
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
 msgstr "このタスクを削除してもよろしいですか？"
@@ -79,6 +83,10 @@ msgstr "グループ化されていない"
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "選択したタスクを統合してもよろしいですか？"
+
+#: mainform.rno
+msgid "&No"
+msgstr "いいえ"
 
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
@@ -115,6 +123,10 @@ msgstr "すべての変更を破棄してもよろしいですか？この操作
 #: mainform.runtitled
 msgid "Untitled"
 msgstr "無題"
+
+#: mainform.ryes
+msgid "&Yes"
+msgstr "はい"
 
 #: task.rdays
 msgid "d"

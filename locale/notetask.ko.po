@@ -46,6 +46,10 @@ msgstr "https://chatgpt.com?q="
 msgid "Are you sure you want to clear the data in the selected area?"
 msgstr "선택한 영역의 데이터를 지우시겠습니까?"
 
+#: mainform.rconfirmation
+msgid "Confirmation"
+msgstr "확인"
+
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
 msgstr "이 작업을 삭제하시겠습니까?"
@@ -79,6 +83,10 @@ msgstr "그룹화되지 않음"
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "선택한 작업을 병합하시겠습니까?"
+
+#: mainform.rno
+msgid "&No"
+msgstr "아니요"
 
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
@@ -115,6 +123,10 @@ msgstr "모든 변경 사항을 버리시겠습니까? 이 작업은 취소할 �
 #: mainform.runtitled
 msgid "Untitled"
 msgstr "제목 없음"
+
+#: mainform.ryes
+msgid "&Yes"
+msgstr "예"
 
 #: task.rdays
 msgid "d"

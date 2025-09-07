@@ -46,6 +46,10 @@ msgstr ""
 msgid "Are you sure you want to clear the data in the selected area?"
 msgstr "Вы ўпэўненыя, што хочаце ачысціць дадзеныя ў абранай зоне?"
 
+#: mainform.rconfirmation
+msgid "Confirmation"
+msgstr "Пацверджанне"
+
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
 msgstr "Вы ўпэўненыя, што хочаце выдаліць гэтую задачу?"
@@ -79,6 +83,10 @@ msgstr "Негрупаваныя"
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "Ці ўпэўнены вы, што хочаце аб'яднаць выбраныя задачы?"
+
+#: mainform.rno
+msgid "&No"
+msgstr "Не"
 
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
@@ -115,6 +123,10 @@ msgstr "Вы ўпэўненыя, што хочаце адмовіцца ад у�
 #: mainform.runtitled
 msgid "Untitled"
 msgstr "Без назвы"
+
+#: mainform.ryes
+msgid "&Yes"
+msgstr "Так"
 
 #: task.rdays
 msgid "d"

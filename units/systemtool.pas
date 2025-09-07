@@ -202,7 +202,7 @@ begin
     ValueSize := SizeOf(Value);
     if RegQueryValueEx(Key, 'AppsUseLightTheme', nil, nil, @Value, @ValueSize) = ERROR_SUCCESS then
     begin
-      Result := Value = 0; // 0 - тёмная тема, 1 - светлая тема
+      Result := Value = 0; // 0 - Dark theme, 1 - Light theme
     end;
     RegCloseKey(Key);
   end;

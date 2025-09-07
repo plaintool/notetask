@@ -46,6 +46,10 @@ msgstr ""
 msgid "Are you sure you want to clear the data in the selected area?"
 msgstr ""
 
+#: mainform.rconfirmation
+msgid "Confirmation"
+msgstr ""
+
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
 msgstr ""
@@ -78,6 +82,10 @@ msgstr ""
 
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
+msgstr ""
+
+#: mainform.rno
+msgid "&No"
 msgstr ""
 
 #: mainform.rnumstringtoolarge
@@ -114,6 +122,10 @@ msgstr ""
 
 #: mainform.runtitled
 msgid "Untitled"
+msgstr ""
+
+#: mainform.ryes
+msgid "&Yes"
 msgstr ""
 
 #: task.rdays
