@@ -393,6 +393,7 @@ type
     FMemoNoteBackup: TCaption;
     FMemoNoteSelStartBackup: integer;
     FMemoNoteSelLengthBackup: integer;
+    FMemoNoteCaretBackup: TPoint;
     FMemoNoteFirstKey: boolean;
     FDatePickerOldDate: TDateTime;
     FDatePickerDateSet: boolean;
@@ -1593,11 +1594,14 @@ end;
 
 procedure TformNotetask.panelNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
-  if Button = mbLeft then
+  if (Button = mbLeft) or (Button = mbRight) then
   begin
     if not memoNote.Focused then memoNote.SetFocus;
     FNoteSelecting := True;
     SelectMemoLine(GetLineAtPos(Y));
+
+    if (Button = mbRight) then
+      PopupMemo.PopUp;
   end;
 end;
 
@@ -4178,7 +4182,7 @@ begin
         CalcRowHeights();
       end
       else
-        taskGrid.Cells[2, RowIndex] := TrimLeadingSpaces(taskGrid.Cells[2, RowIndex]);
+        taskGrid.Cells[2, RowIndex] := TrimLeadingSpaces(taskGrid.Cells[2, RowIndex], Length(unicodestring(IndentStr)));
 
       Tasks.SetTask(taskGrid, RowIndex, False, FShowTime); // Backup created on start
     end;
@@ -4208,12 +4212,13 @@ begin
   FMemoNoteBackup := memoNote.Text;
   FMemoNoteSelStartBackup := memoNote.SelStart;
   FMemoNoteSelLengthBackup := memoNote.SelLength;
+  FMemoNoteCaretBackup := memoNote.CaretPos;
 end;
 
 procedure TformNotetask.MemoNoteUndo;
 var
   newBackup: TCaption;
-  SelStart, SelLength: integer;
+  SelStart, SelLength, LinesPerPage: integer;
 begin
   // Save current selection and text
   newBackup := MemoNote.Text;
@@ -4222,8 +4227,13 @@ begin
 
   // Restore from backup
   memoNote.Text := FMemoNoteBackup;
+  memoNote.CaretPos := FMemoNoteCaretBackup;
   memoNote.SelStart := FMemoNoteSelStartBackup;
   memoNote.SelLength := FMemoNoteSelLengthBackup;
+
+  // Adust scroll position
+  LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
+  memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + LinesPerPage div 2;
 
   // Update backup
   FMemoNotebackup := newBackup;

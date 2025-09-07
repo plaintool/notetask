@@ -40,7 +40,7 @@ function CleanAmount(const Value: string): string;
 
 function DetectDone(const Input: string): boolean;
 
-function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 4): string;
+function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 2): string;
 
 function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;
 
@@ -241,7 +241,7 @@ begin
   end;
 end;
 
-function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 4): string;
+function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 2): string;
 var
   i, SpaceCount: integer;
 begin
