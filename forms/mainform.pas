@@ -394,6 +394,7 @@ type
     FMemoNoteSelStartBackup: integer;
     FMemoNoteSelLengthBackup: integer;
     FMemoNoteCaretBackup: TPoint;
+    FMemoNoteVertScrollBackup: integer;
     FMemoNoteFirstKey: boolean;
     FDatePickerOldDate: TDateTime;
     FDatePickerDateSet: boolean;
@@ -4244,12 +4245,13 @@ begin
   FMemoNoteSelStartBackup := memoNote.SelStart;
   FMemoNoteSelLengthBackup := memoNote.SelLength;
   FMemoNoteCaretBackup := memoNote.CaretPos;
+  FMemoNoteVertScrollBackup := memoNote.VertScrollBar.Position;
 end;
 
 procedure TformNotetask.MemoNoteUndo;
 var
   newBackup: TCaption;
-  SelStart, SelLength, LinesPerPage: integer;
+  SelStart, SelLength: integer;
 begin
   // Save current selection and text
   newBackup := MemoNote.Text;
@@ -4263,11 +4265,15 @@ begin
   memoNote.SelLength := FMemoNoteSelLengthBackup;
 
   // Adjust scroll position
-  if (memoNote.VertScrollBar.Position > 0) then
-  begin
-    LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
-    memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + LinesPerPage div 2;
-  end;
+  memoNote.VertScrollBar.Position := 0;
+  memoNote.VertScrollBar.Position := FMemoNoteVertScrollBackup;
+
+  // Option with scroll centering
+  //if (FMemoNoteVertScrollBackup > 0) then
+  //begin
+  //  LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
+  //  memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + LinesPerPage div 2;
+  //end;
 
   // Update backup
   FMemoNotebackup := newBackup;
