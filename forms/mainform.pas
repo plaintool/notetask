@@ -4262,9 +4262,12 @@ begin
   memoNote.SelStart := FMemoNoteSelStartBackup;
   memoNote.SelLength := FMemoNoteSelLengthBackup;
 
-  // Adust scroll position
-  LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
-  memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + LinesPerPage div 2;
+  // Adjust scroll position
+  if (memoNote.VertScrollBar.Position > 0) then
+  begin
+    LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
+    memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + LinesPerPage div 2;
+  end;
 
   // Update backup
   FMemoNotebackup := newBackup;
