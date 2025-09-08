@@ -2830,9 +2830,11 @@ end;
 procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   LinesPerPage, NewPos: integer;
+  Len, DeleteCount, Pos: integer;
 begin
-  // Test for letter, number, space or back key for backup
-  if (Shift * [ssCtrl, ssAlt] = []) and (not IsSystemKey(Key) or (Key = VK_SPACE) or (Key = VK_BACK)) then
+  // Test for letter, number, space, back, enter, shift or delete key for backup
+  if (Shift * [ssCtrl, ssAlt] = []) and ((not IsSystemKey(Key)) or (Key = VK_SPACE) or (Key = VK_BACK) or
+    (Key = VK_RETURN) or (ssShift in Shift) or ((Key = VK_DELETE) and (memoNote.SelLength = 0))) then
   begin
     if (not FMemoNoteFirstKey) then
     begin
@@ -2899,11 +2901,41 @@ begin
   begin
     if memoNote.SelLength = 0 then
     begin
-      memoNote.SelStart := memoNote.SelStart;
-      memoNote.SelLength := 1;
+      Len := memoNote.GetTextLen;
+      DeleteCount := 0;
+      Pos := memoNote.SelStart + 1; // 1-based indexing
+
+      while Pos <= Len do
+      begin
+        if memoNote.Text[Pos] = ' ' then
+        begin
+          // If space, extend deletion
+          Inc(DeleteCount);
+          Inc(Pos);
+        end
+        else if memoNote.Text[Pos] = #13 then
+        begin
+          // If CR, delete it and check for following LF
+          Inc(DeleteCount);
+          Inc(Pos);
+          if (Pos <= Len) and (memoNote.Text[Pos] = #10) then
+          begin
+            Inc(DeleteCount);
+            Inc(Pos);
+          end;
+          Break; // stop loop after CR (and optional LF)
+        end
+        else
+        begin
+          DeleteCount := 1;
+          Break; // any other char, stop loop
+        end;
+      end;
+      memoNote.SelLength := DeleteCount;
     end
     else
       MemoNoteBackup;
+
     MemoNote.ClearSelection;
     Key := 0;
   end
@@ -3687,7 +3719,7 @@ var
   nextCol: integer;
 begin
   // Test for letter, number, space or back key for backup
-  if (Shift * [ssCtrl, ssAlt] = []) and (not IsSystemKey(Key) or (Key = VK_SPACE) or (Key = VK_BACK)) then
+  if (Shift * [ssCtrl, ssAlt] = []) and ((not IsSystemKey(Key)) or (Key = VK_SPACE) or (Key = VK_BACK)) then
   begin
     if (not FMemoFirstKey) then
     begin
