@@ -3994,6 +3994,7 @@ begin
 
       FillGrid;
       SetInfo;
+      SetNote;
       SetChanged; // Mark that data has changed
     end;
   end;
@@ -4033,6 +4034,7 @@ begin
       taskGrid.ClearSelections;
       FillGrid;
       SetInfo;
+      SetNote;
       SetChanged; // Mark that data has changed
     end;
   end
