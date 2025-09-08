@@ -428,7 +428,9 @@ type
     FNoteLastIndex, FNoteSelStart, FNoteSelLength: integer;
     FKeyPressed: TUTF8Char;
     FLastTabMouseX: integer;
-    FLoadedSelectedTab, FLoadedSelectedRow, FLoadedMemoNoteScroll: integer;
+    FLoadedSelectedTab, FLoadedSelectedRow: integer;
+    FLoadedSelection: TRect;
+    FLoadedMemoNoteScroll, FLoadedMemoNoteSelStart, FLoadedMemoNoteSelLength: integer;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -509,8 +511,11 @@ type
     function IsCanClose: boolean;
     function GetSelectedTab: integer;
     function GetSelectedRow: integer;
+    function GetSelection: TRect;
     function GetSelectedRows: TIntegerArray;
     function GetMemoNoteScroll: integer;
+    function GetMemoNoteSelStart: integer;
+    function GetMemoNoteSelLength: integer;
   public
     FShowArchived: boolean;
     FShowDuration: boolean;
@@ -558,7 +563,10 @@ type
     property SelectedTab: integer read GetSelectedTab write FLoadedSelectedTab;
     property SelectedRow: integer read GetSelectedRow write FLoadedSelectedRow;
     property SelectedRows: TIntegerArray read GetSelectedRows write FLastRowMem;
+    property Selection: TRect read GetSelection write FLoadedSelection;
     property MemoNoteScroll: integer read GetMemoNoteScroll write FLoadedMemoNoteScroll;
+    property MemoNoteSelStart: integer read GetMemoNoteSelStart write FLoadedMemoNoteSelStart;
+    property MemoNoteSelLength: integer read GetMemoNoteSelLength write FLoadedMemoNoteSelLength;
   end;
 
 var
@@ -968,6 +976,29 @@ begin
   SetCaption;
 
   CalcRowHeights(0, True);
+
+  // Restore task grid selection
+  if (FLoadedSelection.Left > 0) or (FLoadedSelection.Right > 0) or (FLoadedSelection.Top > 0) or (FLoadedSelection.Bottom > 0) then
+  begin
+    taskGrid.Col := FLoadedSelection.Left;
+    taskGrid.Selection := TGridRect.Create(FLoadedSelection);
+    FLoadedSelection := Rect(0, 0, 0, 0);
+    SetNote;
+  end;
+
+  // Restore memo note SelStart
+  if (FLoadedMemoNoteSelStart > 0) and (memoNote.Visible) then
+  begin
+    memoNote.SelStart := FLoadedMemoNoteSelStart;
+    FLoadedMemoNoteSelStart := 0;
+  end;
+
+  // Restore memo note SelLength
+  if (FLoadedMemoNoteSelLength > 0) and (memoNote.Visible) then
+  begin
+    memoNote.SelLength := FLoadedMemoNoteSelLength;
+    FLoadedMemoNoteSelLength := 0;
+  end;
 
   // Restore memo note scroll position
   if (FLoadedMemoNoteScroll > 0) and (memoNote.Visible) then
@@ -5146,9 +5177,24 @@ begin
   Result := FLastRowMem;
 end;
 
+function TformNotetask.GetSelection: TRect;
+begin
+  Result := taskGrid.Selection;
+end;
+
 function TformNotetask.GetMemoNoteScroll: integer;
 begin
   Result := memoNote.VertScrollBar.Position;
+end;
+
+function TformNotetask.GetMemoNoteSelStart: integer;
+begin
+  Result := memoNote.SelStart;
+end;
+
+function TformNotetask.GetMemoNoteSelLength: integer;
+begin
+  Result := memoNote.SelLength;
 end;
 
 function TformNotetask.GetIsEditing: boolean;

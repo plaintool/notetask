@@ -173,6 +173,7 @@ var
   FileName: string;
   FileStream: TFileStream;
   RowsArray: TJSONArray;
+  RectObj: TJSONObject;
   i: integer;
 begin
   FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
@@ -235,6 +236,14 @@ begin
     // Save selected Row
     ItemSettings.Add('SelectedRow', Form.SelectedRow);
 
+    // Save grid selection
+    RectObj := TJSONObject.Create;
+    RectObj.Add('Left', Form.Selection.Left);
+    RectObj.Add('Top', Form.Selection.Top);
+    RectObj.Add('Right', Form.Selection.Right);
+    RectObj.Add('Bottom', Form.Selection.Bottom);
+    ItemSettings.Add('SelectionRect', RectObj);
+
     // Save selected Rows
     RowsArray := TJSONArray.Create;
     for i := Low(Form.SelectedRows) to High(Form.SelectedRows) do
@@ -243,6 +252,12 @@ begin
 
     // Save memo note scroll position
     ItemSettings.Add('MemoNoteScroll', Form.MemoNoteScroll);
+
+    // Save memo note SelStart
+    ItemSettings.Add('MemoNoteSelStart', Form.MemoNoteSelStart);
+
+    // Save memo note SelLength
+    ItemSettings.Add('MemoNoteSelLength', Form.MemoNoteSelLength);
 
     ExistingItem := JSONFile.Find(Item); // Find the existing Item by key
     if Assigned(ExistingItem) then
@@ -357,6 +372,13 @@ begin
       if ItemSettings.FindPath('SelectedRow') <> nil then
         Form.SelectedRow := ItemSettings.FindPath('SelectedRow').AsInteger;
 
+      // Load selection Rect
+      if ItemSettings.FindPath('SelectionRect') <> nil then
+      begin
+        with ItemSettings.FindPath('SelectionRect') as TJSONObject do
+          Form.Selection := Rect(Get('Left', 0), Get('Top', 0), Get('Right', 0), Get('Bottom', 0));
+      end;
+
       // Load selected Rows
       if ItemSettings.FindPath('SelectedRows') <> nil then
       begin
@@ -371,6 +393,14 @@ begin
       // Load memo note scroll position
       if ItemSettings.FindPath('MemoNoteScroll') <> nil then
         Form.MemoNoteScroll := ItemSettings.FindPath('MemoNoteScroll').AsInteger;
+
+      // Load memo note SelStart
+      if ItemSettings.FindPath('MemoNoteSelStart') <> nil then
+        Form.MemoNoteSelStart := ItemSettings.FindPath('MemoNoteSelStart').AsInteger;
+
+      // Load memo note SelLength
+      if ItemSettings.FindPath('MemoNoteSelLength') <> nil then
+        Form.MemoNoteSelLength := ItemSettings.FindPath('MemoNoteSelLength').AsInteger;
 
       if (Item <> string.Empty) then
       begin
