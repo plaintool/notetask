@@ -3094,6 +3094,7 @@ begin
   // Restore last open tab and rows
   if (FLoadedSelectedTab >= 0) then
   begin
+    FirstTabRow := -1;
     if (Length(FLastRowMem) > 0) then
       FirstTabRow := FLastRowMem[FindGroupRealIndex(0)];
     if (FLoadedSelectedTab > 0) then
@@ -3104,7 +3105,8 @@ begin
     // Set currect row to mem
     if (Length(FLastRowMem) > 0) then
     begin
-      FLastRowMem[FindGroupRealIndex(0)] := FirstTabRow;
+      if (FirstTabRow >= 0) then
+        FLastRowMem[FindGroupRealIndex(0)] := FirstTabRow;
       FLastRowMem[FindGroupRealIndex(FLoadedSelectedTab)] := FLoadedSelectedRow;
     end;
     FLoadedSelectedTab := -1;
