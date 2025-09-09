@@ -146,8 +146,14 @@ begin
   CompletedStr := RemoveBrackets(CompletedStr);
 
   if (TryStrToFloatLimited(CleanAmount(CompletedStr), Result.FAmount)) then
+  begin
+    Result.FAmountOriginal := CompletedStr;
+  end
   else
   if (TryStrToDateTimeISO(CompletedStr, Result.FDate)) then
+  begin
+    Result.FDateOriginal := CompletedStr;
+  end
   else
   if Length(PartDate) > 2 then
   begin

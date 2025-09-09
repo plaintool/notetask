@@ -37,9 +37,10 @@ type
     FEmptyNote: boolean; // Has empty note symbols
     FSpaceBeforeNote: boolean; // Space before note in file
     FSpaceAfterNote: boolean; // Space after note in file
+    FAmountOriginal: string; // Original sum line
+    FDateOriginal: string; // Original date line
     FDateStart: TDateTime; // Calculated start time interval
     FDateEnd: TDateTime; // Calculated end time interval
-
     constructor Create;
     constructor Create(const TaskString: string); // Constructor that takes a task string
     function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string; reintroduce;
@@ -62,6 +63,8 @@ type
     property EmptyNote: boolean read FEmptyNote write FEmptyNote;
     property SpaceBeforeNote: boolean read FSpaceBeforeNote write FSpaceBeforeNote;
     property SpaceAfterNote: boolean read FSpaceAfterNote write FSpaceAfterNote;
+    property DateOriginal: string read FDateOriginal write FDateOriginal;
+    property AmountOriginal: string read FAmountOriginal write FAmountOriginal;
     property AmountStr: string read GetAmount;
     property DateStr: string read GetDate;
     property DateTimeStr: string read GetDateTime;
@@ -176,6 +179,8 @@ begin
   FSpaceAfterNote := True;
   FDateStart := 0;
   FDateEnd := 0;
+  FAmountOriginal := string.Empty;
+  FDateOriginal := string.Empty;
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -207,6 +212,8 @@ begin
   FSpaceAfterNote := Original.FSpaceAfterNote;
   FDateStart := Original.FDateStart;
   FDateEnd := Original.FDateEnd;
+  FAmountOriginal := Original.FAmountOriginal;
+  FDateOriginal := Original.FDateOriginal;
 end;
 
 function TTask.GetDate: string;
@@ -1217,13 +1224,115 @@ end;
 function TTasks.PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder): TGridRect;
 var
   TempTasks: TTasks;
+  TempTask: TTask;
   ListTasks: TStringList;
   TempDate: TDateTime;
   TempAmount: double;
   Rect: TGridRect;
-  Index, i, j: integer;
   RowTask: TTask;
   IsRowEmpty, DoInsert: boolean;
+  index, row, col: integer;
+
+  procedure PasteSelecting;
+  begin
+    if col = 1 then // Done
+      GetTask(row).Done := TempTask.Done
+    else
+    if col = 2 then // Task
+    begin
+      if (TempTask.Text <> string.Empty) then
+      begin
+        GetTask(row).Text := CleanString(TempTask.Text);
+        GetTask(row).Archive := TempTask.Archive;
+        GetTask(row).Star := TempTask.Star;
+      end
+      else
+      if Rect.Width = 0 then
+      begin
+        if (TempTask.Note <> string.Empty) then
+          GetTask(row).Text := CleanString(TempTask.Note)
+        else
+        if (TempTask.Date <> 0) then
+          GetTask(row).Text := TempTask.DateOriginal // DateTimeToStringISO(TempTask.Date)
+        else
+        if (TempTask.Amount <> 0) then
+          GetTask(row).Text := TempTask.AmountOriginal // FloatToString(TempTask.Amount)
+        else
+          GetTask(row).Text := string.Empty;
+      end
+      else
+        GetTask(row).Text := string.Empty;
+    end
+    else
+    if col = 3 then // Note
+    begin
+      if (TempTask.Note <> string.Empty) then
+      begin
+        GetTask(row).Note := CleanString(TempTask.Note);
+        GetTask(row).NoteItalic := TempTask.NoteItalic;
+      end
+      else
+      if Rect.Width = 0 then
+      begin
+        if (TempTask.Text <> string.Empty) then
+          GetTask(row).Note := CleanString(TempTask.Text)
+        else
+        if (TempTask.Date <> 0) then
+          GetTask(row).Note := TempTask.DateOriginal // DateTimeToStringISO(TempTask.Date)
+        else
+        if (TempTask.Amount <> 0) then
+          GetTask(row).Note := TempTask.AmountOriginal // FloatToString(TempTask.Amount)
+        else
+          GetTask(row).Note := string.Empty;
+      end
+      else
+        GetTask(row).Note := string.Empty;
+    end
+    else
+    if col = 4 then // Amount
+    begin
+      if (TempTask.Amount <> 0) then
+        GetTask(row).Amount := TempTask.Amount
+      else
+      if Rect.Width = 0 then
+      begin
+        if (TempTask.Text <> string.Empty) and (TryStrToFloat(CleanNumeric(TempTask.Text), TempAmount)) then
+          GetTask(row).Amount := TempAmount
+        else
+        if (TempTask.Note <> string.Empty) and (TryStrToFloat(CleanNumeric(TempTask.Note), TempAmount)) then
+          GetTask(row).Amount := TempAmount
+        else
+          GetTask(row).Amount := 0;
+      end
+      else
+        GetTask(row).Amount := 0;
+    end
+    else
+    if col = 5 then // Date
+    begin
+      if (TempTask.Date <> 0) then
+        GetTask(row).Date := TempTask.Date
+      else
+      if Rect.Width = 0 then
+      begin
+        if (TempTask.Text <> string.Empty) and (TryStrToDateTimeISO(TempTask.Text, TempDate)) then
+          GetTask(row).Date := TempDate
+        else
+        if (TempTask.Note <> string.Empty) and (TryStrToDateTimeISO(TempTask.Note, TempDate)) then
+          GetTask(row).Date := TempDate
+        else
+          GetTask(row).Date := 0;
+      end
+      else
+        GetTask(row).Date := 0;
+    end
+    else
+    if col = 6 then // Star
+    begin
+      GetTask(row).Star := TempTask.Star;
+    end;
+  end;
+
 begin
   Result := Grid.Selection;
   DoInsert := True;
@@ -1242,12 +1351,12 @@ begin
 
   // Handle SortOrder: reverse the list for descending order
   if (Grid.Selection.Height = 0) and (SortOrder = soDescending) then
-    for i := 0 to ListTasks.Count div 2 - 1 do
-      ListTasks.Exchange(i, ListTasks.Count - 1 - i);
+    for row := 0 to ListTasks.Count div 2 - 1 do
+      ListTasks.Exchange(row, ListTasks.Count - 1 - row);
 
   // Replace tabs in strings
-  for i := 0 to ListTasks.Count - 1 do
-    ListTasks[i] := CleanString(ListTasks[i]);
+  for row := 0 to ListTasks.Count - 1 do
+    ListTasks[row] := CleanString(ListTasks[row]);
 
   TempTasks := TTasks.Create(ListTasks);
   try
@@ -1260,138 +1369,48 @@ begin
         index := 1
       else
         index := Grid.Row;
-      for i := TempTasks.Count - 1 downto 0 do
-        InsertTask(TempTasks.GetTask(i + 1).ToString(), index, False);
+      for row := TempTasks.Count - 1 downto 0 do
+        InsertTask(TempTasks.GetTask(row + 1).ToString(), index, False);
     end
     else
     begin
       index := 1;
+      Rect := Grid.Selection;
 
       // If the line is empty and one line is selected, then we start with it
-      if (IsRowEmpty) and (Grid.Selection.Height = 0) then
+      if (IsRowEmpty) and (Rect.Height = 0) then
       begin
-        GetTask(Grid.Row).Copy(TempTasks.GetTask(index));
+        TempTask := TempTasks.GetTask(index);
+        if (Rect.Width = 0) and (TempTasks.Count = 1) then
+        begin
+          row := Rect.Top;
+          col := Rect.Left;
+          PasteSelecting;
+        end
+        else
+          GetTask(Grid.Row).Copy(TempTask);
+
         Inc(index);
       end
       else
       begin
-        Rect := Grid.Selection;
-
         // If the selection has height, then do not insert records below
         if (Grid.Selection.Height > 0) then
         begin
           DoInsert := False;
         end;
 
-        for i := Rect.Top to Rect.Bottom do
+        for row := Rect.Top to Rect.Bottom do
         begin
           if (index > TempTasks.Count) then
           begin
-            Index := 1;
+            index := 1;
             DoInsert := False;
           end;
-          for j := Rect.Left to Rect.Right do
-          begin
-            if j = 1 then
-              GetTask(i).Done := TempTasks.GetTask(index).Done
-            else
-            if j = 2 then
-            begin
-              if (TempTasks.GetTask(index).Text <> string.Empty) then
-              begin
-                GetTask(i).Text := CleanString(TempTasks.GetTask(index).Text);
-                GetTask(i).Archive := TempTasks.GetTask(index).Archive;
-                GetTask(i).Star := TempTasks.GetTask(index).Star;
-              end
-              else
-              if Rect.Width = 0 then
-              begin
-                if (TempTasks.GetTask(index).Note <> string.Empty) then
-                  GetTask(i).Text := CleanString(TempTasks.GetTask(index).Note)
-                else
-                if (TempTasks.GetTask(index).Date <> 0) then
-                  GetTask(i).Text := DateTimeToStringISO(TempTasks.GetTask(index).Date)
-                else
-                if (TempTasks.GetTask(index).Amount <> 0) then
-                  GetTask(i).Text := FloatToString(TempTasks.GetTask(index).Amount)
-                else
-                  GetTask(i).Text := string.Empty;
-              end
-              else
-                GetTask(i).Text := string.Empty;
-            end
-            else
-            if j = 3 then
-            begin
-              if (TempTasks.GetTask(index).Note <> string.Empty) then
-              begin
-                GetTask(i).Note := CleanString(TempTasks.GetTask(index).Note);
-                GetTask(i).NoteItalic := TempTasks.GetTask(index).NoteItalic;
-              end
-              else
-              if Rect.Width = 0 then
-              begin
-                if (TempTasks.GetTask(index).Text <> string.Empty) then
-                  GetTask(i).Note := CleanString(TempTasks.GetTask(index).Text)
-                else
-                if (TempTasks.GetTask(index).Date <> 0) then
-                  GetTask(i).Note := DateTimeToStringISO(TempTasks.GetTask(index).Date)
-                else
-                if (TempTasks.GetTask(index).Amount <> 0) then
-                  GetTask(i).Note := FloatToString(TempTasks.GetTask(index).Amount)
-                else
-                  GetTask(i).Note := string.Empty;
-              end
-              else
-                GetTask(i).Note := string.Empty;
-            end
-            else
-            if j = 4 then
-            begin
-              if (TempTasks.GetTask(index).Amount <> 0) then
-                GetTask(i).Amount := TempTasks.GetTask(index).Amount
-              else
-              if Rect.Width = 0 then
-              begin
-                if (TempTasks.GetTask(index).Text <> string.Empty) and
-                  (TryStrToFloat(CleanNumeric(TempTasks.GetTask(index).Text), TempAmount)) then
-                  GetTask(i).Amount := TempAmount
-                else
-                if (TempTasks.GetTask(index).Note <> string.Empty) and
-                  (TryStrToFloat(CleanNumeric(TempTasks.GetTask(index).Note), TempAmount)) then
-                  GetTask(i).Amount := TempAmount
-                else
-                  GetTask(i).Amount := 0;
-              end
-              else
-                GetTask(i).Amount := 0;
-            end
-            else
-            if j = 5 then
-            begin
-              if (TempTasks.GetTask(index).Date <> 0) then
-                GetTask(i).Date := TempTasks.GetTask(index).Date
-              else
-              if Rect.Width = 0 then
-              begin
-                if (TempTasks.GetTask(index).Text <> string.Empty) and (TryStrToDateTimeISO(TempTasks.GetTask(index).Text, TempDate)) then
-                  GetTask(i).Date := TempDate
-                else
-                if (TempTasks.GetTask(index).Note <> string.Empty) and
-                  (TryStrToDateTimeISO(TempTasks.GetTask(index).Note, TempDate)) then
-                  GetTask(i).Date := TempDate
-                else
-                  GetTask(i).Date := 0;
-              end
-              else
-                GetTask(i).Date := 0;
-            end
-            else
-            if j = 6 then
-            begin
-              GetTask(i).Star := TempTasks.GetTask(index).Star;
-            end;
-          end;
+
+          TempTask := TempTasks.GetTask(index);
+          for col := Rect.Left to Rect.Right do
+            PasteSelecting;
           Inc(index);
         end;
       end;
@@ -1399,11 +1418,11 @@ begin
       // Insert if clipboard is bigger than selection
       if (DoInsert) and (index - 1 < TempTasks.Count) then
       begin
-        for i := TempTasks.Count - 1 downto index - 1 do
+        for row := TempTasks.Count - 1 downto index - 1 do
         begin
-          InsertTask(TempTasks.GetTask(i + 1).ToString(), Grid.Row, False);
+          InsertTask(TempTasks.GetTask(row + 1).ToString(), Grid.Row, False);
         end;
-        Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom + (TempTasks.Count - Index) + 1);
+        Result := TGridRect.Create(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom + (TempTasks.Count - index) + 1);
       end;
     end;
   finally
