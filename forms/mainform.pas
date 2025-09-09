@@ -574,10 +574,6 @@ type
 var
   formNotetask: TformNotetask;
   Tasks: TTasks; // Tasks collection
-  clRowHighlight: TColor;
-  clRowFocused: TColor;
-  clRowExpired: TColor;
-  clDarkBlue: TColor;
   ResourceBitmapCheck: TBitmap;
   ResourceBitmapUncheck: TBitmap;
   ResourceBitmapStarGold: TBitmap;
@@ -593,6 +589,12 @@ const
   CommentTwoColonStr = '::';
   CommentREMStr = 'REM ';
   CommentApostropheStr = '''';
+
+  clRowHighlight = TColor($FFF0DC); // RGB(220,240,255)
+  clRowFocused = TColor($FFdcc8); // RGB(200,220,255)
+  clRowExpired = TColor($DCDCFF); // RGB(255,220,220)
+  clDarkBlue = TColor($B40000); // RGB(0,0,180)
+  clGray = TColor($F0F0F0); // RGB(240,240,240)
 
 resourcestring
   rapp = 'Notetask';
@@ -652,10 +654,6 @@ begin
   FDragTab := -1;
   FSortColumn := 0;
   FSortOrder := soAscending;
-  clRowHighlight := RGBToColor(220, 240, 255);
-  clRowFocused := RGBToColor(200, 220, 255);
-  clRowExpired := RGBToColor(255, 220, 220);
-  clDarkBlue := RGBToColor(0, 0, 180);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
@@ -2151,8 +2149,8 @@ begin
   selRight := taskGrid.Selection.Right;
   selCol := taskGrid.Col;
 
-  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.GetLeftGroup(
-    Tasks.SelectedGroup, FShowArchived));
+  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom,
+    Tasks.GetLeftGroup(Tasks.SelectedGroup, FShowArchived));
 
   if (newRow > -1) then
   begin
@@ -2875,13 +2873,13 @@ begin
 
       while Pos <= Len do
       begin
-        if memoNote.Text[Pos] = ' ' then
+        if IsUTF8Char(memoNote.Text, Pos, ' ') then
         begin
           // If space, extend deletion
           Inc(DeleteCount);
           Inc(Pos);
         end
-        else if memoNote.Text[Pos] = #13 then
+        else if IsUTF8Char(memoNote.Text, Pos, #13) or IsUTF8Char(memoNote.Text, Pos, #10) then
         begin
           // If CR, delete it and check for following LF
           Inc(DeleteCount);
@@ -3309,7 +3307,8 @@ begin
     else
       Value := aRunTerminal.Caption;
     if (MessageDlg(ReplaceStr(Value, '...', '?') + sLineBreak + sLineBreak + ScriptPreview.Text, mtConfirmation,
-      [mbYes, mbNo], 0, mbYes) <> mrYes) then exit;
+      [mbYes, mbNo], 0, mbYes) <> mrYes) then
+      exit;
   finally
     ScriptPreview.Free;
     Script.Free;
@@ -3926,6 +3925,7 @@ begin
       Sel := taskGrid.Selection;
 
       FillGrid;
+      SetNote;
       SetChanged; // Mark that data has changed
 
       // Restore selection
@@ -5005,7 +5005,7 @@ begin
             notes.Add(Tasks.GetTask(i).Note);
         memoNote.Lines.Text := notes.Text;
         memoNote.ReadOnly := True;
-        memoNote.Color := $00F5F5F5;
+        memoNote.Color := clGray;
       end
       else if Tasks.Map(taskGrid.Row) > -1 then
       begin

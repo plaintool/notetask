@@ -14,7 +14,8 @@ interface
 uses
   Classes,
   SysUtils,
-  Process;
+  Process,
+  LazUTF8;
 
 function TextToStringList(const Content: string; TrimEnd: boolean = False): TStringList;
 
@@ -47,6 +48,8 @@ function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt
 function EncodeUrl(const url: string): string;
 
 function GetConsoleEncoding: string;
+
+function IsUTF8Char(const S: String; CharIndex: Integer; FindChar: string = ' '): Boolean;
 
 const
   Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
@@ -382,6 +385,17 @@ begin
     Output.Free;
     Process.Free;
   end;
+end;
+
+function IsUTF8Char(const S: String; CharIndex: Integer; FindChar: string = ' '): Boolean;
+var
+  ch: String;
+begin
+  Result := False;
+  if (CharIndex < 1) or (CharIndex > UTF8Length(S)) then Exit;
+
+  ch := UTF8Copy(S, CharIndex, 1);
+  Result := (ch = FindChar);
 end;
 
 end.
