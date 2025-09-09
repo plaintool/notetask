@@ -532,10 +532,10 @@ type
 
     procedure SetLanguage(aLanguage: string = string.Empty);
     procedure FillGrid;
-    function SaveFileAs: boolean;
-    function SaveFile(fileName: string = string.Empty): boolean;
-    function OpenFile(fileName: string): boolean;
     procedure NewFile(SaveSetting: boolean = True);
+    function OpenFile(fileName: string): boolean;
+    function SaveFile(fileName: string = string.Empty): boolean;
+    function SaveFileAs: boolean;
     procedure ApplyGridSettings;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean; overload;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; out aRowsChanged: integer; Silent: boolean): boolean;
@@ -3003,35 +3003,6 @@ begin
   SetChanged;
 end;
 
-function TformNotetask.OpenFile(fileName: string): boolean;
-var
-  Content: string;
-begin
-  Result := False;
-  if not FileExists(fileName) then
-  begin
-    ShowMessage(rfilenotfound);
-    exit;
-  end;
-  // Save settings for current file
-  SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
-
-  FFileName := fileName;
-  EditComplite;
-  ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
-
-  if Assigned(Tasks) then
-    Tasks.Free;
-  Tasks := TTasks.Create(TextToStringList(Content));
-
-  // Load saved settings for file
-  LoadGridSettings(Self, taskGrid, ExtractFileName(FFileName));
-
-  ApplyGridSettings;
-
-  Result := True;
-end;
-
 procedure TformNotetask.NewFile(SaveSetting: boolean = True);
 var
   new: TStringList;
@@ -3069,6 +3040,79 @@ begin
     LoadGridSettings(Self, taskGrid, string.Empty);
     ApplyGridSettings;
   end;
+end;
+
+function TformNotetask.OpenFile(fileName: string): boolean;
+var
+  Content: string;
+begin
+  Result := False;
+  if not FileExists(fileName) then
+  begin
+    ShowMessage(rfilenotfound);
+    exit;
+  end;
+  // Save settings for current file
+  SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+
+  FFileName := fileName;
+  EditComplite;
+  ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
+
+  if Assigned(Tasks) then
+    Tasks.Free;
+  Tasks := TTasks.Create(TextToStringList(Content));
+
+  // Load saved settings for file
+  LoadGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+
+  ApplyGridSettings;
+
+  Result := True;
+end;
+
+function TformNotetask.SaveFile(fileName: string = string.Empty): boolean;
+var
+  TaskList: TStringList;
+begin
+  if (fileName = string.Empty) and (FFileName = string.Empty) then
+    Result := SaveFileAs;
+
+  if (fileName = string.Empty) then
+    fileName := FFileName
+  else
+    FFileName := fileName;
+
+  if (fileName <> string.Empty) then
+  begin
+    TaskList := Tasks.ToStringList;
+    if Assigned(TaskList) and (TaskList <> nil) then
+    begin
+      try
+        EditComplite;
+        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding);
+        SetChanged(False);
+        Tasks.CreateBackupInit;
+        Result := True;
+      finally
+        TaskList.Free;
+      end;
+    end;
+  end
+  else
+    Result := False;
+
+  SetInfo;
+end;
+
+function TformNotetask.SaveFileAs: boolean;
+begin
+  if (saveDialog.Execute) then
+  begin
+    Result := SaveFile(saveDialog.FileName);
+  end
+  else
+    Result := False;
 end;
 
 procedure TformNotetask.ApplyGridSettings;
@@ -3116,50 +3160,6 @@ begin
     end;
     FLoadedSelectedTab := -1;
   end;
-end;
-
-function TformNotetask.SaveFileAs: boolean;
-begin
-  if (saveDialog.Execute) then
-  begin
-    Result := SaveFile(saveDialog.FileName);
-  end
-  else
-    Result := False;
-end;
-
-function TformNotetask.SaveFile(fileName: string = string.Empty): boolean;
-var
-  TaskList: TStringList;
-begin
-  if (fileName = string.Empty) and (FFileName = string.Empty) then
-    Result := SaveFileAs;
-
-  if (fileName = string.Empty) then
-    fileName := FFileName
-  else
-    FFileName := fileName;
-
-  if (fileName <> string.Empty) then
-  begin
-    TaskList := Tasks.ToStringList;
-    if Assigned(TaskList) and (TaskList <> nil) then
-    begin
-      try
-        EditComplite;
-        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding);
-        SetChanged(False);
-        Tasks.CreateBackupInit;
-        Result := True;
-      finally
-        TaskList.Free;
-      end;
-    end;
-  end
-  else
-    Result := False;
-
-  SetInfo;
 end;
 
 function TformNotetask.IsExecuteValueNote(memoPriority: boolean = False): boolean;
@@ -3848,7 +3848,7 @@ begin
   if Assigned(Sender) then
   begin
     Rect := taskGrid.CellRect(aCol, aRow);
-    Sender.SetBounds(Rect.Left + OffsetLeft, Rect.Top + OffsetTop, Rect.Right - Rect.Left + OffsetRight,
+    Sender.SetBounds(Rect.Left + OffsetLeft, Max(Rect.Top, taskGrid.RowHeights[0]) + OffsetTop, Rect.Right - Rect.Left + OffsetRight,
       Rect.Bottom - Rect.Top + OffsetBottom);
   end;
 end;
