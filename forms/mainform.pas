@@ -5092,6 +5092,12 @@ begin
       // Change group if tab was changed
       if (LastRealIndex <> FindGroupRealIndex(groupTabs.TabIndex)) then
         groupTabsChange(groupTabs);
+    end
+    else
+    if not groupTabs.Visible then
+    begin
+      groupTabs.TabIndex := 0;
+      groupTabsChange(groupTabs);
     end;
 
     // Set selected row memory for tabs
