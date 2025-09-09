@@ -996,6 +996,7 @@ begin
   // Restore memo note SelLength
   if (FLoadedMemoNoteSelLength > 0) and (memoNote.Visible) then
   begin
+    if memoNote.CanFocus then memoNote.SetFocus;
     memoNote.SelLength := FLoadedMemoNoteSelLength;
     FLoadedMemoNoteSelLength := 0;
   end;
@@ -2149,8 +2150,8 @@ begin
   selRight := taskGrid.Selection.Right;
   selCol := taskGrid.Col;
 
-  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom,
-    Tasks.GetLeftGroup(Tasks.SelectedGroup, FShowArchived));
+  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.GetLeftGroup(
+    Tasks.SelectedGroup, FShowArchived));
 
   if (newRow > -1) then
   begin
