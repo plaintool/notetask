@@ -584,6 +584,7 @@ const
   IndentStr = '  ';
   CommentSlashStr = '//';
   CommentHashStr = '#';
+  CommentStarStr = '*';
   CommentMinusStr = '--';
   CommentSemicolonStr = ';';
   CommentTwoColonStr = '::';
@@ -2880,12 +2881,12 @@ begin
           Inc(DeleteCount);
           Inc(Pos);
         end
-        else if IsUTF8Char(memoNote.Text, Pos, #13) or IsUTF8Char(memoNote.Text, Pos, #10) then
+        else if (IsUTF8Char(memoNote.Text, Pos, #13)) or (IsUTF8Char(memoNote.Text, Pos, #10)) then
         begin
           // If CR, delete it and check for following LF
           Inc(DeleteCount);
           Inc(Pos);
-          if (Pos <= Len) and (memoNote.Text[Pos] = #10) then
+          if (Pos <= Len) and (IsUTF8Char(memoNote.Text, Pos, #10)) then
           begin
             Inc(DeleteCount);
             Inc(Pos);
@@ -2942,6 +2943,12 @@ begin
   if (ssCtrl in Shift) and (Key = VK_3) then // Ctrl + #
   begin
     MemoNoteToggleComment(CommentHashStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_8) then // Ctrl + *
+  begin
+    MemoNoteToggleComment(CommentStarStr);
     Key := 0;
   end
   else
