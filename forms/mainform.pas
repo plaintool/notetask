@@ -535,6 +535,7 @@ type
     function SaveFileAs: boolean;
     function SaveFile(fileName: string = string.Empty): boolean;
     function OpenFile(fileName: string): boolean;
+    procedure NewFile(SaveSetting: boolean = True);
     procedure ApplyGridSettings;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean; overload;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; out aRowsChanged: integer; Silent: boolean): boolean;
@@ -716,7 +717,7 @@ begin
       FileOpened := OpenFile(FilePath); // Function to load a task from the file
   end;
 
-  if not FileOpened then aNew.Execute;
+  if not FileOpened then NewFile(False);
 end;
 
 procedure TformNotetask.FormDestroy(Sender: TObject);
@@ -1700,41 +1701,8 @@ begin
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
-var
-  new: TStringList;
 begin
-  if IsCanClose then
-  begin
-    EditComplite;
-
-    // Save settings for current file
-    SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
-
-    if Assigned(Tasks) then
-      Tasks.Free;
-
-    new := TStringList.Create;
-    new.Add('[ ]');
-    Tasks := TTasks.Create(new);
-    FFileName := string.Empty;
-
-    // Encoding of new file
-    FEncoding := TEncoding.UTF8;
-
-    // Lineending
-    {$IFDEF UNIX}
-    FLineEnding := FLineEnding.UnixLF;
-    {$ELSE}
-    FLineEnding := FLineEnding.WindowsCRLF;
-    {$ENDIF}
-
-    taskGrid.Clean;
-    taskGrid.RowCount := 2;
-
-    // Load saved settings for new file
-    LoadGridSettings(Self, taskGrid, string.Empty);
-    ApplyGridSettings;
-  end;
+  NewFile;
 end;
 
 procedure TformNotetask.aNewWindowExecute(Sender: TObject);
@@ -3066,6 +3034,45 @@ begin
   Result := True;
 end;
 
+procedure TformNotetask.NewFile(SaveSetting: boolean = True);
+var
+  new: TStringList;
+begin
+  if IsCanClose then
+  begin
+    EditComplite;
+
+    // Save settings for current file
+    if SaveSetting then
+      SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+
+    if Assigned(Tasks) then
+      Tasks.Free;
+
+    new := TStringList.Create;
+    new.Add('[ ]');
+    Tasks := TTasks.Create(new);
+    FFileName := string.Empty;
+
+    // Encoding of new file
+    FEncoding := TEncoding.UTF8;
+
+    // Lineending
+    {$IFDEF UNIX}
+    FLineEnding := FLineEnding.UnixLF;
+    {$ELSE}
+    FLineEnding := FLineEnding.WindowsCRLF;
+    {$ENDIF}
+
+    taskGrid.Clean;
+    taskGrid.RowCount := 2;
+
+    // Load saved settings for new file
+    LoadGridSettings(Self, taskGrid, string.Empty);
+    ApplyGridSettings;
+  end;
+end;
+
 procedure TformNotetask.ApplyGridSettings;
 var
   FirstTabRow: integer;
@@ -3962,6 +3969,7 @@ begin
   end;
   CalcRowHeights(0, True);
   SetInfo;
+  SetNote;
   SetChanged;
 end;
 
