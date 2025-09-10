@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -368,6 +367,7 @@ object formNotetask: TformNotetask
       object menuEnterSubmit: TMenuItem
         Action = aEnterSubmit
         AutoCheck = True
+        ShortCut = 16397
       end
       object menuBidiRightToLeft: TMenuItem
         Action = aBidiRightToLeft
@@ -644,6 +644,7 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Word wrap'
       Checked = True
+      ShortCut = 16471
       OnExecute = aWordWrapExecute
     end
     object aDonate: TAction
@@ -784,12 +785,14 @@ object formNotetask: TformNotetask
       Category = 'View'
       AutoCheck = True
       Caption = 'Show duration'
+      ShortCut = 32816
       OnExecute = aShowDurationExecute
     end
     object aShowNote: TAction
       Category = 'View'
       AutoCheck = True
       Caption = 'Show note'
+      ShortCut = 32825
       OnExecute = aShowNoteExecute
     end
     object aShowTime: TAction
@@ -797,6 +800,7 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Show time'
       Checked = True
+      ShortCut = 32824
       OnExecute = aShowTimeExecute
     end
     object aShowStatusBar: TAction
@@ -804,6 +808,7 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Show status bar'
       Checked = True
+      ShortCut = 32823
       OnExecute = aShowStatusBarExecute
     end
     object aShowColumnDone: TAction
@@ -811,6 +816,7 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Column done'
       Checked = True
+      ShortCut = 32817
       OnExecute = aShowColumnDoneExecute
     end
     object aShowColumnTask: TAction
@@ -818,6 +824,7 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Column task'
       Checked = True
+      ShortCut = 32818
       OnExecute = aShowColumnTaskExecute
     end
     object aShowColumnNote: TAction
@@ -825,12 +832,14 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Column note'
       Checked = True
+      ShortCut = 32819
       OnExecute = aShowColumnNoteExecute
     end
     object aShowColumnAmount: TAction
       Category = 'View'
       AutoCheck = True
       Caption = 'Column amount'
+      ShortCut = 32820
       OnExecute = aShowColumnAmountExecute
     end
     object aShowColumnDate: TAction
@@ -838,6 +847,7 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Column date'
       Checked = True
+      ShortCut = 32821
       OnExecute = aShowColumnDateExecute
     end
     object aShowColumnFavorite: TAction
@@ -845,6 +855,7 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Column fovorite'
       Checked = True
+      ShortCut = 32822
       OnExecute = aShowColumnFavoriteExecute
     end
     object aEnterSubmit: TAction

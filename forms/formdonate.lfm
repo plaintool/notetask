@@ -9,6 +9,7 @@ object formDonateNotetask: TformDonateNotetask
   ClientHeight = 442
   ClientWidth = 441
   Color = clWindow
+  LCLVersion = '4.0.0.4'
   OnCreate = FormCreate
   object buttonOk: TButton
     Left = 356

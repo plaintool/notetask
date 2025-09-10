@@ -1175,41 +1175,51 @@ var
   i, j: integer;
 begin
   SelectedText := TStringList.Create;
+  SelectedText.Options := SelectedText.Options - [soTrailingLineBreak];
+
   try
     Rect := Grid.Selection; // Get grid selection rect
 
-    for i := Rect.Top to Rect.Bottom do
+    if (Rect.Width = 0) and (Rect.Left > 1) then
     begin
-      for j := Rect.Left to Rect.Right do
+      for i := Rect.Top to Rect.Bottom do
       begin
-        if (j = 1) and (Grid.Columns[j - 1].Visible) then pDone := GetTask(i).ToString(j).Trim;
-        if (j = 2) and (Grid.Columns[j - 1].Visible) then pText := GetTask(i).ToString(j).Trim;
-        if (j = 3) and ((Grid.Columns[j - 1].Visible) or NoteVisible) then pNote := GetTask(i).ToString(j).Trim;
-        if (j = 4) and (Grid.Columns[j - 1].Visible) then pAmount := GetTask(i).ToString(j).Trim;
-        if (j = 5) and (Grid.Columns[j - 1].Visible) then pDate := GetTask(i).ToString(j).Trim;
+        SelectedText.Add(Grid.Cells[Rect.Left, i]);
       end;
-      Row1 := (pDone + ' ' + pDate).Trim;
-      Row2 := (pText + ' ' + pNote).Trim;
-
-      if (pDate <> string.Empty) and (Row2 <> string.Empty) then
-        Row1 += ', '
-      else
-      if (Row1 <> string.Empty) and (Row2 <> string.Empty) then
-        Row1 += ' ';
-
-      if (pAmount <> string.Empty) then
+    end
+    else
+      for i := Rect.Top to Rect.Bottom do
       begin
-        Row1 += pAmount;
-        if (Row2 <> string.Empty) then Row1 += ', ';
+        for j := Rect.Left to Rect.Right do
+        begin
+          if (j = 1) and (Grid.Columns[j - 1].Visible) then pDone := GetTask(i).ToString(j).Trim;
+          if (j = 2) and (Grid.Columns[j - 1].Visible) then pText := GetTask(i).ToString(j).Trim;
+          if (j = 3) and ((Grid.Columns[j - 1].Visible) or NoteVisible) then pNote := GetTask(i).ToString(j).Trim;
+          if (j = 4) and (Grid.Columns[j - 1].Visible) then pAmount := GetTask(i).ToString(j).Trim;
+          if (j = 5) and (Grid.Columns[j - 1].Visible) then pDate := GetTask(i).ToString(j).Trim;
+        end;
+        Row1 := (pDone + ' ' + pDate).Trim;
+        Row2 := (pText + ' ' + pNote).Trim;
+
+        if (pDate <> string.Empty) and (Row2 <> string.Empty) then
+          Row1 += ', '
+        else
+        if (Row1 <> string.Empty) and (Row2 <> string.Empty) then
+          Row1 += ' ';
+
+        if (pAmount <> string.Empty) then
+        begin
+          Row1 += pAmount;
+          if (Row2 <> string.Empty) then Row1 += ', ';
+        end;
+
+        RowText := Row1 + Row2;
+
+        if (Grid.Selection.Width = 0) and (Grid.Selection.Height = 0) then
+          RowText := StringReplace(RowText, '<br>', sLineBreak, [rfReplaceAll]);
+
+        SelectedText.Add(RowText.Trim);
       end;
-
-      RowText := Row1 + Row2;
-
-      if (Grid.Selection.Width = 0) and (Grid.Selection.Height = 0) then
-        RowText := StringReplace(RowText, '<br>', sLineBreak, [rfReplaceAll]);
-
-      SelectedText.Add(RowText.Trim);
-    end;
 
     // Copy to clipboard
     if SelectedText.Count > 0 then
