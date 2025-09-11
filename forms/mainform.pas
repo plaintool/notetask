@@ -277,6 +277,8 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
     procedure ApplicationException(Sender: TObject; E: Exception);
+    procedure memoNoteEnter(Sender: TObject);
+    procedure memoNoteExit(Sender: TObject);
     procedure OnQueryEndSession(var CanEnd: boolean);
     procedure groupTabsChange(Sender: TObject);
     procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -2801,10 +2803,31 @@ begin
   end;
 end;
 
+procedure TformNotetask.memoNoteEnter(Sender: TObject);
+begin
+  {$IFDEF UNIX}
+     aDelete.ShortCut:=0;
+  {$ELSE}
+  ; // NOP
+  {$ENDIF}
+end;
+
+procedure TformNotetask.memoNoteExit(Sender: TObject);
+begin
+  {$IFDEF UNIX}
+     aDelete.ShortCut:=VK_DELETE;
+  {$ELSE}
+  ; // NOP
+  {$ENDIF}
+end;
+
 procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   LinesPerPage, NewPos: integer;
+  {$IFDEF UNIX}
+  {$ELSE}
   Len, DeleteCount, Pos: integer;
+  {$ENDIF}
 begin
   // Test for letter, number, space, back, enter, shift or delete key for backup
   if (Shift * [ssCtrl, ssAlt] = []) and ((not IsSystemKey(Key)) or (Key = VK_SPACE) or (Key = VK_BACK) or
@@ -2873,6 +2896,10 @@ begin
   else
   if Key = VK_DELETE then // Delete
   begin
+    {$IFDEF UNIX}
+    if memoNote.SelLength > 0 then
+        MemoNoteBackup;
+    {$ELSE}
     if memoNote.SelLength = 0 then
     begin
       Len := memoNote.GetTextLen;
@@ -2912,6 +2939,7 @@ begin
 
     MemoNote.ClearSelection;
     Key := 0;
+    {$ENDIF}
   end
   else
   if (Key = VK_BACK) then

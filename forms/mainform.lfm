@@ -10,6 +10,7 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
+  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -19,7 +20,7 @@ object formNotetask: TformNotetask
   OnShow = FormShow
   object taskGrid: TStringGrid
     Left = 0
-    Height = 358
+    Height = 360
     Top = 24
     Width = 851
     Align = alClient
@@ -94,8 +95,8 @@ object formNotetask: TformNotetask
   end
   object statusBar: TStatusBar
     Left = 0
-    Height = 23
-    Top = 490
+    Height = 21
+    Top = 492
     Width = 851
     Font.Height = -12
     Panels = <    
@@ -125,7 +126,7 @@ object formNotetask: TformNotetask
     Cursor = crVSplit
     Left = 0
     Height = 5
-    Top = 382
+    Top = 384
     Width = 851
     Align = alBottom
     AutoSnap = False
@@ -152,7 +153,7 @@ object formNotetask: TformNotetask
   object panelNote: TPanel
     Left = 0
     Height = 103
-    Top = 387
+    Top = 389
     Width = 851
     Align = alBottom
     BevelOuter = bvNone
@@ -182,6 +183,8 @@ object formNotetask: TformNotetask
       TabOrder = 0
       WordWrap = False
       OnChange = memoNoteChange
+      OnEnter = memoNoteEnter
+      OnExit = memoNoteExit
       OnKeyDown = memoNoteKeyDown
     end
   end
