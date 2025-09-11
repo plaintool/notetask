@@ -549,6 +549,10 @@ msgstr "保存"
 msgid "Save as..."
 msgstr "另存为..."
 
+#: tformnotetask.asavenotesas.caption
+msgid "Save notes as..."
+msgstr "另存笔记为..."
+
 #: tformnotetask.aselectall.caption
 msgid "Select all"
 msgstr "全选"
@@ -657,6 +661,13 @@ msgid "Opening"
 msgstr "打开"
 
 #: tformnotetask.savedialog.title
+msgctxt "tformnotetask.savedialog.title"
+msgid "Saving"
+msgstr "保存"
+
+#: tformnotetask.savenotesdialog.title
+#, fuzzy
+msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "保存"
 
@@ -731,3 +742,4 @@ msgstr "查找内容："
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "替换为："
+

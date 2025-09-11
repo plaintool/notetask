@@ -539,6 +539,10 @@ msgstr ""
 msgid "Save as..."
 msgstr ""
 
+#: tformnotetask.asavenotesas.caption
+msgid "Save notes as..."
+msgstr ""
+
 #: tformnotetask.aselectall.caption
 msgid "Select all"
 msgstr ""
@@ -647,6 +651,12 @@ msgid "Opening"
 msgstr ""
 
 #: tformnotetask.savedialog.title
+msgctxt "tformnotetask.savedialog.title"
+msgid "Saving"
+msgstr ""
+
+#: tformnotetask.savenotesdialog.title
+msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr ""
 

@@ -549,6 +549,10 @@ msgstr "保存"
 msgid "Save as..."
 msgstr "名前を付けて保存..."
 
+#: tformnotetask.asavenotesas.caption
+msgid "Save notes as..."
+msgstr "ノートを名前を付けて保存..."
+
 #: tformnotetask.aselectall.caption
 msgid "Select all"
 msgstr "すべて選択"
@@ -657,6 +661,13 @@ msgid "Opening"
 msgstr "オープン"
 
 #: tformnotetask.savedialog.title
+msgctxt "tformnotetask.savedialog.title"
+msgid "Saving"
+msgstr "保存"
+
+#: tformnotetask.savenotesdialog.title
+#, fuzzy
+msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "保存"
 
@@ -731,3 +742,4 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
+

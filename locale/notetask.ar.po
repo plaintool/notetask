@@ -549,6 +549,10 @@ msgstr "حفظ"
 msgid "Save as..."
 msgstr "حفظ باسم..."
 
+#: tformnotetask.asavenotesas.caption
+msgid "Save notes as..."
+msgstr "حفظ الملاحظات باسم..."
+
 #: tformnotetask.aselectall.caption
 msgid "Select all"
 msgstr "تحديد الكل"
@@ -657,6 +661,13 @@ msgid "Opening"
 msgstr "فتح"
 
 #: tformnotetask.savedialog.title
+msgctxt "tformnotetask.savedialog.title"
+msgid "Saving"
+msgstr "حفظ"
+
+#: tformnotetask.savenotesdialog.title
+#, fuzzy
+msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "حفظ"
 
@@ -731,3 +742,4 @@ msgstr "ابحث عن ماذا:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "استبدال بـ:"
+

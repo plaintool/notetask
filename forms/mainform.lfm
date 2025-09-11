@@ -326,6 +326,9 @@ object formNotetask: TformNotetask
       object menuRunPowershell: TMenuItem
         Action = aRunPowershell
       end
+      object MenuItem8: TMenuItem
+        Action = aSaveNotesAs
+      end
     end
     object menuGroup: TMenuItem
       Caption = 'Group'
@@ -937,6 +940,11 @@ object formNotetask: TformNotetask
       ShortCut = 16453
       OnExecute = aRunPowershellExecute
     end
+    object aSaveNotesAs: TAction
+      Category = 'Task'
+      Caption = 'Save notes as...'
+      OnExecute = aSaveNotesAsExecute
+    end
   end
   object openDialog: TOpenDialog
     Title = 'Opening'
@@ -958,18 +966,18 @@ object formNotetask: TformNotetask
     MarginTop = 500
     MarginRight = 500
     MarginBottom = 500
-    Left = 488
+    Left = 504
     Top = 176
   end
   object printDialog: TPrintDialog
-    Left = 488
+    Left = 504
     Top = 112
   end
   object fontDialog: TFontDialog
     Title = 'Font select'
     MinFontSize = 0
     MaxFontSize = 0
-    Left = 576
+    Left = 600
     Top = 112
   end
   object Popup: TPopupMenu
@@ -1038,6 +1046,9 @@ object formNotetask: TformNotetask
     object contextRunPowershell: TMenuItem
       Action = aRunPowershell
     end
+    object MenuItem16: TMenuItem
+      Action = aSaveNotesAs
+    end
   end
   object TitleImages: TImageList
     Left = 240
@@ -1105,5 +1116,16 @@ object formNotetask: TformNotetask
     object contextRunPowershell1: TMenuItem
       Action = aRunPowershell
     end
+    object contextSaveNotesAs: TMenuItem
+      Action = aSaveNotesAs
+    end
+  end
+  object saveNotesDialog: TSaveDialog
+    Title = 'Saving'
+    DefaultExt = '.*.txt'
+    Filter = 'Text files (*.txt)|*.txt'
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
+    Left = 400
+    Top = 176
   end
 end

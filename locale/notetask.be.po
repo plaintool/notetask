@@ -549,6 +549,10 @@ msgstr "Сахраніць"
 msgid "Save as..."
 msgstr "Сахраніць як..."
 
+#: tformnotetask.asavenotesas.caption
+msgid "Save notes as..."
+msgstr "Сахраніць нататкі як..."
+
 #: tformnotetask.aselectall.caption
 msgid "Select all"
 msgstr "Выбраць усё"
@@ -657,6 +661,13 @@ msgid "Opening"
 msgstr "Адкрыццё"
 
 #: tformnotetask.savedialog.title
+msgctxt "tformnotetask.savedialog.title"
+msgid "Saving"
+msgstr "Сахраненне"
+
+#: tformnotetask.savenotesdialog.title
+#, fuzzy
+msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "Сахраненне"
 
@@ -731,3 +742,4 @@ msgstr "Знайсці што:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Замяніць на:"
+

@@ -549,6 +549,10 @@ msgstr "저장"
 msgid "Save as..."
 msgstr "다른 이름으로 저장..."
 
+#: tformnotetask.asavenotesas.caption
+msgid "Save notes as..."
+msgstr "메모 다른 이름으로 저장..."
+
 #: tformnotetask.aselectall.caption
 msgid "Select all"
 msgstr "모두 선택"
@@ -657,6 +661,13 @@ msgid "Opening"
 msgstr "열기"
 
 #: tformnotetask.savedialog.title
+msgctxt "tformnotetask.savedialog.title"
+msgid "Saving"
+msgstr "저장"
+
+#: tformnotetask.savenotesdialog.title
+#, fuzzy
+msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "저장"
 
@@ -731,3 +742,4 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
+

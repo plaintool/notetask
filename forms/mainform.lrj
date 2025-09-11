@@ -88,7 +88,9 @@
 {"hash":17959694,"name":"tformnotetask.achatgpt.caption","sourcebytes":[65,115,107,32,67,104,97,116,71,80,84,46,46,46],"value":"Ask ChatGPT..."},
 {"hash":195117374,"name":"tformnotetask.arunterminal.caption","sourcebytes":[82,117,110,32,105,110,32,116,101,114,109,105,110,97,108,46,46,46],"value":"Run in terminal..."},
 {"hash":99103582,"name":"tformnotetask.arunpowershell.caption","sourcebytes":[82,117,110,32,105,110,32,80,111,119,101,114,83,104,101,108,108,46,46,46],"value":"Run in PowerShell..."},
+{"hash":35304206,"name":"tformnotetask.asavenotesas.caption","sourcebytes":[83,97,118,101,32,110,111,116,101,115,32,97,115,46,46,46],"value":"Save notes as..."},
 {"hash":107761687,"name":"tformnotetask.opendialog.title","sourcebytes":[79,112,101,110,105,110,103],"value":"Opening"},
 {"hash":93900871,"name":"tformnotetask.savedialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
-{"hash":131550916,"name":"tformnotetask.fontdialog.title","sourcebytes":[70,111,110,116,32,115,101,108,101,99,116],"value":"Font select"}
+{"hash":131550916,"name":"tformnotetask.fontdialog.title","sourcebytes":[70,111,110,116,32,115,101,108,101,99,116],"value":"Font select"},
+{"hash":93900871,"name":"tformnotetask.savenotesdialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"}
 ]}

@@ -549,6 +549,10 @@ msgstr "सहेजें"
 msgid "Save as..."
 msgstr "के रूप में सहेजें..."
 
+#: tformnotetask.asavenotesas.caption
+msgid "Save notes as..."
+msgstr "नोट्स इस रूप में सहेजें..."
+
 #: tformnotetask.aselectall.caption
 msgid "Select all"
 msgstr "सभी चुनें"
@@ -657,6 +661,13 @@ msgid "Opening"
 msgstr "खोलना"
 
 #: tformnotetask.savedialog.title
+msgctxt "tformnotetask.savedialog.title"
+msgid "Saving"
+msgstr "सहेजना"
+
+#: tformnotetask.savenotesdialog.title
+#, fuzzy
+msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "सहेजना"
 
@@ -731,3 +742,4 @@ msgstr "क्या खोजें:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "इसके साथ बदलें:"
+

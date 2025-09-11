@@ -45,6 +45,7 @@ type
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
+    aSaveNotesAs: TAction;
     aDuplicateTasks: TAction;
     aRunPowershell: TAction;
     aEnterSubmit: TAction;
@@ -105,9 +106,12 @@ type
     menuEnterSubmit: TMenuItem;
     contextDuplicateTasks: TMenuItem;
     contextOutdentTasks: TMenuItem;
+    MenuItem16: TMenuItem;
     MenuItem6: TMenuItem;
     contextRunPowershell: TMenuItem;
     contextIndentTasks: TMenuItem;
+    contextSaveNotesAs: TMenuItem;
+    MenuItem8: TMenuItem;
     menuRunPowershell: TMenuItem;
     MenuShowTime: TMenuItem;
     menuUndoAll: TMenuItem;
@@ -149,6 +153,7 @@ type
     PopupMemo: TPopupMenu;
     printDialog: TPrintDialog;
     saveDialog: TSaveDialog;
+    saveNotesDialog: TSaveDialog;
     Separator1: TMenuItem;
     menuExit: TMenuItem;
     Separator10: TMenuItem;
@@ -263,6 +268,7 @@ type
     MenuItem9: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem15: TMenuItem;
+    procedure aSaveNotesAsExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -3370,6 +3376,62 @@ begin
     Process.Execute;
   finally
     Process.Free;
+  end;
+end;
+
+procedure TformNotetask.aSaveNotesAsExecute(Sender: TObject);
+var
+  notes: TStringList;
+  fileName: string;
+  i: integer;
+const
+  MAX_FILE_NAME_LEN = 50;
+begin
+  notes := TStringList.Create;
+  try
+    fileName := string.Empty;
+    notes.LineBreak := FLineEnding.Value;
+    notes.Options := notes.Options - [soTrailingLineBreak];
+
+
+    if taskGrid.Selection.Height > 0 then
+    begin
+      // Multiple rows selected — concatenate notes
+      for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+        if Tasks.Map(i) > -1 then
+        begin
+          notes.Add(Tasks.GetTask(i).Note);
+          if (i = taskGrid.Selection.Top) then
+            fileName := Tasks.GetTask(i).Text;
+        end;
+    end
+    else if Tasks.Map(taskGrid.Row) > -1 then
+    begin
+      // Single row selected
+      notes.Add(Tasks.GetTask(taskGrid.Row).Note);
+      fileName += Tasks.GetTask(taskGrid.Row).Text;
+    end;
+
+    // limit file name length
+    if Length(fileName) > MAX_FILE_NAME_LEN then
+      fileName := Copy(fileName, 1, MAX_FILE_NAME_LEN);
+
+    // sanitize forbidden characters
+    fileName := StringReplace(fileName, '\', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '/', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, ':', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '*', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '?', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '"', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '<', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '>', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '|', '_', [rfReplaceAll]);
+
+    saveNotesDialog.FileName := fileName;
+    if (saveNotesDialog.Execute) then
+      notes.SaveToFile(saveNotesDialog.FileName, FEncoding);
+  finally
+    notes.Free;
   end;
 end;
 
