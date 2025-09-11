@@ -496,6 +496,7 @@ type
     procedure ApplySortingActions;
     procedure GridBackupSelection;
     procedure GridClearSelection;
+    procedure MemoNoteSetScrollPosition(Value: integer);
     procedure MemoNoteBackup;
     procedure MemoNoteUndo;
     procedure MemoNoteIndent;
@@ -1013,7 +1014,7 @@ begin
   // Restore memo note scroll position
   if (FLoadedMemoNoteScroll > 0) and (memoNote.Visible) then
   begin
-    memoNote.VertScrollBar.Position := FLoadedMemoNoteScroll;
+    MemoNoteSetScrollPosition(FLoadedMemoNoteScroll);
     FLoadedMemoNoteScroll := 0;
   end;
 end;
@@ -2850,7 +2851,7 @@ begin
       memoNote.SelStart := 0
     else
       memoNote.CaretPos := Point(0, NewPos);
-    memoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
+    MemoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
     memoNote.Invalidate;
     Key := 0;
   end
@@ -2863,7 +2864,7 @@ begin
       memoNote.SelStart := memoNote.GetTextLen - Length(unicodestring(memoNote.Lines[memoNote.Lines.Count - 1]))
     else
       memoNote.CaretPos := Point(0, NewPos);
-    memoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
+    MemoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
     memoNote.Invalidate;
     key := 0;
   end
@@ -3738,13 +3739,7 @@ begin
 
   {$IFDEF UNIX}
   if (memoNote.Tag > 0) then
-  begin
-    memoNote.Visible := False;
-    Application.ProcessMessages;
-    memoNote.VertScrollBar.Position;
-    memoNote.VertScrollBar.Position := memoNote.Tag;
-    memoNote.Visible := True;
-  end;
+    MemoNoteSetScrollPosition(memoNote.Tag);
   {$ENDIF}
 end;
 
@@ -4381,6 +4376,21 @@ begin
   taskGrid.Col := 2;
 end;
 
+procedure TformNotetask.MemoNoteSetScrollPosition(Value: integer);
+begin
+  {$IFDEF UNIX}
+  memoNote.Visible := False;
+  Application.ProcessMessages;
+  memoNote.VertScrollBar.Position;
+  memoNote.VertScrollBar.Position := Value;
+  memoNote.Visible := True;
+  if (memoNote.CanFocus) then memoNote.SetFocus;
+  {$ELSE}
+  memoNote.VertScrollBar.Position := 0;
+  memoNote.VertScrollBar.Position := Value;
+  {$ENDIF}
+end;
+
 procedure TformNotetask.MemoNoteBackup;
 begin
   FMemoNoteBackup := memoNote.Text;
@@ -4407,8 +4417,7 @@ begin
   memoNote.SelLength := FMemoNoteSelLengthBackup;
 
   // Adjust scroll position
-  memoNote.VertScrollBar.Position := 0;
-  memoNote.VertScrollBar.Position := FMemoNoteVertScrollBackup;
+  MemoNoteSetScrollPosition(FMemoNoteVertScrollBackup);
 
   // Option with scroll centering
   //if (FMemoNoteVertScrollBackup > 0) then
