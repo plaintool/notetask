@@ -20,7 +20,7 @@ object formNotetask: TformNotetask
   OnShow = FormShow
   object taskGrid: TStringGrid
     Left = 0
-    Height = 360
+    Height = 358
     Top = 24
     Width = 851
     Align = alClient
@@ -95,8 +95,8 @@ object formNotetask: TformNotetask
   end
   object statusBar: TStatusBar
     Left = 0
-    Height = 21
-    Top = 492
+    Height = 23
+    Top = 490
     Width = 851
     Font.Height = -12
     Panels = <    
@@ -126,7 +126,7 @@ object formNotetask: TformNotetask
     Cursor = crVSplit
     Left = 0
     Height = 5
-    Top = 384
+    Top = 382
     Width = 851
     Align = alBottom
     AutoSnap = False
@@ -153,7 +153,7 @@ object formNotetask: TformNotetask
   object panelNote: TPanel
     Left = 0
     Height = 103
-    Top = 389
+    Top = 387
     Width = 851
     Align = alBottom
     BevelOuter = bvNone
@@ -946,6 +946,7 @@ object formNotetask: TformNotetask
     object aSaveNotesAs: TAction
       Category = 'Task'
       Caption = 'Save notes as...'
+      ShortCut = 16473
       OnExecute = aSaveNotesAsExecute
     end
   end

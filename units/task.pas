@@ -360,7 +360,9 @@ end;
 
 procedure TTasks.ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
 begin
-  //  if (GroupIndex < 0) or (GroupIndex > CountGroup) then exit;
+  if (CountGroup <= 0) then exit;
+  if (GroupIndex >= CountGroup) then
+    GroupIndex := CountGroup - 1;
 
   if (UpdateCurrent) then UpdateGroup;
   SetLength(FMapGrid, 0); // Initialize task map

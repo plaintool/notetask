@@ -515,6 +515,8 @@ type
     procedure CalcRowHeights(aRow: integer = 0; aForce: boolean = False);
     procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
+    procedure BackupSelectedState;
+    procedure RestoreSelectedState;
     function LastRowHeight(aRow: integer): integer;
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
@@ -987,36 +989,7 @@ begin
 
   CalcRowHeights(0, True);
 
-  // Restore task grid selection
-  if (FLoadedSelection.Left > 0) or (FLoadedSelection.Right > 0) or (FLoadedSelection.Top > 0) or (FLoadedSelection.Bottom > 0) then
-  begin
-    taskGrid.Col := FLoadedSelection.Left;
-    taskGrid.Selection := TGridRect.Create(FLoadedSelection);
-    FLoadedSelection := Rect(0, 0, 0, 0);
-    SetNote;
-  end;
-
-  // Restore memo note SelStart
-  if (FLoadedMemoNoteSelStart > 0) and (memoNote.Visible) then
-  begin
-    memoNote.SelStart := FLoadedMemoNoteSelStart;
-    FLoadedMemoNoteSelStart := 0;
-  end;
-
-  // Restore memo note SelLength
-  if (FLoadedMemoNoteSelLength > 0) and (memoNote.Visible) then
-  begin
-    if memoNote.CanFocus then memoNote.SetFocus;
-    memoNote.SelLength := FLoadedMemoNoteSelLength;
-    FLoadedMemoNoteSelLength := 0;
-  end;
-
-  // Restore memo note scroll position
-  if (FLoadedMemoNoteScroll > 0) and (memoNote.Visible) then
-  begin
-    MemoNoteSetScrollPosition(FLoadedMemoNoteScroll);
-    FLoadedMemoNoteScroll := 0;
-  end;
+  RestoreSelectedState;
 end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -1808,6 +1781,7 @@ begin
 
     if Confirm = mrYes then
     begin
+      BackupSelectedState;
       Tasks.UndoBackupInit;
       FillGrid;
       ResetRowHeight;
@@ -1817,6 +1791,7 @@ begin
       GridClearSelection;
       Tasks.CreateBackup;
       SetChanged(False);
+      RestoreSelectedState;
     end;
   end;
 end;
@@ -3159,8 +3134,6 @@ begin
 end;
 
 procedure TformNotetask.ApplyGridSettings;
-var
-  FirstTabRow: integer;
 begin
   SetChanged(False);
 
@@ -3182,27 +3155,6 @@ begin
   SetInfo;
   SetNote;
   SetTabs;
-
-  // Restore last open tab and rows
-  if (FLoadedSelectedTab >= 0) then
-  begin
-    FirstTabRow := -1;
-    if (Length(FLastRowMem) > 0) then
-      FirstTabRow := FLastRowMem[FindGroupRealIndex(0)];
-    if (FLoadedSelectedTab > 0) then
-      groupTabs.TabIndex := FLoadedSelectedTab;
-    if (FLoadedSelectedRow > 0) then
-      taskGrid.Row := FLoadedSelectedRow;
-
-    // Set currect row to mem
-    if (Length(FLastRowMem) > 0) then
-    begin
-      if (FirstTabRow >= 0) then
-        FLastRowMem[FindGroupRealIndex(0)] := FirstTabRow;
-      FLastRowMem[FindGroupRealIndex(FLoadedSelectedTab)] := FLoadedSelectedRow;
-    end;
-    FLoadedSelectedTab := -1;
-  end;
 end;
 
 function TformNotetask.IsExecuteValueNote(memoPriority: boolean = False): boolean;
@@ -4689,6 +4641,75 @@ begin
   // Swap the heights of the two rows
   taskGrid.RowHeights[RowIndex1] := taskGrid.RowHeights[RowIndex2];
   taskGrid.RowHeights[RowIndex2] := TempHeight;
+end;
+
+procedure TformNotetask.BackupSelectedState;
+begin
+  FLoadedSelectedTab := groupTabs.TabIndex;
+  FLoadedSelectedRow := taskGrid.Row;
+  FLoadedSelection := taskGrid.Selection;
+  FLoadedMemoNoteSelStart := memoNote.SelStart;
+  FLoadedMemoNoteSelLength := memoNote.SelLength;
+  FLoadedMemoNoteScroll := memoNote.VertScrollBar.Position;
+end;
+
+procedure TformNotetask.RestoreSelectedState;
+var
+  FirstTabRow, Index: integer;
+begin
+  // Restore last open tab and rows
+  if (FLoadedSelectedTab >= 0) then
+  begin
+    FirstTabRow := -1;
+    if (Length(FLastRowMem) > 0) then
+      FirstTabRow := FLastRowMem[FindGroupRealIndex(0)];
+    if (FLoadedSelectedTab > 0) then
+      groupTabs.TabIndex := FLoadedSelectedTab;
+    if (FLoadedSelectedRow > 0) then
+      taskGrid.Row := FLoadedSelectedRow;
+
+    // Set current row to mem
+    if (Length(FLastRowMem) > 0) then
+    begin
+      if (FirstTabRow >= 0) then
+        FLastRowMem[FindGroupRealIndex(0)] := FirstTabRow;
+      Index := FindGroupRealIndex(FLoadedSelectedTab);
+      if (Index >= High(FLastRowMem)) then
+        FLastRowMem[FindGroupRealIndex(FLoadedSelectedTab)] := FLoadedSelectedRow;
+    end;
+    FLoadedSelectedTab := -1;
+  end;
+
+  // Restore task grid selection
+  if (FLoadedSelection.Left > 0) or (FLoadedSelection.Right > 0) or (FLoadedSelection.Top > 0) or (FLoadedSelection.Bottom > 0) then
+  begin
+    taskGrid.Col := FLoadedSelection.Left;
+    taskGrid.Selection := TGridRect.Create(FLoadedSelection);
+    FLoadedSelection := Rect(0, 0, 0, 0);
+    SetNote;
+  end;
+
+  // Restore memo note SelStart
+  if (FLoadedMemoNoteSelStart > 0) and (memoNote.Visible) then
+  begin
+    memoNote.SelStart := FLoadedMemoNoteSelStart;
+    FLoadedMemoNoteSelStart := 0;
+  end;
+
+  // Restore memo note SelLength
+  if (FLoadedMemoNoteSelLength > 0) and (memoNote.Visible) then
+  begin
+    if memoNote.CanFocus then memoNote.SetFocus;
+    memoNote.SelLength := FLoadedMemoNoteSelLength;
+    FLoadedMemoNoteSelLength := 0;
+  end;
+
+  // Restore memo note scroll position
+  if (FLoadedMemoNoteScroll > 0) and (memoNote.Visible) then
+  begin
+    MemoNoteSetScrollPosition(FLoadedMemoNoteScroll);
+    FLoadedMemoNoteScroll := 0;
+  end;
 end;
 
 procedure TformNotetask.SetBiDiRightToLeft(Value: boolean);
