@@ -277,10 +277,10 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
     procedure ApplicationException(Sender: TObject; E: Exception);
+    procedure memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure memoNoteDblClick(Sender: TObject);
     procedure memoNoteEnter(Sender: TObject);
     procedure memoNoteExit(Sender: TObject);
-    procedure memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure OnQueryEndSession(var CanEnd: boolean);
     procedure groupTabsChange(Sender: TObject);
     procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -1408,6 +1408,8 @@ begin
     Memo.OnEnter := @MemoEnter; // Event Enter
     Memo.OnChange := @MemoChange; // Event Change
     Memo.OnKeyDown := @MemoKeyDown; // Event KeyDown
+    Memo.OnMouseDown := @memoNoteMouseDown; // Event MouseDown
+    Memo.OnDblClick := @memoNoteDblClick; // Event MouseDown
     if (aCol = 4) then
       Memo.OnKeyPress := @MemoKeyPress; // Event KeyPress for amount column only
     Memo.Text := taskGrid.Cells[aCol, aRow];
@@ -3059,14 +3061,14 @@ var
   end;
 
 begin
-  Value := unicodestring(memoNote.Text);
+  Value := unicodestring((Sender as TMemo).Text);
   len := Length(Value);
   if len = 0 then Exit;
 
   if (FMemoSelStartClicked >= 0) then
     pos1 := FMemoSelStartClicked
   else
-    pos1 := memoNote.SelStart + 1;
+    pos1 := (Sender as TMemo).SelStart + 1;
 
   if pos1 < 1 then pos1 := 1;
   if pos1 > len then pos1 := len;
@@ -3110,8 +3112,8 @@ begin
   end;
 
   // Apply selection
-  memoNote.SelStart := leftIdx - 1;
-  memoNote.SelLength := rightIdx - leftIdx;
+  (Sender as TMemo).SelStart := leftIdx - 1;
+  (Sender as TMemo).SelLength := rightIdx - leftIdx;
   FMemoSelStartClicked := -1;
 end;
 
