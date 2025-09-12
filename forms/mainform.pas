@@ -3042,6 +3042,7 @@ begin
 end;
 
 procedure TformNotetask.memoNoteDblClick(Sender: TObject);
+{$IFDEF WINDOWS}
 var
   Value: unicodestring;
   pos1, leftIdx, rightIdx, len: integer;
@@ -3059,14 +3060,15 @@ var
     else
       Result := 3;
   end;
-
+{$ENDIF}
 begin
+  {$IFDEF WINDOWS}
   Value := unicodestring((Sender as TMemo).Text);
   len := Length(Value);
   if len = 0 then Exit;
 
   if (FMemoSelStartClicked >= 0) then
-    pos1 := FMemoSelStartClicked
+    pos1 := FMemoSelStartClicked + 1
   else
     pos1 := (Sender as TMemo).SelStart + 1;
 
@@ -3114,6 +3116,7 @@ begin
   // Apply selection
   (Sender as TMemo).SelStart := leftIdx - 1;
   (Sender as TMemo).SelLength := rightIdx - leftIdx;
+  {$ENDIF}
   FMemoSelStartClicked := -1;
 end;
 
@@ -3470,7 +3473,6 @@ begin
     notes.LineBreak := FLineEnding.Value;
     notes.Options := notes.Options - [soTrailingLineBreak];
 
-
     if taskGrid.Selection.Height > 0 then
     begin
       // Multiple rows selected — concatenate notes
@@ -3741,6 +3743,9 @@ procedure TformNotetask.PasteWithLineEnding(AMemo: TMemo);
 var
   s: string;
 begin
+  {$IFDEF UNIX}
+  memoNote.Tag := memoNote.VertScrollBar.Position;
+  {$ENDIF}
   if Clipboard.HasFormat(CF_TEXT) then
   begin
     s := Clipboard.AsText;
@@ -3753,6 +3758,10 @@ begin
 
     AMemo.SelText := s;
   end;
+  {$IFDEF UNIX}
+  if (memoNote.Tag > 0) then
+    MemoNoteSetScrollPosition(memoNote.Tag);
+  {$ENDIF}
 end;
 
 procedure TformNotetask.SelectMemoLine(LineIndex: integer; Move: boolean = False);
@@ -4570,6 +4579,9 @@ var
   CommentOffset: integer;
   FirstCommentPos, j, wordWidth, Count: integer;
 begin
+  {$IFDEF UNIX}
+  memoNote.Tag := memoNote.VertScrollBar.Position;
+  {$ENDIF}
   MemoNoteBackup;
 
   // If no selection and the cursor is on an empty line -> insert a line of the comment character
@@ -4592,6 +4604,12 @@ begin
         resultStr := resultStr + aComment;
 
       memoNote.Lines[memoNote.CaretPos.Y] := resultStr;
+
+      {$IFDEF UNIX}
+    if (memoNote.Tag > 0) then
+      MemoNoteSetScrollPosition(memoNote.Tag);
+      {$ENDIF}
+
       Exit; // Stop method execution, nothing else to do
     end;
   end;
@@ -4676,7 +4694,10 @@ begin
         for j := 0 to i - 1 do
         begin
           FirstCommentPos := FirstCommentPos + Length(unicodestring(memoNote.Lines[j])) + 1;
-          if (FLineEnding = TLineEnding.WindowsCRLF) then Inc(FirstCommentPos);
+          {$IFDEF WINDOWS}
+          //if (FLineEnding = TLineEnding.WindowsCRLF) then
+             Inc(FirstCommentPos);
+          {$ENDIF}
         end;
       end;
     end;
@@ -4688,6 +4709,10 @@ begin
   else
     memoNote.SelStart := SelStartPos;
   memoNote.SelLength := (SelEndPos - SelStartPos) + CommentOffset;
+  {$IFDEF UNIX}
+  if (memoNote.Tag > 0) then
+    MemoNoteSetScrollPosition(memoNote.Tag);
+  {$ENDIF}
 end;
 
 procedure TformNotetask.MemoBackup;
