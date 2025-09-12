@@ -3042,13 +3042,20 @@ end;
 procedure TformNotetask.memoNoteDblClick(Sender: TObject);
 var
   Value: unicodestring;
-  pos1, leftIdx, rightIdx, len, k: integer;
-  expanded: boolean;
+  pos1, leftIdx, rightIdx, len: integer;
+  ch: widechar;
 
-  function IsWordChar(ch: widechar): boolean;
+  function CharType(ch: widechar): integer;
   begin
-    // letters, digits (Unicode), underscore, dash
-    Result := IsLetterOrDigit(ch) or (ch = '_') or (ch = '-');
+    // 1 = letter or digit
+    // 2 = space
+    // 3 = other symbol
+    if IsLetterOrDigit(ch) or (ch = '_') or (ch = '-') then
+      Result := 1
+    else if ch = ' ' then
+      Result := 2
+    else
+      Result := 3;
   end;
 
 begin
@@ -3060,53 +3067,47 @@ begin
     pos1 := FMemoSelStartClicked
   else
     pos1 := memoNote.SelStart + 1;
+
   if pos1 < 1 then pos1 := 1;
   if pos1 > len then pos1 := len;
 
-  // Move to the right until we meet a word
-  while (pos1 <= len) and not IsWordChar(Value[pos1]) do
-    Inc(pos1);
-
-  // If reached the end of the line -> step back
-  if pos1 > len then pos1 := len;
-
-  // If landed on a non-word and there is a word on the left — move caret left
-  if (not IsWordChar(Value[pos1])) and (pos1 > 1) and IsWordChar(Value[pos1 - 1]) then
-    Dec(pos1);
-
-  // Expand left
+  ch := Value[pos1];
   leftIdx := pos1;
-  while (leftIdx > 1) and IsWordChar(Value[leftIdx - 1]) do Dec(leftIdx);
+  rightIdx := pos1 + 1;
 
-  // Expand right
-  rightIdx := pos1;
-  while (rightIdx <= len) and IsWordChar(Value[rightIdx]) do Inc(rightIdx);
-
-  // Join dot-separated tokens (.exe, .tar.gz etc.)
-  repeat
-    expanded := False;
-
-    // Left side "."
-    if (leftIdx > 1) and (Value[leftIdx - 1] = '.') and (leftIdx > 2) and IsWordChar(Value[leftIdx - 2]) then
+  case CharType(ch) of
+    1: // word (letters/digits/_/-)
     begin
-      k := leftIdx - 1;
-      while (k > 1) and IsWordChar(Value[k - 1]) do Dec(k);
-      leftIdx := k;
-      expanded := True;
-      Continue;
+      while (leftIdx > 1) and (CharType(Value[leftIdx - 1]) = 1) do Dec(leftIdx);
+      while (rightIdx <= len) and (CharType(Value[rightIdx]) = 1) do Inc(rightIdx);
+
+      // extend with dot-joined tokens (.exe, .tar.gz etc.)
+      while (leftIdx > 2) and (Value[leftIdx - 1] = '.') and (CharType(Value[leftIdx - 2]) = 1) do
+      begin
+        Dec(leftIdx); // include dot
+        while (leftIdx > 1) and (CharType(Value[leftIdx - 1]) = 1) do Dec(leftIdx);
+      end;
+      while (rightIdx < len) and (Value[rightIdx] = '.') and (CharType(Value[rightIdx + 1]) = 1) do
+      begin
+        Inc(rightIdx); // include dot
+        while (rightIdx <= len) and (CharType(Value[rightIdx]) = 1) do Inc(rightIdx);
+      end;
     end;
 
-    // Right side "."
-    if (rightIdx <= len) and (Value[rightIdx] = '.') and (rightIdx < len) and IsWordChar(Value[rightIdx + 1]) then
+    2: // spaces
     begin
-      k := rightIdx + 1;
-      while (k <= len) and IsWordChar(Value[k]) do Inc(k);
-      rightIdx := k;
-      expanded := True;
-      Continue;
+      while (leftIdx > 1) and (Value[leftIdx - 1] = ' ') do Dec(leftIdx);
+      while (rightIdx <= len) and (Value[rightIdx] = ' ') do Inc(rightIdx);
     end;
 
-  until not expanded;
+    3: // other symbols
+    begin
+      while (leftIdx > 1) and (Value[leftIdx - 1] = ch) do Dec(leftIdx);
+      while (rightIdx <= len) and (Value[rightIdx] = ch) do Inc(rightIdx);
+    end;
+    else
+      ; // NOP
+  end;
 
   // Apply selection
   memoNote.SelStart := leftIdx - 1;
@@ -3815,6 +3816,8 @@ procedure TformNotetask.taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8
 begin
   {$IFDEF UNIX}
   FKeyPressed := UTF8Key;
+  {$ELSE}
+  ; // NOP
   {$ENDIF}
 end;
 
