@@ -361,21 +361,21 @@ var
   FileStream: TFileStream;
   Buffer: array of byte;
 begin
-  Result := False; // Предполагаем, что переноса нет
+  Result := False; // Assume there is no line break
   Buffer := [];
   FileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
   try
-    // Проверяем размер файла
+    // Check file size
     if FileStream.Size > 0 then
     begin
-      // Создаем буфер размером 1 байт
+      // Create a buffer with size of 1 byte
       SetLength(Buffer, 1);
-      // Переходим в конец файла
+      // Move to the end of the file
       FileStream.Position := FileStream.Size - 1;
-      // Читаем последний байт
+      // Read the last byte
       FileStream.Read(Buffer[0], 1);
 
-      // Проверяем, является ли последний байт символом переноса строки
+      // Check if the last byte is a line break character
       if (Buffer[0] = byte(#10)) or (Buffer[0] = byte(#13)) then
         Result := True;
     end;

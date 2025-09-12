@@ -277,8 +277,10 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
     procedure ApplicationException(Sender: TObject; E: Exception);
+    procedure memoNoteDblClick(Sender: TObject);
     procedure memoNoteEnter(Sender: TObject);
     procedure memoNoteExit(Sender: TObject);
+    procedure memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure OnQueryEndSession(var CanEnd: boolean);
     procedure groupTabsChange(Sender: TObject);
     procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -440,6 +442,7 @@ type
     FLoadedSelectedTab, FLoadedSelectedRow: integer;
     FLoadedSelection: TRect;
     FLoadedMemoNoteScroll, FLoadedMemoNoteSelStart, FLoadedMemoNoteSelLength: integer;
+    FMemoSelStartClicked: integer;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -665,6 +668,7 @@ begin
   FBiDiRightToLeft := self.BiDiMode = bdRightToLeft;
   FDragTab := -1;
   FSortColumn := 0;
+  FMemoSelStartClicked := -1;
   FSortOrder := soAscending;
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
@@ -3025,6 +3029,89 @@ begin
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
   CalcRowHeights(taskGrid.Row);
   SetChanged;
+end;
+
+procedure TformNotetask.memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  if not (ssDouble in Shift) then
+  begin
+    FMemoSelStartClicked := (Sender as TMemo).SelStart;
+  end;
+end;
+
+procedure TformNotetask.memoNoteDblClick(Sender: TObject);
+var
+  Value: unicodestring;
+  pos1, leftIdx, rightIdx, len, k: integer;
+  expanded: boolean;
+
+  function IsWordChar(ch: widechar): boolean;
+  begin
+    // letters, digits (Unicode), underscore, dash
+    Result := IsLetterOrDigit(ch) or (ch = '_') or (ch = '-');
+  end;
+
+begin
+  Value := unicodestring(memoNote.Text);
+  len := Length(Value);
+  if len = 0 then Exit;
+
+  if (FMemoSelStartClicked >= 0) then
+    pos1 := FMemoSelStartClicked
+  else
+    pos1 := memoNote.SelStart + 1;
+  if pos1 < 1 then pos1 := 1;
+  if pos1 > len then pos1 := len;
+
+  // Move to the right until we meet a word
+  while (pos1 <= len) and not IsWordChar(Value[pos1]) do
+    Inc(pos1);
+
+  // If reached the end of the line -> step back
+  if pos1 > len then pos1 := len;
+
+  // If landed on a non-word and there is a word on the left — move caret left
+  if (not IsWordChar(Value[pos1])) and (pos1 > 1) and IsWordChar(Value[pos1 - 1]) then
+    Dec(pos1);
+
+  // Expand left
+  leftIdx := pos1;
+  while (leftIdx > 1) and IsWordChar(Value[leftIdx - 1]) do Dec(leftIdx);
+
+  // Expand right
+  rightIdx := pos1;
+  while (rightIdx <= len) and IsWordChar(Value[rightIdx]) do Inc(rightIdx);
+
+  // Join dot-separated tokens (.exe, .tar.gz etc.)
+  repeat
+    expanded := False;
+
+    // Left side "."
+    if (leftIdx > 1) and (Value[leftIdx - 1] = '.') and (leftIdx > 2) and IsWordChar(Value[leftIdx - 2]) then
+    begin
+      k := leftIdx - 1;
+      while (k > 1) and IsWordChar(Value[k - 1]) do Dec(k);
+      leftIdx := k;
+      expanded := True;
+      Continue;
+    end;
+
+    // Right side "."
+    if (rightIdx <= len) and (Value[rightIdx] = '.') and (rightIdx < len) and IsWordChar(Value[rightIdx + 1]) then
+    begin
+      k := rightIdx + 1;
+      while (k <= len) and IsWordChar(Value[k]) do Inc(k);
+      rightIdx := k;
+      expanded := True;
+      Continue;
+    end;
+
+  until not expanded;
+
+  // Apply selection
+  memoNote.SelStart := leftIdx - 1;
+  memoNote.SelLength := rightIdx - leftIdx;
+  FMemoSelStartClicked := -1;
 end;
 
 procedure TformNotetask.NewFile(SaveSetting: boolean = True);

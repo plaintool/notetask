@@ -51,6 +51,8 @@ function GetConsoleEncoding: string;
 
 function IsUTF8Char(const S: String; CharIndex: Integer; FindChar: string = ' '): Boolean;
 
+function IsLetterOrDigit(ch: WideChar): Boolean;
+
 const
   Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
   UnicodeMinusUTF8 = #$E2#$88#$92;
@@ -396,6 +398,11 @@ begin
 
   ch := UTF8Copy(S, CharIndex, 1);
   Result := (ch = FindChar);
+end;
+
+function IsLetterOrDigit(ch: WideChar): Boolean;
+begin
+  Result := (ch in ['0'..'9', 'A'..'Z', 'a'..'z']) or (ch > #127);
 end;
 
 end.
