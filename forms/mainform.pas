@@ -1848,8 +1848,11 @@ var
 begin
   if memoNote.Focused then
   begin
-    MemoNoteBackup;
-    PasteWithLineEnding(memoNote);
+    if (not memoNote.ReadOnly) then
+    begin
+      MemoNoteBackup;
+      PasteWithLineEnding(memoNote);
+    end;
     exit;
   end;
 
@@ -1879,8 +1882,11 @@ procedure TformNotetask.aDeleteExecute(Sender: TObject);
 begin
   if memoNote.Focused then
   begin
-    MemoNoteBackup;
-    MemoNote.ClearSelection;
+    if (not memoNote.ReadOnly) then
+    begin
+      MemoNoteBackup;
+      memoNote.ClearSelection;
+    end;
     exit;
   end;
 
@@ -4664,7 +4670,11 @@ begin
     if (Length(FLastRowMem) > 0) then
       FirstTabRow := FLastRowMem[FindGroupRealIndex(0)];
     if (FLoadedSelectedTab > 0) then
-      groupTabs.TabIndex := FLoadedSelectedTab;
+      groupTabs.TabIndex := FLoadedSelectedTab
+    else
+    if (FLoadedSelectedTab = 0) and (FindGroupRealIndex(0) > 0) then
+      groupTabsChange(groupTabs);
+
     if (FLoadedSelectedRow > 0) then
       taskGrid.Row := FLoadedSelectedRow;
 
@@ -5202,11 +5212,12 @@ begin
       else
       if (LastIndex < 0) then
       begin
-        while (LastRealIndex < Tasks.CountGroup) do
+        i := LastRealIndex;
+        while (i < Tasks.CountGroup) do
         begin
-          Inc(LastRealIndex);
-          LastIndex := FindGroupTabIndex(LastRealIndex);
-          if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count) then
+          Inc(i);
+          LastIndex := FindGroupTabIndex(i);
+          if (LastIndex >= 0) and (LastIndex < groupTabs.Tabs.Count) then
           begin
             groupTabs.TabIndex := LastIndex;
             FoundTab := True;
