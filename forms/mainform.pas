@@ -549,7 +549,7 @@ type
     procedure SetLanguage(aLanguage: string = string.Empty);
     procedure FillGrid;
     procedure NewFile(SaveSetting: boolean = True);
-    function OpenFile(fileName: string): boolean;
+    function OpenFile(fileName: string; saveSettings: boolean = True): boolean;
     function SaveFile(fileName: string = string.Empty): boolean;
     function SaveFileAs: boolean;
     procedure ApplyGridSettings;
@@ -730,7 +730,7 @@ begin
   begin
     FilePath := ParamStr(1); // Get the file path
     if (not FilePath.StartsWith('--')) then
-      FileOpened := OpenFile(FilePath); // Function to load a task from the file
+      FileOpened := OpenFile(FilePath, False); // Function to load a task from the file
   end;
 
   if not FileOpened then NewFile(False);
@@ -3179,7 +3179,7 @@ begin
   end;
 end;
 
-function TformNotetask.OpenFile(fileName: string): boolean;
+function TformNotetask.OpenFile(fileName: string; saveSettings: boolean = True): boolean;
 var
   Content: string;
 begin
@@ -3190,7 +3190,8 @@ begin
     exit;
   end;
   // Save settings for current file
-  SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+  if (saveSettings) then
+    SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
   FFileName := fileName;
   EditComplite;
@@ -3274,6 +3275,7 @@ begin
   SetInfo;
   SetNote;
   SetTabs;
+  RestoreSelectedState;
 end;
 
 function TformNotetask.IsExecuteValueNote(memoPriority: boolean = False): boolean;
