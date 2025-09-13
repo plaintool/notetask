@@ -37,7 +37,8 @@ uses
   LConvEncoding,
   GridPrn,
   task,
-  lineending;
+  lineending,
+  stringtool;
 
 type
   { TformNotetask }
@@ -441,6 +442,7 @@ type
     FLastTabMouseX: integer;
     FLoadedSelectedTab, FLoadedSelectedRow: integer;
     FLoadedSelection: TRect;
+    FLoadedRowMem: TIntegerArray;
     FLoadedMemoNoteScroll, FLoadedMemoNoteSelStart, FLoadedMemoNoteSelLength: integer;
     FMemoSelStartClicked: integer;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
@@ -518,8 +520,8 @@ type
     procedure CalcRowHeights(aRow: integer = 0; aForce: boolean = False);
     procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
-    procedure BackupSelectedState;
-    procedure RestoreSelectedState;
+    procedure BackupSelectedState(aRowMem: boolean = False);
+    procedure RestoreSelectedState(aRowMem: boolean = True);
     function LastRowHeight(aRow: integer): integer;
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
@@ -578,7 +580,7 @@ type
     property WrapAround: boolean read FWrapAround write FWrapAround;
     property SelectedTab: integer read GetSelectedTab write FLoadedSelectedTab;
     property SelectedRow: integer read GetSelectedRow write FLoadedSelectedRow;
-    property SelectedRows: TIntegerArray read GetSelectedRows write FLastRowMem;
+    property SelectedRows: TIntegerArray read GetSelectedRows write FLoadedRowMem;
     property Selection: TRect read GetSelection write FLoadedSelection;
     property MemoNoteScroll: integer read GetMemoNoteScroll write FLoadedMemoNoteScroll;
     property MemoNoteSelStart: integer read GetMemoNoteSelStart write FLoadedMemoNoteSelStart;
@@ -640,7 +642,7 @@ resourcestring
 
 implementation
 
-uses filemanager, settings, stringtool, systemtool, forminput, formfind, formreplace, formabout, formdonate;
+uses filemanager, settings, systemtool, forminput, formfind, formreplace, formabout, formdonate;
 
   {$R *.lfm}
 
@@ -1523,6 +1525,10 @@ begin
     SetNote;
   FLastRow := aRow;
 
+  // Save row to mem
+  if Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex) then
+    FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)] := aRow;
+
   // Disable merge if no multiselect
   if (taskGrid.Selection.Height > 0) then
     aMergeTasks.Enabled := True
@@ -2038,6 +2044,7 @@ begin
     taskGrid.Selection := TGridRect.Create(selLeft, 0, selRight, selLen);
   end;
   SetChanged;
+  SetNote;
   SetInfo;
 end;
 
@@ -2068,6 +2075,7 @@ begin
     taskGrid.Selection := TGridRect.Create(selLeft, taskGrid.RowCount - selLen, selRight, taskGrid.RowCount);
   end;
   SetChanged;
+  SetNote;
   SetInfo;
 end;
 
@@ -2099,6 +2107,7 @@ begin
     ResetRowHeight(-1);
   end;
   SetChanged;
+  SetNote;
   SetInfo;
 end;
 
@@ -2130,6 +2139,7 @@ begin
     ResetRowHeight(-1);
   end;
   SetChanged;
+  SetNote;
   SetInfo;
 end;
 
@@ -2163,6 +2173,7 @@ begin
     taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
   end;
   SetChanged;
+  SetNote;
   SetInfo;
 end;
 
@@ -2196,6 +2207,7 @@ begin
     taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
   end;
   SetChanged;
+  SetNote;
   SetInfo;
 end;
 
@@ -2319,8 +2331,9 @@ begin
       if (newName = rgroupuntitled) then newName := string.Empty;
 
       Result := Tasks.InsertGroup(newName);
-      if (Result <> groupTabs.TabIndex) then
+      if (Result <> FindGroupRealIndex(groupTabs.TabIndex)) then
       begin
+        InsertAtPos(FLastRowMem, Result, 0);
         SetTabs;
         ChangeGroup(FindGroupTabIndex(Result));
         SetChanged;
@@ -2377,6 +2390,7 @@ begin
     begin
       if (Tasks.CopyGroup(FindGroupRealIndex(groupTabs.TabIndex), editText.Text)) then
       begin
+        InsertAtPos(FLastRowMem, FindGroupRealIndex(groupTabs.TabIndex) + 1, FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)]);
         SetTabs;
         ChangeGroup(groupTabs.TabIndex + 1);
         SetChanged;
@@ -2390,6 +2404,7 @@ end;
 procedure TformNotetask.aDeleteGroupExecute(Sender: TObject);
 var
   Confirm: integer;
+  Mem: TIntegerArray;
 begin
   Confirm := MessageDlg(rdeletegroupconfirm, mtConfirmation, [mbYes, mbNo], 0);
 
@@ -2397,8 +2412,13 @@ begin
   begin
     if (Tasks.DeleteGroup(FindGroupRealIndex(groupTabs.TabIndex))) then
     begin
+      DeleteAtPos(FLastRowMem, FindGroupRealIndex(groupTabs.TabIndex));
+      Mem := CloneArray(FLastRowMem);
       SetTabs;
       ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
+      FLastRowMem := CloneArray(Mem);
+      if (Length(FLastRowMem) > Tasks.SelectedGroup) then
+        taskGrid.Row := FLastRowMem[Tasks.SelectedGroup];
       SetChanged;
     end;
   end;
@@ -4766,8 +4786,10 @@ begin
   taskGrid.RowHeights[RowIndex2] := TempHeight;
 end;
 
-procedure TformNotetask.BackupSelectedState;
+procedure TformNotetask.BackupSelectedState(aRowMem: boolean = False);
 begin
+  if (aRowMem) then
+    FLoadedRowMem := CloneArray(FLastRowMem);
   FLoadedSelectedTab := groupTabs.TabIndex;
   FLoadedSelectedRow := taskGrid.Row;
   FLoadedSelection := taskGrid.Selection;
@@ -4776,10 +4798,14 @@ begin
   FLoadedMemoNoteScroll := memoNote.VertScrollBar.Position;
 end;
 
-procedure TformNotetask.RestoreSelectedState;
+procedure TformNotetask.RestoreSelectedState(aRowMem: boolean = True);
 var
   FirstTabRow, Index: integer;
 begin
+  // Restore rows memory
+  if (aRowMem) and (Length(FLoadedRowMem) > 0) then
+    FLastRowMem := CloneArray(FLoadedRowMem);
+
   // Restore last open tab and rows
   if (FLoadedSelectedTab >= 0) then
   begin
@@ -4792,6 +4818,9 @@ begin
     if (FLoadedSelectedTab = 0) and (FindGroupRealIndex(0) > 0) then
       groupTabsChange(groupTabs);
 
+    if (aRowMem) and (Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex)) then
+      taskGrid.Row := FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)]
+    else
     if (FLoadedSelectedRow > 0) then
       taskGrid.Row := FLoadedSelectedRow;
 
@@ -5466,6 +5495,8 @@ begin
       end;
       mrNo:
       begin
+        // Reset group rows memory
+        FLastRowMem := CloneArray(FLoadedRowMem);
         // Do not save, but allow form to close
         Result := True;
       end;

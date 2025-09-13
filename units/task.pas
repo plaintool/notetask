@@ -18,11 +18,10 @@ uses
   Grids,
   Clipbrd,
   StrUtils,
-  DateUtils;
+  DateUtils,
+  stringtool;
 
 type
-  TIntegerArray = array of integer;
-
   // Class representing a single task
   TTask = class
   public
@@ -160,7 +159,7 @@ resourcestring
 
 implementation
 
-uses stringtool, mdformat;
+uses mdformat;
 
   { TTask }
 

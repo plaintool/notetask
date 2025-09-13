@@ -17,6 +17,9 @@ uses
   Process,
   LazUTF8;
 
+type
+  TIntegerArray = array of integer;
+
 function TextToStringList(const Content: string; TrimEnd: boolean = False): TStringList;
 
 function TryStrToDateTimeISO(const S: string; out ADateTime: TDateTime): boolean;
@@ -49,9 +52,15 @@ function EncodeUrl(const url: string): string;
 
 function GetConsoleEncoding: string;
 
-function IsUTF8Char(const S: String; CharIndex: Integer; FindChar: string = ' '): Boolean;
+function IsUTF8Char(const S: string; CharIndex: integer; FindChar: string = ' '): boolean;
 
-function IsLetterOrDigit(ch: WideChar): Boolean;
+function IsLetterOrDigit(ch: widechar): boolean;
+
+procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer);
+
+procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
+
+function CloneArray(const Src: TIntegerArray): TIntegerArray;
 
 const
   Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
@@ -389,9 +398,9 @@ begin
   end;
 end;
 
-function IsUTF8Char(const S: String; CharIndex: Integer; FindChar: string = ' '): Boolean;
+function IsUTF8Char(const S: string; CharIndex: integer; FindChar: string = ' '): boolean;
 var
-  ch: String;
+  ch: string;
 begin
   Result := False;
   if (CharIndex < 1) or (CharIndex > UTF8Length(S)) then Exit;
@@ -400,9 +409,49 @@ begin
   Result := (ch = FindChar);
 end;
 
-function IsLetterOrDigit(ch: WideChar): Boolean;
+function IsLetterOrDigit(ch: widechar): boolean;
 begin
   Result := (ch in ['0'..'9', 'A'..'Z', 'a'..'z']) or (ch > #127);
+end;
+
+procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer);
+var
+  i, Len: integer;
+begin
+  Len := Length(A);
+  if (Pos < 0) or (Pos > Len) then
+    Exit; // Out of bounds
+
+  // Increase array size
+  SetLength(A, Len + 1);
+
+  // Shift elements to the right
+  for i := Len - 1 downto Pos do
+    A[i + 1] := A[i];
+
+  // Insert new value
+  A[Pos] := Value;
+end;
+
+procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
+var
+  i, Len: integer;
+begin
+  Len := Length(A);
+  if (Pos < 0) or (Pos >= Len) then
+    Exit; // Out of bounds
+
+  // Shift left
+  for i := Pos to Len - 2 do
+    A[i] := A[i + 1];
+
+  // Decrease array size
+  SetLength(A, Len - 1);
+end;
+
+function CloneArray(const Src: TIntegerArray): TIntegerArray;
+begin
+  Result := Copy(Src, 0, Length(Src));
 end;
 
 end.
