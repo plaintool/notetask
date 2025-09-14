@@ -521,7 +521,7 @@ type
     procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     procedure BackupSelectedState(aRowMem: boolean = False);
-    procedure RestoreSelectedState(aRowMem: boolean = True);
+    procedure RestoreSelectedState(aRowMem: boolean = True; aRowMemPriority: boolean = True; aFocusMemo: boolean = False);
     function LastRowHeight(aRow: integer): integer;
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
@@ -995,7 +995,7 @@ begin
 
   CalcRowHeights(0, True);
 
-  RestoreSelectedState;
+  RestoreSelectedState(True, True, True);
 end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -1803,7 +1803,7 @@ begin
       GridClearSelection;
       Tasks.CreateBackup;
       SetChanged(False);
-      RestoreSelectedState;
+      RestoreSelectedState(True, False);
     end;
   end;
 end;
@@ -4800,7 +4800,7 @@ begin
   FLoadedMemoNoteScroll := memoNote.VertScrollBar.Position;
 end;
 
-procedure TformNotetask.RestoreSelectedState(aRowMem: boolean = True);
+procedure TformNotetask.RestoreSelectedState(aRowMem: boolean = True; aRowMemPriority: boolean = True; aFocusMemo: boolean = False);
 var
   FirstTabRow, Index: integer;
 begin
@@ -4820,7 +4820,7 @@ begin
     if (FLoadedSelectedTab = 0) and (FindGroupRealIndex(0) > 0) then
       groupTabsChange(groupTabs);
 
-    if (aRowMem) and (Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex)) then
+    if (aRowMem) and (aRowMemPriority) and (Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex)) then
       taskGrid.Row := FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)]
     else
     if (FLoadedSelectedRow > 0) then
@@ -4847,26 +4847,29 @@ begin
     SetNote;
   end;
 
-  // Restore memo note SelStart
-  if (FLoadedMemoNoteSelStart > 0) and (memoNote.Visible) then
+  if (memoNote.Visible) and (Showing) then
   begin
-    memoNote.SelStart := FLoadedMemoNoteSelStart;
-    FLoadedMemoNoteSelStart := 0;
-  end;
+    // Restore memo note SelStart
+    if (FLoadedMemoNoteSelStart > 0) then
+    begin
+      memoNote.SelStart := FLoadedMemoNoteSelStart;
+      FLoadedMemoNoteSelStart := 0;
+    end;
 
-  // Restore memo note SelLength
-  if (FLoadedMemoNoteSelLength > 0) and (memoNote.Visible) then
-  begin
-    if memoNote.CanFocus then memoNote.SetFocus;
-    memoNote.SelLength := FLoadedMemoNoteSelLength;
-    FLoadedMemoNoteSelLength := 0;
-  end;
+    // Restore memo note SelLength
+    if (FLoadedMemoNoteSelLength > 0) then
+    begin
+      if (memoNote.CanFocus) then memoNote.SetFocus;
+      memoNote.SelLength := FLoadedMemoNoteSelLength;
+      FLoadedMemoNoteSelLength := 0;
+    end;
 
-  // Restore memo note scroll position
-  if (FLoadedMemoNoteScroll > 0) and (memoNote.Visible) then
-  begin
-    MemoNoteSetScrollPosition(FLoadedMemoNoteScroll);
-    FLoadedMemoNoteScroll := 0;
+    // Restore memo note scroll position
+    if (FLoadedMemoNoteScroll > 0) then
+    begin
+      MemoNoteSetScrollPosition(FLoadedMemoNoteScroll);
+      FLoadedMemoNoteScroll := 0;
+    end;
   end;
 end;
 
