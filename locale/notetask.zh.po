@@ -329,6 +329,7 @@ msgid "Ask ChatGPT..."
 msgstr "询问 ChatGPT..."
 
 #: tformnotetask.acopy.caption
+msgctxt "tformnotetask.acopy.caption"
 msgid "Copy"
 msgstr "复制"
 
@@ -618,6 +619,11 @@ msgctxt "tformnotetask.caption"
 msgid "Notetask"
 msgstr "记事任务"
 
+#: tformnotetask.contextcopystatusbar.caption
+msgctxt "tformnotetask.contextcopystatusbar.caption"
+msgid "Copy"
+msgstr "复制"
+
 #: tformnotetask.fontdialog.title
 msgid "Font select"
 msgstr "选择字体"
@@ -666,7 +672,6 @@ msgid "Saving"
 msgstr "保存"
 
 #: tformnotetask.savenotesdialog.title
-#, fuzzy
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "保存"
@@ -742,4 +747,3 @@ msgstr "查找内容："
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "替换为："
-

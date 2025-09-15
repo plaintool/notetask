@@ -119,7 +119,9 @@ object formNotetask: TformNotetask
         Width = 50
       end>
     ParentFont = False
+    PopupMenu = PopupStatusbar
     SimplePanel = False
+    OnContextPopup = statusBarContextPopup
   end
   object Splitter: TSplitter
     Cursor = crVSplit
@@ -1132,5 +1134,13 @@ object formNotetask: TformNotetask
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
     Left = 400
     Top = 176
+  end
+  object PopupStatusbar: TPopupMenu
+    Left = 160
+    Top = 384
+    object ContextCopyStatusbar: TMenuItem
+      Caption = 'Copy'
+      OnClick = ContextCopyStatusbarClick
+    end
   end
 end

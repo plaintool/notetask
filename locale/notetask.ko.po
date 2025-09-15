@@ -329,6 +329,7 @@ msgid "Ask ChatGPT..."
 msgstr "ChatGPT에게 질문하기..."
 
 #: tformnotetask.acopy.caption
+msgctxt "tformnotetask.acopy.caption"
 msgid "Copy"
 msgstr "복사"
 
@@ -618,6 +619,11 @@ msgctxt "tformnotetask.caption"
 msgid "Notetask"
 msgstr "노트 작업"
 
+#: tformnotetask.contextcopystatusbar.caption
+msgctxt "tformnotetask.contextcopystatusbar.caption"
+msgid "Copy"
+msgstr "복사"
+
 #: tformnotetask.fontdialog.title
 msgid "Font select"
 msgstr "글꼴 선택"
@@ -666,7 +672,6 @@ msgid "Saving"
 msgstr "저장"
 
 #: tformnotetask.savenotesdialog.title
-#, fuzzy
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "저장"
@@ -742,4 +747,3 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
-

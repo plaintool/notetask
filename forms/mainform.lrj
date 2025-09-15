@@ -92,5 +92,6 @@
 {"hash":107761687,"name":"tformnotetask.opendialog.title","sourcebytes":[79,112,101,110,105,110,103],"value":"Opening"},
 {"hash":93900871,"name":"tformnotetask.savedialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
 {"hash":131550916,"name":"tformnotetask.fontdialog.title","sourcebytes":[70,111,110,116,32,115,101,108,101,99,116],"value":"Font select"},
-{"hash":93900871,"name":"tformnotetask.savenotesdialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"}
+{"hash":93900871,"name":"tformnotetask.savenotesdialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
+{"hash":304761,"name":"tformnotetask.contextcopystatusbar.caption","sourcebytes":[67,111,112,121],"value":"Copy"}
 ]}

@@ -319,6 +319,7 @@ msgid "Ask ChatGPT..."
 msgstr ""
 
 #: tformnotetask.acopy.caption
+msgctxt "tformnotetask.acopy.caption"
 msgid "Copy"
 msgstr ""
 
@@ -606,6 +607,11 @@ msgstr ""
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
+msgstr ""
+
+#: tformnotetask.contextcopystatusbar.caption
+msgctxt "tformnotetask.contextcopystatusbar.caption"
+msgid "Copy"
 msgstr ""
 
 #: tformnotetask.fontdialog.title

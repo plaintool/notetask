@@ -108,6 +108,7 @@ type
     contextDuplicateTasks: TMenuItem;
     contextOutdentTasks: TMenuItem;
     MenuItem16: TMenuItem;
+    ContextCopyStatusbar: TMenuItem;
     MenuItem6: TMenuItem;
     contextRunPowershell: TMenuItem;
     contextIndentTasks: TMenuItem;
@@ -152,6 +153,7 @@ type
     panelNote: TPanel;
     Popup: TPopupMenu;
     PopupMemo: TPopupMenu;
+    PopupStatusbar: TPopupMenu;
     printDialog: TPrintDialog;
     saveDialog: TSaveDialog;
     saveNotesDialog: TSaveDialog;
@@ -270,6 +272,7 @@ type
     MenuItem10: TMenuItem;
     MenuItem15: TMenuItem;
     procedure aSaveNotesAsExecute(Sender: TObject);
+    procedure ContextCopyStatusbarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -293,6 +296,7 @@ type
     procedure panelNoteMouseLeave(Sender: TObject);
     procedure panelNoteMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure statusBarContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
     procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
     procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
@@ -445,6 +449,7 @@ type
     FLoadedRowMem: TIntegerArray;
     FLoadedMemoNoteScroll, FLoadedMemoNoteSelStart, FLoadedMemoNoteSelLength: integer;
     FMemoSelStartClicked: integer;
+    FStatusPanelIndex: integer;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -1692,6 +1697,42 @@ end;
 procedure TformNotetask.panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   FNoteSelecting := False;
+end;
+
+procedure TformNotetask.statusBarContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
+var
+  i, PosX: integer;
+begin
+  // If menu called by keyboard MousePos is invalid
+  if (MousePos.X < 0) or (MousePos.Y < 0) then
+  begin
+    Handled := True;
+    exit;
+  end;
+
+  FStatusPanelIndex := -1;
+  PosX := 0;
+  for i := 0 to statusBar.Panels.Count - 1 do
+  begin
+    Inc(PosX, statusBar.Panels[i].Width);
+    if (MousePos.X < PosX) or (i = statusBar.Panels.Count - 1) then
+    begin
+      FStatusPanelIndex := i;
+      Break;
+    end;
+  end;
+end;
+
+procedure TformNotetask.ContextCopyStatusbarClick(Sender: TObject);
+var
+  PanelText: string;
+begin
+  if (FStatusPanelIndex >= 0) and (FStatusPanelIndex < statusBar.Panels.Count) then
+  begin
+    PanelText := statusBar.Panels[FStatusPanelIndex].Text;
+    if PanelText <> string.Empty then
+      Clipboard.AsText := PanelText;
+  end;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);

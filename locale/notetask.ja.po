@@ -329,6 +329,7 @@ msgid "Ask ChatGPT..."
 msgstr "ChatGPTに聞く..."
 
 #: tformnotetask.acopy.caption
+msgctxt "tformnotetask.acopy.caption"
 msgid "Copy"
 msgstr "コピー"
 
@@ -618,6 +619,11 @@ msgctxt "tformnotetask.caption"
 msgid "Notetask"
 msgstr "ノートタスク"
 
+#: tformnotetask.contextcopystatusbar.caption
+msgctxt "tformnotetask.contextcopystatusbar.caption"
+msgid "Copy"
+msgstr "コピー"
+
 #: tformnotetask.fontdialog.title
 msgid "Font select"
 msgstr "フォント選択"
@@ -666,7 +672,6 @@ msgid "Saving"
 msgstr "保存"
 
 #: tformnotetask.savenotesdialog.title
-#, fuzzy
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "保存"
@@ -742,4 +747,3 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
-

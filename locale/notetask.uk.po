@@ -329,6 +329,7 @@ msgid "Ask ChatGPT..."
 msgstr "Запитати ChatGPT..."
 
 #: tformnotetask.acopy.caption
+msgctxt "tformnotetask.acopy.caption"
 msgid "Copy"
 msgstr "Копіювати"
 
@@ -618,6 +619,11 @@ msgctxt "tformnotetask.caption"
 msgid "Notetask"
 msgstr "Завдання нотатки"
 
+#: tformnotetask.contextcopystatusbar.caption
+msgctxt "tformnotetask.contextcopystatusbar.caption"
+msgid "Copy"
+msgstr "Копіювати"
+
 #: tformnotetask.fontdialog.title
 msgid "Font select"
 msgstr "Вибір шрифту"
@@ -666,7 +672,6 @@ msgid "Saving"
 msgstr "Збереження"
 
 #: tformnotetask.savenotesdialog.title
-#, fuzzy
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "Збереження"
@@ -742,4 +747,3 @@ msgstr "Знайти що:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Замінити на:"
-
