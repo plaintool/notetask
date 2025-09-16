@@ -19,7 +19,7 @@ uses
   Clipbrd,
   StrUtils,
   DateUtils,
-  stringtool;
+  formattool;
 
 type
   // Class representing a single task
@@ -537,15 +537,18 @@ begin
     if not TryStrToFloat(CleanNumeric(Grid.Cells[4, Row]), pAmount, FS) then
     begin
       pAmount := 0; // If parsing the amount failed, set to 0
-      Grid.Cells[4, Row] := '';
+      Grid.Cells[4, Row] := string.Empty;
     end
+    else
+    if (pAmount = 0) then
+      Grid.Cells[4, Row] := string.Empty
     else
       Grid.Cells[4, Row] := FloatToString(pAmount);
     Task.Amount := pAmount;
     if not TryStrToDateTime(Grid.Cells[5, Row], pDate) then
     begin
       pDate := 0; // If parsing the date failed, set to 0
-      Grid.Cells[5, Row] := '';
+      Grid.Cells[5, Row] := string.Empty;
     end
     else
       Grid.Cells[5, Row] := DateTimeToString(pDate, DisplayTime);
@@ -1848,8 +1851,8 @@ begin
     for I := StartIndex to EndIndex do
     begin
       Ind := Map(I);
-      if (Ind > -1) and ((Archive = True) or (FTaskList[Ind].Archive = False)) and
-        ((Done = False) or (FTaskList[Ind].Done = True) or (FTaskList[I].Archive = True)) then
+      if (Ind > -1) and ((Archive = True) or (FTaskList[Ind].Archive = False)) and ((Done = False) or
+        (FTaskList[Ind].Done = True) or (FTaskList[I].Archive = True)) then
         TotalDuration += (FTaskList[Ind].FDateEnd - FTaskList[Ind].FDateStart);
     end;
   end;

@@ -18,11 +18,12 @@ uses
   SysUtils,
   DateTimeCtrls,
   systemtool,
-  stringtool,
   mainform,
   forminput,
   formfind,
-  formreplace;
+  formreplace,
+  formattool,
+  mathparser;
 
   {$R *.res}
 

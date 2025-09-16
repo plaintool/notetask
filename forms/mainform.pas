@@ -38,7 +38,7 @@ uses
   GridPrn,
   task,
   lineending,
-  stringtool;
+  formattool;
 
 type
   { TformNotetask }
@@ -3883,7 +3883,10 @@ begin
   if UTF8Key = #8 then  // backspace
     Memo.SelText := string.Empty
   else
-    Memo.SelText := UTF8Key;
+  if (taskGrid.Col <> 4) then
+    Memo.SelText := UTF8Key
+  else
+    Memo.SelText := CleanNumericExpression(UTF8Key);
 end;
 
 procedure TformNotetask.taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
@@ -3995,10 +3998,8 @@ begin
     Key := '.';
 
   // Allow digits and one decimal point
-  if not (Key in ['0'..'9', '.', '-', #8, #13]) then
-    Key := #0 // Block other keys
-  else if (Key = '.') and (Pos('.', TMemo(Sender).Text) > 0) then
-    Key := #0; // Block second decimal point
+  if not (Key in ['0'..'9', '.', '-', '+', '/', '*', '%', '^', '(', ')', ' ', #8, #13]) then
+    Key := #0; // Block other keys
 end;
 
 procedure TformNotetask.DatePickerEnter(Sender: TObject);

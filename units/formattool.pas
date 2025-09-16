@@ -4,7 +4,7 @@
 //  You may obtain a copy of the License at https://www.gnu.org/licenses/gpl-3.0.html
 //-----------------------------------------------------------------------------------
 
-unit stringtool;
+unit formattool;
 
 {$mode ObjFPC}{$H+}
 {$codepage utf8}
@@ -38,6 +38,8 @@ function RemoveBrackets(const S: string): string;
 
 function CleanString(const Value: string): string;
 
+function CleanNumericExpression(Value: string): string;
+
 function CleanNumeric(Value: string): string;
 
 function CleanAmount(const Value: string): string;
@@ -69,6 +71,8 @@ const
   MaxDT: TDateTime = 2958465.999988426; // 31.12.9999 23:59:59
 
 implementation
+
+uses mathparser;
 
 function TextToStringList(const Content: string; TrimEnd: boolean = False): TStringList;
 var
@@ -213,17 +217,46 @@ begin
   Result := Value.Replace(#9, ' ');
 end;
 
-function CleanNumeric(Value: string): string;
+function CleanNumericExpression(Value: string): string;
 var
   i: integer;
   C: char;
 begin
-  Result := '';
+  Result := string.Empty;
   Value := Value.Replace(UnicodeMinusUTF8, '-');
   for i := 1 to Length(Value) do
   begin
     C := Value[i];
-    // allow digits and ASCII minus
+    // allow digits and actions
+    if C in ['0'..'9', '-', '+', '*', '/', '%', '^', '(', ')', '.'] then
+      Result := Result + C
+    else if C = ',' then
+      Result := Result + '.'; // replace comma with dot
+  end;
+end;
+
+function CleanNumeric(Value: string): string;
+var
+  i: integer;
+  C: char;
+  ValTest: double;
+begin
+  Result := string.Empty;
+
+  // Clean if expression
+  Value := CleanNumericExpression(Value);
+
+  // If numeric then simple return result
+  if TryStrToFloat(Value, ValTest) then exit(Value);
+
+  // Try to evaluate as a mathematical expression first
+  Value := TMathParser.Eval(Value);
+
+  // After evaluation clean manually
+  for i := 1 to Length(Value) do
+  begin
+    C := Value[i];
+    // allow digits, ASCII minus, and dot
     if C in ['0'..'9', '-', '.'] then
       Result := Result + C
     else if C = ',' then
