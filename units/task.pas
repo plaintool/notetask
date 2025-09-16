@@ -1838,7 +1838,8 @@ begin
   begin
     for I := 0 to Count - 1 do
     begin
-      if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) then
+      if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True) or
+        (FTaskList[I].Archive = True)) then
         TotalDuration += (FTaskList[I].FDateEnd - FTaskList[I].FDateStart);
     end;
   end
@@ -1847,7 +1848,8 @@ begin
     for I := StartIndex to EndIndex do
     begin
       Ind := Map(I);
-      if (Ind > -1) and ((Archive = True) or (FTaskList[Ind].Archive = False)) and ((Done = False) or (FTaskList[Ind].Done = True)) then
+      if (Ind > -1) and ((Archive = True) or (FTaskList[Ind].Archive = False)) and
+        ((Done = False) or (FTaskList[Ind].Done = True) or (FTaskList[I].Archive = True)) then
         TotalDuration += (FTaskList[Ind].FDateEnd - FTaskList[Ind].FDateStart);
     end;
   end;
