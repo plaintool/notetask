@@ -29,7 +29,7 @@ function TasksToStringList(GroupCount: integer; AddCompleted: boolean; GetGroupN
 
 implementation
 
-uses stringtool;
+uses formattool;
 
 function TaskFromString(const TaskString: string): TTask;
 var

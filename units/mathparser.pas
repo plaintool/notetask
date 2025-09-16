@@ -17,10 +17,41 @@ uses
 type
   TMathParser = class
   public
+    class function MaxPrecision(const Expr: string): integer;
     class function Eval(const Expr: string): string;
   end;
 
 implementation
+
+class function TMathParser.MaxPrecision(const Expr: string): integer;
+var
+  i, DotPos, Digits: integer;
+  S: string;
+begin
+  Result := 0;
+  i := 1;
+  while i <= Length(Expr) do
+  begin
+    if Expr[i] in ['0'..'9'] then
+    begin
+      // Find number end
+      DotPos := 0;
+      Digits := 0;
+      while (i <= Length(Expr)) and (Expr[i] in ['0'..'9', '.', ',']) do
+      begin
+        if Expr[i] in ['.', ','] then
+          DotPos := i
+        else if DotPos > 0 then
+          Inc(Digits);
+        Inc(i);
+      end;
+      if Digits > Result then
+        Result := Digits;
+    end
+    else
+      Inc(i);
+  end;
+end;
 
 class function TMathParser.Eval(const Expr: string): string;
 var
@@ -157,13 +188,19 @@ var
 
 var
   R: double;
+  Precision: integer;
+  FormatStr: string;
 begin
   Result := string.Empty;
   i := 1;
   try
     R := ParseExpr;
     SkipSpaces;
-    Result := FormatFloat('0.##', R);
+
+    Precision := Max(MaxPrecision(Expr), 5);
+    FormatStr := '0.' + StringOfChar('#', Precision);
+
+    Result := FormatFloat(FormatStr, R);
   except
     Result := string.Empty; // Return empty string on any error
   end;
