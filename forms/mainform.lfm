@@ -76,6 +76,7 @@ object formNotetask: TformNotetask
     OnDrawCell = taskGridDrawCell
     OnHeaderClick = taskGridHeaderClick
     OnHeaderSized = taskGridHeaderSized
+    OnKeyDown = taskGridKeyDown
     OnMouseDown = taskGridMouseDown
     OnMouseLeave = taskGridMouseLeave
     OnMouseUp = taskGridMouseUp

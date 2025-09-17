@@ -303,6 +303,8 @@ type
     procedure taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
     procedure taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
+    procedure taskGridKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
+      );
     procedure taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure taskGridMouseLeave(Sender: TObject);
     procedure taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -1177,6 +1179,45 @@ end;
 procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
 begin
   FIsSelecting := True;
+end;
+
+procedure TformNotetask.taskGridKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+  Grid: TStringGrid;
+  i: Integer;
+begin
+  Grid := Sender as TStringGrid;
+
+  // HOME -> search from column 1 (left to right)
+  if Key = VK_HOME then
+  begin
+    for i := 1 to Grid.ColCount - 1 do
+    begin
+      if Grid.ColWidths[i] > 0 then
+      begin
+        Grid.Col := i;
+        Break;
+      end;
+    end;
+    Key := 0; // consume key
+    Exit;
+  end;
+
+  // END -> search from column 6 down to 0
+  if Key = VK_END then
+  begin
+    for i := 6 downto 0 do
+    begin
+      if (i < Grid.ColCount) and (Grid.ColWidths[i] > 0) then
+      begin
+        Grid.Col := i;
+        Break;
+      end;
+    end;
+    Key := 0; // consume key
+    Exit;
+  end;
 end;
 
 procedure TformNotetask.taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
