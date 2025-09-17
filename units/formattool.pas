@@ -67,7 +67,7 @@ function CloneArray(const Src: TIntegerArray): TIntegerArray;
 const
   Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
   UnicodeMinusUTF8 = #$E2#$88#$92;
-  MaxFloatStringLength = 17;
+  MaxFloatStringLength = 15;
   MaxDT: TDateTime = 2958465.999988426; // 31.12.9999 23:59:59
 
 implementation
