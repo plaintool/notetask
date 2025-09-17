@@ -1915,6 +1915,7 @@ begin
   begin
     Sel := Tasks.PasteFromClipboard(taskGrid, SortOrder);
     FillGrid;
+    ResetRowHeight;
     if (Assigned(DatePicker)) then
       DatePicker.DateTime := Tasks.GetTask(taskGrid.Row).Date;
     if (SortColumn = 0) then

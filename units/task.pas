@@ -739,12 +739,15 @@ var
   i: integer;
 begin
   Result := False;
+  UpdateGroup;
+
+  // Check if the index is within valid range
   if (aIndex < 0) or (aIndex >= CountGroup) then exit;
 
   FGroupNameList.Add(string.Empty);
   SetLength(FGroupList, CountGroup + 1);
 
-  // Shift groups to the left, overwriting the group at aIndex
+  // Shift groups to the right, overwriting the group at aIndex
   for i := CountGroup - 2 downto aIndex + 1 do
   begin
     FGroupList[i + 1] := FGroupList[i];

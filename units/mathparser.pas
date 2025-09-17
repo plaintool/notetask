@@ -26,7 +26,6 @@ implementation
 class function TMathParser.MaxPrecision(const Expr: string): integer;
 var
   i, DotPos, Digits: integer;
-  S: string;
 begin
   Result := 0;
   i := 1;
