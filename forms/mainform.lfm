@@ -377,7 +377,6 @@ object formNotetask: TformNotetask
       object menuEnterSubmit: TMenuItem
         Action = aEnterSubmit
         AutoCheck = True
-        ShortCut = 16397
       end
       object menuBidiRightToLeft: TMenuItem
         Action = aBidiRightToLeft
@@ -873,6 +872,7 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Enter submit'
       Checked = True
+      ShortCut = 16397
       OnExecute = aEnterSubmitExecute
     end
     object aDuplicateTasks: TAction

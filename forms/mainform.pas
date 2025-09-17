@@ -303,8 +303,7 @@ type
     procedure taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
     procedure taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
-    procedure taskGridKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
-      );
+    procedure taskGridKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure taskGridMouseLeave(Sender: TObject);
     procedure taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -975,6 +974,12 @@ begin
       begin
         EditComplite(True);
         Key := 0;
+      end
+      else
+      if (taskGrid.Col in [2, 3]) and (FEnterSubmit) and (Shift = [ssCtrl]) then
+      begin
+        Memo.SelText := sLineBreak;
+        key := 0;
       end;
     end
     else
@@ -1181,11 +1186,10 @@ begin
   FIsSelecting := True;
 end;
 
-procedure TformNotetask.taskGridKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TformNotetask.taskGridKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   Grid: TStringGrid;
-  i: Integer;
+  i: integer;
 begin
   Grid := Sender as TStringGrid;
 
