@@ -22,8 +22,7 @@ uses
   forminput,
   formfind,
   formreplace,
-  formattool,
-  mathparser;
+  formattool;
 
   {$R *.res}
 

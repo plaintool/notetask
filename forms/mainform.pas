@@ -680,6 +680,7 @@ begin
   FSortColumn := 0;
   FMemoSelStartClicked := -1;
   FSortOrder := soAscending;
+  FKeyPressed := string.Empty;
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
@@ -3961,10 +3962,10 @@ begin
     Memo.SelectAll;
   FMemoNeedSelectAll := True;
 
-  if (FKeyPressed <> '') and (FKeyPressed <> #13) then
+  if (FKeyPressed <> string.Empty) and (FKeyPressed <> #13) then
   begin
-    Memo.SelText := FKeyPressed;
-    FKeyPressed := '';
+    Memo.SelText := CleanNumericExpression(FKeyPressed);
+    FKeyPressed := string.Empty;
   end;
 
   if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
