@@ -285,13 +285,13 @@ object formNotetask: TformNotetask
       object menuInsertTask: TMenuItem
         Action = aInsertTask
       end
-      object MenuItem6: TMenuItem
+      object menuDuplicateTasks: TMenuItem
         Action = aDuplicateTasks
       end
       object menuDeleteTasks: TMenuItem
         Action = aDeleteTasks
       end
-      object MenuItem1: TMenuItem
+      object menuMergeTasks: TMenuItem
         Action = aMergeTasks
       end
       object menuArchiveTasks: TMenuItem
@@ -333,7 +333,7 @@ object formNotetask: TformNotetask
       object menuRunPowershell: TMenuItem
         Action = aRunPowershell
       end
-      object MenuItem8: TMenuItem
+      object menuSaveNotesAs: TMenuItem
         Action = aSaveNotesAs
       end
     end
@@ -342,7 +342,7 @@ object formNotetask: TformNotetask
       object menuInsertGroup: TMenuItem
         Action = aInsertGroup
       end
-      object MenuItem3: TMenuItem
+      object menuDuplicateGroup: TMenuItem
         Action = aDuplicateGroup
         ShortCut = 24644
       end
@@ -355,10 +355,10 @@ object formNotetask: TformNotetask
       object Separator16: TMenuItem
         Caption = '-'
       end
-      object MenuItem4: TMenuItem
+      object menuMoveGroupLeft: TMenuItem
         Action = aMoveGroupLeft
       end
-      object MenuItem5: TMenuItem
+      object menuMoveGroupRight: TMenuItem
         Action = aMoveGroupRight
       end
       object menuMoveTasksLeft: TMenuItem
@@ -400,7 +400,7 @@ object formNotetask: TformNotetask
         Action = aShowTime
         AutoCheck = True
       end
-      object MenuItem2: TMenuItem
+      object menuShowNote: TMenuItem
         Action = aShowNote
         AutoCheck = True
       end
@@ -440,10 +440,10 @@ object formNotetask: TformNotetask
       Caption = 'Help'
       object menuLanguage: TMenuItem
         Caption = 'Language'
-        object MenuItem11: TMenuItem
+        object menuArabic: TMenuItem
           Action = aLangArabic
         end
-        object MenuItem14: TMenuItem
+        object menuBelarusian: TMenuItem
           Action = aLangBelarusian
         end
         object menuChinese: TMenuItem
@@ -458,7 +458,7 @@ object formNotetask: TformNotetask
         object menuGerman: TMenuItem
           Action = aLangGerman
         end
-        object MenuItem12: TMenuItem
+        object menuHindi: TMenuItem
           Action = aLangHindi
         end
         object menuItalian: TMenuItem
@@ -479,7 +479,7 @@ object formNotetask: TformNotetask
         object menuSpanish: TMenuItem
           Action = aLangSpanish
         end
-        object MenuItem13: TMenuItem
+        object menuUkrainian: TMenuItem
           Action = aLangUkrainian
         end
       end
@@ -1054,7 +1054,7 @@ object formNotetask: TformNotetask
     object contextRunPowershell: TMenuItem
       Action = aRunPowershell
     end
-    object MenuItem16: TMenuItem
+    object contextSaveNotesAs: TMenuItem
       Action = aSaveNotesAs
     end
   end
@@ -1072,16 +1072,16 @@ object formNotetask: TformNotetask
   object PopupTabs: TPopupMenu
     Left = 160
     Top = 240
-    object MenuItem7: TMenuItem
+    object ContextInsertGroup: TMenuItem
       Action = aInsertGroup
     end
-    object MenuItem9: TMenuItem
+    object ContextRenameGroup: TMenuItem
       Action = aRenameGroup
     end
-    object MenuItem10: TMenuItem
+    object ContextDuplicateGroup: TMenuItem
       Action = aDuplicateGroup
     end
-    object MenuItem15: TMenuItem
+    object ContextDeleteGroup: TMenuItem
       Action = aDeleteGroup
     end
   end
@@ -1124,7 +1124,7 @@ object formNotetask: TformNotetask
     object contextRunPowershell1: TMenuItem
       Action = aRunPowershell
     end
-    object contextSaveNotesAs: TMenuItem
+    object contextSaveNotesAs1: TMenuItem
       Action = aSaveNotesAs
     end
   end

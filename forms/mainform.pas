@@ -107,13 +107,13 @@ type
     menuEnterSubmit: TMenuItem;
     contextDuplicateTasks: TMenuItem;
     contextOutdentTasks: TMenuItem;
-    MenuItem16: TMenuItem;
+    contextSaveNotesAs: TMenuItem;
     ContextCopyStatusbar: TMenuItem;
-    MenuItem6: TMenuItem;
+    menuDuplicateTasks: TMenuItem;
     contextRunPowershell: TMenuItem;
     contextIndentTasks: TMenuItem;
-    contextSaveNotesAs: TMenuItem;
-    MenuItem8: TMenuItem;
+    contextSaveNotesAs1: TMenuItem;
+    menuSaveNotesAs: TMenuItem;
     menuRunPowershell: TMenuItem;
     MenuShowTime: TMenuItem;
     menuUndoAll: TMenuItem;
@@ -213,10 +213,10 @@ type
     aLangUkrainian: TAction;
     aLangBelarusian: TAction;
     aLangHindi: TAction;
-    MenuItem11: TMenuItem;
-    MenuItem12: TMenuItem;
-    MenuItem13: TMenuItem;
-    MenuItem14: TMenuItem;
+    menuArabic: TMenuItem;
+    menuHindi: TMenuItem;
+    menuUkrainian: TMenuItem;
+    menuBelarusian: TMenuItem;
     aShowColumnDone: TAction;
     aShowColumnNote: TAction;
     aShowColumnDate: TAction;
@@ -240,11 +240,11 @@ type
     menuRunTerminal: TMenuItem;
     contextRunTerminal: TMenuItem;
     aMergeTasks: TAction;
-    MenuItem1: TMenuItem;
+    menuMergeTasks: TMenuItem;
     contextMergeTasks: TMenuItem;
     Splitter: TSplitter;
     aShowNote: TAction;
-    MenuItem2: TMenuItem;
+    menuShowNote: TMenuItem;
     groupTabs: TTabControl;
     aInsertGroup: TAction;
     aDeleteGroup: TAction;
@@ -259,20 +259,18 @@ type
     menuMoveTasksLeft: TMenuItem;
     menuMoveTasksRight: TMenuItem;
     aDuplicateGroup: TAction;
-    MenuItem3: TMenuItem;
+    menuDuplicateGroup: TMenuItem;
     aMoveGroupLeft: TAction;
     aMoveGroupRight: TAction;
-    MenuItem4: TMenuItem;
+    menuMoveGroupLeft: TMenuItem;
     Separator16: TMenuItem;
-    MenuItem5: TMenuItem;
+    menuMoveGroupRight: TMenuItem;
     PopupTabs: TPopupMenu;
-    MenuItem7: TMenuItem;
+    ContextInsertGroup: TMenuItem;
     contextInsertTask: TMenuItem;
-    MenuItem9: TMenuItem;
-    MenuItem10: TMenuItem;
-    MenuItem15: TMenuItem;
-    procedure aSaveNotesAsExecute(Sender: TObject);
-    procedure ContextCopyStatusbarClick(Sender: TObject);
+    ContextRenameGroup: TMenuItem;
+    ContextDuplicateGroup: TMenuItem;
+    ContextDeleteGroup: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -297,6 +295,7 @@ type
     procedure panelNoteMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure statusBarContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
+    procedure ContextCopyStatusbarClick(Sender: TObject);
     procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
     procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
@@ -316,6 +315,7 @@ type
     procedure taskGridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
     procedure taskGridSelection(Sender: TObject; aCol, aRow: integer);
+    procedure aSaveNotesAsExecute(Sender: TObject);
     procedure aDuplicateTasksExecute(Sender: TObject);
     procedure aEnterSubmitExecute(Sender: TObject);
     procedure aRunPowershellExecute(Sender: TObject);
@@ -451,6 +451,7 @@ type
     FLoadedMemoNoteScroll, FLoadedMemoNoteSelStart, FLoadedMemoNoteSelLength: integer;
     FMemoSelStartClicked: integer;
     FStatusPanelIndex: integer;
+    FAdjustingScrollBars: boolean;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -528,6 +529,7 @@ type
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     procedure BackupSelectedState(aRowMem: boolean = False);
     procedure RestoreSelectedState(aRowMem: boolean = True; aRowMemPriority: boolean = True; aFocusMemo: boolean = False);
+    procedure GridAdjustScrollBars;
     function LastRowHeight(aRow: integer): integer;
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
@@ -1267,6 +1269,10 @@ procedure TformNotetask.taskGridResize(Sender: TObject);
 var
   Rect: TRect;
 begin
+  {$IFDEF UNIX}
+  GridAdjustScrollBars;
+  {$ENDIF}
+
   // Get the cell dimensions
   Rect := taskGrid.CellRect(taskGrid.Col, taskGrid.Row);
 
@@ -4959,6 +4965,41 @@ begin
       MemoNoteSetScrollPosition(FLoadedMemoNoteScroll);
       FLoadedMemoNoteScroll := 0;
     end;
+  end;
+end;
+
+procedure TformNotetask.GridAdjustScrollBars;
+var
+  totalWidth, visibleWidth: integer;
+  newStyle: TScrollStyle;
+begin
+  // Guard: if already adjusting — exit to avoid recursion
+  if FAdjustingScrollBars then Exit;
+  FAdjustingScrollBars := True;
+  try
+    // Calculate widths
+    totalWidth := taskGrid.GridWidth;
+    visibleWidth := taskGrid.ClientWidth;
+
+    if totalWidth > visibleWidth then
+      newStyle := ssAutoBoth
+    else
+      newStyle := ssAutoVertical;
+
+    // Only change when necessary (prevents extra events)
+    if taskGrid.ScrollBars <> newStyle then
+    begin
+      taskGrid.ScrollBars := newStyle;
+
+      // If we disabled horizontal scrollbar, try to hide native scrollbar
+      if (newStyle = ssAutoVertical) and (taskGrid.HandleAllocated) then
+      begin
+        // Try to hide native horizontal scrollbar (widgetset dependent)
+        ShowScrollBar(taskGrid.Handle, SB_HORZ, False);
+      end;
+    end;
+  finally
+    FAdjustingScrollBars := False;
   end;
 end;
 
