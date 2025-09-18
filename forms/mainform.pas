@@ -1397,10 +1397,11 @@ begin
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
 
       drawrect.Right := aRect.Right - 4;
+      flags := DT_NOPREFIX;
       if FBiDiRightToLeft then
-        flags := DT_RIGHT
+        flags := flags or DT_RIGHT
       else
-        flags := DT_LEFT;
+        flags := flags or DT_LEFT;
       if FWordWrap then
         flags := flags or DT_WORDBREAK;
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
