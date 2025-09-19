@@ -1598,7 +1598,7 @@ end;
 
 procedure TformNotetask.groupTabsChange(Sender: TObject);
 begin
-  if FIsEditing then EditComplite;
+  EditComplite;
 
   if (Length(FLastRowMem) > Tasks.SelectedGroup) then
     FLastRowMem[Tasks.SelectedGroup] := taskGrid.Row;
@@ -3852,6 +3852,7 @@ begin
 
     taskGrid.EditorMode := False;
     FIsEditing := False;
+    ResetRowHeight;
     if taskGrid.CanFocus then taskGrid.SetFocus;
   end;
 end;
@@ -4350,6 +4351,7 @@ begin
       Tasks.ArchiveTask(RowIndex);
       FillGrid;
       ResetRowHeight;
+      SetTabs;
       SetInfo;
       SetNote;
       SetChanged;
@@ -4386,9 +4388,9 @@ begin
           Tasks.ArchiveTask(RowIndex);
         end;
       end;
-      SetTabs;
       FillGrid;
       ResetRowHeight;
+      SetTabs;
       SetInfo;
       SetNote;
       SetChanged; // Mark that data has changed
@@ -4928,8 +4930,8 @@ begin
       if (FirstTabRow >= 0) then
         FLastRowMem[FindGroupRealIndex(0)] := FirstTabRow;
       Index := FindGroupRealIndex(FLoadedSelectedTab);
-      if (Index >= High(FLastRowMem)) then
-        FLastRowMem[FindGroupRealIndex(FLoadedSelectedTab)] := FLoadedSelectedRow;
+      if (Index >= Low(FLastRowMem)) and (Index <= High(FLastRowMem)) then
+        FLastRowMem[Index] := FLoadedSelectedRow;
     end;
     FLoadedSelectedTab := -1;
   end;

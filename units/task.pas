@@ -1855,7 +1855,7 @@ begin
     begin
       Ind := Map(I);
       if (Ind > -1) and ((Archive = True) or (FTaskList[Ind].Archive = False)) and ((Done = False) or
-        (FTaskList[Ind].Done = True) or (FTaskList[I].Archive = True)) then
+        (FTaskList[Ind].Done = True) or (FTaskList[Ind].Archive = True)) then
         TotalDuration += (FTaskList[Ind].FDateEnd - FTaskList[Ind].FDateStart);
     end;
   end;
