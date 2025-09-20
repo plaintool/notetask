@@ -1193,36 +1193,73 @@ procedure TformNotetask.taskGridKeyDown(Sender: TObject; var Key: word; Shift: T
 var
   Grid: TStringGrid;
   i: integer;
+  //Sel:TGridRect;
+  //Col: integer;
 begin
   Grid := Sender as TStringGrid;
 
-  // HOME -> search from column 1 (left to right)
-  if Key = VK_HOME then
+  // Remove due to conflict with standard selection behavior
+  //// Shift + Home -> select from current position to first visible column
+  //if (Key = VK_HOME) and (ssShift in Shift) and not (ssCtrl in Shift) then
+  //begin
+  //  Sel:=  Grid.Selection;
+  //  Col := Grid.Col;
+  //  for i := 1 to Grid.ColCount - 1 do
+  //    if Grid.ColWidths[i] > 0 then
+  //    begin
+  //      Grid.Col := i;
+  //      Break;
+  //    end;
+  //  Grid.ClearSelections;
+  //  Grid.Selection := Rect(Grid.Col, Sel.Top, Sel.Right, Sel.Bottom);
+  //  Grid.Update;
+  //  Key := 0;
+  //  Exit;
+  //end
+  //else
+  //// Shift + End -> select from current position to last visible column
+  //if (Key = VK_END) and (ssShift in Shift) and not (ssCtrl in Shift) then
+  //begin
+  //  Sel:=  Grid.Selection;
+  //  Col := Grid.Col;
+
+  //  for i := Grid.ColCount - 1 downto 0 do
+  //    if Grid.ColWidths[i] > 0 then
+  //    begin
+  //      Grid.Col := i;
+  //      Break;
+  //    end;
+  //  Grid.ClearSelections;
+  //  Grid.Selection := Rect(Sel.Left, Sel.Top, Grid.Col, Sel.Bottom);
+  //  Grid.Update;
+  //  Key := 0;
+  //  Exit;
+  //end
+  //else
+
+  // Default HOME -> move to first visible column
+  if (Key = VK_HOME) and not (ssCtrl in Shift) and not (ssShift in Shift) then
   begin
     for i := 1 to Grid.ColCount - 1 do
-    begin
       if Grid.ColWidths[i] > 0 then
       begin
         Grid.Col := i;
         Break;
       end;
-    end;
-    Key := 0; // consume key
+    Key := 0;
     Exit;
-  end;
-
-  // END -> search from column 6 down to 0
-  if Key = VK_END then
+  end
+  else
+  // Default END -> move to last visible column
+  if (Key = VK_END) and not (ssCtrl in Shift) and not (ssShift in Shift) then
   begin
-    for i := 6 downto 0 do
-    begin
-      if (i < Grid.ColCount) and (Grid.ColWidths[i] > 0) then
+    for i := Grid.ColCount - 1 downto 0 do
+      if Grid.ColWidths[i] > 0 then
       begin
         Grid.Col := i;
         Break;
       end;
-    end;
-    Key := 0; // consume key
+    Key := 0;
     Exit;
   end;
 end;
