@@ -5327,29 +5327,37 @@ var
   i: integer;
   h: integer;
 begin
-  h := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
+  taskGrid.BeginUpdate;
+  try
+    h := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
 
-  // if -1 only selection
-  if (aRow = -1) then
-  begin
-    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-      taskGrid.RowHeights[i] := h;
-  end
-  else
-  // if 0 for all rows
-  if (aRow = 0) then
-  begin
-    for i := 1 to taskGrid.RowCount - 1 do
-      taskGrid.RowHeights[i] := h;
-  end
-  else // if valid row just that row
-    taskGrid.RowHeights[aRow] := taskGrid.DefaultRowHeight;
+    // if -1 only selection
+    if (aRow = -1) then
+    begin
+      for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+        taskGrid.RowHeights[i] := h;
+    end
+    else
+    // if 0 for all rows
+    if (aRow = 0) then
+    begin
+      for i := 1 to taskGrid.RowCount - 1 do
+      begin
+        if taskGrid.RowHeights[i] <> h then
+          taskGrid.RowHeights[i] := h;
+      end;
+    end
+    else // if valid row just that row
+      taskGrid.RowHeights[aRow] := taskGrid.DefaultRowHeight;
 
-  if (Assigned(Memo)) and ((aRow = 0) or (aRow = taskGrid.Row)) then
-    Memo.Height := h;
+    if (Assigned(Memo)) and ((aRow = 0) or (aRow = taskGrid.Row)) then
+      Memo.Height := h;
 
-  if (aCalcRowHeight) then
-    CalcRowHeights(aRow);
+    if (aCalcRowHeight) then
+      CalcRowHeights(aRow);
+  finally
+    taskGrid.EndUpdate;
+  end;
 end;
 
 function TformNotetask.LastRowHeight(aRow: integer): integer;
