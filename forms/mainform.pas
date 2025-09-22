@@ -558,7 +558,7 @@ type
     procedure FillGrid;
     procedure NewFile(SaveSetting: boolean = True);
     function OpenFile(fileName: string; saveSettings: boolean = True): boolean;
-    function SaveFile(fileName: string = string.Empty): boolean;
+    function SaveFile(fileName: string = string.Empty; Encrypted: boolean = False): boolean;
     function SaveFileAs: boolean;
     procedure ApplyGridSettings;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean; overload;
@@ -636,17 +636,23 @@ resourcestring
   rsavechanges = 'Do you want to save the changes?';
   rclearconfirm = 'Are you sure you want to clear the data in the selected area?';
   ropendialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
-  rsavedialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
+  rsavedialogfilter =
+    'Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
   rundoconfirm = 'Are you sure you want to discard all changes? This action cannot be undone.';
   rnumstringtoolarge = 'The line number is out of the allowed range.';
   rchatgpt = 'https://chatgpt.com?q=';
   rdeletegroupconfirm = 'Are you sure you want to delete this group? This will also delete all tasks within this group.';
   rentergroupname = 'Enter the group name:';
-  rConfirmation = 'Confirmation';
+  rconfirmation = 'Confirmation';
+  rgototask = 'Go to task';
+  rtasknumber = 'Task number:';
+  rpassword = 'Password:';
+  rconfirmpassword = 'Confirm Password:';
   rgroup = 'Group';
-  rOK = 'OK';
-  rYes = '&Yes';
-  rNo = '&No';
+  rgoto = 'Go to';
+  rok = 'OK';
+  ryes = '&Yes';
+  rno = '&No';
 
 implementation
 
@@ -2454,7 +2460,7 @@ begin
   try
     Left := self.Left + 14;
     Top := self.top + 52;
-    SetCaption(rgroup, rentergroupname, rOK);
+    SetMode(aInsertGroup.Caption, rentergroupname, rOK);
 
     // Show the form as a modal dialog
     if ShowModal = mrOk then
@@ -2487,7 +2493,7 @@ begin
   try
     Left := self.Left + 14;
     Top := self.top + 52;
-    SetCaption(rgroup, rentergroupname, rOK, groupTabs.Tabs[groupTabs.TabIndex]);
+    SetMode(aRenameGroup.Caption, rentergroupname, rOK, groupTabs.Tabs[groupTabs.TabIndex]);
 
     // Show the form as a modal dialog
     if (ShowModal = mrOk) {and (editText.Text <> groupTabs.Tabs[groupTabs.TabIndex])} then
@@ -2515,7 +2521,7 @@ begin
   try
     Left := self.Left + 14;
     Top := self.top + 52;
-    SetCaption(rgroup, rentergroupname, rOK, groupTabs.Tabs[groupTabs.TabIndex]);
+    SetMode(aDuplicateGroup.Caption, rentergroupname, rOK, groupTabs.Tabs[groupTabs.TabIndex]);
 
     // Show the form as a modal dialog
     if (ShowModal = mrOk) then
@@ -2746,7 +2752,7 @@ begin
   try
     Left := self.Left + 14;
     Top := self.top + 52;
-    editText.Text := IntToStr(taskGrid.Row);
+    SetMode(rgototask, rtasknumber, rgoto, IntToStr(taskGrid.Row), True);
 
     // Show the form as a modal dialog
     if ShowModal = mrOk then
@@ -3341,7 +3347,7 @@ begin
   Result := True;
 end;
 
-function TformNotetask.SaveFile(fileName: string = string.Empty): boolean;
+function TformNotetask.SaveFile(fileName: string = string.Empty; Encrypted: boolean = False): boolean;
 var
   TaskList: TStringList;
 begin
@@ -3379,7 +3385,7 @@ function TformNotetask.SaveFileAs: boolean;
 begin
   if (saveDialog.Execute) then
   begin
-    Result := SaveFile(saveDialog.FileName);
+    Result := SaveFile(saveDialog.FileName, saveDialog.FilterIndex = 2);
   end
   else
     Result := False;

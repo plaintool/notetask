@@ -2,5 +2,7 @@
 {"hash":185813483,"name":"tforminputtext.caption","sourcebytes":[71,111,32,116,111,32,116,97,115,107],"value":"Go to task"},
 {"hash":5117871,"name":"tforminputtext.buttonok.caption","sourcebytes":[71,111,32,116,111],"value":"Go to"},
 {"hash":77089212,"name":"tforminputtext.buttoncancel.caption","sourcebytes":[67,97,110,99,101,108],"value":"Cancel"},
-{"hash":2822442,"name":"tforminputtext.labelcaption.caption","sourcebytes":[84,97,115,107,32,110,117,109,98,101,114,58],"value":"Task number:"}
+{"hash":2822442,"name":"tforminputtext.labelcaption.caption","sourcebytes":[84,97,115,107,32,110,117,109,98,101,114,58],"value":"Task number:"},
+{"hash":174684714,"name":"tforminputtext.labelcaption2.caption","sourcebytes":[67,111,110,102,105,114,109,32,112,97,115,115,119,111,114,100,58],"value":"Confirm password:"},
+{"hash":22827956,"name":"tforminputtext.checkshowpassword.caption","sourcebytes":[83,104,111,119,32,80,97,115,115,119,111,114,100],"value":"Show Password"}
 ]}

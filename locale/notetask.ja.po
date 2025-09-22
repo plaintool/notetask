@@ -50,6 +50,10 @@ msgstr "選択したエリアのデータをクリアしてもよろしいです
 msgid "Confirmation"
 msgstr "確認"
 
+#: mainform.rconfirmpassword
+msgid "Confirm Password:"
+msgstr "パスワードの確認:"
+
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
 msgstr "このタスクを削除してもよろしいですか？"
@@ -69,6 +73,16 @@ msgstr "グループ名を入力してください:"
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "要求されたファイルはディスク上に見つかりませんでした。"
+
+#: mainform.rgoto
+msgctxt "mainform.rgoto"
+msgid "Go to"
+msgstr "移動"
+
+#: mainform.rgototask
+msgctxt "mainform.rgototask"
+msgid "Go to task"
+msgstr "タスクに移動"
 
 #: mainform.rgroup
 msgctxt "mainform.rgroup"
@@ -102,6 +116,10 @@ msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "タスクファイル (*.tsk)|*.tsk|テキストファイル (*.txt)|*.txt|Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.*"
 
+#: mainform.rpassword
+msgid "Password:"
+msgstr "パスワード:"
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
@@ -113,8 +131,13 @@ msgstr "変更を保存しますか？"
 
 #: mainform.rsavedialogfilter
 msgctxt "mainform.rsavedialogfilter"
-msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "タスクファイル (*.tsk)|*.tsk|テキストファイル (*.txt)|*.txt|Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.*"
+msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
+msgstr "タスクファイル (*.tsk)|*.tsk|暗号化タスクファイル (*.tsk)|*.tsk|テキストファイル (*.txt)|*.txt|Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.*"
+
+#: mainform.rtasknumber
+msgctxt "mainform.rtasknumber"
+msgid "Task number:"
+msgstr "タスク番号："
 
 #: mainform.rundoconfirm
 msgid "Are you sure you want to discard all changes? This action cannot be undone."
@@ -301,16 +324,27 @@ msgid "Cancel"
 msgstr "キャンセル"
 
 #: tforminputtext.buttonok.caption
+msgctxt "tforminputtext.buttonok.caption"
 msgid "Go to"
 msgstr "移動"
 
 #: tforminputtext.caption
+msgctxt "tforminputtext.caption"
 msgid "Go to task"
 msgstr "タスクに移動"
 
+#: tforminputtext.checkshowpassword.caption
+msgid "Show Password"
+msgstr "パスワードを表示"
+
 #: tforminputtext.labelcaption.caption
+msgctxt "tforminputtext.labelcaption.caption"
 msgid "Task number:"
 msgstr "タスク番号："
+
+#: tforminputtext.labelcaption2.caption
+msgid "Confirm password:"
+msgstr "パスワードの確認:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."

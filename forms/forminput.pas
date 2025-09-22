@@ -25,17 +25,17 @@ type
   TformInputText = class(TForm)
     buttonOk: TButton;
     buttonCancel: TButton;
+    checkShowPassword: TCheckBox;
     editText: TEdit;
+    editText2: TEdit;
     LabelCaption: TLabel;
-    procedure editTextKeyPress(Sender: TObject; var Key: char);
+    LabelCaption2: TLabel;
+    procedure checkShowPasswordChange(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-  private
-    FNumbersOnly: boolean;
-
   public
-    procedure SetCaption(aCaption, aPrompt, aButtonOk: string; aDefault: string = ''; aNumbersOnly: boolean = False);
+    procedure SetMode(aCaption, aPrompt, aButtonOk: string; aDefault: string = ''; aNumbersOnly: boolean = False;
+      aPassword: boolean = False; aConfirmPassword: boolean = False);
   end;
 
 var
@@ -47,22 +47,10 @@ implementation
 
 { TformInputText }
 
-procedure TformInputText.FormCreate(Sender: TObject);
-begin
-  FNumbersOnly := True;
-end;
-
 procedure TformInputText.FormShow(Sender: TObject);
 begin
   editText.SetFocus;
   editText.SelectAll;
-end;
-
-procedure TformInputText.editTextKeyPress(Sender: TObject; var Key: char);
-begin
-  // Allow only numeric characters and control characters (like Backspace)
-  if (FNumbersOnly) and (not (Key in ['0'..'9', #8])) then
-    Key := #0; // Block other characters
 end;
 
 procedure TformInputText.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -81,13 +69,54 @@ begin
   end;
 end;
 
-procedure TformInputText.SetCaption(aCaption, aPrompt, aButtonOk: string; aDefault: string = ''; aNumbersOnly: boolean = False);
+procedure TformInputText.checkShowPasswordChange(Sender: TObject);
+begin
+  if (checkShowPassword.Checked) then
+  begin
+    editText.PasswordChar := #0;
+    editText2.PasswordChar := #0;
+  end
+  else
+  begin
+    editText.PasswordChar := '*';
+    editText2.PasswordChar := '*';
+  end;
+end;
+
+procedure TformInputText.SetMode(aCaption, aPrompt, aButtonOk: string; aDefault: string = '';
+  aNumbersOnly: boolean = False; aPassword: boolean = False;aConfirmPassword: boolean = False);
 begin
   Caption := aCaption;
   LabelCaption.Caption := aPrompt;
   buttonOk.Caption := aButtonOk;
-  FNumbersOnly := aNumbersOnly;
+  editText.NumbersOnly := aNumbersOnly;
   editText.Text := aDefault;
+  if aPassword and not aConfirmPassword then
+  begin
+    editText.PasswordChar := '*';
+    labelCaption2.Visible := False;
+    editText2.Visible := False;
+    checkShowPassword.Visible := False;
+    Height := 103;
+  end
+  else
+  if aConfirmPassword then
+  begin
+    editText.PasswordChar := '*';
+    editText2.PasswordChar := '*';
+    labelCaption2.Visible := True;
+    editText2.Visible := True;
+    checkShowPassword.Visible := True;
+    Height := 180;
+  end
+  else
+  begin
+    editText.PasswordChar := #0;
+    labelCaption2.Visible := False;
+    editText2.Visible := False;
+    checkShowPassword.Visible := False;
+    Height := 103;
+  end;
 end;
 
 end.

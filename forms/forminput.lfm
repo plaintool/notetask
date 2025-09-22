@@ -1,40 +1,38 @@
 object formInputText: TformInputText
   Left = 318
-  Height = 103
+  Height = 180
   Top = 250
   Width = 250
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Go to task'
-  ClientHeight = 103
+  ClientHeight = 180
   ClientWidth = 250
   KeyPreview = True
   ShowInTaskBar = stNever
-  LCLVersion = '4.0.0.4'
-  OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   object buttonOk: TButton
     Left = 85
     Height = 25
-    Top = 72
+    Top = 149
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = 'Go to'
     Default = True
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 3
   end
   object buttonCancel: TButton
     Left = 165
     Height = 25
-    Top = 72
+    Top = 149
     Width = 75
     Anchors = [akLeft, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 4
   end
   object editText: TEdit
     Left = 13
@@ -42,7 +40,6 @@ object formInputText: TformInputText
     Top = 32
     Width = 227
     TabOrder = 0
-    OnKeyPress = editTextKeyPress
   end
   object LabelCaption: TLabel
     Left = 13
@@ -50,5 +47,28 @@ object formInputText: TformInputText
     Top = 12
     Width = 70
     Caption = 'Task number:'
+  end
+  object LabelCaption2: TLabel
+    Left = 13
+    Height = 15
+    Top = 64
+    Width = 100
+    Caption = 'Confirm password:'
+  end
+  object editText2: TEdit
+    Left = 13
+    Height = 23
+    Top = 84
+    Width = 227
+    TabOrder = 1
+  end
+  object checkShowPassword: TCheckBox
+    Left = 13
+    Height = 19
+    Top = 118
+    Width = 100
+    Caption = 'Show Password'
+    TabOrder = 2
+    OnChange = checkShowPasswordChange
   end
 end

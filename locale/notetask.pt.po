@@ -50,6 +50,10 @@ msgstr "Tem certeza de que deseja limpar os dados na área selecionada?"
 msgid "Confirmation"
 msgstr "Confirmação"
 
+#: mainform.rconfirmpassword
+msgid "Confirm Password:"
+msgstr "Confirmar senha:"
+
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
 msgstr "Tem certeza de que deseja excluir esta tarefa?"
@@ -69,6 +73,16 @@ msgstr "Digite o nome do grupo:"
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "O arquivo solicitado não foi encontrado no disco."
+
+#: mainform.rgoto
+msgctxt "mainform.rgoto"
+msgid "Go to"
+msgstr "Ir para"
+
+#: mainform.rgototask
+msgctxt "mainform.rgototask"
+msgid "Go to task"
+msgstr "Ir para a tarefa"
 
 #: mainform.rgroup
 msgctxt "mainform.rgroup"
@@ -102,6 +116,10 @@ msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "Arquivos de tarefa (*.tsk)|*.tsk|Arquivos de texto (*.txt)|*.txt|Arquivos Markdown (*.md)|*.md|Todos os arquivos (*.*)|*.*"
 
+#: mainform.rpassword
+msgid "Password:"
+msgstr "Senha:"
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
@@ -113,8 +131,13 @@ msgstr "Deseja salvar as alterações?"
 
 #: mainform.rsavedialogfilter
 msgctxt "mainform.rsavedialogfilter"
-msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "Arquivos de tarefa (*.tsk)|*.tsk|Arquivos de texto (*.txt)|*.txt|Arquivos Markdown (*.md)|*.md|Todos os arquivos (*.*)|*.*"
+msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
+msgstr "Arquivos de tarefa (*.tsk)|*.tsk|Arquivos de tarefa criptografados (*.tsk)|*.tsk|Arquivos de texto (*.txt)|*.txt|Arquivos Markdown (*.md)|*.md|Todos os arquivos (*.*)|*.*"
+
+#: mainform.rtasknumber
+msgctxt "mainform.rtasknumber"
+msgid "Task number:"
+msgstr "Número da tarefa:"
 
 #: mainform.rundoconfirm
 msgid "Are you sure you want to discard all changes? This action cannot be undone."
@@ -301,16 +324,27 @@ msgid "Cancel"
 msgstr "Cancelar"
 
 #: tforminputtext.buttonok.caption
+msgctxt "tforminputtext.buttonok.caption"
 msgid "Go to"
 msgstr "Ir para"
 
 #: tforminputtext.caption
+msgctxt "tforminputtext.caption"
 msgid "Go to task"
 msgstr "Ir para a tarefa"
 
+#: tforminputtext.checkshowpassword.caption
+msgid "Show Password"
+msgstr "Mostrar senha"
+
 #: tforminputtext.labelcaption.caption
+msgctxt "tforminputtext.labelcaption.caption"
 msgid "Task number:"
 msgstr "Número da tarefa:"
+
+#: tforminputtext.labelcaption2.caption
+msgid "Confirm password:"
+msgstr "Confirmar senha:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."

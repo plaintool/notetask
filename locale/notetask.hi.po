@@ -50,6 +50,10 @@ msgstr "क्या आप सुनिश्चित हैं कि आप 
 msgid "Confirmation"
 msgstr "पुष्टि"
 
+#: mainform.rconfirmpassword
+msgid "Confirm Password:"
+msgstr "पासवर्ड की पुष्टि करें:"
+
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
 msgstr "क्या आप सुनिश्चित हैं कि आप इस कार्य को हटाना चाहते हैं?"
@@ -69,6 +73,16 @@ msgstr "समूह का नाम दर्ज करें:"
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "अनुरोधित फ़ाइल डिस्क पर नहीं मिली।"
+
+#: mainform.rgoto
+msgctxt "mainform.rgoto"
+msgid "Go to"
+msgstr "जाएं"
+
+#: mainform.rgototask
+msgctxt "mainform.rgototask"
+msgid "Go to task"
+msgstr "कार्य पर जाएं"
 
 #: mainform.rgroup
 msgctxt "mainform.rgroup"
@@ -100,7 +114,11 @@ msgstr "ठीक है"
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
+msgstr "कार्य फ़ाइलें (*.tsk)|*.tsk|टेक्स्ट फ़ाइलें (*.txt)|*.txt|Markdown फ़ाइलें (*.md)|*.md|सभी फ़ाइलें (*.*)|*.*"
+
+#: mainform.rpassword
+msgid "Password:"
+msgstr "पासवर्ड:"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"
@@ -113,8 +131,13 @@ msgstr "क्या आप परिवर्तन सहेजना चा�
 
 #: mainform.rsavedialogfilter
 msgctxt "mainform.rsavedialogfilter"
-msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
+msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
+msgstr "कार्य फ़ाइलें (*.tsk)|*.tsk|एन्क्रिप्टेड कार्य फ़ाइलें (*.tsk)|*.tsk|टेक्स्ट फ़ाइलें (*.txt)|*.txt|Markdown फ़ाइलें (*.md)|*.md|सभी फ़ाइलें (*.*)|*.*"
+
+#: mainform.rtasknumber
+msgctxt "mainform.rtasknumber"
+msgid "Task number:"
+msgstr "कार्य संख्या:"
 
 #: mainform.rundoconfirm
 msgid "Are you sure you want to discard all changes? This action cannot be undone."
@@ -301,16 +324,27 @@ msgid "Cancel"
 msgstr "रद्द करें"
 
 #: tforminputtext.buttonok.caption
+msgctxt "tforminputtext.buttonok.caption"
 msgid "Go to"
 msgstr "जाएं"
 
 #: tforminputtext.caption
+msgctxt "tforminputtext.caption"
 msgid "Go to task"
 msgstr "कार्य पर जाएं"
 
+#: tforminputtext.checkshowpassword.caption
+msgid "Show Password"
+msgstr "पासवर्ड दिखाएँ"
+
 #: tforminputtext.labelcaption.caption
+msgctxt "tforminputtext.labelcaption.caption"
 msgid "Task number:"
 msgstr "कार्य संख्या:"
+
+#: tforminputtext.labelcaption2.caption
+msgid "Confirm password:"
+msgstr "पासवर्ड की पुष्टि करें:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."

@@ -50,6 +50,10 @@ msgstr "您确定要清除所选区域中的数据吗？"
 msgid "Confirmation"
 msgstr "确认"
 
+#: mainform.rconfirmpassword
+msgid "Confirm Password:"
+msgstr "确认密码:"
+
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
 msgstr "您确定要删除此任务吗？"
@@ -69,6 +73,16 @@ msgstr "输入组名称："
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "在磁盘上找不到请求的文件。"
+
+#: mainform.rgoto
+msgctxt "mainform.rgoto"
+msgid "Go to"
+msgstr "转到"
+
+#: mainform.rgototask
+msgctxt "mainform.rgototask"
+msgid "Go to task"
+msgstr "转到任务"
 
 #: mainform.rgroup
 msgctxt "mainform.rgroup"
@@ -102,6 +116,10 @@ msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "任务文件 (*.tsk)|*.tsk|文本文件 (*.txt)|*.txt|Markdown 文件 (*.md)|*.md|所有文件 (*.*)|*.*"
 
+#: mainform.rpassword
+msgid "Password:"
+msgstr "密码:"
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
@@ -113,8 +131,13 @@ msgstr "您想保存更改吗？"
 
 #: mainform.rsavedialogfilter
 msgctxt "mainform.rsavedialogfilter"
-msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "任务文件 (*.tsk)|*.tsk|文本文件 (*.txt)|*.txt|Markdown 文件 (*.md)|*.md|所有文件 (*.*)|*.*"
+msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
+msgstr "任务文件 (*.tsk)|*.tsk|加密任务文件 (*.tsk)|*.tsk|文本文件 (*.txt)|*.txt|Markdown 文件 (*.md)|*.md|所有文件 (*.*)|*.*"
+
+#: mainform.rtasknumber
+msgctxt "mainform.rtasknumber"
+msgid "Task number:"
+msgstr "任务编号："
 
 #: mainform.rundoconfirm
 msgid "Are you sure you want to discard all changes? This action cannot be undone."
@@ -301,16 +324,27 @@ msgid "Cancel"
 msgstr "取消"
 
 #: tforminputtext.buttonok.caption
+msgctxt "tforminputtext.buttonok.caption"
 msgid "Go to"
 msgstr "转到"
 
 #: tforminputtext.caption
+msgctxt "tforminputtext.caption"
 msgid "Go to task"
 msgstr "转到任务"
 
+#: tforminputtext.checkshowpassword.caption
+msgid "Show Password"
+msgstr "显示密码"
+
 #: tforminputtext.labelcaption.caption
+msgctxt "tforminputtext.labelcaption.caption"
 msgid "Task number:"
 msgstr "任务编号："
+
+#: tforminputtext.labelcaption2.caption
+msgid "Confirm password:"
+msgstr "确认密码:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."

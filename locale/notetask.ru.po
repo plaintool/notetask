@@ -50,6 +50,10 @@ msgstr "Вы уверены, что хотите очистить данные �
 msgid "Confirmation"
 msgstr "Подтверждение"
 
+#: mainform.rconfirmpassword
+msgid "Confirm Password:"
+msgstr "Подтвердите пароль:"
+
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
 msgstr "Вы уверены, что хотите удалить эту задачу?"
@@ -69,6 +73,16 @@ msgstr "Введите название группы:"
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "Запрошенный файл не найден на диске."
+
+#: mainform.rgoto
+msgctxt "mainform.rgoto"
+msgid "Go to"
+msgstr "Переход"
+
+#: mainform.rgototask
+msgctxt "mainform.rgototask"
+msgid "Go to task"
+msgstr "Переход к задаче"
 
 #: mainform.rgroup
 msgctxt "mainform.rgroup"
@@ -102,6 +116,10 @@ msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "Файлы задач (*.tsk)|*.tsk|Текстовые файлы (*.txt)|*.txt|Файлы разметки Markdown (*.md)|*.md|Все файлы (*.*)|*.*"
 
+#: mainform.rpassword
+msgid "Password:"
+msgstr "Пароль:"
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
@@ -113,8 +131,13 @@ msgstr "Сохранить изменения?"
 
 #: mainform.rsavedialogfilter
 msgctxt "mainform.rsavedialogfilter"
-msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "Файлы задач (*.tsk)|*.tsk|Текстовые файлы (*.txt)|*.txt|Файлы разметки Markdown (*.md)|*.md|Все файлы (*.*)|*.*"
+msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
+msgstr "Файлы задач (*.tsk)|*.tsk|Зашифрованные файлы задач (*.tsk)|*.tsk|Текстовые файлы (*.txt)|*.txt|Markdown файлы (*.md)|*.md|Все файлы (*.*)|*.*"
+
+#: mainform.rtasknumber
+msgctxt "mainform.rtasknumber"
+msgid "Task number:"
+msgstr "Номер задачи:"
 
 #: mainform.rundoconfirm
 msgid "Are you sure you want to discard all changes? This action cannot be undone."
@@ -301,16 +324,27 @@ msgid "Cancel"
 msgstr "Отмена"
 
 #: tforminputtext.buttonok.caption
+msgctxt "tforminputtext.buttonok.caption"
 msgid "Go to"
 msgstr "Переход"
 
 #: tforminputtext.caption
+msgctxt "tforminputtext.caption"
 msgid "Go to task"
 msgstr "Переход к задаче"
 
+#: tforminputtext.checkshowpassword.caption
+msgid "Show Password"
+msgstr "Показать пароль"
+
 #: tforminputtext.labelcaption.caption
+msgctxt "tforminputtext.labelcaption.caption"
 msgid "Task number:"
 msgstr "Номер задачи:"
+
+#: tforminputtext.labelcaption2.caption
+msgid "Confirm password:"
+msgstr "Подтвердите пароль:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."
