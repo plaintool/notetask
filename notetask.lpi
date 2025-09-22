@@ -244,6 +244,44 @@
         <Filename Value="units\formattool.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="units\crypto.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="units\DCPrijndael.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="units\dcprijndael.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DCPrijndael"/>
+      </Unit>
+      <Unit>
+        <Filename Value="units\dcpsha256.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DCPsha256"/>
+      </Unit>
+      <Unit>
+        <Filename Value="units\dcpblockciphers.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DCPblockciphers"/>
+      </Unit>
+      <Unit>
+        <Filename Value="units\dcpconst.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DCPconst"/>
+      </Unit>
+      <Unit>
+        <Filename Value="units\dcpcrypt2.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DCPcrypt2"/>
+      </Unit>
+      <Unit>
+        <Filename Value="units\dcpbase64.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DCPbase64"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
