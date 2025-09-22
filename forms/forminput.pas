@@ -16,6 +16,7 @@ uses
   StdCtrls,
   Classes,
   Controls,
+  Dialogs,
   LCLType;
 
 type
@@ -31,6 +32,7 @@ type
     LabelCaption: TLabel;
     LabelCaption2: TLabel;
     procedure checkShowPasswordChange(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
   public
@@ -40,6 +42,9 @@ type
 
 var
   formInputText: TformInputText;
+
+resourcestring
+  rpasswordsnotequal = 'Passwords are not equal!';
 
 implementation
 
@@ -69,6 +74,19 @@ begin
   end;
 end;
 
+procedure TformInputText.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+begin
+  // Check if modal result is OK (user pressed OK button)
+  if ModalResult = mrOk then
+  begin
+    if editText.Text <> editText2.Text then
+    begin
+      CanClose := False; // prevent form closing
+      ShowMessage(rpasswordsnotequal);
+    end;
+  end;
+end;
+
 procedure TformInputText.checkShowPasswordChange(Sender: TObject);
 begin
   if (checkShowPassword.Checked) then
@@ -84,7 +102,7 @@ begin
 end;
 
 procedure TformInputText.SetMode(aCaption, aPrompt, aButtonOk: string; aDefault: string = '';
-  aNumbersOnly: boolean = False; aPassword: boolean = False;aConfirmPassword: boolean = False);
+  aNumbersOnly: boolean = False; aPassword: boolean = False; aConfirmPassword: boolean = False);
 begin
   Caption := aCaption;
   LabelCaption.Caption := aPrompt;

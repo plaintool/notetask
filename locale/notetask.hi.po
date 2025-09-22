@@ -19,6 +19,10 @@ msgstr "नीचे"
 msgid "Up"
 msgstr "ऊपर"
 
+#: forminput.rpasswordsnotequal
+msgid "Passwords are not equal!"
+msgstr "पासवर्ड समान नहीं हैं!"
+
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"

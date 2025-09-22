@@ -10,6 +10,8 @@ object formInputText: TformInputText
   ClientWidth = 250
   KeyPreview = True
   ShowInTaskBar = stNever
+  LCLVersion = '4.0.0.4'
+  OnCloseQuery = FormCloseQuery
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   object buttonOk: TButton

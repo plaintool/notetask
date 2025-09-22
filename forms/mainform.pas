@@ -3350,6 +3350,7 @@ end;
 function TformNotetask.SaveFile(fileName: string = string.Empty; Encrypted: boolean = False): boolean;
 var
   TaskList: TStringList;
+  Password: string;
 begin
   if (fileName = string.Empty) and (FFileName = string.Empty) then
     Result := SaveFileAs;
@@ -3361,12 +3362,32 @@ begin
 
   if (fileName <> string.Empty) then
   begin
+    Password := string.Empty;
+    if (Encrypted) then
+    begin
+      // Create an instance of the form
+      with formInputText do
+      try
+        Left := self.Left + 14;
+        Top := self.top + 52;
+        SetMode(rpassword, rpassword, rok, string.Empty, False, True, True);
+
+        // Show the form as a modal dialog
+        if ShowModal = mrOk then
+          Password := editText.Text
+        else
+          exit(False);
+      finally
+        Hide;
+      end;
+    end;
+
     TaskList := Tasks.ToStringList;
     if Assigned(TaskList) and (TaskList <> nil) then
     begin
       try
         EditComplite;
-        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding);
+        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, Encrypted, Password);
         SetChanged(False);
         Tasks.CreateBackupInit;
         Result := True;

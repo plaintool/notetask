@@ -44,7 +44,8 @@ function EndsWithLineBreak(const FileName: string): boolean;
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
   out LineEnding: TLineEnding; out LineCount: integer);
 
-procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
+procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding;
+  Encrypt: boolean = False; Password: string = '');
 
 function FindPowerShellCore: string;
 
@@ -55,6 +56,8 @@ var
   UTF16LEBOMEncoding, UTF16BEBOMEncoding: TEncoding;
 
 implementation
+
+uses crypto;
 
 function GetEncodingName(Encoding: TEncoding): string;
 begin
@@ -442,9 +445,11 @@ begin
   end;
 end;
 
-procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
+procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding;
+  Encrypt: boolean = False; Password: string = '');
 var
   LineEndingStr: string;
+  FullText: string;
   FileStream: TFileStream;
   i: integer;
   LineWithEnding: string;
@@ -476,19 +481,34 @@ begin
     if StringList.Count = 0 then
       Exit;
 
-    for i := 0 to StringList.Count - 1 do
+    if Encrypt then
     begin
-      // For each line except the last, add LineEndingStr
-      if i < StringList.Count - 1 then
-        LineWithEnding := StringList[i] + LineEndingStr
-      else
-        LineWithEnding := StringList[i];
+      // Combine all lines into a single string
+      FullText := StringList.Text;
 
-      // Convert the string to bytes with the specified encoding
-      Bytes := FileEncoding.GetBytes(unicodestring(LineWithEnding));
+      // Replace default line endings with the selected LineEndingStr
+      if LineEndingStr <> LineEnding.Value then
+        FullText := StringReplace(FullText, LineEnding.Value, LineEndingStr, [rfReplaceAll]);
+
+      // Convert encrypted string to bytes with the specified encoding
+      Bytes := FileEncoding.GetBytes(unicodestring(EncryptData(FullText, Password)));
       if Assigned(Bytes) then
-        FileStream.WriteBuffer(Bytes[0], Length(Bytes)); // Write bytes to the file
-    end;
+        FileStream.WriteBuffer(Bytes[0], Length(Bytes));
+    end
+    else
+      for i := 0 to StringList.Count - 1 do
+      begin
+        // For each line except the last, add LineEndingStr
+        if i < StringList.Count - 1 then
+          LineWithEnding := StringList[i] + LineEndingStr
+        else
+          LineWithEnding := StringList[i];
+
+        // Convert the string to bytes with the specified encoding
+        Bytes := FileEncoding.GetBytes(unicodestring(LineWithEnding));
+        if Assigned(Bytes) then
+          FileStream.WriteBuffer(Bytes[0], Length(Bytes)); // Write bytes to the file
+      end;
   finally
     // Free resources
     FileStream.Free;
