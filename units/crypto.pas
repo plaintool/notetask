@@ -7,22 +7,106 @@ interface
 uses
   Classes,
   SysUtils,
+  ZLib,
   Base64,
   DCPrijndael,
   DCPsha256;
 
-function EncryptData(const PlainText, Password: string): string;
+/// Compresses a memory stream and prepends its original size for later decompression.
+function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
 
-function DecryptData(const CipherBase64, Password: string): string;
+/// Decompresses a memory stream using the stored original size to allocate output buffer.
+function DecompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
+
+/// EncryptData returns Base64 string containing: IV(16) || HMAC(32) || CipherText
+function EncryptData(const PlainText, Hash: string): string;
+
+/// DecryptData returns decrypted UTF-8 string, returns empty string on errors
+function DecryptData(const CipherBase64, Hash: string): string;
 
 implementation
 
-/// EncryptData returns Base64 string containing: IV(16) || HMAC(32) || CipherText
-function EncryptData(const PlainText, Password: string): string;
+function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
+var
+  Source, Dest: PBytef;
+  SourceLen, DestLen: uLong;
+  MemPtr: PBytef;
+begin
+  if InputStream.Size = 0 then
+  begin
+    Result := TMemoryStream.Create;
+    Exit;
+  end;
+
+  InputStream.Position := 0;
+  SourceLen := InputStream.Size;
+  Source := InputStream.Memory;
+
+  Result := TMemoryStream.Create;
+  try
+    DestLen := compressBound(SourceLen);
+    Result.SetSize(4 + DestLen);
+
+    MemPtr := PBytef(Result.Memory);
+    Dest := MemPtr;
+    Inc(pbyte(Dest), 4); // move pointer 4 bytes forward for compressed data
+
+    if compress(Dest, @DestLen, Source, SourceLen) <> Z_OK then
+      raise Exception.Create('Compression failed');
+
+    // store OriginalSize in first 4 bytes
+    PCardinal(MemPtr)^ := SourceLen;
+
+    Result.SetSize(4 + DestLen);
+    Result.Position := 0;
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+function DecompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
+var
+  Source, Dest: PBytef;
+  OriginalSize, DestLen: uLong;
+  MemPtr: PBytef;
+begin
+  if InputStream.Size = 0 then
+  begin
+    Result := TMemoryStream.Create;
+    Exit;
+  end;
+
+  InputStream.Position := 0;
+  MemPtr := PBytef(InputStream.Memory);
+
+  // read original uncompressed size
+  OriginalSize := PCardinal(MemPtr)^;
+
+  Source := MemPtr;
+  Inc(pbyte(Source), 4); // compressed data starts after 4 bytes
+
+  Result := TMemoryStream.Create;
+  try
+    DestLen := OriginalSize;
+    Result.SetSize(DestLen);
+    Dest := Result.Memory;
+
+    if uncompress(Dest, @DestLen, Source, InputStream.Size - 4) <> Z_OK then
+      raise Exception.Create('Decompression failed');
+
+    Result.Position := 0;
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+function EncryptData(const PlainText, Hash: string): string;
 var
   Cipher: TDCP_rijndael;
-  Hash: TDCP_sha256;
-  InputStream, OutputStream: TMemoryStream;
+  Sha256: TDCP_sha256;
+  InputStream, CompressedStream, OutputStream: TMemoryStream;
   // initialize small arrays at declaration to avoid FPC uninitialized hints
   Key: array[0..15] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   TempHash: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -40,38 +124,44 @@ begin
   InputStream := TMemoryStream.Create;
   OutputStream := TMemoryStream.Create;
   Cipher := TDCP_rijndael.Create(nil);
-  Hash := TDCP_sha256.Create(nil);
+  Sha256 := TDCP_sha256.Create(nil);
   try
     if Length(UTF8Input) > 0 then
       InputStream.WriteBuffer(UTF8Input[1], Length(UTF8Input));
-    InputStream.Position := 0;
 
     // generate random IV
     Randomize;
     for i := 0 to High(IV) do
       IV[i] := Random(256);
 
-    // derive key: SHA256(password) -> take first 16 bytes (AES-128)
-    Hash.Init;
-    Hash.UpdateStr(Password);
-    Hash.Final(TempHash[0]);
+    // derive key: SHA256(Hash) -> take first 16 bytes (AES-128)
+    Sha256.Init;
+    Sha256.UpdateStr(Hash);
+    Sha256.Final(TempHash[0]);
     Move(TempHash[0], Key[0], SizeOf(Key));
 
-    // encrypt (AES-128)
-    Cipher.Init(Key[0], 128, @IV[0]);
+    CompressedStream := CompressMemoryStream(InputStream);
     try
-      Cipher.EncryptStream(InputStream, OutputStream, InputStream.Size);
+      CompressedStream.Position := 0;
+
+      // encrypt (AES-128)
+      Cipher.Init(Key[0], 128, @IV[0]);
+      try
+        Cipher.EncryptStream(CompressedStream, OutputStream, CompressedStream.Size);
+      finally
+        Cipher.Burn;
+      end;
     finally
-      Cipher.Burn;
+      CompressedStream.Free;
     end;
 
     // compute HMAC-like = SHA256(key || ciphertext)
-    Hash.Init;
-    Hash.Update(Key[0], SizeOf(Key));
+    Sha256.Init;
+    Sha256.Update(Key[0], SizeOf(Key));
     if OutputStream.Size > 0 then
       // faster: take direct pointer to memory
-      Hash.Update(OutputStream.Memory^, OutputStream.Size);
-    Hash.Final(HMAC[0]);
+      Sha256.Update(OutputStream.Memory^, OutputStream.Size);
+    Sha256.Final(HMAC[0]);
 
     // build container: IV + HMAC + CipherText
     SetLength(Buffer, Length(IV) + Length(HMAC) + OutputStream.Size);
@@ -94,17 +184,16 @@ begin
     InputStream.Free;
     OutputStream.Free;
     Cipher.Free;
-    Hash.Free;
+    Sha256.Free;
   end;
 end;
 
-/// DecryptData returns decrypted UTF-8 string and sets Success = True on success
-function DecryptData(const CipherBase64, Password: string): string;
+function DecryptData(const CipherBase64, Hash: string): string;
 var
   Decoded: rawbytestring;
-  InputStream, EncryptedStream, OutputStream: TMemoryStream;
+  InputStream, EncryptedStream, OutputStream, DecompressedStream: TMemoryStream;
   Cipher: TDCP_rijndael;
-  Hash: TDCP_sha256;
+  sha256: TDCP_sha256;
   Key: array[0..15] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   TempHash: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   IV: array[0..15] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -126,7 +215,7 @@ begin
   EncryptedStream := TMemoryStream.Create;
   OutputStream := TMemoryStream.Create;
   Cipher := TDCP_rijndael.Create(nil);
-  Hash := TDCP_sha256.Create(nil);
+  sha256 := TDCP_sha256.Create(nil);
   try
     // put decoded bytes into stream for easy reading
     InputStream.WriteBuffer(Decoded[1], Length(Decoded));
@@ -145,17 +234,17 @@ begin
     EncryptedStream.Position := 0;
 
     // derive key
-    Hash.Init;
-    Hash.UpdateStr(Password);
-    Hash.Final(TempHash[0]);
+    sha256.Init;
+    sha256.UpdateStr(Hash);
+    sha256.Final(TempHash[0]);
     Move(TempHash[0], Key[0], SizeOf(Key));
 
     // compute expected HMAC = SHA256(key || ciphertext)
-    Hash.Init;
-    Hash.Update(Key[0], SizeOf(Key));
+    sha256.Init;
+    sha256.Update(Key[0], SizeOf(Key));
     if EncryptedStream.Size > 0 then
-      Hash.Update(EncryptedStream.Memory^, EncryptedStream.Size);
-    Hash.Final(ExpectedHMAC[0]);
+      sha256.Update(EncryptedStream.Memory^, EncryptedStream.Size);
+    sha256.Final(ExpectedHMAC[0]);
 
     // constant-time compare HMACs
     for i := 0 to High(HMAC) do
@@ -174,9 +263,15 @@ begin
     // convert decrypted UTF-8 bytes to string
     if OutputStream.Size > 0 then
     begin
-      SetLength(OutBytes, OutputStream.Size);
-      OutputStream.Position := 0;
-      OutputStream.ReadBuffer(OutBytes[1], OutputStream.Size);
+      DecompressedStream := DecompressMemoryStream(OutputStream);
+      try
+        SetLength(OutBytes, DecompressedStream.Size);
+        DecompressedStream.Position := 0;
+        DecompressedStream.ReadBuffer(OutBytes[1], DecompressedStream.Size);
+      finally
+        DecompressedStream.Free;
+      end;
+
       Result := string(UTF8ToString(OutBytes));
     end
     else
@@ -191,7 +286,7 @@ begin
     EncryptedStream.Free;
     OutputStream.Free;
     Cipher.Free;
-    Hash.Free;
+    sha256.Free;
   end;
 end;
 
