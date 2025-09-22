@@ -79,7 +79,7 @@ begin
   // Check if modal result is OK (user pressed OK button)
   if ModalResult = mrOk then
   begin
-    if editText.Text <> editText2.Text then
+    if (editText2.Visible) and (editText.Text <> editText2.Text) then
     begin
       CanClose := False; // prevent form closing
       ShowMessage(rpasswordsnotequal);
@@ -109,6 +109,7 @@ begin
   buttonOk.Caption := aButtonOk;
   editText.NumbersOnly := aNumbersOnly;
   editText.Text := aDefault;
+  editText2.Text := aDefault;
   if aPassword and not aConfirmPassword then
   begin
     editText.PasswordChar := '*';
@@ -125,7 +126,7 @@ begin
     labelCaption2.Visible := True;
     editText2.Visible := True;
     checkShowPassword.Visible := True;
-    Height := 180;
+    Height := 190;
   end
   else
   begin

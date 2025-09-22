@@ -419,6 +419,8 @@ type
     FDisableCheckToggle: boolean;
     FDisableStarToggle: boolean;
     FFileName: string;
+    FEncrypted: boolean;
+    FHash: TBytes;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
     FLineCount: integer;
@@ -558,7 +560,7 @@ type
     procedure FillGrid;
     procedure NewFile(SaveSetting: boolean = True);
     function OpenFile(fileName: string; saveSettings: boolean = True): boolean;
-    function SaveFile(fileName: string = string.Empty; Encrypted: boolean = False): boolean;
+    function SaveFile(fileName: string = string.Empty; encrypt: boolean = False): boolean;
     function SaveFileAs: boolean;
     procedure ApplyGridSettings;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean; overload;
@@ -648,6 +650,7 @@ resourcestring
   rtasknumber = 'Task number:';
   rpassword = 'Password:';
   rconfirmpassword = 'Confirm Password:';
+  rincorrectpassword = 'Incorrect password!';
   rgroup = 'Group';
   rgoto = 'Go to';
   rok = 'OK';
@@ -656,7 +659,7 @@ resourcestring
 
 implementation
 
-uses filemanager, settings, systemtool, forminput, formfind, formreplace, formabout, formdonate;
+uses filemanager, settings, systemtool, crypto, forminput, formfind, formreplace, formabout, formdonate;
 
   {$R *.lfm}
 
@@ -687,6 +690,8 @@ begin
   FMemoSelStartClicked := -1;
   FSortOrder := soAscending;
   FKeyPressed := string.Empty;
+  FEncrypted := False;
+  FHash := nil;
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
@@ -3320,6 +3325,7 @@ end;
 function TformNotetask.OpenFile(fileName: string; saveSettings: boolean = True): boolean;
 var
   Content: string;
+  FileNameOld: string;
 begin
   Result := False;
   if not FileExists(fileName) then
@@ -3331,9 +3337,53 @@ begin
   if (saveSettings) then
     SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
+  FileNameOld := FFileName;
   FFileName := fileName;
   EditComplite;
-  ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
+
+  if (CouldBeEncryptedFile(FFileName)) then
+  begin
+    FHash := GetHash(string.Empty);
+    Content := DecryptData(LoadFileAsString(FFileName), FHash);
+    if Content = string.Empty then
+    begin
+      // Create an instance of the form
+      with formInputText do
+      try
+        Left := self.Left + 14;
+        Top := self.top + 52;
+        SetMode(ReplaceStr(rpassword, ':', ''), rpassword, rok, string.Empty, False, True);
+
+        // Show the form as a modal dialog
+        if ShowModal = mrOk then
+        begin
+          FEncrypted := True;
+          FHash := GetHash(editText.Text);
+        end
+        else
+        begin
+          FFileName := FileNameOld;
+          exit(False);
+        end;
+
+        Content := DecryptData(LoadFileAsString(FFileName), FHash);
+        if (Content <> string.Empty) then
+          ReadStringFile(Content, FEncoding, FLineEnding, FLineCount)
+        else
+        begin
+          FFileName := FileNameOld;
+          ShowMessage(rincorrectpassword);
+          exit(False);
+        end;
+      finally
+        Hide;
+      end;
+    end
+    else
+      ReadStringFile(Content, FEncoding, FLineEnding, FLineCount);
+  end
+  else
+    ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
 
   if Assigned(Tasks) then
     Tasks.Free;
@@ -3347,10 +3397,9 @@ begin
   Result := True;
 end;
 
-function TformNotetask.SaveFile(fileName: string = string.Empty; Encrypted: boolean = False): boolean;
+function TformNotetask.SaveFile(fileName: string = string.Empty; encrypt: boolean = False): boolean;
 var
   TaskList: TStringList;
-  Password: string;
 begin
   if (fileName = string.Empty) and (FFileName = string.Empty) then
     Result := SaveFileAs;
@@ -3362,19 +3411,21 @@ begin
 
   if (fileName <> string.Empty) then
   begin
-    Password := string.Empty;
-    if (Encrypted) then
+    if (encrypt) then
     begin
       // Create an instance of the form
       with formInputText do
       try
         Left := self.Left + 14;
         Top := self.top + 52;
-        SetMode(rpassword, rpassword, rok, string.Empty, False, True, True);
+        SetMode(ReplaceStr(rpassword, ':', ''), rpassword, rok, string.Empty, False, True, True);
 
         // Show the form as a modal dialog
         if ShowModal = mrOk then
-          Password := editText.Text
+        begin
+          FEncrypted := True;
+          FHash := GetHash(editText.Text);
+        end
         else
           exit(False);
       finally
@@ -3387,7 +3438,7 @@ begin
     begin
       try
         EditComplite;
-        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, Encrypted, Password);
+        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, FHash);
         SetChanged(False);
         Tasks.CreateBackupInit;
         Result := True;
@@ -3404,6 +3455,10 @@ end;
 
 function TformNotetask.SaveFileAs: boolean;
 begin
+  if FEncrypted then
+    saveDialog.FilterIndex := 2
+  else
+    saveDialog.FilterIndex := 1;
   if (saveDialog.Execute) then
   begin
     Result := SaveFile(saveDialog.FileName, saveDialog.FilterIndex = 2);

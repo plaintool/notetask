@@ -98,6 +98,10 @@ msgctxt "mainform.rgroupuntitled"
 msgid "Ungrouped"
 msgstr "Без групи"
 
+#: mainform.rincorrectpassword
+msgid "Incorrect password!"
+msgstr "Невірний пароль!"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "Ви впевнені, що хочете об'єднати вибрані завдання?"

@@ -41,11 +41,13 @@ function DetectLineEnding(const FileName: string; MaxLines: integer = 100): TLin
 
 function EndsWithLineBreak(const FileName: string): boolean;
 
+procedure ReadStringFile(var Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding; out LineCount: integer);
+
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
   out LineEnding: TLineEnding; out LineCount: integer);
 
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding;
-  Encrypt: boolean = False; Password: string = '');
+  Encrypt: boolean = False; Hash: TBytes = nil);
 
 function FindPowerShellCore: string;
 
@@ -387,6 +389,55 @@ begin
   end;
 end;
 
+procedure ReadStringFile(var Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding; out LineCount: integer);
+var
+  StringList: TStringList;
+begin
+  // Default encoding – UTF8, можно расширить, если нужно определять по BOM
+  FileEncoding := TEncoding.UTF8;
+
+  // Detect line endings
+  if Pos(#13#10, Content) > 0 then
+    LineEnding := TLineEnding.WindowsCRLF
+  else if Pos(#10, Content) > 0 then
+    LineEnding := TLineEnding.UnixLF
+  else if Pos(#13, Content) > 0 then
+    LineEnding := TLineEnding.MacintoshCR
+  else
+    LineEnding := TLineEnding.Unknown;
+
+  // Load into TStringList to count lines
+  StringList := TStringList.Create;
+  StringList.Options := StringList.Options - [soTrailingLineBreak]; // don't add extra line breaks
+  try
+    StringList.Text := Content;
+
+    // Handle empty content
+    if Content = string.Empty then
+    begin
+      LineEnding := TLineEnding.WindowsCRLF;
+      if StringList.Count = 0 then
+      begin
+        StringList.Add(string.Empty);
+        Content := '[]';
+      end;
+    end
+    else
+    begin
+      // Append line break if content originally ended with one
+      if (Length(Content) > 0) and (Content[Length(Content)] in [#10, #13]) then
+      begin
+        StringList.Add(string.Empty);
+        Content := Content + LineEnding.Value;
+      end;
+    end;
+
+    LineCount := StringList.Count;
+  finally
+    StringList.Free;
+  end;
+end;
+
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
   out LineEnding: TLineEnding; out LineCount: integer);
 var
@@ -446,7 +497,7 @@ begin
 end;
 
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding;
-  Encrypt: boolean = False; Password: string = '');
+  Encrypt: boolean = False; Hash: TBytes = nil);
 var
   LineEndingStr: string;
   FullText: string;
@@ -491,7 +542,7 @@ begin
         FullText := StringReplace(FullText, LineEnding.Value, LineEndingStr, [rfReplaceAll]);
 
       // Convert encrypted string to bytes with the specified encoding
-      Bytes := FileEncoding.GetBytes(unicodestring(EncryptData(FullText, Password)));
+      Bytes := FileEncoding.GetBytes(unicodestring(EncryptData(FullText, Hash)));
       if Assigned(Bytes) then
         FileStream.WriteBuffer(Bytes[0], Length(Bytes));
     end

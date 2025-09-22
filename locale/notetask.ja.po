@@ -98,6 +98,10 @@ msgctxt "mainform.rgroupuntitled"
 msgid "Ungrouped"
 msgstr "グループ化されていない"
 
+#: mainform.rincorrectpassword
+msgid "Incorrect password!"
+msgstr "パスワードが間違っています！"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "選択したタスクを統合してもよろしいですか？"

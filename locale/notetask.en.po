@@ -98,6 +98,10 @@ msgctxt "mainform.rgroupuntitled"
 msgid "Ungrouped"
 msgstr "Ungrouped"
 
+#: mainform.rincorrectpassword
+msgid "Incorrect password!"
+msgstr "Incorrect password!"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "Are you sure you want to merge selected tasks?"

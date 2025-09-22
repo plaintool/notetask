@@ -98,6 +98,10 @@ msgctxt "mainform.rgroupuntitled"
 msgid "Ungrouped"
 msgstr "未分组"
 
+#: mainform.rincorrectpassword
+msgid "Incorrect password!"
+msgstr "密码错误！"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "您确定要合并选定的任务吗？"
