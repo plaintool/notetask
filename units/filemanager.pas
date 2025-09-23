@@ -388,7 +388,10 @@ begin
     FileStream.Position := 0;
 
     // Create a dynamic array for up to the first 1024 bytes
-    SetLength(ContentBuffer, Min(FileStream.Size, 1024 * 4));
+    if FileStream.Size > 1024 * 4 then
+      SetLength(ContentBuffer, 1024 * 4)
+    else
+      SetLength(ContentBuffer, FileStream.Size);
     BytesRead := FileStream.Read(ContentBuffer[0], Length(ContentBuffer));
 
     // Check if the file content could be ANSI

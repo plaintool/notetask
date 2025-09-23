@@ -560,7 +560,7 @@ type
     procedure FillGrid;
     procedure NewFile(SaveSetting: boolean = True);
     function OpenFile(fileName: string; saveSettings: boolean = True; ShowTrigger: boolean = False): boolean;
-    function SaveFile(fileName: string = string.Empty; encrypt: boolean = False): boolean;
+    function SaveFile(fileName: string = string.Empty; saveAs: boolean = False; encrypt: boolean = False): boolean;
     function SaveFileAs: boolean;
     procedure ApplyGridSettings;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean; overload;
@@ -651,6 +651,7 @@ resourcestring
   rpassword = 'Password:';
   rconfirmpassword = 'Confirm Password:';
   rincorrectpassword = 'Incorrect password!';
+  rencrypted = 'Encrypted';
   rgroup = 'Group';
   rgoto = 'Go to';
   rok = 'OK';
@@ -3312,6 +3313,9 @@ begin
     Tasks := TTasks.Create(new);
     FFileName := string.Empty;
 
+    FEncrypted := False;
+    FHash := nil;
+
     // Encoding of new file
     FEncoding := TEncoding.UTF8;
 
@@ -3335,6 +3339,8 @@ function TformNotetask.OpenFile(fileName: string; saveSettings: boolean = True; 
 var
   Content: string;
   FileNameOld: string;
+  EncryptedOld: boolean;
+  HashOld: TBytes = nil;
 begin
   Result := False;
   if not FileExists(fileName) then
@@ -3346,12 +3352,17 @@ begin
   if (saveSettings) then
     SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
+  EncryptedOld := FEncrypted;
+  FEncrypted := False;
+  HashOld := FHash;
+  FHash := nil;
   FileNameOld := FFileName;
   FFileName := fileName;
   EditComplite;
 
   if (CouldBeEncryptedFile(FFileName)) then
   begin
+    FEncrypted := True;
     FHash := GetHash(string.Empty);
     Content := DecryptData(LoadFileAsString(FFileName), FHash);
     if Content = string.Empty then
@@ -3386,7 +3397,11 @@ begin
             exit(False);
           end
           else
+          begin
+            FEncrypted := EncryptedOld;
+            FHash := HashOld;
             exit(False);
+          end;
         end;
 
         Content := DecryptData(LoadFileAsString(FFileName), FHash);
@@ -3402,7 +3417,11 @@ begin
             exit(False);
           end
           else
+          begin
+            FEncrypted := EncryptedOld;
+            FHash := HashOld;
             exit(False);
+          end;
         end;
       finally
         Hide;
@@ -3426,7 +3445,7 @@ begin
   Result := True;
 end;
 
-function TformNotetask.SaveFile(fileName: string = string.Empty; encrypt: boolean = False): boolean;
+function TformNotetask.SaveFile(fileName: string = string.Empty; saveAs: boolean = False; encrypt: boolean = False): boolean;
 var
   TaskList: TStringList;
 begin
@@ -3460,6 +3479,12 @@ begin
       finally
         Hide;
       end;
+    end
+    else
+    if saveAs then
+    begin
+      FEncrypted := False;
+      FHash := nil;
     end;
 
     TaskList := Tasks.ToStringList;
@@ -3490,7 +3515,7 @@ begin
     saveDialog.FilterIndex := 1;
   if (saveDialog.Execute) then
   begin
-    Result := SaveFile(saveDialog.FileName, saveDialog.FilterIndex = 2);
+    Result := SaveFile(saveDialog.FileName, True, saveDialog.FilterIndex = 2);
   end
   else
     Result := False;
@@ -5740,9 +5765,9 @@ var
   NewCaption: string;
 begin
   if (FFileName <> '') then
-    NewCaption := ExtractFileName(FFileName) + ' - ' + rapp
+    NewCaption := ExtractFileName(FFileName) + ifthen(FEncrypted, ' (' + rencrypted + ')', string.Empty) + ' - ' + rapp
   else
-    NewCaption := runtitled + ' - ' + rapp;
+    NewCaption := runtitled + ifthen(FEncrypted, ' (' + rencrypted + ')', string.Empty) + ' - ' + rapp;
 
   if FChanged then
     NewCaption := '*' + NewCaption;

@@ -70,6 +70,10 @@ msgstr "您确定要删除此组吗？这也会删除此组内的所有任务。
 msgid "Are you sure you want to delete selected tasks?"
 msgstr "您确定要删除所选任务吗？"
 
+#: mainform.rencrypted
+msgid "Encrypted"
+msgstr "已加密"
+
 #: mainform.rentergroupname
 msgid "Enter the group name:"
 msgstr "输入组名称："

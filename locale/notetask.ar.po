@@ -70,6 +70,10 @@ msgstr "هل أنت متأكد أنك تريد حذف هذه المجموعة؟ 
 msgid "Are you sure you want to delete selected tasks?"
 msgstr "هل أنت متأكد أنك تريد حذف المهام المحددة؟"
 
+#: mainform.rencrypted
+msgid "Encrypted"
+msgstr "مُشَفَّر"
+
 #: mainform.rentergroupname
 msgid "Enter the group name:"
 msgstr "أدخل اسم المجموعة:"

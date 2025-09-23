@@ -60,6 +60,10 @@ msgstr ""
 msgid "Are you sure you want to delete selected tasks?"
 msgstr ""
 
+#: mainform.rencrypted
+msgid "Encrypted"
+msgstr ""
+
 #: mainform.rentergroupname
 msgid "Enter the group name:"
 msgstr ""

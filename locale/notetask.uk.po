@@ -70,6 +70,10 @@ msgstr "Ви впевнені, що хочете видалити цю груп�
 msgid "Are you sure you want to delete selected tasks?"
 msgstr "Ви впевнені, що хочете видалити вибрані завдання?"
 
+#: mainform.rencrypted
+msgid "Encrypted"
+msgstr "Зашифровано"
+
 #: mainform.rentergroupname
 msgid "Enter the group name:"
 msgstr "Введіть назву групи:"

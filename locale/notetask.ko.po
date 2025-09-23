@@ -70,6 +70,10 @@ msgstr "이 그룹을 삭제하시겠습니까? 이 그룹 내의 모든 작업�
 msgid "Are you sure you want to delete selected tasks?"
 msgstr "선택한 작업을 삭제하시겠습니까?"
 
+#: mainform.rencrypted
+msgid "Encrypted"
+msgstr "암호화됨"
+
 #: mainform.rentergroupname
 msgid "Enter the group name:"
 msgstr "그룹 이름을 입력하세요:"

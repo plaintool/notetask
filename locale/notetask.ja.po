@@ -70,6 +70,10 @@ msgstr "このグループを削除してもよろしいですか？このグル
 msgid "Are you sure you want to delete selected tasks?"
 msgstr "選択したタスクを削除してもよろしいですか？"
 
+#: mainform.rencrypted
+msgid "Encrypted"
+msgstr "暗号化済み"
+
 #: mainform.rentergroupname
 msgid "Enter the group name:"
 msgstr "グループ名を入力してください:"

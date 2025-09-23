@@ -70,6 +70,10 @@ msgstr "Êtes-vous sûr de vouloir supprimer ce groupe ? Cela supprimera égalem
 msgid "Are you sure you want to delete selected tasks?"
 msgstr "Êtes-vous sûr de vouloir supprimer les tâches sélectionnées ?"
 
+#: mainform.rencrypted
+msgid "Encrypted"
+msgstr "Chiffré"
+
 #: mainform.rentergroupname
 msgid "Enter the group name:"
 msgstr "Entrez le nom du groupe :"
