@@ -13,7 +13,7 @@ interface
 uses
   Classes,
   SysUtils,
-  ZLib,
+  PasZLib,
   Base64,
   DCPrijndael,
   DCPsha256;
@@ -45,11 +45,17 @@ implementation
 const
   FILE_MAGIC: array[0..3] of byte = (78, 84, 83, 75); // 'NTSK'
 
+function CompressBound(SourceLen: cardinal): cardinal;
+begin
+  // formula from zlib to estimate max compressed size
+  Result := SourceLen + ((SourceLen + 7) shr 3) + ((SourceLen + 63) shr 6) + 11;
+end;
+
 function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
 var
-  Source, Dest: PBytef;
-  SourceLen, DestLen: uLong;
-  MemPtr: PBytef;
+  Source, Dest: pchar;
+  SourceLen, DestLen: cardinal;
+  MemPtr: pchar;
 begin
   if InputStream.Size = 0 then
   begin
@@ -63,19 +69,21 @@ begin
 
   Result := TMemoryStream.Create;
   try
+    // allocate memory: 4 bytes for original size + estimated compressed size
     DestLen := compressBound(SourceLen);
     Result.SetSize(4 + DestLen);
 
-    MemPtr := PBytef(Result.Memory);
+    MemPtr := Result.Memory;
     Dest := MemPtr;
     Inc(pbyte(Dest), 4); // move pointer 4 bytes forward for compressed data
 
-    if compress(Dest, @DestLen, Source, SourceLen) <> Z_OK then
+    if compress(Dest, DestLen, Source, SourceLen) <> Z_OK then
       raise Exception.Create('Compression failed');
 
-    // store OriginalSize in first 4 bytes
+    // store original size in first 4 bytes
     PCardinal(MemPtr)^ := SourceLen;
 
+    // adjust memory size to actual compressed data
     Result.SetSize(4 + DestLen);
     Result.Position := 0;
   except
@@ -86,9 +94,9 @@ end;
 
 function DecompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
 var
-  Source, Dest: PBytef;
-  OriginalSize, DestLen: uLong;
-  MemPtr: PBytef;
+  Source, Dest: pchar;
+  OriginalSize, DestLen: cardinal;
+  MemPtr: pchar;
 begin
   if InputStream.Size = 0 then
   begin
@@ -97,7 +105,7 @@ begin
   end;
 
   InputStream.Position := 0;
-  MemPtr := PBytef(InputStream.Memory);
+  MemPtr := InputStream.Memory;
 
   // read original uncompressed size
   OriginalSize := PCardinal(MemPtr)^;
@@ -111,7 +119,7 @@ begin
     Result.SetSize(DestLen);
     Dest := Result.Memory;
 
-    if uncompress(Dest, @DestLen, Source, InputStream.Size - 4) <> Z_OK then
+    if uncompress(Dest, DestLen, Source, InputStream.Size - 4) <> Z_OK then
       raise Exception.Create('Decompression failed');
 
     Result.Position := 0;
