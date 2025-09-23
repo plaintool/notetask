@@ -111,6 +111,7 @@ begin
   editText.NumbersOnly := aNumbersOnly;
   editText.Text := aDefault;
   editText2.Text := aDefault;
+  checkShowPassword.Checked := False;
   if aPassword and not aConfirmPassword then
   begin
     editText.PasswordChar := '*';
