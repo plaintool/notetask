@@ -54,6 +54,7 @@ implementation
 
 procedure TformInputText.FormShow(Sender: TObject);
 begin
+  SetFocus;
   editText.SetFocus;
   editText.SelectAll;
 end;
