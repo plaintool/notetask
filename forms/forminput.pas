@@ -115,8 +115,9 @@ begin
     editText.PasswordChar := '*';
     labelCaption2.Visible := False;
     editText2.Visible := False;
-    checkShowPassword.Visible := False;
-    Height := 103;
+    checkShowPassword.Visible := True;
+    checkShowPassword.Top := 72;
+    Height := 135;
   end
   else
   if aConfirmPassword then
@@ -126,6 +127,7 @@ begin
     labelCaption2.Visible := True;
     editText2.Visible := True;
     checkShowPassword.Visible := True;
+    checkShowPassword.Top := 128;
     Height := 190;
   end
   else
@@ -134,6 +136,7 @@ begin
     labelCaption2.Visible := False;
     editText2.Visible := False;
     checkShowPassword.Visible := False;
+    checkShowPassword.Top := 128;
     Height := 103;
   end;
 end;

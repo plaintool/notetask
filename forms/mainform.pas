@@ -559,7 +559,7 @@ type
     procedure SetLanguage(aLanguage: string = string.Empty);
     procedure FillGrid;
     procedure NewFile(SaveSetting: boolean = True);
-    function OpenFile(fileName: string; saveSettings: boolean = True): boolean;
+    function OpenFile(fileName: string; saveSettings: boolean = True; ShowTrigger: boolean = False): boolean;
     function SaveFile(fileName: string = string.Empty; encrypt: boolean = False): boolean;
     function SaveFileAs: boolean;
     procedure ApplyGridSettings;
@@ -666,9 +666,6 @@ uses filemanager, settings, systemtool, crypto, forminput, formfind, formreplace
   { TformNotetask }
 
 procedure TformNotetask.FormCreate(Sender: TObject);
-var
-  FilePath: string;
-  FileOpened: boolean;
 begin
   // Initialize variables
   FBackup := True;
@@ -743,17 +740,6 @@ begin
   aPageProperties.Visible := False;
   aPageProperties.Enabled := False;
   {$ENDIF}
-
-  // Check if a command line argument is passed
-  FileOpened := False;
-  if ParamCount > 0 then
-  begin
-    FilePath := ParamStr(1); // Get the file path
-    if (not FilePath.StartsWith('--')) then
-      FileOpened := OpenFile(FilePath, False); // Function to load a task from the file
-  end;
-
-  if not FileOpened then NewFile(False);
 end;
 
 procedure TformNotetask.FormDestroy(Sender: TObject);
@@ -768,6 +754,38 @@ begin
   ResourceBitmapUncheck.Free;
   ResourceBitmapStarGold.Free;
   ResourceBitmapStarGray.Free;
+end;
+
+procedure TformNotetask.FormShow(Sender: TObject);
+var
+  FilePath: string;
+  FileOpened: boolean;
+begin
+  Visible := False;
+
+  // Check if a command line argument is passed
+  FileOpened := False;
+  if ParamCount > 0 then
+  begin
+    FilePath := ParamStr(1); // Get the file path
+    if (not FilePath.StartsWith('--')) then
+      FileOpened := OpenFile(FilePath, False, True); // Function to load a task from the file
+  end;
+
+  if not FileOpened then NewFile(False);
+
+  if (not Application.Terminated) then
+  begin
+    OnShow := nil;
+    Visible := True;
+    OnShow := @FormShow;
+  end;
+
+  SetCaption;
+
+  CalcRowHeights(0, True);
+
+  RestoreSelectedState(True, True, True);
 end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -1013,15 +1031,6 @@ end;
 procedure TformNotetask.FormResize(Sender: TObject);
 begin
   taskGridResize(Sender);
-end;
-
-procedure TformNotetask.FormShow(Sender: TObject);
-begin
-  SetCaption;
-
-  CalcRowHeights(0, True);
-
-  RestoreSelectedState(True, True, True);
 end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -3322,7 +3331,7 @@ begin
   end;
 end;
 
-function TformNotetask.OpenFile(fileName: string; saveSettings: boolean = True): boolean;
+function TformNotetask.OpenFile(fileName: string; saveSettings: boolean = True; ShowTrigger: boolean = False): boolean;
 var
   Content: string;
   FileNameOld: string;
@@ -3350,8 +3359,16 @@ begin
       // Create an instance of the form
       with formInputText do
       try
-        Left := self.Left + 14;
-        Top := self.top + 52;
+        if (ShowTrigger) then
+        begin
+          Left := Screen.Width div 2 - formInputText.Width div 2;
+          Top := Screen.Height div 2 - formInputText.Height div 2;
+        end
+        else
+        begin
+          Left := self.Left + 14;
+          Top := self.top + 52;
+        end;
         SetMode(ReplaceStr(rpassword, ':', ''), rpassword, rok, string.Empty, False, True);
 
         // Show the form as a modal dialog
@@ -3363,7 +3380,13 @@ begin
         else
         begin
           FFileName := FileNameOld;
-          exit(False);
+          if (ShowTrigger) then
+          begin
+            Application.Terminate;
+            exit(False);
+          end
+          else
+            exit(False);
         end;
 
         Content := DecryptData(LoadFileAsString(FFileName), FHash);
@@ -3373,7 +3396,13 @@ begin
         begin
           FFileName := FileNameOld;
           ShowMessage(rincorrectpassword);
-          exit(False);
+          if (ShowTrigger) then
+          begin
+            Application.Terminate;
+            exit(False);
+          end
+          else
+            exit(False);
         end;
       finally
         Hide;
