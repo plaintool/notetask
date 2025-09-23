@@ -639,11 +639,10 @@ begin
     if Encrypt then
     begin
       // Combine all lines into a single string
-      FullText := StringList.Text;
+      StringList.Options := StringList.Options - [soTrailingLineBreak]; // don't add extra line breaks
+      StringList.LineBreak := LineEndingStr;
 
-      // Replace default line endings with the selected LineEndingStr
-      if LineEndingStr <> LineEnding.Value then
-        FullText := StringReplace(FullText, LineEnding.Value, LineEndingStr, [rfReplaceAll]);
+      FullText := StringList.Text;
 
       // Convert encrypted string to bytes with the specified encoding
       Bytes := FileEncoding.GetBytes(unicodestring(EncryptData(FullText, Hash)));
