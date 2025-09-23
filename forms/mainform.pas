@@ -3338,6 +3338,7 @@ end;
 function TformNotetask.OpenFile(fileName: string; saveSettings: boolean = True; ShowTrigger: boolean = False): boolean;
 var
   Content: string;
+  Bytes:TBytes;
   FileNameOld: string;
   EncryptedOld: boolean;
   HashOld: TBytes = nil;
@@ -3364,8 +3365,8 @@ begin
   begin
     FEncrypted := True;
     FHash := GetHash(string.Empty);
-    Content := DecryptData(LoadFileAsString(FFileName), FHash);
-    if Content = string.Empty then
+    Bytes := DecryptData(LoadFileAsBytes(FFileName), FHash);
+    if Bytes = nil then
     begin
       // Create an instance of the form
       with formInputText do
@@ -3404,9 +3405,9 @@ begin
           end;
         end;
 
-        Content := DecryptData(LoadFileAsString(FFileName), FHash);
-        if (Content <> string.Empty) then
-          ReadStringFile(Content, FEncoding, FLineEnding, FLineCount)
+        Bytes := DecryptData(LoadFileAsBytes(FFileName), FHash);
+        if (Bytes <> nil) then
+          ReadTextFile(Bytes, Content, FEncoding, FLineEnding, FLineCount)
         else
         begin
           FFileName := FileNameOld;
@@ -3428,7 +3429,7 @@ begin
       end;
     end
     else
-      ReadStringFile(Content, FEncoding, FLineEnding, FLineCount);
+      ReadTextFile(Bytes, Content, FEncoding, FLineEnding, FLineCount);
   end
   else
     ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);

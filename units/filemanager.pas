@@ -21,7 +21,8 @@ uses
   {$ELSE}
   Windows,
   {$ENDIF}
-  lineending;
+  lineending,
+  crypto;
 
 function GetEncodingName(Encoding: TEncoding): string;
 
@@ -29,22 +30,29 @@ function IsUserEncoding(Enc: TEncoding): boolean;
 
 function IsBOMEncoding(Encoding: TEncoding): boolean;
 
-function IsValidUTF8(var Buffer: array of byte; BytesRead: integer): boolean;
+function IsValidUTF8(var Buffer: TBytes; BytesRead: integer): boolean;
 
-function IsValidAscii(var Buffer: array of byte; BytesRead: integer): boolean;
+function IsValidAscii(var Buffer: TBytes; BytesRead: integer): boolean;
 
-function IsValidAnsi(var Buffer: array of byte; BytesRead: integer): boolean;
+function IsValidAnsi(var Buffer: TBytes; BytesRead: integer): boolean;
 
-function DetectEncoding(const FileName: string): TEncoding;
+function DetectEncoding(const Buffer: TBytes): TEncoding; overload;
 
-function DetectLineEnding(const FileName: string; MaxLines: integer = 100): TLineEnding;
+function DetectEncoding(const FileName: string): TEncoding; overload;
 
-function EndsWithLineBreak(const FileName: string): boolean;
+function DetectLineEnding(const Buffer: TBytes; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding; overload;
 
-procedure ReadStringFile(var Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding; out LineCount: integer);
+function DetectLineEnding(const FileName: string; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding; overload;
+
+function EndsWithLineBreak(const Buffer: TBytes): boolean; overload;
+
+function EndsWithLineBreak(const FileName: string): boolean; overload;
+
+procedure ReadTextFile(const Bytes: TBytes; out Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding;
+  out LineCount: integer); overload;
 
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
-  out LineEnding: TLineEnding; out LineCount: integer);
+  out LineEnding: TLineEnding; out LineCount: integer); overload;
 
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding;
   Encrypt: boolean = False; Hash: TBytes = nil);
@@ -58,8 +66,6 @@ var
   UTF16LEBOMEncoding, UTF16BEBOMEncoding: TEncoding;
 
 implementation
-
-uses crypto;
 
 function GetEncodingName(Encoding: TEncoding): string;
 begin
@@ -111,7 +117,7 @@ begin
     exit(True);
 end;
 
-function IsValidUTF8(var Buffer: array of byte; BytesRead: integer): boolean;
+function IsValidUTF8(var Buffer: TBytes; BytesRead: integer): boolean;
 var
   i: integer;
   remaining: integer;
@@ -237,7 +243,7 @@ begin
     Result := False;
 end;
 
-function IsValidAscii(var Buffer: array of byte; BytesRead: integer): boolean;
+function IsValidAscii(var Buffer: TBytes; BytesRead: integer): boolean;
 var
   i: integer;
 begin
@@ -253,7 +259,7 @@ begin
   end;
 end;
 
-function IsValidAnsi(var Buffer: array of byte; BytesRead: integer): boolean;
+function IsValidAnsi(var Buffer: TBytes; BytesRead: integer): boolean;
 var
   i: integer;
 begin
@@ -351,110 +357,114 @@ begin
   end;
 end;
 
-function DetectEncoding(const FileName: string): TEncoding;
+function DetectEncoding(const Buffer: TBytes): TEncoding; overload;
 var
-  FileStream: TFileStream;
-  Buffer: array[0..3] of byte = (0, 0, 0, 0);
-  ContentBuffer: array of byte; // Dynamic array
-  BytesRead: integer;
+  ContentBuffer: TBytes = nil;
+  BytesToCheck: integer;
 begin
-  Result := TEncoding.UTF8; // Assume UTF-8 by default
-  ContentBuffer := [];
-  FileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
-  try
-    // If the file is empty, treat it as UTF-8
-    if FileStream.Size = 0 then
-      Exit(TEncoding.UTF8);
+  Result := TEncoding.UTF8;
 
-    // Read the first 4 bytes to check for BOM
-    BytesRead := FileStream.Read(Buffer, SizeOf(Buffer));
+  if Length(Buffer) = 0 then Exit(TEncoding.UTF8);
 
-    // Check if the read bytes correspond to BOM
-    if BytesRead >= 3 then
-    begin
-      // Check for UTF-8 BOM
-      if (Buffer[0] = $EF) and (Buffer[1] = $BB) and (Buffer[2] = $BF) then
-        exit(UTF8BOMEncoding)// UTF-8 BOM
-      // Check for UTF-16 LE BOM
-      else if (Buffer[0] = $FF) and (Buffer[1] = $FE) then
-        exit(UTF16LEBOMEncoding) // UTF-16 LE BOM
-      // Check for UTF-16 BE BOM
-      else if (Buffer[0] = $FE) and (Buffer[1] = $FF) then
-        exit(UTF16BEBOMEncoding); // UTF-16 BE BOM
-    end;
+  // Check BOM first
+  if (Length(Buffer) >= 3) and (Buffer[0] = $EF) and (Buffer[1] = $BB) and (Buffer[2] = $BF) then
+    Exit(UTF8BOMEncoding)
+  else if (Length(Buffer) >= 2) and (Buffer[0] = $FF) and (Buffer[1] = $FE) then
+    Exit(UTF16LEBOMEncoding)
+  else if (Length(Buffer) >= 2) and (Buffer[0] = $FE) and (Buffer[1] = $FF) then
+    Exit(UTF16BEBOMEncoding);
 
-    // If no BOM is found, check the content for text patterns
-    // Reset position to the beginning of the file
-    FileStream.Position := 0;
+  // No BOM found, check the first up to 1024*4 bytes
+  if Length(Buffer) > 1024 * 4 then
+    BytesToCheck := 1024 * 4
+  else
+    BytesToCheck := Length(Buffer);
 
-    // Create a dynamic array for up to the first 1024 bytes
-    if FileStream.Size > 1024 * 4 then
-      SetLength(ContentBuffer, 1024 * 4)
-    else
-      SetLength(ContentBuffer, FileStream.Size);
-    BytesRead := FileStream.Read(ContentBuffer[0], Length(ContentBuffer));
+  SetLength(ContentBuffer, BytesToCheck);
+  Move(Buffer[0], ContentBuffer[0], BytesToCheck);
 
-    // Check if the file content could be ANSI
-    if IsValidUtf8(ContentBuffer, BytesRead) then
-      Result := TEncoding.UTF8
-    else if IsValidAnsi(ContentBuffer, BytesRead) then
-      Result := TEncoding.ANSI
-    else if IsValidAscii(ContentBuffer, BytesRead) then
-      Result := TEncoding.ASCII
-    else
-      Result := TEncoding.UTF8; // If not detected, assume UTF-8
-  finally
-    FileStream.Free;
-  end;
+  // Check content heuristics
+  if IsValidUtf8(ContentBuffer, BytesToCheck) then
+    Result := TEncoding.UTF8
+  else if IsValidAnsi(ContentBuffer, BytesToCheck) then
+    Result := TEncoding.ANSI
+  else if IsValidAscii(ContentBuffer, BytesToCheck) then
+    Result := TEncoding.ASCII
+  else
+    Result := TEncoding.UTF8;
 end;
 
-function DetectLineEnding(const FileName: string; MaxLines: integer = 100): TLineEnding;
-type
-  TBuffer = array[0..4095] of byte;
+function DetectEncoding(const FileName: string): TEncoding;
 var
-  FileStream: TFileStream;
-  Buffer: TBuffer;
-  BytesRead, I: integer;
-  CountCRLF, CountLF, CountCR, LinesChecked: integer;
+  Bytes: TBytes;
 begin
-  Buffer := Default(TBuffer);
+  Bytes := LoadFileAsBytes(FileName);
+  Result := DetectEncoding(Bytes);
+end;
+
+function DetectLineEnding(const Buffer: TBytes; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding; overload;
+var
+  Text: unicodestring;
+  Ch, PrevCh: widechar;
+  I, LinesChecked: integer;
+  CountCRLF, CountLF, CountCR: integer;
+begin
   CountCRLF := 0;
   CountLF := 0;
   CountCR := 0;
   LinesChecked := 0;
+  PrevCh := #0;
 
-  FileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
-  try
-    while (LinesChecked < MaxLines) and (FileStream.Position < FileStream.Size) do
+  // Convert bytes to UnicodeString
+  if Encoding = UTF16LEBOMEncoding then
+    Text := TEncoding.Unicode.GetString(Buffer)
+  else if Encoding = UTF16BEBOMEncoding then
+    Text := TEncoding.BigEndianUnicode.GetString(Buffer)
+  else
+    Text := TEncoding.UTF8.GetString(Buffer); // UTF-8 or ANSI/ASCII
+
+  I := 1;
+  while (I <= Length(Text)) and (LinesChecked < MaxLines) do
+  begin
+    Ch := Text[I];
+
+    if (PrevCh = #13) and (Ch = #10) then
     begin
-      BytesRead := FileStream.Read(Buffer, SizeOf(Buffer));
-      I := 0;
-      while (I < BytesRead) and (LinesChecked < MaxLines) do
+      Inc(CountCRLF);
+      Inc(LinesChecked);
+      PrevCh := #0; // reset previous
+    end
+    else
+    begin
+      if Ch = #13 then
+        PrevCh := #13
+      else
       begin
-        if (Buffer[I] = 13) and (I + 1 < BytesRead) and (Buffer[I + 1] = 10) then
-        begin
-          Inc(CountCRLF);
-          Inc(LinesChecked);
-          Inc(I, 2);
-          Continue;
-        end
-        else if Buffer[I] = 10 then
+        if Ch = #10 then
         begin
           Inc(CountLF);
           Inc(LinesChecked);
         end
-        else if Buffer[I] = 13 then
+        else if PrevCh = #13 then
         begin
           Inc(CountCR);
           Inc(LinesChecked);
+          PrevCh := #0;
         end;
-        Inc(I);
       end;
     end;
-  finally
-    FileStream.Free;
+
+    Inc(I);
   end;
 
+  // Handle last CR at the end
+  if PrevCh = #13 then
+  begin
+    Inc(CountCR);
+    Inc(LinesChecked);
+  end;
+
+  // Determine dominant line ending
   if (CountCRLF >= CountLF) and (CountCRLF >= CountCR) and (CountCRLF > 0) then
     Result := TLineEnding.WindowsCRLF
   else if (CountLF >= CountCR) and (CountLF > 0) then
@@ -465,79 +475,82 @@ begin
     Result := TLineEnding.Unknown;
 end;
 
-function EndsWithLineBreak(const FileName: string): boolean;
+function DetectLineEnding(const FileName: string; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding;
 var
-  FileStream: TFileStream;
-  Buffer: array of byte;
+  Bytes: TBytes;
 begin
-  Result := False; // Assume there is no line break
-  Buffer := [];
-  FileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
-  try
-    // Check file size
-    if FileStream.Size > 0 then
-    begin
-      // Create a buffer with size of 1 byte
-      SetLength(Buffer, 1);
-      // Move to the end of the file
-      FileStream.Position := FileStream.Size - 1;
-      // Read the last byte
-      FileStream.Read(Buffer[0], 1);
-
-      // Check if the last byte is a line break character
-      if (Buffer[0] = byte(#10)) or (Buffer[0] = byte(#13)) then
-        Result := True;
-    end;
-  finally
-    FileStream.Free;
-  end;
+  Bytes := LoadFileAsBytes(FileName);
+  Result := DetectLineEnding(Bytes, Encoding, MaxLines);
 end;
 
-procedure ReadStringFile(var Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding; out LineCount: integer);
+function EndsWithLineBreak(const Buffer: TBytes): boolean;
+begin
+  Result := False;
+  if Length(Buffer) = 0 then Exit;
+
+  if (Buffer[High(Buffer)] = byte(#10)) or (Buffer[High(Buffer)] = byte(#13)) then
+    Result := True;
+end;
+
+function EndsWithLineBreak(const FileName: string): boolean;
+var
+  Bytes: TBytes;
+begin
+  Bytes := LoadFileAsBytes(FileName);
+  Result := EndsWithLineBreak(Bytes);
+end;
+
+procedure ReadTextFile(const Bytes: TBytes; out Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding;
+  out LineCount: integer);
 var
   StringList: TStringList;
+  MemoryStream: TMemoryStream;
 begin
-  // Default encoding – UTF8, можно расширить, если нужно определять по BOM
-  FileEncoding := TEncoding.UTF8;
+  // Determine the encoding from byte array
+  FileEncoding := DetectEncoding(Bytes);
+  LineEnding := DetectLineEnding(Bytes, FileEncoding);
 
-  // Detect line endings
-  if Pos(#13#10, Content) > 0 then
-    LineEnding := TLineEnding.WindowsCRLF
-  else if Pos(#10, Content) > 0 then
-    LineEnding := TLineEnding.UnixLF
-  else if Pos(#13, Content) > 0 then
-    LineEnding := TLineEnding.MacintoshCR
-  else
-    LineEnding := TLineEnding.Unknown;
-
-  // Load into TStringList to count lines
+  // Load the bytes into TStringList using MemoryStream
   StringList := TStringList.Create;
-  StringList.Options := StringList.Options - [soTrailingLineBreak]; // don't add extra line breaks
+  MemoryStream := TMemoryStream.Create;
   try
-    StringList.Text := Content;
+    MemoryStream.WriteBuffer(Bytes[0], Length(Bytes));
+    MemoryStream.Position := 0;
 
-    // Handle empty content
+    // Don't add line break at end string
+    StringList.Options := StringList.Options - [soTrailingLineBreak];
+    StringList.LoadFromStream(MemoryStream, FileEncoding);
+    Content := StringList.Text;
+
+    // Determine the line ending type if content is empty
     if Content = string.Empty then
     begin
       LineEnding := TLineEnding.WindowsCRLF;
-      if StringList.Count = 0 then
+      if (StringList.Count = 1) and (StringList[0] = string.Empty) then
       begin
         StringList.Add(string.Empty);
-        Content := '[]';
+        Content += LineEnding.Value;
+      end
+      else if StringList.Count = 0 then
+      begin
+        StringList.Add(string.Empty);
+        Content += '[]';
       end;
     end
     else
     begin
-      // Append line break if content originally ended with one
-      if (Length(Content) > 0) and (Content[Length(Content)] in [#10, #13]) then
+      // Check if original byte array ended with line break
+      if EndsWithLineBreak(Bytes) then
       begin
         StringList.Add(string.Empty);
-        Content := Content + LineEnding.Value;
+        Content += LineEnding.Value;
       end;
     end;
 
+    // Count the number of lines
     LineCount := StringList.Count;
   finally
+    MemoryStream.Free;
     StringList.Free;
   end;
 end;
@@ -545,126 +558,85 @@ end;
 procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
   out LineEnding: TLineEnding; out LineCount: integer);
 var
-  StringList: TStringList;
+  Bytes: TBytes;
 begin
-  // Determine the encoding
-  FileEncoding := DetectEncoding(FileName);
-  LineEnding := DetectLineEnding(FileName);
-
-  // Read the file content using TStringList
-  StringList := TStringList.Create;
-  // Don't add line break at end string
-  StringList.Options := StringList.Options - [soTrailingLineBreak];
-  try
-    StringList.LoadFromFile(FileName, FileEncoding);
-    Content := StringList.Text;
-
-    UpdateFileReadAccess(FileName);
-
-    // Determine the line ending type
-    //if Pos(#13#10, Content) > 0 then
-    //  LineEnding := TLineEnding.WindowsCRLF
-    //else if Pos(#10, Content) > 0 then
-    //  LineEnding := TLineEnding.UnixLF
-    //else if Pos(#13, Content) > 0 then
-    //  LineEnding := TLineEnding.MacintoshCR
-    //else
-    //  LineEnding := TLineEnding.Unknown;
-
-    if Content = string.Empty then
-    begin
-      LineEnding := TLineEnding.WindowsCRLF;
-      if (StringList.Count = 1) and (Stringlist[0] = string.empty) then
-      begin
-        StringList.Add(string.Empty);
-        Content += LineEnding.Value;
-      end
-      else
-      if StringList.Count = 0 then
-      begin
-        StringList.Add(string.Empty);
-        Content += '[]';
-      end;
-    end
-    else
-    if (EndsWithLineBreak(FileName)) then
-    begin
-      StringList.Add(string.Empty);
-      Content += LineEnding.Value;
-    end;
-
-    // Count the number of lines
-    LineCount := StringList.Count;
-  finally
-    StringList.Free;
-  end;
+  Bytes := LoadFileAsBytes(FileName);
+  ReadTextFile(Bytes, Content, FileEncoding, LineEnding, LineCount);
 end;
 
-procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding;
-  Encrypt: boolean = False; Hash: TBytes = nil);
+procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding;
+  LineEnding: TLineEnding; Encrypt: boolean = False; Hash: TBytes = nil);
 var
-  LineEndingStr: string;
-  FullText: string;
   FileStream: TFileStream;
   i: integer;
   LineWithEnding: string;
-  Bytes: TBytes;
-  Preamble: TBytes; // Array for BOM
+  Bytes: TBytes = nil;
+  Preamble: TBytes = nil; // Array for BOM
+  TextBytes: TBytes = nil;
 begin
-  // Set the line ending type based on the provided LineEnding
-  if LineEnding = TLineEnding.WindowsCRLF then
-    LineEndingStr := sLineBreak // CRLF
-  else if LineEnding = TLineEnding.UnixLF then
-    LineEndingStr := #10 // LF
-  else if LineEnding = TLineEnding.MacintoshCR then
-    LineEndingStr := #13 // CR
-  else
-    LineEndingStr := sLineBreak; // Default to standard line ending
-
   // Open the file for writing
   FileStream := TFileStream.Create(FileName, fmCreate);
   try
-    // Write the BOM (if any) before writing the content
-    if (IsBOMEncoding(FileEncoding)) then
-    begin
-      Preamble := FileEncoding.GetPreamble;
-      if Length(Preamble) > 0 then
-        FileStream.WriteBuffer(Preamble[0], Length(Preamble)); // Write BOM
-    end;
-
-    // Write empty file
-    if StringList.Count = 0 then
-      Exit;
-
     if Encrypt then
     begin
       // Combine all lines into a single string
       StringList.Options := StringList.Options - [soTrailingLineBreak]; // don't add extra line breaks
-      StringList.LineBreak := LineEndingStr;
+      StringList.LineBreak := LineEnding.Value;
+      if FileEncoding = TEncoding.ANSI then
+        TextBytes := TEncoding.ANSI.GetAnsiBytes(StringList.Text)
+      else
+      if FileEncoding = TEncoding.ASCII then
+        TextBytes := TEncoding.ASCII.GetAnsiBytes(StringList.Text)
+      else
+        TextBytes := FileEncoding.GetBytes(unicodestring(StringList.Text));
 
-      FullText := StringList.Text;
+      // Prepend BOM inside text (if needed)
+      if IsBOMEncoding(FileEncoding) then
+      begin
+        Preamble := FileEncoding.GetPreamble;
+        if Length(Preamble) > 0 then
+        begin
+          SetLength(Bytes, Length(Preamble) + Length(TextBytes));
+          Move(Preamble[0], Bytes[0], Length(Preamble));
+          Move(TextBytes[0], Bytes[Length(Preamble)], Length(TextBytes));
+        end
+        else
+          Bytes := TextBytes;
+      end
+      else
+        Bytes := TextBytes;
 
-      // Convert encrypted string to bytes with the specified encoding
-      Bytes := FileEncoding.GetBytes(unicodestring(EncryptData(FullText, Hash)));
-      if Assigned(Bytes) then
+      // Encrypt bytes
+      Bytes := EncryptData(Bytes, Hash);
+
+      // Write encrypted bytes to file
+      if Length(Bytes) > 0 then
         FileStream.WriteBuffer(Bytes[0], Length(Bytes));
     end
     else
+    begin
+      // For non-encrypted files, write BOM normally at the start
+      if IsBOMEncoding(FileEncoding) then
+      begin
+        Preamble := FileEncoding.GetPreamble;
+        if Length(Preamble) > 0 then
+          FileStream.WriteBuffer(Preamble[0], Length(Preamble));
+      end;
+
+      // Write plain text line by line
       for i := 0 to StringList.Count - 1 do
       begin
-        // For each line except the last, add LineEndingStr
         if i < StringList.Count - 1 then
-          LineWithEnding := StringList[i] + LineEndingStr
+          LineWithEnding := StringList[i] + LineEnding.Value
         else
           LineWithEnding := StringList[i];
 
-        // Convert the string to bytes with the specified encoding
         Bytes := FileEncoding.GetBytes(unicodestring(LineWithEnding));
         if Assigned(Bytes) then
-          FileStream.WriteBuffer(Bytes[0], Length(Bytes)); // Write bytes to the file
+          FileStream.WriteBuffer(Bytes[0], Length(Bytes));
       end;
+    end;
   finally
-    // Free resources
     FileStream.Free;
   end;
 end;

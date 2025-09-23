@@ -14,31 +14,32 @@ uses
   Classes,
   SysUtils,
   PasZLib,
-  Base64,
   DCPrijndael,
   DCPsha256;
 
-/// Compresses a memory stream and prepends its original size for later decompression.
+/// Compresses InputStream and returns a memory stream with original size prepended.
 function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
 
-/// Decompresses a memory stream using the stored original size to allocate output buffer.
+/// Decompresses InputStream using stored original size and returns resulting memory stream.
 function DecompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
 
-/// EncryptData returns Base64 string containing: IV(16) || HMAC(32) || CipherText
-function EncryptData(const PlainText: string; const Hash: TBytes): string;
+/// Encrypts PlainData using Hash and returns combined TBytes: IV(16) || HMAC(32) || CipherText.
+function EncryptData(const PlainData: TBytes; const Hash: TBytes): TBytes;
 
-/// DecryptData returns decrypted UTF-8 string, returns empty string on errors
-function DecryptData(const CipherBase64: string; const Hash: TBytes): string;
+/// Decrypts CipherData using Hash and returns decrypted TBytes, empty on error.
+function DecryptData(const CipherData: TBytes; const Hash: TBytes): TBytes;
 
-/// Generate hash bytes from token string
+/// Generates a hash as TBytes from given Token string.
 function GetHash(const Token: string): TBytes;
 
-/// Checks if a file is likely encrypted with our format (IV + HMAC + ciphertext)
-/// Does not require the password, only tries to decrypt first few bytes
+/// Checks if FileName could be encrypted with our format (IV + HMAC + CipherText) without password.
 function CouldBeEncryptedFile(const FileName: string): boolean;
 
-// Load file as string
+/// Loads the entire file as raw bytes string.
 function LoadFileAsString(const FileName: string): rawbytestring;
+
+/// Loads the entire file as TBytes array.
+function LoadFileAsBytes(const FileName: string): TBytes;
 
 implementation
 
@@ -129,48 +130,47 @@ begin
   end;
 end;
 
-function EncryptData(const PlainText: string; const Hash: TBytes): string;
+function EncryptData(const PlainData: TBytes; const Hash: TBytes): TBytes;
 var
   Cipher: TDCP_rijndael;
   Sha256: TDCP_sha256;
   InputStream, CompressedStream, OutputStream: TMemoryStream;
-  // initialize small arrays at declaration to avoid FPC uninitialized hints
+  // AES-128 key
   Key: array[0..15] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  // Initialization Vector
   IV: array[0..15] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  // SHA-256 result
   HMAC: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  UTF8Input: rawbytestring;
-  Buffer: rawbytestring;
+  Container: TBytes = nil;
   i: integer;
 begin
-  Result := string.Empty;
-  // convert input to UTF-8 bytes
-  UTF8Input := UTF8Encode(PlainText);
-  Buffer := string.Empty;
+  Result := nil;
 
   InputStream := TMemoryStream.Create;
   OutputStream := TMemoryStream.Create;
   Cipher := TDCP_rijndael.Create(nil);
   Sha256 := TDCP_sha256.Create(nil);
   try
-    if Length(UTF8Input) > 0 then
-      InputStream.WriteBuffer(UTF8Input[1], Length(UTF8Input));
+    // write input data to stream
+    if Length(PlainData) > 0 then
+      InputStream.WriteBuffer(PlainData[0], Length(PlainData));
 
     // generate random IV
     Randomize;
     for i := 0 to High(IV) do
       IV[i] := Random(256);
 
-    // derive key directly from precomputed hash
+    // derive key directly from precomputed hash (first 16 bytes for AES-128)
+    FillChar(Key, SizeOf(Key), 0);
     if Length(Hash) >= 16 then
-      Move(Hash[0], Key[0], SizeOf(Key)) // take first 16 bytes for AES-128
-    else
-      FillChar(Key, SizeOf(Key), 0);
+      Move(Hash[0], Key[0], SizeOf(Key));
 
+    // compress before encryption
     CompressedStream := CompressMemoryStream(InputStream);
     try
       CompressedStream.Position := 0;
 
-      // encrypt (AES-128)
+      // encrypt
       Cipher.Init(Key[0], 128, @IV[0]);
       try
         Cipher.EncryptStream(CompressedStream, OutputStream, CompressedStream.Size);
@@ -185,24 +185,23 @@ begin
     Sha256.Init;
     Sha256.Update(Key[0], SizeOf(Key));
     if OutputStream.Size > 0 then
-      // faster: take direct pointer to memory
       Sha256.Update(OutputStream.Memory^, OutputStream.Size);
     Sha256.Final(HMAC[0]);
 
-    // build container: IV + HMAC + CipherText
-    SetLength(Buffer, Length(FILE_MAGIC) + Length(IV) + Length(HMAC) + OutputStream.Size);
-    // copy Magic
-    Move(FILE_MAGIC[0], Buffer[1], Length(FILE_MAGIC));
-    // copy IV
-    Move(IV[0], Buffer[1 + Length(FILE_MAGIC)], Length(IV));
-    // copy HMAC
-    Move(HMAC[0], Buffer[1 + Length(FILE_MAGIC) + Length(IV)], Length(HMAC));
-    // copy ciphertext (if any)
-    if OutputStream.Size > 0 then
-      Move(OutputStream.Memory^, Buffer[1 + Length(FILE_MAGIC) + Length(IV) + Length(HMAC)], OutputStream.Size);
+    // allocate container: MAGIC + IV + HMAC + CipherText
+    SetLength(Container, Length(FILE_MAGIC) + Length(IV) + Length(HMAC) + OutputStream.Size);
 
-    // base64 encode the whole container
-    Result := EncodeStringBase64(Buffer);
+    // copy parts into container
+    if Length(FILE_MAGIC) > 0 then
+      Move(FILE_MAGIC[0], Container[0], Length(FILE_MAGIC));
+    Move(IV[0], Container[Length(FILE_MAGIC)], Length(IV));
+    Move(HMAC[0], Container[Length(FILE_MAGIC) + Length(IV)], Length(HMAC));
+    if OutputStream.Size > 0 then
+      Move(OutputStream.Memory^,
+        Container[Length(FILE_MAGIC) + Length(IV) + Length(HMAC)],
+        OutputStream.Size);
+
+    Result := Container;
 
     // clear sensitive memory
     FillChar(Key, SizeOf(Key), 0);
@@ -215,9 +214,8 @@ begin
   end;
 end;
 
-function DecryptData(const CipherBase64: string; const Hash: TBytes): string;
+function DecryptData(const CipherData: TBytes; const Hash: TBytes): TBytes;
 var
-  Decoded: rawbytestring;
   InputStream, EncryptedStream, OutputStream, DecompressedStream: TMemoryStream;
   Cipher: TDCP_rijndael;
   sha256: TDCP_sha256;
@@ -227,16 +225,14 @@ var
   ExpectedHMAC: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   Magic: array[0..3] of byte = (0, 0, 0, 0);
   EncryptedSize: integer;
-  OutBytes: rawbytestring;
+  OutBytes: TBytes = nil;
   i: integer;
 begin
-  Result := string.Empty;
-  if CipherBase64 = string.Empty then Exit;
-  OutBytes := string.Empty;
-  Decoded := DecodeStringBase64(CipherBase64);
+  Result := nil;
+  if Length(CipherData) = 0 then Exit;
 
   // basic length check (IV + HMAC)
-  if Length(Decoded) < (16 + 32) then Exit;
+  if Length(CipherData) < (SizeOf(IV) + SizeOf(HMAC) + SizeOf(Magic)) then Exit;
 
   InputStream := TMemoryStream.Create;
   EncryptedStream := TMemoryStream.Create;
@@ -244,44 +240,40 @@ begin
   Cipher := TDCP_rijndael.Create(nil);
   sha256 := TDCP_sha256.Create(nil);
   try
-    // put decoded bytes into stream for easy reading
-    InputStream.WriteBuffer(Decoded[1], Length(Decoded));
+    InputStream.WriteBuffer(CipherData[0], Length(CipherData));
     InputStream.Position := 0;
 
     // read and check MAGIC
     InputStream.ReadBuffer(Magic[0], SizeOf(Magic));
-    if not CompareMem(@Magic[0], @FILE_MAGIC[0], SizeOf(FILE_MAGIC)) then
-      Exit(string.Empty); // not our encrypted file
+    if not CompareMem(@Magic[0], @FILE_MAGIC[0], SizeOf(FILE_MAGIC)) then Exit;
 
     // read IV and HMAC
     InputStream.ReadBuffer(IV[0], SizeOf(IV));
     InputStream.ReadBuffer(HMAC[0], SizeOf(HMAC));
 
     // remaining is encrypted data
-    EncryptedSize := InputStream.Size - (SizeOf(FILE_MAGIC) + SizeOf(IV) + SizeOf(HMAC));
+    EncryptedSize := InputStream.Size - (SizeOf(Magic) + SizeOf(IV) + SizeOf(HMAC));
     if EncryptedSize < 0 then Exit;
 
-    // copy encrypted bytes into memory stream
     EncryptedStream.CopyFrom(InputStream, EncryptedSize);
     EncryptedStream.Position := 0;
 
-    // derive key directly from precomputed hash
-    if Length(Hash) >= 16 then
-      Move(Hash[0], Key[0], SizeOf(Key)) // take first 16 bytes for AES-128
+    // derive key
+    if Length(Hash) >= SizeOf(Key) then
+      Move(Hash[0], Key[0], SizeOf(Key))
     else
       FillChar(Key, SizeOf(Key), 0);
 
-    // compute expected HMAC = SHA256(key || ciphertext)
+    // compute expected HMAC
     sha256.Init;
     sha256.Update(Key[0], SizeOf(Key));
     if EncryptedStream.Size > 0 then
       sha256.Update(EncryptedStream.Memory^, EncryptedStream.Size);
     sha256.Final(ExpectedHMAC[0]);
 
-    // constant-time compare HMACs
+    // verify HMAC
     for i := 0 to High(HMAC) do
-      if HMAC[i] <> ExpectedHMAC[i] then
-        Exit(string.Empty); // password incorrect or data corrupt
+      if HMAC[i] <> ExpectedHMAC[i] then Exit;
 
     // decrypt
     EncryptedStream.Position := 0;
@@ -292,22 +284,20 @@ begin
       Cipher.Burn;
     end;
 
-    // convert decrypted UTF-8 bytes to string
+    // decompress
     if OutputStream.Size > 0 then
     begin
       DecompressedStream := DecompressMemoryStream(OutputStream);
       try
         SetLength(OutBytes, DecompressedStream.Size);
         DecompressedStream.Position := 0;
-        DecompressedStream.ReadBuffer(OutBytes[1], DecompressedStream.Size);
+        DecompressedStream.ReadBuffer(OutBytes[0], DecompressedStream.Size);
       finally
         DecompressedStream.Free;
       end;
 
-      Result := string(UTF8ToString(OutBytes));
-    end
-    else
-      Result := string.Empty;
+      Result := Outbytes;
+    end;
 
     // clear sensitive memory
     FillChar(Key, SizeOf(Key), 0);
@@ -344,29 +334,38 @@ end;
 function CouldBeEncryptedFile(const FileName: string): boolean;
 var
   FS: TFileStream;
-  Encoded: ansistring;
-  Decoded: rawbytestring;
   Magic: array[0..3] of byte = (0, 0, 0, 0);
 begin
   Result := False;
   if not FileExists(FileName) then Exit;
-  Encoded := string.Empty;
 
   FS := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
   try
-    SetLength(Encoded, FS.Size);
-    FS.ReadBuffer(Encoded[1], FS.Size);
+    if FS.Size < SizeOf(Magic) then Exit;
+
+    FS.ReadBuffer(Magic, SizeOf(Magic));
+
+    Result := CompareMem(@Magic[0], @FILE_MAGIC[0], SizeOf(Magic));
   finally
     FS.Free;
   end;
+end;
 
+function LoadFileAsBytes(const FileName: string): TBytes;
+var
+  FS: TFileStream;
+begin
+  Result := nil;
+  SetLength(Result, 0);
+  if not FileExists(FileName) then Exit;
+
+  FS := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
   try
-    Decoded := DecodeStringBase64(Encoded);
-    if Length(Decoded) < Length(FILE_MAGIC) then Exit;
-    Move(Decoded[1], Magic[0], Length(Magic));
-    Result := CompareMem(@Magic[0], @FILE_MAGIC[0], SizeOf(FILE_MAGIC));
-  except
-    Result := False;
+    SetLength(Result, FS.Size);
+    if FS.Size > 0 then
+      FS.ReadBuffer(Result[0], FS.Size);
+  finally
+    FS.Free;
   end;
 end;
 
@@ -374,7 +373,7 @@ function LoadFileAsString(const FileName: string): rawbytestring;
 var
   FS: TFileStream;
 begin
-  Result := '';
+  Result := string.Empty;
   if not FileExists(FileName) then Exit;
   FS := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
   try
