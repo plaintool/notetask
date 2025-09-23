@@ -123,92 +123,116 @@ begin
   codePoint := 0;
   minCode := 0;
 
+  // If buffer is empty, it's technically valid UTF-8
+  if BytesRead <= 0 then
+    Exit;
+
   for i := 0 to BytesRead - 1 do
   begin
     if remaining = 0 then
     begin
-      // Handling new character
+      // Handle new character sequence
       if Buffer[i] <= $7F then
       begin
-        // Valid ASCII character (0xxxxxxx)
+        // Valid ASCII character (0xxxxxxx) - always valid in UTF-8
         continue;
       end
-      else if (Buffer[i] >= $C0) and (Buffer[i] <= $DF) then
+      else if (Buffer[i] >= $C2) and (Buffer[i] <= $DF) then
       begin
-        // 2-byte sequence (110xxxxx)
+        // 2-byte sequence (110xxxxx) - NOTE: Starts from $C2, not $C0
+        // $C0 and $C1 would create overlong encodings for ASCII chars
         remaining := 1;
         codePoint := Buffer[i] and $1F; // Extract 5 bits
-        minCode := $80; // Min value for 2-byte seq
+        minCode := $80; // Minimum code point for 2-byte sequence
       end
       else if (Buffer[i] >= $E0) and (Buffer[i] <= $EF) then
       begin
         // 3-byte sequence (1110xxxx)
         remaining := 2;
         codePoint := Buffer[i] and $0F; // Extract 4 bits
-        minCode := $800; // Min value for 3-byte seq
+        minCode := $800; // Minimum code point for 3-byte sequence
       end
-      else if (Buffer[i] >= $F0) and (Buffer[i] <= $F7) then
+      else if (Buffer[i] >= $F0) and (Buffer[i] <= $F4) then
       begin
-        // 4-byte sequence (11110xxx)
+        // 4-byte sequence (11110xxx) - NOTE: Only up to $F4 (Unicode max is U+10FFFF)
         remaining := 3;
         codePoint := Buffer[i] and $07; // Extract 3 bits
-        minCode := $10000; // Min value for 4-byte seq
+        minCode := $10000; // Minimum code point for 4-byte sequence
       end
       else
       begin
-        // Invalid starting byte
+        // Invalid starting byte:
+        // - $C0, $C1: Overlong encoding (should use 1 byte for ASCII)
+        // - $F5-$FF: Beyond Unicode maximum (U+10FFFF)
+        // - $80-$BF: Continuation bytes without leading byte
         Result := False;
         Exit;
       end;
     end
     else
     begin
-      // Handling continuation byte (must be 10xxxxxx)
+      // Handle continuation byte (must be 10xxxxxx)
       if (Buffer[i] < $80) or (Buffer[i] > $BF) then
       begin
+        // Invalid continuation byte
         Result := False;
         Exit;
       end;
 
-      // Add 6 bits to code point
+      // Add 6 bits to the code point
       codePoint := (codePoint shl 6) or (Buffer[i] and $3F);
       Dec(remaining);
 
-      // If sequence complete, validate code point
+      // If sequence is complete, validate the code point
       if remaining = 0 then
       begin
-        // Check minimal encoding length
+        // Check for overlong encoding (using more bytes than necessary)
         if codePoint < minCode then
         begin
           Result := False;
           Exit;
         end;
 
-        // Special checks for 3-byte sequences
+        // Check for 3-byte sequences that could represent surrogates
         if minCode = $800 then
         begin
-          // Forbidden surrogate pairs (U+D800..U+DFFF)
+          // UTF-8 should not encode surrogate pairs (U+D800 to U+DFFF)
+          // These are reserved for UTF-16 encoding
           if (codePoint >= $D800) and (codePoint <= $DFFF) then
           begin
             Result := False;
             Exit;
           end;
         end
-        // Special checks for 4-byte sequences
+        // Check for 4-byte sequences beyond Unicode maximum
         else if minCode = $10000 then
         begin
-          // Maximum Unicode value (U+10FFFF)
+          // Unicode maximum is U+10FFFF
           if codePoint > $10FFFF then
           begin
             Result := False;
             Exit;
           end;
         end;
+
+        // Additional validation for specific starting bytes
+        if (Buffer[i - remaining - 1] = $E0) and (codePoint < $800) then
+        begin
+          // Overlong encoding for 3-byte sequence starting with $E0
+          Result := False;
+          Exit;
+        end
+        else if (Buffer[i - remaining - 1] = $F0) and (codePoint < $10000) then
+        begin
+          // Overlong encoding for 4-byte sequence starting with $F0
+          Result := False;
+          Exit;
+        end;
       end;
     end;
   end;
 
-  // Check for incomplete sequence at end
+  // Check for incomplete multi-byte sequence at the end of buffer
   if remaining > 0 then
     Result := False;
 end;
@@ -233,19 +257,96 @@ function IsValidAnsi(var Buffer: array of byte; BytesRead: integer): boolean;
 var
   i: integer;
 begin
-  Result := True; // Assume valid ANSI
+  Result := True;
 
-  for i := 0 to BytesRead - 1 do
+  // If buffer is empty, consider it valid ANSI (empty text)
+  if BytesRead <= 0 then
+    Exit;
+
+  i := 0;
+  while i < BytesRead do
   begin
-    // Allow characters from 0 to 255 (Windows-1251)
-    if (Buffer[i] > $7F) and (Buffer[i] < $C0) and (Buffer[i] <> $A0) and (Buffer[i] <> $A1) and
-      (Buffer[i] <> $A2) and (Buffer[i] <> $A3) and (Buffer[i] <> $A4) and (Buffer[i] <> $A5) and
-      (Buffer[i] <> $A6) and (Buffer[i] <> $A7) and (Buffer[i] <> $A8) and (Buffer[i] <> $A9) and
-      (Buffer[i] <> $AA) and (Buffer[i] <> $AB) and (Buffer[i] <> $AC) and (Buffer[i] <> $AD) and
-      (Buffer[i] <> $AE) and (Buffer[i] <> $AF) then
+    // Check for UTF-8 BOM (EF BB BF)
+    if (i + 2 < BytesRead) and (Buffer[i] = $EF) and (Buffer[i + 1] = $BB) and (Buffer[i + 2] = $BF) then
     begin
-      Result := False; // Invalid ANSI character found
+      Result := False; // UTF-8 BOM found
       Exit;
+    end;
+
+    // Check for UTF-16 LE BOM (FF FE)
+    if (i + 1 < BytesRead) and (Buffer[i] = $FF) and (Buffer[i + 1] = $FE) then
+    begin
+      Result := False; // UTF-16 LE BOM found
+      Exit;
+    end;
+
+    // Check for UTF-16 BE BOM (FE FF)
+    if (i + 1 < BytesRead) and (Buffer[i] = $FE) and (Buffer[i + 1] = $FF) then
+    begin
+      Result := False; // UTF-16 BE BOM found
+      Exit;
+    end;
+
+    // Check for UTF-8 multi-byte sequences
+    if (Buffer[i] and $80) <> 0 then // High bit set - potential multi-byte
+    begin
+      // 2-byte UTF-8 sequence (110xxxxx 10xxxxxx)
+      if (Buffer[i] and $E0) = $C0 then
+      begin
+        if (i + 1 >= BytesRead) or ((Buffer[i + 1] and $C0) <> $80) then
+        begin
+          // Invalid UTF-8 continuation byte, but could be valid ANSI
+          Inc(i);
+          Continue;
+        end
+        else
+        begin
+          // Valid UTF-8 2-byte sequence found
+          Result := False;
+          Exit;
+        end;
+      end
+      // 3-byte UTF-8 sequence (1110xxxx 10xxxxxx 10xxxxxx)
+      else if (Buffer[i] and $F0) = $E0 then
+      begin
+        if (i + 2 >= BytesRead) or ((Buffer[i + 1] and $C0) <> $80) or ((Buffer[i + 2] and $C0) <> $80) then
+        begin
+          Inc(i);
+          Continue;
+        end
+        else
+        begin
+          Result := False;
+          Exit;
+        end;
+      end
+      // 4-byte UTF-8 sequence (11110xxx 10xxxxxx 10xxxxxx 10xxxxxx)
+      else if (Buffer[i] and $F8) = $F0 then
+      begin
+        if (i + 3 >= BytesRead) or ((Buffer[i + 1] and $C0) <> $80) or ((Buffer[i + 2] and $C0) <> $80) or
+          ((Buffer[i + 3] and $C0) <> $80) then
+        begin
+          Inc(i);
+          Continue;
+        end
+        else
+        begin
+          Result := False;
+          Exit;
+        end;
+      end
+      else
+      begin
+        // Single byte with high bit set - valid in ANSI
+        // Continue checking next bytes
+        Inc(i);
+        Continue;
+      end;
+    end
+    else
+    begin
+      // Standard ASCII character (0-127) - always valid in ANSI
+      Inc(i);
     end;
   end;
 end;
@@ -285,12 +386,12 @@ begin
     // If no BOM is found, check the content for text patterns
     // Reset position to the beginning of the file
     FileStream.Position := 0;
-    // Create a dynamic array for the first 1024 bytes
-    SetLength(ContentBuffer, 1024);
+
+    // Create a dynamic array for up to the first 1024 bytes
+    SetLength(ContentBuffer, Min(FileStream.Size, 1024 * 4));
     BytesRead := FileStream.Read(ContentBuffer[0], Length(ContentBuffer));
 
     // Check if the file content could be ANSI
-
     if IsValidUtf8(ContentBuffer, BytesRead) then
       Result := TEncoding.UTF8
     else if IsValidAnsi(ContentBuffer, BytesRead) then
