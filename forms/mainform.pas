@@ -490,7 +490,7 @@ type
     procedure ArchiveTask(aRow: integer = 0);
     procedure ArchiveTasks;
     procedure CompleteTasks(aRow: integer = 0);
-    procedure StarTask(aRow: integer = 0);
+    procedure StarTasks(aRow: integer = 0);
     procedure IndentTasks(Outdent: boolean = False);
     procedure SetBiDiRightToLeft(Value: boolean);
     procedure SetShowStatusBar(Value: boolean);
@@ -981,8 +981,8 @@ begin
   begin
     if not IsEditing then
     begin
-      if (taskGrid.Col = 6) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
-        StarTask
+      if (not taskGrid.Columns[0].Visible) or (taskGrid.Col = 6) then
+        StarTasks
       else
         CompleteTasks;
       Key := 0;
@@ -1024,7 +1024,7 @@ begin
         CompleteTasks
       else
       if (taskGrid.Col = 6) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
-        StarTask;
+        StarTasks;
     end;
   end;
 end;
@@ -1164,7 +1164,7 @@ begin
   begin
     if (FDisableStarToggle) then exit;
 
-    StarTask(aRow);
+    StarTasks(aRow);
   end;
 end;
 
@@ -4619,7 +4619,6 @@ begin
     if ShowDuration then FillGrid;
     SetChanged; // Mark that data has changed
     SetInfo;
-    Invalidate;
   end
   else
   begin
@@ -4639,6 +4638,7 @@ begin
       end;
       // Mark the task as completed in the collection
       Tasks.CompleteTask(RowIndex, False);
+
       if Tasks.GetTask(RowIndex).Done then
       begin
         Check := True;
@@ -4653,38 +4653,55 @@ begin
       if (ShowDuration) and (Check) then FillGrid;
       SetChanged; // Mark that data has changed
       SetInfo;
-      Invalidate;
     end;
   end;
 end;
 
-procedure TformNotetask.StarTask(aRow: integer = 0);
+procedure TformNotetask.StarTasks(aRow: integer = 0);
 var
-  RowIndex: integer;
+  Rows: TIntegerArray = nil;
+  i, RowIndex: integer;
 begin
-  if (aRow = 0) then
-    RowIndex := taskGrid.Row
-  else
-    RowIndex := aRow;
-
-  if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+  // Detect selected rows
+  if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
   begin
-    if FBackup then
-    begin
-      GridBackupSelection;
-      Tasks.CreateBackup;
-    end;
-    // Mark the task as completed in the collection
-    Tasks.StarTask(RowIndex, False);
-    if Tasks.GetTask(RowIndex).Star then
-      taskGrid.Cells[6, RowIndex] := '1'
+    SetLength(Rows, taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1);
+    for i := 0 to High(Rows) do
+      Rows[i] := taskGrid.Selection.Top + i;
+  end
+  else
+  begin
+    if aRow = 0 then
+      RowIndex := taskGrid.Row
     else
-      taskGrid.Cells[6, RowIndex] := '0';
-
-    Tasks.SetTask(taskGrid, RowIndex, False, FShowTime);
-    SetChanged; // Mark that data has changed
-    Invalidate;
+      RowIndex := aRow;
+    SetLength(Rows, 1);
+    Rows[0] := RowIndex;
   end;
+
+  if FBackup then
+  begin
+    GridBackupSelection;
+    Tasks.CreateBackup;
+  end;
+
+  for i := 0 to High(Rows) do
+  begin
+    RowIndex := Rows[i];
+    if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+    begin
+      Tasks.StarTask(RowIndex, False);
+
+      if Tasks.GetTask(RowIndex).Star then
+        taskGrid.Cells[6, RowIndex] := '1'
+      else
+        taskGrid.Cells[6, RowIndex] := '0';
+
+      Tasks.SetTask(taskGrid, RowIndex, False, FShowTime);
+    end;
+  end;
+
+  SetChanged;  // Mark that data has changed
 end;
 
 procedure TformNotetask.IndentTasks(Outdent: boolean = False);
@@ -5148,6 +5165,8 @@ begin
       FLoadedMemoNoteScroll := 0;
     end;
   end;
+
+  taskGrid.Invalidate;
 end;
 
 procedure TformNotetask.GridAdjustScrollBars;
@@ -5792,6 +5811,7 @@ begin
   aUndo.Enabled := FChanged;
   aUndoAll.Enabled := FChanged;
   SetCaption;
+  taskGrid.Invalidate;
 end;
 
 procedure TformNotetask.DisableDrag;
