@@ -36,13 +36,14 @@ It is designed to help you quickly organize a large number of small routine task
 - **Grouping** — each group on its own page, with full group management
 - **Track duration** — per-task (on/off) and **total duration** for all or selected tasks
 - **Track amount** — per-task quantities or prices and **total amount** for all or selected tasks
-- **Status bar summary** — separate time totals for **completed** and **incomplete** tasks
-- **Customize columns** — toggle visibility of columns and interface elements (e.g., duration, note field, status bar)
 - **Merge tasks** — combine multiple tasks into one
 - **Indent tasks** — create subtasks and task hierarchies
 - **Highlight** — automatic background highlighting of overdue tasks, text highlighting of archived but incomplete tasks and blue text for tasks with a future due date
 - **Copy tasks** — copy selected tasks or fields in Markdown format
 - **Paste tasks** — insert individual fields or entire tasks from clipboard
+- **Encrypt files** — password-based encryption and decryption of task files for secure storage and sharing
+- **Customize columns** — toggle visibility of columns and interface elements (e.g., duration, note field, status bar)
+- **Status bar summary** — shows totals of dates and amounts separately for **completed** and **incomplete** tasks
 
 ### Shopping list
 **Notetask** allows you to keep a shopping list with item prices and see the total cost in the status bar, including the cost of purchased items.
@@ -57,6 +58,15 @@ Suitable for note-taking with an optional general note field at the bottom of th
 Supports advanced features such as executing selected comments, tasks, or the entire script from notes as console commands.
 
 ![sample4](samples/sample4.png)
+
+### Encryption
+Notetask supports file encryption using AES-256 in CBC mode with a SHA-256-derived key. Files are first compressed with zlib and then encrypted, with an HMAC-like SHA-256 checksum added for integrity verification.
+
+The user can save an encrypted binary file with password protection. If the password is left empty, the file is still encrypted but without password protection, storing only the compressed data in the encrypted format.
+
+To save an encrypted file, the corresponding format must be selected in the file save dialog.
+
+![statusbar](samples/encrypt.png)
 
 ### Shortcuts
 Nearly all major features can be accessed through convenient keyboard shortcuts.  
