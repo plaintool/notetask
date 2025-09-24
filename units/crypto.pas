@@ -135,8 +135,8 @@ var
   Cipher: TDCP_rijndael;
   Sha256: TDCP_sha256;
   InputStream, CompressedStream, OutputStream: TMemoryStream;
-  // AES-128 key
-  Key: array[0..15] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  // AES-256 key
+  Key: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   // Initialization Vector
   IV: array[0..15] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   // SHA-256 result
@@ -160,9 +160,9 @@ begin
     for i := 0 to High(IV) do
       IV[i] := Random(256);
 
-    // derive key directly from precomputed hash (first 16 bytes for AES-128)
+    // derive key directly from precomputed hash (first 32 bytes for AES-256)
     FillChar(Key, SizeOf(Key), 0);
-    if Length(Hash) >= 16 then
+    if Length(Hash) >= 32 then
       Move(Hash[0], Key[0], SizeOf(Key));
 
     // compress before encryption
@@ -171,7 +171,7 @@ begin
       CompressedStream.Position := 0;
 
       // encrypt
-      Cipher.Init(Key[0], 128, @IV[0]);
+      Cipher.Init(Key[0], 256, @IV[0]);
       try
         Cipher.EncryptStream(CompressedStream, OutputStream, CompressedStream.Size);
       finally
@@ -219,8 +219,11 @@ var
   InputStream, EncryptedStream, OutputStream, DecompressedStream: TMemoryStream;
   Cipher: TDCP_rijndael;
   sha256: TDCP_sha256;
-  Key: array[0..15] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  // AES-256 key
+  Key: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  // Initialization Vector
   IV: array[0..15] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  // SHA-256 HMAC
   HMAC: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   ExpectedHMAC: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   Magic: array[0..3] of byte = (0, 0, 0, 0);
@@ -277,7 +280,7 @@ begin
 
     // decrypt
     EncryptedStream.Position := 0;
-    Cipher.Init(Key[0], 128, @IV[0]);
+    Cipher.Init(Key[0], 256, @IV[0]);
     try
       Cipher.DecryptStream(EncryptedStream, OutputStream, EncryptedSize);
     finally
