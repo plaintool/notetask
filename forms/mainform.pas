@@ -3338,7 +3338,7 @@ end;
 function TformNotetask.OpenFile(fileName: string; saveSettings: boolean = True; ShowTrigger: boolean = False): boolean;
 var
   Content: string;
-  Bytes:TBytes;
+  Bytes: TBytes;
   FileNameOld: string;
   EncryptedOld: boolean;
   HashOld: TBytes = nil;
@@ -3511,10 +3511,15 @@ end;
 function TformNotetask.SaveFileAs: boolean;
 begin
   if FEncrypted then
-    saveDialog.FilterIndex := 2
-  else
-    saveDialog.FilterIndex := 1;
-  if (saveDialog.Execute) then
+    saveDialog.FilterIndex := 2;
+
+  if FFileName <> string.Empty then
+  begin
+    saveDialog.FileName := ExtractFileName(FFileName); // file name only
+    saveDialog.InitialDir := ExtractFileDir(FFileName); // set initial directory
+  end;
+
+  if saveDialog.Execute then
   begin
     Result := SaveFile(saveDialog.FileName, True, saveDialog.FilterIndex = 2);
   end
