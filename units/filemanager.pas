@@ -24,6 +24,10 @@ uses
   lineending,
   crypto;
 
+function FindPowerShellCore: string;
+
+procedure UpdateFileReadAccess(const FileName: string);
+
 function GetEncodingName(Encoding: TEncoding): string;
 
 function IsUserEncoding(Enc: TEncoding): boolean;
@@ -57,15 +61,83 @@ procedure ReadTextFile(const FileName: string; out Content: string; out FileEnco
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding;
   Encrypt: boolean = False; Hash: TBytes = nil);
 
-function FindPowerShellCore: string;
-
-procedure UpdateFileReadAccess(const FileName: string);
-
 var
   UTF8BOMEncoding: TEncoding;
   UTF16LEBOMEncoding, UTF16BEBOMEncoding: TEncoding;
 
 implementation
+
+function FindPowerShellCore: string;
+var
+  SearchPaths: array of string;
+  PathEnv, PathPart, TrimmedPath: string;
+  I: integer;
+  Paths: array of string;
+begin
+  Result := string.Empty;
+
+  // Common install locations for PowerShell 7 and 6
+  SearchPaths := ['C:\Program Files\PowerShell\6\pwsh.exe', 'C:\Program Files\PowerShell\7\pwsh.exe',
+    'C:\Program Files\PowerShell\8\pwsh.exe', 'C:\Program Files\PowerShell\9\pwsh.exe', 'C:\Program Files\PowerShell\10\pwsh.exe'];
+
+  // Check known fixed locations first
+  for I := Low(SearchPaths) to High(SearchPaths) do
+    if FileExists(SearchPaths[I]) then
+      Exit(SearchPaths[I]);
+
+  // Check all folders in PATH environment variable
+  PathEnv := SysUtils.GetEnvironmentVariable('PATH');
+  Paths := SplitString(PathEnv, ';');
+
+  for I := 0 to Length(Paths) - 1 do
+  begin
+    TrimmedPath := Trim(Paths[I]);
+    if TrimmedPath <> '' then
+    begin
+      PathPart := IncludeTrailingPathDelimiter(TrimmedPath) + 'pwsh.exe';
+      if FileExists(PathPart) then
+        Exit(PathPart);
+    end;
+  end;
+end;
+
+procedure UpdateFileReadAccess(const FileName: string);
+var
+  {$IFDEF UNIX}
+  t: utimbuf;
+  {$ELSE}
+  h: THandle;
+  ft: TFileTime;
+  {$ENDIF}
+begin
+  {$IFDEF UNIX}
+  // Convert local time to UTC and update only access time (atime) on UNIX
+  t.actime := DateTimeToUnix(Now, False);
+  // Keep the modification time (mtime) unchanged
+  t.modtime := FileAge(FileName);
+  // Apply the updated times to the file
+  fpUTime(FileName, @t);
+  {$ELSE}
+  // Zero initialize FILETIME
+  ft.dwLowDateTime := 0;
+  ft.dwHighDateTime := 0;
+
+  // Open the file handle for writing to update LastAccessTime
+  h := CreateFile(PChar(FileName), GENERIC_WRITE, FILE_SHARE_READ or FILE_SHARE_WRITE, nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+  if h <> INVALID_HANDLE_VALUE then
+  begin
+    try
+      // Get the current system time as FILETIME
+      GetSystemTimeAsFileTime(ft);
+      // Set only the LastAccessTime of the file
+      SetFileTime(h, nil, @ft, nil);
+    finally
+      // Close the file handle
+      CloseHandle(h);
+    end;
+  end;
+  {$ENDIF}
+end;
 
 function GetEncodingName(Encoding: TEncoding): string;
 begin
@@ -472,7 +544,21 @@ begin
   else if CountCR > 0 then
     Result := TLineEnding.MacintoshCR
   else
+  begin
+    {$IFDEF Windows}
+      Result := TLineEnding.WindowsCRLF;
+    {$ELSE}
+    {$IFDEF Linux}
+        Result := TLineEnding.UnixLF;
+    {$ELSE}
+    {$IFDEF Darwin}
+          Result := TLineEnding.MacintoshCR;
+    {$ELSE}
     Result := TLineEnding.Unknown;
+    {$ENDIF}
+    {$ENDIF}
+    {$ENDIF}
+  end;
 end;
 
 function DetectLineEnding(const FileName: string; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding;
@@ -514,7 +600,8 @@ begin
   StringList := TStringList.Create;
   MemoryStream := TMemoryStream.Create;
   try
-    MemoryStream.WriteBuffer(Bytes[0], Length(Bytes));
+    if (Length(Bytes) > 0) then
+      MemoryStream.WriteBuffer(Bytes[0], Length(Bytes));
     MemoryStream.Position := 0;
 
     // Don't add line break at end string
@@ -573,6 +660,7 @@ var
   Bytes: TBytes = nil;
   Preamble: TBytes = nil; // Array for BOM
   TextBytes: TBytes = nil;
+  Text: string;
 begin
   // Open the file for writing
   FileStream := TFileStream.Create(FileName, fmCreate);
@@ -582,13 +670,16 @@ begin
       // Combine all lines into a single string
       StringList.Options := StringList.Options - [soTrailingLineBreak]; // don't add extra line breaks
       StringList.LineBreak := LineEnding.Value;
+      Text := StringList.Text;
+      // Add [] to empty files to allow opening
+      if (Text = string.Empty) then Text := Text + '[]';
       if FileEncoding = TEncoding.ANSI then
-        TextBytes := TEncoding.ANSI.GetAnsiBytes(StringList.Text)
+        TextBytes := TEncoding.ANSI.GetAnsiBytes(Text)
       else
       if FileEncoding = TEncoding.ASCII then
-        TextBytes := TEncoding.ASCII.GetAnsiBytes(StringList.Text)
+        TextBytes := TEncoding.ASCII.GetAnsiBytes(Text)
       else
-        TextBytes := FileEncoding.GetBytes(unicodestring(StringList.Text));
+        TextBytes := FileEncoding.GetBytes(unicodestring(Text));
 
       // Prepend BOM inside text (if needed)
       if IsBOMEncoding(FileEncoding) then
@@ -639,78 +730,6 @@ begin
   finally
     FileStream.Free;
   end;
-end;
-
-function FindPowerShellCore: string;
-var
-  SearchPaths: array of string;
-  PathEnv, PathPart, TrimmedPath: string;
-  I: integer;
-  Paths: array of string;
-begin
-  Result := string.Empty;
-
-  // Common install locations for PowerShell 7 and 6
-  SearchPaths := ['C:\Program Files\PowerShell\6\pwsh.exe', 'C:\Program Files\PowerShell\7\pwsh.exe',
-    'C:\Program Files\PowerShell\8\pwsh.exe', 'C:\Program Files\PowerShell\9\pwsh.exe', 'C:\Program Files\PowerShell\10\pwsh.exe'];
-
-  // Check known fixed locations first
-  for I := Low(SearchPaths) to High(SearchPaths) do
-    if FileExists(SearchPaths[I]) then
-      Exit(SearchPaths[I]);
-
-  // Check all folders in PATH environment variable
-  PathEnv := SysUtils.GetEnvironmentVariable('PATH');
-  Paths := SplitString(PathEnv, ';');
-
-  for I := 0 to Length(Paths) - 1 do
-  begin
-    TrimmedPath := Trim(Paths[I]);
-    if TrimmedPath <> '' then
-    begin
-      PathPart := IncludeTrailingPathDelimiter(TrimmedPath) + 'pwsh.exe';
-      if FileExists(PathPart) then
-        Exit(PathPart);
-    end;
-  end;
-end;
-
-procedure UpdateFileReadAccess(const FileName: string);
-var
-  {$IFDEF UNIX}
-  t: utimbuf;
-  {$ELSE}
-  h: THandle;
-  ft: TFileTime;
-  {$ENDIF}
-begin
-  {$IFDEF UNIX}
-  // Convert local time to UTC and update only access time (atime) on UNIX
-  t.actime := DateTimeToUnix(Now, False);
-  // Keep the modification time (mtime) unchanged
-  t.modtime := FileAge(FileName);
-  // Apply the updated times to the file
-  fpUTime(FileName, @t);
-  {$ELSE}
-  // Zero initialize FILETIME
-  ft.dwLowDateTime := 0;
-  ft.dwHighDateTime := 0;
-
-  // Open the file handle for writing to update LastAccessTime
-  h := CreateFile(PChar(FileName), GENERIC_WRITE, FILE_SHARE_READ or FILE_SHARE_WRITE, nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-  if h <> INVALID_HANDLE_VALUE then
-  begin
-    try
-      // Get the current system time as FILETIME
-      GetSystemTimeAsFileTime(ft);
-      // Set only the LastAccessTime of the file
-      SetFileTime(h, nil, @ft, nil);
-    finally
-      // Close the file handle
-      CloseHandle(h);
-    end;
-  end;
-  {$ENDIF}
 end;
 
 initialization
