@@ -32,9 +32,15 @@ function TryStrToFloatLimited(const S: string; out Value: double): boolean;
 
 function FloatToString(Value: double): string;
 
+function SplitByFirstSpaces(const S: string; Count: integer = 1): TStringArray;
+
+function StartsWithBracketAZ(const S: string): boolean;
+
 function IsBracket(const Input: string): boolean;
 
 function RemoveBrackets(const S: string): string;
+
+function DetectDone(const Input: string): boolean;
 
 function CleanString(const Value: string): string;
 
@@ -43,8 +49,6 @@ function CleanNumericExpression(Value: string): string;
 function CleanNumeric(Value: string): string;
 
 function CleanAmount(const Value: string): string;
-
-function DetectDone(const Input: string): boolean;
 
 function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 2): string;
 
@@ -58,6 +62,8 @@ function IsUTF8Char(const S: string; CharIndex: integer; FindChar: string = ' ')
 
 function IsLetterOrDigit(ch: widechar): boolean;
 
+function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
+
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer);
 
 procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
@@ -65,7 +71,8 @@ procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
 function CloneArray(const Src: TIntegerArray): TIntegerArray;
 
 const
-  Brackets: array[0..11] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]', '[X]', '[ ]', '[]');
+  Brackets: array[0..17] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]',
+    '[X]', '[ ]', '[]', 'x ', '-x ', '- x ', 'X ', '-X ', '- X ');
   UnicodeMinusUTF8 = #$E2#$88#$92;
   MaxFloatStringLength = 15;
   MaxDT: TDateTime = 2958465.999988426; // 31.12.9999 23:59:59
@@ -171,6 +178,62 @@ begin
   Result := FloatToStr(Value);
 end;
 
+function SplitByFirstSpaces(const S: string; Count: integer = 1): TStringArray;
+var
+  SpacePos, i: integer;
+  Remaining: string;
+begin
+  Result := nil;
+  if Count < 1 then Count := 1;
+
+  SetLength(Result, 0);
+  Remaining := S;
+
+  for i := 1 to Count do
+  begin
+    SpacePos := Pos(' ', Remaining);
+    if SpacePos = 0 then
+      Break;
+
+    SetLength(Result, Length(Result) + 1);
+    Result[High(Result)] := Copy(Remaining, 1, SpacePos - 1);
+    Remaining := Copy(Remaining, SpacePos + 1, Length(Remaining));
+  end;
+
+  // Add whatever is left as the last part
+  SetLength(Result, Length(Result) + 1);
+  Result[High(Result)] := Remaining;
+end;
+
+function StartsWithBracketAZ(const S: string): boolean;
+var
+  C: char;
+begin
+  Result := False;
+  // String must be at least 4 characters long: "(A) "
+  if Length(S) < 4 then
+    Exit;
+
+  // First char must be '('
+  if S[1] <> '(' then
+    Exit;
+
+  // Second char must be A..Z
+  C := S[2];
+  if not (C in ['A'..'Z']) then
+    Exit;
+
+  // Third char must be ')'
+  if S[3] <> ')' then
+    Exit;
+
+  // Fourth char must be space
+  if S[4] <> ' ' then
+    Exit;
+
+  Result := True;
+end;
+
 function IsBracket(const Input: string): boolean;
 var
   TrimmedInput: string;
@@ -208,6 +271,25 @@ begin
       if (Length(Result) > 0) and (Result.StartsWith(' ')) then
         Delete(Result, 1, 1);
       Break;
+    end;
+  end;
+end;
+
+function DetectDone(const Input: string): boolean;
+var
+  i: integer;
+  LowerInput: string;
+const
+  Brackets: array[0..5] of string = ('- [x]', '-[x]', '[x]', 'x ', '- x ', '-x ');
+begin
+  Result := False;
+  LowerInput := Trim(LowerCase(Input));
+  for i := 0 to High(Brackets) do
+  begin
+    if LowerInput.StartsWith(LowerCase(Brackets[i])) then
+    begin
+      Result := True;
+      Exit;
     end;
   end;
 end;
@@ -267,25 +349,6 @@ end;
 function CleanAmount(const Value: string): string;
 begin
   Result := Value.Replace(' ', string.empty).Replace(',', '.').Trim;
-end;
-
-function DetectDone(const Input: string): boolean;
-var
-  i: integer;
-  LowerInput: string;
-const
-  Brackets: array[0..2] of string = ('- [x]', '-[x]', '[x]');
-begin
-  Result := False;
-  LowerInput := Trim(LowerCase(Input));
-  for i := 0 to High(Brackets) do
-  begin
-    if LowerInput.StartsWith(LowerCase(Brackets[i])) then
-    begin
-      Result := True;
-      Exit;
-    end;
-  end;
 end;
 
 function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 2): string;
@@ -445,6 +508,24 @@ end;
 function IsLetterOrDigit(ch: widechar): boolean;
 begin
   Result := (ch in ['0'..'9', 'A'..'Z', 'a'..'z']) or (ch > #127);
+end;
+
+function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
+var
+  i: integer;
+begin
+  Result := string.Empty;
+  if Length(Parts) = 0 then Exit;
+
+  if StartIndex < 0 then StartIndex := 0;
+  if StartIndex > High(Parts) then Exit;
+
+  for i := StartIndex to High(Parts) do
+  begin
+    Result += Parts[i];
+    if i < High(Parts) then
+      Result += Separator;
+  end;
 end;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer);

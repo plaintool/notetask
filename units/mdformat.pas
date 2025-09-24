@@ -33,42 +33,71 @@ uses formattool;
 
 function TaskFromString(const TaskString: string): TTask;
 var
-  PartNote, PartDate: TStringArray; // Use TStringArray for compatibility
+  PartNote, PartDate, PartSpace: TStringArray; // Use TStringArray for compatibility
   CompletedStr: string;
 
-  procedure FillText(start: integer = 1);
-  var
-    i: integer;
+  function TestParts(Part: TStringArray; var Result1: TTask; const Separator: string = ','): boolean;
   begin
-    Result.FText := string.Empty;
-    for i := start to High(PartDate) do
+    Result := False;
+    if Length(Part) > 2 then
     begin
-      Result.FText += PartDate[i];
-      if (i < High(PartDate)) then Result.FText += ',';
-    end;
-  end;
-
-  procedure FillNote(start: integer = 1);
-  var
-    i: integer;
-  begin
-    Result.FNote := string.Empty;
-    for i := start to High(PartNote) do
+      Result := True;
+      // Extract and trim the date string
+      if (TryStrToDateTimeISO(Part[0].Trim, Result1.FDate)) then
+      begin
+        // Extract and trim the amount string
+        if (TryStrToFloatLimited(Part[1].Trim, Result1.FAmount)) then
+          Result1.FText := JoinArrayText(Part, 2, Separator)
+        else
+        begin
+          Result1.FText := JoinArrayText(Part, 1, Separator);
+          Result1.FAmount := 0;
+        end;
+        if (Length(Result1.FText) > 0) and (Result1.FText.StartsWith(' ')) then
+          Delete(Result1.FText, 1, 1); // Delete space in begining
+      end
+      else
+      // Extract and trim the amount string
+      if (TryStrToFloatLimited(Part[0].Trim, Result1.FAmount)) then
+      begin
+        Result1.FText := JoinArrayText(Part, 1, Separator);
+        if (Length(Result1.FText) > 0) and (Result1.FText.StartsWith(' ')) then
+          Delete(Result1.FText, 1, 1); // Delete space in begining
+      end
+      else
+      begin
+        Result1.FText := CompletedStr;
+        Result1.FDate := 0;
+        Result1.FAmount := 0;
+      end;
+    end
+    else
+    if Length(Part) > 1 then
     begin
-      Result.FNote += PartNote[i];
-      if (i < High(PartNote)) then Result.FNote += '//';
-    end;
-  end;
-
-  procedure FillCompletedStr(start: integer = 0);
-  var
-    i: integer;
-  begin
-    CompletedStr := string.Empty;
-    for i := start to High(PartNote) do
-    begin
-      CompletedStr += PartNote[i];
-      if (i < High(PartNote)) then CompletedStr += '//';
+      Result := True;
+      // Extract and trim the amount string
+      if (TryStrToFloatLimited(Part[0].Trim, Result1.FAmount)) then
+      begin
+        Result1.FText := JoinArrayText(Part, 1, Separator);
+        if (Length(Result1.FText) > 0) and (Result1.FText.StartsWith(' ')) then
+          Delete(Result1.FText, 1, 1); // Delete space in begining
+      end
+      else
+      begin
+        // Extract and trim the date string
+        if (TryStrToDateTimeISO(Part[0].Trim, Result1.FDate)) then
+        begin
+          Result1.FText := JoinArrayText(Part, 1, Separator);
+          if (Length(Result1.FText) > 0) and (Result1.FText.StartsWith(' ')) then
+            Delete(Result1.FText, 1, 1); // Delete space in begining
+        end
+        else
+        begin
+          Result1.FText := CompletedStr;
+          Result1.FDate := 0;
+        end;
+        Result1.FAmount := 0;
+      end;
     end;
   end;
 
@@ -102,14 +131,14 @@ begin
     else
       Result.FSpaceAfterNote := False;
 
-    FillNote;
+    Result.FNote := JoinArrayText(PartNote, 1, '//');
 
     // Test for empty Note symbols
     if (Result.FNote.Trim = string.empty) then
       Result.FEmptyNote := True;
   end
   else
-    FillCompletedStr;
+    CompletedStr := JoinArrayText(PartNote, 0, '//');
 
   // Remove star in start and end of Note
   if (Result.FNote.TrimLeft.StartsWith('*')) and (Result.FNote.TrimRight.EndsWith('*')) then
@@ -155,69 +184,15 @@ begin
     Result.FDateOriginal := CompletedStr;
   end
   else
-  if Length(PartDate) > 2 then
+  if not TestParts(PartDate, Result) then
   begin
-    // Extract and trim the date string
-    if (TryStrToDateTimeISO(PartDate[0].Trim, Result.FDate)) then
-    begin
-      // Extract and trim the amount string
-      if (TryStrToFloatLimited(PartDate[1].Trim, Result.FAmount)) then
-        FillText(2)
-      else
-      begin
-        FillText(1);
-        Result.FAmount := 0;
-      end;
-      if (Length(Result.FText) > 0) and (Result.FText.StartsWith(' ')) then
-        Delete(Result.FText, 1, 1); // Delete space in begining
-    end
-    else
-    // Extract and trim the amount string
-    if (TryStrToFloatLimited(PartDate[0].Trim, Result.FAmount)) then
-    begin
-      FillText(1);
-      if (Length(Result.FText) > 0) and (Result.FText.StartsWith(' ')) then
-        Delete(Result.FText, 1, 1); // Delete space in begining
-    end
-    else
+    PartSpace := SplitByFirstSpaces(CompletedStr, 2);
+    if not TestParts(PartSpace, Result, ' ') then
     begin
       Result.FText := CompletedStr;
       Result.FDate := 0;
       Result.FAmount := 0;
     end;
-  end
-  else
-  if Length(PartDate) > 1 then
-  begin
-    // Extract and trim the amount string
-    if (TryStrToFloatLimited(PartDate[0].Trim, Result.FAmount)) then
-    begin
-      FillText(1);
-      if (Length(Result.FText) > 0) and (Result.FText.StartsWith(' ')) then
-        Delete(Result.FText, 1, 1); // Delete space in begining
-    end
-    else
-    begin
-      // Extract and trim the date string
-      if (TryStrToDateTimeISO(PartDate[0].Trim, Result.FDate)) then
-      begin
-        FillText(1);
-        if (Length(Result.FText) > 0) and (Result.FText.StartsWith(' ')) then
-          Delete(Result.FText, 1, 1); // Delete space in begining
-      end
-      else
-      begin
-        Result.FText := CompletedStr;
-        Result.FDate := 0;
-      end;
-      Result.FAmount := 0;
-    end;
-  end
-  else
-  begin
-    Result.FText := CompletedStr;
-    Result.FDate := 0;
-    Result.FAmount := 0;
   end;
 
   Result.FText := StringReplace(Result.FText, '<br>', sLineBreak, [rfReplaceAll]);
@@ -242,6 +217,9 @@ begin
     // Remove '**' from the start and end of the Text
     Result.FText := Result.FText.Substring(2, Length(Result.FText) - 4);
   end
+  else
+  if StartsWithBracketAZ(Result.FText.TrimLeft) then
+    Result.FStar := True
   else
     Result.FStar := False;
 end;
