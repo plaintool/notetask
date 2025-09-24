@@ -3361,7 +3361,7 @@ begin
   FFileName := fileName;
   EditComplite;
 
-  if (CouldBeEncryptedFile(FFileName)) then
+  if (CheckEncryptedFile(FFileName)) then
   begin
     FEncrypted := True;
     FHash := GetHash(string.Empty);

@@ -33,10 +33,7 @@ function DecryptData(const CipherData: TBytes; const Hash: TBytes): TBytes;
 function GetHash(const Token: string): TBytes;
 
 /// Checks if FileName could be encrypted with our format (IV + HMAC + CipherText) without password.
-function CouldBeEncryptedFile(const FileName: string): boolean;
-
-/// Loads the entire file as raw bytes string.
-function LoadFileAsString(const FileName: string): rawbytestring;
+function CheckEncryptedFile(const FileName: string): boolean;
 
 /// Loads the entire file as TBytes array.
 function LoadFileAsBytes(const FileName: string): TBytes;
@@ -334,7 +331,7 @@ begin
   end;
 end;
 
-function CouldBeEncryptedFile(const FileName: string): boolean;
+function CheckEncryptedFile(const FileName: string): boolean;
 var
   FS: TFileStream;
   Magic: array[0..3] of byte = (0, 0, 0, 0);
@@ -367,22 +364,6 @@ begin
     SetLength(Result, FS.Size);
     if FS.Size > 0 then
       FS.ReadBuffer(Result[0], FS.Size);
-  finally
-    FS.Free;
-  end;
-end;
-
-function LoadFileAsString(const FileName: string): rawbytestring;
-var
-  FS: TFileStream;
-begin
-  Result := string.Empty;
-  if not FileExists(FileName) then Exit;
-  FS := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
-  try
-    SetLength(Result, FS.Size);
-    if FS.Size > 0 then
-      FS.ReadBuffer(Result[1], FS.Size);
   finally
     FS.Free;
   end;
