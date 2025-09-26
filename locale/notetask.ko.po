@@ -440,6 +440,10 @@ msgstr "글꼴..."
 msgid "Go to..."
 msgstr "이동하기..."
 
+#: tformnotetask.ahidenotetext.caption
+msgid "Hide note text"
+msgstr "메모 텍스트 숨기기"
+
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "작업 들여쓰기 늘리기"
@@ -829,4 +833,3 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
-

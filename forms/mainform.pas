@@ -46,6 +46,7 @@ type
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
+    AHideNoteText: TAction;
     aSaveNotesAs: TAction;
     aDuplicateTasks: TAction;
     aRunPowershell: TAction;
@@ -122,6 +123,7 @@ type
     contextUTF8BOM: TMenuItem;
     contextUTF16BEBOM: TMenuItem;
     contextUTF16LEBOM: TMenuItem;
+    menuHideNoteText: TMenuItem;
     menuSaveNotesAs: TMenuItem;
     menuRunPowershell: TMenuItem;
     MenuShowTime: TMenuItem;
@@ -282,6 +284,7 @@ type
     ContextRenameGroup: TMenuItem;
     ContextDuplicateGroup: TMenuItem;
     ContextDeleteGroup: TMenuItem;
+    procedure AHideNoteTextExecute(Sender: TObject);
     procedure contextANSIClick(Sender: TObject);
     procedure contextASCIIClick(Sender: TObject);
     procedure contextMacintoshCRClick(Sender: TObject);
@@ -517,6 +520,7 @@ type
     procedure SetShowNote(Value: boolean);
     procedure SetShowDuration(Value: boolean);
     procedure SetShowTime(Value: boolean);
+    procedure SetHideNoteText(Value: boolean);
     procedure SetShowArchived(Value: boolean);
     procedure SetShowColumnDone(Value: boolean);
     procedure SetShowColumnTask(Value: boolean);
@@ -568,6 +572,7 @@ type
     FShowDuration: boolean;
     FShowTime: boolean;
     FShowNote: boolean;
+    FHideNoteText: boolean;
     FShowStatusBar: boolean;
     FShowColumnDone: boolean;
     FShowColumnTask: boolean;
@@ -595,6 +600,7 @@ type
     property ShowDuration: boolean read FShowDuration write SetShowDuration;
     property ShowTime: boolean read FShowTime write SetShowTime;
     property ShowNote: boolean read FShowNote write SetShowNote;
+    property HideNoteText: boolean read FHideNoteText write SetHideNoteText;
     property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
     property ShowColumnDone: boolean read FShowColumnDone write SetShowColumnDone;
     property ShowColumnTask: boolean read FShowColumnTask write SetShowColumnTask;
@@ -693,6 +699,7 @@ begin
   FWordWrap := True;
   FEnterSubmit := True;
   FShowTime := True;
+  FHideNoteText := False;
   FShowStatusBar := True;
   FShowNote := False;
   FMemoNeedSelectAll := True;
@@ -746,6 +753,7 @@ begin
   ShowNote := FShowNote;
   ShowStatusBar := FShowStatusBar;
   ShowTime := FShowTime;
+  HideNoteText := FHideNoteText;
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
@@ -1489,6 +1497,10 @@ begin
         flags := flags or DT_LEFT;
       if FWordWrap then
         flags := flags or DT_WORDBREAK;
+
+      if (FHideNoteText) and (aCol = 3) then
+        S := RepeatString(#$2022 + ' ', grid.canvas.TextWidth(S) div grid.canvas.TextWidth(#$2022 + ' '));
+
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
     end;
   end;
@@ -2784,6 +2796,15 @@ begin
   ShowNote := aShowNote.Checked;
 end;
 
+procedure TformNotetask.AHideNoteTextExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  EditComplite;
+  HideNoteText := aHideNoteText.Checked;
+  FillGrid;
+end;
+
 procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -3663,6 +3684,7 @@ begin
   ShowStatusBar := FShowStatusBar;
   ShowArchived := FShowArchived;
   Showtime := FShowTime;
+  HideNoteText := FHideNoteText;
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
@@ -5408,6 +5430,12 @@ begin
   StatusBar.Top := panelNote.Top + panelNote.Height;
 
   SetNote;
+end;
+
+procedure TformNotetask.SetHideNoteText(Value: boolean);
+begin
+  aHideNoteText.Checked := Value;
+  FHideNoteText := Value;
 end;
 
 procedure TformNotetask.SetShowColumnDone(Value: boolean);

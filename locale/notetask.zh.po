@@ -440,6 +440,10 @@ msgstr "字体..."
 msgid "Go to..."
 msgstr "转到..."
 
+#: tformnotetask.ahidenotetext.caption
+msgid "Hide note text"
+msgstr "隐藏笔记文本"
+
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "增加任务缩进"
@@ -829,4 +833,3 @@ msgstr "查找内容："
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "替换为："
-

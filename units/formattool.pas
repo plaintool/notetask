@@ -62,6 +62,8 @@ function IsUTF8Char(const S: string; CharIndex: integer; FindChar: string = ' ')
 
 function IsLetterOrDigit(ch: widechar): boolean;
 
+function RepeatString(const S: string; Count: integer): string;
+
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer);
@@ -508,6 +510,15 @@ end;
 function IsLetterOrDigit(ch: widechar): boolean;
 begin
   Result := (ch in ['0'..'9', 'A'..'Z', 'a'..'z']) or (ch > #127);
+end;
+
+function RepeatString(const S: string; Count: integer): string;
+var
+  i: integer;
+begin
+  Result := string.Empty;
+  for i := 1 to Count do
+    Result := Result + S;
 end;
 
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;

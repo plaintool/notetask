@@ -440,6 +440,10 @@ msgstr "Шрыфт..."
 msgid "Go to..."
 msgstr "Перайсці да..."
 
+#: tformnotetask.ahidenotetext.caption
+msgid "Hide note text"
+msgstr "Схаваць тэкст нататкі"
+
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "Увялічыць адступ заданняў"
@@ -829,4 +833,3 @@ msgstr "Знайсці што:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Замяніць на:"
-

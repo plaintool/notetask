@@ -440,6 +440,10 @@ msgstr "خط..."
 msgid "Go to..."
 msgstr "اذهب إلى..."
 
+#: tformnotetask.ahidenotetext.caption
+msgid "Hide note text"
+msgstr "إخفاء نص الملاحظة"
+
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "زيادة المسافة البادئة للمهام"
@@ -829,4 +833,3 @@ msgstr "ابحث عن ماذا:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "استبدال بـ:"
-

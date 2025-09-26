@@ -199,6 +199,7 @@ begin
     ItemSettings.Add('ShowDuration', Form.ShowDuration);
     ItemSettings.Add('ShowTime', Form.ShowTime);
     ItemSettings.Add('ShowNote', Form.ShowNote);
+    ItemSettings.Add('HideNoteText', Form.HideNoteText);
     ItemSettings.Add('ShowStatusBar', Form.ShowStatusBar);
     ItemSettings.Add('ShowArchived', Form.ShowArchived);
     ItemSettings.Add('NoteHeight', Form.panelNote.Height);
@@ -289,7 +290,7 @@ var
   i: integer;
 begin
   Result := False;
-  FileContent := '';
+  FileContent := string.Empty;
   FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
   Item := Item.ToLower;
   ForceDirectories(GetSettingsDirectory); // Ensure the directory exists
@@ -318,6 +319,9 @@ begin
 
       if ItemSettings.FindPath('ShowNote') <> nil then
         Form.FShowNote := ItemSettings.FindPath('ShowNote').AsBoolean;
+
+      if ItemSettings.FindPath('HideNoteText') <> nil then
+        Form.FHideNoteText := ItemSettings.FindPath('HideNoteText').AsBoolean;
 
       if ItemSettings.FindPath('NoteHeight') <> nil then
         Form.panelNote.Height := ItemSettings.FindPath('NoteHeight').AsInteger;

@@ -440,6 +440,10 @@ msgstr ""
 msgid "Go to..."
 msgstr ""
 
+#: tformnotetask.ahidenotetext.caption
+msgid "Hide note text"
+msgstr ""
+
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr ""

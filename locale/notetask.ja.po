@@ -440,6 +440,10 @@ msgstr "フォント..."
 msgid "Go to..."
 msgstr "移動..."
 
+#: tformnotetask.ahidenotetext.caption
+msgid "Hide note text"
+msgstr "メモのテキストを非表示"
+
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "タスクのインデントを増やす"
@@ -829,4 +833,3 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
-

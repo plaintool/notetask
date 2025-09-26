@@ -440,6 +440,10 @@ msgstr "Font..."
 msgid "Go to..."
 msgstr "Go to..."
 
+#: tformnotetask.ahidenotetext.caption
+msgid "Hide note text"
+msgstr "Hide note text"
+
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "Indent tasks"
@@ -829,4 +833,3 @@ msgstr "Find what:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Replace with:"
-

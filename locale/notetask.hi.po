@@ -440,6 +440,10 @@ msgstr "फॉन्ट..."
 msgid "Go to..."
 msgstr "जाएं..."
 
+#: tformnotetask.ahidenotetext.caption
+msgid "Hide note text"
+msgstr "नोट का टेक्स्ट छिपाएँ"
+
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
 msgstr "कार्यों की इंडेंट बढ़ाएं"
@@ -829,4 +833,3 @@ msgstr "क्या खोजें:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "इसके साथ बदलें:"
-
