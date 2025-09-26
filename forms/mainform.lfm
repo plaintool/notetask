@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -121,7 +120,6 @@ object formNotetask: TformNotetask
         Width = 50
       end>
     ParentFont = False
-    PopupMenu = PopupStatusbar
     SimplePanel = False
     OnContextPopup = statusBarContextPopup
   end
@@ -1139,10 +1137,64 @@ object formNotetask: TformNotetask
   end
   object PopupStatusbar: TPopupMenu
     Left = 160
-    Top = 384
+    Top = 392
     object ContextCopyStatusbar: TMenuItem
       Caption = 'Copy'
       OnClick = ContextCopyStatusbarClick
+    end
+  end
+  object PopupLineEnding: TPopupMenu
+    Left = 264
+    Top = 392
+    object contextWindowsCRLF: TMenuItem
+      Caption = 'WindowsCRLF'
+      RadioItem = True
+      OnClick = contextWindowsCRLFClick
+    end
+    object contextUnixLF: TMenuItem
+      Caption = 'UnixLF'
+      RadioItem = True
+      OnClick = contextUnixLFClick
+    end
+    object contextMacintoshCR: TMenuItem
+      Caption = 'MacintoshCR'
+      RadioItem = True
+      OnClick = contextMacintoshCRClick
+    end
+  end
+  object PopupEncoding: TPopupMenu
+    Left = 368
+    Top = 392
+    object contextASCII: TMenuItem
+      Caption = 'ASCII'
+      RadioItem = True
+      Visible = False
+      OnClick = contextASCIIClick
+    end
+    object contextANSI: TMenuItem
+      Caption = 'ANSI'
+      RadioItem = True
+      OnClick = contextANSIClick
+    end
+    object contextUTF8: TMenuItem
+      Caption = 'UTF-8'
+      RadioItem = True
+      OnClick = contextUTF8Click
+    end
+    object contextUTF8BOM: TMenuItem
+      Caption = 'UTF-8 BOM'
+      RadioItem = True
+      OnClick = contextUTF8BOMClick
+    end
+    object contextUTF16BEBOM: TMenuItem
+      Caption = 'UTF-16 BE BOM'
+      RadioItem = True
+      OnClick = contextUTF16BEBOMClick
+    end
+    object contextUTF16LEBOM: TMenuItem
+      Caption = 'UTF-16 LE BOM'
+      RadioItem = True
+      OnClick = contextUTF16LEBOMClick
     end
   end
 end

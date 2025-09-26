@@ -83,6 +83,8 @@ type
     ActionList: TActionList;
     contextAskChatGPT1: TMenuItem;
     contextCopy1: TMenuItem;
+    contextWindowsCRLF: TMenuItem;
+    contextANSI: TMenuItem;
     contextCut1: TMenuItem;
     contextDelete1: TMenuItem;
     contextPaste1: TMenuItem;
@@ -113,6 +115,13 @@ type
     contextRunPowershell: TMenuItem;
     contextIndentTasks: TMenuItem;
     contextSaveNotesAs1: TMenuItem;
+    contextUnixLF: TMenuItem;
+    contextMacintoshCR: TMenuItem;
+    contextASCII: TMenuItem;
+    contextUTF8: TMenuItem;
+    contextUTF8BOM: TMenuItem;
+    contextUTF16BEBOM: TMenuItem;
+    contextUTF16LEBOM: TMenuItem;
     menuSaveNotesAs: TMenuItem;
     menuRunPowershell: TMenuItem;
     MenuShowTime: TMenuItem;
@@ -152,8 +161,10 @@ type
     pageSetupDialog: TPageSetupDialog;
     panelNote: TPanel;
     Popup: TPopupMenu;
+    PopupEncoding: TPopupMenu;
     PopupMemo: TPopupMenu;
     PopupStatusbar: TPopupMenu;
+    PopupLineEnding: TPopupMenu;
     printDialog: TPrintDialog;
     saveDialog: TSaveDialog;
     saveNotesDialog: TSaveDialog;
@@ -271,6 +282,15 @@ type
     ContextRenameGroup: TMenuItem;
     ContextDuplicateGroup: TMenuItem;
     ContextDeleteGroup: TMenuItem;
+    procedure contextANSIClick(Sender: TObject);
+    procedure contextASCIIClick(Sender: TObject);
+    procedure contextMacintoshCRClick(Sender: TObject);
+    procedure contextUnixLFClick(Sender: TObject);
+    procedure contextUTF16BEBOMClick(Sender: TObject);
+    procedure contextUTF16LEBOMClick(Sender: TObject);
+    procedure contextUTF8BOMClick(Sender: TObject);
+    procedure contextUTF8Click(Sender: TObject);
+    procedure contextWindowsCRLFClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -1832,6 +1852,15 @@ begin
       Break;
     end;
   end;
+
+  if (FStatusPanelIndex > 2) and (FStatusPanelIndex < statusBar.Panels.Count) then
+    PopupStatusbar.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
+  else
+  if (FStatusPanelIndex = 1) then
+    PopupEncoding.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
+  else
+  if (FStatusPanelIndex = 2) then
+    PopupLineEnding.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y);
 end;
 
 procedure TformNotetask.ContextCopyStatusbarClick(Sender: TObject);
@@ -1843,6 +1872,105 @@ begin
     PanelText := statusBar.Panels[FStatusPanelIndex].Text;
     if PanelText <> string.Empty then
       Clipboard.AsText := PanelText;
+  end;
+end;
+
+procedure TformNotetask.contextWindowsCRLFClick(Sender: TObject);
+begin
+  FLineEnding := TLineEnding.WindowsCRLF;
+  if (contextWindowsCRLF.Checked = False) then
+  begin
+    contextWindowsCRLF.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextUnixLFClick(Sender: TObject);
+begin
+  FLineEnding := TLineEnding.UnixLF;
+  if (contextUnixLF.Checked = False) then
+  begin
+    contextUnixLF.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextMacintoshCRClick(Sender: TObject);
+begin
+  FLineEnding := TLineEnding.MacintoshCR;
+  if (contextMacintoshCR.Checked = False) then
+  begin
+    contextMacintoshCR.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextANSIClick(Sender: TObject);
+begin
+  FEncoding := TEncoding.ANSI;
+  if (contextANSI.Checked = False) then
+  begin
+    contextANSI.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextASCIIClick(Sender: TObject);
+begin
+  FEncoding := TEncoding.ASCII;
+  if (contextASCII.Checked = False) then
+  begin
+    contextASCII.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextUTF8Click(Sender: TObject);
+begin
+  FEncoding := TEncoding.UTF8;
+  if (contextUTF8.Checked = False) then
+  begin
+    contextUTF8.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextUTF8BOMClick(Sender: TObject);
+begin
+  FEncoding := UTF8BOMEncoding;
+  if (contextUTF8BOM.Checked = False) then
+  begin
+    contextUTF8BOM.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextUTF16BEBOMClick(Sender: TObject);
+begin
+  FEncoding := UTF16BEBOMEncoding;
+  if (contextUTF16BEBOM.Checked = False) then
+  begin
+    contextUTF16BEBOM.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextUTF16LEBOMClick(Sender: TObject);
+begin
+  FEncoding := UTF16LEBOMEncoding;
+  if (contextUTF16LEBOM.Checked = False) then
+  begin
+    contextUTF16LEBOM.Checked := True;
+    SetInfo;
+    SetChanged;
   end;
 end;
 
@@ -5543,9 +5671,26 @@ begin
   if (not ShowStatusBar) then exit;
 
   if Assigned(FEncoding) then
+  begin
     statusBar.Panels[1].Text := UpperCase(GetEncodingName(FEncoding));
+
+    // Encoding menu check
+    contextANSI.Checked := FEncoding = TEncoding.ANSI;
+    contextASCII.Checked := FEncoding = TEncoding.ASCII;
+    contextUTF8.Checked := FEncoding = TEncoding.UTF8;
+    contextUTF8BOM.Checked := FEncoding = UTF8BOMEncoding;
+    contextUTF16BEBOM.Checked := FEncoding = UTF16BEBOMEncoding;
+    contextUTF16LEBOM.Checked := FEncoding = UTF16LEBOMEncoding;
+  end;
   if Assigned(FLineEnding) then
+  begin
     statusBar.Panels[2].Text := FLineEnding.ToString;
+
+    // Line ending menu check
+    contextWindowsCRLF.Checked := FLineEnding = TLineEnding.WindowsCRLF;
+    contextUnixLF.Checked := FLineEnding = TLineEnding.UnixLF;
+    contextMacintoshCR.Checked := FLineEnding = TLineEnding.MacintoshCR;
+  end;
 
   // Task counts
   if (taskGrid.Selection.Height = 0) then

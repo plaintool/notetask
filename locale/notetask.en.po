@@ -665,10 +665,46 @@ msgctxt "tformnotetask.caption"
 msgid "Notetask"
 msgstr "Notetask"
 
+#: tformnotetask.contextansi.caption
+msgid "ANSI"
+msgstr ""
+
+#: tformnotetask.contextascii.caption
+msgid "ASCII"
+msgstr ""
+
 #: tformnotetask.contextcopystatusbar.caption
 msgctxt "tformnotetask.contextcopystatusbar.caption"
 msgid "Copy"
 msgstr "Copy"
+
+#: tformnotetask.contextmacintoshcr.caption
+msgid "MacintoshCR"
+msgstr ""
+
+#: tformnotetask.contextunixlf.caption
+msgid "UnixLF"
+msgstr ""
+
+#: tformnotetask.contextutf16bebom.caption
+msgid "UTF-16 BE BOM"
+msgstr ""
+
+#: tformnotetask.contextutf16lebom.caption
+msgid "UTF-16 LE BOM"
+msgstr ""
+
+#: tformnotetask.contextutf8.caption
+msgid "UTF-8"
+msgstr ""
+
+#: tformnotetask.contextutf8bom.caption
+msgid "UTF-8 BOM"
+msgstr ""
+
+#: tformnotetask.contextwindowscrlf.caption
+msgid "WindowsCRLF"
+msgstr ""
 
 #: tformnotetask.fontdialog.title
 msgid "Font select"
@@ -793,3 +829,4 @@ msgstr "Find what:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Replace with:"
+

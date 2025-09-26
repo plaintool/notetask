@@ -93,5 +93,14 @@
 {"hash":93900871,"name":"tformnotetask.savedialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
 {"hash":131550916,"name":"tformnotetask.fontdialog.title","sourcebytes":[70,111,110,116,32,115,101,108,101,99,116],"value":"Font select"},
 {"hash":93900871,"name":"tformnotetask.savenotesdialog.title","sourcebytes":[83,97,118,105,110,103],"value":"Saving"},
-{"hash":304761,"name":"tformnotetask.contextcopystatusbar.caption","sourcebytes":[67,111,112,121],"value":"Copy"}
+{"hash":304761,"name":"tformnotetask.contextcopystatusbar.caption","sourcebytes":[67,111,112,121],"value":"Copy"},
+{"hash":112821174,"name":"tformnotetask.contextwindowscrlf.caption","sourcebytes":[87,105,110,100,111,119,115,67,82,76,70],"value":"WindowsCRLF"},
+{"hash":96800006,"name":"tformnotetask.contextunixlf.caption","sourcebytes":[85,110,105,120,76,70],"value":"UnixLF"},
+{"hash":101049986,"name":"tformnotetask.contextmacintoshcr.caption","sourcebytes":[77,97,99,105,110,116,111,115,104,67,82],"value":"MacintoshCR"},
+{"hash":4618201,"name":"tformnotetask.contextascii.caption","sourcebytes":[65,83,67,73,73],"value":"ASCII"},
+{"hash":287609,"name":"tformnotetask.contextansi.caption","sourcebytes":[65,78,83,73],"value":"ANSI"},
+{"hash":5933320,"name":"tformnotetask.contextutf8.caption","sourcebytes":[85,84,70,45,56],"value":"UTF-8"},
+{"hash":151657917,"name":"tformnotetask.contextutf8bom.caption","sourcebytes":[85,84,70,45,56,32,66,79,77],"value":"UTF-8 BOM"},
+{"hash":250495981,"name":"tformnotetask.contextutf16bebom.caption","sourcebytes":[85,84,70,45,49,54,32,66,69,32,66,79,77],"value":"UTF-16 BE BOM"},
+{"hash":260981741,"name":"tformnotetask.contextutf16lebom.caption","sourcebytes":[85,84,70,45,49,54,32,76,69,32,66,79,77],"value":"UTF-16 LE BOM"}
 ]}
