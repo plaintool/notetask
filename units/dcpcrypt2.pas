@@ -650,24 +650,24 @@ begin
     b1[i] := b1[i] xor b2[i];
 end;
 
+{$HINTS OFF}
 procedure dcpFillChar(out x; Count: SizeInt; Value: byte);
 begin
-  {$HINTS OFF}
   FillChar(x, Count, Value);
-  {$HINTS ON}
 end;
+{$HINTS ON}
 
 procedure ZeroMemory(Destination: Pointer; Length: PtrUInt);
 begin
   FillChar(Destination^, Length, 0);
 end;
 
+{$HINTS OFF}
 procedure dcpFillChar(out x; Count: SizeInt; Value: char);
 begin
-  {$HINTS OFF}
   FillChar(x, Count, Value);
-  {$HINTS ON}
 end;
+{$HINTS ON}
 
 // Supposed to be an optimized version of XorBlock() using 32-bit xor
 procedure XorBlockEx(var InData1, InData2; Size: longword);
