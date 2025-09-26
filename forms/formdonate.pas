@@ -76,21 +76,29 @@ end;
 
 procedure TformDonateNotetask.buttonCopy1Click(Sender: TObject);
 begin
+  if editWallet1.CanFocus then  editWallet1.SetFocus;
+  editWallet1.SelectAll;
   Clipboard.AsText := editWallet1.Text;
 end;
 
 procedure TformDonateNotetask.buttonCopy2Click(Sender: TObject);
 begin
+  if editWallet2.CanFocus then  editWallet2.SetFocus;
+  editWallet2.SelectAll;
   Clipboard.AsText := editWallet2.Text;
 end;
 
 procedure TformDonateNotetask.buttonCopy3Click(Sender: TObject);
 begin
+  if editWallet3.CanFocus then  editWallet3.SetFocus;
+  editWallet3.SelectAll;
   Clipboard.AsText := editWallet3.Text;
 end;
 
 procedure TformDonateNotetask.buttonCopy4Click(Sender: TObject);
 begin
+  if editWallet4.CanFocus then  editWallet4.SetFocus;
+  editWallet4.SelectAll;
   Clipboard.AsText := editWallet4.Text;
 end;
 
