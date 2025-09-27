@@ -1,1 +1,1 @@
-C:\Windows\System32\tar -cvf notetask.tar --exclude=notetask.tar --exclude=examples --exclude=installer --exclude=lib *
+C:\Windows\System32\tar -cvf notetask.tar --exclude=notetask.tar --exclude=examples --exclude=installer --exclude=lib --exclude=.git *

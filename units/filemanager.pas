@@ -59,7 +59,7 @@ procedure ReadTextFile(const FileName: string; out Content: string; out FileEnco
   out LineEnding: TLineEnding; out LineCount: integer); overload;
 
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding;
-  Encrypt: boolean = False; Hash: TBytes = nil);
+  Encrypt: boolean = False; Hash: TBytes = nil; Salt: TBytes = nil);
 
 var
   UTF8BOMEncoding: TEncoding;
@@ -652,7 +652,7 @@ begin
 end;
 
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding;
-  LineEnding: TLineEnding; Encrypt: boolean = False; Hash: TBytes = nil);
+  LineEnding: TLineEnding; Encrypt: boolean = False; Hash: TBytes = nil; Salt: TBytes = nil);
 var
   FileStream: TFileStream;
   i: integer;
@@ -698,7 +698,7 @@ begin
         Bytes := TextBytes;
 
       // Encrypt bytes
-      Bytes := EncryptData(Bytes, Hash);
+      Bytes := EncryptData(Bytes, Hash, Salt);
 
       // Write encrypted bytes to file
       if Length(Bytes) > 0 then

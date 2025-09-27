@@ -443,7 +443,8 @@ type
     FDisableStarToggle: boolean;
     FFileName: string;
     FEncrypted: boolean;
-    FHash: TBytes;
+    FToken: string;
+    FSalt: TBytes;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
     FLineCount: integer;
@@ -716,7 +717,8 @@ begin
   FSortOrder := soAscending;
   FKeyPressed := string.Empty;
   FEncrypted := False;
-  FHash := nil;
+  FToken := string.Empty;
+  FreeBytesSecure(FSalt);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
@@ -3463,7 +3465,8 @@ begin
     FFileName := string.Empty;
 
     FEncrypted := False;
-    FHash := nil;
+    FToken := string.Empty;
+    FreeBytesSecure(FSalt);
 
     // Encoding of new file
     FEncoding := TEncoding.UTF8;
@@ -3490,7 +3493,8 @@ var
   Bytes: TBytes;
   FileNameOld: string;
   EncryptedOld: boolean;
-  HashOld: TBytes = nil;
+  TokenOld: string = string.Empty;
+  SaltOld: TBytes = nil;
 begin
   Result := False;
   if not FileExists(fileName) then
@@ -3504,8 +3508,10 @@ begin
 
   EncryptedOld := FEncrypted;
   FEncrypted := False;
-  HashOld := FHash;
-  FHash := nil;
+  TokenOld := FToken;
+  SaltOld := FSalt;
+  FToken := string.Empty;
+  FreeBytesSecure(FSalt);
   FileNameOld := FFileName;
   FFileName := fileName;
   EditComplite;
@@ -3513,8 +3519,7 @@ begin
   if (CheckEncryptedFile(FFileName)) then
   begin
     FEncrypted := True;
-    FHash := GetHash(string.Empty);
-    Bytes := DecryptData(LoadFileAsBytes(FFileName), FHash);
+    Bytes := DecryptData(LoadFileAsBytes(FFileName), FToken, FSalt);
     if Bytes = nil then
     begin
       // Create an instance of the form
@@ -3536,7 +3541,7 @@ begin
         if ShowModal = mrOk then
         begin
           FEncrypted := True;
-          FHash := GetHash(editText.Text);
+          FToken := editText.Text;
         end
         else
         begin
@@ -3549,12 +3554,13 @@ begin
           else
           begin
             FEncrypted := EncryptedOld;
-            FHash := HashOld;
+            FToken := TokenOld;
+            FSalt := SaltOld;
             exit(False);
           end;
         end;
 
-        Bytes := DecryptData(LoadFileAsBytes(FFileName), FHash);
+        Bytes := DecryptData(LoadFileAsBytes(FFileName), FToken, FSalt);
         if (Bytes <> nil) then
           ReadTextFile(Bytes, Content, FEncoding, FLineEnding, FLineCount)
         else
@@ -3569,7 +3575,8 @@ begin
           else
           begin
             FEncrypted := EncryptedOld;
-            FHash := HashOld;
+            FToken := TokenOld;
+            FSalt := SaltOld;
             exit(False);
           end;
         end;
@@ -3622,7 +3629,9 @@ begin
         if ShowModal = mrOk then
         begin
           FEncrypted := True;
-          FHash := GetHash(editText.Text);
+          FToken := editText.Text;
+          FreeBytesSecure(FSalt);
+          GetHash(FToken, FSalt);
         end
         else
           exit(False);
@@ -3634,7 +3643,8 @@ begin
     if saveAs then
     begin
       FEncrypted := False;
-      FHash := nil;
+      FToken := string.empty;
+      FreeBytesSecure(FSalt);
     end;
 
     TaskList := Tasks.ToStringList;
@@ -3642,7 +3652,7 @@ begin
     begin
       try
         EditComplite;
-        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, FHash);
+        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, GetHash(FToken, FSalt), FSalt);
         SetChanged(False);
         Tasks.CreateBackupInit;
         Result := True;
