@@ -59,7 +59,9 @@ procedure ReadTextFile(const FileName: string; out Content: string; out FileEnco
   out LineEnding: TLineEnding; out LineCount: integer); overload;
 
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding;
-  Encrypt: boolean = False; Hash: TBytes = nil; Salt: TBytes = nil);
+  Encrypt: boolean; Token: string; var Salt, KeyEnc, KeyAuth: TBytes); overload;
+
+procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding); overload;
 
 var
   UTF8BOMEncoding: TEncoding;
@@ -652,7 +654,7 @@ begin
 end;
 
 procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding;
-  LineEnding: TLineEnding; Encrypt: boolean = False; Hash: TBytes = nil; Salt: TBytes = nil);
+  LineEnding: TLineEnding; Encrypt: boolean; Token: string; var Salt, KeyEnc, KeyAuth: TBytes);
 var
   FileStream: TFileStream;
   i: integer;
@@ -698,7 +700,7 @@ begin
         Bytes := TextBytes;
 
       // Encrypt bytes
-      Bytes := EncryptData(Bytes, Hash, Salt);
+      Bytes := EncryptData(Bytes, Token, Salt, KeyEnc, KeyAuth);
 
       // Write encrypted bytes to file
       if Length(Bytes) > 0 then
@@ -729,6 +731,17 @@ begin
     end;
   finally
     FileStream.Free;
+  end;
+end;
+
+procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
+var
+  dummy: TBytes = nil;
+begin
+  try
+    SaveTextFile(FileName, StringList, FileEncoding, LineEnding, False, string.Empty, dummy, dummy, dummy);
+  finally
+    FreeBytesSecure(dummy);
   end;
 end;
 

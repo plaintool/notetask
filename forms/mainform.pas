@@ -443,7 +443,8 @@ type
     FDisableStarToggle: boolean;
     FFileName: string;
     FEncrypted: boolean;
-    FToken: string;
+    FKeyEnc: TBytes;
+    FKeyAuth: TBytes;
     FSalt: TBytes;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
@@ -717,7 +718,8 @@ begin
   FSortOrder := soAscending;
   FKeyPressed := string.Empty;
   FEncrypted := False;
-  FToken := string.Empty;
+  FreeBytesSecure(FKeyEnc);
+  FreeBytesSecure(FKeyAuth);
   FreeBytesSecure(FSalt);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
@@ -3465,7 +3467,8 @@ begin
     FFileName := string.Empty;
 
     FEncrypted := False;
-    FToken := string.Empty;
+    FreeBytesSecure(FKeyEnc);
+    FreeBytesSecure(FKeyAuth);
     FreeBytesSecure(FSalt);
 
     // Encoding of new file
@@ -3493,8 +3496,10 @@ var
   Bytes: TBytes;
   FileNameOld: string;
   EncryptedOld: boolean;
-  TokenOld: string = string.Empty;
+  KeyEncOld: TBytes = nil;
+  KeyAuthOld: TBytes = nil;
   SaltOld: TBytes = nil;
+  Token: string;
 begin
   Result := False;
   if not FileExists(fileName) then
@@ -3508,9 +3513,12 @@ begin
 
   EncryptedOld := FEncrypted;
   FEncrypted := False;
-  TokenOld := FToken;
-  SaltOld := FSalt;
-  FToken := string.Empty;
+
+  KeyEncOld := CopyBytes(FKeyEnc);
+  KeyAuthOld := CopyBytes(FKeyAuth);
+  SaltOld := CopyBytes(FSalt);
+  FreeBytesSecure(FKeyEnc);
+  FreeBytesSecure(FKeyAuth);
   FreeBytesSecure(FSalt);
   FileNameOld := FFileName;
   FFileName := fileName;
@@ -3519,7 +3527,7 @@ begin
   if (CheckEncryptedFile(FFileName)) then
   begin
     FEncrypted := True;
-    Bytes := DecryptData(LoadFileAsBytes(FFileName), FToken, FSalt);
+    Bytes := DecryptData(LoadFileAsBytes(FFileName), string.Empty, FSalt, FKeyEnc, FKeyAuth);
     if Bytes = nil then
     begin
       // Create an instance of the form
@@ -3541,7 +3549,7 @@ begin
         if ShowModal = mrOk then
         begin
           FEncrypted := True;
-          FToken := editText.Text;
+          Token := editText.Text;
         end
         else
         begin
@@ -3554,13 +3562,14 @@ begin
           else
           begin
             FEncrypted := EncryptedOld;
-            FToken := TokenOld;
-            FSalt := SaltOld;
+            FKeyEnc := CopyBytes(KeyEncOld);
+            FKeyAuth := CopyBytes(KeyAuthOld);
+            FSalt := CopyBytes(SaltOld);
             exit(False);
           end;
         end;
 
-        Bytes := DecryptData(LoadFileAsBytes(FFileName), FToken, FSalt);
+        Bytes := DecryptData(LoadFileAsBytes(FFileName), Token, FSalt, FKeyEnc, FKeyAuth);
         if (Bytes <> nil) then
           ReadTextFile(Bytes, Content, FEncoding, FLineEnding, FLineCount)
         else
@@ -3575,12 +3584,17 @@ begin
           else
           begin
             FEncrypted := EncryptedOld;
-            FToken := TokenOld;
-            FSalt := SaltOld;
+            FKeyEnc := CopyBytes(KeyEncOld);
+            FKeyAuth := CopyBytes(KeyAuthOld);
+            FSalt := CopyBytes(SaltOld);
             exit(False);
           end;
         end;
       finally
+        ClearStringSecure(Token);
+        FreeBytesSecure(KeyEncOld);
+        FreeBytesSecure(KeyAuthOld);
+        FreeBytesSecure(SaltOld);
         Hide;
       end;
     end
@@ -3605,6 +3619,7 @@ end;
 function TformNotetask.SaveFile(fileName: string = string.Empty; saveAs: boolean = False; encrypt: boolean = False): boolean;
 var
   TaskList: TStringList;
+  Token: string = string.Empty;
 begin
   if (fileName = string.Empty) and (FFileName = string.Empty) then
     Result := SaveFileAs;
@@ -3629,9 +3644,10 @@ begin
         if ShowModal = mrOk then
         begin
           FEncrypted := True;
-          FToken := editText.Text;
+          Token := editText.Text;
           FreeBytesSecure(FSalt);
-          GetHash(FToken, FSalt);
+          FreeBytesSecure(FKeyEnc);
+          FreeBytesSecure(FKeyAuth);
         end
         else
           exit(False);
@@ -3643,8 +3659,9 @@ begin
     if saveAs then
     begin
       FEncrypted := False;
-      FToken := string.empty;
       FreeBytesSecure(FSalt);
+      FreeBytesSecure(FKeyEnc);
+      FreeBytesSecure(FKeyAuth);
     end;
 
     TaskList := Tasks.ToStringList;
@@ -3652,7 +3669,7 @@ begin
     begin
       try
         EditComplite;
-        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, GetHash(FToken, FSalt), FSalt);
+        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, Token, FSalt, FKeyEnc, FKeyAuth);
         SetChanged(False);
         Tasks.CreateBackupInit;
         Result := True;

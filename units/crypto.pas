@@ -33,16 +33,16 @@ function DecompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
 function GetRandomBytes(len: integer): TBytes;
 
 /// Encrypts PlainData using Hash and returns combined TBytes: IV(16) || HMAC(32) || CipherText.
-function EncryptData(const PlainData: TBytes; const Hash, Salt: TBytes): TBytes;
+function EncryptData(const PlainData: TBytes; const Token: string; var Salt, KeyEnc, KeyAuth: TBytes): TBytes;
 
 /// Decrypts CipherData using Hash and returns decrypted TBytes, empty on error.
-function DecryptData(const CipherData: TBytes; const Token: string; out Salt: TBytes): TBytes;
+function DecryptData(const CipherData: TBytes; const Token: string; out Salt, KeyEnc, KeyAuth: TBytes): TBytes;
 
 /// GetHash replacement that uses PBKDF2-HMAC-SHA256.
 /// - Token: user password (string). It will be treated as UTF-8 bytes.
 /// - Salt: if not assigned, will be generated (16 bytes) using GetRandomBytes.
 /// Returns 32-byte derived key.
-function GetHash(const Token: string; var Salt: TBytes): TBytes;
+function GetHash(const Token: string; var Salt: TBytes; len: integer = 64): TBytes;
 
 /// Checks if FileName could be encrypted with our format (IV + HMAC + CipherText) without password.
 function CheckEncryptedFile(const FileName: string): boolean;
@@ -51,10 +51,10 @@ function CheckEncryptedFile(const FileName: string): boolean;
 function LoadFileAsBytes(const FileName: string): TBytes;
 
 /// Convert TBytes to array of byte given length
-procedure BytesToArray(const Data: TBytes; const len: integer; var ResArray: array of byte);
+procedure BytesToArray(const Src: TBytes; var Dest: array of byte; DestLen: integer = -1);
 
 /// Constant-time comparison
-function ConstantTimeCompare(const A, B: TBytes): boolean;
+function ConstantTimeCompare(const A, B: array of byte): boolean;
 
 // Gentle cleaning of TBytes
 procedure FreeBytesSecure(var Bytes: TBytes);
@@ -62,12 +62,15 @@ procedure FreeBytesSecure(var Bytes: TBytes);
 // Gentle cleaning of string
 procedure ClearStringSecure(var S: string);
 
-/// HMAC-SHA256 using TDCP_sha256 from DCPcrypt.
+/// Returns an independent copy of a TBytes array
+function CopyBytes(const Source: TBytes): TBytes;
+
+/// HMAC-SHA256 using TDCP_sha256 from DCPcrypt
 /// Input: Key (any length), Data (any length)
 /// Output: 32-byte MAC
 function HMAC_SHA256(const Key, Data: TBytes): TBytes;
 
-/// PBKDF2-HMAC-SHA256 implementation (RFC 2898-like).
+/// PBKDF2-HMAC-SHA256 implementation (RFC 2898-like)
 /// Password: arbitrary bytes (we will pass UTF-8 bytes of Token)
 /// Salt: arbitrary bytes
 /// Iterations: number of iterations (>= 1)
@@ -78,6 +81,7 @@ implementation
 
 const
   FILE_MAGIC: array[0..3] of byte = (78, 84, 83, 75); // 'NTSK'
+  HASH_ITERATIONS = 50000;
 
 function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
 var
@@ -157,19 +161,19 @@ begin
   end;
 end;
 
-function EncryptData(const PlainData: TBytes; const Hash, Salt: TBytes): TBytes;
+function EncryptData(const PlainData: TBytes; const Token: string; var Salt, KeyEnc, KeyAuth: TBytes): TBytes;
 var
   Cipher: TDCP_rijndael;
   Sha256: TDCP_sha256;
   InputStream, CompressedStream, OutputStream: TMemoryStream;
-  // AES-256 key
-  Key: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   // Initialization Vector
   IV: array[0..15] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   // SHA-256 result
   HMAC: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  Container: TBytes = nil;
-  DataToAuthenticate: TBytes = nil;
+  // AES-256 key
+  DataToAuth: TBytes = nil;
+  Hash: TBytes = nil;
+  Container: TBytes = nil; // Return as result
 begin
   Result := nil;
 
@@ -183,12 +187,17 @@ begin
       InputStream.WriteBuffer(PlainData[0], Length(PlainData));
 
     // generate random IV
-    BytesToArray(GetRandomBytes(16), 16, IV);
+    BytesToArray(GetRandomBytes(16), IV);
 
-    // derive key directly from precomputed hash (first 32 bytes for AES-256)
-    FillChar(Key, SizeOf(Key), 0);
-    if Length(Hash) >= 32 then
-      Move(Hash[0], Key[0], SizeOf(Key));
+    // derive keys directly from precomputed hash (32 bytes for AES-256)
+    if (not Assigned(KeyEnc)) or (not Assigned(KeyAuth)) then
+    begin
+      Hash := GetHash(Token, Salt);
+      SetLength(KeyEnc, 32);
+      SetLength(KeyAuth, 32);
+      Move(Hash[0], KeyEnc[0], 32);
+      Move(Hash[32], KeyAuth[0], 32);
+    end;
 
     // compress before encryption
     CompressedStream := CompressMemoryStream(InputStream);
@@ -197,7 +206,7 @@ begin
 
       // encrypt
       Cipher.CipherMode := cmCBC;
-      Cipher.Init(Key[0], 256, @IV[0]);
+      Cipher.Init(KeyEnc[0], 256, @IV[0]);
       try
         Cipher.EncryptStream(CompressedStream, OutputStream, CompressedStream.Size);
       finally
@@ -208,14 +217,13 @@ begin
     end;
 
     // compute data to authenticate
-    SetLength(DataToAuthenticate, Length(Salt) + Length(IV) + OutputStream.Size);
-    Move(Salt[0], DataToAuthenticate[0], Length(Salt));
-    Move(IV[0], DataToAuthenticate[Length(Salt)], Length(IV));
+    SetLength(DataToAuth, Length(Salt) + Length(IV) + OutputStream.Size);
+    Move(Salt[0], DataToAuth[0], Length(Salt));
+    Move(IV[0], DataToAuth[Length(Salt)], Length(IV));
     if OutputStream.Size > 0 then
-      Move(OutputStream.Memory^, DataToAuthenticate[Length(Salt) + Length(IV)], OutputStream.Size);
+      Move(OutputStream.Memory^, DataToAuth[Length(Salt) + Length(IV)], OutputStream.Size);
     // compute HMAC
-    BytesToArray(HMAC_SHA256(Key, DataToAuthenticate), 32, HMAC);
-    FreeBytesSecure(DataToAuthenticate);
+    BytesToArray(HMAC_SHA256(KeyAuth, DataToAuth), HMAC);
 
     // allocate container: MAGIC + SALT + IV + HMAC + CipherText
     SetLength(Container, Length(FILE_MAGIC) + Length(Salt) + Length(IV) + Length(HMAC) + OutputStream.Size);
@@ -243,8 +251,10 @@ begin
     Result := Container;
   finally
     // clear sensitive memory
-    FillChar(Key, SizeOf(Key), 0);
     FillChar(HMAC, SizeOf(HMAC), 0);
+    FillChar(IV, SizeOf(IV), 0);
+    FreeBytesSecure(DataToAuth);
+    FreeBytesSecure(Hash);
 
     InputStream.Free;
     OutputStream.Free;
@@ -253,23 +263,22 @@ begin
   end;
 end;
 
-function DecryptData(const CipherData: TBytes; const Token: string; out Salt: TBytes): TBytes;
+function DecryptData(const CipherData: TBytes; const Token: string; out Salt, KeyEnc, KeyAuth: TBytes): TBytes;
 var
-  InputStream, EncryptedStream, OutputStream, DecompressedStream: TMemoryStream;
   Cipher: TDCP_rijndael;
-  sha256: TDCP_sha256;
-  // AES-256 key
-  Key: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  Sha256: TDCP_sha256;
+  InputStream, EncryptedStream, OutputStream, DecompressedStream: TMemoryStream;
+  EncryptedSize: int64;
   // Initialization Vector
   IV: array[0..15] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   // SHA-256 HMAC
   HMAC: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   ExpectedHMAC: array[0..31] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   Magic: array[0..3] of byte = (0, 0, 0, 0);
-  Hash: TBytes;
-  EncryptedSize: integer;
-  OutBytes: TBytes = nil;
+  // AES-256 key
   DataToVerify: TBytes = nil;
+  Hash: TBytes;
+  OutBytes: TBytes = nil; // Return as result
 begin
   Result := nil;
   if Length(CipherData) = 0 then Exit;
@@ -285,7 +294,7 @@ begin
   EncryptedStream := TMemoryStream.Create;
   OutputStream := TMemoryStream.Create;
   Cipher := TDCP_rijndael.Create(nil);
-  sha256 := TDCP_sha256.Create(nil);
+  Sha256 := TDCP_sha256.Create(nil);
   try
     InputStream.WriteBuffer(CipherData[0], Length(CipherData));
     InputStream.Position := 0;
@@ -294,10 +303,8 @@ begin
     InputStream.ReadBuffer(Magic[0], SizeOf(Magic));
     if not CompareMem(@Magic[0], @FILE_MAGIC[0], SizeOf(FILE_MAGIC)) then Exit;
 
-    // read IV and HMAC
+    // read Salt, IV, HMAC
     InputStream.ReadBuffer(Salt[0], Length(Salt));
-    Hash := GetHash(Token, Salt);
-
     InputStream.ReadBuffer(IV[0], SizeOf(IV));
     InputStream.ReadBuffer(HMAC[0], SizeOf(HMAC));
 
@@ -308,11 +315,14 @@ begin
     EncryptedStream.CopyFrom(InputStream, EncryptedSize);
     EncryptedStream.Position := 0;
 
-    // derive key
-    if Length(Hash) >= SizeOf(Key) then
-      Move(Hash[0], Key[0], SizeOf(Key))
-    else
-      Exit;
+    // derive keys
+    Hash := GetHash(Token, Salt);
+    KeyEnc := nil;
+    KeyAuth := nil;
+    SetLength(KeyEnc, 32);
+    SetLength(KeyAuth, 32);
+    Move(Hash[0], KeyEnc[0], 32);
+    Move(Hash[32], KeyAuth[0], 32);
 
     // compute data to verify
     SetLength(DataToVerify, Length(Salt) + SizeOf(IV) + EncryptedStream.Size);
@@ -321,17 +331,17 @@ begin
     if EncryptedStream.Size > 0 then
       Move(EncryptedStream.Memory^, DataToVerify[Length(Salt) + SizeOf(IV)], EncryptedStream.Size);
     // compute expected HMAC
-    BytesToArray(HMAC_SHA256(Key, DataToVerify), 32, ExpectedHMAC);
+    BytesToArray(HMAC_SHA256(KeyAuth, DataToVerify), ExpectedHMAC);
     FillChar(DataToVerify[0], Length(DataToVerify), 0);
 
     // verify HMAC using constant-time comparison
-    if not ConstantTimeCompare(TBytes(HMAC), TBytes(ExpectedHMAC)) then
+    if not ConstantTimeCompare(HMAC, ExpectedHMAC) then
       Exit;
 
     // decrypt
     EncryptedStream.Position := 0;
     Cipher.CipherMode := cmCBC;
-    Cipher.Init(Key[0], 256, @IV[0]);
+    Cipher.Init(KeyEnc[0], 256, @IV[0]);
     try
       Cipher.DecryptStream(EncryptedStream, OutputStream, EncryptedSize);
     finally
@@ -354,16 +364,18 @@ begin
     end;
   finally
     // clear sensitive memory
-    FillChar(Key, SizeOf(Key), 0);
+    FillChar(HMAC, SizeOf(HMAC), 0);
     FillChar(ExpectedHMAC, SizeOf(ExpectedHMAC), 0);
-    FreeBytesSecure(Hash);
+    FillChar(Magic, SizeOf(Magic), 0);
     FreeBytesSecure(DataToVerify);
+    FreeBytesSecure(Hash);
+    EncryptedSize := 0;
 
     InputStream.Free;
     EncryptedStream.Free;
     OutputStream.Free;
     Cipher.Free;
-    sha256.Free;
+    Sha256.Free;
   end;
 end;
 
@@ -398,51 +410,43 @@ begin
   {$ENDIF}
 end;
 
-function GetHash(const Token: string; var Salt: TBytes): TBytes;
+function GetHash(const Token: string; var Salt: TBytes; len: integer = 64): TBytes;
 var
   PasswordBytes: TBytes = nil;
-  Iterations: integer;
-  DKLen: integer;
   Derived: TBytes;
   TempToken: string;
 begin
   Result := nil;
-
-  // Parameters: you may tune iterations for your environment.
-  // For desktop/bulk use: 100000 iterations is a reasonable starting point.
-  Iterations := 50000;
-  DKLen := 32; // want 32 bytes (256 bits) output
-
-  // Ensure salt exists (16 bytes)
-  if (not Assigned(Salt)) or (Length(Salt) <> 16) then
-  begin
-    Salt := GetRandomBytes(16);
-  end;
-
-  // Convert Token (Unicode) to UTF-8 bytes
-  TempToken := UTF8Encode(Token);
   try
-    SetLength(PasswordBytes, Length(TempToken));
-    if Length(PasswordBytes) > 0 then
-      Move(TempToken[1], PasswordBytes[0], Length(PasswordBytes));
+    // Ensure salt exists (16 bytes)
+    if (not Assigned(Salt)) or (Length(Salt) <> 16) then
+      Salt := GetRandomBytes(16);
+
+    // Convert Token (Unicode) to UTF-8 bytes
+    TempToken := UTF8Encode(Token);
+    try
+      SetLength(PasswordBytes, Length(TempToken));
+      if Length(PasswordBytes) > 0 then
+        Move(TempToken[1], PasswordBytes[0], Length(PasswordBytes));
+    finally
+      ClearStringSecure(TempToken);
+    end;
+
+    // Derive key with PBKDF2-HMAC-SHA256
+    Derived := PBKDF2_HMAC_SHA256(PasswordBytes, Salt, HASH_ITERATIONS, len);
+
+    // Return derived key
+    SetLength(Result, len);
+    if Length(Derived) >= len then
+      Move(Derived[0], Result[0], len)
+    else
+      FillChar(Result[0], len, 0);
   finally
-    ClearStringSecure(TempToken);
+    // clear sensitive memory
+    if (Assigned(PasswordBytes)) and (Length(PasswordBytes) > 0) then
+      FreeBytesSecure(PasswordBytes);
+    FreeBytesSecure(Derived);
   end;
-
-  // Derive key with PBKDF2-HMAC-SHA256
-  Derived := PBKDF2_HMAC_SHA256(PasswordBytes, Salt, Iterations, DKLen);
-
-  // Return derived key
-  SetLength(Result, DKLen);
-  if Length(Derived) >= DKLen then
-    Move(Derived[0], Result[0], DKLen)
-  else
-    FillChar(Result[0], DKLen, 0);
-
-  // clear sensitive memory
-  if (Assigned(PasswordBytes)) and (Length(PasswordBytes) > 0) then
-    FreeBytesSecure(PasswordBytes);
-  FreeBytesSecure(Derived);
 end;
 
 function CheckEncryptedFile(const FileName: string): boolean;
@@ -462,6 +466,7 @@ begin
     Result := CompareMem(@Magic[0], @FILE_MAGIC[0], SizeOf(Magic));
   finally
     FS.Free;
+    FillChar(Magic, SizeOf(Magic), 0);
   end;
 end;
 
@@ -483,31 +488,37 @@ begin
   end;
 end;
 
-procedure BytesToArray(const Data: TBytes; const len: integer; var ResArray: array of byte);
+procedure BytesToArray(const Src: TBytes; var Dest: array of byte; DestLen: integer = -1);
 var
-  CopyLength: integer;
-  ResArrayLen: integer;
-  SafeLen: integer;
+  CopyLen: integer;
+  RealDestLen: integer;
 begin
-  ResArrayLen := Length(ResArray);
+  // actual length of the destination array (works for both static and dynamic arrays)
+  RealDestLen := Length(Dest);
+  if RealDestLen = 0 then Exit;   // nothing to copy if destination has no space
 
-  // Automatically limit the length to the size of the target array
-  SafeLen := len;
-  if SafeLen > ResArrayLen then
-    SafeLen := ResArrayLen;
+  // if the user explicitly provided desired length, respect it,
+  // otherwise use the full destination array length
+  if DestLen < 0 then
+    DestLen := RealDestLen
+  else if DestLen > RealDestLen then
+    DestLen := RealDestLen;       // clamp length to avoid going out of bounds
 
-  CopyLength := Length(Data);
-  if CopyLength > SafeLen then
-    CopyLength := SafeLen;
+  // number of bytes to copy from source
+  CopyLen := Length(Src);
+  if CopyLen > DestLen then
+    CopyLen := DestLen;
 
-  if CopyLength > 0 then
-    Move(Data[0], ResArray[0], CopyLength);
+  // copy bytes from source into destination
+  if CopyLen > 0 then
+    System.Move(Src[0], Dest[0], CopyLen);
 
-  if SafeLen > CopyLength then
-    FillChar(ResArray[CopyLength], SafeLen - CopyLength, 0);
+  // fill remaining destination space with zeros
+  if DestLen > CopyLen then
+    FillChar(Dest[CopyLen], DestLen - CopyLen, 0);
 end;
 
-function ConstantTimeCompare(const A, B: TBytes): boolean;
+function ConstantTimeCompare(const A, B: array of byte): boolean;
 var
   i: integer;
   diff: byte;
@@ -535,6 +546,14 @@ begin
     FillChar(S[1], Length(S) * SizeOf(char), 0);
     S := string.Empty;
   end;
+end;
+
+function CopyBytes(const Source: TBytes): TBytes;
+begin
+  Result := nil;
+  SetLength(Result, Length(Source));
+  if Length(Source) > 0 then
+    Move(Source[0], Result[0], Length(Source));
 end;
 
 function HMAC_SHA256(const Key, Data: TBytes): TBytes;
@@ -701,8 +720,9 @@ begin
     // clear locals
     FreeBytesSecure(TBlk);
     FreeBytesSecure(U);
-    FreeBytesSecure(Accumulator);
+    FillChar(IntBlock, SizeOf(IntBlock), 0);
     FreeBytesSecure(TmpKey);
+    FreeBytesSecure(Accumulator);
   end;
 end;
 
