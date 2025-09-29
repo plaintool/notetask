@@ -14,8 +14,10 @@ interface
 uses
   Classes,
   SysUtils,
+  Graphics,
   Process,
-  LazUTF8;
+  LazUTF8,
+  lineending;
 
 type
   TIntegerArray = array of integer;
@@ -63,6 +65,8 @@ function IsUTF8Char(const S: string; CharIndex: integer; FindChar: string = ' ')
 function IsLetterOrDigit(ch: widechar): boolean;
 
 function RepeatString(const S: string; Count: integer): string;
+
+function MaskTextWithBullets(const AText: string; ACanvas: TCanvas; ALineEnding: TLineEnding): string;
 
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
 
@@ -519,6 +523,40 @@ begin
   Result := string.Empty;
   for i := 1 to Count do
     Result := Result + S;
+end;
+
+function MaskTextWithBullets(const AText: string; ACanvas: TCanvas; ALineEnding: TLineEnding): string;
+var
+  Lines: TStringList;
+  i, Count: integer;
+  Bullet, Line: string;
+begin
+  Result := '';
+  Lines := TStringList.Create;
+  try
+    // Split text into separate lines
+    Lines.Text := AText;
+    Bullet := #$2022 + ' '; // Unicode bullet with space
+
+    for i := 0 to Lines.Count - 1 do
+    begin
+      Line := Lines[i];
+      if Trim(Line) <> string.Empty then
+      begin
+        // Calculate how many bullets fit in the width of this line
+        Count := ACanvas.TextWidth(Line) div ACanvas.TextWidth(Bullet);
+        if Count < 1 then Count := 1; // always at least one bullet
+        Line := RepeatString(Bullet, Count);
+      end;
+      // Restore line breaks
+      if Result = string.Empty then
+        Result := Line
+      else
+        Result := Result + ALineEnding.Value + Line;
+    end;
+  finally
+    Lines.Free;
+  end;
 end;
 
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;

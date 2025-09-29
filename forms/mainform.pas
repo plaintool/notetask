@@ -1503,7 +1503,7 @@ begin
         flags := flags or DT_WORDBREAK;
 
       if (FHideNoteText) and (aCol = 3) then
-        S := RepeatString(#$2022 + ' ', grid.canvas.TextWidth(S) div grid.canvas.TextWidth(#$2022 + ' '));
+        S := MaskTextWithBullets(S, grid.Canvas, FLineEnding);
 
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
     end;
