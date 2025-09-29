@@ -448,6 +448,8 @@ type
     FSalt: TBytes;
     FEncoding: TEncoding;
     FLineEnding: TLineEnding;
+    FEncodingOriginal: TEncoding;
+    FLineEndingOriginal: TLineEnding;
     FLineCount: integer;
     FWordWrap: boolean;
     FEnterSubmit: boolean;
@@ -781,7 +783,6 @@ begin
   SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
   // Free allocated resources
-  //FLineEnding.Free;
   Tasks.Free;
   ResourceBitmapCheck.Free;
   ResourceBitmapUncheck.Free;
@@ -2089,6 +2090,8 @@ begin
 
     if Confirm = mrYes then
     begin
+      FLineEnding := FLineEndingOriginal;
+      FEncoding := FEncodingOriginal;
       BackupSelectedState;
       Tasks.UndoBackupInit;
       FillGrid;
@@ -3486,7 +3489,11 @@ begin
 
     // Load saved settings for new file
     LoadGridSettings(Self, taskGrid, string.Empty);
+
     ApplyGridSettings;
+
+    FLineEndingOriginal := FLineEnding;
+    FEncodingOriginal := FEncoding;
   end;
 end;
 
@@ -3613,6 +3620,8 @@ begin
 
   ApplyGridSettings;
 
+  FLineEndingOriginal := FLineEnding;
+  FEncodingOriginal := FEncoding;
   Result := True;
 end;
 
