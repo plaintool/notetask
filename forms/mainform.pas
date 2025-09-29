@@ -297,6 +297,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure FormKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -1059,6 +1060,15 @@ begin
       if (taskGrid.Col = 6) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
         StarTasks;
     end;
+  end;
+end;
+
+procedure TformNotetask.FormKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
+begin
+  if (Key = VK_MENU) and (ssShift in Shift) then
+  begin
+    Key := 0; // block menu flicker when Alt+Shift
+    Exit;
   end;
 end;
 

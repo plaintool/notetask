@@ -15,6 +15,7 @@ object formNotetask: TformNotetask
   OnDestroy = FormDestroy
   OnDropFiles = FormDropFiles
   OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
   OnResize = FormResize
   OnShow = FormShow
   object taskGrid: TStringGrid
