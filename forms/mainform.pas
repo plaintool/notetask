@@ -5006,6 +5006,7 @@ end;
 procedure TformNotetask.MemoNoteIndent;
 var
   SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
+  CaretPos: TPoint;
   Offset: integer;
 begin
   MemoNoteBackup;
@@ -5013,6 +5014,9 @@ begin
   begin
     SelStartPos := memoNote.SelStart;
     SelEndPos := SelStartPos + memoNote.SelLength;
+    CaretPos := Point(memoNote.CaretPos.X, memoNote.CaretPos.Y);
+
+    memoNote.Lines.BeginUpdate;
 
     // Calculate start line number of selection
     memoNote.SelStart := SelStartPos;
@@ -5025,6 +5029,13 @@ begin
     // Restore selection
     memoNote.SelStart := SelStartPos;
     memoNote.SelLength := SelEndPos - SelStartPos;
+
+    memoNote.Lines.EndUpdate;
+
+    // If last line not selected decrement endline
+    if (StartLine <> EndLine) and (SelEndPos - SelStartPos > 0) and (EndLine = CaretPos.Y) and
+      ((CaretPos.X = 0) or ((CaretPos.X = (SelEndPos - SelStartPos)) and (MemoNote.SelText[Length(MemoNote.SelText)] in [#10, #13]))) then
+      Dec(EndLine);
 
     // Add IndentStr at the start of each selected line
     for i := StartLine to EndLine do
@@ -5042,12 +5053,16 @@ end;
 procedure TformNotetask.MemoNoteOutdent;
 var
   SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
+  CaretPos: TPoint;
   Offset: integer;
   line: string;
 begin
   MemoNoteBackup;
   SelStartPos := memoNote.SelStart;
   SelEndPos := SelStartPos + memoNote.SelLength;
+  CaretPos := Point(memoNote.CaretPos.X, memoNote.CaretPos.Y);
+
+  memoNote.Lines.BeginUpdate;
 
   // Calculate start line number of selection
   memoNote.SelStart := SelStartPos;
@@ -5060,6 +5075,13 @@ begin
   // Restore selection
   memoNote.SelStart := SelStartPos;
   memoNote.SelLength := SelEndPos - SelStartPos;
+
+  memoNote.Lines.EndUpdate;
+
+  // If last line not selected decrement endline
+  if (StartLine <> EndLine) and (SelEndPos - SelStartPos > 0) and (EndLine = CaretPos.Y) and
+    ((CaretPos.X = 0) or ((CaretPos.X = (SelEndPos - SelStartPos)) and (MemoNote.SelText[Length(MemoNote.SelText)] in [#10, #13]))) then
+    Dec(EndLine);
 
   // Remove IndentStr at the start of each selected line if present
   Offset := 0;
@@ -5085,6 +5107,7 @@ end;
 procedure TformNotetask.MemoNoteToggleComment(aComment: string);
 var
   SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
+  CaretPos: TPoint;
   line, trimmed, resultStr: string;
   AllCommented: boolean;
   MinIndent, CurrentIndent: integer;
@@ -5100,7 +5123,7 @@ begin
   if (memoNote.SelLength = 0) then
   begin
     line := Trim(memoNote.Lines[memoNote.CaretPos.Y]);
-    if line = '' then
+    if line = string.Empty then
     begin
       // Create a string of the comment character, approximate length to fit the editor width
       // Calculate how many times we can repeat the full word
@@ -5111,7 +5134,7 @@ begin
         Count := 60; // fallback value
 
       // Build the repeated string
-      resultStr := '';
+      resultStr := string.Empty;
       for j := 1 to Count do
         resultStr := resultStr + aComment;
 
@@ -5129,6 +5152,9 @@ begin
   FirstCommentPos := -1;
   SelStartPos := memoNote.SelStart;
   SelEndPos := SelStartPos + memoNote.SelLength;
+  CaretPos := Point(memoNote.CaretPos.X, memoNote.CaretPos.Y);
+
+  memoNote.Lines.BeginUpdate;
 
   // Calculate start and end lines of selection
   memoNote.SelStart := SelStartPos;
@@ -5140,6 +5166,13 @@ begin
   // Restore selection
   memoNote.SelStart := SelStartPos;
   memoNote.SelLength := SelEndPos - SelStartPos;
+
+  memoNote.Lines.EndUpdate;
+
+  // If last line not selected decrement endline
+  if (StartLine <> EndLine) and (SelEndPos - SelStartPos > 0) and (EndLine = CaretPos.Y) and
+    ((CaretPos.X = 0) or ((CaretPos.X = (SelEndPos - SelStartPos)) and (MemoNote.SelText[Length(MemoNote.SelText)] in [#10, #13]))) then
+    Dec(EndLine);
 
   // Find minimum IndentStr among non-empty lines
   MinIndent := MaxInt;
