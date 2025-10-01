@@ -4803,7 +4803,7 @@ begin
         if Tasks.GetTask(RowIndex).Done then
         begin
           taskGrid.Cells[1, RowIndex] := '1';
-          if (taskGrid.Cells[5, RowIndex] = '') then
+          if (taskGrid.Columns.Items[4].Visible) and (taskGrid.Cells[5, RowIndex] = string.Empty) then
             taskGrid.Cells[5, RowIndex] := DateTimeToString(Now, FShowTime);
         end
         else
@@ -4839,7 +4839,7 @@ begin
       begin
         Check := True;
         taskGrid.Cells[1, RowIndex] := '1';
-        if (taskGrid.Cells[5, RowIndex] = '') then
+        if (taskGrid.Columns.Items[4].Visible) and (taskGrid.Cells[5, RowIndex] = string.Empty) then
           taskGrid.Cells[5, RowIndex] := DateTimeToString(Now, FShowTime);
       end
       else
