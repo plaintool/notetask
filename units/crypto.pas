@@ -59,6 +59,9 @@ function ConstantTimeCompare(const A, B: array of byte): boolean;
 // Gentle cleaning of TBytes
 procedure FreeBytesSecure(var Bytes: TBytes);
 
+// Gentle cleaning of TMemoryStream
+procedure FreeMemoryStreamSecure(var Stream: TMemoryStream);
+
 // Gentle cleaning of string
 procedure ClearStringSecure(var S: string);
 
@@ -82,6 +85,7 @@ implementation
 const
   FILE_MAGIC: array[0..3] of byte = (78, 84, 83, 75); // 'NTSK'
   HASH_ITERATIONS = 50000;
+  MAX_ALLOWED_UNCOMPRESSED = 512 * 1024 * 1024;
 
 function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
 var
@@ -141,6 +145,9 @@ begin
 
   // read original uncompressed size
   OriginalSize := PCardinal(MemPtr)^;
+
+  if (OriginalSize = 0) or (OriginalSize > MAX_ALLOWED_UNCOMPRESSED) then
+    raise Exception.Create('Operation failed');
 
   Source := MemPtr;
   Inc(pbyte(Source), 4); // compressed data starts after 4 bytes
@@ -213,7 +220,7 @@ begin
         Cipher.Burn;
       end;
     finally
-      CompressedStream.Free;
+      FreeMemoryStreamSecure(CompressedStream);
     end;
 
     // compute data to authenticate
@@ -256,8 +263,8 @@ begin
     FreeBytesSecure(DataToAuth);
     FreeBytesSecure(Hash);
 
-    InputStream.Free;
-    OutputStream.Free;
+    FreeMemoryStreamSecure(InputStream);
+    FreeMemoryStreamSecure(OutputStream);
     Cipher.Free;
     Sha256.Free;
   end;
@@ -286,96 +293,103 @@ begin
   // initialize salt
   Salt := nil;
   SetLength(Salt, 16);
-
-  // basic length check (IV + HMAC)
-  if Length(CipherData) < (SizeOf(Magic) + Length(Salt) + SizeOf(IV) + SizeOf(HMAC)) then Exit;
-
-  InputStream := TMemoryStream.Create;
-  EncryptedStream := TMemoryStream.Create;
-  OutputStream := TMemoryStream.Create;
-  Cipher := TDCP_rijndael.Create(nil);
-  Sha256 := TDCP_sha256.Create(nil);
   try
-    InputStream.WriteBuffer(CipherData[0], Length(CipherData));
-    InputStream.Position := 0;
+    // basic length check (IV + HMAC)
+    if Length(CipherData) < (SizeOf(Magic) + Length(Salt) + SizeOf(IV) + SizeOf(HMAC)) then Exit;
 
-    // read and check MAGIC
-    InputStream.ReadBuffer(Magic[0], SizeOf(Magic));
-    if not CompareMem(@Magic[0], @FILE_MAGIC[0], SizeOf(FILE_MAGIC)) then Exit;
-
-    // read Salt, IV, HMAC
-    InputStream.ReadBuffer(Salt[0], Length(Salt));
-    InputStream.ReadBuffer(IV[0], SizeOf(IV));
-    InputStream.ReadBuffer(HMAC[0], SizeOf(HMAC));
-
-    // remaining is encrypted data
-    EncryptedSize := InputStream.Size - (SizeOf(Magic) + Length(Salt) + SizeOf(IV) + SizeOf(HMAC));
-    if EncryptedSize < 0 then Exit;
-
-    EncryptedStream.CopyFrom(InputStream, EncryptedSize);
-    EncryptedStream.Position := 0;
-
-    // derive keys
-    Hash := GetHash(Token, Salt);
-    KeyEnc := nil;
-    KeyAuth := nil;
-    SetLength(KeyEnc, 32);
-    SetLength(KeyAuth, 32);
-    Move(Hash[0], KeyEnc[0], 32);
-    Move(Hash[32], KeyAuth[0], 32);
-
-    // compute data to verify
-    SetLength(DataToVerify, Length(Salt) + SizeOf(IV) + EncryptedStream.Size);
-    Move(Salt[0], DataToVerify[0], Length(Salt));
-    Move(IV[0], DataToVerify[Length(Salt)], SizeOf(IV));
-    if EncryptedStream.Size > 0 then
-      Move(EncryptedStream.Memory^, DataToVerify[Length(Salt) + SizeOf(IV)], EncryptedStream.Size);
-    // compute expected HMAC
-    BytesToArray(HMAC_SHA256(KeyAuth, DataToVerify), ExpectedHMAC);
-    FillChar(DataToVerify[0], Length(DataToVerify), 0);
-
-    // verify HMAC using constant-time comparison
-    if not ConstantTimeCompare(HMAC, ExpectedHMAC) then
-      Exit;
-
-    // decrypt
-    EncryptedStream.Position := 0;
-    Cipher.CipherMode := cmCBC;
-    Cipher.Init(KeyEnc[0], 256, @IV[0]);
+    InputStream := TMemoryStream.Create;
+    EncryptedStream := TMemoryStream.Create;
+    OutputStream := TMemoryStream.Create;
+    Cipher := TDCP_rijndael.Create(nil);
+    Sha256 := TDCP_sha256.Create(nil);
     try
-      Cipher.DecryptStream(EncryptedStream, OutputStream, EncryptedSize);
-    finally
-      Cipher.Burn;
-    end;
+      InputStream.WriteBuffer(CipherData[0], Length(CipherData));
+      InputStream.Position := 0;
 
-    // decompress
-    if OutputStream.Size > 0 then
-    begin
-      DecompressedStream := DecompressMemoryStream(OutputStream);
+      // read and check MAGIC
+      InputStream.ReadBuffer(Magic[0], SizeOf(Magic));
+      if not CompareMem(@Magic[0], @FILE_MAGIC[0], SizeOf(FILE_MAGIC)) then Exit;
+
+      // read Salt, IV, HMAC
+      InputStream.ReadBuffer(Salt[0], Length(Salt));
+      InputStream.ReadBuffer(IV[0], SizeOf(IV));
+      InputStream.ReadBuffer(HMAC[0], SizeOf(HMAC));
+
+      // remaining is encrypted data
+      EncryptedSize := InputStream.Size - (SizeOf(Magic) + Length(Salt) + SizeOf(IV) + SizeOf(HMAC));
+      if EncryptedSize < 0 then Exit;
+
+      EncryptedStream.CopyFrom(InputStream, EncryptedSize);
+      EncryptedStream.Position := 0;
+
+      // derive keys
+      Hash := GetHash(Token, Salt);
+      KeyEnc := nil;
+      KeyAuth := nil;
+      SetLength(KeyEnc, 32);
+      SetLength(KeyAuth, 32);
+      Move(Hash[0], KeyEnc[0], 32);
+      Move(Hash[32], KeyAuth[0], 32);
+
+      // compute data to verify
+      SetLength(DataToVerify, Length(Salt) + SizeOf(IV) + EncryptedStream.Size);
+      Move(Salt[0], DataToVerify[0], Length(Salt));
+      Move(IV[0], DataToVerify[Length(Salt)], SizeOf(IV));
+      if EncryptedStream.Size > 0 then
+        Move(EncryptedStream.Memory^, DataToVerify[Length(Salt) + SizeOf(IV)], EncryptedStream.Size);
+      // compute expected HMAC
+      BytesToArray(HMAC_SHA256(KeyAuth, DataToVerify), ExpectedHMAC);
+      FillChar(DataToVerify[0], Length(DataToVerify), 0);
+
+      // verify HMAC using constant-time comparison
+      if not ConstantTimeCompare(HMAC, ExpectedHMAC) then
+        Exit;
+
+      // decrypt
+      EncryptedStream.Position := 0;
+      Cipher.CipherMode := cmCBC;
+      Cipher.Init(KeyEnc[0], 256, @IV[0]);
       try
-        SetLength(OutBytes, DecompressedStream.Size);
-        DecompressedStream.Position := 0;
-        DecompressedStream.ReadBuffer(OutBytes[0], DecompressedStream.Size);
+        Cipher.DecryptStream(EncryptedStream, OutputStream, EncryptedSize);
       finally
-        DecompressedStream.Free;
+        Cipher.Burn;
       end;
 
-      Result := Outbytes;
-    end;
-  finally
-    // clear sensitive memory
-    FillChar(HMAC, SizeOf(HMAC), 0);
-    FillChar(ExpectedHMAC, SizeOf(ExpectedHMAC), 0);
-    FillChar(Magic, SizeOf(Magic), 0);
-    FreeBytesSecure(DataToVerify);
-    FreeBytesSecure(Hash);
-    EncryptedSize := 0;
+      // decompress
+      if OutputStream.Size > 0 then
+      begin
+        DecompressedStream := DecompressMemoryStream(OutputStream);
+        try
+          SetLength(OutBytes, DecompressedStream.Size);
+          DecompressedStream.Position := 0;
+          DecompressedStream.ReadBuffer(OutBytes[0], DecompressedStream.Size);
+        finally
+          FreeMemoryStreamSecure(DecompressedStream);
+        end;
 
-    InputStream.Free;
-    EncryptedStream.Free;
-    OutputStream.Free;
-    Cipher.Free;
-    Sha256.Free;
+        Result := Outbytes;
+      end;
+
+    finally
+      // clear sensitive memory
+      FillChar(HMAC, SizeOf(HMAC), 0);
+      FillChar(ExpectedHMAC, SizeOf(ExpectedHMAC), 0);
+      FillChar(Magic, SizeOf(Magic), 0);
+      FreeBytesSecure(DataToVerify);
+      FreeBytesSecure(Hash);
+      EncryptedSize := 0;
+
+      FreeMemoryStreamSecure(InputStream);
+      FreeMemoryStreamSecure(EncryptedStream);
+      FreeMemoryStreamSecure(OutputStream);
+      Cipher.Free;
+      Sha256.Free;
+    end;
+  except
+    FreeBytesSecure(Salt);
+    FreeBytesSecure(KeyEnc);
+    FreeBytesSecure(KeyAuth);
+    raise;
   end;
 end;
 
@@ -396,7 +410,7 @@ begin
     if stream.Read(Result[0], len) <> len then
       raise Exception.Create('Failed to read enough bytes from /dev/urandom');
   finally
-    stream.Free;
+    FreeMemoryStreamSecure(stream);
   end;
   {$ELSE}
   if not CryptAcquireContext(hProv, nil, nil, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT) then
@@ -537,6 +551,21 @@ begin
   if Length(Bytes) > 0 then
     FillChar(Bytes[0], Length(Bytes), 0);
   SetLength(Bytes, 0);
+end;
+
+procedure FreeMemoryStreamSecure(var Stream: TMemoryStream);
+begin
+  if Assigned(Stream) then
+  begin
+    if Stream.Size > 0 then
+    begin
+      // fill memory with zeros
+      FillChar(Stream.Memory^, Stream.Size, 0);
+      Stream.Clear; // optional: очистить сам поток
+    end;
+    Stream.Free;
+    Stream := nil;
+  end;
 end;
 
 procedure ClearStringSecure(var S: string);
