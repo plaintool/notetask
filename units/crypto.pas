@@ -14,7 +14,7 @@ uses
   Classes,
   SysUtils,
   {$IFDEF MSWINDOWS}
-  JwaWinCrypt,
+  Windows,
   {$ELSE}
   Unix,
   {$ENDIF}
@@ -87,6 +87,17 @@ const
   HASH_ITERATIONS = 50000;
   MAX_ALLOWED_UNCOMPRESSED = 512 * 1024 * 1024;
 
+{$IFDEF MSWINDOWS}
+const
+  BCRYPT_USE_SYSTEM_PREFERRED_RNG = $00000002;
+
+type
+  NTSTATUS = longint;
+
+function BCryptGenRandom(hAlgorithm: Pointer; pbBuffer: Pointer; cbBuffer: ULONG; dwFlags: ULONG): NTSTATUS;
+  stdcall; external 'bcrypt.dll';
+{$ENDIF}
+
 function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
 var
   Source, Dest: pchar;
@@ -105,21 +116,26 @@ begin
 
   Result := TMemoryStream.Create;
   try
-    // allocate memory: 4 bytes for original size + estimated compressed size
-    DestLen := SourceLen + ((SourceLen + 7) shr 3) + ((SourceLen + 63) shr 6) + 11; // formula from zlib to estimate max compressed size
+    // calculate maximum possible compressed size
+    DestLen := SourceLen + ((SourceLen + 7) shr 3) + ((SourceLen + 63) shr 6) + 11;
+
+    // allocate buffer (4 bytes for original size header + compressed data)
     Result.SetSize(4 + DestLen);
 
     MemPtr := Result.Memory;
+
+    // leave 4 bytes at start for OriginalSize
     Dest := MemPtr;
-    Inc(pbyte(Dest), 4); // move pointer 4 bytes forward for compressed data
+    Inc(pbyte(Dest), 4);
 
+    // compress updates DestLen with actual compressed size
     if compress(Dest, DestLen, Source, SourceLen) <> Z_OK then
-      raise Exception.Create('Operation failed');
+      raise Exception.Create('Compression failed');
 
-    // store original size in first 4 bytes
+    // store original (uncompressed) size in the first 4 bytes
     PCardinal(MemPtr)^ := SourceLen;
 
-    // adjust memory size to actual compressed data
+    // shrink buffer to real compressed size
     Result.SetSize(4 + DestLen);
     Result.Position := 0;
   except
@@ -146,7 +162,7 @@ begin
   // read original uncompressed size
   OriginalSize := PCardinal(MemPtr)^;
 
-  if (OriginalSize = 0) or (OriginalSize > MAX_ALLOWED_UNCOMPRESSED) then
+  if (InputStream.Size < 4 + 1) or (OriginalSize = 0) or (OriginalSize > MAX_ALLOWED_UNCOMPRESSED) then
     raise Exception.Create('Operation failed');
 
   Source := MemPtr;
@@ -197,9 +213,10 @@ begin
     BytesToArray(GetRandomBytes(16), IV);
 
     // derive keys directly from precomputed hash (32 bytes for AES-256)
-    if (not Assigned(KeyEnc)) or (not Assigned(KeyAuth)) then
+    if (Length(KeyEnc) <> 32) or (Length(KeyAuth) <> 32) then
     begin
       Hash := GetHash(Token, Salt);
+      if Length(Hash) < 64 then raise Exception.Create('Operation failed');
       SetLength(KeyEnc, 32);
       SetLength(KeyAuth, 32);
       Move(Hash[0], KeyEnc[0], 32);
@@ -229,6 +246,7 @@ begin
     Move(IV[0], DataToAuth[Length(Salt)], Length(IV));
     if OutputStream.Size > 0 then
       Move(OutputStream.Memory^, DataToAuth[Length(Salt) + Length(IV)], OutputStream.Size);
+
     // compute HMAC
     BytesToArray(HMAC_SHA256(KeyAuth, DataToAuth), HMAC);
 
@@ -317,13 +335,17 @@ begin
 
       // remaining is encrypted data
       EncryptedSize := InputStream.Size - (SizeOf(Magic) + Length(Salt) + SizeOf(IV) + SizeOf(HMAC));
-      if EncryptedSize < 0 then Exit;
-
+      if EncryptedSize < 0 then
+      begin
+        FreeBytesSecure(Salt);
+        Exit;
+      end;
       EncryptedStream.CopyFrom(InputStream, EncryptedSize);
       EncryptedStream.Position := 0;
 
       // derive keys
       Hash := GetHash(Token, Salt);
+      if Length(Hash) < 64 then raise Exception.Create('Operation failed');
       KeyEnc := nil;
       KeyAuth := nil;
       SetLength(KeyEnc, 32);
@@ -343,7 +365,12 @@ begin
 
       // verify HMAC using constant-time comparison
       if not ConstantTimeCompare(HMAC, ExpectedHMAC) then
+      begin
+        FreeBytesSecure(Salt);
+        FreeBytesSecure(KeyEnc);
+        FreeBytesSecure(KeyAuth);
         Exit;
+      end;
 
       // decrypt
       EncryptedStream.Position := 0;
@@ -397,29 +424,29 @@ function GetRandomBytes(len: integer): TBytes;
   {$IFDEF UNIX}
 var
   stream: TFileStream;
-  {$ELSE}
-var
-  hProv: QWord = 0;
   {$ENDIF}
 begin
   Result := nil;
+  if len <= 0 then
+    Exit;
   SetLength(Result, len);
   {$IFDEF UNIX}
     stream := TFileStream.Create('/dev/urandom', fmOpenRead);
   try
     if stream.Read(Result[0], len) <> len then
-      raise Exception.Create('Failed to read enough bytes from /dev/urandom');
+    begin
+      FreeBytesSecure(Result);
+      raise Exception.Create('Operation failed');
+    end;
   finally
-    FreeMemoryStreamSecure(stream);
+    stream.Free;
   end;
   {$ELSE}
-  if not CryptAcquireContext(hProv, nil, nil, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT) then
-    raise Exception.Create('CryptAcquireContext failed');
-  try
-    if not CryptGenRandom(hProv, len, @Result[0]) then
-      raise Exception.Create('CryptGenRandom failed');
-  finally
-    CryptReleaseContext(hProv, 0);
+  // On Windows, use BCryptGenRandom (CNG)
+  if (BCryptGenRandom(nil, @Result[0], len, BCRYPT_USE_SYSTEM_PREFERRED_RNG) <> 0) then
+  begin
+    FreeBytesSecure(Result);
+    raise Exception.Create('Operation failed');
   end;
   {$ENDIF}
 end;
@@ -524,12 +551,16 @@ begin
     CopyLen := DestLen;
 
   // copy bytes from source into destination
-  if CopyLen > 0 then
+  if (CopyLen > 0) and (Length(Src) >= CopyLen) then
     System.Move(Src[0], Dest[0], CopyLen);
 
   // fill remaining destination space with zeros
   if DestLen > CopyLen then
     FillChar(Dest[CopyLen], DestLen - CopyLen, 0);
+
+  // wipe sensitive data from temporary buffer
+  if Length(Src) > 0 then
+    FillChar(Src[0], Length(Src), 0);
 end;
 
 function ConstantTimeCompare(const A, B: array of byte): boolean;
@@ -739,11 +770,6 @@ begin
         else
           Break;
       end;
-
-      // clear accumulator and tmp buffers for next block
-      FillChar(Accumulator[0], Length(Accumulator), 0);
-      FillChar(U[0], Length(U), 0);
-      SetLength(TmpKey, 0);
     end;
   finally
     // clear locals

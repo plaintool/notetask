@@ -60,7 +60,7 @@ Supports advanced features such as executing selected comments, tasks, or the en
 ![sample4](samples/sample4.png)
 
 ### Encryption
-Notetask encrypts files using AES-256 in CBC mode with a PBKDF2-HMAC-SHA256–derived key. Files are compressed via zlib before encryption, and a SHA-256 HMAC over salt, IV, and ciphertext ensures integrity and authenticity.
+Notetask encrypts files using AES-256 in CBC mode with a key derived via PBKDF2-HMAC-SHA256. The derived 64-byte key is split into a 32-byte encryption key and a 32-byte HMAC key. Files are compressed using zlib before encryption, and a SHA-256 HMAC over the salt, IV, and ciphertext ensures integrity and authenticity.
 
 The user can save an encrypted binary file with password protection. If the password is left empty, the file is still encrypted but without password protection, storing only the compressed data in the encrypted format.
 

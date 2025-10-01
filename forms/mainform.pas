@@ -3640,67 +3640,71 @@ var
   TaskList: TStringList;
   Token: string = string.Empty;
 begin
-  if (fileName = string.Empty) and (FFileName = string.Empty) then
-    Result := SaveFileAs;
+  try
+    if (fileName = string.Empty) and (FFileName = string.Empty) then
+      Result := SaveFileAs;
 
-  if (fileName = string.Empty) then
-    fileName := FFileName
-  else
-    FFileName := fileName;
+    if (fileName = string.Empty) then
+      fileName := FFileName
+    else
+      FFileName := fileName;
 
-  if (fileName <> string.Empty) then
-  begin
-    if (encrypt) then
+    if (fileName <> string.Empty) then
     begin
-      // Create an instance of the form
-      with formInputText do
-      try
-        Left := self.Left + 14;
-        Top := self.top + 52;
-        SetMode(ReplaceStr(rpassword, ':', ''), rpassword, rok, string.Empty, False, True, True);
+      if (encrypt) then
+      begin
+        // Create an instance of the form
+        with formInputText do
+        try
+          Left := self.Left + 14;
+          Top := self.top + 52;
+          SetMode(ReplaceStr(rpassword, ':', ''), rpassword, rok, string.Empty, False, True, True);
 
-        // Show the form as a modal dialog
-        if ShowModal = mrOk then
-        begin
-          FEncrypted := True;
-          Token := editText.Text;
-          FreeBytesSecure(FSalt);
-          FreeBytesSecure(FKeyEnc);
-          FreeBytesSecure(FKeyAuth);
-        end
-        else
-          exit(False);
-      finally
-        Hide;
+          // Show the form as a modal dialog
+          if ShowModal = mrOk then
+          begin
+            FEncrypted := True;
+            Token := editText.Text;
+            FreeBytesSecure(FSalt);
+            FreeBytesSecure(FKeyEnc);
+            FreeBytesSecure(FKeyAuth);
+          end
+          else
+            exit(False);
+        finally
+          Hide;
+        end;
+      end
+      else
+      if saveAs then
+      begin
+        FEncrypted := False;
+        FreeBytesSecure(FSalt);
+        FreeBytesSecure(FKeyEnc);
+        FreeBytesSecure(FKeyAuth);
+      end;
+
+      TaskList := Tasks.ToStringList;
+      if Assigned(TaskList) and (TaskList <> nil) then
+      begin
+        try
+          EditComplite;
+          SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, Token, FSalt, FKeyEnc, FKeyAuth);
+          SetChanged(False);
+          Tasks.CreateBackupInit;
+          Result := True;
+        finally
+          TaskList.Free;
+        end;
       end;
     end
     else
-    if saveAs then
-    begin
-      FEncrypted := False;
-      FreeBytesSecure(FSalt);
-      FreeBytesSecure(FKeyEnc);
-      FreeBytesSecure(FKeyAuth);
-    end;
+      Result := False;
 
-    TaskList := Tasks.ToStringList;
-    if Assigned(TaskList) and (TaskList <> nil) then
-    begin
-      try
-        EditComplite;
-        SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, Token, FSalt, FKeyEnc, FKeyAuth);
-        SetChanged(False);
-        Tasks.CreateBackupInit;
-        Result := True;
-      finally
-        TaskList.Free;
-      end;
-    end;
-  end
-  else
-    Result := False;
-
-  SetInfo;
+    SetInfo;
+  finally
+    ClearStringSecure(Token);
+  end;
 end;
 
 function TformNotetask.SaveFileAs: boolean;
