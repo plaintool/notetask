@@ -2873,12 +2873,17 @@ begin
 end;
 
 procedure TformNotetask.aWordWrapExecute(Sender: TObject);
+var
+  sel: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
 
   EditComplite;
   FWordWrap := aWordWrap.Checked;
+  sel := memoNote.SelLength;
   memoNote.WordWrap := FWordWrap;
+  if sel = 0 then
+    memoNote.SelLength := 0;
   ResetRowHeight;
   Invalidate;
 end;
@@ -3334,6 +3339,13 @@ begin
   if (ssCtrl in Shift) and (Key = VK_OEM_7) then // Ctrl + '
   begin
     MemoNoteToggleComment(CommentApostropheStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_RETURN) then // Ctrl + Enter
+  begin
+    MemoNoteBackup;
+    memoNote.SelText := RenderWordCanvas(memoNote.SelText, Font.Name, Max(Font.Size - 2, 2));
     Key := 0;
   end
   else

@@ -76,6 +76,8 @@ procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
 
 function CloneArray(const Src: TIntegerArray): TIntegerArray;
 
+function RenderWordCanvas(const AWord: string; const FontName: string = 'Monospace'; FontSize: integer = 12): string;
+
 const
   Brackets: array[0..17] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]',
     '[X]', '[ ]', '[]', 'x ', '-x ', '- x ', 'X ', '-X ', '- X ');
@@ -615,6 +617,72 @@ end;
 function CloneArray(const Src: TIntegerArray): TIntegerArray;
 begin
   Result := Copy(Src, 0, Length(Src));
+end;
+
+function RenderWordCanvas(const AWord: string; const FontName: string = 'Monospace'; FontSize: integer = 12): string;
+var
+  bmp: TBitmap;
+  x, y: integer;
+  line, res: unicodestring;
+  col: TColor;
+  r, g, b: byte;
+  luminance: integer;
+  char: boolean;
+begin
+  if Length(AWord) > 1024 then exit(AWord);
+
+  bmp := TBitmap.Create;
+  try
+    bmp.Canvas.Font.Name := FontName;
+    bmp.Canvas.Font.Size := FontSize;
+    bmp.Canvas.Font.Color := clBlack;
+
+    // use exact size
+    bmp.SetSize(bmp.Canvas.TextWidth(AWord), bmp.Canvas.TextHeight(AWord));
+
+    // fill background
+    bmp.Canvas.Brush.Color := clWhite;
+    bmp.Canvas.FillRect(0, 0, bmp.Width, bmp.Height);
+
+    // draw text into rect
+    bmp.Canvas.TextRect(Rect(0, 0, bmp.Width, bmp.Height), 0, 0, AWord);
+
+    // scan pixels
+    Res := string.Empty;
+    for y := 0 to bmp.Height - 1 do
+    begin
+      line := string.Empty;
+      char := False;
+      for x := 0 to bmp.Width - 1 do
+      begin
+        col := bmp.Canvas.Pixels[x, y];
+        r := Red(col);
+        g := Green(col);
+        b := Blue(col);
+        luminance := (r + g + b) div 3;
+
+        if luminance < 150 then
+        begin
+          line := line + #$2593;
+          char := True;
+        end
+        else if luminance < 200 then
+        begin
+          line := line + #$2592;
+          char := True;
+        end
+        else
+          line := line + #$2591;
+      end;
+
+      if char then
+        Res := Res + line + sLineBreak;
+    end;
+
+    Result := UTF8Encode(Res);
+  finally
+    bmp.Free;
+  end;
 end;
 
 end.
