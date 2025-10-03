@@ -18,9 +18,9 @@ uses
   SysUtils,
   systemtool,
   mainform,
-  forminput,
+  formmemo,
   formfind,
-  formreplace;
+  formreplace, forminput;
 
   {$R *.res}
 
@@ -32,9 +32,10 @@ begin
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
-  Application.CreateForm(TformInputText, formInputText);
   Application.CreateForm(TformFindText, formFindText);
   Application.CreateForm(TformReplaceText, formReplaceText);
+  Application.CreateForm(TformInputText, formInputText);
+  Application.CreateForm(TformMemoText, formMemoText);
   ApplicationTranslate(Language);
   //SetFileTypeIcon('.tsk', 1);
   Application.Run;

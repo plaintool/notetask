@@ -691,7 +691,7 @@ resourcestring
 
 implementation
 
-uses filemanager, settings, systemtool, crypto, forminput, formfind, formreplace, formabout, formdonate;
+uses filemanager, settings, systemtool, crypto, forminput, formmemo, formfind, formreplace, formabout, formdonate;
 
   {$R *.lfm}
 
@@ -3804,8 +3804,25 @@ begin
 end;
 
 procedure TformNotetask.ExecuteChatGpt;
+var
+  Value: string;
 begin
-  OpenURL(rchatgpt + EncodeUrl(GetExecuteValue(taskGrid.Row)));
+  Value := GetExecuteValue(taskGrid.Row);
+
+  with formMemoText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    SetMode(rapp, aChatGpt.Caption, rOK, TrimRight(sLineBreak + sLineBreak + Value), 400, 200, FWordWrap);
+
+    // Show the form as a modal dialog
+    if ShowModal = mrOk then
+    begin
+      OpenURL(rchatgpt + EncodeUrl(Trim(formMemoText.memoText.Text)));
+    end;
+  finally
+    Hide;
+  end;
 end;
 
 procedure TformNotetask.ExecuteTerminal(usePowershell: boolean = True);

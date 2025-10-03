@@ -20,6 +20,12 @@ msgid "Up"
 msgstr "Уверх"
 
 #: forminput.rpasswordsnotequal
+msgctxt "forminput.rpasswordsnotequal"
+msgid "Passwords are not equal!"
+msgstr "Паролі не супадаюць!"
+
+#: formmemo.rpasswordsnotequal
+msgctxt "formmemo.rpasswordsnotequal"
 msgid "Passwords are not equal!"
 msgstr "Паролі не супадаюць!"
 
@@ -346,6 +352,7 @@ msgid "Go to task"
 msgstr "Перайсці да задачы"
 
 #: tforminputtext.checkshowpassword.caption
+msgctxt "tforminputtext.checkshowpassword.caption"
 msgid "Show Password"
 msgstr "Паказаць пароль"
 
@@ -355,8 +362,29 @@ msgid "Task number:"
 msgstr "Нумар задачы:"
 
 #: tforminputtext.labelcaption2.caption
+msgctxt "tforminputtext.labelcaption2.caption"
 msgid "Confirm password:"
 msgstr "Пацвердзіць пароль:"
+
+#: tformmemotext.buttoncancel.caption
+msgctxt "tformmemotext.buttoncancel.caption"
+msgid "Cancel"
+msgstr "Скасаваць"
+
+#: tformmemotext.buttonok.caption
+msgctxt "tformmemotext.buttonok.caption"
+msgid "Go to"
+msgstr "Перайсці да"
+
+#: tformmemotext.caption
+msgctxt "tformmemotext.caption"
+msgid "Notetask"
+msgstr "Notetask"
+
+#: tformmemotext.labelcaption.caption
+msgctxt "tformmemotext.labelcaption.caption"
+msgid "Enter Value:"
+msgstr "Увядзіце значэнне:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."

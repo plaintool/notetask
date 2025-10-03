@@ -20,6 +20,12 @@ msgid "Up"
 msgstr "위로"
 
 #: forminput.rpasswordsnotequal
+msgctxt "forminput.rpasswordsnotequal"
+msgid "Passwords are not equal!"
+msgstr "비밀번호가 일치하지 않습니다!"
+
+#: formmemo.rpasswordsnotequal
+msgctxt "formmemo.rpasswordsnotequal"
 msgid "Passwords are not equal!"
 msgstr "비밀번호가 일치하지 않습니다!"
 
@@ -346,6 +352,7 @@ msgid "Go to task"
 msgstr "작업으로 이동"
 
 #: tforminputtext.checkshowpassword.caption
+msgctxt "tforminputtext.checkshowpassword.caption"
 msgid "Show Password"
 msgstr "비밀번호 표시"
 
@@ -355,8 +362,29 @@ msgid "Task number:"
 msgstr "작업 번호:"
 
 #: tforminputtext.labelcaption2.caption
+msgctxt "tforminputtext.labelcaption2.caption"
 msgid "Confirm password:"
 msgstr "비밀번호 확인:"
+
+#: tformmemotext.buttoncancel.caption
+msgctxt "tformmemotext.buttoncancel.caption"
+msgid "Cancel"
+msgstr "취소"
+
+#: tformmemotext.buttonok.caption
+msgctxt "tformmemotext.buttonok.caption"
+msgid "Go to"
+msgstr "이동하기"
+
+#: tformmemotext.caption
+msgctxt "tformmemotext.caption"
+msgid "Notetask"
+msgstr "Notetask"
+
+#: tformmemotext.labelcaption.caption
+msgctxt "tformmemotext.labelcaption.caption"
+msgid "Enter Value:"
+msgstr "값을 입력하세요:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."

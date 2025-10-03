@@ -20,6 +20,12 @@ msgid "Up"
 msgstr "Cima"
 
 #: forminput.rpasswordsnotequal
+msgctxt "forminput.rpasswordsnotequal"
+msgid "Passwords are not equal!"
+msgstr "As senhas não são iguais!"
+
+#: formmemo.rpasswordsnotequal
+msgctxt "formmemo.rpasswordsnotequal"
 msgid "Passwords are not equal!"
 msgstr "As senhas não são iguais!"
 
@@ -346,6 +352,7 @@ msgid "Go to task"
 msgstr "Ir para a tarefa"
 
 #: tforminputtext.checkshowpassword.caption
+msgctxt "tforminputtext.checkshowpassword.caption"
 msgid "Show Password"
 msgstr "Mostrar senha"
 
@@ -355,8 +362,29 @@ msgid "Task number:"
 msgstr "Número da tarefa:"
 
 #: tforminputtext.labelcaption2.caption
+msgctxt "tforminputtext.labelcaption2.caption"
 msgid "Confirm password:"
 msgstr "Confirmar senha:"
+
+#: tformmemotext.buttoncancel.caption
+msgctxt "tformmemotext.buttoncancel.caption"
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: tformmemotext.buttonok.caption
+msgctxt "tformmemotext.buttonok.caption"
+msgid "Go to"
+msgstr "Ir para"
+
+#: tformmemotext.caption
+msgctxt "tformmemotext.caption"
+msgid "Notetask"
+msgstr "Notetask"
+
+#: tformmemotext.labelcaption.caption
+msgctxt "tformmemotext.labelcaption.caption"
+msgid "Enter Value:"
+msgstr "Digite o valor:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."

@@ -1,0 +1,6 @@
+{"version":1,"strings":[
+{"hash":111979979,"name":"tformmemotext.caption","sourcebytes":[78,111,116,101,116,97,115,107],"value":"Notetask"},
+{"hash":5117871,"name":"tformmemotext.buttonok.caption","sourcebytes":[71,111,32,116,111],"value":"Go to"},
+{"hash":77089212,"name":"tformmemotext.buttoncancel.caption","sourcebytes":[67,97,110,99,101,108],"value":"Cancel"},
+{"hash":17012682,"name":"tformmemotext.labelcaption.caption","sourcebytes":[69,110,116,101,114,32,86,97,108,117,101,58],"value":"Enter Value:"}
+]}

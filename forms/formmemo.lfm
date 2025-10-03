@@ -1,0 +1,52 @@
+object formMemoText: TformMemoText
+  Left = 318
+  Height = 120
+  Top = 250
+  Width = 300
+  BorderIcons = [biSystemMenu]
+  Caption = 'Notetask'
+  ClientHeight = 120
+  ClientWidth = 300
+  Constraints.MinHeight = 100
+  Constraints.MinWidth = 200
+  KeyPreview = True
+  ShowInTaskBar = stNever
+  OnKeyDown = FormKeyDown
+  OnShow = FormShow
+  object buttonOk: TButton
+    Left = 135
+    Height = 25
+    Top = 89
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'Go to'
+    ModalResult = 1
+    TabOrder = 1
+  end
+  object buttonCancel: TButton
+    Left = 215
+    Height = 25
+    Top = 89
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 2
+  end
+  object LabelCaption: TLabel
+    Left = 13
+    Height = 15
+    Top = 12
+    Width = 61
+    Caption = 'Enter Value:'
+  end
+  object memoText: TMemo
+    Left = 13
+    Height = 42
+    Top = 32
+    Width = 277
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+  end
+end
