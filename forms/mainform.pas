@@ -3160,6 +3160,7 @@ var
   {$ELSE}
   Len, DeleteCount, Pos: integer;
   {$ENDIF}
+  Render: string;
 begin
   // Test for letter, number, space, back, enter, shift or delete key for backup
   if (Shift * [ssCtrl, ssAlt] = []) and ((not IsSystemKey(Key)) or (Key = VK_SPACE) or (Key = VK_BACK) or
@@ -3342,10 +3343,14 @@ begin
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key = VK_RETURN) then // Ctrl + Enter
+  if (ssCtrl in Shift) and (Key = VK_RETURN) and (trim(memoNote.SelText) <> string.Empty) then // Ctrl + Enter
   begin
-    MemoNoteBackup;
-    memoNote.SelText := RenderWordCanvas(memoNote.SelText, Font.Name, Max(Font.Size - 2, 2));
+    Render := RenderWordCanvas(memoNote.SelText, Font.Name, Max(Font.Size - 2, 2));
+    if (Render <> memoNote.SelText) then
+    begin
+      MemoNoteBackup;
+      memoNote.SelText := Render;
+    end;
     Key := 0;
   end
   else
