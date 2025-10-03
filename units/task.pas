@@ -1260,8 +1260,11 @@ var
       if (TempTask.Text <> string.Empty) then
       begin
         GetTask(row).Text := CleanString(TempTask.Text);
-        GetTask(row).Archive := TempTask.Archive;
-        GetTask(row).Star := TempTask.Star;
+        if (Rect.Width > 0) then
+        begin
+          GetTask(row).Archive := TempTask.Archive;
+          GetTask(row).Star := TempTask.Star;
+        end;
       end
       else
       if Rect.Width = 0 then
