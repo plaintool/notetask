@@ -3811,9 +3811,12 @@ begin
 
   with formMemoText do
   try
-    Left := self.Left + 14;
-    Top := self.top + 52;
-    SetMode(rapp, aChatGpt.Caption, rOK, TrimRight(sLineBreak + sLineBreak + Value), 400, 200, FWordWrap);
+    if not formMemoText.Showed then
+    begin
+      Left := self.Left + 14;
+      Top := self.top + 52;
+    end;
+    SetMode(rapp, aChatGpt.Caption, rOK, TrimRight(sLineBreak + sLineBreak + Value), 400, 180, FWordWrap);
 
     // Show the form as a modal dialog
     if ShowModal = mrOk then

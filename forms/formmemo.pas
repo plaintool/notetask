@@ -26,9 +26,11 @@ type
     buttonCancel: TButton;
     LabelCaption: TLabel;
     memoText: TMemo;
+    procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
   public
+    Showed: boolean;
     procedure SetMode(aCaption, aPrompt, aButtonOk: string; aDefault: string = ''; aWidth: integer = 300;
       aHeight: integer = 120; aWordWrap: boolean = True);
   end;
@@ -42,11 +44,17 @@ implementation
 
 { TformMemoText }
 
+procedure TformMemoText.FormCreate(Sender: TObject);
+begin
+  Showed := False;
+end;
+
 procedure TformMemoText.FormShow(Sender: TObject);
 begin
   SetFocus;
   memoText.SetFocus;
   memoText.SelStart := 0;
+  Showed := True;
 end;
 
 procedure TformMemoText.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -66,8 +74,10 @@ begin
   buttonOk.Caption := aButtonOk;
   memoText.Text := aDefault;
   memoText.WordWrap := aWordWrap;
-  Width := aWidth;
-  Height := aHeight;
+  if (aWidth > Width) then
+    Width := aWidth;
+  if (aHeight > Height) then
+    Height := aHeight;
 end;
 
 end.
