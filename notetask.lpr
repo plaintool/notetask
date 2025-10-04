@@ -18,9 +18,10 @@ uses
   SysUtils,
   systemtool,
   mainform,
+  forminput,
   formmemo,
   formfind,
-  formreplace, forminput;
+  formreplace;
 
   {$R *.res}
 
@@ -28,8 +29,8 @@ begin
   RequireDerivedFormResource := True;
   Language := GetOSLanguage;
   DefaultFormatSettings.DecimalSeparator := '.';
-  Application.Title:='Notetask';
-  Application.Scaled:=True;
+  Application.Title := 'Notetask';
+  Application.Scaled := True;
   Application.Initialize;
   Application.CreateForm(TformNotetask, formNotetask);
   Application.CreateForm(TformFindText, formFindText);
@@ -37,6 +38,5 @@ begin
   Application.CreateForm(TformInputText, formInputText);
   Application.CreateForm(TformMemoText, formMemoText);
   ApplicationTranslate(Language);
-  //SetFileTypeIcon('.tsk', 1);
   Application.Run;
 end.
