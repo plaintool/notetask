@@ -4381,7 +4381,10 @@ begin
 
   if (FKeyPressed <> string.Empty) and (FKeyPressed <> #13) then
   begin
-    Memo.SelText := CleanNumericExpression(FKeyPressed);
+    if (taskGrid.Col = 4) then
+      Memo.SelText := CleanNumericExpression(FKeyPressed)
+    else
+      Memo.SelText := FKeyPressed;
     FKeyPressed := string.Empty;
   end;
 
