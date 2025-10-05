@@ -3345,7 +3345,7 @@ begin
   else
   if (ssCtrl in Shift) and (Key = VK_RETURN) and (trim(memoNote.SelText) <> string.Empty) then // Ctrl + Enter
   begin
-    Render := RenderWordCanvas(memoNote.SelText, Font.Name, Max(Font.Size - 2, 2));
+    Render := RenderWordCanvas(memoNote.SelText, Font.Name, Max(ifthen(Font.Size = 0, 10, Font.Size) - 2, 2));
     if (Render <> memoNote.SelText) then
     begin
       MemoNoteBackup;

@@ -661,18 +661,28 @@ begin
         b := Blue(col);
         luminance := (r + g + b) div 3;
 
-        if luminance < 150 then
+        if luminance < 128 then
         begin
           line := line + #$2593;
           char := True;
         end
-        else if luminance < 200 then
+        else if luminance < 192 then
         begin
           line := line + #$2592;
           char := True;
         end
         else
+        if luminance < 216 then
+        begin
           line := line + #$2591;
+          char := True;
+        end
+        else
+        {$IFDEF UNIX}
+          line := line + #$2591;
+          {$ELSE}
+          line := line + #$2003;
+        {$ENDIF}
       end;
 
       if char then
