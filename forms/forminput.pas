@@ -63,6 +63,9 @@ procedure TformInputText.FormKeyDown(Sender: TObject; var Key: word; Shift: TShi
 begin
   if Key = VK_RETURN then
   begin
+    if buttonCancel.Focused then
+      buttonCancel.Click
+    else
     if buttonOk.Default then
       buttonOk.Click;
     Key := 0;
