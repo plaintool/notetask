@@ -167,6 +167,13 @@ To remove Notetask from your system, use:
 sudo dnf remove notetask
 ```
 
+Some Notetask functions can run scripts in a terminal.
+If no terminal emulator is installed, you can add one, for example:
+
+```bash
+sudo dnf install -y xterm
+```
+
 ## Licensing
 
 Notetask is licensed under the GPL v3 license. See the LICENSE file for details.
