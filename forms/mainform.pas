@@ -3656,11 +3656,13 @@ function TformNotetask.SaveFile(fileName: string = string.Empty; saveAs: boolean
 var
   TaskList: TStringList;
   Token: string = string.Empty;
+  FileNameOld: string;
 begin
   try
     if (fileName = string.Empty) and (FFileName = string.Empty) then
-      Result := SaveFileAs;
+      exit(SaveFileAs);
 
+    FileNameOld := FFileName;
     if (fileName = string.Empty) then
       fileName := FFileName
     else
@@ -3687,7 +3689,10 @@ begin
             FreeBytesSecure(FKeyAuth);
           end
           else
+          begin
+            FFileName := FileNameOld;
             exit(False);
+          end;
         finally
           Hide;
         end;
