@@ -3843,7 +3843,9 @@ var
   Overflow: boolean;
   maxPreview: integer;
   i: integer;
-  {$IFNDEF UNIX}
+  {$IFDEF UNIX}
+  Terminal: string;
+  {$ELSE}
   PwshPath: string;
   {$ENDIF}
 
@@ -3884,6 +3886,29 @@ var
     end;
   end;
 
+  {$IFDEF UNIX}
+  function FindTerminal: string;
+  const
+    Terminals: array[0..8] of string = (
+      '/usr/bin/xterm',
+      '/usr/bin/gnome-terminal',
+      '/usr/bin/konsole',
+      '/usr/bin/tilix',
+      '/usr/bin/xfce4-terminal',
+      '/usr/bin/alacritty',
+      '/usr/bin/lxterminal',
+      '/usr/bin/mate-terminal',
+      '/usr/bin/x-terminal-emulator'
+    );
+  var
+    i: Integer;
+  begin
+    for i := Low(Terminals) to High(Terminals) do
+      if FileExists(Terminals[i]) then
+        Exit(Terminals[i]);
+    Result := '';
+  end;
+  {$ENDIF}
 begin
   // Define the temporary file for commands
   {$IFDEF UNIX}
@@ -3938,8 +3963,9 @@ begin
       Value := aRunPowershell.Caption
     else
       Value := aRunTerminal.Caption;
-    if (MessageDlg(ReplaceStr(Value, '...', '?') + sLineBreak + sLineBreak + ScriptPreview.Text, mtConfirmation,
-      [mbYes, mbNo], 0, mbYes) <> mrYes) then
+    if (MessageDlg(ReplaceStr(Value, '...', '?') + sLineBreak +
+      sLineBreak + ScriptPreview.Text, mtConfirmation, [mbYes, mbNo], 0, mbYes) <>
+      mrYes) then
       exit;
   finally
     ScriptPreview.Free;
@@ -3964,9 +3990,44 @@ begin
   Process := TProcess.Create(nil);
   try
     {$IFDEF UNIX}
-    Process.Executable := '/bin/bash';  // Use bash to execute the script
-    Process.Parameters.Add('-e');
-    Process.Parameters.Add(TempFile);
+    Terminal := FindTerminal;
+    Process.Options := [];
+
+    if Terminal <> string.Empty then
+    begin
+      Process.Executable := Terminal;
+
+      if Pos('gnome-terminal', Terminal) > 0 then
+      begin
+        Process.Parameters.Add('--');
+        Process.Parameters.Add('/bin/bash');
+        Process.Parameters.Add(TempFile);
+      end
+      else if Pos('xfce4-terminal', Terminal) > 0 then
+      begin
+        Process.Parameters.Add('-e');
+        Process.Parameters.Add('/bin/bash -c "source ' + TempFile + '"');
+      end
+      else if Pos('mate-terminal', Terminal) > 0 then
+      begin
+        Process.Parameters.Add('--');
+        Process.Parameters.Add('/bin/bash');
+        Process.Parameters.Add(TempFile);
+      end else
+      begin
+        Process.Parameters.Add('-e');
+        Process.Parameters.Add('/bin/bash');
+        Process.Parameters.Add(TempFile);
+      end;
+    end
+    else
+    begin
+      // fallback — no terminal emulator found
+      Process.Executable := '/bin/bash';
+      Process.Parameters.Add('-e');
+      Process.Parameters.Add(TempFile);
+      Process.Options := [poNewConsole]; // Open in a new console window
+    end;
     {$ELSE}
     if usePowershell then
     begin
@@ -3987,8 +4048,8 @@ begin
       Process.Parameters.Add('/K');
       Process.Parameters.Add(TempFile);
     end;
-    {$ENDIF}
     Process.Options := [poNewConsole]; // Open in a new console window
+    {$ENDIF}
 
     // Execute the process
     Process.Execute;
