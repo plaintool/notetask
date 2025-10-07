@@ -15,9 +15,9 @@ uses
   Forms,
   Classes,
   SysUtils,
-  fpjson,
   Grids,
   Graphics,
+  fpjson,
   mainform;
 
 type
@@ -59,17 +59,17 @@ begin
     // Save form position and size
     if (Form.WindowState in [wsMaximized, wsMinimized]) then
     begin
-      JSONObj.Add('Left', Form.RestoredLeft);
-      JSONObj.Add('Top', Form.RestoredTop);
-      JSONObj.Add('Width', Form.RestoredWidth);
-      JSONObj.Add('Height', Form.RestoredHeight);
+      JSONObj.Add('Left', Form.ScaleFormTo96(Form.RestoredLeft));
+      JSONObj.Add('Top', Form.ScaleFormTo96(Form.RestoredTop));
+      JSONObj.Add('Width', Form.ScaleFormTo96(Form.RestoredWidth));
+      JSONObj.Add('Height', Form.ScaleFormTo96(Form.RestoredHeight));
     end
     else
     begin
-      JSONObj.Add('Left', Form.Left);
-      JSONObj.Add('Top', Form.Top);
-      JSONObj.Add('Width', Form.Width);
-      JSONObj.Add('Height', Form.Height);
+      JSONObj.Add('Left', Form.ScaleFormTo96(Form.Left));
+      JSONObj.Add('Top', Form.ScaleFormTo96(Form.Top));
+      JSONObj.Add('Width', Form.ScaleFormTo96(Form.Width));
+      JSONObj.Add('Height', Form.ScaleFormTo96(Form.Height));
     end;
     JSONObj.Add('WindowState', Ord(Form.WindowState));
     JSONObj.Add('WordWrap', Form.WordWrap);
@@ -119,19 +119,25 @@ begin
 
       // Check and load form's position and size
       if JSONObj.FindPath('Left') <> nil then
-        Form.Left := JSONObj.FindPath('Left').AsInteger;
+        Form.Left := Form.Scale96ToForm(JSONObj.FindPath('Left').AsInteger);
 
       if JSONObj.FindPath('Top') <> nil then
-        Form.Top := JSONObj.FindPath('Top').AsInteger;
+        Form.Top := Form.Scale96ToForm(JSONObj.FindPath('Top').AsInteger);
 
       if JSONObj.FindPath('Width') <> nil then
-        Form.Width := JSONObj.FindPath('Width').AsInteger;
+        Form.Width := Form.Scale96ToForm(JSONObj.FindPath('Width').AsInteger);
 
       if JSONObj.FindPath('Height') <> nil then
-        Form.Height := JSONObj.FindPath('Height').AsInteger;
+        Form.Height := Form.Scale96ToForm(JSONObj.FindPath('Height').AsInteger);
 
       if JSONObj.FindPath('WindowState') <> nil then
+      begin
+        {$IFDEF UNIX}
+        Form.FWindowStateLoaded := TWindowState(JSONObj.FindPath('WindowState').AsInteger);
+        {$ELSE}
         Form.WindowState := TWindowState(JSONObj.FindPath('WindowState').AsInteger);
+        {$ENDIF}
+      end;
 
       if JSONObj.FindPath('WordWrap') <> nil then
         Form.WordWrap := JSONObj.FindPath('WordWrap').AsBoolean;
@@ -202,7 +208,7 @@ begin
     ItemSettings.Add('HideNoteText', Form.HideNoteText);
     ItemSettings.Add('ShowStatusBar', Form.ShowStatusBar);
     ItemSettings.Add('ShowArchived', Form.ShowArchived);
-    ItemSettings.Add('NoteHeight', Form.panelNote.Height);
+    ItemSettings.Add('NoteHeight', Form.ScaleFormTo96(Form.panelNote.Height));
     ItemSettings.Add('ShowColumnDone', Form.ShowColumnDone);
     ItemSettings.Add('ShowColumnTask', Form.ShowColumnTask);
     ItemSettings.Add('ShowColumnNote', Form.ShowColumnNote);
@@ -212,17 +218,17 @@ begin
 
     // Add column widths if the columns are visible
     if Grid.Columns[0].Visible then
-      ItemSettings.Add('ColumnDone', Grid.Columns[0].Width);
+      ItemSettings.Add('ColumnDone', Form.ScaleFormTo96(Grid.Columns[0].Width));
     if Grid.Columns[1].Visible then
-      ItemSettings.Add('ColumnTask', Grid.Columns[1].Width);
+      ItemSettings.Add('ColumnTask', Form.ScaleFormTo96(Grid.Columns[1].Width));
     if Grid.Columns[2].Visible then
-      ItemSettings.Add('ColumnNote', Grid.Columns[2].Width);
+      ItemSettings.Add('ColumnNote', Form.ScaleFormTo96(Grid.Columns[2].Width));
     if Grid.Columns[3].Visible then
-      ItemSettings.Add('ColumnDate', Grid.Columns[3].Width);
+      ItemSettings.Add('ColumnDate', Form.ScaleFormTo96(Grid.Columns[3].Width));
     if Grid.Columns[4].Visible then
-      ItemSettings.Add('ColumnAmount', Grid.Columns[4].Width);
+      ItemSettings.Add('ColumnAmount', Form.ScaleFormTo96(Grid.Columns[4].Width));
     if Grid.Columns[5].Visible then
-      ItemSettings.Add('ColumnFavorite', Grid.Columns[5].Width);
+      ItemSettings.Add('ColumnFavorite', Form.ScaleFormTo96(Grid.Columns[5].Width));
 
     // Sorting
     if (Item <> string.Empty) then
@@ -252,7 +258,7 @@ begin
     ItemSettings.Add('SelectedRows', RowsArray);
 
     // Save memo note scroll position
-    ItemSettings.Add('MemoNoteScroll', Form.MemoNoteScroll);
+    ItemSettings.Add('MemoNoteScroll', Form.ScaleFormTo96(Form.MemoNoteScroll));
 
     // Save memo note SelStart
     ItemSettings.Add('MemoNoteSelStart', Form.MemoNoteSelStart);
@@ -324,7 +330,7 @@ begin
         Form.FHideNoteText := ItemSettings.FindPath('HideNoteText').AsBoolean;
 
       if ItemSettings.FindPath('NoteHeight') <> nil then
-        Form.panelNote.Height := ItemSettings.FindPath('NoteHeight').AsInteger;
+        Form.panelNote.Height := Form.Scale96ToForm(ItemSettings.FindPath('NoteHeight').AsInteger);
 
       if ItemSettings.FindPath('ShowArchived') <> nil then
         Form.FShowArchived := ItemSettings.FindPath('ShowArchived').AsBoolean;
@@ -351,22 +357,22 @@ begin
         Form.FShowColumnFavorite := ItemSettings.FindPath('ShowColumnFavorite').AsBoolean;
 
       if ItemSettings.FindPath('ColumnDone') <> nil then
-        Grid.Columns[0].Width := ItemSettings.FindPath('ColumnDone').AsInteger;
+        Grid.Columns[0].Width := Form.Scale96ToForm(ItemSettings.FindPath('ColumnDone').AsInteger);
 
       if ItemSettings.FindPath('ColumnTask') <> nil then
-        Grid.Columns[1].Width := ItemSettings.FindPath('ColumnTask').AsInteger;
+        Grid.Columns[1].Width := Form.Scale96ToForm(ItemSettings.FindPath('ColumnTask').AsInteger);
 
       if ItemSettings.FindPath('ColumnNote') <> nil then
-        Grid.Columns[2].Width := ItemSettings.FindPath('ColumnNote').AsInteger;
+        Grid.Columns[2].Width := Form.Scale96ToForm(ItemSettings.FindPath('ColumnNote').AsInteger);
 
       if ItemSettings.FindPath('ColumnDate') <> nil then
-        Grid.Columns[3].Width := ItemSettings.FindPath('ColumnDate').AsInteger;
+        Grid.Columns[3].Width := Form.Scale96ToForm(ItemSettings.FindPath('ColumnDate').AsInteger);
 
       if ItemSettings.FindPath('ColumnAmount') <> nil then
-        Grid.Columns[4].Width := ItemSettings.FindPath('ColumnAmount').AsInteger;
+        Grid.Columns[4].Width := Form.Scale96ToForm(ItemSettings.FindPath('ColumnAmount').AsInteger);
 
       if ItemSettings.FindPath('ColumnFavorite') <> nil then
-        Grid.Columns[5].Width := ItemSettings.FindPath('ColumnFavorite').AsInteger;
+        Grid.Columns[5].Width := Form.Scale96ToForm(ItemSettings.FindPath('ColumnFavorite').AsInteger);
 
       // Load selected Tab
       if ItemSettings.FindPath('SelectedTab') <> nil then
@@ -396,7 +402,7 @@ begin
 
       // Load memo note scroll position
       if ItemSettings.FindPath('MemoNoteScroll') <> nil then
-        Form.MemoNoteScroll := ItemSettings.FindPath('MemoNoteScroll').AsInteger;
+        Form.MemoNoteScroll := Form.Scale96ToForm(ItemSettings.FindPath('MemoNoteScroll').AsInteger);
 
       // Load memo note SelStart
       if ItemSettings.FindPath('MemoNoteSelStart') <> nil then

@@ -586,6 +586,9 @@ type
     FShowColumnAmount: boolean;
     FShowColumnDate: boolean;
     FShowColumnFavorite: boolean;
+    {$IFDEF UNIX}
+    FWindowStateLoaded: TWindowState;
+    {$ENDIF}
 
     procedure SetLanguage(aLanguage: string = string.Empty);
     procedure FillGrid;
@@ -817,6 +820,10 @@ begin
     OnShow := nil;
     Visible := True;
     OnShow := @FormShow;
+    {$IFDEF UNIX}
+    Application.ProcessMessages;
+    WindowState := FWindowStateLoaded;
+    {$ENDIF}
   end;
 
   SetCaption;
@@ -1437,7 +1444,7 @@ begin
     end
     else
     begin
-      if (Tasks.HasTask(ARow)) then
+      if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
       begin
         task := Tasks.GetTask(ARow);
         if (ShowColumnDate) and (not task.Done) and (task.Date > 0) and (task.Date < Now) then // Color expired task
@@ -1459,7 +1466,7 @@ begin
       end;
     end;
 
-    if (Tasks.HasTask(ARow)) then
+    if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
     begin
       task := Tasks.GetTask(ARow);
       if task.Star then

@@ -121,8 +121,8 @@ begin
     labelCaption2.Visible := False;
     editText2.Visible := False;
     checkShowPassword.Visible := True;
-    checkShowPassword.Top := 72;
-    Height := 135;
+    checkShowPassword.Top := ScaleDesignToForm(72);
+    Height := ScaleDesignToForm(135);
   end
   else
   if aConfirmPassword then
@@ -132,8 +132,8 @@ begin
     labelCaption2.Visible := True;
     editText2.Visible := True;
     checkShowPassword.Visible := True;
-    checkShowPassword.Top := 128;
-    Height := 190;
+    checkShowPassword.Top := ScaleDesignToForm(128);
+    Height := ScaleDesignToForm(190);
   end
   else
   begin
@@ -141,8 +141,8 @@ begin
     labelCaption2.Visible := False;
     editText2.Visible := False;
     checkShowPassword.Visible := False;
-    checkShowPassword.Top := 128;
-    Height := 103;
+    checkShowPassword.Top := ScaleDesignToForm(128);
+    Height := ScaleDesignToForm(103);
   end;
 end;
 
