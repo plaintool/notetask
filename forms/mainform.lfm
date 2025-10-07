@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -33,7 +32,7 @@ object formNotetask: TformNotetask
         Alignment = taCenter
         ButtonStyle = cbsCheckboxColumn
         Title.Caption = 'Done'
-        Width = 50
+        Width = 65
       end    
       item
         Title.Caption = 'Task'
@@ -55,7 +54,7 @@ object formNotetask: TformNotetask
         Alignment = taCenter
         ButtonStyle = cbsCheckboxColumn
         Title.Caption = 'Star'
-        Width = 50
+        Width = 65
       end>
     DefaultColWidth = 50
     FixedColor = clWindow
