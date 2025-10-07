@@ -16,6 +16,7 @@ uses
   SysUtils,
   Graphics,
   Process,
+  RegExpr,
   LazUTF8,
   lineending;
 
@@ -68,6 +69,14 @@ function RepeatString(const S: string; Count: integer): string;
 
 function MaskTextWithBullets(const AText: string; ACanvas: TCanvas; ALineEnding: TLineEnding): string;
 
+function RenderWordCanvas(const AWord: string; const FontName: string = 'Monospace'; FontSize: integer = 12): string;
+
+function IsEmail(const S: string): boolean;
+
+function IsURL(const S: string): boolean;
+
+function HasScheme(const URL: string): boolean;
+
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer);
@@ -75,8 +84,6 @@ procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer);
 procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
 
 function CloneArray(const Src: TIntegerArray): TIntegerArray;
-
-function RenderWordCanvas(const AWord: string; const FontName: string = 'Monospace'; FontSize: integer = 12): string;
 
 const
   Brackets: array[0..17] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]',
@@ -561,64 +568,6 @@ begin
   end;
 end;
 
-function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
-var
-  i: integer;
-begin
-  Result := string.Empty;
-  if Length(Parts) = 0 then Exit;
-
-  if StartIndex < 0 then StartIndex := 0;
-  if StartIndex > High(Parts) then Exit;
-
-  for i := StartIndex to High(Parts) do
-  begin
-    Result += Parts[i];
-    if i < High(Parts) then
-      Result += Separator;
-  end;
-end;
-
-procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer);
-var
-  i, Len: integer;
-begin
-  Len := Length(A);
-  if (Pos < 0) or (Pos > Len) then
-    Exit; // Out of bounds
-
-  // Increase array size
-  SetLength(A, Len + 1);
-
-  // Shift elements to the right
-  for i := Len - 1 downto Pos do
-    A[i + 1] := A[i];
-
-  // Insert new value
-  A[Pos] := Value;
-end;
-
-procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
-var
-  i, Len: integer;
-begin
-  Len := Length(A);
-  if (Pos < 0) or (Pos >= Len) then
-    Exit; // Out of bounds
-
-  // Shift left
-  for i := Pos to Len - 2 do
-    A[i] := A[i + 1];
-
-  // Decrease array size
-  SetLength(A, Len - 1);
-end;
-
-function CloneArray(const Src: TIntegerArray): TIntegerArray;
-begin
-  Result := Copy(Src, 0, Length(Src));
-end;
-
 function RenderWordCanvas(const AWord: string; const FontName: string = 'Monospace'; FontSize: integer = 12): string;
 var
   bmp: TBitmap;
@@ -693,6 +642,111 @@ begin
   finally
     bmp.Free;
   end;
+end;
+
+function IsEmail(const S: string): boolean;
+var
+  RE: TRegExpr;
+  EmailToCheck: string;
+begin
+  // Remove mailto: prefix if present
+  if LowerCase(Copy(S, 1, 7)) = 'mailto:' then
+    EmailToCheck := Copy(S, 8, MaxInt)
+  else
+    EmailToCheck := S;
+
+  // Improved regular expression for email validation
+  RE := TRegExpr.Create;
+  try
+    RE.Expression := '^(?i)[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$';
+    Result := RE.Exec(EmailToCheck);
+  finally
+    RE.Free;
+  end;
+end;
+
+function IsURL(const S: string): boolean;
+var
+  RE: TRegExpr;
+begin
+  RE := TRegExpr.Create;
+  try
+    RE.Expression :=
+      '^(?i)' + // case-insensitive
+      '(' + '(https?|ftp)://[^\s/$.?#].[^\s]*' +  // with scheme
+      '|' + '([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,}(:\d+)?(/[^\s?]*)?(\?[^\s?#]*([#][^\s]*)?)?' +
+      // domain with optional port, path and params
+      '|' + '[A-Za-z0-9_-]+(/[^\s?]*)?(\?[^\s?#]*([#][^\s]*)?)?' + // simple hostname without domain
+      ')$';
+    Result := RE.Exec(S);
+  finally
+    RE.Free;
+  end;
+end;
+
+function HasScheme(const URL: string): boolean;
+begin
+  // Check if URL starts with any scheme (protocol)
+  Result := (Pos('://', URL) > 0) or (Pos('mailto:', LowerCase(URL)) = 1) or
+    (Pos('tel:', LowerCase(URL)) = 1) or (Pos('sms:', LowerCase(URL)) = 1);
+end;
+
+function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
+var
+  i: integer;
+begin
+  Result := string.Empty;
+  if Length(Parts) = 0 then Exit;
+
+  if StartIndex < 0 then StartIndex := 0;
+  if StartIndex > High(Parts) then Exit;
+
+  for i := StartIndex to High(Parts) do
+  begin
+    Result += Parts[i];
+    if i < High(Parts) then
+      Result += Separator;
+  end;
+end;
+
+procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer);
+var
+  i, Len: integer;
+begin
+  Len := Length(A);
+  if (Pos < 0) or (Pos > Len) then
+    Exit; // Out of bounds
+
+  // Increase array size
+  SetLength(A, Len + 1);
+
+  // Shift elements to the right
+  for i := Len - 1 downto Pos do
+    A[i + 1] := A[i];
+
+  // Insert new value
+  A[Pos] := Value;
+end;
+
+procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
+var
+  i, Len: integer;
+begin
+  Len := Length(A);
+  if (Pos < 0) or (Pos >= Len) then
+    Exit; // Out of bounds
+
+  // Shift left
+  for i := Pos to Len - 2 do
+    A[i] := A[i + 1];
+
+  // Decrease array size
+  SetLength(A, Len - 1);
+end;
+
+function CloneArray(const Src: TIntegerArray): TIntegerArray;
+begin
+  Result := Copy(Src, 0, Length(Src));
 end;
 
 end.

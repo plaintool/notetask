@@ -550,6 +550,7 @@ type
     function IsExecuteValueNote(memoPriority: boolean = False): boolean;
     function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
+    procedure TryOpenAsUrl(Value: string);
     procedure ExecuteTerminal(usePowershell: boolean = True);
     procedure MoveTabLeft(Index: integer);
     procedure MoveTabRight(Index: integer);
@@ -647,6 +648,8 @@ const
   CommentTwoColonStr = '::';
   CommentREMStr = 'REM ';
   CommentApostropheStr = '''';
+  mailto = 'mailto:';
+  http = 'http://';
 
   clRowHighlight = TColor($FFF0DC); // RGB(220,240,255)
   clRowFocused = TColor($FFdcc8); // RGB(200,220,255)
@@ -1359,6 +1362,9 @@ begin
     end;
     Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
   end;
+
+  if (Button = mbLeft) and (ssCtrl in Shift) and (taskGrid.Col in [2, 3]) then
+    TryOpenAsUrl(taskGrid.Cells[taskGrid.Col, taskGrid.Row]);
 end;
 
 procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
@@ -3833,6 +3839,15 @@ begin
   end;
 end;
 
+procedure TformNotetask.TryOpenAsUrl(Value: string);
+begin
+  if IsURL(Value) then
+    OpenURL(IfThen(HasScheme(Value), Value, http + Value))
+  else
+  if IsEmail(Value) then
+    OpenURL(IfThen(AnsiStartsText(mailto, Value), Value, mailto + Value));
+end;
+
 procedure TformNotetask.ExecuteTerminal(usePowershell: boolean = True);
 var
   Process: TProcess;
@@ -3963,9 +3978,8 @@ begin
       Value := aRunPowershell.Caption
     else
       Value := aRunTerminal.Caption;
-    if (MessageDlg(ReplaceStr(Value, '...', '?') + sLineBreak +
-      sLineBreak + ScriptPreview.Text, mtConfirmation, [mbYes, mbNo], 0, mbYes) <>
-      mrYes) then
+    if (MessageDlg(ReplaceStr(Value, '...', '?') + sLineBreak + sLineBreak + ScriptPreview.Text, mtConfirmation,
+      [mbYes, mbNo], 0, mbYes) <> mrYes) then
       exit;
   finally
     ScriptPreview.Free;
