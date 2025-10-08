@@ -88,6 +88,10 @@ msgstr "أدخل اسم المجموعة:"
 msgid "The requested file was not found on the disk."
 msgstr "لم يتم العثور على الملف المطلوب على القرص."
 
+#: mainform.rfilereadonly
+msgid "The file is read-only or is in use by another user."
+msgstr "الملف للقراءة فقط أو مستخدم من قبل مستخدم آخر."
+
 #: mainform.rgoto
 msgctxt "mainform.rgoto"
 msgid "Go to"
@@ -137,6 +141,10 @@ msgstr "ملفات المهام (*.tsk)|*.tsk|ملفات النصوص (*.txt)|*.
 #: mainform.rpassword
 msgid "Password:"
 msgstr "كلمة المرور:"
+
+#: mainform.rreadonly
+msgid "Read-only"
+msgstr "للقراءة فقط"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"

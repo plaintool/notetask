@@ -46,7 +46,7 @@ type
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
-    AHideNoteText: TAction;
+    aHideNoteText: TAction;
     aSaveNotesAs: TAction;
     aDuplicateTasks: TAction;
     aRunPowershell: TAction;
@@ -284,16 +284,6 @@ type
     ContextRenameGroup: TMenuItem;
     ContextDuplicateGroup: TMenuItem;
     ContextDeleteGroup: TMenuItem;
-    procedure AHideNoteTextExecute(Sender: TObject);
-    procedure contextANSIClick(Sender: TObject);
-    procedure contextASCIIClick(Sender: TObject);
-    procedure contextMacintoshCRClick(Sender: TObject);
-    procedure contextUnixLFClick(Sender: TObject);
-    procedure contextUTF16BEBOMClick(Sender: TObject);
-    procedure contextUTF16LEBOMClick(Sender: TObject);
-    procedure contextUTF8BOMClick(Sender: TObject);
-    procedure contextUTF8Click(Sender: TObject);
-    procedure contextWindowsCRLFClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -320,6 +310,15 @@ type
     procedure panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure statusBarContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
     procedure ContextCopyStatusbarClick(Sender: TObject);
+    procedure contextANSIClick(Sender: TObject);
+    procedure contextASCIIClick(Sender: TObject);
+    procedure contextMacintoshCRClick(Sender: TObject);
+    procedure contextUnixLFClick(Sender: TObject);
+    procedure contextUTF16BEBOMClick(Sender: TObject);
+    procedure contextUTF16LEBOMClick(Sender: TObject);
+    procedure contextUTF8BOMClick(Sender: TObject);
+    procedure contextUTF8Click(Sender: TObject);
+    procedure contextWindowsCRLFClick(Sender: TObject);
     procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
     procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
@@ -417,12 +416,14 @@ type
     procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure memoNoteChange(Sender: TObject);
     procedure taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
+    procedure aHideNoteTextExecute(Sender: TObject);
   private
     Memo: TMemo;
     PanelMemo: TPanel;
     DatePicker: TDateTimePicker;
     FChanged: boolean;
     FBackup: boolean;
+    FReadOnly: boolean;
     FMemoStartEdit: boolean;
     FMemoOldText: TCaption;
     FMemoNeedSelectAll: boolean;
@@ -482,6 +483,7 @@ type
     FMemoSelStartClicked: integer;
     FStatusPanelIndex: integer;
     FAdjustingScrollBars: boolean;
+    FSReserved: TFileStream;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -506,10 +508,10 @@ type
     procedure EditCell(aCol: integer = -1; aRow: integer = -1);
     procedure EditComplite(aEnter: boolean = False; aEscape: boolean = False);
     procedure DisableDrag;
+    procedure SetCaption;
     procedure SetInfo;
     procedure SetNote;
     procedure SetTabs(Change: boolean = True);
-    procedure SetCaption;
     procedure ClearSelected(ShowConfirm: boolean = True);
     procedure MergeTasks;
     procedure DuplicateTasks;
@@ -520,6 +522,7 @@ type
     procedure CompleteTasks(aRow: integer = 0);
     procedure StarTasks(aRow: integer = 0);
     procedure IndentTasks(Outdent: boolean = False);
+    procedure SetReadOnly(Value: boolean);
     procedure SetBiDiRightToLeft(Value: boolean);
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowNote(Value: boolean);
@@ -562,6 +565,7 @@ type
     procedure BackupSelectedState(aRowMem: boolean = False);
     procedure RestoreSelectedState(aRowMem: boolean = True; aRowMemPriority: boolean = True; aFocusMemo: boolean = False);
     procedure GridAdjustScrollBars;
+    procedure FreeFile;
     function LastRowHeight(aRow: integer): integer;
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
@@ -602,6 +606,7 @@ type
       overload;
     function Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
+    property ReadOnly: boolean read FReadOnly write SetReadOnly;
     property WordWrap: boolean read FWordWrap write FWordWrap;
     property EnterSubmit: boolean read FEnterSubmit write FEnterSubmit;
     property BiDiRightToLeft: boolean read FBiDiRightToLeft write SetBiDiRightToLeft;
@@ -667,6 +672,7 @@ resourcestring
   rcantfind = 'Can''t find';
   rgroupuntitled = 'Ungrouped';
   rfilenotfound = 'The requested file was not found on the disk.';
+  rfilereadonly = 'The file is read-only or is in use by another user.';
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rdeletesconfirm = 'Are you sure you want to delete selected tasks?';
   rmergesconfirm = 'Are you sure you want to merge selected tasks?';
@@ -689,6 +695,7 @@ resourcestring
   rconfirmpassword = 'Confirm Password:';
   rincorrectpassword = 'Incorrect password!';
   rencrypted = 'Encrypted';
+  rreadonly = 'Read-only';
   rgroup = 'Group';
   rgoto = 'Go to';
   rok = 'OK';
@@ -707,6 +714,7 @@ procedure TformNotetask.FormCreate(Sender: TObject);
 begin
   // Initialize variables
   FBackup := True;
+  FReadOnly := False;
   FWordWrap := True;
   FEnterSubmit := True;
   FShowTime := True;
@@ -795,6 +803,8 @@ begin
   ResourceBitmapUncheck.Free;
   ResourceBitmapStarGold.Free;
   ResourceBitmapStarGray.Free;
+
+  FreeFile;
 end;
 
 procedure TformNotetask.FormShow(Sender: TObject);
@@ -831,6 +841,8 @@ begin
   CalcRowHeights(0, True);
 
   RestoreSelectedState(True, True, True);
+
+  if (ReadOnly) then ShowMessage(rfilereadonly);
 end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -1538,6 +1550,12 @@ procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: intege
 var
   sDateTime: TDateTime;
 begin
+  if FReadOnly then
+  begin
+    Editor := nil;  // disable editor — grid stays view-only
+    exit;
+  end;
+
   if (aCol in [2, 3, 4]) then
   begin
     PanelMemo := TPanel.Create(Self);
@@ -1707,7 +1725,7 @@ begin
 
   // Disable merge if no multiselect
   if (taskGrid.Selection.Height > 0) then
-    aMergeTasks.Enabled := True
+    aMergeTasks.Enabled := not ReadOnly
   else
     aMergeTasks.Enabled := False;
 
@@ -2826,7 +2844,7 @@ begin
   ShowNote := aShowNote.Checked;
 end;
 
-procedure TformNotetask.AHideNoteTextExecute(Sender: TObject);
+procedure TformNotetask.aHideNoteTextExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 
@@ -3524,6 +3542,9 @@ begin
     FLineEnding := FLineEnding.WindowsCRLF;
     {$ENDIF}
 
+    FreeFile;
+    ReadOnly := False;
+
     taskGrid.Clean;
     taskGrid.RowCount := 2;
 
@@ -3570,6 +3591,9 @@ begin
   FileNameOld := FFileName;
   FFileName := fileName;
   EditComplite;
+
+  FreeFile;
+  ReadOnly := not TryLockFile(FFileName, FSReserved);
 
   if (CheckEncryptedFile(FFileName)) then
   begin
@@ -3662,6 +3686,7 @@ begin
 
   FLineEndingOriginal := FLineEnding;
   FEncodingOriginal := FEncoding;
+  if (ReadOnly) and (not ShowTrigger) then ShowMessage(rfilereadonly);
   Result := True;
 end;
 
@@ -3723,11 +3748,22 @@ begin
       if Assigned(TaskList) and (TaskList <> nil) then
       begin
         try
-          EditComplite;
-          SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, Token, FSalt, FKeyEnc, FKeyAuth);
-          SetChanged(False);
-          Tasks.CreateBackupInit;
-          Result := True;
+          try
+            EditComplite;
+            FreeFile;
+            SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, Token, FSalt, FKeyEnc, FKeyAuth);
+            SetChanged(False);
+            Tasks.CreateBackupInit;
+            ReadOnly := not TryLockFile(fileName, FSReserved);
+            Result := True;
+          except
+            on E: Exception do
+            begin
+              FFileName := FileNameOld;
+              FreeFile;
+              ShowMessage(E.Message);
+            end;
+          end;
         finally
           TaskList.Free;
         end;
@@ -3803,7 +3839,7 @@ begin
       Result := memoNote.SelText
     else
     begin
-      if (PanelMemo.Visible) and (Memo.SelLength > 0) then
+      if (Assigned(PanelMemo)) and (PanelMemo.Visible) and (Memo.SelLength > 0) then
         Result := Memo.SelText
       else
       if (not string.IsNullOrEmpty(Tasks.GetTask(aRow).Note)) then
@@ -3814,7 +3850,7 @@ begin
   end
   else
   begin
-    if (PanelMemo.Visible) and (Memo.SelLength > 0) then
+    if (Assigned(PanelMemo)) and (PanelMemo.Visible) and (Memo.SelLength > 0) then
       Result := Memo.SelText
     else
       Result := Tasks.GetTask(aRow).Text;
@@ -4661,6 +4697,8 @@ var
   Sel: TRect;
   MaxDate: TDateTime;
 begin
+  if (ReadOnly) then exit;
+
   // If multiple rows are selected
   if (taskGrid.Selection.Height > 0) then
   begin
@@ -4716,6 +4754,8 @@ procedure TformNotetask.DuplicateTasks;
 var
   Sel, Back: TGridRect;
 begin
+  if (ReadOnly) then exit;
+
   taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
   Tasks.CopyToClipboard(taskGrid, FShowNote);
   Back := taskGrid.Selection;
@@ -4755,6 +4795,8 @@ var
   RowIndex: integer;
   Confirm: integer;
 begin
+  if (ReadOnly) then exit;
+
   // Get current RowIndex selected
   if (aRow = 0) then
     RowIndex := taskGrid.Row
@@ -4791,6 +4833,8 @@ procedure TformNotetask.DeleteTasks(ShowConfirm: boolean = True);
 var
   i, RowIndex, Confirm: integer;
 begin
+  if (ReadOnly) then exit;
+
   // If multiple rows are selected
   if (taskGrid.Selection.Height > 0) then
   begin
@@ -4834,6 +4878,8 @@ var
   RowIndex: integer;
   Confirm: integer;
 begin
+  if (ReadOnly) then exit;
+
   // Get current RowIndex selected
   if (aRow = 0) then
     RowIndex := taskGrid.Row
@@ -4869,6 +4915,8 @@ procedure TformNotetask.ArchiveTasks;
 var
   i, RowIndex, Confirm: integer;
 begin
+  if (ReadOnly) then exit;
+
   // If multiple rows are selected
   if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
   begin
@@ -4912,7 +4960,7 @@ var
   Check: boolean;
   i: integer;
 begin
-  if (not ShowColumnDone) then exit;
+  if (ReadOnly) or (not ShowColumnDone) then exit;
 
   // If multiple rows are selected
   if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
@@ -4989,6 +5037,8 @@ var
   Rows: TIntegerArray = nil;
   i, RowIndex: integer;
 begin
+  if (ReadOnly) then exit;
+
   // Detect selected rows
   if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
   begin
@@ -5036,6 +5086,8 @@ var
   RowIndex: integer;
   i: integer;
 begin
+  if (ReadOnly) then exit;
+
   if FBackup then
   begin
     GridBackupSelection;
@@ -5070,6 +5122,8 @@ end;
 
 procedure TformNotetask.GridClearSelection;
 begin
+  if (ReadOnly) then exit;
+
   FLastGridSelection := TRect.Empty;
   FLastGridRow := 1;
   FLastGridCol := 2;
@@ -5564,6 +5618,20 @@ begin
   end;
 end;
 
+procedure TformNotetask.FreeFile;
+begin
+  // Release the reserved file stream if it exists
+  if Assigned(FSReserved) then
+  begin
+    try
+      FSReserved.Free;
+    except
+      // Ignore any unexpected error during destruction
+    end;
+    FSReserved := nil;
+  end;
+end;
+
 procedure TformNotetask.SetBiDiRightToLeft(Value: boolean);
 var
   i: integer;
@@ -5739,12 +5807,12 @@ end;
 
 procedure TformNotetask.ApplySortingActions;
 begin
-  aMoveTaskTop.Enabled := SortColumn = 0;
-  aMoveTaskBottom.Enabled := SortColumn = 0;
-  aMoveTaskUp.Enabled := SortColumn = 0;
-  aMoveTaskDown.Enabled := SortColumn = 0;
-  aMoveTaskLeft.Enabled := SortColumn = 0;
-  aMoveTaskRight.Enabled := SortColumn = 0;
+  aMoveTaskTop.Enabled := (not ReadOnly) and (SortColumn = 0);
+  aMoveTaskBottom.Enabled := (not ReadOnly) and (SortColumn = 0);
+  aMoveTaskUp.Enabled := (not ReadOnly) and (SortColumn = 0);
+  aMoveTaskDown.Enabled := (not ReadOnly) and (SortColumn = 0);
+  aMoveTaskLeft.Enabled := (not ReadOnly) and (SortColumn = 0);
+  aMoveTaskRight.Enabled := (not ReadOnly) and (SortColumn = 0);
 
   if (SortColumn = 0) then
     taskGrid.Options := taskGrid.Options + [goRowMoving]
@@ -5895,6 +5963,24 @@ begin
     Result := taskGrid.DefaultRowHeight;
 end;
 
+procedure TformNotetask.SetCaption;
+var
+  NewCaption: string;
+begin
+  if (FFileName <> '') then
+    NewCaption := ExtractFileName(FFileName) + ifthen(FEncrypted, ' (' + rencrypted + ')', string.Empty) +
+      ifthen(FReadOnly, ' (' + rreadonly + ')', string.Empty) + ' - ' + rapp
+  else
+    NewCaption := runtitled + ifthen(FEncrypted, ' (' + rencrypted + ')', string.Empty) +
+      ifthen(FReadOnly, ' (' + rreadonly + ')', string.Empty) + ' - ' + rapp;
+
+  if FChanged then
+    NewCaption := '*' + NewCaption;
+
+  if Caption <> NewCaption then
+    Caption := NewCaption;
+end;
+
 procedure TformNotetask.SetInfo;
 var
   CurAll: integer;
@@ -6022,7 +6108,7 @@ begin
       begin
         // Single row selected — set editable note
         memoNote.Text := Tasks.GetTask(taskGrid.Row).Note;
-        memoNote.ReadOnly := False;
+        memoNote.ReadOnly := FReadOnly;
         memoNote.Color := clDefault;
       end
       else
@@ -6038,6 +6124,37 @@ begin
     MemoNoteBackup;
     memoNote.OnChange := @memoNoteChange;
   end;
+end;
+
+procedure TformNotetask.SetReadOnly(Value: boolean);
+begin
+  FReadOnly := Value;
+  aUndo.Enabled := not Value;
+  aUndoAll.Enabled := not Value;
+  aCut.Enabled := not Value;
+  aPaste.Enabled := not Value;
+  aDelete.Enabled := not Value;
+  aReplace.Enabled := not Value;
+  aDateTime.Enabled := not Value;
+  aInsertGroup.Enabled := not Value;
+  aRenameGroup.Enabled := not Value;
+  aDuplicateGroup.Enabled := not Value;
+  aDeleteGroup.Enabled := not Value;
+  aMoveGroupLeft.Enabled := not Value;
+  aMoveGroupRight.Enabled := not Value;
+  aMoveTaskLeft.Enabled := not Value;
+  aMoveTaskRight.Enabled := not Value;
+  aInsertTask.Enabled := not Value;
+  aMergeTasks.Enabled := not Value;
+  aDuplicateTasks.Enabled := not Value;
+  aDeleteTasks.Enabled := not Value;
+  aArchiveTasks.Enabled := not Value;
+  aMoveTaskTop.Enabled := not Value;
+  aMoveTaskUp.Enabled := not Value;
+  aMoveTaskDown.Enabled := not Value;
+  aMoveTaskBottom.Enabled := not Value;
+  aIndentTasks.Enabled := not Value;
+  aOutdentTasks.Enabled := not Value;
 end;
 
 procedure TformNotetask.SetTabs(Change: boolean = True);
@@ -6168,29 +6285,13 @@ begin
   end;
 end;
 
-procedure TformNotetask.SetCaption;
-var
-  NewCaption: string;
-begin
-  if (FFileName <> '') then
-    NewCaption := ExtractFileName(FFileName) + ifthen(FEncrypted, ' (' + rencrypted + ')', string.Empty) + ' - ' + rapp
-  else
-    NewCaption := runtitled + ifthen(FEncrypted, ' (' + rencrypted + ')', string.Empty) + ' - ' + rapp;
-
-  if FChanged then
-    NewCaption := '*' + NewCaption;
-
-  if Caption <> NewCaption then
-    Caption := NewCaption;
-end;
-
 procedure TformNotetask.SetChanged(aChanged: boolean = True);
 begin
   if (aChanged = False) then
     taskGrid.Modified := False;
 
   FChanged := taskGrid.Modified or aChanged;
-  aSave.Enabled := FChanged;
+  aSave.Enabled := FChanged and not FReadOnly;
   aUndo.Enabled := FChanged;
   aUndoAll.Enabled := FChanged;
   SetCaption;

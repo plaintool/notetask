@@ -88,6 +88,10 @@ msgstr "समूह का नाम दर्ज करें:"
 msgid "The requested file was not found on the disk."
 msgstr "अनुरोधित फ़ाइल डिस्क पर नहीं मिली।"
 
+#: mainform.rfilereadonly
+msgid "The file is read-only or is in use by another user."
+msgstr "फ़ाइल केवल-पढ़ने योग्य है या किसी अन्य उपयोगकर्ता द्वारा उपयोग में है।"
+
 #: mainform.rgoto
 msgctxt "mainform.rgoto"
 msgid "Go to"
@@ -137,6 +141,10 @@ msgstr "कार्य फ़ाइलें (*.tsk)|*.tsk|टेक्स्�
 #: mainform.rpassword
 msgid "Password:"
 msgstr "पासवर्ड:"
+
+#: mainform.rreadonly
+msgid "Read-only"
+msgstr "केवल-पढ़ने योग्य"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"

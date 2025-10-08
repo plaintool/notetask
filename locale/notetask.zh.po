@@ -88,6 +88,10 @@ msgstr "输入组名称："
 msgid "The requested file was not found on the disk."
 msgstr "在磁盘上找不到请求的文件。"
 
+#: mainform.rfilereadonly
+msgid "The file is read-only or is in use by another user."
+msgstr "文件为只读或正在被其他用户使用。"
+
 #: mainform.rgoto
 msgctxt "mainform.rgoto"
 msgid "Go to"
@@ -137,6 +141,10 @@ msgstr "任务文件 (*.tsk)|*.tsk|文本文件 (*.txt)|*.txt|Markdown 文件 (*
 #: mainform.rpassword
 msgid "Password:"
 msgstr "密码:"
+
+#: mainform.rreadonly
+msgid "Read-only"
+msgstr "只读"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"

@@ -88,6 +88,10 @@ msgstr "グループ名を入力してください:"
 msgid "The requested file was not found on the disk."
 msgstr "要求されたファイルはディスク上に見つかりませんでした。"
 
+#: mainform.rfilereadonly
+msgid "The file is read-only or is in use by another user."
+msgstr "ファイルは読み取り専用、または他のユーザーによって使用されています。"
+
 #: mainform.rgoto
 msgctxt "mainform.rgoto"
 msgid "Go to"
@@ -137,6 +141,10 @@ msgstr "タスクファイル (*.tsk)|*.tsk|テキストファイル (*.txt)|*.t
 #: mainform.rpassword
 msgid "Password:"
 msgstr "パスワード:"
+
+#: mainform.rreadonly
+msgid "Read-only"
+msgstr "読み取り専用"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"

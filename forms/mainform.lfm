@@ -406,7 +406,7 @@ object formNotetask: TformNotetask
         AutoCheck = True
       end
       object menuHideNoteText: TMenuItem
-        Action = AHideNoteText
+        Action = aHideNoteText
         AutoCheck = True
       end
       object menuShowStatusBar: TMenuItem
@@ -903,12 +903,12 @@ object formNotetask: TformNotetask
       ShortCut = 16473
       OnExecute = aSaveNotesAsExecute
     end
-    object AHideNoteText: TAction
+    object aHideNoteText: TAction
       Category = 'View'
       AutoCheck = True
       Caption = 'Hide note text'
       ShortCut = 32957
-      OnExecute = AHideNoteTextExecute
+      OnExecute = aHideNoteTextExecute
     end
     object aShowStatusBar: TAction
       Category = 'View'

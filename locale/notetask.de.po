@@ -88,6 +88,10 @@ msgstr "Geben Sie den Gruppennamen ein:"
 msgid "The requested file was not found on the disk."
 msgstr "Die angeforderte Datei wurde auf der Festplatte nicht gefunden."
 
+#: mainform.rfilereadonly
+msgid "The file is read-only or is in use by another user."
+msgstr "Die Datei ist schreibgeschützt oder wird von einem anderen Benutzer verwendet."
+
 #: mainform.rgoto
 msgctxt "mainform.rgoto"
 msgid "Go to"
@@ -137,6 +141,10 @@ msgstr "Aufgaben-Dateien (*.tsk)|*.tsk|Text-Dateien (*.txt)|*.txt|Markdown-Datei
 #: mainform.rpassword
 msgid "Password:"
 msgstr "Passwort:"
+
+#: mainform.rreadonly
+msgid "Read-only"
+msgstr "Nur Lesen"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"

@@ -17,6 +17,7 @@ uses
   StrUtils,
   {$IFDEF UNIX}
   BaseUnix,
+  Unix,
   DateUtils,
   {$ELSE}
   Windows,
@@ -51,6 +52,8 @@ function DetectLineEnding(const FileName: string; Encoding: TEncoding; MaxLines:
 function EndsWithLineBreak(const Buffer: TBytes): boolean; overload;
 
 function EndsWithLineBreak(const FileName: string): boolean; overload;
+
+function TryLockFile(const AFileName: string; out Stream: TFileStream): boolean;
 
 procedure ReadTextFile(const Bytes: TBytes; out Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding;
   out LineCount: integer); overload;
@@ -586,6 +589,68 @@ var
 begin
   Bytes := LoadFileAsBytes(FileName);
   Result := EndsWithLineBreak(Bytes);
+end;
+
+function TryLockFile(const AFileName: string; out Stream: TFileStream): boolean;
+var
+  fs: TFileStream;
+begin
+  Result := False;
+  Stream := nil;
+
+  {$IFDEF MSWINDOWS}
+  try
+    // Try to open file in read/write mode with exclusive share.
+    fs := TFileStream.Create(AFileName, fmOpenReadWrite or fmShareDenyWrite);
+    // If we reached here, file is successfully locked.
+    Stream := fs;
+    Result := True;
+  except
+    on E: EFOpenError do
+    begin
+      // File is probably in use or cannot be locked.
+      Result := False;
+    end;
+    on E: Exception do
+    begin
+      // Any other unexpected error.
+      Result := False;
+    end;
+  end;
+  {$ENDIF}
+
+  {$IFDEF UNIX}
+  try
+    try
+      // Open file for reading and writing
+      fs := TFileStream.Create(AFileName, fmOpenReadWrite);
+    except
+      fs := nil;
+      Stream := nil;
+      exit(False);
+    end;
+    // Shared lock that allows reading but prevents writing by others
+    if fpflock(fs.Handle, LOCK_SH or LOCK_NB) = 0 then
+    begin
+      Stream := fs;
+      Result := True;
+    end
+    else
+    begin
+      fs.Free;
+      Stream := nil;
+      Result := False;
+    end;
+  except
+    on E: Exception do
+    begin
+      if Assigned(fs) then
+        fs.Free;
+      Stream := nil;
+      Result := False;
+    end;
+  end;
+  {$ENDIF}
 end;
 
 procedure ReadTextFile(const Bytes: TBytes; out Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding;
