@@ -79,7 +79,7 @@ function HasScheme(const URL: string): boolean;
 
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
 
-procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer);
+procedure InsertAtPos(var A: TIntegerArray; Pos, Value:integer; Delta: integer = 0);
 
 procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
 
@@ -709,7 +709,7 @@ begin
   end;
 end;
 
-procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer);
+procedure InsertAtPos(var A: TIntegerArray; Pos, Value:integer; Delta: integer = 0);
 var
   i, Len: integer;
 begin
@@ -726,6 +726,10 @@ begin
 
   // Insert new value
   A[Pos] := Value;
+
+  // Increase all following elements by Delta
+  for i := Pos + 1 to High(A) do
+    A[i] := A[i] + Delta;
 end;
 
 procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);

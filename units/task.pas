@@ -100,6 +100,7 @@ type
     function Map(Index: integer): integer;
     function ReverseMap(Value: integer): integer;
     procedure AddMap(Value: integer);
+    procedure InsertMap(Pos, Value: integer; Delta: integer = 1);
     function AddTask(const TaskString: string): integer; // Method to add a task
     function AddGroupTask(const GroupIndex: integer; const TaskString: string): integer;
     function GetTask(Index: integer): TTask; // Method to get a task by row index
@@ -128,7 +129,7 @@ type
     procedure SwapTasks(OldIndex, NewIndex: integer);
     procedure MoveTask(OldIndex, NewIndex: integer);
     procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False);
-    function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder): TGridRect;
+    function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True): TGridRect;
     procedure CreateBackup;
     procedure UndoBackup;
     procedure CreateBackupInit;
@@ -453,6 +454,11 @@ begin
   FMapGrid[High(FMapGrid)] := Value;
 end;
 
+procedure TTasks.InsertMap(Pos, Value: integer; Delta: integer = 1);
+begin
+  InsertAtPos(FMapGrid, Pos, Value, Delta);
+end;
+
 function TTasks.AddTask(const TaskString: string): integer;
 var
   Task: TTask;
@@ -580,9 +586,7 @@ begin
 
   // Shift tasks down to make space for the new task
   for i := Count - 1 downto Ind + 1 do
-  begin
     FTaskList[i] := FTaskList[i - 1]; // Move tasks one position down
-  end;
 
   FTaskList[Ind] := Task; // Insert the new task at the specified index
 
@@ -1238,7 +1242,7 @@ begin
   end;
 end;
 
-function TTasks.PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder): TGridRect;
+function TTasks.PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True): TGridRect;
 var
   TempTasks: TTasks;
   TempTask: TTask;
@@ -1357,7 +1361,7 @@ begin
   Result := Grid.Selection;
   DoInsert := True;
   if Clipboard.AsText = string.Empty then exit;
-  CreateBackup;
+  if Backup then CreateBackup;
 
   if (Grid.Row > 0) then
   begin

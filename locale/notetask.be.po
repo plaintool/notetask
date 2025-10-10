@@ -118,7 +118,7 @@ msgstr "Няправільны пароль!"
 
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
-msgstr "Ці ўпэўнены вы, што хочаце аб'яднаць выбраныя задачы?"
+msgstr "Вы ўпэўнены, што хочаце аб’яднаць выбраныя заданні?"
 
 #: mainform.rno
 msgid "&No"
@@ -159,6 +159,14 @@ msgstr "Вы хочаце захаваць змены?"
 msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "Файлы задач (*.tsk)|*.tsk|Шыфраваныя файлы задач (*.tsk)|*.tsk|Тэкставыя файлы (*.txt)|*.txt|Markdown файлы (*.md)|*.md|Усе файлы (*.*)|*.*"
+
+#: mainform.rsplitconfirm
+msgid "Are you sure you want to split the selected tasks based on the current column?"
+msgstr "Вы ўпэўнены, што хочаце падзяліць выбраныя заданні па бягучым слупку?"
+
+#: mainform.rsplitwarning
+msgid "Please select the column with line breaks to split the tasks."
+msgstr "Калі ласка, выберыце слупок з пераносамі радкоў для падзелу заданняў."
 
 #: mainform.rtasknumber
 msgctxt "mainform.rtasknumber"
@@ -687,6 +695,10 @@ msgstr "Панэль стану"
 #: tformnotetask.ashowtime.caption
 msgid "Show time"
 msgstr "Адлюстроўваць час"
+
+#: tformnotetask.asplittasks.caption
+msgid "Split tasks"
+msgstr "Падзяліць заданні"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

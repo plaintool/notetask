@@ -160,6 +160,14 @@ msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "任务文件 (*.tsk)|*.tsk|加密任务文件 (*.tsk)|*.tsk|文本文件 (*.txt)|*.txt|Markdown 文件 (*.md)|*.md|所有文件 (*.*)|*.*"
 
+#: mainform.rsplitconfirm
+msgid "Are you sure you want to split the selected tasks based on the current column?"
+msgstr "您确定要根据当前列拆分所选任务吗？"
+
+#: mainform.rsplitwarning
+msgid "Please select the column with line breaks to split the tasks."
+msgstr "请选择带有换行符的列以拆分任务。"
+
 #: mainform.rtasknumber
 msgctxt "mainform.rtasknumber"
 msgid "Task number:"
@@ -687,6 +695,10 @@ msgstr "状态栏"
 #: tformnotetask.ashowtime.caption
 msgid "Show time"
 msgstr "显示时间"
+
+#: tformnotetask.asplittasks.caption
+msgid "Split tasks"
+msgstr "拆分任务"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

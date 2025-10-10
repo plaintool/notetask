@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -289,14 +288,17 @@ object formNotetask: TformNotetask
       object menuDuplicateTasks: TMenuItem
         Action = aDuplicateTasks
       end
-      object menuDeleteTasks: TMenuItem
-        Action = aDeleteTasks
-      end
       object menuMergeTasks: TMenuItem
         Action = aMergeTasks
       end
+      object menuSplitTasks: TMenuItem
+        Action = aSplitTasks
+      end
       object menuArchiveTasks: TMenuItem
         Action = aArchiveTasks
+      end
+      object menuDeleteTasks: TMenuItem
+        Action = aDeleteTasks
       end
       object Separator2: TMenuItem
         Caption = '-'
@@ -741,12 +743,6 @@ object formNotetask: TformNotetask
       Caption = 'Ukrainian'
       OnExecute = aLangUkrainianExecute
     end
-    object aMergeTasks: TAction
-      Category = 'Task'
-      Caption = 'Merge tasks'
-      ShortCut = 16461
-      OnExecute = aMergeTasksExecute
-    end
     object aInsertGroup: TAction
       Category = 'Group'
       Caption = 'Insert group'
@@ -822,14 +818,88 @@ object formNotetask: TformNotetask
       AutoCheck = True
       Caption = 'Enter submit'
       Checked = True
-      ShortCut = 16397
+      ShortCut = 24589
       OnExecute = aEnterSubmitExecute
+    end
+    object aHideNoteText: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Hide note text'
+      ShortCut = 32957
+      OnExecute = aHideNoteTextExecute
+    end
+    object aShowStatusBar: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Show status bar'
+      Checked = True
+      ShortCut = 32823
+      OnExecute = aShowStatusBarExecute
+    end
+    object aShowColumnDone: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column done'
+      Checked = True
+      ShortCut = 32817
+      OnExecute = aShowColumnDoneExecute
+    end
+    object aShowColumnTask: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column task'
+      Checked = True
+      ShortCut = 32818
+      OnExecute = aShowColumnTaskExecute
+    end
+    object aShowColumnNote: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column note'
+      Checked = True
+      ShortCut = 32819
+      OnExecute = aShowColumnNoteExecute
+    end
+    object aShowColumnAmount: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column amount'
+      ShortCut = 32820
+      OnExecute = aShowColumnAmountExecute
+    end
+    object aShowColumnDate: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column date'
+      Checked = True
+      ShortCut = 32821
+      OnExecute = aShowColumnDateExecute
+    end
+    object aShowColumnFavorite: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Column fovorite'
+      Checked = True
+      ShortCut = 32822
+      OnExecute = aShowColumnFavoriteExecute
     end
     object aDuplicateTasks: TAction
       Category = 'Task'
       Caption = 'Duplicate tasks'
       ShortCut = 16452
       OnExecute = aDuplicateTasksExecute
+    end
+    object aMergeTasks: TAction
+      Category = 'Task'
+      Caption = 'Merge tasks'
+      ShortCut = 16461
+      OnExecute = aMergeTasksExecute
+    end
+    object aSplitTasks: TAction
+      Category = 'Task'
+      Caption = 'Split tasks'
+      ShortCut = 24653
+      OnExecute = aSplitTasksExecute
     end
     object aDeleteTasks: TAction
       Category = 'Task'
@@ -903,68 +973,6 @@ object formNotetask: TformNotetask
       ShortCut = 16473
       OnExecute = aSaveNotesAsExecute
     end
-    object aHideNoteText: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Hide note text'
-      ShortCut = 32957
-      OnExecute = aHideNoteTextExecute
-    end
-    object aShowStatusBar: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Show status bar'
-      Checked = True
-      ShortCut = 32823
-      OnExecute = aShowStatusBarExecute
-    end
-    object aShowColumnDone: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column done'
-      Checked = True
-      ShortCut = 32817
-      OnExecute = aShowColumnDoneExecute
-    end
-    object aShowColumnTask: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column task'
-      Checked = True
-      ShortCut = 32818
-      OnExecute = aShowColumnTaskExecute
-    end
-    object aShowColumnNote: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column note'
-      Checked = True
-      ShortCut = 32819
-      OnExecute = aShowColumnNoteExecute
-    end
-    object aShowColumnAmount: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column amount'
-      ShortCut = 32820
-      OnExecute = aShowColumnAmountExecute
-    end
-    object aShowColumnDate: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column date'
-      Checked = True
-      ShortCut = 32821
-      OnExecute = aShowColumnDateExecute
-    end
-    object aShowColumnFavorite: TAction
-      Category = 'View'
-      AutoCheck = True
-      Caption = 'Column fovorite'
-      Checked = True
-      ShortCut = 32822
-      OnExecute = aShowColumnFavoriteExecute
-    end
   end
   object openDialog: TOpenDialog
     Title = 'Opening'
@@ -1018,11 +1026,14 @@ object formNotetask: TformNotetask
     object contextMergeTasks: TMenuItem
       Action = aMergeTasks
     end
-    object contextDeleteTasks: TMenuItem
-      Action = aDeleteTasks
+    object contextSplitTasks: TMenuItem
+      Action = aSplitTasks
     end
     object contextArchiveTasks: TMenuItem
       Action = aArchiveTasks
+    end
+    object contextDeleteTasks: TMenuItem
+      Action = aDeleteTasks
     end
     object Separator10: TMenuItem
       Caption = '-'

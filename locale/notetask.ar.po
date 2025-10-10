@@ -160,6 +160,14 @@ msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "ملفات المهام (*.tsk)|*.tsk|ملفات المهام المشفرة (*.tsk)|*.tsk|ملفات النص (*.txt)|*.txt|ملفات Markdown (*.md)|*.md|كل الملفات (*.*)|*.*"
 
+#: mainform.rsplitconfirm
+msgid "Are you sure you want to split the selected tasks based on the current column?"
+msgstr "هل أنت متأكد أنك تريد تقسيم المهام المحددة بناءً على العمود الحالي؟"
+
+#: mainform.rsplitwarning
+msgid "Please select the column with line breaks to split the tasks."
+msgstr "يرجى تحديد العمود الذي يحتوي على فواصل الأسطر لتقسيم المهام."
+
 #: mainform.rtasknumber
 msgctxt "mainform.rtasknumber"
 msgid "Task number:"
@@ -687,6 +695,10 @@ msgstr "شريط الحالة"
 #: tformnotetask.ashowtime.caption
 msgid "Show time"
 msgstr "عرض الوقت"
+
+#: tformnotetask.asplittasks.caption
+msgid "Split tasks"
+msgstr "تقسيم المهام"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

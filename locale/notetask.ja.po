@@ -160,6 +160,14 @@ msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "タスクファイル (*.tsk)|*.tsk|暗号化タスクファイル (*.tsk)|*.tsk|テキストファイル (*.txt)|*.txt|Markdownファイル (*.md)|*.md|すべてのファイル (*.*)|*.*"
 
+#: mainform.rsplitconfirm
+msgid "Are you sure you want to split the selected tasks based on the current column?"
+msgstr "現在の列に基づいて選択したタスクを分割してもよろしいですか？"
+
+#: mainform.rsplitwarning
+msgid "Please select the column with line breaks to split the tasks."
+msgstr "タスクを分割するには、改行を含む列を選択してください。"
+
 #: mainform.rtasknumber
 msgctxt "mainform.rtasknumber"
 msgid "Task number:"
@@ -687,6 +695,10 @@ msgstr "ステータスバー"
 #: tformnotetask.ashowtime.caption
 msgid "Show time"
 msgstr "時間を表示"
+
+#: tformnotetask.asplittasks.caption
+msgid "Split tasks"
+msgstr "タスクを分割"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

@@ -160,6 +160,14 @@ msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "작업 파일 (*.tsk)|*.tsk|암호화된 작업 파일 (*.tsk)|*.tsk|텍스트 파일 (*.txt)|*.txt|Markdown 파일 (*.md)|*.md|모든 파일 (*.*)|*.*"
 
+#: mainform.rsplitconfirm
+msgid "Are you sure you want to split the selected tasks based on the current column?"
+msgstr "현재 열을 기준으로 선택한 작업을 나누시겠습니까?"
+
+#: mainform.rsplitwarning
+msgid "Please select the column with line breaks to split the tasks."
+msgstr "작업을 나누려면 줄 바꿈이 있는 열을 선택하세요."
+
 #: mainform.rtasknumber
 msgctxt "mainform.rtasknumber"
 msgid "Task number:"
@@ -687,6 +695,10 @@ msgstr "상태 표시줄"
 #: tformnotetask.ashowtime.caption
 msgid "Show time"
 msgstr "시간 표시"
+
+#: tformnotetask.asplittasks.caption
+msgid "Split tasks"
+msgstr "작업 나누기"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

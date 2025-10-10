@@ -160,6 +160,14 @@ msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "Файлы задач (*.tsk)|*.tsk|Зашифрованные файлы задач (*.tsk)|*.tsk|Текстовые файлы (*.txt)|*.txt|Markdown файлы (*.md)|*.md|Все файлы (*.*)|*.*"
 
+#: mainform.rsplitconfirm
+msgid "Are you sure you want to split the selected tasks based on the current column?"
+msgstr "Вы уверены, что хотите разделить выбранные задачи по текущему столбцу?"
+
+#: mainform.rsplitwarning
+msgid "Please select the column with line breaks to split the tasks."
+msgstr "Пожалуйста, выберите столбец с разрывами строк для разделения задач."
+
 #: mainform.rtasknumber
 msgctxt "mainform.rtasknumber"
 msgid "Task number:"
@@ -687,6 +695,10 @@ msgstr "Строка состояния"
 #: tformnotetask.ashowtime.caption
 msgid "Show time"
 msgstr "Показывать время"
+
+#: tformnotetask.asplittasks.caption
+msgid "Split tasks"
+msgstr "Разделить задачи"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

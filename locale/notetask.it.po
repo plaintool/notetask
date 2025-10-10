@@ -37,12 +37,12 @@ msgstr "Notetask"
 #: mainform.rarchiveconfirm
 msgctxt "mainform.rarchiveconfirm"
 msgid "Are you sure you want to archive / unarchive this task?"
-msgstr "Sei sicuro di voler archiviare / disarchiviare questo compito?"
+msgstr "È sicuro di voler archiviare / disarchiviare questo compito?"
 
 #: mainform.rarchivesconfirm
 msgctxt "mainform.rarchivesconfirm"
 msgid "Are you sure you want to archive / unarchive selected tasks?"
-msgstr "Sei sicuro di voler archiviare / disarchiviare i compiti selezionati?"
+msgstr "È sicuro di voler archiviare / disarchiviare i compiti selezionati?"
 
 #: mainform.rcantfind
 msgid "Can't find"
@@ -54,7 +54,7 @@ msgstr ""
 
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
-msgstr "Sei sicuro di voler cancellare i dati nell'area selezionata?"
+msgstr "È sicuro di voler cancellare i dati nell'area selezionata?"
 
 #: mainform.rconfirmation
 msgid "Confirmation"
@@ -66,15 +66,15 @@ msgstr "Conferma password:"
 
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
-msgstr "Sei sicuro di voler eliminare questo compito?"
+msgstr "È sicuro di voler eliminare questo compito?"
 
 #: mainform.rdeletegroupconfirm
 msgid "Are you sure you want to delete this group? This will also delete all tasks within this group."
-msgstr "Sei sicuro di voler eliminare questo gruppo? Questo eliminerà anche tutte le attività all'interno del gruppo."
+msgstr "È sicuro di voler eliminare questo gruppo? Questo eliminerà anche tutte le attività all'interno del gruppo."
 
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
-msgstr "Sei sicuro di voler eliminare i compiti selezionati?"
+msgstr "È sicuro di voler eliminare i compiti selezionati?"
 
 #: mainform.rencrypted
 msgid "Encrypted"
@@ -118,7 +118,7 @@ msgstr "Password errata!"
 
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
-msgstr "Sei sicuro di voler unire i compiti selezionati?"
+msgstr "È sicuro di voler unire i compiti selezionati?"
 
 #: mainform.rno
 msgid "&No"
@@ -160,6 +160,14 @@ msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "File di compito (*.tsk)|*.tsk|File di compito crittografati (*.tsk)|*.tsk|File di testo (*.txt)|*.txt|File Markdown (*.md)|*.md|Tutti i file (*.*)|*.*"
 
+#: mainform.rsplitconfirm
+msgid "Are you sure you want to split the selected tasks based on the current column?"
+msgstr "È sicuro di voler dividere le attività selezionate in base alla colonna corrente?"
+
+#: mainform.rsplitwarning
+msgid "Please select the column with line breaks to split the tasks."
+msgstr "Selezioni la colonna con interruzioni di riga per dividere le attività."
+
 #: mainform.rtasknumber
 msgctxt "mainform.rtasknumber"
 msgid "Task number:"
@@ -167,7 +175,7 @@ msgstr "Numero del compito:"
 
 #: mainform.rundoconfirm
 msgid "Are you sure you want to discard all changes? This action cannot be undone."
-msgstr "Sei sicuro di voler annullare tutte le modifiche? Questa azione non può essere annullata."
+msgstr "È sicuro di voler annullare tutte le modifiche? Questa azione non può essere annullata."
 
 #: mainform.runtitled
 msgid "Untitled"
@@ -687,6 +695,10 @@ msgstr "Barra di stato"
 #: tformnotetask.ashowtime.caption
 msgid "Show time"
 msgstr "Visualizza ora"
+
+#: tformnotetask.asplittasks.caption
+msgid "Split tasks"
+msgstr "Dividi attività"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

@@ -70,7 +70,7 @@ msgstr "Sind Sie sicher, dass Sie diese Aufgabe löschen möchten?"
 
 #: mainform.rdeletegroupconfirm
 msgid "Are you sure you want to delete this group? This will also delete all tasks within this group."
-msgstr "Möchten Sie diese Gruppe wirklich löschen? Dies wird auch alle Aufgaben in dieser Gruppe löschen."
+msgstr "Sind Sie sicher, dass Sie diese Gruppe löschen möchten? Dadurch werden auch alle Aufgaben innerhalb dieser Gruppe gelöscht."
 
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
@@ -118,7 +118,7 @@ msgstr "Falsches Passwort!"
 
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
-msgstr "Bist du sicher, dass du die ausgewählten Aufgaben zusammenführen möchtest?"
+msgstr "Sind Sie sicher, dass Sie die ausgewählten Aufgaben zusammenführen möchten?"
 
 #: mainform.rno
 msgid "&No"
@@ -159,6 +159,14 @@ msgstr "Möchten Sie die Änderungen speichern?"
 msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
 msgstr "Aufgaben-Dateien (*.tsk)|*.tsk|Verschlüsselte Aufgaben-Dateien (*.tsk)|*.tsk|Textdateien (*.txt)|*.txt|Markdown-Dateien (*.md)|*.md|Alle Dateien (*.*)|*.*"
+
+#: mainform.rsplitconfirm
+msgid "Are you sure you want to split the selected tasks based on the current column?"
+msgstr "Sind Sie sicher, dass Sie die ausgewählten Aufgaben nach der aktuellen Spalte aufteilen möchten?"
+
+#: mainform.rsplitwarning
+msgid "Please select the column with line breaks to split the tasks."
+msgstr "Bitte wähle die Spalte mit Zeilenumbrüchen aus, um die Aufgaben zu teilen."
 
 #: mainform.rtasknumber
 msgctxt "mainform.rtasknumber"
@@ -687,6 +695,10 @@ msgstr "Statusleiste"
 #: tformnotetask.ashowtime.caption
 msgid "Show time"
 msgstr "Zeit anzeigen"
+
+#: tformnotetask.asplittasks.caption
+msgid "Split tasks"
+msgstr "Aufgaben teilen"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"

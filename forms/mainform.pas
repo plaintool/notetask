@@ -46,6 +46,7 @@ type
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
+    aSplitTasks: TAction;
     aHideNoteText: TAction;
     aSaveNotesAs: TAction;
     aDuplicateTasks: TAction;
@@ -124,6 +125,8 @@ type
     contextUTF16BEBOM: TMenuItem;
     contextUTF16LEBOM: TMenuItem;
     menuHideNoteText: TMenuItem;
+    contextSplitTasks: TMenuItem;
+    menuSplitTasks: TMenuItem;
     menuSaveNotesAs: TMenuItem;
     menuRunPowershell: TMenuItem;
     MenuShowTime: TMenuItem;
@@ -284,6 +287,7 @@ type
     ContextRenameGroup: TMenuItem;
     ContextDuplicateGroup: TMenuItem;
     ContextDeleteGroup: TMenuItem;
+    procedure aSplitTasksExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -484,6 +488,7 @@ type
     FStatusPanelIndex: integer;
     FAdjustingScrollBars: boolean;
     FSReserved: TFileStream;
+    FRepaint: boolean;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -513,8 +518,9 @@ type
     procedure SetNote;
     procedure SetTabs(Change: boolean = True);
     procedure ClearSelected(ShowConfirm: boolean = True);
-    procedure MergeTasks;
     procedure DuplicateTasks;
+    procedure MergeTasks;
+    procedure SplitTasks;
     procedure DeleteTask(aRow: integer = 0; ShowConfirm: boolean = True);
     procedure DeleteTasks(ShowConfirm: boolean = True);
     procedure ArchiveTask(aRow: integer = 0);
@@ -676,6 +682,8 @@ resourcestring
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rdeletesconfirm = 'Are you sure you want to delete selected tasks?';
   rmergesconfirm = 'Are you sure you want to merge selected tasks?';
+  rsplitconfirm = 'Are you sure you want to split the selected tasks based on the current column?';
+  rsplitwarning = 'Please select the column with line breaks to split the tasks.';
   rarchiveconfirm = 'Are you sure you want to archive / unarchive this task?';
   rarchivesconfirm = 'Are you sure you want to archive / unarchive selected tasks?';
   rsavechanges = 'Do you want to save the changes?';
@@ -722,6 +730,7 @@ begin
   FShowStatusBar := True;
   FShowNote := False;
   FMemoNeedSelectAll := True;
+  FRepaint := False;
   FShowColumnDone := True;
   FShowColumnTask := True;
   FShowColumnNote := True;
@@ -1383,7 +1392,7 @@ begin
   end;
 
   if (Button = mbLeft) and (ssCtrl in Shift) and (taskGrid.Col in [2, 3]) then
-    TryOpenAsUrl(taskGrid.Cells[taskGrid.Col, taskGrid.Row]);
+    TryOpenAsUrl(Trim(taskGrid.Cells[taskGrid.Col, taskGrid.Row]));
 end;
 
 procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
@@ -1723,13 +1732,15 @@ begin
   if Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex) then
     FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)] := aRow;
 
-  // Disable merge if no multiselect
-  if (taskGrid.Selection.Height > 0) then
-    aMergeTasks.Enabled := not ReadOnly
-  else
-    aMergeTasks.Enabled := False;
-
   FLastSelectionHeight := taskGrid.Selection.Height;
+
+  if (not FRepaint) then
+  begin
+    FRepaint := True;
+    Application.ProcessMessages;
+    TaskGrid.Invalidate;
+    Application.ProcessMessages;
+  end;
 end;
 
 procedure TformNotetask.groupTabsChange(Sender: TObject);
@@ -2334,6 +2345,14 @@ begin
   SetNote;
 end;
 
+procedure TformNotetask.aDuplicateTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if taskGrid.RowCount < 2 then exit;
+
+  DuplicateTasks;
+end;
+
 procedure TformNotetask.aMergeTasksExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -2342,12 +2361,12 @@ begin
   MergeTasks;
 end;
 
-procedure TformNotetask.aDuplicateTasksExecute(Sender: TObject);
+procedure TformNotetask.aSplitTasksExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
+  if taskGrid.RowCount = 0 then exit;
 
-  DuplicateTasks;
+  SplitTasks;
 end;
 
 procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);
@@ -4690,6 +4709,53 @@ begin
   end;
 end;
 
+procedure TformNotetask.DuplicateTasks;
+var
+  Sel, Back, Original: TGridRect;
+begin
+  if (ReadOnly) then exit;
+
+  if (FBackup) then
+  begin
+    GridBackupSelection;
+    Tasks.CreateBackup;
+  end;
+
+  Original := taskGrid.Selection;
+  taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
+  Tasks.CopyToClipboard(taskGrid, FShowNote);
+  Back := taskGrid.Selection;
+  if (SortOrder = soAscending) then
+  begin
+    taskGrid.Row := taskGrid.Selection.Bottom;
+    taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Bottom, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
+  end
+  else
+  begin
+    taskGrid.Row := taskGrid.Selection.Top;
+    taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Top);
+  end;
+  Tasks.PasteFromClipboard(taskGrid, SortOrder, False);
+  if (SortOrder = soAscending) then
+    Sel := TGridRect.Create(Original.Left, Back.Bottom + 1, Original.Right, Back.Bottom + Back.Height + 1)
+  else
+    Sel := TGridRect.Create(Original.Left, Back.Top, Original.Right, Back.Bottom);
+  FillGrid;
+  if (SortColumn = 0) then
+  begin
+    if (SortOrder = soAscending) then
+      taskGrid.Row := Sel.Top
+    else
+      taskGrid.Row := Sel.Bottom;
+    taskGrid.Selection := Sel;
+    FLastSelectionHeight := Sel.Height;
+  end;
+  CalcRowHeights(0, True);
+  SetInfo;
+  SetNote;
+  SetChanged;
+end;
+
 procedure TformNotetask.MergeTasks;
 var
   i, Confirm: integer;
@@ -4717,8 +4783,10 @@ begin
       for i := taskGrid.Selection.Top + 1 to taskGrid.Selection.Bottom do
       begin
         Target := Tasks.GetTask(i);
-        Task.Text := task.Text + IfThen(Target.Text <> string.Empty, FLineEnding.Value + Target.Text, string.Empty);
-        Task.Note := task.Note + IfThen(Target.Note <> string.Empty, FLineEnding.Value + Target.Note, string.Empty);
+        if (task.Text <> Target.Text) then
+          Task.Text := Task.Text + FLineEnding.Value + Target.Text;
+        if (task.Note <> Target.Note) then
+          Task.Note := Task.Note + FLineEnding.Value + Target.Note;
         Task.Amount := Task.Amount + Target.Amount;
 
         if (Target.Date > MaxDate) then
@@ -4750,44 +4818,148 @@ begin
   end;
 end;
 
-procedure TformNotetask.DuplicateTasks;
+procedure TformNotetask.SplitTasks;
 var
-  Sel, Back: TGridRect;
+  i, j, index, colToSplit, Confirm: integer;
+  Sel: TGridRect;
+  Task, NewTask: TTask;
+  TasksToSplit: array of TTask = nil;
+  Lines, Lines2: TStringList;
+  Source, Source2: string;
 begin
-  if (ReadOnly) then exit;
+  if (ReadOnly) then Exit;
 
-  taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
-  Tasks.CopyToClipboard(taskGrid, FShowNote);
-  Back := taskGrid.Selection;
-  if (SortOrder = soAscending) then
+  // Check if the current column can be split
+  colToSplit := -1;
+  for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
   begin
-    taskGrid.Row := taskGrid.Selection.Bottom;
-    taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Bottom, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
-  end
-  else
-  begin
-    taskGrid.Row := taskGrid.Selection.Top;
-    taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Top);
+    if (taskGrid.Col = 2) and (Pos(FLineEnding.Value, Tasks.GetTask(i).Text) > 0) then
+      colToSplit := 2
+    else if (taskGrid.Col = 3) and (Pos(FLineEnding.Value, Tasks.GetTask(i).Note) > 0) then
+      colToSplit := 3;
   end;
-  Tasks.PasteFromClipboard(taskGrid, SortOrder);
-  if (SortOrder = soAscending) then
-    Sel := TGridRect.Create(0, Back.Bottom + 1, taskGrid.Columns.Count, Back.Bottom + Back.Height + 1)
-  else
-    Sel := TGridRect.Create(0, Back.Top, taskGrid.Columns.Count, Back.Bottom);
+
+  if (colToSplit = -1) then
+  begin
+    ShowMessage(rsplitwarning);
+    Exit;
+  end;
+
+  Confirm := MessageDlg(rsplitconfirm, mtConfirmation, [mbYes, mbNo], 0);
+  if (Confirm <> mrYes) then Exit;
+
+  // Create backup if enabled
+  if (FBackup) then
+  begin
+    GridBackupSelection;
+    Tasks.CreateBackup;
+  end;
+
+  Lines := TStringList.Create;
+  Lines2 := TStringList.Create;
+  try
+    Lines.LineBreak := FLineEnding.Value;
+    Lines2.LineBreak := FLineEnding.Value;
+
+    // Cache selected tasks (avoid accessing the grid during modifications)
+    SetLength(TasksToSplit, taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1);
+    for i := 0 to High(TasksToSplit) do
+      TasksToSplit[i] := Tasks.GetTask(taskGrid.Selection.Top + i);
+
+    // Process tasks in order
+    index := taskGrid.Selection.Top;
+    for i := 0 to High(TasksToSplit) do
+    begin
+      Task := TasksToSplit[i];
+
+      // Get fields for splitting
+      if (colToSplit = 2) then
+      begin
+        Source := Task.Text;
+        Source2 := Task.Note;
+      end
+      else
+      begin
+        Source := Task.Note;
+        Source2 := Task.Text;
+      end;
+
+      if Pos(FLineEnding.Value, Source) = 0 then
+        Continue; // No line breaks — skip
+
+      Lines.Text := Source;
+      Lines2.Text := Source2;
+
+      // Update original task
+      if (colToSplit = 2) then
+        Task.Text := Trim(Lines[0])
+      else
+        Task.Note := Trim(Lines[0]);
+
+      if Lines.Count = Lines2.Count then
+      begin
+        if (colToSplit = 2) then
+          Task.Note := Trim(Lines2[0])
+        else
+          Task.Text := Trim(Lines2[0]);
+      end;
+
+      // Create new tasks
+
+      for j := 1 to Lines.Count - 1 do
+      begin
+        NewTask := TTask.Create;
+        try
+          NewTask.Copy(Task); // Copy all properties
+
+          if (colToSplit = 2) then
+            NewTask.Text := Trim(Lines[j])
+          else
+            NewTask.Note := Trim(Lines[j]);
+
+          if Lines.Count = Lines2.Count then
+          begin
+            if (colToSplit = 2) then
+              NewTask.Note := Trim(Lines2[j])
+            else
+              NewTask.Text := Trim(Lines2[j]);
+          end;
+
+          if SortOrder = soAscending then
+          begin
+            Tasks.InsertTask(NewTask.ToString, index + i + j - 1, False);
+            Tasks.InsertMap(index, Tasks.Map(index));
+          end
+          else
+          begin
+            Tasks.InsertTask(NewTask.ToString, index + i + j, False);
+            Tasks.InsertMap(index, Tasks.Map(index), 0);
+          end;
+        finally
+          NewTask.Free;
+        end;
+      end;
+      index := index + Lines.Count - 1;
+    end;
+  finally
+    Lines.Free;
+    Lines2.Free;
+    SetLength(TasksToSplit, 0);
+  end;
+
+  // Refresh grid and UI
+  Sel := taskGrid.Selection;
   FillGrid;
-  if (SortColumn = 0) then
-  begin
-    if (SortOrder = soAscending) then
-      taskGrid.Row := Sel.Top
-    else
-      taskGrid.Row := Sel.Bottom;
-    taskGrid.Selection := Sel;
-    FLastSelectionHeight := Sel.Height;
-  end;
   CalcRowHeights(0, True);
   SetInfo;
   SetNote;
   SetChanged;
+
+  // Restore selection
+  if (SortColumn = 0) then
+    taskGrid.Selection := TGridRect.Create(sel.Left, sel.Top, Sel.Right, index + (Sel.Bottom - Sel.Top))
+  else
+    taskGrid.Selection := Sel;
 end;
 
 procedure TformNotetask.DeleteTask(aRow: integer = 0; ShowConfirm: boolean = True);
@@ -6146,6 +6318,7 @@ begin
   aMoveTaskRight.Enabled := not Value;
   aInsertTask.Enabled := not Value;
   aMergeTasks.Enabled := not Value;
+  aSplitTasks.Enabled := not Value;
   aDuplicateTasks.Enabled := not Value;
   aDeleteTasks.Enabled := not Value;
   aArchiveTasks.Enabled := not Value;
