@@ -36,9 +36,9 @@ begin
       // Find number end
       DotPos := 0;
       Digits := 0;
-      while (i <= Length(Expr)) and (Expr[i] in ['0'..'9', '.', ',']) do
+      while (i <= Length(Expr)) and (Expr[i] in ['0'..'9', '.', ',', DefaultFormatSettings.DecimalSeparator]) do
       begin
-        if Expr[i] in ['.', ','] then
+        if Expr[i] in ['.', ',', DefaultFormatSettings.DecimalSeparator] then
           DotPos := i
         else if DotPos > 0 then
           Inc(Digits);
@@ -74,10 +74,10 @@ var
     S: string;
   begin
     StartPos := i;
-    while (i <= Length(Expr)) and (Expr[i] in ['0'..'9', '.', ',']) do
+    while (i <= Length(Expr)) and (Expr[i] in ['0'..'9', '.', ',', DefaultFormatSettings.DecimalSeparator]) do
       Inc(i);
     S := Copy(Expr, StartPos, i - StartPos);
-    S := StringReplace(S, ',', '.', [rfReplaceAll]);
+    //S := StringReplace(S, ',', '.', [rfReplaceAll]);
     Result := StrToFloatDef(S, 0);
   end;
 

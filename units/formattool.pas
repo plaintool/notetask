@@ -31,9 +31,11 @@ function DateTimeToStringISO(Value: TDateTime; ADisplayTime: boolean = True): st
 
 function DateTimeToString(Value: TDateTime; ADisplayTime: boolean = True): string;
 
-function TryStrToFloatLimited(const S: string; out Value: double): boolean;
+function TryStrToFloatLimited(const S: string; out Value: double): boolean; overload;
 
-function FloatToString(Value: double): string;
+function FloatToString(Value: double): string; overload;
+
+function FloatToString(Value: double; FS: TFormatSettings): string; overload;
 
 function SplitByFirstSpaces(const S: string; Count: integer = 1): TStringArray;
 
@@ -79,7 +81,7 @@ function HasScheme(const URL: string): boolean;
 
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
 
-procedure InsertAtPos(var A: TIntegerArray; Pos, Value:integer; Delta: integer = 0);
+procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
 
 procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
 
@@ -182,15 +184,32 @@ begin
 end;
 
 function TryStrToFloatLimited(const S: string; out Value: double): boolean;
+var
+  FS: TFormatSettings;
 begin
   if Length(S) > MaxFloatStringLength then
     Exit(False);
   Result := TryStrToFloat(S, Value);
+  if (not Result) then
+  begin
+    FS.DecimalSeparator := '.';
+    Result := TryStrToFloat(S, Value, FS);
+    if (not Result) then
+    begin
+      FS.DecimalSeparator := ',';
+      Result := TryStrToFloat(S, Value, FS);
+    end;
+  end;
 end;
 
 function FloatToString(Value: double): string;
 begin
   Result := FloatToStr(Value);
+end;
+
+function FloatToString(Value: double; FS: TFormatSettings): string;
+begin
+  Result := FloatToStr(Value, FS);
 end;
 
 function SplitByFirstSpaces(const S: string; Count: integer = 1): TStringArray;
@@ -321,14 +340,14 @@ var
 begin
   Result := string.Empty;
   Value := Value.Replace(UnicodeMinusUTF8, '-');
+  Value := Value.Replace('.', DefaultFormatSettings.DecimalSeparator);
+  Value := Value.Replace(',', DefaultFormatSettings.DecimalSeparator);
   for i := 1 to Length(Value) do
   begin
     C := Value[i];
     // allow digits and actions
-    if C in ['0'..'9', '-', '+', '*', '/', '%', '^', '(', ')', '.'] then
-      Result := Result + C
-    else if C = ',' then
-      Result := Result + '.'; // replace comma with dot
+    if C in ['0'..'9', '-', '+', '*', '/', '%', '^', '(', ')', DefaultFormatSettings.DecimalSeparator] then
+      Result := Result + C;
   end;
 end;
 
@@ -354,16 +373,14 @@ begin
   begin
     C := Value[i];
     // allow digits, ASCII minus, and dot
-    if C in ['0'..'9', '-', '.'] then
-      Result := Result + C
-    else if C = ',' then
-      Result := Result + '.'; // replace comma with dot
+    if C in ['0'..'9', '-', '.', ',', DefaultFormatSettings.DecimalSeparator] then
+      Result := Result + C;
   end;
 end;
 
 function CleanAmount(const Value: string): string;
 begin
-  Result := Value.Replace(' ', string.empty).Replace(',', '.').Trim;
+  Result := Value.Replace(' ', string.empty).Trim;
 end;
 
 function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 2): string;
@@ -687,8 +704,8 @@ end;
 function HasScheme(const URL: string): boolean;
 begin
   // Check if URL starts with any scheme (protocol)
-  Result := (Pos('://', URL) > 0) or (Pos('mailto:', LowerCase(URL)) = 1) or
-    (Pos('tel:', LowerCase(URL)) = 1) or (Pos('sms:', LowerCase(URL)) = 1);
+  Result := (Pos('://', URL) > 0) or (Pos('mailto:', LowerCase(URL)) = 1) or (Pos('tel:', LowerCase(URL)) = 1) or
+    (Pos('sms:', LowerCase(URL)) = 1);
 end;
 
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
@@ -709,7 +726,7 @@ begin
   end;
 end;
 
-procedure InsertAtPos(var A: TIntegerArray; Pos, Value:integer; Delta: integer = 0);
+procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
 var
   i, Len: integer;
 begin

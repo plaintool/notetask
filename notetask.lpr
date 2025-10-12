@@ -28,7 +28,6 @@ uses
 begin
   RequireDerivedFormResource := True;
   Language := GetOSLanguage;
-  DefaultFormatSettings.DecimalSeparator := '.';
   Application.Title:='Notetask';
   Application.Scaled:=True;
   Application.Initialize;

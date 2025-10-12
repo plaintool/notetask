@@ -4610,11 +4610,11 @@ procedure TformNotetask.MemoKeyPress(Sender: TObject; var Key: char);
 begin
   // Event KeyPress for Amount column only
   // Replace comma with dot for decimal input
-  if Key = ',' then
-    Key := '.';
+  if Key in ['.', ','] then
+    Key := DefaultFormatSettings.DecimalSeparator;
 
   // Allow digits and one decimal point
-  if not (Key in ['0'..'9', '.', '-', '+', '/', '*', '%', '^', '(', ')', ' ', #8, #13]) then
+  if not (Key in ['0'..'9', DefaultFormatSettings.DecimalSeparator, '-', '+', '/', '*', '%', '^', '(', ')', ' ', #8, #13]) then
     Key := #0; // Block other keys
 end;
 
@@ -5974,6 +5974,7 @@ begin
 
   ApplySortingActions;
 
+  FLastRow := taskGrid.Row;
   SetNote;
 end;
 

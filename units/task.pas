@@ -50,6 +50,7 @@ type
     function GetDateTime: string;
     function GetDateTimeISO: string;
     function GetAmount: string;
+    function GetAmountDot: string;
 
     property Done: boolean read FDone write FDone;
     property Text: string read FText write FText;
@@ -65,6 +66,7 @@ type
     property DateOriginal: string read FDateOriginal write FDateOriginal;
     property AmountOriginal: string read FAmountOriginal write FAmountOriginal;
     property AmountStr: string read GetAmount;
+    property AmountStrDot: string read GetAmountDot;
     property DateStr: string read GetDate;
     property DateTimeStr: string read GetDateTime;
     property DateTimeStrISO: string read GetDateTimeISO;
@@ -234,6 +236,14 @@ end;
 function TTask.GetAmount: string;
 begin
   Result := FloatToString(FAmount);
+end;
+
+function TTask.GetAmountDot: string;
+var
+  FS: TFormatSettings;
+begin
+  FS.DecimalSeparator := '.';
+  Result := FloatToString(FAmount, FS);
 end;
 
 { TTasks }
@@ -521,7 +531,6 @@ var
   Task: TTask;
   pDate: TDateTime;
   pAmount: double;
-  FS: TFormatSettings;
 begin
   if (Row > 0) and (Row <= Count) then
   begin
@@ -538,9 +547,7 @@ begin
     Task.Note := Grid.Cells[3, Row].Replace(sLineBreak, '<br>').Replace(#10, string.Empty).Replace(
       #13, string.Empty).Replace('<br>', sLineBreak);
 
-    FS := DefaultFormatSettings;
-    FS.DecimalSeparator := '.';
-    if not TryStrToFloat(CleanNumeric(Grid.Cells[4, Row]), pAmount, FS) then
+    if not TryStrToFloat(CleanNumeric(Grid.Cells[4, Row]), pAmount) then
     begin
       pAmount := 0; // If parsing the amount failed, set to 0
       Grid.Cells[4, Row] := string.Empty;
@@ -1212,7 +1219,7 @@ begin
         Row1 := (pDone + ' ' + pDate).Trim;
         Row2 := (pText + ' ' + pNote).Trim;
 
-        if (pDate <> string.Empty) and (Row2 <> string.Empty) then
+        if (pDate <> string.Empty) and ((Row2 <> string.Empty) or (pAmount <> string.Empty)) then
           Row1 += ', '
         else
         if (Row1 <> string.Empty) and (Row2 <> string.Empty) then
@@ -1320,10 +1327,10 @@ var
       else
       if Rect.Width = 0 then
       begin
-        if (TempTask.Text <> string.Empty) and (TryStrToFloat(CleanNumeric(TempTask.Text), TempAmount)) then
+        if (TempTask.Text <> string.Empty) and (TryStrToFloatLimited(CleanNumeric(TempTask.Text), TempAmount)) then
           GetTask(row).Amount := TempAmount
         else
-        if (TempTask.Note <> string.Empty) and (TryStrToFloat(CleanNumeric(TempTask.Note), TempAmount)) then
+        if (TempTask.Note <> string.Empty) and (TryStrToFloatLimited(CleanNumeric(TempTask.Note), TempAmount)) then
           GetTask(row).Amount := TempAmount
         else
           GetTask(row).Amount := 0;

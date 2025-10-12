@@ -229,7 +229,10 @@ var
   TextString: string;
   DoneString: string;
   NoteString: string;
+  FS: TFormatSettings;
 begin
+  FS.DecimalSeparator := '.';
+
   // Replace line breaks from task description and Note
   TextString := StringReplace(Task.FText, sLineBreak, '<br>', [rfReplaceAll]);
   TextString := StringReplace(TextString, #13, '<br>', [rfReplaceAll]);
@@ -274,7 +277,7 @@ begin
     3: Result := NoteString; // Returning only the Note
     4:
       if Task.FAmount <> 0 then
-        Result := FloatToString(Task.FAmount)
+        Result := FloatToString(Task.FAmount, FS)
       else
         Result := string.Empty;
     5:
@@ -289,13 +292,13 @@ begin
         if Task.FAmount <> 0 then
         begin
           if Task.FDate > 0 then
-            Result := Format('%s, %s, %s%s', [Task.DateTimeStrISO, Task.AmountStr, TextString, NoteString])
+            Result := Format('%s, %s, %s%s', [Task.DateTimeStrISO, Task.AmountStrDot, TextString, NoteString])
           else
           begin
             if (TextString + NoteString <> string.Empty) then
-              Result := Format('%s, %s%s', [Task.AmountStr, TextString, NoteString])
+              Result := Format('%s, %s%s', [Task.AmountStrDot, TextString, NoteString])
             else
-              Result := Format('%s', [Task.AmountStr]);
+              Result := Format('%s', [Task.AmountStrDot]);
           end;
         end
         else
@@ -316,13 +319,13 @@ begin
         if Task.FAmount <> 0 then
         begin
           if Task.FDate > 0 then
-            Result := Format('%s %s, %s, %s%s', [DoneString, Task.DateTimeStrISO, Task.AmountStr, TextString, NoteString]).Trim
+            Result := Format('%s %s, %s, %s%s', [DoneString, Task.DateTimeStrISO, Task.AmountStrDot, TextString, NoteString]).Trim
           else
           begin
             if (TextString + NoteString <> string.Empty) then
-              Result := Format('%s %s, %s%s', [DoneString, Task.AmountStr, TextString, NoteString]).Trim
+              Result := Format('%s %s, %s%s', [DoneString, Task.AmountStrDot, TextString, NoteString]).Trim
             else
-              Result := Format('%s %s', [DoneString, Task.AmountStr]).Trim;
+              Result := Format('%s %s', [DoneString, Task.AmountStrDot]).Trim;
           end;
         end
         else
