@@ -1135,10 +1135,14 @@ begin
 end;
 
 procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
+var
+  LastTask: integer;
 begin
   EditComplite;
   if IsColumn then
   begin
+    LastTask := Tasks.Map(FLastRow);
+
     if (FSortColumn <> Index) then
       SortOrder := soAscending
     else
@@ -1151,9 +1155,11 @@ begin
     FSortColumn := Index;
 
     ApplySorting;
+
+    taskGrid.Row := Tasks.ReverseMap(LastTask);
   end
   else
-    // Set row when clicked on begining of row
+    // Set LastTask when clicked on begining of LastTask
   begin
     if (ssShift in GetKeyShiftState) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Top <> index) then
     begin
@@ -5845,11 +5851,15 @@ begin
 end;
 
 procedure TformNotetask.SetShowArchived(Value: boolean);
+var
+  LastTask: integer;
 begin
+  LastTask := Tasks.Map(taskGrid.Row);
   FShowArchived := Value;
   aShowArchived.Checked := FShowArchived;
   SetTabs;
   FillGrid;
+  taskGrid.Row := Tasks.ReverseMap(LastTask);
   ResetRowHeight;
   SetInfo;
   SetNote;
