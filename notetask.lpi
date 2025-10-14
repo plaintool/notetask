@@ -12,7 +12,6 @@
       <UseXPManifest Value="True"/>
       <XPManifest>
         <DpiAware Value="True"/>
-        <ExecutionLevel Value="highestAvailable"/>
         <TextName Value="notetask"/>
         <TextDesc Value=""/>
       </XPManifest>
