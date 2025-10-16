@@ -10,3 +10,4 @@
 /installer/rpmsetup/*.rpm
 /installer/*.wixobj
 /installer/*.wixpdb
+/installer/*.pfx
