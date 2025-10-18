@@ -9,6 +9,7 @@ A simple application for creating and organizing task lists, offering essential 
 >- [Notetask](#notetask)
 >   - [What is it?](#what-is-it)
 >   - [Features](#features)
+>   - [Demo](#demo)
 >- [File Format](#file-format)
 >   - [Legend](#legend)
 >   - [Example](#example)
@@ -30,13 +31,14 @@ This handy desktop app helps you organize your tasks, capture ideas, and manage 
 It is designed to help you quickly organize a large number of small routine tasks. You can enter tasks directly in the app or paste raw text from the clipboard — such as a list of requirements or ideas — then sort them into groups, set durations or amounts, and start working right away. Perfect for managing project to-dos, bug lists, feature requests, and other ongoing tasks.
 
 ## Features:
-- **Numbering** — Tasks are numbered automatically based on their order of appearance in the file.
+- **Numbering** — Tasks are numbered automatically based on their order of appearance in the file
 - **Move tasks** — single or multiple, within or between groups; task priority is set simply by its position in the list
 - **Archive tasks** — cross out archived items, which can be hidden or shown as needed
 - **Grouping** — each group on its own page, with full group management
 - **Track duration** — per-task (on/off) and **total duration** for all or selected tasks
 - **Track amount** — per-task quantities or prices and **total amount** for all or selected tasks
 - **Merge tasks** — combine multiple tasks into one
+- **Split tasks** — split a single task into multiple tasks based on the selected column; each line break in the column becomes a new task, while all other columns are copied to each new task
 - **Indent tasks** — create subtasks and task hierarchies
 - **Highlight** — automatic background highlighting of overdue tasks, text highlighting of archived but incomplete tasks and blue text for tasks with a future due date
 - **Copy tasks** — copy selected tasks or fields in Markdown format
@@ -55,12 +57,17 @@ Suitable for note-taking with an optional general note field at the bottom of th
 
 ![sample3](samples/sample3.png)
 
+### Personal Information
+Suitable for storing personal information in encrypted files, with secure access and optional grouping for better organization.
+
+![sample5](samples/sample5.png)
+
 Supports advanced features such as executing selected comments, tasks, or the entire script from notes as console commands.
 
 ![sample4](samples/sample4.png)
 
 ### Encryption
-Notetask encrypts files using AES-256 in CBC mode with a key derived via PBKDF2-HMAC-SHA256. The derived 64-byte key is split into a 32-byte encryption key and a 32-byte HMAC key. Files are compressed using zlib before encryption, and a SHA-256 HMAC over the salt, IV, and ciphertext ensures integrity and authenticity.
+Notetask can encrypts files using AES-256 in CBC mode with a key derived via PBKDF2-HMAC-SHA256. The derived 64-byte key is split into a 32-byte encryption key and a 32-byte HMAC key. Files are compressed using zlib before encryption, and a SHA-256 HMAC over the salt, IV, and ciphertext ensures integrity and authenticity.
 
 The user can save an encrypted binary file with password protection. If the password is left empty, the file is still encrypted but without password protection, storing only the compressed data in the encrypted format.
 
@@ -83,6 +90,10 @@ The status bar provides a concise, real-time overview of the current task list. 
 - **Elapsed time / Estimated total time** — helps monitor progress on timed tasks.
 
 ![statusbar](samples/statusbar.png)
+
+## Demo
+
+![statusbar](samples/demo.gif)
 
 ## File Format
 
@@ -125,18 +136,18 @@ The status bar provides a concise, real-time overview of the current task list. 
 
 ## Installation
 
-[![latest version](https://img.shields.io/github/v/release/nextwordis/notetask?color=blue&label=Latest%20release&style=for-the-badge)](https://github.com/nextwordis/notetask/releases/latest)
+[![latest version](https://img.shields.io/github/v/release/plaintool/notetask?color=blue&label=Latest%20release&style=for-the-badge)](https://github.com/plaintool/notetask/releases/latest)
 
 ### Windows
 
-Download the installer executable from the [releases page](https://github.com/nextwordis/Notetask/releases). Run the installer and follow the on-screen instructions to complete the installation. After installation, you can launch Notetask from the Start menu or desktop shortcut.
+Download the installer executable from the [releases page](https://github.com/plaintool/Notetask/releases). Run the installer and follow the on-screen instructions to complete the installation. After installation, you can launch Notetask from the Start menu or desktop shortcut.
 
 ---
 
 ### Linux
 *Debian-like systems*
 
-Download the appropriate `.deb` package for your system from the [releases page](https://github.com/nextwordis/Notetask/releases). To install the package, open a terminal and run:
+Download the appropriate `.deb` package for your system from the [releases page](https://github.com/plaintool/Notetask/releases). To install the package, open a terminal and run:
 
 ```bash
 sudo dpkg -i /path/to/notetask.deb

@@ -24,7 +24,7 @@ Root: HKA; Subkey: "Software\Classes\Applications\notetask.exe\shell\open\comman
 #define MyAppName "Notetask"
 #define MyAppVersion "1.0"
 #define MyAppPublisher "Alexander Tverskoy"
-#define MyAppURL "https://github.com/nextwordis/notetask"
+#define MyAppURL "https://github.com/plaintool/notetask"
 #define MyAppExeName "notetask.exe"
 
 [Setup]
