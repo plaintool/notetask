@@ -49,5 +49,8 @@ IF %ERRORLEVEL% EQU 0 (
     echo Signing failed for notetask-%VERSION%-allusers.msi
 )
 
+:: --- Portable ---
+tar -czf notetask.tar.gz -C .. notetask.exe -C "%CD%\debsetup\DATA\usr\bin" notetask
+
 echo Build and signing completed successfully!
 pause

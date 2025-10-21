@@ -4,6 +4,7 @@
 *.dbg
 *.msi
 *.mo
+*.tar.gz
 /lib
 /installer/debsetup/*.deb
 /installer/debsetup/DATA/usr/bin/notetask
