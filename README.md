@@ -16,6 +16,7 @@ A simple application for creating and organizing task lists, offering essential 
 > - [Installation](#installation)
 >   - [Windows](#windows)
 >   - [Linux](#linux)
+>- [Featured on](#featured-on)
 >- [Licensing](#licensing)
 
 ## What is it?
@@ -184,6 +185,12 @@ If no terminal emulator is installed, you can add one, for example:
 ```bash
 sudo dnf install -y xterm
 ```
+
+## Featured on
+Notetask has been reviewed and listed on reputable software directories:
+
+- [MajorGeeks](https://www.majorgeeks.com/files/details/notetask.html)
+- [AlternativeTo](https://alternativeto.net/software/notetask/about/)
 
 ## Licensing
 
