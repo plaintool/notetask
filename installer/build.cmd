@@ -50,7 +50,7 @@ IF %ERRORLEVEL% EQU 0 (
 )
 
 :: --- Portable ---
-tar -czf notetask.tar.gz -C .. notetask.exe -C "%CD%\debsetup\DATA\usr\bin" notetask
+tar -czf notetask-1.0.0.tar.gz -C .. notetask.exe -C "%CD%\debsetup\DATA\usr\bin" notetask
 
 echo Build and signing completed successfully!
 pause
