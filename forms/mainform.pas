@@ -6161,7 +6161,10 @@ begin
     NewCaption := '*' + NewCaption;
 
   if Caption <> NewCaption then
+  begin
     Caption := NewCaption;
+    Application.Title := NewCaption;
+  end;
 end;
 
 procedure TformNotetask.SetInfo;
