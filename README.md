@@ -33,6 +33,7 @@ It is designed to help you quickly organize a large number of small routine task
 
 ## Features:
 - **Numbering** — Tasks are numbered automatically based on their order of appearance in the file
+- **Multiline** — Tasks and notes with an option to submit or insert a line break when pressing Enter
 - **Move tasks** — single or multiple, within or between groups; task priority is set simply by its position in the list
 - **Archive tasks** — cross out archived items, which can be hidden or shown as needed
 - **Grouping** — each group on its own page, with full group management
@@ -61,11 +62,11 @@ Suitable for note-taking with an optional general note field at the bottom of th
 ### Personal Information
 Suitable for storing personal information in encrypted files, with secure access and optional grouping for better organization.
 
-![sample5](samples/sample5.png)
+![sample5](samples/sample4.png)
 
 Supports advanced features such as executing selected comments, tasks, or the entire script from notes as console commands.
 
-![sample4](samples/sample4.png)
+![sample4](samples/powershell.png)
 
 ### Encryption
 Notetask can encrypts files using AES-256 in CBC mode with a key derived via PBKDF2-HMAC-SHA256. The derived 64-byte key is split into a 32-byte encryption key and a 32-byte HMAC key. Files are compressed using zlib before encryption, and a SHA-256 HMAC over the salt, IV, and ciphertext ensures integrity and authenticity.
@@ -190,6 +191,7 @@ sudo dnf install -y xterm
 Notetask has been reviewed and listed on reputable software directories:
 
 - [MajorGeeks](https://www.majorgeeks.com/files/details/notetask.html)
+- [Softpedia](https://www.softpedia.com/get/Office-tools/Diary-Organizers-Calendar/Notetask.shtml)
 - [AlternativeTo](https://alternativeto.net/software/notetask/about/)
 
 ## Licensing
