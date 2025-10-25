@@ -12,3 +12,4 @@
 /installer/*.wixobj
 /installer/*.wixpdb
 /installer/*.pfx
+/installer/history/*
