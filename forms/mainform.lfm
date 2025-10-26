@@ -161,7 +161,7 @@ object formNotetask: TformNotetask
     BevelOuter = bvNone
     ClientHeight = 103
     ClientWidth = 851
-    Color = 16119285
+    Color = clBtnFace
     ParentBackground = False
     ParentColor = False
     TabOrder = 1

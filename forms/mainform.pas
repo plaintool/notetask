@@ -670,6 +670,8 @@ const
   clRowExpired = TColor($DCDCFF); // RGB(255,220,220)
   clDarkBlue = TColor($B40000); // RGB(0,0,180)
   clGray = TColor($F0F0F0); // RGB(240,240,240)
+  clGrayDark = TColor($E9E9E9); // RGB(233,233,233)
+  clGrayHighlight = TColor($E3E3E3); // RGB(227,227,227)
 
 resourcestring
   rapp = 'Notetask';
@@ -749,7 +751,8 @@ begin
   FreeBytesSecure(FSalt);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
-
+  panelNote.Color := clGray;
+  Splitter.Color := clGrayDark;
   Application.OnException := @ApplicationException;
   Application.OnQueryEndSession := @OnQueryEndSession;
 
@@ -1891,13 +1894,13 @@ end;
 
 procedure TformNotetask.panelNoteMouseEnter(Sender: TObject);
 begin
-  panelNote.Color := $E3E3E3;
+  panelNote.Color := clGrayHighlight;
 end;
 
 procedure TformNotetask.panelNoteMouseLeave(Sender: TObject);
 begin
   FNoteSelecting := False;
-  panelNote.Color := $00F5F5F5;
+  panelNote.Color := clGray;
 end;
 
 procedure TformNotetask.panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
