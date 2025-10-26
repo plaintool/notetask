@@ -24,11 +24,6 @@ msgctxt "forminput.rpasswordsnotequal"
 msgid "Passwords are not equal!"
 msgstr "पासवर्ड समान नहीं हैं!"
 
-#: formmemo.rpasswordsnotequal
-msgctxt "formmemo.rpasswordsnotequal"
-msgid "Passwords are not equal!"
-msgstr "पासवर्ड समान नहीं हैं!"
-
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"
@@ -881,3 +876,4 @@ msgstr "क्या खोजें:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "इसके साथ बदलें:"
+

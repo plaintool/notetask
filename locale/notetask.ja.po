@@ -24,11 +24,6 @@ msgctxt "forminput.rpasswordsnotequal"
 msgid "Passwords are not equal!"
 msgstr "パスワードが一致しません！"
 
-#: formmemo.rpasswordsnotequal
-msgctxt "formmemo.rpasswordsnotequal"
-msgid "Passwords are not equal!"
-msgstr "パスワードが一致しません！"
-
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"
@@ -881,3 +876,4 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
+

@@ -24,11 +24,6 @@ msgctxt "forminput.rpasswordsnotequal"
 msgid "Passwords are not equal!"
 msgstr "Пароли не совпадают!"
 
-#: formmemo.rpasswordsnotequal
-msgctxt "formmemo.rpasswordsnotequal"
-msgid "Passwords are not equal!"
-msgstr "Пароли не совпадают!"
-
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"
@@ -881,3 +876,4 @@ msgstr "Что:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Чем:"
+

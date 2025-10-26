@@ -24,11 +24,6 @@ msgctxt "forminput.rpasswordsnotequal"
 msgid "Passwords are not equal!"
 msgstr "¡Las contraseñas no son iguales!"
 
-#: formmemo.rpasswordsnotequal
-msgctxt "formmemo.rpasswordsnotequal"
-msgid "Passwords are not equal!"
-msgstr "¡Las contraseñas no son iguales!"
-
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"
@@ -881,3 +876,4 @@ msgstr "Buscar qué:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Reemplazar con:"
+

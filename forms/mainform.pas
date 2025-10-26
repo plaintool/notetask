@@ -3578,8 +3578,10 @@ begin
 
     // Load saved settings for new file
     LoadGridSettings(Self, taskGrid, string.Empty);
-
     ApplyGridSettings;
+
+    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Row, taskGrid.Selection.Right, taskGrid.Row);
+    taskGrid.Row := 1;
 
     FLineEndingOriginal := FLineEnding;
     FEncodingOriginal := FEncoding;

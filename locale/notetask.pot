@@ -14,11 +14,6 @@ msgctxt "forminput.rpasswordsnotequal"
 msgid "Passwords are not equal!"
 msgstr ""
 
-#: formmemo.rpasswordsnotequal
-msgctxt "formmemo.rpasswordsnotequal"
-msgid "Passwords are not equal!"
-msgstr ""
-
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"

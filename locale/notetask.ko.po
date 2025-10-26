@@ -24,11 +24,6 @@ msgctxt "forminput.rpasswordsnotequal"
 msgid "Passwords are not equal!"
 msgstr "비밀번호가 일치하지 않습니다!"
 
-#: formmemo.rpasswordsnotequal
-msgctxt "formmemo.rpasswordsnotequal"
-msgid "Passwords are not equal!"
-msgstr "비밀번호가 일치하지 않습니다!"
-
 #: mainform.rapp
 msgctxt "mainform.rapp"
 msgid "Notetask"
@@ -881,3 +876,4 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
+
