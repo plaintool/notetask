@@ -301,6 +301,8 @@ type
     procedure memoNoteDblClick(Sender: TObject);
     procedure memoNoteEnter(Sender: TObject);
     procedure memoNoteExit(Sender: TObject);
+    procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure memoNoteChange(Sender: TObject);
     procedure OnQueryEndSession(var CanEnd: boolean);
     procedure groupTabsChange(Sender: TObject);
     procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -342,6 +344,7 @@ type
     procedure taskGridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
     procedure taskGridSelection(Sender: TObject; aCol, aRow: integer);
+    procedure taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure aSaveNotesAsExecute(Sender: TObject);
     procedure aDuplicateTasksExecute(Sender: TObject);
     procedure aEnterSubmitExecute(Sender: TObject);
@@ -417,9 +420,6 @@ type
     procedure aDuplicateGroupExecute(Sender: TObject);
     procedure aMoveGroupLeftExecute(Sender: TObject);
     procedure aMoveGroupRightExecute(Sender: TObject);
-    procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure memoNoteChange(Sender: TObject);
-    procedure taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure aHideNoteTextExecute(Sender: TObject);
   private
     Memo: TMemo;
@@ -556,6 +556,7 @@ type
     procedure MemoNoteToggleComment(aComment: string);
     procedure MemoBackup;
     procedure MemoUndo;
+    procedure MemoDelKey(aMemoNote: boolean = True);
     function IsExecuteValueNote(memoPriority: boolean = False): boolean;
     function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
@@ -2279,6 +2280,7 @@ begin
   if (taskGrid.InplaceEditor is TPanel) then
     with Memo do
     begin
+      {$IFDEF UNIX}
       if SelLength = 0 then
       begin
         SelStart := SelStart;
@@ -2287,6 +2289,9 @@ begin
       else
         MemoBackup;
       ClearSelection;
+      {$ELSE}
+      MemoDelKey(False);
+      {$ENDIF}
     end;
 end;
 
@@ -3218,10 +3223,6 @@ end;
 procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   LinesPerPage, NewPos: integer;
-  {$IFDEF UNIX}
-  {$ELSE}
-  Len, DeleteCount, Pos: integer;
-  {$ENDIF}
   Render: string;
 begin
   // Test for letter, number, space, back, enter, shift or delete key for backup
@@ -3295,44 +3296,7 @@ begin
     if memoNote.SelLength > 0 then
         MemoNoteBackup;
     {$ELSE}
-    if memoNote.SelLength = 0 then
-    begin
-      Len := memoNote.GetTextLen;
-      DeleteCount := 0;
-      Pos := memoNote.SelStart + 1; // 1-based indexing
-
-      while Pos <= Len do
-      begin
-        if IsUTF8Char(memoNote.Text, Pos, ' ') then
-        begin
-          // If space, extend deletion
-          Inc(DeleteCount);
-          Inc(Pos);
-        end
-        else if (IsUTF8Char(memoNote.Text, Pos, #13)) or (IsUTF8Char(memoNote.Text, Pos, #10)) then
-        begin
-          // If CR, delete it and check for following LF
-          Inc(DeleteCount);
-          Inc(Pos);
-          if (Pos <= Len) and (IsUTF8Char(memoNote.Text, Pos, #10)) then
-          begin
-            Inc(DeleteCount);
-            Inc(Pos);
-          end;
-          Break; // stop loop after CR (and optional LF)
-        end
-        else
-        begin
-          DeleteCount := 1;
-          Break; // any other char, stop loop
-        end;
-      end;
-      memoNote.SelLength := DeleteCount;
-    end
-    else
-      MemoNoteBackup;
-
-    MemoNote.ClearSelection;
+    MemoDelKey;
     Key := 0;
     {$ENDIF}
   end
@@ -5652,6 +5616,60 @@ begin
   FMemobackup := newBackup;
   FMemoSelStartBackup := SelStart;
   FMemoSelLengthBackup := SelLength;
+end;
+
+procedure TformNotetask.MemoDelKey(aMemoNote: boolean = True);
+var
+  TargetMemo: Tmemo;
+  Len, DeleteCount, Pos: integer;
+begin
+  if aMemoNote then
+    TargetMemo := memoNote
+  else
+    TargetMemo := Memo;
+
+  if TargetMemo.SelLength = 0 then
+  begin
+    Len := TargetMemo.GetTextLen;
+    DeleteCount := 0;
+    Pos := TargetMemo.SelStart + 1; // 1-based indexing
+
+    while Pos <= Len do
+    begin
+      if IsUTF8Char(TargetMemo.Text, Pos, ' ') then
+      begin
+        // If space, extend deletion
+        Inc(DeleteCount);
+        Inc(Pos);
+      end
+      else if (IsUTF8Char(TargetMemo.Text, Pos, #13)) or (IsUTF8Char(TargetMemo.Text, Pos, #10)) then
+      begin
+        // If CR, delete it and check for following LF
+        Inc(DeleteCount);
+        Inc(Pos);
+        if (Pos <= Len) and (IsUTF8Char(TargetMemo.Text, Pos, #10)) then
+        begin
+          Inc(DeleteCount);
+          Inc(Pos);
+        end;
+        Break; // stop loop after CR (and optional LF)
+      end
+      else
+      begin
+        DeleteCount := 1;
+        Break; // any other char, stop loop
+      end;
+    end;
+    TargetMemo.SelLength := DeleteCount;
+  end
+  else
+  begin
+    if aMemoNote then
+      MemoNoteBackup
+    else
+      MemoBackup;
+  end;
+  TargetMemo.ClearSelection;
 end;
 
 function TformNotetask.GetScrollPosition: integer;
