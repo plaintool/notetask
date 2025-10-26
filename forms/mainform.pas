@@ -1109,6 +1109,9 @@ end;
 procedure TformNotetask.FormResize(Sender: TObject);
 begin
   taskGridResize(Sender);
+
+  if StatusBar.Top < MemoNote.Top then
+    StatusBar.Top := ClientHeight - StatusBar.Height;
 end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
