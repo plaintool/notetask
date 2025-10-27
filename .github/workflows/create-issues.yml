@@ -6,53 +6,74 @@ on:
 jobs:
   create_issues:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      - name: Determine issue type
-        id: check
-        run: |
-          msg="${{ github.event.head_commit.message }}"
-          upper_msg=$(echo "$msg" | tr '[:lower:]' '[:upper:]')
-          if [[ "$upper_msg" == *"FIX:"* ]]; then
-            echo "type=Bug" >> $GITHUB_OUTPUT
-          elif [[ "$upper_msg" == *"FEATURE:"* ]]; then
-            echo "type=Feature" >> $GITHUB_OUTPUT
-          else
-            echo "type=None" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create GitHub Issue via API
-        if: steps.check.outputs.type != 'None'
+      - name: Process all commits
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMIT_ID: ${{ github.event.head_commit.id }}
-          COMMIT_MSG: ${{ github.event.head_commit.message }}
-          COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}
-          ISSUE_LABEL: ${{ steps.check.outputs.type }}
         run: |
-          TITLE=$(echo "$COMMIT_MSG" | sed -E 's/^(FIX|FEATURE):\s*//i')
-          BODY="**Commit:** https://github.com/$GITHUB_REPOSITORY/commit/$COMMIT_ID\n**Author:** $COMMIT_AUTHOR\n\nThis issue was automatically created from commit $COMMIT_ID"
+          BEFORE_SHA="${{ github.event.before }}"
+          CURRENT_SHA="${{ github.event.after }}"
           
-          JSON="{\"title\":\"$TITLE\",\"body\":\"$BODY\",\"labels\":[\"$ISSUE_LABEL\",\"Auto\"]}"
+          echo "Processing commits from $BEFORE_SHA to $CURRENT_SHA"
           
-          RESPONSE=$(curl -s -X POST \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Content-Type: application/json" \
-            https://api.github.com/repos/${GITHUB_REPOSITORY}/issues \
-            -d "$JSON")
+          COMMITS=$(git log --pretty=format:"%H|%s|%an" $BEFORE_SHA..$CURRENT_SHA)
           
-          ISSUE_NUMBER=$(echo "$RESPONSE" | grep -o '"number":[0-9]*' | cut -d: -f2)
-          
-          if [ -n "$ISSUE_NUMBER" ]; then
-            curl -s -X PATCH \
-              -H "Authorization: token $GITHUB_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              -H "Content-Type: application/json" \
-              https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/$ISSUE_NUMBER \
-              -d '{"state":"closed"}'
+          while IFS='|' read -r COMMIT_ID COMMIT_MSG COMMIT_AUTHOR; do
+            echo "Processing commit: $COMMIT_ID by $COMMIT_AUTHOR"
             
-            echo "Created and closed issue #$ISSUE_NUMBER for commit $COMMIT_ID"
-          fi
+            upper_msg=$(echo "$COMMIT_MSG" | tr '[:lower:]' '[:upper:]')
+            if [[ "$upper_msg" == *"FIX:"* ]]; then
+              type="Bug"
+            elif [[ "$upper_msg" == *"FEATURE:"* ]]; then
+              type="Feature"
+            elif [[ "$upper_msg" == *"ENHANCEMENT:"* ]]; then
+              type="Enhancement"
+            else
+              type="None"
+            fi
+            
+            if [ "$type" != "None" ]; then
+              echo "Creating $type issue for commit: $COMMIT_ID"
+              
+              TITLE=$(echo "$COMMIT_MSG" | sed -E 's/^(FIX|FEATURE|ENHANCEMENT):\s*//i')
+              BODY="**Commit:** https://github.com/$GITHUB_REPOSITORY/commit/$COMMIT_ID\n**Author:** $COMMIT_AUTHOR\n\nThis issue was automatically created from commit $COMMIT_ID"
+              
+              JSON="{\"title\":\"$TITLE\",\"body\":\"$BODY\",\"labels\":[\"$type\",\"Auto\"]}"
+              
+              RESPONSE=$(curl -s -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github+json" \
+                -H "Content-Type: application/json" \
+                https://api.github.com/repos/${GITHUB_REPOSITORY}/issues \
+                -d "$JSON")
+              
+              ISSUE_NUMBER=$(echo "$RESPONSE" | grep -o '"number":[[:space:]]*[0-9]*' | grep -o '[0-9]*')
+              if [ -z "$ISSUE_NUMBER" ]; then
+                ISSUE_NUMBER=$(echo "$RESPONSE" | sed -n 's/.*"number":\([0-9]*\).*/\1/p')
+              fi
+              
+              if [ -n "$ISSUE_NUMBER" ] && [ "$ISSUE_NUMBER" != "null" ]; then
+                echo "Waiting 5 seconds before closing issue..."
+                sleep 5
+                
+                curl -s -X PATCH \
+                  -H "Authorization: token $GITHUB_TOKEN" \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "Content-Type: application/json" \
+                  https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/$ISSUE_NUMBER \
+                  -d '{"state":"closed"}'
+                
+                echo "Created and closed issue #$ISSUE_NUMBER for commit $COMMIT_ID"
+              fi
+            else
+              echo "Skipping commit $COMMIT_ID - no matching type"
+            fi
+          done <<< "$COMMITS"
