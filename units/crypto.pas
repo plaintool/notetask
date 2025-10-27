@@ -592,7 +592,7 @@ begin
     begin
       // fill memory with zeros
       FillChar(Stream.Memory^, Stream.Size, 0);
-      Stream.Clear; // optional: очистить сам поток
+      Stream.Clear;
     end;
     Stream.Free;
     Stream := nil;

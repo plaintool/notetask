@@ -22,19 +22,28 @@ uses
   DefaultTranslator,
   Translations,
   LResources,
-  LCLTranslator
+  LCLTranslator,
+  LCLIntf,
+  Dialogs,
   {$IFDEF Windows}
-  ,Windows
-  ,Registry
+  Windows,
+  Registry,
+  wininet,
   {$ENDIF}
   {$IFDEF Linux}
-  ,Unix
-  ,LCLType
+  Unix,
+  LCLType,
+  Process,
+  fphttpclient,
+  opensslsockets,
   {$ENDIF}
   {$IFDEF MacOS}
-  ,MacOSAll
+  MacOSAll,
+  fphttpclient,
+  opensslsockets,
   {$ENDIF}
-  ;
+  fpjson,
+  jsonparser;
 
 function GetOSLanguage: string;
 
@@ -54,8 +63,15 @@ function IsSystemKey(Key: word): boolean;
 
 function GetAppVersion: string;
 
+function CheckGithubLatestVersion(const Repo: string = 'plaintool/notetask'): boolean;
+
 var
   Language: string;
+
+resourcestring
+  newversion = 'New version available: %s. Open GitHub page to download?';
+  newversionuptodate = 'Your version is up to date.';
+  newversioncheckerror = 'Error checking version:';
 
 implementation
 
@@ -501,6 +517,189 @@ begin
     Result := Info.VersionStrings.Values['ProductVersion'];
   finally
     Info.Free;
+  end;
+end;
+
+function CheckGithubLatestVersion(const Repo: string = 'plaintool/notetask'): boolean;
+var
+  JsonData: TJSONData;
+  LatestVersion, Msg: string;
+  Url: string;
+  CurrentVersion: string;
+  ResponseContent: string;
+
+{$IFDEF WINDOWS}
+  function HttpGetWinInet(const AUrl: string): string;
+  var
+    hInet, hUrl: HINTERNET;
+    Buffer: array[0..4095] of Char;
+    BytesRead: DWORD = 0;
+    I: Integer;
+  begin
+    for I := 0 to High(Buffer) do
+      Buffer[I] := #0;
+
+    Result := '';
+    hInet := InternetOpen('NotetaskVersionChecker', INTERNET_OPEN_TYPE_PRECONFIG, nil, nil, 0);
+    if hInet = nil then
+      Exit;
+
+    try
+      hUrl := InternetOpenUrl(hInet, PChar(AUrl), nil, 0,
+                             INTERNET_FLAG_RELOAD or INTERNET_FLAG_SECURE or
+                             INTERNET_FLAG_EXISTING_CONNECT, 0);
+      if hUrl = nil then
+        Exit;
+
+      try
+        while InternetReadFile(hUrl, @Buffer, SizeOf(Buffer), BytesRead) and (BytesRead > 0) do
+        begin
+          Result := Result + Copy(Buffer, 1, BytesRead);
+        end;
+      finally
+        InternetCloseHandle(hUrl);
+      end;
+    finally
+      InternetCloseHandle(hInet);
+    end;
+  end;
+{$ELSE}
+
+  function HttpGetCurl(const AUrl: string): string;
+  var
+    Process: TProcess;
+    OutputStream: TMemoryStream;
+    BytesRead: longint;
+    Buffer: TBytes = nil;
+    OutputString: ansistring = '';
+  begin
+    Result := '';
+    SetLength(Buffer, 2048);
+    Process := TProcess.Create(nil);
+    OutputStream := TMemoryStream.Create;
+    try
+      Process.Executable := 'curl';
+      Process.Parameters.Add('-s');
+      Process.Parameters.Add('-L');
+      Process.Parameters.Add('-H');
+      Process.Parameters.Add('User-Agent: NotetaskVersionChecker');
+      Process.Parameters.Add(AUrl);
+
+      Process.Options := [poUsePipes, poNoConsole];
+      Process.Execute;
+
+      while Process.Running or (Process.Output.NumBytesAvailable > 0) do
+      begin
+        BytesRead := Process.Output.Read(Buffer[1], SizeOf(Buffer));
+        if BytesRead > 0 then
+          OutputStream.Write(Buffer[1], BytesRead);
+      end;
+
+      Process.WaitOnExit;
+
+      if OutputStream.Size > 0 then
+      begin
+        SetLength(OutputString, OutputStream.Size);
+        OutputStream.Position := 0;
+        OutputStream.Read(OutputString[1], OutputStream.Size);
+        Result := string(OutputString);
+      end;
+    finally
+      OutputStream.Free;
+      Process.Free;
+    end;
+  end;
+
+  function IsCurlAvailable: boolean;
+  var
+    Process: TProcess;
+    ExitStatus: integer;
+  begin
+    Result := False;
+    Process := TProcess.Create(nil);
+    try
+      Process.Executable := 'curl';
+      Process.Parameters.Add('--version');
+      Process.Options := [poWaitOnExit, poNoConsole, poUsePipes];
+      Process.ShowWindow := swoHIDE;
+
+      try
+        Process.Execute;
+        Process.WaitOnExit;
+        ExitStatus := Process.ExitStatus;
+        Result := (ExitStatus = 0);
+      except
+        on E: EProcess do
+          Result := False;
+        on E: Exception do
+          Result := False;
+      end;
+    finally
+      Process.Free;
+    end;
+  end;
+
+{$ENDIF}
+begin
+  CurrentVersion := GetAppVersion;
+  Result := False;
+  Url := Format('https://api.github.com/repos/%s/releases/latest', [Repo]);
+
+  try
+    {$IFDEF WINDOWS}
+    ResponseContent := HttpGetWinInet(Url);
+    {$ELSE}
+    try
+      with TFPHttpClient.Create(nil) do
+      try
+        AddHeader('User-Agent', 'NotetaskVersionChecker');
+        ResponseContent := Get(Url);
+      finally
+        Free;
+      end;
+    except
+      on E: Exception do
+      begin
+        if IsCurlAvailable then
+        begin
+          ResponseContent := HttpGetCurl(Url);
+        end
+        else
+        begin
+          ShowMessage(newversioncheckerror + ' ' + 'Please install curl or OpenSSL library!');
+          Exit;
+        end;
+      end;
+    end;
+    {$ENDIF}
+
+    if ResponseContent <> '' then
+    begin
+      JsonData := GetJSON(ResponseContent);
+      try
+        LatestVersion := JsonData.GetPath('tag_name').AsString;
+
+        if AnsiLowerCase(StringReplace(LatestVersion, 'v', '', [rfReplaceAll])) <> AnsiLowerCase(
+          StringReplace(CurrentVersion, 'v', '', [rfReplaceAll])) then
+        begin
+          Msg := Format(newversion, [LatestVersion]);
+          if MessageDlg(Msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+            OpenURL(Format('https://github.com/%s/releases/latest', [Repo]));
+        end
+        else
+          ShowMessage(newversionuptodate);
+
+        Result := True;
+      finally
+        JsonData.Free;
+      end;
+    end
+    else
+      ShowMessage(newversioncheckerror);
+
+  except
+    on E: Exception do
+      ShowMessage(newversioncheckerror + ' ' + E.Message);
   end;
 end;
 

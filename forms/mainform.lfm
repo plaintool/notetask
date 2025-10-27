@@ -496,6 +496,9 @@ object formNotetask: TformNotetask
       object menuDonate: TMenuItem
         Action = aDonate
       end
+      object MenuItem1: TMenuItem
+        Action = aCheckforupdates
+      end
       object menuAbout: TMenuItem
         Action = aAbout
       end
@@ -662,16 +665,6 @@ object formNotetask: TformNotetask
       Checked = True
       ShortCut = 16471
       OnExecute = aWordWrapExecute
-    end
-    object aDonate: TAction
-      Category = 'Help'
-      Caption = 'Buy me a coffee...'
-      OnExecute = aDonateExecute
-    end
-    object aAbout: TAction
-      Category = 'Help'
-      Caption = 'About...'
-      OnExecute = aAboutExecute
     end
     object aLangArabic: TAction
       Category = 'Language'
@@ -972,6 +965,21 @@ object formNotetask: TformNotetask
       Caption = 'Save notes as...'
       ShortCut = 16473
       OnExecute = aSaveNotesAsExecute
+    end
+    object aCheckforupdates: TAction
+      Category = 'Help'
+      Caption = 'Check for updates'
+      OnExecute = aCheckforupdatesExecute
+    end
+    object aDonate: TAction
+      Category = 'Help'
+      Caption = 'Buy me a coffee...'
+      OnExecute = aDonateExecute
+    end
+    object aAbout: TAction
+      Category = 'Help'
+      Caption = 'About...'
+      OnExecute = aAboutExecute
     end
   end
   object openDialog: TOpenDialog

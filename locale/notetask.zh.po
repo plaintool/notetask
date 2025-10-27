@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Poedit 3.8\n"
 
 #: formfind.rdirectiondown
 msgid "Down"
@@ -179,6 +179,19 @@ msgstr "无标题"
 #: mainform.ryes
 msgid "&Yes"
 msgstr "是"
+
+#: systemtool.newversion
+#, object-pascal-format
+msgid "New version available: %s. Open GitHub page to download?"
+msgstr "有新版本可用：%s。打开 GitHub 页面下载吗？"
+
+#: systemtool.newversioncheckerror
+msgid "Error checking version:"
+msgstr "检查版本时出错："
+
+#: systemtool.newversionuptodate
+msgid "Your version is up to date."
+msgstr "您的版本是最新的。"
 
 #: task.rdays
 msgid "d"
@@ -412,6 +425,10 @@ msgstr "阅读顺序：从右到左"
 #: tformnotetask.achatgpt.caption
 msgid "Ask ChatGPT..."
 msgstr "询问 ChatGPT..."
+
+#: tformnotetask.acheckforupdates.caption
+msgid "Check for updates"
+msgstr "检查更新"
 
 #: tformnotetask.acopy.caption
 msgctxt "tformnotetask.acopy.caption"
@@ -876,4 +893,3 @@ msgstr "查找内容："
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "替换为："
-

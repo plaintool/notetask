@@ -46,6 +46,7 @@ type
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
+    aCheckforupdates: TAction;
     aSplitTasks: TAction;
     aHideNoteText: TAction;
     aSaveNotesAs: TAction;
@@ -126,6 +127,7 @@ type
     contextUTF16LEBOM: TMenuItem;
     menuHideNoteText: TMenuItem;
     contextSplitTasks: TMenuItem;
+    MenuItem1: TMenuItem;
     menuSplitTasks: TMenuItem;
     menuSaveNotesAs: TMenuItem;
     menuRunPowershell: TMenuItem;
@@ -287,6 +289,7 @@ type
     ContextRenameGroup: TMenuItem;
     ContextDuplicateGroup: TMenuItem;
     ContextDeleteGroup: TMenuItem;
+    procedure aCheckforupdatesExecute(Sender: TObject);
     procedure aSplitTasksExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -2384,6 +2387,11 @@ begin
   if taskGrid.RowCount = 0 then exit;
 
   SplitTasks;
+end;
+
+procedure TformNotetask.aCheckforupdatesExecute(Sender: TObject);
+begin
+  CheckGithubLatestVersion;
 end;
 
 procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);

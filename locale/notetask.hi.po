@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Poedit 3.8\n"
 
 #: formfind.rdirectiondown
 msgid "Down"
@@ -179,6 +179,19 @@ msgstr "बिना शीर्षक"
 #: mainform.ryes
 msgid "&Yes"
 msgstr "हाँ"
+
+#: systemtool.newversion
+#, object-pascal-format
+msgid "New version available: %s. Open GitHub page to download?"
+msgstr "नया संस्करण उपलब्ध है: %s. डाउनलोड करने के लिए GitHub पृष्ठ खोलें?"
+
+#: systemtool.newversioncheckerror
+msgid "Error checking version:"
+msgstr "संस्करण की जाँच में त्रुटि:"
+
+#: systemtool.newversionuptodate
+msgid "Your version is up to date."
+msgstr "आपका संस्करण अद्यतित है।"
 
 #: task.rdays
 msgid "d"
@@ -412,6 +425,10 @@ msgstr "पढ़ने का क्रम: दाएं से बाएं"
 #: tformnotetask.achatgpt.caption
 msgid "Ask ChatGPT..."
 msgstr "ChatGPT से पूछें..."
+
+#: tformnotetask.acheckforupdates.caption
+msgid "Check for updates"
+msgstr "अद्यतन की जाँच करें"
 
 #: tformnotetask.acopy.caption
 msgctxt "tformnotetask.acopy.caption"
@@ -876,4 +893,3 @@ msgstr "क्या खोजें:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "इसके साथ बदलें:"
-
