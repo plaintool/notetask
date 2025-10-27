@@ -130,8 +130,8 @@ type
     function MoveTasksDown(Index1, Index2: integer): integer;
     procedure SwapTasks(OldIndex, NewIndex: integer);
     procedure MoveTask(OldIndex, NewIndex: integer);
-    procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False);
-    function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True): TGridRect;
+    procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
+    function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;
     procedure CreateBackup;
     procedure UndoBackup;
     procedure CreateBackupInit;
@@ -1184,7 +1184,7 @@ begin
   // This may require additional logic depending on how you want to track indices.
 end;
 
-procedure TTasks.CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False);
+procedure TTasks.CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
 var
   SelectedText: TStringList;
   Rect: TGridRect;
@@ -1211,13 +1211,13 @@ begin
         for j := Rect.Left to Rect.Right do
         begin
           if (j = 1) and (Grid.Columns[j - 1].Visible) then pDone := GetTask(i).ToString(j).Trim;
-          if (j = 2) and (Grid.Columns[j - 1].Visible) then pText := GetTask(i).ToString(j).Trim;
-          if (j = 3) and ((Grid.Columns[j - 1].Visible) or NoteVisible) then pNote := GetTask(i).ToString(j).Trim;
+          if (j = 2) and (Grid.Columns[j - 1].Visible) then pText := GetTask(i).ToString(j);
+          if (j = 3) and ((Grid.Columns[j - 1].Visible) or NoteVisible) then pNote := GetTask(i).ToString(j);
           if (j = 4) and (Grid.Columns[j - 1].Visible) then pAmount := GetTask(i).ToString(j).Trim;
           if (j = 5) and (Grid.Columns[j - 1].Visible) then pDate := GetTask(i).ToString(j).Trim;
         end;
         Row1 := (pDone + ' ' + pDate).Trim;
-        Row2 := (pText + ' ' + pNote).Trim;
+        Row2 := (pText + ' ' + pNote);
 
         if (pDate <> string.Empty) and ((Row2 <> string.Empty) or (pAmount <> string.Empty)) then
           Row1 += ', '
@@ -1236,20 +1236,23 @@ begin
         if (Grid.Selection.Width = 0) and (Grid.Selection.Height = 0) then
           RowText := StringReplace(RowText, '<br>', sLineBreak, [rfReplaceAll]);
 
-        SelectedText.Add(RowText.Trim);
+        SelectedText.Add(RowText);
       end;
 
     // Copy to clipboard
     if SelectedText.Count > 0 then
     begin
-      Clipboard.AsText := SelectedText.Text;
+      if Assigned(Value) then
+        Value^ := SelectedText.Text
+      else
+        Clipboard.AsText := SelectedText.Text;
     end;
   finally
     SelectedText.Free;
   end;
 end;
 
-function TTasks.PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True): TGridRect;
+function TTasks.PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;
 var
   TempTasks: TTasks;
   TempTask: TTask;
@@ -1367,7 +1370,7 @@ var
 begin
   Result := Grid.Selection;
   DoInsert := True;
-  if Clipboard.AsText = string.Empty then exit;
+  if (not Assigned(Value)) and (Clipboard.AsText = string.Empty) then exit;
   if Backup then CreateBackup;
 
   if (Grid.Row > 0) then
@@ -1378,7 +1381,10 @@ begin
   else
     IsRowEmpty := False;
 
-  ListTasks := TextToStringList(Clipboard.AsText, True);
+  if (Assigned(Value)) then
+    ListTasks := TextToStringList(Value^, True)
+  else
+    ListTasks := TextToStringList(Clipboard.AsText, True);
 
   // Handle SortOrder: reverse the list for descending order
   if (Grid.Selection.Height = 0) and (SortOrder = soDescending) then

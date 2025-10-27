@@ -572,6 +572,7 @@ type
     procedure BackupSelectedState(aRowMem: boolean = False);
     procedure RestoreSelectedState(aRowMem: boolean = True; aRowMemPriority: boolean = True; aFocusMemo: boolean = False);
     procedure GridAdjustScrollBars;
+    procedure GridInvalidate;
     procedure FreeFile;
     function LastRowHeight(aRow: integer): integer;
     function GetScrollPosition: integer;
@@ -1750,9 +1751,7 @@ begin
   if (not FRepaint) then
   begin
     FRepaint := True;
-    Application.ProcessMessages;
-    TaskGrid.Invalidate;
-    Application.ProcessMessages;
+    GridInvalidate;
   end;
 end;
 
@@ -2275,6 +2274,7 @@ begin
     ClearSelected(False);
     if ShowDuration then FillGrid;
     SetInfo;
+    SetNote;
   end
   else
   if (taskGrid.InplaceEditor is TPanel) then
@@ -3435,7 +3435,7 @@ var
     // 1 = letter or digit
     // 2 = space
     // 3 = other symbol
-    if IsLetterOrDigit(ch) or (ch = '_') or (ch = '-') then
+    if IsLetterOrDigit(ch) or (ch = '_') or (ch = '-') or (ch = '@') then
       Result := 1
     else if ch = ' ' then
       Result := 2
@@ -4690,6 +4690,7 @@ end;
 procedure TformNotetask.DuplicateTasks;
 var
   Sel, Back, Original: TGridRect;
+  Value: string;
 begin
   if (ReadOnly) then exit;
 
@@ -4701,7 +4702,7 @@ begin
 
   Original := taskGrid.Selection;
   taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
-  Tasks.CopyToClipboard(taskGrid, FShowNote);
+  Tasks.CopyToClipboard(taskGrid, FShowNote, @Value);
   Back := taskGrid.Selection;
   if (SortOrder = soAscending) then
   begin
@@ -4713,7 +4714,7 @@ begin
     taskGrid.Row := taskGrid.Selection.Top;
     taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Top);
   end;
-  Tasks.PasteFromClipboard(taskGrid, SortOrder, False);
+  Tasks.PasteFromClipboard(taskGrid, SortOrder, False, @Value);
   if (SortOrder = soAscending) then
     Sel := TGridRect.Create(Original.Left, Back.Bottom + 1, Original.Right, Back.Bottom + Back.Height + 1)
   else
@@ -5784,7 +5785,7 @@ begin
     end;
   end;
 
-  taskGrid.Invalidate;
+  GridInvalidate;
 end;
 
 procedure TformNotetask.GridAdjustScrollBars;
@@ -5820,6 +5821,13 @@ begin
   finally
     FAdjustingScrollBars := False;
   end;
+end;
+
+procedure TformNotetask.GridInvalidate;
+begin
+  Application.ProcessMessages;
+  taskGrid.Invalidate;
+  Application.ProcessMessages;
 end;
 
 procedure TformNotetask.FreeFile;
@@ -6509,7 +6517,7 @@ begin
   aUndo.Enabled := FChanged;
   aUndoAll.Enabled := FChanged;
   SetCaption;
-  taskGrid.Invalidate;
+  GridInvalidate;
 end;
 
 procedure TformNotetask.DisableDrag;
