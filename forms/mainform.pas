@@ -6469,7 +6469,8 @@ begin
   if (aLanguage <> string.Empty) then
   begin
     Language := aLanguage;
-    ApplicationTranslate(Language);
+    if not ApplicationTranslate(Language) then
+      Language := 'en';
   end;
 
   openDialog.Filter := ropendialogfilter;

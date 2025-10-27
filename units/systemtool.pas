@@ -109,65 +109,70 @@ var
   PoFile: TPOFile;
   LocalTranslator: TUpdateTranslator;
   i: integer;
+  LangToUse: string;
+  LangFound: boolean;
 begin
   Result := False;
-
-  // Wrap in try-finally to ensure resources are freed
   Res := nil;
   PoStringStream := nil;
   PoFile := nil;
   LocalTranslator := nil;
 
+  // Determine which language to load
+  LangToUse := Language;
+
   try
     try
-      // Create string stream
       PoStringStream := TStringStream.Create('');
 
-      // Load the resource file and save the resource to the string stream
-      Res := TResourceStream.Create(HInstance, 'notetask.' + Language, RT_RCDATA);
+      // Try to load the language resource file
+      try
+        Res := TResourceStream.Create(HInstance, 'notetask.' + LangToUse, RT_RCDATA);
+        LangFound := True;
+      except
+        // If language resource not found, fall back to English
+        LangToUse := 'en';
+        Res := TResourceStream.Create(HInstance, 'notetask.en', RT_RCDATA);
+        LangFound := False;
+      end;
+
+      // Save resource to string stream
       Res.SaveToStream(PoStringStream);
 
-      // Read strings from the file
+      // Read PO strings
       PoFile := TPOFile.Create(False);
       PoFile.ReadPOText(PoStringStream.DataString);
 
-      // Translate resource strings (this works for messagestring and resourcestring)
-      if (not Assigned(AForm)) then
+      // Apply translations to resource strings
+      if not Assigned(AForm) then
         Result := TranslateResourceStrings(PoFile);
 
-      if (Result) or (Assigned(AForm)) then
+      if Result or Assigned(AForm) then
       begin
-        // Create a local translator for the form or forms
+        // Create a local translator for the form or all forms
         LocalTranslator := TPOTranslator.Create(PoFile);
-        if (Assigned(LRSTranslator)) then LRSTranslator.Free;
+        if Assigned(LRSTranslator) then
+          LRSTranslator.Free;
         LRSTranslator := LocalTranslator;
 
+        // Translate only the specified form
         if Assigned(AForm) then
-        begin
-          // Translate only the specified form
-          LocalTranslator.UpdateTranslation(AForm);
-        end
+          LocalTranslator.UpdateTranslation(AForm)
         else
         begin
           // Translate all forms
           for i := 0 to Screen.CustomFormCount - 1 do
             LocalTranslator.UpdateTranslation(Screen.CustomForms[i]);
-
           // Translate all data modules
           for i := 0 to Screen.DataModuleCount - 1 do
             LocalTranslator.UpdateTranslation(Screen.DataModules[i]);
         end;
       end;
-
     except
-      on E: Exception do
-      begin
-        // Handle translation error and display message
-        WriteLn('Error during translation: ', E.Message);
-        Result := False; // Return False in case of error
-      end;
+      Result := False;
     end;
 
+    Result := Result and LangFound;
   finally
     // Free all used resources
     if Assigned(LocalTranslator) then
@@ -175,13 +180,11 @@ begin
       LRSTranslator := nil;
       LocalTranslator.Free;
     end
-    else
-    if Assigned(PoFile) then
+    else if Assigned(PoFile) then
       PoFile.Free;
 
     if Assigned(PoStringStream) then
       PoStringStream.Free;
-
     if Assigned(Res) then
       Res.Free;
   end;
