@@ -2748,7 +2748,7 @@ begin
       newName := editText.Text;
       if (newName = rgroupuntitled) and (groupTabs.TabIndex = 0) then newName := string.Empty;
 
-      if (Tasks.RenameGroup(groupTabs.TabIndex, newName)) then
+      if (Tasks.RenameGroup(FindGroupRealIndex(groupTabs.TabIndex), newName)) then
       begin
         SetTabs;
         SetChanged;
