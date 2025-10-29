@@ -145,6 +145,8 @@ object formNotetask: TformNotetask
     OnChange = groupTabsChange
     Align = alTop
     Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 2
     Visible = False
     OnMouseDown = groupTabsMouseDown
@@ -496,7 +498,7 @@ object formNotetask: TformNotetask
       object menuDonate: TMenuItem
         Action = aDonate
       end
-      object MenuItem1: TMenuItem
+      object menuCheckforupdates: TMenuItem
         Action = aCheckforupdates
       end
       object menuAbout: TMenuItem

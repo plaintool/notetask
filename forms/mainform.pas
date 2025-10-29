@@ -127,7 +127,7 @@ type
     contextUTF16LEBOM: TMenuItem;
     menuHideNoteText: TMenuItem;
     contextSplitTasks: TMenuItem;
-    MenuItem1: TMenuItem;
+    menuCheckforupdates: TMenuItem;
     menuSplitTasks: TMenuItem;
     menuSaveNotesAs: TMenuItem;
     menuRunPowershell: TMenuItem;
@@ -299,14 +299,17 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
-    procedure ApplicationException(Sender: TObject; E: Exception);
+    procedure ApplicationOnException(Sender: TObject; E: Exception);
+    procedure ApplicationOnQueryEndSession(var CanEnd: boolean);
+    procedure ApplicationOnShowHint(var HintStr: string; var CanShow: boolean; var HintInfo: THintInfo);
+
     procedure memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure memoNoteDblClick(Sender: TObject);
     procedure memoNoteEnter(Sender: TObject);
     procedure memoNoteExit(Sender: TObject);
     procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure memoNoteChange(Sender: TObject);
-    procedure OnQueryEndSession(var CanEnd: boolean);
+
     procedure groupTabsChange(Sender: TObject);
     procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure groupTabsMouseLeave(Sender: TObject);
@@ -477,12 +480,12 @@ type
     FLastRowHeights: array of integer;
     FLastRow: integer;
     FLastRowMem: array of integer;
+    FLastTabMouseX: integer;
     FGroupIndexMap: array of integer;
     FDragTab: integer;
     FNoteSelecting: boolean;
     FNoteLastIndex, FNoteSelStart, FNoteSelLength: integer;
     FKeyPressed: TUTF8Char;
-    FLastTabMouseX: integer;
     FLoadedSelectedTab, FLoadedSelectedRow: integer;
     FLoadedSelection: TRect;
     FLoadedRowMem: TIntegerArray;
@@ -758,8 +761,9 @@ begin
   saveDialog.Filter := rsavedialogfilter;
   panelNote.Color := clGray;
   Splitter.Color := clGrayDark;
-  Application.OnException := @ApplicationException;
-  Application.OnQueryEndSession := @OnQueryEndSession;
+  Application.OnException := @ApplicationOnException;
+  Application.OnQueryEndSession := @ApplicationOnQueryEndSession;
+  Application.OnShowHint := @ApplicationOnShowHint;
 
   taskGrid.DefaultRowHeight := DefRowHeight;
 
@@ -1133,16 +1137,40 @@ begin
   end;
 end;
 
-procedure TformNotetask.ApplicationException(Sender: TObject; E: Exception);
+procedure TformNotetask.ApplicationOnException(Sender: TObject; E: Exception);
 begin
   MessageDlg('Notetask', E.Message, mtWarning, [mbOK], 0);
 end;
 
-procedure TformNotetask.OnQueryEndSession(var CanEnd: boolean);
+procedure TformNotetask.ApplicationOnQueryEndSession(var CanEnd: boolean);
 begin
   CanEnd := IsCanClose;
   if (CanEnd) then
     Application.Terminate;
+end;
+
+procedure TFormNotetask.ApplicationOnShowHint(var HintStr: string; var CanShow: boolean; var HintInfo: THintInfo);
+var
+  TabIndex: integer;
+begin
+  // Check if the hint is requested for the TabControl
+  if HintInfo.HintControl is TNoteBookStringsTabControl then
+  begin
+    // Determine which tab is under the mouse cursor
+    TabIndex := groupTabs.IndexOfTabAt(HintInfo.CursorPos.X, 5);
+
+    if TabIndex >= 0 then
+    begin
+      // For testing, just show the tab's caption as the hint
+      HintStr := groupTabs.Tabs[TabIndex];
+
+      // Allow the hint to be displayed
+      CanShow := True;
+    end
+    else
+      // Mouse is not over a tab, do not show hint
+      CanShow := False;
+  end;
 end;
 
 procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
@@ -1829,6 +1857,8 @@ begin
         MoveTabLeft(groupTabs.TabIndex);
     end;
   end;
+  // Hide hint if long move
+  if (Abs(FLastTabMouseX - X) > 5) then Application.HideHint;
   FLastTabMouseX := X;
 end;
 
@@ -4197,12 +4227,17 @@ begin
   if (Index = 1) and (Tasks.GroupNames[0] = string.Empty) then exit;
 
   Result := Tasks.MoveGroupLeft(FindGroupRealIndex(Index), ShowArchived);
-  RowMem := FLastRowMem[Result];
+  if (Length(FLastRowMem) > Result) then
+    RowMem := FLastRowMem[Result];
   Result := FindGroupTabIndex(Result);
   if (Result >= 0) and (Result <> Index) then
   begin
-    FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
-    FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
+    if (Length(FLastRowMem) > FindGroupRealIndex(Index)) then
+    begin
+      if (Length(FLastRowMem) > FindGroupRealIndex(Result)) then
+        FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
+      FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
+    end;
     SetTabs(False);
     if (FDragTab >= 0) then FDragTab := Result;
     ChangeGroup(Result);
@@ -4217,12 +4252,17 @@ begin
   if (Index = 0) and (Tasks.GroupNames[0] = string.Empty) then exit;
 
   Result := Tasks.MoveGroupRight(FindGroupRealIndex(Index), ShowArchived);
-  RowMem := FLastRowMem[Result];
+  if (Length(FLastRowMem) > Result) then
+    RowMem := FLastRowMem[Result];
   Result := FindGroupTabIndex(Result);
   if (Result >= 0) and (Result <> Index) then
   begin
-    FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
-    FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
+    if (Length(FLastRowMem) > FindGroupRealIndex(Index)) then
+    begin
+      if (Length(FLastRowMem) > FindGroupRealIndex(Result)) then
+        FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
+      FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
+    end;
     SetTabs(False);
     if (FDragTab >= 0) then FDragTab := Result;
     ChangeGroup(Result);
@@ -5742,7 +5782,7 @@ var
 begin
   // Restore rows memory
   if (aRowMem) and (Length(FLoadedRowMem) > 0) then
-    FLastRowMem := CloneArray(FLoadedRowMem);
+    CopyToArray(FLastRowMem, FLoadedRowMem);
 
   // Restore last open tab and rows
   if (FLoadedSelectedTab >= 0) then

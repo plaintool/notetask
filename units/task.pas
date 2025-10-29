@@ -95,6 +95,7 @@ type
     procedure UpdateGroup;
     procedure ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
     function GetGroupName(Index: integer): string;
+    function GetGroupHint(Index: integer): string;
     function GetGroupArchived(Index: integer): boolean;
     function GetTaskCount(GroupIndex: integer): integer;
     function GetTaskInGroup(GroupIndex, TaskIndex: integer): TTask;
@@ -382,6 +383,11 @@ begin
 end;
 
 function TTasks.GetGroupName(Index: integer): string;
+begin
+  Result := FGroupNameList[Index];
+end;
+
+function TTasks.GetGroupHint(Index: integer): string;
 begin
   Result := FGroupNameList[Index];
 end;

@@ -17,6 +17,7 @@ uses
   Graphics,
   Process,
   RegExpr,
+  Math,
   LazUTF8,
   lineending;
 
@@ -86,6 +87,8 @@ procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer 
 procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
 
 function CloneArray(const Src: TIntegerArray): TIntegerArray;
+
+procedure CopyToArray(var Dest: TIntegerArray; const Src: TIntegerArray);
 
 const
   Brackets: array[0..17] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]',
@@ -768,6 +771,16 @@ end;
 function CloneArray(const Src: TIntegerArray): TIntegerArray;
 begin
   Result := Copy(Src, 0, Length(Src));
+end;
+
+procedure CopyToArray(var Dest: TIntegerArray; const Src: TIntegerArray);
+var
+  CopyCount, i: integer;
+begin
+  // Determine how many elements to copy: take the smaller of Dest length and Src length
+  CopyCount := Min(Length(Dest), Length(Src));
+  for i := 0 to CopyCount - 1 do
+    Dest[i] := Src[i];
 end;
 
 end.
