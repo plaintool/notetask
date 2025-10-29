@@ -1444,6 +1444,8 @@ var
   task: TTask;
   amount: double;
   FS: TFormatSettings;
+  ImgIndex: integer;
+  ImgX, ImgY: integer;
 begin
   grid := Sender as TStringGrid;
   bgFill := clWhite;
@@ -1457,6 +1459,19 @@ begin
     grid.Canvas.Pen.Width := 0;
     grid.Canvas.Brush.Style := bsClear;
     grid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
+
+    if (aRow = 0) and (aCol = 0) and (SortColumn = 0) and Assigned(taskGrid.TitleImageList) then
+    begin
+      if SortOrder = soAscending then
+        ImgIndex := 0
+      else
+        ImgIndex := 1;
+
+      ImgX := aRect.Right - taskGrid.TitleImageList.Width - 4;
+      ImgY := aRect.Top + ((aRect.Bottom - aRect.Top - taskGrid.TitleImageList.Height) div 2);
+
+      taskGrid.TitleImageList.Draw(grid.Canvas, ImgX, ImgY, ImgIndex, True);
+    end;
   end
   else
   begin
@@ -5733,7 +5748,7 @@ begin
   if (FLoadedSelectedTab >= 0) then
   begin
     FirstTabRow := -1;
-    if (Length(FLastRowMem) > 0) then
+    if (Length(FLastRowMem) > FindGroupRealIndex(0)) then
       FirstTabRow := FLastRowMem[FindGroupRealIndex(0)];
     if (FLoadedSelectedTab > 0) then
       groupTabs.TabIndex := FLoadedSelectedTab
