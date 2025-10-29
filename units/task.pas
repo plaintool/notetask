@@ -77,11 +77,13 @@ type
   private
     FGroupList: array of array of TTask; // Array of task groups
     FGroupNameList: TStringList; // List of group names
+    FGroupHintList: TStringList; // List of group hints
     FTaskList: array of TTask; // Array of tasks
     FMapGrid: TIntegerArray; // Maps grid rows to tasks
     FBackupTaskList: array of TTask; // Backup array of tasks
     FInitGroupList: array of array of TTask; // Initial array of task groups
     FInitGroupNameList: TStringList; // List of group names
+    FInitGroupHintList: TStringList; // List of group names
     FSelectedGroup: integer;
 
     function GetGroupCount: integer;
@@ -91,7 +93,8 @@ type
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
     function ToStringList: TStringList;
-    procedure AddGroup(const GroupName: string; const TaskStrings: TStringList = nil); // Add new group from a StringList
+    procedure AddGroup(const GroupName: string; const GroupHint: string; const TaskStrings: TStringList = nil);
+    // Add new group from a StringList
     procedure UpdateGroup;
     procedure ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
     function GetGroupName(Index: integer): string;
@@ -118,6 +121,7 @@ type
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
     function InsertGroup(aName: string): integer;
     function RenameGroup(aIndex: integer; aName: string): boolean;
+    function RehintGroup(aIndex: integer; aHint: string): boolean;
     function CopyGroup(aIndex: integer; aName: string): boolean;
     function DeleteGroup(aIndex: integer): boolean;
     function GetLeftGroup(aIndex: integer; aShowArchived: boolean): integer;
@@ -146,6 +150,7 @@ type
     procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder; SortColumn: integer);
 
     property GroupNames: TStringList read FGroupNameList;
+    property GroupHints: TStringList read FGroupHintList;
     property SelectedGroup: integer read FSelectedGroup;
     property CountGroup: integer read GetGroupCount;
     property Count: integer read GetCount;
@@ -254,6 +259,7 @@ begin
   SetLength(FGroupList, 0); // Initialize group array
   FSelectedGroup := -1;
   FGroupNameList := TStringList.Create;
+  FGroupHintList := TStringList.Create;
 
   if Assigned(TaskStrings) then
   begin
@@ -317,6 +323,9 @@ begin
   if Assigned(FGroupNameList) then
     FGroupNameList.Free;
 
+  if Assigned(FGroupHintList) then
+    FGroupHintList.Free;
+
   if Assigned(FInitGroupNameList) then
     FInitGroupNameList.Free;
 
@@ -339,19 +348,21 @@ begin
       for j := 0 to Length(FGroupList[i]) - 1 do
         if FGroupList[i, j].Done then addCompleted := True;
 
-    Result := mdformat.TasksToStringList(CountGroup, addCompleted, @GetGroupName, @GetTaskCount, @GetTaskInGroup);
+    Result := mdformat.TasksToStringList(CountGroup, addCompleted, @GetGroupName, @GetGroupHint, @GetTaskCount, @GetTaskInGroup);
   except
     Result.Free;
     raise;
   end;
 end;
 
-procedure TTasks.AddGroup(const GroupName: string; const TaskStrings: TStringList = nil); // Add new group from a StringList
+procedure TTasks.AddGroup(const GroupName: string; const GroupHint: string;
+  const TaskStrings: TStringList = nil); // Add new group from a StringList
 var
   i: integer; // Index for iteration
 begin
   SetLength(FGroupList, CountGroup + 1);
   FGroupNameList.Add(GroupName);
+  FGroupHintList.Add(GroupHint);
 
   // Iterate through the StringList to create tasks
   if (Assigned(TaskStrings)) then
@@ -389,7 +400,7 @@ end;
 
 function TTasks.GetGroupHint(Index: integer): string;
 begin
-  Result := FGroupNameList[Index];
+  Result := FGroupHintList[Index];
 end;
 
 function TTasks.GetGroupArchived(Index: integer): boolean;
@@ -719,6 +730,7 @@ begin
   // Increase the size of the group array
   SetLength(FGroupList, CountGroup + 1);
   FGroupNameList.Add(string.Empty);
+  FGroupHintList.Add(string.Empty);
 
   // Check if the selected group is within bounds and shift groups to the right
   if (FSelectedGroup >= 0) and (FSelectedGroup < CountGroup - 2) then
@@ -728,6 +740,7 @@ begin
     begin
       FGroupList[i] := FGroupList[i - 1];
       FGroupNameList[i] := FGroupNameList[i - 1];
+      FGroupHintList[i] := FGroupHintList[i - 1];
     end;
   end;
 
@@ -735,6 +748,7 @@ begin
   Inc(FSelectedGroup);
   SetLength(FGroupList[FSelectedGroup], 0);
   FGroupNameList[FSelectedGroup] := IfThen(aName = string.Empty, aName, '## ' + aName);
+  FGroupHintList[FSelectedGroup] := string.Empty;
 
   // Change group to new one
   ChangeGroup(SelectedGroup);
@@ -751,6 +765,14 @@ begin
   Result := True;
 end;
 
+function TTasks.RehintGroup(aIndex: integer; aHint: string): boolean;
+begin
+  Result := False;
+  if (aIndex < 0) or (aIndex >= CountGroup) then exit;
+  FGroupHintList[aIndex] := aHint;
+  Result := True;
+end;
+
 function TTasks.CopyGroup(aIndex: integer; aName: string): boolean;
 var
   i: integer;
@@ -762,6 +784,7 @@ begin
   if (aIndex < 0) or (aIndex >= CountGroup) then exit;
 
   FGroupNameList.Add(string.Empty);
+  FGroupHintList.Add(string.Empty);
   SetLength(FGroupList, CountGroup + 1);
 
   // Shift groups to the right, overwriting the group at aIndex
@@ -769,6 +792,7 @@ begin
   begin
     FGroupList[i + 1] := FGroupList[i];
     FGroupNameList[i + 1] := FGroupNameList[i];
+    FGroupHintList[i + 1] := FGroupHintList[i];
   end;
 
   // Copy tasks
@@ -781,6 +805,7 @@ begin
 
   // Name new group
   FGroupNameList[aIndex + 1] := IfThen(aName = string.Empty, aName, '## ' + aName);
+  FGroupHintList[aIndex + 1] := FGroupHintList[aIndex];
 
   Result := True;
 end;
@@ -808,10 +833,12 @@ begin
   begin
     FGroupList[i] := FGroupList[i + 1];
     FGroupNameList[i] := FGroupNameList[i + 1];
+    FGroupHintList[i] := FGroupHintList[i + 1];
   end;
 
   // Decrease the size of the group array and name list
   FGroupNameList.Delete(CountGroup - 1);
+  FGroupHintList.Delete(CountGroup - 1);
   SetLength(FGroupList, CountGroup - 1);
 
   // If groups don't exists then add new
@@ -819,6 +846,7 @@ begin
   begin
     SetLength(FGroupList, CountGroup + 1);
     FGroupNameList.Add(string.Empty);
+    FGroupHintList.Add(string.Empty);
   end;
 
   // Update the selected group if needed
@@ -881,7 +909,7 @@ end;
 function TTasks.MoveGroupLeft(Index: integer; aShowArchived: boolean): integer;
 var
   tempGroup: array of TTask;
-  tempName: string;
+  tempName, tempHint: string;
   target, i: integer;
 begin
   Result := Index;
@@ -893,17 +921,20 @@ begin
   // Save the group that will be moved
   tempGroup := FGroupList[Index];
   tempName := FGroupNameList[Index];
+  tempHint := FGroupHintList[Index];
 
   // Shift all groups one position to the right (from target to Index-1)
   for i := Index downto target + 1 do
   begin
     FGroupList[i] := FGroupList[i - 1];
     FGroupNameList[i] := FGroupNameList[i - 1];
+    FGroupHintList[i] := FGroupHintList[i - 1];
   end;
 
   // Place the saved group at the target position
   FGroupList[target] := tempGroup;
   FGroupNameList[target] := tempName;
+  FGroupHintList[target] := tempHint;
 
   Result := target;
   FSelectedGroup := Result;
@@ -912,7 +943,7 @@ end;
 function TTasks.MoveGroupRight(Index: integer; aShowArchived: boolean): integer;
 var
   tempGroup: array of TTask;
-  tempName: string;
+  tempName, tempHint: string;
   target, i: integer;
 begin
   Result := Index;
@@ -924,17 +955,20 @@ begin
   // Save the group that will be moved
   tempGroup := FGroupList[Index];
   tempName := FGroupNameList[Index];
+  tempHint := FGroupHintList[Index];
 
   // Shift all groups one position to the left (from Index+1 to target)
   for i := Index to target - 1 do
   begin
     FGroupList[i] := FGroupList[i + 1];
     FGroupNameList[i] := FGroupNameList[i + 1];
+    FGroupHintList[i] := FGroupHintList[i + 1];
   end;
 
   // Place the saved group at the target position
   FGroupList[target] := tempGroup;
   FGroupNameList[target] := tempName;
+  FGroupHintList[target] := tempHint;
 
   Result := target;
   FSelectedGroup := Result;
@@ -1594,6 +1628,11 @@ begin
     FInitGroupNameList := TStringList.Create;
     FInitGroupNameList.Assign(FGroupNameList);
   end;
+  if Assigned(FGroupHintList) then
+  begin
+    FInitGroupHintList := TStringList.Create;
+    FInitGroupHintList.Assign(FGroupHintList);
+  end;
 end;
 
 procedure TTasks.UndoBackupInit;
@@ -1638,10 +1677,20 @@ begin
     FGroupNameList.Free;
     FGroupNameList := nil;
   end;
+  if Assigned(FGroupHintList) then
+  begin
+    FGroupHintList.Free;
+    FGroupHintList := nil;
+  end;
   if Assigned(FInitGroupNameList) then
   begin
     FGroupNameList := TStringList.Create;
     FGroupNameList.Assign(FInitGroupNameList);
+  end;
+  if Assigned(FInitGroupHintList) then
+  begin
+    FGroupHintList := TStringList.Create;
+    FGroupHintList.Assign(FInitGroupHintList);
   end;
 
   ChangeGroup(SelectedGroup);

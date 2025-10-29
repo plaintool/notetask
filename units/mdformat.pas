@@ -16,8 +16,9 @@ uses
   Task;
 
 type
-  TAddGroupProc = procedure(const GroupName: string; const Lines: TStringList) of object;
+  TAddGroupProc = procedure(const GroupName: string; const GroupHint: string; const Lines: TStringList) of object;
   TGetGroupNameFunc = function(Index: integer): string of object;
+  TGetGroupHintFunc = function(Index: integer): string of object;
   TGetTaskCountFunc = function(GroupIndex: integer): integer of object;
   TGetTaskFunc = function(GroupIndex, TaskIndex: integer): TTask of object;
 
@@ -25,7 +26,7 @@ function TaskFromString(const TaskString: string): TTask;
 function TaskToString(Task: TTask; Col: integer = 0; AddEmptyCompletion: boolean = True): string;
 procedure TasksFromStringList(const TaskStrings: TStringList; AddGroup: TAddGroupProc);
 function TasksToStringList(GroupCount: integer; AddCompleted: boolean; GetGroupName: TGetGroupNameFunc;
-  GetTaskCount: TGetTaskCountFunc; GetTask: TGetTaskFunc): TStringList;
+  GetGroupHint: TGetGroupHintFunc; GetTaskCount: TGetTaskCountFunc; GetTask: TGetTaskFunc): TStringList;
 
 implementation
 
@@ -234,12 +235,8 @@ begin
   FS.DecimalSeparator := '.';
 
   // Replace line breaks from task description and Note
-  TextString := StringReplace(Task.FText, sLineBreak, '<br>', [rfReplaceAll]);
-  TextString := StringReplace(TextString, #13, '<br>', [rfReplaceAll]);
-  TextString := StringReplace(TextString, #10, '<br>', [rfReplaceAll]);
-  NoteString := StringReplace(Task.FNote, sLineBreak, '<br>', [rfReplaceAll]);
-  NoteString := StringReplace(NoteString, #13, '<br>', [rfReplaceAll]);
-  NoteString := StringReplace(NoteString, #10, '<br>', [rfReplaceAll]);
+  TextString := ReplaceLineBreaks(Task.FText);
+  NoteString := ReplaceLineBreaks(Task.FNote);
 
   // Add '**' for starred tasks
   if Task.FStar then
@@ -347,13 +344,14 @@ end;
 procedure TasksFromStringList(const TaskStrings: TStringList; AddGroup: TAddGroupProc);
 var
   i: integer; // Index for iteration
-  TabName, Value: string;
+  TabName, TabHint, Value: string;
   TabContent: TStringList;
 begin
   // Iterate through the StringList to create tasks
   TabContent := TStringList.Create;
   try
     TabName := string.Empty;
+    TabHint := string.Empty;
 
     for i := 0 to TaskStrings.Count - 1 do
     begin
@@ -363,11 +361,13 @@ begin
       begin
         if (TabContent.Count > 0) or (TabName <> string.Empty) then
         begin
-          AddGroup(TabName, TabContent);
+          AddGroup(TabName, TabHint, TabContent);
           TabContent.Clear;
         end;
 
-        TabName := Value;
+        // Format: ## Name // Tooltip
+        ParseGroupName(Value, TabName, TabHint);
+        TabHint := StringReplace(TabHint, '<br>', sLineBreak, [rfReplaceAll]);
         Continue;
       end;
 
@@ -375,22 +375,27 @@ begin
     end;
 
     // Add last group
-    AddGroup(TabName, TabContent);
+    AddGroup(TabName, TabHint, TabContent);
   finally
     TabContent.Free;
   end;
 end;
 
 function TasksToStringList(GroupCount: integer; AddCompleted: boolean; GetGroupName: TGetGroupNameFunc;
-  GetTaskCount: TGetTaskCountFunc; GetTask: TGetTaskFunc): TStringList;
+  GetGroupHint: TGetGroupHintFunc; GetTaskCount: TGetTaskCountFunc; GetTask: TGetTaskFunc): TStringList;
 var
   i, j: integer;
 begin
   Result := TStringList.Create;
   for i := 0 to GroupCount - 1 do
   begin
-    if (GetGroupName(i) <> '') then
-      Result.Add(GetGroupName(i));
+    if (GetGroupName(i) <> string.Empty) then
+    begin
+      if (GetGroupHint(i) <> string.Empty) then
+        Result.Add(GetGroupName(i) + ' // ' + ReplaceLineBreaks(GetGroupHint(i)))
+      else
+        Result.Add(GetGroupName(i));
+    end;
 
     for j := 0 to GetTaskCount(i) - 1 do
       Result.Add(TaskToString(GetTask(i, j), 0, AddCompleted));

@@ -31,8 +31,9 @@ type
     procedure FormShow(Sender: TObject);
   public
     Showed: boolean;
+    SelectAll: boolean;
     procedure SetMode(aCaption, aPrompt, aButtonOk: string; aDefault: string = ''; aWidth: integer = 300;
-      aHeight: integer = 120; aWordWrap: boolean = True);
+      aHeight: integer = 120; aWordWrap: boolean = True; aSelectAll: boolean = False);
   end;
 
 var
@@ -47,13 +48,17 @@ implementation
 procedure TformMemoText.FormCreate(Sender: TObject);
 begin
   Showed := False;
+  SelectAll := False;
 end;
 
 procedure TformMemoText.FormShow(Sender: TObject);
 begin
   SetFocus;
   memoText.SetFocus;
-  memoText.SelStart := 0;
+  if SelectAll then
+    memoText.SelectAll
+  else
+    memoText.SelStart := 0;
   Showed := True;
 end;
 
@@ -67,13 +72,14 @@ begin
 end;
 
 procedure TformMemoText.SetMode(aCaption, aPrompt, aButtonOk: string; aDefault: string = ''; aWidth: integer = 300;
-  aHeight: integer = 120; aWordWrap: boolean = True);
+  aHeight: integer = 120; aWordWrap: boolean = True; aSelectAll: boolean = False);
 begin
   Caption := aCaption;
   LabelCaption.Caption := aPrompt;
   buttonOk.Caption := aButtonOk;
   memoText.Text := aDefault;
   memoText.WordWrap := aWordWrap;
+  SelectAll := aSelectAll;
   if (aWidth > Width) then
     Width := aWidth;
   if (aHeight > Height) then

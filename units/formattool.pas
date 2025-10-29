@@ -82,6 +82,10 @@ function HasScheme(const URL: string): boolean;
 
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
 
+procedure ParseGroupName(const Value: string; out NameText, HintText: string);
+
+function ReplaceLineBreaks(const S: string): string;
+
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
 
 procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
@@ -727,6 +731,38 @@ begin
     if i < High(Parts) then
       Result += Separator;
   end;
+end;
+
+procedure ParseGroupName(const Value: string; out NameText, HintText: string);
+var
+  PosCommentStart: integer;
+begin
+  NameText := string.Empty;
+  HintText := string.Empty;
+
+  // find the start of the comment
+  PosCommentStart := Pos('//', Value);
+  if PosCommentStart > 0 then
+  begin
+    // name is everything before //
+    NameText := Trim(Copy(Value, 1, PosCommentStart - 1));
+    HintText := Trim(Copy(Value, PosCommentStart + 2, MaxInt));
+  end
+  else
+  begin
+    // if // not found, the whole Value is the name
+    NameText := Trim(Value);
+  end;
+end;
+
+function ReplaceLineBreaks(const S: string): string;
+var
+  ResultStr: string;
+begin
+  ResultStr := StringReplace(S, sLineBreak, '<br>', [rfReplaceAll]);
+  ResultStr := StringReplace(ResultStr, #13, '<br>', [rfReplaceAll]);
+  ResultStr := StringReplace(ResultStr, #10, '<br>', [rfReplaceAll]);
+  Result := ResultStr;
 end;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);

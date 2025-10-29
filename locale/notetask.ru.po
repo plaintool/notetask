@@ -468,6 +468,10 @@ msgstr "Дублировать группу"
 msgid "Duplicate tasks"
 msgstr "Дублировать задачи"
 
+#: tformnotetask.aeditgrouptooltip.caption
+msgid "Edit Group Tooltip"
+msgstr "Редактировать подсказку группы"
+
 #: tformnotetask.aentersubmit.caption
 msgid "Enter submit"
 msgstr "Enter подтверждает"

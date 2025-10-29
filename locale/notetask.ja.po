@@ -468,6 +468,10 @@ msgstr "グループを複製する"
 msgid "Duplicate tasks"
 msgstr "タスクを複製する"
 
+#: tformnotetask.aeditgrouptooltip.caption
+msgid "Edit Group Tooltip"
+msgstr "グループのツールチップを編集"
+
 #: tformnotetask.aentersubmit.caption
 msgid "Enter submit"
 msgstr "Enter 送信"

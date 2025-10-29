@@ -468,6 +468,10 @@ msgstr "复制组"
 msgid "Duplicate tasks"
 msgstr "复制任务"
 
+#: tformnotetask.aeditgrouptooltip.caption
+msgid "Edit Group Tooltip"
+msgstr "编辑组提示"
+
 #: tformnotetask.aentersubmit.caption
 msgid "Enter submit"
 msgstr "Enter 提交"

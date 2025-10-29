@@ -357,6 +357,9 @@ object formNotetask: TformNotetask
       object menuRenameGroup: TMenuItem
         Action = aRenameGroup
       end
+      object MenuItem1: TMenuItem
+        Action = aEditGroupTooltip
+      end
       object Separator16: TMenuItem
         Caption = '-'
       end
@@ -750,42 +753,6 @@ object formNotetask: TformNotetask
       ShortCut = 16497
       OnExecute = aRenameGroupExecute
     end
-    object aDuplicateGroup: TAction
-      Category = 'Group'
-      Caption = 'Duplicate group'
-      ShortCut = 24643
-      OnExecute = aDuplicateGroupExecute
-    end
-    object aDeleteGroup: TAction
-      Category = 'Group'
-      Caption = 'Delete group'
-      ShortCut = 24622
-      OnExecute = aDeleteGroupExecute
-    end
-    object aMoveGroupLeft: TAction
-      Category = 'Group'
-      Caption = 'Move group left'
-      ShortCut = 24613
-      OnExecute = aMoveGroupLeftExecute
-    end
-    object aMoveGroupRight: TAction
-      Category = 'Group'
-      Caption = 'Move group right'
-      ShortCut = 24615
-      OnExecute = aMoveGroupRightExecute
-    end
-    object aMoveTaskLeft: TAction
-      Category = 'Group'
-      Caption = 'Move tasks to left group'
-      ShortCut = 16421
-      OnExecute = aMoveTaskLeftExecute
-    end
-    object aMoveTaskRight: TAction
-      Category = 'Group'
-      Caption = 'Move tasks to right group'
-      ShortCut = 16423
-      OnExecute = aMoveTaskRightExecute
-    end
     object aShowDuration: TAction
       Category = 'View'
       AutoCheck = True
@@ -983,6 +950,48 @@ object formNotetask: TformNotetask
       Caption = 'About...'
       OnExecute = aAboutExecute
     end
+    object aEditGroupTooltip: TAction
+      Category = 'Group'
+      Caption = 'Edit Group Tooltip'
+      ShortCut = 24689
+      OnExecute = aEditGroupTooltipExecute
+    end
+    object aDuplicateGroup: TAction
+      Category = 'Group'
+      Caption = 'Duplicate group'
+      ShortCut = 24643
+      OnExecute = aDuplicateGroupExecute
+    end
+    object aDeleteGroup: TAction
+      Category = 'Group'
+      Caption = 'Delete group'
+      ShortCut = 24622
+      OnExecute = aDeleteGroupExecute
+    end
+    object aMoveGroupLeft: TAction
+      Category = 'Group'
+      Caption = 'Move group left'
+      ShortCut = 24613
+      OnExecute = aMoveGroupLeftExecute
+    end
+    object aMoveGroupRight: TAction
+      Category = 'Group'
+      Caption = 'Move group right'
+      ShortCut = 24615
+      OnExecute = aMoveGroupRightExecute
+    end
+    object aMoveTaskLeft: TAction
+      Category = 'Group'
+      Caption = 'Move tasks to left group'
+      ShortCut = 16421
+      OnExecute = aMoveTaskLeftExecute
+    end
+    object aMoveTaskRight: TAction
+      Category = 'Group'
+      Caption = 'Move tasks to right group'
+      ShortCut = 16423
+      OnExecute = aMoveTaskRightExecute
+    end
   end
   object openDialog: TOpenDialog
     Title = 'Opening'
@@ -1108,14 +1117,17 @@ object formNotetask: TformNotetask
     object ContextInsertGroup: TMenuItem
       Action = aInsertGroup
     end
-    object ContextRenameGroup: TMenuItem
-      Action = aRenameGroup
-    end
     object ContextDuplicateGroup: TMenuItem
       Action = aDuplicateGroup
     end
     object ContextDeleteGroup: TMenuItem
       Action = aDeleteGroup
+    end
+    object ContextRenameGroup: TMenuItem
+      Action = aRenameGroup
+    end
+    object MenuItem2: TMenuItem
+      Action = aEditGroupTooltip
     end
   end
   object PopupMemo: TPopupMenu

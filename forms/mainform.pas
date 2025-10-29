@@ -47,6 +47,7 @@ type
     aAbout: TAction;
     aCopy: TAction;
     aCheckforupdates: TAction;
+    aEditGroupTooltip: TAction;
     aSplitTasks: TAction;
     aHideNoteText: TAction;
     aSaveNotesAs: TAction;
@@ -128,6 +129,8 @@ type
     menuHideNoteText: TMenuItem;
     contextSplitTasks: TMenuItem;
     menuCheckforupdates: TMenuItem;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
     menuSplitTasks: TMenuItem;
     menuSaveNotesAs: TMenuItem;
     menuRunPowershell: TMenuItem;
@@ -290,6 +293,7 @@ type
     ContextDuplicateGroup: TMenuItem;
     ContextDeleteGroup: TMenuItem;
     procedure aCheckforupdatesExecute(Sender: TObject);
+    procedure aEditGroupTooltipExecute(Sender: TObject);
     procedure aSplitTasksExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -481,6 +485,7 @@ type
     FLastRow: integer;
     FLastRowMem: array of integer;
     FLastTabMouseX: integer;
+    FLastTabTarget: integer;
     FGroupIndexMap: array of integer;
     FDragTab: integer;
     FNoteSelecting: boolean;
@@ -881,6 +886,12 @@ begin
     Key := 0;
   end
   else
+  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_F2) then // Ctrl + Shift + F2
+  begin
+    aEditGroupTooltip.Execute;
+    Key := 0;
+  end
+  else
   if (ssCtrl in Shift) and (Key = VK_F2) then // Ctrl + F2
   begin
     aRenameGroup.Execute;
@@ -1162,14 +1173,20 @@ begin
     if TabIndex >= 0 then
     begin
       // For testing, just show the tab's caption as the hint
-      HintStr := groupTabs.Tabs[TabIndex];
+      HintStr := Tasks.GetGroupHint(FindGroupRealIndex(TabIndex));
 
       // Allow the hint to be displayed
       CanShow := True;
+      Application.HintPause := 100;
+      Application.HintHidePause := MaxInt;
     end
     else
+    begin
       // Mouse is not over a tab, do not show hint
       CanShow := False;
+      Application.HintPause := 500;
+      Application.HintHidePause := 2500;
+    end;
   end;
 end;
 
@@ -1844,9 +1861,9 @@ procedure TformNotetask.groupTabsMouseMove(Sender: TObject; Shift: TShiftState; 
 var
   target: integer;
 begin
+  target := groupTabs.IndexOfTabAt(X, Y);
   if FDragTab >= 0 then
   begin
-    target := groupTabs.IndexOfTabAt(X, Y);
     if target >= 0 then
     begin
       if (FLastTabMouseX <> X) and (FLastTabMouseX > 0) then  Screen.Cursor := crDrag;
@@ -1858,8 +1875,10 @@ begin
     end;
   end;
   // Hide hint if long move
-  if (Abs(FLastTabMouseX - X) > 5) then Application.HideHint;
+  if (target <> FLastTabTarget) then
+    Application.HideHint;
   FLastTabMouseX := X;
+  FLastTabTarget := target;
 end;
 
 procedure TformNotetask.groupTabsMouseLeave(Sender: TObject);
@@ -2798,6 +2817,30 @@ begin
         SetTabs;
         SetChanged;
       end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aEditGroupTooltipExecute(Sender: TObject);
+begin
+  if (groupTabs.TabIndex = 0) and (Tasks.GroupNames[0] = string.Empty) then
+    exit;
+  with formMemoText do
+  try
+    if not formMemoText.Showed then
+    begin
+      Left := self.Left + 14;
+      Top := self.top + 52;
+    end;
+    SetMode(rapp, aEditGroupTooltip.Caption, rOK, Tasks.GetGroupHint(FindGroupRealIndex(groupTabs.TabIndex)), 400, 180, FWordWrap, True);
+
+    // Show the form as a modal dialog
+    if ShowModal = mrOk then
+    begin
+      Tasks.RehintGroup(FindGroupRealIndex(groupTabs.TabIndex), formMemoText.memoText.Text);
+      SetChanged;
     end;
   finally
     Hide;

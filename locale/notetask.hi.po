@@ -468,6 +468,10 @@ msgstr "समूह डुप्लिकेट करना"
 msgid "Duplicate tasks"
 msgstr "कार्यों को डुप्लिकेट करें"
 
+#: tformnotetask.aeditgrouptooltip.caption
+msgid "Edit Group Tooltip"
+msgstr "समूह टूलटिप संपादित करें"
+
 #: tformnotetask.aentersubmit.caption
 msgid "Enter submit"
 msgstr "Enter पुष्टि करता है"
