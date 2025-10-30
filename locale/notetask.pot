@@ -470,6 +470,10 @@ msgstr ""
 msgid "Exit"
 msgstr ""
 
+#: tformnotetask.afilter.caption
+msgid "Filter..."
+msgstr ""
+
 #: tformnotetask.afind.caption
 msgid "Find..."
 msgstr ""

@@ -480,6 +480,10 @@ msgstr "Enter envia"
 msgid "Exit"
 msgstr "Sair"
 
+#: tformnotetask.afilter.caption
+msgid "Filter..."
+msgstr "Filtrar..."
+
 #: tformnotetask.afind.caption
 msgid "Find..."
 msgstr "Encontrar..."
@@ -777,7 +781,7 @@ msgstr ""
 #: tformnotetask.filterbox.texthint
 msgctxt "tformnotetask.filterbox.texthint"
 msgid "Type to filter..."
-msgstr ""
+msgstr "Digite para filtrar..."
 
 #: tformnotetask.fontdialog.title
 msgid "Font select"
@@ -902,4 +906,3 @@ msgstr "Encontrar o quê:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Substituir por:"
-

@@ -480,6 +480,10 @@ msgstr "Enter पुष्टि करता है"
 msgid "Exit"
 msgstr "बाहर निकलें"
 
+#: tformnotetask.afilter.caption
+msgid "Filter..."
+msgstr "फ़िल्टर..."
+
 #: tformnotetask.afind.caption
 msgid "Find..."
 msgstr "खोजें..."
@@ -777,7 +781,7 @@ msgstr ""
 #: tformnotetask.filterbox.texthint
 msgctxt "tformnotetask.filterbox.texthint"
 msgid "Type to filter..."
-msgstr ""
+msgstr "फ़िल्टर करने के लिए टाइप करें..."
 
 #: tformnotetask.fontdialog.title
 msgid "Font select"
@@ -902,4 +906,3 @@ msgstr "क्या खोजें:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "इसके साथ बदलें:"
-

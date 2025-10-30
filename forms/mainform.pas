@@ -32,7 +32,7 @@ uses
   ComCtrls,
   ExtCtrls,
   Grids,
-  Menus,
+  Menus, Buttons,
   PrintersDlgs,
   DateTimePicker,
   GridPrn,
@@ -47,6 +47,7 @@ type
     aAbout: TAction;
     aCopy: TAction;
     aCheckforupdates: TAction;
+    aFilter: TAction;
     aEditGroupTooltip: TAction;
     aSplitTasks: TAction;
     aHideNoteText: TAction;
@@ -97,6 +98,7 @@ type
     contextSelectAll1: TMenuItem;
     contextUndo1: TMenuItem;
     filterBox: TComboBox;
+    filterClear: TSpeedButton;
     fontDialog: TFontDialog;
     groupTabs: TTabControl;
     MainMenu: TMainMenu;
@@ -133,6 +135,7 @@ type
     menuCheckforupdates: TMenuItem;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
+    menuFilter: TMenuItem;
     menuSplitTasks: TMenuItem;
     menuSaveNotesAs: TMenuItem;
     menuRunPowershell: TMenuItem;
@@ -297,10 +300,11 @@ type
     ContextDeleteGroup: TMenuItem;
     procedure aCheckforupdatesExecute(Sender: TObject);
     procedure aEditGroupTooltipExecute(Sender: TObject);
+    procedure aFilterExecute(Sender: TObject);
     procedure aSplitTasksExecute(Sender: TObject);
     procedure filterBoxChange(Sender: TObject);
-    procedure filterBoxDrawItem(Control: TWinControl; Index: integer; ARect: TRect; State: TOwnerDrawState);
     procedure filterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure filterClearClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -330,6 +334,7 @@ type
     procedure panelNoteMouseLeave(Sender: TObject);
     procedure panelNoteMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure SplitFilterChangeBounds(Sender: TObject);
     procedure statusBarContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
     procedure ContextCopyStatusbarClick(Sender: TObject);
     procedure contextANSIClick(Sender: TObject);
@@ -515,6 +520,7 @@ type
     function GetLineAtEnd: integer;
     function GetLineAtPos(Y: integer): integer;
     procedure PasteWithLineEnding(AMemo: TMemo);
+    procedure UpdateComboRegion(Combo: TComboBox; AInset: integer = 2);
     procedure SelectMemoLine(LineIndex: integer; Move: boolean = False);
     procedure SetMemoFocusDelayed(Data: PtrInt);
     procedure PanelMemoEnter(Sender: TObject);
@@ -534,6 +540,7 @@ type
     procedure SetInfo;
     procedure SetNote;
     procedure SetTabs(Change: boolean = True);
+    procedure SetTabsVisible;
     procedure ClearSelected(ShowConfirm: boolean = True);
     procedure DuplicateTasks;
     procedure MergeTasks;
@@ -773,6 +780,9 @@ begin
   panelNote.Color := clGray;
   Splitter.Color := clGrayDark;
   SplitFilter.Color := clGrayDark;
+
+  // Remove standart border
+  UpdateComboRegion(filterBox);
 
   Application.OnException := @ApplicationOnException;
   Application.OnQueryEndSession := @ApplicationOnQueryEndSession;
@@ -1142,6 +1152,9 @@ begin
 
   if StatusBar.Top < MemoNote.Top then
     StatusBar.Top := ClientHeight - StatusBar.Height;
+
+  //if filterClear.Left < filterBox.Left then
+  //  filterClear.Left := ClientWidth - filterClear.Width;
 end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -2029,10 +2042,6 @@ begin
   SetNote;
 end;
 
-procedure TformNotetask.filterBoxDrawItem(Control: TWinControl; Index: integer; ARect: TRect; State: TOwnerDrawState);
-begin
-end;
-
 procedure TformNotetask.filterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   SelStart, SelLen: integer;
@@ -2045,9 +2054,11 @@ begin
     VK_DELETE: // Delete
     begin
       if SelLen > 0 then
-        filterBox.Text := Copy(filterBox.Text, 1, SelStart) + Copy(filterBox.Text, SelStart + SelLen + 1, MaxInt)
+        filterBox.Text := string(Copy(unicodestring(filterBox.Text), 1, SelStart) +
+          Copy(unicodestring(filterBox.Text), SelStart + SelLen + 1, MaxInt))
       else
-        filterBox.Text := Copy(filterBox.Text, 1, SelStart) + Copy(filterBox.Text, SelStart + 2, MaxInt);
+        filterBox.Text := string(Copy(unicodestring(filterBox.Text), 1, SelStart) +
+          Copy(unicodestring(filterBox.Text), SelStart + 2, MaxInt));
       filterBox.SelStart := SelStart;
       Key := 0;
     end;
@@ -2062,7 +2073,7 @@ begin
       begin
         if SelLen > 0 then
         begin
-          ClipText := Copy(filterBox.Text, SelStart + 1, SelLen);
+          ClipText := string(Copy(unicodestring(filterBox.Text), SelStart + 1, SelLen));
           Clipboard.AsText := ClipText;
         end;
         Key := 0;
@@ -2072,9 +2083,10 @@ begin
       begin
         if SelLen > 0 then
         begin
-          ClipText := Copy(filterBox.Text, SelStart + 1, SelLen);
+          ClipText := string(Copy(unicodestring(filterBox.Text), SelStart + 1, SelLen));
           Clipboard.AsText := ClipText;
-          filterBox.Text := Copy(filterBox.Text, 1, SelStart) + Copy(filterBox.Text, SelStart + SelLen + 1, MaxInt);
+          filterBox.Text := string(Copy(unicodestring(filterBox.Text), 1, SelStart) +
+            Copy(unicodestring(filterBox.Text), SelStart + SelLen + 1, MaxInt));
         end;
         Key := 0;
       end;
@@ -2082,12 +2094,24 @@ begin
     Ord('V'): if ssCtrl in Shift then // Ctrl + V
       begin
         ClipText := Clipboard.AsText;
-        filterBox.Text := Copy(filterBox.Text, 1, SelStart) + ClipText + Copy(filterBox.Text, SelStart + SelLen + 1, MaxInt);
-        filterBox.SelStart := SelStart + Length(ClipText);
+        filterBox.Text := string(Copy(unicodestring(filterBox.Text), 1, SelStart) + unicodestring(ClipText) +
+          Copy(unicodestring(filterBox.Text), SelStart + SelLen + 1, MaxInt));
+        filterBox.SelStart := SelStart + Length(unicodestring(ClipText));
         Key := 0;
       end;
   end;
   filterBox.OnChange(Self);
+end;
+
+procedure TformNotetask.filterClearClick(Sender: TObject);
+begin
+  filterBox.Clear;
+  filterBox.OnChange(Self);
+end;
+
+procedure TformNotetask.SplitFilterChangeBounds(Sender: TObject);
+begin
+  UpdateComboRegion(filterBox);
 end;
 
 procedure TformNotetask.ContextCopyStatusbarClick(Sender: TObject);
@@ -2417,23 +2441,21 @@ begin
       memoNote.ClearSelection;
     end;
     exit;
+  end;
+
+  if taskGrid.RowCount < 2 then exit;
+  if not IsEditing then
+  begin
+    ClearSelected(False);
+    if ShowDuration then FillGrid;
+    SetInfo;
+    SetNote;
   end
   else
-  if taskGrid.Focused then
-  begin
-    if taskGrid.RowCount < 2 then exit;
-    if not IsEditing then
+  if (taskGrid.InplaceEditor is TPanel) then
+    with Memo do
     begin
-      ClearSelected(False);
-      if ShowDuration then FillGrid;
-      SetInfo;
-      SetNote;
-    end
-    else
-    if (taskGrid.InplaceEditor is TPanel) then
-      with Memo do
-      begin
-        {$IFDEF UNIX}
+      {$IFDEF UNIX}
       if SelLength = 0 then
       begin
         SelStart := SelStart;
@@ -2441,15 +2463,11 @@ begin
       end
       else
         MemoBackup;
-        ClearSelection;
-        {$ELSE}
-        MemoDelKey(False);
-        {$ENDIF}
-      end;
-  end
-  else
-  if filterBox.Focused then
-    filterbox.ClearSelection;
+      ClearSelection;
+      {$ELSE}
+      MemoDelKey(False);
+      {$ENDIF}
+    end;
 end;
 
 procedure TformNotetask.aSelectAllExecute(Sender: TObject);
@@ -2936,6 +2954,16 @@ begin
   finally
     Hide;
   end;
+end;
+
+procedure TformNotetask.aFilterExecute(Sender: TObject);
+begin
+  panelTabs.Visible := (not panelTabs.Visible and not filterBox.Focused) or
+    (not ((groupTabs.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty)));
+  Invalidate;
+  Application.ProcessMessages;
+  if (panelTabs.Visible) then
+    filterBox.SetFocus;
 end;
 
 procedure TformNotetask.aDuplicateGroupExecute(Sender: TObject);
@@ -3985,6 +4013,8 @@ procedure TformNotetask.ApplyGridSettings;
 begin
   SetChanged(False);
 
+  filterBox.Left := 0;
+  SplitFilter.Left := 0;
   ShowNote := FShowNote;
   ShowStatusBar := FShowStatusBar;
   ShowArchived := FShowArchived;
@@ -4618,6 +4648,16 @@ begin
   if (memoNote.Tag > 0) then
     MemoNoteSetScrollPosition(memoNote.Tag);
   {$ENDIF}
+end;
+
+procedure TformNotetask.UpdateComboRegion(Combo: TComboBox; AInset: integer = 2);
+var
+  Rgn: HRGN;
+begin
+  // Define a client area without the border (inset pixels from each side)
+  Rgn := CreateRectRgn(AInset, AInset, Combo.Width - AInset, Combo.Height - AInset);
+  // Windows takes ownership of Rgn, so it must NOT be deleted manually.
+  SetWindowRgn(Combo.Handle, Rgn, True);
 end;
 
 procedure TformNotetask.SelectMemoLine(LineIndex: integer; Move: boolean = False);
@@ -6614,7 +6654,7 @@ begin
     end;
 
     groupTabs.Tabs := Clean;
-    groupTabs.Visible := not ((groupTabs.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty));
+    SetTabsVisible;
 
     if (Change) and (groupTabs.Visible) and (LastRealIndex >= 0) then
     begin
@@ -6660,6 +6700,12 @@ begin
   finally
     Clean.Free;
   end;
+end;
+
+procedure TformNotetask.SetTabsVisible;
+begin
+  panelTabs.Visible := (filterbox.Text <> string.Empty) or (filterBox.Focused) or
+    (not ((groupTabs.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty)));
 end;
 
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);

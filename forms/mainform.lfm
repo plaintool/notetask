@@ -10,6 +10,7 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
+  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -188,9 +189,36 @@ object formNotetask: TformNotetask
     ClientWidth = 851
     ParentBackground = False
     TabOrder = 4
-    object filterBox: TComboBox
-      Left = 723
+    Visible = False
+    object SplitFilter: TSplitter
+      Left = 701
       Height = 24
+      Top = 0
+      Width = 5
+      Align = alRight
+      MinSize = 20
+      ResizeAnchor = akRight
+      OnChangeBounds = SplitFilterChangeBounds
+    end
+    object groupTabs: TTabControl
+      Left = 0
+      Height = 24
+      Top = 0
+      Width = 701
+      OnChange = groupTabsChange
+      Align = alClient
+      Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 1
+      OnMouseDown = groupTabsMouseDown
+      OnMouseLeave = groupTabsMouseLeave
+      OnMouseMove = groupTabsMouseMove
+      OnMouseUp = groupTabsMouseUp
+    end
+    object filterBox: TComboBox
+      Left = 706
+      Height = 23
       Top = 0
       Width = 128
       Align = alRight
@@ -198,43 +226,37 @@ object formNotetask: TformNotetask
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       AutoSelect = False
       AutoSize = False
-      Constraints.MinWidth = 100
+      Color = clWindow
+      Constraints.MinWidth = 20
       DropDownCount = 10
       ItemHeight = 15
-      ParentColor = True
       Sorted = True
-      Style = csSimple
-      TabOrder = 0
+      TabOrder = 2
       TextHint = 'Type to filter...'
       OnChange = filterBoxChange
-      OnDrawItem = filterBoxDrawItem
       OnKeyDown = filterBoxKeyDown
     end
-    object SplitFilter: TSplitter
-      Left = 718
+    object filterClear: TSpeedButton
+      Left = 834
       Height = 24
       Top = 0
-      Width = 5
+      Width = 17
       Align = alRight
-      ResizeAnchor = akRight
-    end
-    object groupTabs: TTabControl
-      Left = 0
-      Height = 24
-      Top = 0
-      Width = 718
-      OnChange = groupTabsChange
-      Align = alClient
-      Constraints.MinWidth = 100
-      Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 2
-      Visible = False
-      OnMouseDown = groupTabsMouseDown
-      OnMouseLeave = groupTabsMouseLeave
-      OnMouseMove = groupTabsMouseMove
-      OnMouseUp = groupTabsMouseUp
+      Color = clWindow
+      Flat = True
+      Glyph.Data = {
+        32010000424D3201000000000000360000002800000009000000090000000100
+        180000000000FC00000064000000640000000000000000000000FFFFFFC9C9C9
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC9C9C9FFFFFF00F1F1F15C5C5CADADADFF
+        FFFFFFFFFFFFFFFFADADAD5C5C5CF1F1F100FFFFFFF1F1F15C5C5CADADADFFFF
+        FFADADAD5C5C5CF1F1F1FFFFFF00FFFFFFFFFFFFF1F1F15C5C5CADADAD5C5C5C
+        F1F1F1FFFFFFFFFFFF00FFFFFFFFFFFFFFFFFFF1F1F15C5C5CF1F1F1FFFFFFFF
+        FFFFFFFFFF00FFFFFFFFFFFFF1F1F15C5C5CADADAD5C5C5CF1F1F1FFFFFFFFFF
+        FF00FFFFFFF1F1F15C5C5CADADADFFFFFFADADAD5C5C5CF1F1F1FFFFFF00F1F1
+        F15C5C5CADADADFFFFFFFFFFFFFFFFFFADADAD5C5C5CF1F1F100FFFFFFC9C9C9
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC9C9C9FFFFFF00
+      }
+      OnClick = filterClearClick
     end
   end
   object MainMenu: TMainMenu
@@ -314,6 +336,9 @@ object formNotetask: TformNotetask
       end
       object menuGoTo: TMenuItem
         Action = aGoTo
+      end
+      object menuFilter: TMenuItem
+        Action = aFilter
       end
       object Separator7: TMenuItem
         Caption = '-'
@@ -682,24 +707,6 @@ object formNotetask: TformNotetask
       ShortCut = 16456
       OnExecute = aReplaceExecute
     end
-    object aGoTo: TAction
-      Category = 'Edit'
-      Caption = 'Go to...'
-      ShortCut = 16455
-      OnExecute = aGoToExecute
-    end
-    object aSelectAll: TAction
-      Category = 'Edit'
-      Caption = 'Select all'
-      ShortCut = 16449
-      OnExecute = aSelectAllExecute
-    end
-    object aDateTime: TAction
-      Category = 'Edit'
-      Caption = 'Date time'
-      ShortCut = 116
-      OnExecute = aDateTimeExecute
-    end
     object aBidiRightToLeft: TAction
       Category = 'Format'
       AutoCheck = True
@@ -1034,6 +1041,30 @@ object formNotetask: TformNotetask
       Caption = 'Move tasks to right group'
       ShortCut = 16423
       OnExecute = aMoveTaskRightExecute
+    end
+    object aGoTo: TAction
+      Category = 'Edit'
+      Caption = 'Go to...'
+      ShortCut = 16455
+      OnExecute = aGoToExecute
+    end
+    object aFilter: TAction
+      Category = 'Edit'
+      Caption = 'Filter...'
+      ShortCut = 32838
+      OnExecute = aFilterExecute
+    end
+    object aSelectAll: TAction
+      Category = 'Edit'
+      Caption = 'Select all'
+      ShortCut = 16449
+      OnExecute = aSelectAllExecute
+    end
+    object aDateTime: TAction
+      Category = 'Edit'
+      Caption = 'Date time'
+      ShortCut = 116
+      OnExecute = aDateTimeExecute
     end
   end
   object openDialog: TOpenDialog

@@ -480,6 +480,10 @@ msgstr "Enter 提交"
 msgid "Exit"
 msgstr "退出"
 
+#: tformnotetask.afilter.caption
+msgid "Filter..."
+msgstr "过滤..."
+
 #: tformnotetask.afind.caption
 msgid "Find..."
 msgstr "查找..."
@@ -777,7 +781,7 @@ msgstr ""
 #: tformnotetask.filterbox.texthint
 msgctxt "tformnotetask.filterbox.texthint"
 msgid "Type to filter..."
-msgstr ""
+msgstr "输入以过滤..."
 
 #: tformnotetask.fontdialog.title
 msgid "Font select"
@@ -902,4 +906,3 @@ msgstr "查找内容："
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "替换为："
-
