@@ -4265,7 +4265,8 @@ end;
 
 procedure TformNotetask.MoveTabLeft(Index: integer);
 var
-  Result, RowMem: integer;
+  Result: integer;
+  RowMem: integer = -1;
 begin
   if (Index = 1) and (Tasks.GroupNames[0] = string.Empty) then exit;
 
@@ -4275,11 +4276,13 @@ begin
   Result := FindGroupTabIndex(Result);
   if (Result >= 0) and (Result <> Index) then
   begin
-    if (Length(FLastRowMem) > FindGroupRealIndex(Index)) then
+    if (Length(FLastRowMem) > FindGroupRealIndex(Index)) and (RowMem >= 0) then
     begin
       if (Length(FLastRowMem) > FindGroupRealIndex(Result)) then
         FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
-      FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
+      if (RowMem >= 0) then
+        FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
+
     end;
     SetTabs(False);
     if (FDragTab >= 0) then FDragTab := Result;
@@ -4290,7 +4293,8 @@ end;
 
 procedure TformNotetask.MoveTabRight(Index: integer);
 var
-  Result, RowMem: integer;
+  Result: integer;
+  RowMem: integer = -1;
 begin
   if (Index = 0) and (Tasks.GroupNames[0] = string.Empty) then exit;
 
@@ -4304,7 +4308,8 @@ begin
     begin
       if (Length(FLastRowMem) > FindGroupRealIndex(Result)) then
         FLastRowMem[FindGroupRealIndex(Result)] := FLastRowMem[FindGroupRealIndex(Index)];
-      FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
+      if (RowMem >= 0) then
+        FLastRowMem[FindGroupRealIndex(Index)] := RowMem;
     end;
     SetTabs(False);
     if (FDragTab >= 0) then FDragTab := Result;

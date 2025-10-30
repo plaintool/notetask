@@ -1,1 +1,3 @@
 installer/debsetup/** text eol=lf
+installer/debsetup/**/*.exe -text
+installer/debsetup/**/*.png -text
