@@ -6,6 +6,7 @@
 {"hash":75787348,"name":"tformnotetask.taskgrid.columns[3].title.caption","sourcebytes":[65,109,111,117,110,116],"value":"Amount"},
 {"hash":305317,"name":"tformnotetask.taskgrid.columns[4].title.caption","sourcebytes":[68,97,116,101],"value":"Date"},
 {"hash":371330,"name":"tformnotetask.taskgrid.columns[5].title.caption","sourcebytes":[83,116,97,114],"value":"Star"},
+{"hash":195115934,"name":"tformnotetask.filterbox.texthint","sourcebytes":[84,121,112,101,32,116,111,32,102,105,108,116,101,114,46,46,46],"value":"Type to filter..."},
 {"hash":315429,"name":"tformnotetask.menufile.caption","sourcebytes":[70,105,108,101],"value":"File"},
 {"hash":310020,"name":"tformnotetask.menuedit.caption","sourcebytes":[69,100,105,116],"value":"Edit"},
 {"hash":370843,"name":"tformnotetask.menutask.caption","sourcebytes":[84,97,115,107],"value":"Task"},

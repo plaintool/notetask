@@ -137,23 +137,6 @@ object formNotetask: TformNotetask
     ResizeAnchor = akBottom
     Visible = False
   end
-  object groupTabs: TTabControl
-    Left = 0
-    Height = 24
-    Top = 0
-    Width = 851
-    OnChange = groupTabsChange
-    Align = alTop
-    Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 2
-    Visible = False
-    OnMouseDown = groupTabsMouseDown
-    OnMouseLeave = groupTabsMouseLeave
-    OnMouseMove = groupTabsMouseMove
-    OnMouseUp = groupTabsMouseUp
-  end
   object panelNote: TPanel
     Left = 0
     Height = 103
@@ -192,6 +175,66 @@ object formNotetask: TformNotetask
       OnExit = memoNoteExit
       OnKeyDown = memoNoteKeyDown
       OnMouseDown = memoNoteMouseDown
+    end
+  end
+  object panelTabs: TPanel
+    Left = 0
+    Height = 24
+    Top = 0
+    Width = 851
+    Align = alTop
+    BevelOuter = bvNone
+    ClientHeight = 24
+    ClientWidth = 851
+    ParentBackground = False
+    TabOrder = 4
+    object filterBox: TComboBox
+      Left = 723
+      Height = 24
+      Top = 0
+      Width = 128
+      Align = alRight
+      AutoComplete = True
+      AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      AutoSelect = False
+      AutoSize = False
+      Constraints.MinWidth = 100
+      DropDownCount = 10
+      ItemHeight = 15
+      ParentColor = True
+      Sorted = True
+      Style = csSimple
+      TabOrder = 0
+      TextHint = 'Type to filter...'
+      OnChange = filterBoxChange
+      OnDrawItem = filterBoxDrawItem
+      OnKeyDown = filterBoxKeyDown
+    end
+    object SplitFilter: TSplitter
+      Left = 718
+      Height = 24
+      Top = 0
+      Width = 5
+      Align = alRight
+      ResizeAnchor = akRight
+    end
+    object groupTabs: TTabControl
+      Left = 0
+      Height = 24
+      Top = 0
+      Width = 718
+      OnChange = groupTabsChange
+      Align = alClient
+      Constraints.MinWidth = 100
+      Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 2
+      Visible = False
+      OnMouseDown = groupTabsMouseDown
+      OnMouseLeave = groupTabsMouseLeave
+      OnMouseMove = groupTabsMouseMove
+      OnMouseUp = groupTabsMouseUp
     end
   end
   object MainMenu: TMainMenu

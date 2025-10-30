@@ -774,6 +774,11 @@ msgstr ""
 msgid "WindowsCRLF"
 msgstr ""
 
+#: tformnotetask.filterbox.texthint
+msgctxt "tformnotetask.filterbox.texthint"
+msgid "Type to filter..."
+msgstr ""
+
 #: tformnotetask.fontdialog.title
 msgid "Font select"
 msgstr "选择字体"
@@ -897,3 +902,4 @@ msgstr "查找内容："
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "替换为："
+

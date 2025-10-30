@@ -774,6 +774,11 @@ msgstr ""
 msgid "WindowsCRLF"
 msgstr ""
 
+#: tformnotetask.filterbox.texthint
+msgctxt "tformnotetask.filterbox.texthint"
+msgid "Type to filter..."
+msgstr ""
+
 #: tformnotetask.fontdialog.title
 msgid "Font select"
 msgstr "फॉन्ट चयन"
@@ -897,3 +902,4 @@ msgstr "क्या खोजें:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "इसके साथ बदलें:"
+

@@ -43,9 +43,8 @@ type
     constructor Create;
     constructor Create(const TaskString: string); // Constructor that takes a task string
     function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string; reintroduce;
-    //constructor Create2(const TaskString: string); // Constructor that takes a task string
-    //function ToString2(Col: integer = 0; AddEmptyCompletion: boolean = True): string;
     procedure Copy(Original: TTask);
+    function MatchesFilter(const Filter: string; DisplayTime: boolean): boolean;
     function GetDate: string;
     function GetDateTime: string;
     function GetDateTimeISO: string;
@@ -88,7 +87,7 @@ type
 
     function GetGroupCount: integer;
     function GetCount: integer;
-    function GetCountArchive: integer;
+    function GetCountFilter(Archive: boolean; Filter: string; DisplayTime: boolean): integer;
   public
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
@@ -99,7 +98,7 @@ type
     procedure ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
     function GetGroupName(Index: integer): string;
     function GetGroupHint(Index: integer): string;
-    function GetGroupArchived(Index: integer): boolean;
+    function GetGroupFiltered(Index: integer; ShowArchive: boolean; Filter: string; DisplayTime: boolean): boolean;
     function GetTaskCount(GroupIndex: integer): integer;
     function GetTaskInGroup(GroupIndex, TaskIndex: integer): TTask;
     procedure InitMap(Length: integer);
@@ -124,10 +123,10 @@ type
     function RehintGroup(aIndex: integer; aHint: string): boolean;
     function CopyGroup(aIndex: integer; aName: string): boolean;
     function DeleteGroup(aIndex: integer): boolean;
-    function GetLeftGroup(aIndex: integer; aShowArchived: boolean): integer;
-    function GetRightGroup(aIndex: integer; aShowArchived: boolean): integer;
-    function MoveGroupLeft(Index: integer; aShowArchived: boolean): integer;
-    function MoveGroupRight(Index: integer; aShowArchived: boolean): integer;
+    function GetLeftGroup(aIndex: integer; aShowArchived: boolean; aFilter: string; DisplayTime: boolean): integer;
+    function GetRightGroup(aIndex: integer; aShowArchived: boolean; aFilter: string; DisplayTime: boolean): integer;
+    function MoveGroupLeft(Index: integer; aShowArchived: boolean; aFilter: string; DisplayTime: boolean): integer;
+    function MoveGroupRight(Index: integer; aShowArchived: boolean; aFilter: string; DisplayTime: boolean): integer;
     function MoveGroupTasks(Index1, Index2, NewGroup: integer): integer;
     function MoveTasksTop(Index1, Index2: integer): integer;
     function MoveTasksBottom(Index1, Index2: integer): integer;
@@ -147,14 +146,14 @@ type
     function CalcSum(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): double;
     function CalcDuration(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): string;
 
-    procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder; SortColumn: integer);
+    procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder;
+      SortColumn: integer; Filter: string);
 
     property GroupNames: TStringList read FGroupNameList;
     property GroupHints: TStringList read FGroupHintList;
     property SelectedGroup: integer read FSelectedGroup;
     property CountGroup: integer read GetGroupCount;
     property Count: integer read GetCount;
-    property CountArhive: integer read GetCountArchive;
     property MapGrid: TIntegerArray read FMapGrid;
   end;
 
@@ -222,6 +221,91 @@ begin
   FDateEnd := Original.FDateEnd;
   FAmountOriginal := Original.FAmountOriginal;
   FDateOriginal := Original.FDateOriginal;
+end;
+
+function TTask.MatchesFilter(const Filter: string; DisplayTime: boolean): boolean;
+var
+  TrimFilter, Oper, ValuePart, DateAsStr: string;
+  FilterValue: double;
+
+  function StartsWithOperator(const S: string; out Op, Rest: string): boolean;
+  const
+    Ops: array[0..6] of string = ('>=', '<=', '<>', '!=', '=', '>', '<');
+  var
+    i: integer;
+  begin
+    for i := 0 to High(Ops) do
+      if StartsText(Ops[i], S) then
+      begin
+        Op := Ops[i];
+        Rest := Trim(System.Copy(S, Length(Ops[i]) + 1, MaxInt));
+        Exit(True);
+      end;
+    Op := '';
+    Rest := S;
+    Result := False;
+  end;
+
+  function CompareWithOperator(const A: string; Op: string; const B: string): boolean;
+  var
+    NumA, NumB: double;
+  begin
+    // Try numeric comparison first
+    if TryStrToFloat(A, NumA) and TryStrToFloat(B, NumB) then
+    begin
+      if Op = '=' then Result := NumA = NumB
+      else if Op = '>' then Result := NumA > NumB
+      else if Op = '<' then Result := NumA < NumB
+      else if Op = '>=' then Result := NumA >= NumB
+      else if Op = '<=' then Result := NumA <= NumB
+      else if (Op = '<>') or (Op = '!=') then Result := NumA <> NumB
+      else
+        Result := False;
+    end
+    else
+    begin
+      // String comparison
+      if Op = '=' then Result := A = B
+      else if Op = '<>' then Result := A <> B
+      else if Op = '!=' then Result := A <> B
+      else
+        Result := False;
+    end;
+  end;
+
+begin
+  TrimFilter := Trim(Filter);
+  if TrimFilter = '' then
+    Exit(True); // Empty filter matches everything
+
+  if StartsWithOperator(TrimFilter, Oper, ValuePart) then
+  begin
+    // Compare with operator
+    if CompareWithOperator(FText, Oper, ValuePart) then Exit(True);
+    if CompareWithOperator(FNote, Oper, ValuePart) then Exit(True);
+    if CompareWithOperator(FloatToStr(FAmount), Oper, ValuePart) then Exit(True);
+    DateAsStr := DateTimeToString(FDate, DisplayTime);
+    if CompareWithOperator(DateAsStr, Oper, ValuePart) then Exit(True);
+
+    // Special case for Done field (0/1)
+    if (TryStrToFloat(ValuePart, FilterValue)) and ((FilterValue = 0) or (FilterValue = 1)) then
+      if CompareWithOperator(BoolToStr(FDone, True), Oper, ValuePart) then Exit(True);
+  end
+  else
+  begin
+    // No operator, simple substring search
+    if (Pos(LowerCase(TrimFilter), LowerCase(FText)) > 0) then Exit(True);
+    if (Pos(LowerCase(TrimFilter), LowerCase(FNote)) > 0) then Exit(True);
+    if (Pos(LowerCase(TrimFilter), LowerCase(FloatToStr(FAmount))) > 0) then Exit(True);
+    DateAsStr := DateTimeToString(FDate, DisplayTime);
+    if (Pos(LowerCase(TrimFilter), LowerCase(DateAsStr)) > 0) then Exit(True);
+
+    // Special case for Done field
+    if (TrimFilter = '1') or (TrimFilter = '0') then
+      if FDone = (TrimFilter = '1') then Exit(True);
+  end;
+
+  Result := False;
 end;
 
 function TTask.GetDate: string;
@@ -355,8 +439,8 @@ begin
   end;
 end;
 
-procedure TTasks.AddGroup(const GroupName: string; const GroupHint: string;
-  const TaskStrings: TStringList = nil); // Add new group from a StringList
+procedure TTasks.AddGroup(const GroupName: string; const GroupHint: string; const TaskStrings: TStringList = nil);
+// Add new group from a StringList
 var
   i: integer; // Index for iteration
 begin
@@ -382,7 +466,7 @@ end;
 
 procedure TTasks.ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
 begin
-  if (CountGroup <= 0) then exit;
+  if (CountGroup <= 0) or (GroupIndex < 0) then exit;
   if (GroupIndex >= CountGroup) then
     GroupIndex := CountGroup - 1;
 
@@ -403,29 +487,30 @@ begin
   Result := FGroupHintList[Index];
 end;
 
-function TTasks.GetGroupArchived(Index: integer): boolean;
+function TTasks.GetGroupFiltered(Index: integer; ShowArchive: boolean; Filter: string; DisplayTime: boolean): boolean;
 var
   i: integer;
+  TaskArray: array of TTask;
 begin
-  if (Index = SelectedGroup) then
-  begin
-    if Length(FTaskList) = 0 then
-      Exit(False);
-
-    for i := 0 to High(FTaskList) do
-      if not FTaskList[i].Archive then
-        Exit(False);
-  end
+  // Select the task array for the specified group
+  if Index = SelectedGroup then
+    TaskArray := FTaskList
   else
-  begin
-    if Length(FGroupList[Index]) = 0 then
-      Exit(False);
+    TaskArray := FGroupList[Index];
 
-    for i := 0 to High(FGroupList[Index]) do
-      if not FGroupList[Index][i].Archive then
-        Exit(False);
+  // If the group has no tasks, hide the tab
+  if Length(TaskArray) = 0 then
+    Exit(False);
+
+  // Check if there is at least one task that is not archived (if ShowArchive = False)
+  // and matches the filter
+  for i := 0 to High(TaskArray) do
+  begin
+    if ((ShowArchive) or (not TaskArray[i].Archive)) and TaskArray[i].MatchesFilter(Filter, DisplayTime) then
+      Exit(False); // Group should be visible
   end;
 
+  // If no matching task is found, hide the group
   Result := True;
 end;
 
@@ -858,7 +943,7 @@ begin
   Result := True;
 end;
 
-function TTasks.GetLeftGroup(aIndex: integer; aShowArchived: boolean): integer;
+function TTasks.GetLeftGroup(aIndex: integer; aShowArchived: boolean; aFilter: string; DisplayTime: boolean): integer;
 var
   i, target: integer;
 begin
@@ -873,7 +958,7 @@ begin
   begin
     target := -1;
     for i := aIndex - 1 downto 0 do
-      if (not GetGroupArchived(i)) then
+      if (not GetGroupFiltered(i, aShowArchived, aFilter, DisplayTime)) then
       begin
         target := i;
         break;
@@ -882,7 +967,7 @@ begin
   Result := target;
 end;
 
-function TTasks.GetRightGroup(aIndex: integer; aShowArchived: boolean): integer;
+function TTasks.GetRightGroup(aIndex: integer; aShowArchived: boolean; aFilter: string; DisplayTime: boolean): integer;
 var
   i, target: integer;
 begin
@@ -897,7 +982,7 @@ begin
   begin
     target := -1;
     for i := aIndex + 1 to CountGroup - 1 do
-      if (not GetGroupArchived(i)) then
+      if (not GetGroupFiltered(i, aShowArchived, aFilter, DisplayTime)) then
       begin
         target := i;
         break;
@@ -906,7 +991,7 @@ begin
   Result := target;
 end;
 
-function TTasks.MoveGroupLeft(Index: integer; aShowArchived: boolean): integer;
+function TTasks.MoveGroupLeft(Index: integer; aShowArchived: boolean; aFilter: string; DisplayTime: boolean): integer;
 var
   tempGroup: array of TTask;
   tempName, tempHint: string;
@@ -915,7 +1000,7 @@ begin
   Result := Index;
   if (Index < 1) then exit;
 
-  target := GetLeftGroup(Index, aShowArchived);
+  target := GetLeftGroup(Index, aShowArchived, aFilter, DisplayTime);
   if target < 0 then exit;
 
   // Save the group that will be moved
@@ -940,7 +1025,7 @@ begin
   FSelectedGroup := Result;
 end;
 
-function TTasks.MoveGroupRight(Index: integer; aShowArchived: boolean): integer;
+function TTasks.MoveGroupRight(Index: integer; aShowArchived: boolean; aFilter: string; DisplayTime: boolean): integer;
 var
   tempGroup: array of TTask;
   tempName, tempHint: string;
@@ -949,7 +1034,7 @@ begin
   Result := Index;
   if (Index >= CountGroup - 1) then exit;
 
-  target := GetRightGroup(Index, aShowArchived);
+  target := GetRightGroup(Index, aShowArchived, aFilter, DisplayTime);
   if target < 0 then exit;
 
   // Save the group that will be moved
@@ -1947,16 +2032,17 @@ begin
   Result := Length(FTaskList);
 end;
 
-function TTasks.GetCountArchive: integer;
+function TTasks.GetCountFilter(Archive: boolean; Filter: string; DisplayTime: boolean): integer;
 var
   I: integer;
 begin
   Result := 0;
   for I := 0 to Count - 1 do
-    if FTaskList[I].Archive then Result += 1;
+    if (not Archive and FTaskList[I].Archive) or (not FTaskList[I].MatchesFilter(Filter, DisplayTime)) then Result += 1;
 end;
 
-procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder; SortColumn: integer);
+procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder;
+  SortColumn: integer; Filter: string);
 var
   I, J, ArhCount, RowIndex: integer;
   LastDate, MinDate, MaxDate: TDateTime;
@@ -2129,13 +2215,9 @@ begin
     SetLength(StartDates, 0);
     SetLength(EndDates, 0);
 
-    // Archive tasks count
-    ArhCount := GetCountArchive;
-
-    if (ShowArchive) then
-      Grid.RowCount := Count + 1
-    else
-      Grid.RowCount := Count - ArhCount + 1;
+    // Task count
+    ArhCount := GetCountFilter(ShowArchive, Filter, DisplayTime);
+    Grid.RowCount := Count - ArhCount + 1;
 
     // Default row indexing based on sort order
     if SortOrder = soAscending then
@@ -2213,7 +2295,8 @@ begin
       end;
 
       // Fill task in grid for archive or not
-      if (ShowArchive = True) or (FTaskList[I].Archive = False) then
+      if ((ShowArchive = True) or (FTaskList[I].Archive = False)) and ((Filter = string.Empty) or
+        (FTaskList[I].MatchesFilter(Filter, DisplayTime))) then
       begin
         Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].Done));
         Grid.Cells[2, RowIndex] := FTaskList[I].Text;

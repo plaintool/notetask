@@ -764,6 +764,11 @@ msgstr ""
 msgid "WindowsCRLF"
 msgstr ""
 
+#: tformnotetask.filterbox.texthint
+msgctxt "tformnotetask.filterbox.texthint"
+msgid "Type to filter..."
+msgstr ""
+
 #: tformnotetask.fontdialog.title
 msgid "Font select"
 msgstr ""
