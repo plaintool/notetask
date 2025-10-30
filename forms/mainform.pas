@@ -1438,6 +1438,12 @@ begin
 
   if (Button = mbLeft) and (ssCtrl in Shift) and (taskGrid.Col in [2, 3]) then
     TryOpenAsUrl(Trim(taskGrid.Cells[taskGrid.Col, taskGrid.Row]));
+
+  if (not FRepaint) then
+  begin
+    FRepaint := True;
+    GridInvalidate;
+  end;
 end;
 
 procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
@@ -1793,12 +1799,6 @@ begin
     FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)] := aRow;
 
   FLastSelectionHeight := taskGrid.Selection.Height;
-
-  if (not FRepaint) then
-  begin
-    FRepaint := True;
-    GridInvalidate;
-  end;
 end;
 
 procedure TformNotetask.groupTabsChange(Sender: TObject);
