@@ -102,12 +102,13 @@ The status bar provides a concise, real-time overview of the current task list. 
 **Notetask** uses a simple *plain text* format based on *Markdown* (file extension .tsk), where **each line represents a single task** with the following structure:
 
 ```md
-## Group
+## Group // Tooltip
 - [x] Date, Amount, ~~**Text**~~ // Note <br>
 ```
 ### Legend
 *All fields are optional. A task line may include any combination of them.*
 - `## Group` — the group title, marking the start of a set of related tasks  
+- `// Tooltip` — tooltip with the group description
 - `- [x] or - [ ]` — task completion status ([x] = done, [ ] = pending)
 - `Date` — task date and optional timestamp in ISO 8601 format `yyyy-MM-ddTHH:mm:ss`
 - `Amount` — numeric value related to the task (e.g., cost, quantity), using a dot `.` as the decimal separator
