@@ -2,34 +2,23 @@
 <XML_DIZ_INFO>
   <Program_Info>
     <Program_Name>NoteTask</Program_Name>
-    <Program_Version>1.0.1</Program_Version>
+    <Program_Version>1.1.0</Program_Version>
     <Program_Release_Date>2025-10-28</Program_Release_Date>
     <Program_Summary>A simple application for creating and organizing task lists, offering essential features for efficient task management, similar to Notepad in its simplicity and functionality.</Program_Summary>
     <Program_Description>Notetask is a free and open-source cross-platform task manager and note-taking application for Windows and Linux, written in Lazarus (Free Pascal). The core idea of Notetask is simple: it stores tasks and notes in plain text files, where each line represents a separate task or note. Users can also choose to save their files in an encrypted format for personal information, while all data remains local to their device.
 
 Notetask provides a customizable interface and a range of features to manage tasks effectively, including automatic numbering, paged task groups with duration and amount tracking, task merging, splitting, archiving, indentation, highlighting for overdue or upcoming tasks, copy/paste in Markdown, and an optional encrypted file format. It is fully Unicode-enabled and localized in 14 languages.
 
-Changelog (v1.0.1)
-New Features:
-- Implemented functionality to check for application updates via the GitHub API
-Implemented enhancements:
-- Darken the note separator
-Fixed bugs:
-- Program not started in unavailable language.
-- Task duplication bugs that cleared the clipboard and lost left indentation
-- Delete key functions incorrectly in the memo grid
-- A bug where reducing the window size to zero caused the note to swap positions with the status bar
-- Reset selection to the first line when creating a new file, as only a single line exists
-- Window title is not displayed in the taskbar
+Changelog (v1.1.0)
 
 Alternative downloads:
 - Fedora rpm package (Linux): 
-https://github.com/plaintool/notetask/releases/download/v1.0.1/notetask-1.0.1.rpm
+https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0.rpm
 - Portable/Archive: 
-https://github.com/plaintool/notetask/releases/download/v1.0.1/notetask-1.0.1.tar.gz
+https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0.tar.gz
 </Program_Description>
     <Program_Homepage_URL>https://github.com/plaintool/notetask</Program_Homepage_URL>
-    <Program_Download_URL>https://github.com/plaintool/notetask/releases/download/v1.0.1/notetask-1.0.1.deb</Program_Download_URL>
+    <Program_Download_URL>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0.deb</Program_Download_URL>
     <Program_Icon_URL>https://github.com/plaintool/notetask/raw/master/samples/notetask.png</Program_Icon_URL>
     <Program_Screenshot_URL>https://github.com/plaintool/notetask/raw/master/samples/sample1.png,https://github.com/plaintool/notetask/raw/master/samples/sample2.png,https://github.com/plaintool/notetask/raw/master/samples/sample3.png,https://github.com/plaintool/notetask/raw/master/samples/sample4.png,https://github.com/plaintool/notetask/raw/master/samples/menu.png,https://github.com/plaintool/notetask/raw/master/samples/powershell.png,https://github.com/plaintool/notetask/raw/master/samples/encrypt.png,https://github.com/plaintool/notetask/raw/master/samples/demo.gif</Program_Screenshot_URL>
     <Program_Video_URL>https://youtu.be/02zsu6tL3qU</Program_Video_URL>

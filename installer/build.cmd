@@ -3,7 +3,7 @@ setlocal
 
 :: Define paths
 SET "SOURCE_DIR=E:\notetask\installer"
-SET "VERSION=1.0.1"
+SET "VERSION=1.1.0"
 
 :: --- Build peruser ---
 echo Compiling msisetup_peruser.wxs with candle...
@@ -50,7 +50,7 @@ IF %ERRORLEVEL% EQU 0 (
 )
 
 :: --- Portable ---
-tar -czf notetask-1.0.1.tar.gz -C .. notetask.exe -C "%CD%\debsetup\DATA\usr\bin" notetask
+tar -czf notetask-1.1.0.tar.gz -C .. notetask.exe -C "%CD%\debsetup\DATA\usr\bin" notetask
 
 echo Build and signing completed successfully!
 pause
