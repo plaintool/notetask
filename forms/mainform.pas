@@ -539,6 +539,7 @@ type
     procedure SetCaption;
     procedure SetInfo;
     procedure SetNote;
+    procedure SetFilter(Value: string = string.Empty);
     procedure SetTabs(Change: boolean = True);
     procedure SetTabsVisible;
     procedure ClearSelected(ShowConfirm: boolean = True);
@@ -2036,8 +2037,7 @@ end;
 
 procedure TformNotetask.filterBoxChange(Sender: TObject);
 var
-  LastTask: integer;
-  LastTab: integer;
+  LastTask, LastTab: integer;
 begin
   LastTask := Tasks.Map(taskGrid.Row);
   LastTab := FindGroupRealIndex(groupTabs.TabIndex);
@@ -2119,7 +2119,7 @@ end;
 
 procedure TformNotetask.filterClearClick(Sender: TObject);
 begin
-  filterBox.Clear;
+  filterBox.Text := string.Empty;
   filterBox.OnChange(Self);
 end;
 
@@ -3458,6 +3458,8 @@ begin
   {$ELSE}
   ; // NOP
   {$ENDIF}
+
+  SetFilter(MemoNote.Text);
 end;
 
 procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -3790,6 +3792,8 @@ begin
     taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Row, taskGrid.Selection.Right, taskGrid.Row);
     taskGrid.Row := 1;
 
+    SetFilter;
+
     FLineEndingOriginal := FLineEnding;
     FEncodingOriginal := FEncoding;
   end;
@@ -3920,6 +3924,8 @@ begin
   LoadGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
   ApplyGridSettings;
+
+  SetFilter;
 
   FLineEndingOriginal := FLineEnding;
   FEncodingOriginal := FEncoding;
@@ -4640,7 +4646,10 @@ begin
     begin
       // Pressing the Escape key cancels editing
       if (aEscape) then
-        Memo.Text := FMemoOldText;
+        Memo.Text := FMemoOldText
+      else
+      if taskGrid.Col in [2, 3] then
+        SetFilter(Memo.Text);
     end;
 
     taskGrid.EditorMode := False;
@@ -6613,6 +6622,12 @@ begin
     MemoNoteBackup;
     memoNote.OnChange := @memoNoteChange;
   end;
+end;
+
+procedure TformNotetask.SetFilter(Value: string = string.Empty);
+begin
+  Tasks.FillTags(Value);
+  filterBox.Items.Assign(Tasks.Tags);
 end;
 
 procedure TformNotetask.SetReadOnly(Value: boolean);

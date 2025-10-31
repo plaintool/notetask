@@ -82,6 +82,10 @@ function HasScheme(const URL: string): boolean;
 
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
 
+procedure FillTagsFromString(var List: TStringList; const S: string);
+
+procedure ReplaceStartsWith(var List: TStringList; const S: string);
+
 procedure ParseGroupName(const Value: string; out NameText, HintText: string);
 
 function ReplaceLineBreaks(const S: string): string;
@@ -731,6 +735,52 @@ begin
     if i < High(Parts) then
       Result += Separator;
   end;
+end;
+
+procedure FillTagsFromString(var List: TStringList; const S: string);
+var
+  i, Start: integer;
+  Ch: char;
+  WordStr: string;
+begin
+  i := 1;
+  while i <= Length(S) do
+  begin
+    Ch := S[i];
+    // Check if the character is a tag prefix
+    // and is at the start of string or preceded by space/line break
+    if (Ch in ['@', '#', '+', '%']) and ((i = 1) or (S[i - 1] in [#32, #13, #10])) then
+    begin
+      Start := i;
+      Inc(i);
+      // Continue while the character is a letter or digit
+      while (i <= Length(S)) and (S[i] in ['0'..'9', 'A'..'Z', 'a'..'z']) do
+        Inc(i);
+
+      WordStr := Copy(S, Start, i - Start);
+      // Add the tag only if it contains more than just the prefix
+      if Length(WordStr) > 1 then
+        ReplaceStartsWith(List, WordStr); // List.Add(WordStr);
+    end
+    else
+      Inc(i);
+  end;
+end;
+
+procedure ReplaceStartsWith(var List: TStringList; const S: string);
+var
+  i: integer;
+begin
+  // Iterate backwards to safely remove items while looping
+  for i := List.Count - 1 downto 0 do
+  begin
+    // If the item is at the start of the string S, remove it
+    if (Pos(LowerCase(List[i]), LowerCase(S)) = 1) then
+      List.Delete(i);
+  end;
+
+  // Add the string to the list
+  List.Add(S);
 end;
 
 procedure ParseGroupName(const Value: string; out NameText, HintText: string);

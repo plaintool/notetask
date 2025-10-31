@@ -77,12 +77,14 @@ type
     FGroupList: array of array of TTask; // Array of task groups
     FGroupNameList: TStringList; // List of group names
     FGroupHintList: TStringList; // List of group hints
+    FTags: TStringList; // List of detected tags
     FTaskList: array of TTask; // Array of tasks
     FMapGrid: TIntegerArray; // Maps grid rows to tasks
     FBackupTaskList: array of TTask; // Backup array of tasks
     FInitGroupList: array of array of TTask; // Initial array of task groups
     FInitGroupNameList: TStringList; // List of group names
-    FInitGroupHintList: TStringList; // List of group names
+    FInitGroupHintList: TStringList; // List of group hints
+    FInitTags: TStringList; // List of detected tags
     FSelectedGroup: integer;
 
     function GetGroupCount: integer;
@@ -136,6 +138,7 @@ type
     procedure MoveTask(OldIndex, NewIndex: integer);
     procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
     function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;
+    procedure FillTags(Value: string = string.Empty);
     procedure CreateBackup;
     procedure UndoBackup;
     procedure CreateBackupInit;
@@ -151,6 +154,7 @@ type
 
     property GroupNames: TStringList read FGroupNameList;
     property GroupHints: TStringList read FGroupHintList;
+    property Tags: TStringList read FTags;
     property SelectedGroup: integer read FSelectedGroup;
     property CountGroup: integer read GetGroupCount;
     property Count: integer read GetCount;
@@ -230,7 +234,7 @@ var
 
   function StartsWithOperator(const S: string; out Op, Rest: string): boolean;
   const
-    Ops: array[0..6] of string = ('>=', '<=', '<>', '!=', '=', '>', '<');
+    Ops: array[0..7] of string = ('>=', '<=', '<>', '!=', '=', '>', '<', '!');
   var
     i: integer;
   begin
@@ -241,7 +245,7 @@ var
         Rest := Trim(System.Copy(S, Length(Ops[i]) + 1, MaxInt));
         Exit(True);
       end;
-    Op := '';
+    Op := string.Empty;
     Rest := S;
     Result := False;
   end;
@@ -268,6 +272,7 @@ var
       if Op = '=' then Result := A = B
       else if Op = '<>' then Result := A <> B
       else if Op = '!=' then Result := A <> B
+      else if Op = '!' then Result := Pos(LowerCase(B), LowerCase(A)) = 0
       else
         Result := False;
     end;
@@ -275,21 +280,29 @@ var
 
 begin
   TrimFilter := Trim(Filter);
-  if TrimFilter = '' then
+  if TrimFilter = string.Empty then
     Exit(True); // Empty filter matches everything
 
   if StartsWithOperator(TrimFilter, Oper, ValuePart) then
   begin
-    // Compare with operator
-    if CompareWithOperator(FText, Oper, ValuePart) then Exit(True);
-    if CompareWithOperator(FNote, Oper, ValuePart) then Exit(True);
-    if CompareWithOperator(FloatToStr(FAmount), Oper, ValuePart) then Exit(True);
     DateAsStr := DateTimeToString(FDate, DisplayTime);
-    if CompareWithOperator(DateAsStr, Oper, ValuePart) then Exit(True);
+    // Compare with operator
+    if (Oper = '!') then
+    begin
+      if CompareWithOperator(FText, Oper, ValuePart) and CompareWithOperator(FNote, Oper, ValuePart) and
+        CompareWithOperator(FloatToStr(FAmount), Oper, ValuePart) and CompareWithOperator(DateAsStr, Oper, ValuePart) then Exit(True);
+    end
+    else
+    begin
+      if CompareWithOperator(FText, Oper, ValuePart) then Exit(True);
+      if CompareWithOperator(FNote, Oper, ValuePart) then Exit(True);
+      if CompareWithOperator(FloatToStr(FAmount), Oper, ValuePart) then Exit(True);
+      if CompareWithOperator(DateAsStr, Oper, ValuePart) then Exit(True);
 
-    // Special case for Done field (0/1)
-    if (TryStrToFloat(ValuePart, FilterValue)) and ((FilterValue = 0) or (FilterValue = 1)) then
-      if CompareWithOperator(BoolToStr(FDone, True), Oper, ValuePart) then Exit(True);
+      // Special case for Done field (0/1)
+      if (TryStrToFloat(ValuePart, FilterValue)) and ((FilterValue = 0) or (FilterValue = 1)) then
+        if CompareWithOperator(BoolToStr(FDone, True), Oper, ValuePart) then Exit(True);
+    end;
   end
   else
   begin
@@ -344,12 +357,17 @@ begin
   FSelectedGroup := -1;
   FGroupNameList := TStringList.Create;
   FGroupHintList := TStringList.Create;
+  FTags := TStringList.Create;
+  FTags.Duplicates := dupIgnore;
+  FTags.Sorted := True;
 
   if Assigned(TaskStrings) then
   begin
     mdformat.TasksFromStringList(TaskStrings, @AddGroup);
     TaskStrings.Free;
   end;
+
+  FillTags;
 
   CreateBackupInit;
   ChangeGroup(0, True);
@@ -410,8 +428,17 @@ begin
   if Assigned(FGroupHintList) then
     FGroupHintList.Free;
 
+  if Assigned(FTags) then
+    FTags.Free;
+
   if Assigned(FInitGroupNameList) then
     FInitGroupNameList.Free;
+
+  if Assigned(FInitGroupHintList) then
+    FInitGroupHintList.Free;
+
+  if Assigned(FInitTags) then
+    FInitTags.Free;
 
   SetLength(FMapGrid, 0);
   FMapGrid := nil;
@@ -1592,6 +1619,24 @@ begin
   end;
 end;
 
+procedure TTasks.FillTags(Value: string = string.Empty);
+var
+  i, j: integer;
+begin
+  if (Value = string.Empty) then
+  begin
+    FTags.Clear;
+    for i := 0 to High(FGroupList) do
+      for j := 0 to High(FGroupList[i]) do
+      begin
+        FillTagsFromString(FTags, FGroupList[i][j].Text);
+        FillTagsFromString(FTags, FGroupList[i][j].Note);
+      end;
+  end
+  else
+    FillTagsFromString(FTags, Value);
+end;
+
 procedure TTasks.CreateBackup;
 var
   i: integer;
@@ -1713,10 +1758,27 @@ begin
     FInitGroupNameList := TStringList.Create;
     FInitGroupNameList.Assign(FGroupNameList);
   end;
+
+  if Assigned(FInitGroupHintList) then
+  begin
+    FInitGroupHintList.Free;
+    FInitGroupHintList := nil;
+  end;
   if Assigned(FGroupHintList) then
   begin
     FInitGroupHintList := TStringList.Create;
     FInitGroupHintList.Assign(FGroupHintList);
+  end;
+
+  if Assigned(FInitTags) then
+  begin
+    FInitTags.Free;
+    FInitTags := nil;
+  end;
+  if Assigned(FTags) then
+  begin
+    FInitTags := TStringList.Create;
+    FInitTags.Assign(FTags);
   end;
 end;
 
@@ -1767,6 +1829,11 @@ begin
     FGroupHintList.Free;
     FGroupHintList := nil;
   end;
+  if Assigned(FTags) then
+  begin
+    FTags.Free;
+    FTags := nil;
+  end;
   if Assigned(FInitGroupNameList) then
   begin
     FGroupNameList := TStringList.Create;
@@ -1776,6 +1843,11 @@ begin
   begin
     FGroupHintList := TStringList.Create;
     FGroupHintList.Assign(FInitGroupHintList);
+  end;
+  if Assigned(FInitTags) then
+  begin
+    FTags := TStringList.Create;
+    FTags.Assign(FInitTags);
   end;
 
   ChangeGroup(SelectedGroup);
