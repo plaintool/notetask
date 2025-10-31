@@ -2035,9 +2035,19 @@ begin
 end;
 
 procedure TformNotetask.filterBoxChange(Sender: TObject);
+var
+  LastTask: integer;
+  LastTab: integer;
 begin
+  LastTask := Tasks.Map(taskGrid.Row);
+  LastTab := FindGroupRealIndex(groupTabs.TabIndex);
+
   SetTabs;
   FillGrid;
+
+  if (LastTab = FindGroupRealIndex(groupTabs.TabIndex)) then
+    taskGrid.Row := Tasks.ReverseMap(LastTask);
+
   SetInfo;
   SetNote;
 end;
@@ -2099,6 +2109,10 @@ begin
         filterBox.SelStart := SelStart + Length(unicodestring(ClipText));
         Key := 0;
       end;
+
+    VK_ESCAPE:
+      if taskGrid.Visible and taskGrid.CanFocus then
+        taskGrid.SetFocus;
   end;
   filterBox.OnChange(Self);
 end;
@@ -2963,7 +2977,18 @@ begin
   Invalidate;
   Application.ProcessMessages;
   if (panelTabs.Visible) then
-    filterBox.SetFocus;
+  begin
+    if filterBox.Focused then
+    begin
+      if taskGrid.Visible and taskGrid.CanFocus then
+        taskGrid.SetFocus;
+    end
+    else
+    begin
+      if filterBox.Visible and filterBox.CanFocus then
+        filterBox.SetFocus;
+    end;
+  end;
 end;
 
 procedure TformNotetask.aDuplicateGroupExecute(Sender: TObject);
