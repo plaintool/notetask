@@ -3766,6 +3766,7 @@ begin
     new.Add('[ ]');
     Tasks := TTasks.Create(new);
     FFileName := string.Empty;
+    panelTabs.Visible := False;
 
     FEncrypted := False;
     FreeBytesSecure(FKeyEnc);
@@ -3794,10 +3795,6 @@ begin
 
     taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Row, taskGrid.Selection.Right, taskGrid.Row);
     taskGrid.Row := 1;
-
-    if TaskGrid.Visible and TaskGrid.CanFocus then
-      taskGrid.SetFocus;
-    panelTabs.Visible := False;
 
     SetFilter;
 

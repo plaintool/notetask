@@ -104,6 +104,7 @@ const
   UnicodeMinusUTF8 = #$E2#$88#$92;
   MaxFloatStringLength = 15;
   MaxDT: TDateTime = 2958465.999988426; // 31.12.9999 23:59:59
+  MaxTagLength = 500;
 
 implementation
 
@@ -752,7 +753,7 @@ begin
       Start := i;
       Inc(i);
       // Scan until closing backtick, line break, or max length
-      while (i <= Length(S)) and (S[i] <> '`') and (i - Start < 100) do
+      while (i <= Length(S)) and (S[i] <> '`') and (i - Start < MaxTagLength) do
       begin
         if S[i] in [#13, #10] then
           Break;
@@ -764,7 +765,7 @@ begin
       begin
         WordStr := Copy(S, Start, i - Start + 1);
         // Add the tag if it meets length requirements and has no line breaks
-        if (Length(WordStr) > 2) and (Length(WordStr) <= 100) and (Pos(#13, WordStr) = 0) and (Pos(#10, WordStr) = 0) then
+        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and (Pos(#13, WordStr) = 0) and (Pos(#10, WordStr) = 0) then
           ReplaceStartsWith(List, WordStr);
         Inc(i); // Move past the closing backtick
       end
@@ -779,8 +780,8 @@ begin
       // Collect alphanumeric characters, hyphens, and underscores
       // Also check that we have at least one alphanumeric character
       HasAlphaNum := False;
-      while (i <= Length(S)) and (S[i] in ['0'..'9', 'A'..'Z', 'a'..'z', '-', '_']) and (i - Start < 100) do
-        // Limit total length to 100 characters
+      while (i <= Length(S)) and (S[i] in ['0'..'9', 'A'..'Z', 'a'..'z', '-', '_']) and (i - Start < MaxTagLength) do
+        // Limit total length to MaxTagLength characters
       begin
         if S[i] in ['0'..'9', 'A'..'Z', 'a'..'z'] then
           HasAlphaNum := True;
@@ -789,7 +790,7 @@ begin
 
       WordStr := Copy(S, Start, i - Start);
       // Add tag if length is valid and contains at least one alphanumeric character
-      if (Length(WordStr) > 1) and (Length(WordStr) <= 100) and HasAlphaNum then
+      if (Length(WordStr) > 1) and (Length(WordStr) <= MaxTagLength) and HasAlphaNum then
         ReplaceStartsWith(List, WordStr);
     end
     else
