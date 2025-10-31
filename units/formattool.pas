@@ -740,27 +740,57 @@ end;
 procedure FillTagsFromString(var List: TStringList; const S: string);
 var
   i, Start: integer;
-  Ch: char;
   WordStr: string;
+  HasAlphaNum: boolean;
 begin
   i := 1;
   while i <= Length(S) do
   begin
-    Ch := S[i];
-    // Check if the character is a tag prefix
-    // and is at the start of string or preceded by space/line break
-    if (Ch in ['@', '#', '+', '%']) and ((i = 1) or (S[i - 1] in [#32, #13, #10])) then
+    // Check for backtick tag first
+    if S[i] = '`' then
     begin
       Start := i;
       Inc(i);
-      // Continue while the character is a letter or digit
-      while (i <= Length(S)) and (S[i] in ['0'..'9', 'A'..'Z', 'a'..'z']) do
+      // Scan until closing backtick, line break, or max length
+      while (i <= Length(S)) and (S[i] <> '`') and (i - Start < 100) do
+      begin
+        if S[i] in [#13, #10] then
+          Break;
         Inc(i);
+      end;
+
+      // Check if we found a valid closing backtick
+      if (i <= Length(S)) and (S[i] = '`') then
+      begin
+        WordStr := Copy(S, Start, i - Start + 1);
+        // Add the tag if it meets length requirements and has no line breaks
+        if (Length(WordStr) > 2) and (Length(WordStr) <= 100) and (Pos(#13, WordStr) = 0) and (Pos(#10, WordStr) = 0) then
+          ReplaceStartsWith(List, WordStr);
+        Inc(i); // Move past the closing backtick
+      end
+      else
+        Inc(i); // Move forward if no valid closing backtick found
+    end
+    // Check for prefix tags (@, #, %, +, $)
+    else if (S[i] in ['@', '#', '%', '+', '$']) and ((i = 1) or (S[i - 1] in [#32, #13, #10])) then
+    begin
+      Start := i;
+      Inc(i);
+      // Collect alphanumeric characters, hyphens, and underscores
+      // Also check that we have at least one alphanumeric character
+      HasAlphaNum := False;
+      while (i <= Length(S)) and (S[i] in ['0'..'9', 'A'..'Z', 'a'..'z', '-', '_']) and (i - Start < 100) do
+        // Limit total length to 100 characters
+      begin
+        if S[i] in ['0'..'9', 'A'..'Z', 'a'..'z'] then
+          HasAlphaNum := True;
+        Inc(i);
+      end;
 
       WordStr := Copy(S, Start, i - Start);
-      // Add the tag only if it contains more than just the prefix
-      if Length(WordStr) > 1 then
-        ReplaceStartsWith(List, WordStr); // List.Add(WordStr);
+      // Add tag if length is valid and contains at least one alphanumeric character
+      if (Length(WordStr) > 1) and (Length(WordStr) <= 100) and HasAlphaNum then
+        ReplaceStartsWith(List, WordStr);
     end
     else
       Inc(i);

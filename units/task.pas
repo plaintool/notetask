@@ -230,7 +230,6 @@ end;
 function TTask.MatchesFilter(const Filter: string; DisplayTime: boolean): boolean;
 var
   TrimFilter, Oper, ValuePart, DateAsStr: string;
-  FilterValue: double;
 
   function StartsWithOperator(const S: string; out Op, Rest: string): boolean;
   const
@@ -253,6 +252,7 @@ var
   function CompareWithOperator(const A: string; Op: string; const B: string): boolean;
   var
     NumA, NumB: double;
+    DateA, DateB: TDateTime;
   begin
     // Try numeric comparison first
     if TryStrToFloat(A, NumA) and TryStrToFloat(B, NumB) then
@@ -266,12 +266,23 @@ var
       else
         Result := False;
     end
+    else if TryStrToDate(A, DateA) and TryStrToDate(B, DateB) then
+    begin
+      // Date comparison
+      if Op = '=' then Result := DateA = DateB
+      else if Op = '>' then Result := DateA > DateB
+      else if Op = '<' then Result := DateA < DateB
+      else if Op = '>=' then Result := DateA >= DateB
+      else if Op = '<=' then Result := DateA <= DateB
+      else if (Op = '<>') or (Op = '!=') then Result := DateA <> DateB
+      else
+        Result := False;
+    end
     else
     begin
       // String comparison
       if Op = '=' then Result := A = B
-      else if Op = '<>' then Result := A <> B
-      else if Op = '!=' then Result := A <> B
+      else if (Op = '<>') or (Op = '!=') then Result := A <> B
       else if Op = '!' then Result := Pos(LowerCase(B), LowerCase(A)) = 0
       else
         Result := False;
@@ -285,6 +296,9 @@ begin
 
   if StartsWithOperator(TrimFilter, Oper, ValuePart) then
   begin
+    if ValuePart = string.Empty then
+      Exit(True); // Empty filter matches everything
+
     DateAsStr := DateTimeToString(FDate, DisplayTime);
     // Compare with operator
     if (Oper = '!') then
@@ -294,28 +308,34 @@ begin
     end
     else
     begin
+      // Special case for Done field (0/1)
+      if (ValuePart = '1') or (ValuePart = '0') then
+        if FDone = (ValuePart = '1') then
+          Exit(True)
+        else
+          Exit(False);
+
       if CompareWithOperator(FText, Oper, ValuePart) then Exit(True);
       if CompareWithOperator(FNote, Oper, ValuePart) then Exit(True);
       if CompareWithOperator(FloatToStr(FAmount), Oper, ValuePart) then Exit(True);
       if CompareWithOperator(DateAsStr, Oper, ValuePart) then Exit(True);
-
-      // Special case for Done field (0/1)
-      if (TryStrToFloat(ValuePart, FilterValue)) and ((FilterValue = 0) or (FilterValue = 1)) then
-        if CompareWithOperator(BoolToStr(FDone, True), Oper, ValuePart) then Exit(True);
     end;
   end
   else
   begin
+    // Special case for Done field
+    if (TrimFilter = '1') or (TrimFilter = '0') then
+      if FDone = (TrimFilter = '1') then
+        Exit(True)
+      else
+        Exit(False);
+
     // No operator, simple substring search
     if (Pos(LowerCase(TrimFilter), LowerCase(FText)) > 0) then Exit(True);
     if (Pos(LowerCase(TrimFilter), LowerCase(FNote)) > 0) then Exit(True);
     if (Pos(LowerCase(TrimFilter), LowerCase(FloatToStr(FAmount))) > 0) then Exit(True);
     DateAsStr := DateTimeToString(FDate, DisplayTime);
     if (Pos(LowerCase(TrimFilter), LowerCase(DateAsStr)) > 0) then Exit(True);
-
-    // Special case for Done field
-    if (TrimFilter = '1') or (TrimFilter = '0') then
-      if FDone = (TrimFilter = '1') then Exit(True);
   end;
 
   Result := False;

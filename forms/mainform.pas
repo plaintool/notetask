@@ -520,7 +520,8 @@ type
     function GetLineAtEnd: integer;
     function GetLineAtPos(Y: integer): integer;
     procedure PasteWithLineEnding(AMemo: TMemo);
-    procedure UpdateComboRegion(Combo: TComboBox; AInset: integer = 2);
+    procedure UpdateComboRegion(Combo: TComboBox; AInsetLeft: integer = 1; AInsetTop: integer = 1;
+      AInsetRight: integer = 0; AInsetBottom: integer = 1);
     procedure SelectMemoLine(LineIndex: integer; Move: boolean = False);
     procedure SetMemoFocusDelayed(Data: PtrInt);
     procedure PanelMemoEnter(Sender: TObject);
@@ -697,6 +698,7 @@ const
   clRowExpired = TColor($DCDCFF); // RGB(255,220,220)
   clDarkBlue = TColor($B40000); // RGB(0,0,180)
   clGray = TColor($F0F0F0); // RGB(240,240,240)
+  clGrayLight = TColor($FAFAFA); // RGB(250,250,250)
   clGrayDark = TColor($E9E9E9); // RGB(233,233,233)
   clGrayHighlight = TColor($E3E3E3); // RGB(227,227,227)
 
@@ -780,7 +782,7 @@ begin
   saveDialog.Filter := rsavedialogfilter;
   panelNote.Color := clGray;
   Splitter.Color := clGrayDark;
-  SplitFilter.Color := clGrayDark;
+  SplitFilter.Color := clGrayLight;
 
   // Remove standart border
   UpdateComboRegion(filterBox);
@@ -3756,6 +3758,7 @@ begin
     if SaveSetting then
       SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
+    FilterBox.Clear;
     if Assigned(Tasks) then
       Tasks.Free;
 
@@ -3791,6 +3794,10 @@ begin
 
     taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Row, taskGrid.Selection.Right, taskGrid.Row);
     taskGrid.Row := 1;
+
+    if TaskGrid.Visible and TaskGrid.CanFocus then
+      taskGrid.SetFocus;
+    panelTabs.Visible := False;
 
     SetFilter;
 
@@ -4684,13 +4691,14 @@ begin
   {$ENDIF}
 end;
 
-procedure TformNotetask.UpdateComboRegion(Combo: TComboBox; AInset: integer = 2);
+procedure TformNotetask.UpdateComboRegion(Combo: TComboBox; AInsetLeft: integer = 1; AInsetTop: integer = 1;
+  AInsetRight: integer = 0; AInsetBottom: integer = 1);
 var
   Rgn: HRGN;
 begin
   // Define a client area without the border (inset pixels from each side)
-  Rgn := CreateRectRgn(AInset, AInset, Combo.Width - AInset, Combo.Height - AInset);
-  // Windows takes ownership of Rgn, so it must NOT be deleted manually.
+  Rgn := CreateRectRgn(AInsetLeft, AInsetTop, Combo.Width - AInsetRight, Combo.Height - AInsetBottom);
+  // Windows takes ownership of Rgn, so it must not be deleted manually.
   SetWindowRgn(Combo.Handle, Rgn, True);
 end;
 
@@ -6625,9 +6633,21 @@ begin
 end;
 
 procedure TformNotetask.SetFilter(Value: string = string.Empty);
+var
+  i: integer;
+  SortedState: boolean;
 begin
   Tasks.FillTags(Value);
+  SortedState := filterBox.Sorted;
+  filterBox.Sorted := False;
   filterBox.Items.Assign(Tasks.Tags);
+
+  // Remove ` from each item directly
+  for i := 0 to filterBox.Items.Count - 1 do
+    filterBox.Items[i] := StringReplace(filterBox.Items[i], '`', '', [rfReplaceAll]);
+  filterBox.Sorted := SortedState;
+
+  UpdateComboRegion(filterBox);
 end;
 
 procedure TformNotetask.SetReadOnly(Value: boolean);

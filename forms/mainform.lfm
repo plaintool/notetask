@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -334,11 +333,11 @@ object formNotetask: TformNotetask
       object menuReplace: TMenuItem
         Action = aReplace
       end
-      object menuGoTo: TMenuItem
-        Action = aGoTo
-      end
       object menuFilter: TMenuItem
         Action = aFilter
+      end
+      object menuGoTo: TMenuItem
+        Action = aGoTo
       end
       object Separator7: TMenuItem
         Caption = '-'
