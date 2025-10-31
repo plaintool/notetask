@@ -2123,6 +2123,8 @@ procedure TformNotetask.filterClearClick(Sender: TObject);
 begin
   filterBox.Text := string.Empty;
   filterBox.OnChange(Self);
+  if Visible and taskGrid.Visible and taskGrid.CanFocus then
+    taskGrid.SetFocus;
 end;
 
 procedure TformNotetask.SplitFilterChangeBounds(Sender: TObject);

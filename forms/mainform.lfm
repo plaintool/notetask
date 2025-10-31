@@ -10,6 +10,7 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
+  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -190,7 +191,7 @@ object formNotetask: TformNotetask
     TabOrder = 4
     Visible = False
     object SplitFilter: TSplitter
-      Left = 701
+      Left = 639
       Height = 24
       Top = 0
       Width = 5
@@ -203,7 +204,7 @@ object formNotetask: TformNotetask
       Left = 0
       Height = 24
       Top = 0
-      Width = 701
+      Width = 639
       OnChange = groupTabsChange
       Align = alClient
       Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
@@ -216,10 +217,10 @@ object formNotetask: TformNotetask
       OnMouseUp = groupTabsMouseUp
     end
     object filterBox: TComboBox
-      Left = 706
+      Left = 644
       Height = 23
       Top = 0
-      Width = 128
+      Width = 190
       Align = alRight
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
