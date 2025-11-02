@@ -40,10 +40,13 @@ type
     FDateOriginal: string; // Original date line
     FDateStart: TDateTime; // Calculated start time interval
     FDateEnd: TDateTime; // Calculated end time interval
+    FTags: TStringList; // List of detected tags
     constructor Create;
     constructor Create(const TaskString: string); // Constructor that takes a task string
+    destructor Destroy; override; // Destructor
     function ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string; reintroduce;
     procedure Copy(Original: TTask);
+    procedure FillTags;
     function MatchesFilter(const Filter: string; DisplayTime: boolean): boolean;
     function GetDate: string;
     function GetDateTime: string;
@@ -69,6 +72,7 @@ type
     property DateStr: string read GetDate;
     property DateTimeStr: string read GetDateTime;
     property DateTimeStrISO: string read GetDateTimeISO;
+    property Tags: TStringList read FTags;
   end;
 
   // Class representing a collection of tasks
@@ -138,7 +142,7 @@ type
     procedure MoveTask(OldIndex, NewIndex: integer);
     procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
     function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;
-    procedure FillTags(Value: string = string.Empty);
+    procedure FillTags(Task: TTask = nil);
     procedure CreateBackup;
     procedure UndoBackup;
     procedure CreateBackupInit;
@@ -192,6 +196,9 @@ begin
   FDateEnd := 0;
   FAmountOriginal := string.Empty;
   FDateOriginal := string.Empty;
+  FTags := TStringList.Create;
+  FTags.Duplicates := dupIgnore;
+  FTags.Sorted := True;
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -201,6 +208,12 @@ begin
   Temp := mdformat.TaskFromString(TaskString);
   Self.Copy(Temp); // Copy fields to new task
   Temp.Free;
+end;
+
+destructor TTask.Destroy;
+begin
+  FTags.Free;
+  inherited;
 end;
 
 function TTask.ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string;
@@ -225,6 +238,18 @@ begin
   FDateEnd := Original.FDateEnd;
   FAmountOriginal := Original.FAmountOriginal;
   FDateOriginal := Original.FDateOriginal;
+  if (not Assigned(FTags)) then
+    FTags := TStringList.Create;
+  if (Assigned(Original.FTags)) then
+    FTags.Assign(Original.FTags)
+  else
+    FTags.Clear;
+end;
+
+procedure TTask.FillTags;
+begin
+  FillTagsFromString(FTags, FText);
+  FillTagsFromString(FTags, FNote);
 end;
 
 function TTask.MatchesFilter(const Filter: string; DisplayTime: boolean): boolean;
@@ -1639,22 +1664,25 @@ begin
   end;
 end;
 
-procedure TTasks.FillTags(Value: string = string.Empty);
+procedure TTasks.FillTags(Task: TTask = nil);
 var
   i, j: integer;
 begin
-  if (Value = string.Empty) then
+  if (Assigned(Task)) then
+  begin
+    Task.FillTags;
+    FTags.AddStrings(Task.Tags);
+  end
+  else
   begin
     FTags.Clear;
     for i := 0 to High(FGroupList) do
       for j := 0 to High(FGroupList[i]) do
       begin
-        FillTagsFromString(FTags, FGroupList[i][j].Text);
-        FillTagsFromString(FTags, FGroupList[i][j].Note);
+        FGroupList[i][j].FillTags;
+        FTags.AddStrings(FGroupList[i][j].Tags);
       end;
-  end
-  else
-    FillTagsFromString(FTags, Value);
+  end;
 end;
 
 procedure TTasks.CreateBackup;

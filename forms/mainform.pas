@@ -540,7 +540,7 @@ type
     procedure SetCaption;
     procedure SetInfo;
     procedure SetNote;
-    procedure SetFilter(Value: string = string.Empty);
+    procedure SetFilter(FillTags: boolean = True);
     procedure SetTabs(Change: boolean = True);
     procedure SetTabsVisible;
     procedure ClearSelected(ShowConfirm: boolean = True);
@@ -836,6 +836,7 @@ begin
   aRunPowershell.Enabled := False;
   aPageProperties.Visible := False;
   aPageProperties.Enabled := False;
+  filterClear.Flat:=False;
   {$ENDIF}
 end;
 
@@ -2349,6 +2350,7 @@ begin
       Tasks.UndoBackupInit;
       FillGrid;
       ResetRowHeight;
+      SetFilter(False);
       SetInfo;
       SetNote;
       SetTabs;
@@ -3463,7 +3465,7 @@ begin
   ; // NOP
   {$ENDIF}
 
-  SetFilter(MemoNote.Text);
+  SetFilter;
 end;
 
 procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -4655,7 +4657,7 @@ begin
         Memo.Text := FMemoOldText
       else
       if taskGrid.Col in [2, 3] then
-        SetFilter(Memo.Text);
+        SetFilter;
     end;
 
     taskGrid.EditorMode := False;
@@ -4692,13 +4694,17 @@ end;
 
 procedure TformNotetask.UpdateComboRegion(Combo: TComboBox; AInsetLeft: integer = 1; AInsetTop: integer = 1;
   AInsetRight: integer = 0; AInsetBottom: integer = 1);
+{$IFDEF Windows}
 var
   Rgn: HRGN;
+{$ENDIF}
 begin
+  {$IFDEF Windows}
   // Define a client area without the border (inset pixels from each side)
   Rgn := CreateRectRgn(AInsetLeft, AInsetTop, Combo.Width - AInsetRight, Combo.Height - AInsetBottom);
   // Windows takes ownership of Rgn, so it must not be deleted manually.
   SetWindowRgn(Combo.Handle, Rgn, True);
+  {$ENDIF}
 end;
 
 procedure TformNotetask.SelectMemoLine(LineIndex: integer; Move: boolean = False);
@@ -6631,12 +6637,13 @@ begin
   end;
 end;
 
-procedure TformNotetask.SetFilter(Value: string = string.Empty);
+procedure TformNotetask.SetFilter(FillTags: boolean = True);
 var
   i: integer;
   SortedState: boolean;
 begin
-  Tasks.FillTags(Value);
+  if FillTags then
+    Tasks.FillTags(Tasks.GetTask(taskGrid.Row));
   SortedState := filterBox.Sorted;
   filterBox.Sorted := False;
   filterBox.Items.Assign(Tasks.Tags);
