@@ -204,6 +204,7 @@ begin
     ItemSettings := TJSONObject.Create;
     ItemSettings.Add('ShowDuration', Form.ShowDuration);
     ItemSettings.Add('ShowTime', Form.ShowTime);
+    ItemSettings.Add('ShowTags', Form.ShowTags);
     ItemSettings.Add('ShowNote', Form.ShowNote);
     ItemSettings.Add('HideNoteText', Form.HideNoteText);
     ItemSettings.Add('ShowStatusBar', Form.ShowStatusBar);
@@ -323,6 +324,9 @@ begin
 
       if ItemSettings.FindPath('ShowTime') <> nil then
         Form.FShowTime := ItemSettings.FindPath('ShowTime').AsBoolean;
+
+      if ItemSettings.FindPath('ShowTags') <> nil then
+        Form.FShowTags := ItemSettings.FindPath('ShowTags').AsBoolean;
 
       if ItemSettings.FindPath('ShowNote') <> nil then
         Form.FShowNote := ItemSettings.FindPath('ShowNote').AsBoolean;

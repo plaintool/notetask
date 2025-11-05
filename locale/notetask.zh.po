@@ -141,6 +141,14 @@ msgstr "密码:"
 msgid "Read-only"
 msgstr "只读"
 
+#: mainform.rremovetag
+msgid "Are you sure you want to remove tag"
+msgstr "您确定要删除标签"
+
+#: mainform.rremovetagtitle
+msgid "Remove tag"
+msgstr "删除标签"
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
@@ -711,6 +719,10 @@ msgstr "备注"
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "状态栏"
+
+#: tformnotetask.ashowtags.caption
+msgid "Show tags"
+msgstr "标签"
 
 #: tformnotetask.ashowtime.caption
 msgid "Show time"

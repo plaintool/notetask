@@ -72,7 +72,7 @@ type
     property DateStr: string read GetDate;
     property DateTimeStr: string read GetDateTime;
     property DateTimeStrISO: string read GetDateTimeISO;
-    property Tags: TStringList read FTags;
+    property Tags: TStringList read FTags write FTags;
   end;
 
   // Class representing a collection of tasks

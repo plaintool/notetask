@@ -141,6 +141,14 @@ msgstr ""
 msgid "Read-only"
 msgstr ""
 
+#: mainform.rremovetag
+msgid "Are you sure you want to remove tag"
+msgstr ""
+
+#: mainform.rremovetagtitle
+msgid "Remove tag"
+msgstr ""
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
@@ -710,6 +718,10 @@ msgstr ""
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
+msgstr ""
+
+#: tformnotetask.ashowtags.caption
+msgid "Show tags"
 msgstr ""
 
 #: tformnotetask.ashowtime.caption

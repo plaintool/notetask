@@ -141,6 +141,14 @@ msgstr "パスワード:"
 msgid "Read-only"
 msgstr "読み取り専用"
 
+#: mainform.rremovetag
+msgid "Are you sure you want to remove tag"
+msgstr "タグを削除します"
+
+#: mainform.rremovetagtitle
+msgid "Remove tag"
+msgstr "タグを削除"
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
@@ -711,6 +719,10 @@ msgstr "メモ"
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "ステータスバー"
+
+#: tformnotetask.ashowtags.caption
+msgid "Show tags"
+msgstr "タグ"
 
 #: tformnotetask.ashowtime.caption
 msgid "Show time"

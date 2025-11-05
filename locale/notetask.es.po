@@ -141,6 +141,14 @@ msgstr "Contraseña:"
 msgid "Read-only"
 msgstr "Solo lectura"
 
+#: mainform.rremovetag
+msgid "Are you sure you want to remove tag"
+msgstr "Está seguro de que quiere eliminar la etiqueta"
+
+#: mainform.rremovetagtitle
+msgid "Remove tag"
+msgstr "Eliminar etiqueta"
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
@@ -711,6 +719,10 @@ msgstr "Nota"
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "Barra de estado"
+
+#: tformnotetask.ashowtags.caption
+msgid "Show tags"
+msgstr "Etiquetas"
 
 #: tformnotetask.ashowtime.caption
 msgid "Show time"

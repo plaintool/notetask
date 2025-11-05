@@ -25,20 +25,22 @@ uses
   Process,
   Math,
   Clipbrd,
-  LCLIntf,
-  LCLType,
-  LConvEncoding,
   ActnList,
   ComCtrls,
   ExtCtrls,
   Grids,
-  Menus, Buttons,
+  Menus,
+  Buttons,
+  LCLIntf,
+  LCLType,
+  LConvEncoding,
   PrintersDlgs,
   DateTimePicker,
   GridPrn,
   task,
   lineending,
-  formattool;
+  formattool,
+  TagEdit;
 
 type
   { TformNotetask }
@@ -174,6 +176,7 @@ type
     menuNew: TMenuItem;
     openDialog: TOpenDialog;
     pageSetupDialog: TPageSetupDialog;
+    panelTags: TPanel;
     panelTabs: TPanel;
     panelNote: TPanel;
     Popup: TPopupMenu;
@@ -199,6 +202,7 @@ type
     Separator7: TMenuItem;
     Separator8: TMenuItem;
     SplitFilter: TSplitter;
+    SplitTags: TSplitter;
     statusBar: TStatusBar;
     taskGrid: TStringGrid;
     aLangEnglish: TAction;
@@ -271,6 +275,8 @@ type
     menuMergeTasks: TMenuItem;
     contextMergeTasks: TMenuItem;
     Splitter: TSplitter;
+    aShowTags: TAction;
+    menuShowTags: TMenuItem;
     aShowNote: TAction;
     menuShowNote: TMenuItem;
     aInsertGroup: TAction;
@@ -301,6 +307,7 @@ type
     procedure aCheckforupdatesExecute(Sender: TObject);
     procedure aEditGroupTooltipExecute(Sender: TObject);
     procedure aFilterExecute(Sender: TObject);
+    procedure aShowTagsExecute(Sender: TObject);
     procedure aSplitTasksExecute(Sender: TObject);
     procedure filterBoxChange(Sender: TObject);
     procedure filterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -323,6 +330,9 @@ type
     procedure memoNoteExit(Sender: TObject);
     procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure memoNoteChange(Sender: TObject);
+    procedure editTagsChange(Sender: TObject);
+    procedure editTagsKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure editTagsTagClick(Sender: TObject; const TagText: string);
 
     procedure groupTabsChange(Sender: TObject);
     procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -446,6 +456,7 @@ type
     Memo: TMemo;
     PanelMemo: TPanel;
     DatePicker: TDateTimePicker;
+    editTags: TTagEdit;
     FChanged: boolean;
     FBackup: boolean;
     FReadOnly: boolean;
@@ -539,6 +550,7 @@ type
     procedure DisableDrag;
     procedure SetCaption;
     procedure SetInfo;
+    procedure SetTags;
     procedure SetNote;
     procedure SetFilter(FillTags: boolean = True);
     procedure SetTabs(Change: boolean = True);
@@ -557,6 +569,7 @@ type
     procedure SetReadOnly(Value: boolean);
     procedure SetBiDiRightToLeft(Value: boolean);
     procedure SetShowStatusBar(Value: boolean);
+    procedure SetShowTags(Value: boolean);
     procedure SetShowNote(Value: boolean);
     procedure SetShowDuration(Value: boolean);
     procedure SetShowTime(Value: boolean);
@@ -583,6 +596,7 @@ type
     procedure MemoBackup;
     procedure MemoUndo;
     procedure MemoDelKey(aMemoNote: boolean = True);
+    procedure EditSelForDel(TargetEdit: TCustomEdit);
     function IsExecuteValueNote(memoPriority: boolean = False): boolean;
     function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
@@ -615,6 +629,7 @@ type
     FShowArchived: boolean;
     FShowDuration: boolean;
     FShowTime: boolean;
+    FShowTags: boolean;
     FShowNote: boolean;
     FHideNoteText: boolean;
     FShowStatusBar: boolean;
@@ -635,6 +650,7 @@ type
     function SaveFile(fileName: string = string.Empty; saveAs: boolean = False; encrypt: boolean = False): boolean;
     function SaveFileAs: boolean;
     procedure ApplyGridSettings;
+    procedure AlignBottomControls;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean; overload;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; out aRowsChanged: integer; Silent: boolean): boolean;
       overload;
@@ -647,6 +663,7 @@ type
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property ShowDuration: boolean read FShowDuration write SetShowDuration;
     property ShowTime: boolean read FShowTime write SetShowTime;
+    property ShowTags: boolean read FShowTags write SetShowTags;
     property ShowNote: boolean read FShowNote write SetShowNote;
     property HideNoteText: boolean read FHideNoteText write SetHideNoteText;
     property ShowStatusBar: boolean read FShowStatusBar write SetShowStatusBar;
@@ -726,6 +743,8 @@ resourcestring
   rnumstringtoolarge = 'The line number is out of the allowed range.';
   rchatgpt = 'https://chatgpt.com?q=';
   rdeletegroupconfirm = 'Are you sure you want to delete this group? This will also delete all tasks within this group.';
+  rremovetagtitle = 'Remove tag';
+  rremovetag = 'Are you sure you want to remove tag';
   rentergroupname = 'Enter the group name:';
   rconfirmation = 'Confirmation';
   rgototask = 'Go to task';
@@ -751,6 +770,16 @@ uses filemanager, settings, systemtool, crypto, forminput, formmemo, formfind, f
 
 procedure TformNotetask.FormCreate(Sender: TObject);
 begin
+  // Init components
+  editTags := TTagEdit.Create(Self);
+  editTags.Parent := panelTags;
+  editTags.Align := alClient;
+  editTags.DragIndicatorColor := clRed;
+  editTags.TagHoverColor := clNone;
+  editTags.OnChange := @editTagsChange;
+  editTags.OnKeyDown := @editTagsKeyDown;
+  editTags.OnTagClick := @editTagsTagClick;
+
   // Initialize variables
   FBackup := True;
   FReadOnly := False;
@@ -759,6 +788,7 @@ begin
   FShowTime := True;
   FHideNoteText := False;
   FShowStatusBar := True;
+  FShowTags := False;
   FShowNote := False;
   FMemoNeedSelectAll := True;
   FRepaint := False;
@@ -818,6 +848,7 @@ begin
   aEnterSubmit.Checked := FEnterSubmit;
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowArchived.Checked := FShowArchived;
+  ShowTags := FShowTags;
   ShowNote := FShowNote;
   ShowStatusBar := FShowStatusBar;
   ShowTime := FShowTime;
@@ -853,6 +884,8 @@ begin
   ResourceBitmapStarGray.Free;
 
   FreeFile;
+
+  editTags.Free;
 end;
 
 procedure TformNotetask.FormShow(Sender: TObject);
@@ -895,7 +928,7 @@ end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
-  if memoNote.Focused or filterBox.Focused then
+  if memoNote.Focused or filterBox.Focused or editTags.Focused then
     exit;
 
   if Screen.ActiveForm <> Self then
@@ -1154,11 +1187,7 @@ procedure TformNotetask.FormResize(Sender: TObject);
 begin
   taskGridResize(Sender);
 
-  if StatusBar.Top < MemoNote.Top then
-    StatusBar.Top := ClientHeight - StatusBar.Height;
-
-  //if filterClear.Left < filterBox.Left then
-  //  filterClear.Left := ClientWidth - filterClear.Width;
+  AlignBottomControls;
 end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -1345,6 +1374,7 @@ begin
     SetInfo;
     SetChanged;
     SetNote;
+    SetTags;
   end;
 end;
 
@@ -1357,6 +1387,7 @@ begin
     if ShowDuration then FillGrid;
     SetInfo;
     SetNote;
+    SetTags;
   end;
 end;
 
@@ -1835,7 +1866,10 @@ begin
     SetInfo;
 
   if (aRow <> FLastRow) or (taskGrid.Selection.Height <> FLastSelectionHeight) then
+  begin
     SetNote;
+    SetTags;
+  end;
   FLastRow := aRow;
 
   // Save row to mem
@@ -1871,6 +1905,7 @@ begin
 
   ResetRowHeight;
   SetNote;
+  SetTags;
   SetInfo;
 end;
 
@@ -2053,6 +2088,7 @@ begin
 
   SetInfo;
   SetNote;
+  SetTags;
 end;
 
 procedure TformNotetask.filterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -2302,7 +2338,14 @@ begin
   begin
     MemoNoteUndo;
     exit;
+  end
+  else
+  if editTags.Focused and not editTags.ReadOnly then
+  begin
+    editTags.EditBox.Undo;
+    exit;
   end;
+
   if Screen.ActiveForm <> Self then exit;
 
   if not IsEditing then
@@ -2325,6 +2368,7 @@ begin
     taskGrid.TopRow := TempTopRow;
     SetInfo;
     SetNote;
+    SetTags;
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
@@ -2353,6 +2397,7 @@ begin
       SetFilter(False);
       SetInfo;
       SetNote;
+      SetTags;
       SetTabs;
       GridClearSelection;
       Tasks.CreateBackup;
@@ -2369,6 +2414,12 @@ begin
   begin
     MemoNoteBackup;
     memoNote.CutToClipboard;
+    exit;
+  end
+  else
+  if editTags.Focused then
+  begin
+    editTags.EditBox.CutToClipboard;
     exit;
   end;
 
@@ -2398,6 +2449,12 @@ begin
   begin
     memoNote.CopyToClipboard;
     exit;
+  end
+  else
+  if editTags.Focused then
+  begin
+    editTags.EditBox.CopyToClipboard;
+    exit;
   end;
 
   if Screen.ActiveForm <> Self then exit;
@@ -2423,6 +2480,13 @@ begin
       PasteWithLineEnding(memoNote);
     end;
     exit;
+  end
+  else
+  if editTags.Focused then
+  begin
+    if not editTags.ReadOnly then
+      editTags.EditBox.PasteFromClipboard;
+    exit;
   end;
 
   if Screen.ActiveForm <> Self then exit;
@@ -2439,6 +2503,7 @@ begin
     SetChanged;
     SetInfo;
     SetNote;
+    SetTags;
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
@@ -2461,6 +2526,13 @@ begin
       memoNote.ClearSelection;
     end;
     exit;
+  end
+  else
+  if editTags.Focused then
+  begin
+    if not editTags.ReadOnly then
+      editTags.EditBox.ClearSelection;
+    exit;
   end;
 
   if taskGrid.RowCount < 2 then exit;
@@ -2470,6 +2542,7 @@ begin
     if ShowDuration then FillGrid;
     SetInfo;
     SetNote;
+    SetTags;
   end
   else
   if (taskGrid.InplaceEditor is TPanel) then
@@ -2497,6 +2570,12 @@ begin
   begin
     memoNote.SelectAll;
     exit;
+  end
+  else
+  if editTags.Focused then
+  begin
+    editTags.EditBox.SelectAll;
+    exit;
   end;
 
   if Screen.ActiveForm <> Self then exit;
@@ -2508,6 +2587,7 @@ begin
     FLastSelectionHeight := taskGrid.Selection.Height;
     SetInfo;
     SetNote;
+    SetTags;
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
@@ -2556,6 +2636,7 @@ begin
   SetInfo;
   SetChanged;
   SetNote;
+  SetTags;
 end;
 
 procedure TformNotetask.aDuplicateTasksExecute(Sender: TObject);
@@ -2623,6 +2704,7 @@ begin
   end;
   SetChanged;
   SetNote;
+  SetTags;
   SetInfo;
 end;
 
@@ -2654,6 +2736,7 @@ begin
   end;
   SetChanged;
   SetNote;
+  SetTags;
   SetInfo;
 end;
 
@@ -2686,6 +2769,7 @@ begin
   end;
   SetChanged;
   SetNote;
+  SetTags;
   SetInfo;
 end;
 
@@ -2718,6 +2802,7 @@ begin
   end;
   SetChanged;
   SetNote;
+  SetTags;
   SetInfo;
 end;
 
@@ -2752,6 +2837,7 @@ begin
   end;
   SetChanged;
   SetNote;
+  SetTags;
   SetInfo;
 end;
 
@@ -2786,6 +2872,7 @@ begin
   end;
   SetChanged;
   SetNote;
+  SetTags;
   SetInfo;
 end;
 
@@ -3117,6 +3204,13 @@ begin
   ShowTime := aShowTime.Checked;
   FillGrid;
   SetInfo;
+end;
+
+procedure TformNotetask.aShowTagsExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowTags := aShowTags.Checked;
 end;
 
 procedure TformNotetask.aShowNoteExecute(Sender: TObject);
@@ -3663,6 +3757,34 @@ begin
   SetChanged;
 end;
 
+procedure TformNotetask.editTagsChange(Sender: TObject);
+begin
+  Tasks.GetTask(taskGrid.Row).Tags.Assign(editTags.Items);
+  SetChanged;
+end;
+
+procedure TformNotetask.editTagsKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+begin
+  if editTags.ReadOnly then exit
+  else
+  if Key = VK_DELETE then // Delete
+  begin
+    {$IFDEF UNIX}
+    {$ELSE}
+    if (editTags.EditBox.SelLength = 0) then
+      EditSelForDel(editTags.EditBox);
+    editTags.EditBox.ClearSelection;
+    Key := 0;
+    {$ENDIF}
+  end;
+end;
+
+procedure TformNotetask.editTagsTagClick(Sender: TObject; const TagText: string);
+begin
+  filterBox.Text := TagText;
+  filterBoxChange(Self);
+end;
+
 procedure TformNotetask.memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   if not (ssDouble in Shift) then
@@ -4055,6 +4177,7 @@ begin
   filterBox.Left := 0;
   SplitFilter.Left := 0;
   ShowNote := FShowNote;
+  ShowTags := FShowTags;
   ShowStatusBar := FShowStatusBar;
   ShowArchived := FShowArchived;
   Showtime := FShowTime;
@@ -4072,8 +4195,50 @@ begin
   ResetRowHeight;
   SetInfo;
   SetNote;
+  SetTags;
   SetTabs;
   RestoreSelectedState;
+end;
+
+procedure TformNotetask.AlignBottomControls;
+var
+  BottomPos: integer;
+begin
+  //if (StatusBar.Top < panelNote.Top) or (StatusBar.Top < panelTags.Top) then
+  //  StatusBar.Top := ClientHeight - StatusBar.Height;
+
+  // Start from the bottom of the client area
+  BottomPos := ClientHeight;
+
+  // Align StatusBar at the very bottom
+  StatusBar.Top := BottomPos - StatusBar.Height;
+  BottomPos := StatusBar.Top;
+
+  // Align panelTags above SplitTags
+  panelTags.Top := BottomPos - panelTags.Height;
+  BottomPos := panelTags.Top;
+
+  // Align SplitTags above panelTags
+  SplitTags.Top := BottomPos - SplitTags.Height;
+  BottomPos := SplitTags.Top;
+
+  // Align panelNote above SplitTags
+  panelNote.Top := BottomPos - panelNote.Height;
+  BottomPos := panelNote.Top;
+
+  // Align Splitter above panelNote
+  Splitter.Top := BottomPos - Splitter.Height;
+  // BottomPos := Splitter.Top; // not needed unless есть что-то сверху
+
+  // Ensure none of the controls go above the top of the form
+  if Splitter.Top < 0 then
+  begin
+    Splitter.Top := 0;
+    panelNote.Top := Splitter.Top + Splitter.Height;
+    SplitTags.Top := panelNote.Top + panelNote.Height;
+    panelTags.Top := SplitTags.Top + SplitTags.Height;
+    StatusBar.Top := panelTags.Top + panelTags.Height;
+  end;
 end;
 
 function TformNotetask.IsExecuteValueNote(memoPriority: boolean = False): boolean;
@@ -5021,6 +5186,7 @@ begin
   CalcRowHeights(0, True);
   SetInfo;
   SetNote;
+  SetTags;
   SetChanged;
 end;
 
@@ -5077,6 +5243,7 @@ begin
 
       FillGrid;
       SetNote;
+      SetTags;
       SetChanged; // Mark that data has changed
 
       // Restore selection
@@ -5221,6 +5388,7 @@ begin
   CalcRowHeights(0, True);
   SetInfo;
   SetNote;
+  SetTags;
   SetChanged;
 
   // Restore selection
@@ -5264,6 +5432,7 @@ begin
       FillGrid;
       SetInfo;
       SetNote;
+      SetTags;
       SetChanged; // Mark that data has changed
     end;
   end;
@@ -5306,6 +5475,7 @@ begin
       FillGrid;
       SetInfo;
       SetNote;
+      SetTags;
       SetChanged; // Mark that data has changed
     end;
   end
@@ -5346,6 +5516,7 @@ begin
       SetTabs;
       SetInfo;
       SetNote;
+      SetTags;
       SetChanged;
     end;
   end;
@@ -5387,6 +5558,7 @@ begin
       SetTabs;
       SetInfo;
       SetNote;
+      SetTags;
       SetChanged; // Mark that data has changed
     end;
   end
@@ -5908,10 +6080,46 @@ begin
   FMemoSelLengthBackup := SelLength;
 end;
 
+procedure TformNotetask.EditSelForDel(TargetEdit: TCustomEdit);
+var
+  Len, DeleteCount, Pos: integer;
+begin
+  Len := TargetEdit.GetTextLen;
+  DeleteCount := 0;
+  Pos := TargetEdit.SelStart + 1; // 1-based indexing
+
+  while Pos <= Len do
+  begin
+    if IsUTF8Char(TargetEdit.Text, Pos, ' ') then
+    begin
+      // If space, extend deletion
+      Inc(DeleteCount);
+      Inc(Pos);
+    end
+    else if (IsUTF8Char(TargetEdit.Text, Pos, #13)) or (IsUTF8Char(TargetEdit.Text, Pos, #10)) then
+    begin
+      // If CR, delete it and check for following LF
+      Inc(DeleteCount);
+      Inc(Pos);
+      if (Pos <= Len) and (IsUTF8Char(TargetEdit.Text, Pos, #10)) then
+      begin
+        Inc(DeleteCount);
+        Inc(Pos);
+      end;
+      Break; // stop loop after CR (and optional LF)
+    end
+    else
+    begin
+      DeleteCount := 1;
+      Break; // any other char, stop loop
+    end;
+  end;
+  TargetEdit.SelLength := DeleteCount;
+end;
+
 procedure TformNotetask.MemoDelKey(aMemoNote: boolean = True);
 var
   TargetMemo: Tmemo;
-  Len, DeleteCount, Pos: integer;
 begin
   if aMemoNote then
     TargetMemo := memoNote
@@ -5919,39 +6127,7 @@ begin
     TargetMemo := Memo;
 
   if TargetMemo.SelLength = 0 then
-  begin
-    Len := TargetMemo.GetTextLen;
-    DeleteCount := 0;
-    Pos := TargetMemo.SelStart + 1; // 1-based indexing
-
-    while Pos <= Len do
-    begin
-      if IsUTF8Char(TargetMemo.Text, Pos, ' ') then
-      begin
-        // If space, extend deletion
-        Inc(DeleteCount);
-        Inc(Pos);
-      end
-      else if (IsUTF8Char(TargetMemo.Text, Pos, #13)) or (IsUTF8Char(TargetMemo.Text, Pos, #10)) then
-      begin
-        // If CR, delete it and check for following LF
-        Inc(DeleteCount);
-        Inc(Pos);
-        if (Pos <= Len) and (IsUTF8Char(TargetMemo.Text, Pos, #10)) then
-        begin
-          Inc(DeleteCount);
-          Inc(Pos);
-        end;
-        Break; // stop loop after CR (and optional LF)
-      end
-      else
-      begin
-        DeleteCount := 1;
-        Break; // any other char, stop loop
-      end;
-    end;
-    TargetMemo.SelLength := DeleteCount;
-  end
+    EditSelForDel(TargetMemo)
   else
   begin
     if aMemoNote then
@@ -6047,6 +6223,7 @@ begin
     taskGrid.Selection := TGridRect.Create(FLoadedSelection);
     FLoadedSelection := Rect(0, 0, 0, 0);
     SetNote;
+    SetTags;
   end;
 
   if (memoNote.Visible) and (Showing) then
@@ -6150,6 +6327,8 @@ begin
     memoNote.Alignment := taRightJustify;
     memoNote.BorderSpacing.Left := 0;
     memoNote.BorderSpacing.Right := 10;
+    editTags.BiDiMode := bdRightToLeft;
+    ;
     SetCursorTo(panelNote, 'RIGHTARROW');
   end
   else
@@ -6163,6 +6342,7 @@ begin
     memoNote.Alignment := taLeftJustify;
     memoNote.BorderSpacing.Left := 10;
     memoNote.BorderSpacing.Right := 0;
+    memoNote.BiDiMode := bdLeftToRight;
     SetCursorTo(panelNote, 'LEFTARROW');
   end;
 end;
@@ -6188,6 +6368,7 @@ begin
   ResetRowHeight;
   SetInfo;
   SetNote;
+  SetTags;
 end;
 
 procedure TformNotetask.SetShowDuration(Value: boolean);
@@ -6205,6 +6386,19 @@ begin
   FShowTime := Value;
 end;
 
+procedure TformNotetask.SetShowTags(Value: boolean);
+begin
+  FShowTags := Value;
+
+  aShowTags.Checked := FShowTags;
+  panelTags.Visible := FShowTags;
+  SplitTags.Visible := FShowTags;
+
+  AlignBottomControls;
+
+  SetTags;
+end;
+
 procedure TformNotetask.SetShowNote(Value: boolean);
 begin
   FShowNote := Value;
@@ -6212,7 +6406,8 @@ begin
   aShowNote.Checked := FShowNote;
   panelNote.Visible := FShowNote;
   Splitter.Visible := FShowNote;
-  StatusBar.Top := panelNote.Top + panelNote.Height;
+
+  AlignBottomControls;
 
   SetNote;
 end;
@@ -6311,6 +6506,7 @@ begin
 
   FLastRow := taskGrid.Row;
   SetNote;
+  SetTags;
 end;
 
 procedure TformNotetask.ApplySortingActions;
@@ -6593,6 +6789,47 @@ begin
     statusBar.Panels[5].Text := string.empty;
 end;
 
+procedure TformNotetask.SetTags;
+var
+  i: integer;
+  tags: TStringList;
+begin
+  if (not ShowTags) then exit;
+
+  tags := TStringList.Create;
+  try
+    if Assigned(Tasks) and (taskGrid.RowCount > 1) then
+    begin
+      if taskGrid.Selection.Height > 0 then
+      begin
+        // Multiple rows selected — concatenate tags and set read-only
+        for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+          if Tasks.Map(i) > -1 then
+            tags.AddStrings(Tasks.GetTask(i).Tags);
+        editTags.Items.Assign(tags);
+        editTags.ReadOnly := True;
+        editTags.Color := clGray;
+      end
+      else if Tasks.Map(taskGrid.Row) > -1 then
+      begin
+        // Single row selected — set editable tag
+        editTags.Items.Assign(Tasks.GetTask(taskGrid.Row).Tags);
+        editTags.ReadOnly := FReadOnly;
+        editTags.Color := clDefault;
+      end
+      else
+        editTags.Items.Clear;
+    end
+    else
+    begin
+      editTags.Items.Clear;
+      editTags.ReadOnly := True;
+    end;
+  finally
+    tags.Free;
+  end;
+end;
+
 procedure TformNotetask.SetNote;
 var
   i: integer;
@@ -6800,6 +7037,11 @@ begin
 
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
+  if Assigned(editTags) then
+  begin
+    editTags.RemoveConfirmMessage := rremovetag;
+    editTags.RemoveConfirmTitle := rremovetagtitle;
+  end;
 
   if (Assigned(Tasks)) and (Tasks.GroupNames[0] = string.Empty) and (groupTabs.Tabs.Count > 0) then
     groupTabs.Tabs[0] := rgroupuntitled;

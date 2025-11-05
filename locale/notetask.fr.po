@@ -141,6 +141,14 @@ msgstr "Mot de passe:"
 msgid "Read-only"
 msgstr "Lecture seule"
 
+#: mainform.rremovetag
+msgid "Are you sure you want to remove tag"
+msgstr "Êtes-vous sûr de vouloir supprimer l’étiquette"
+
+#: mainform.rremovetagtitle
+msgid "Remove tag"
+msgstr "Supprimer l’étiquette"
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
@@ -711,6 +719,10 @@ msgstr "Note"
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "Barre d'état"
+
+#: tformnotetask.ashowtags.caption
+msgid "Show tags"
+msgstr "Étiquettes"
 
 #: tformnotetask.ashowtime.caption
 msgid "Show time"

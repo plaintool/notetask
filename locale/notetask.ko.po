@@ -141,6 +141,14 @@ msgstr "비밀번호:"
 msgid "Read-only"
 msgstr "읽기 전용"
 
+#: mainform.rremovetag
+msgid "Are you sure you want to remove tag"
+msgstr "태그를 제거합니다"
+
+#: mainform.rremovetagtitle
+msgid "Remove tag"
+msgstr "태그 제거"
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
@@ -711,6 +719,10 @@ msgstr "메모"
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "상태 표시줄"
+
+#: tformnotetask.ashowtags.caption
+msgid "Show tags"
+msgstr "태그"
 
 #: tformnotetask.ashowtime.caption
 msgid "Show time"

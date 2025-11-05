@@ -141,6 +141,14 @@ msgstr "Пароль:"
 msgid "Read-only"
 msgstr "Толькі для чытання"
 
+#: mainform.rremovetag
+msgid "Are you sure you want to remove tag"
+msgstr "Вы ўпэўнены, што хочаце выдаліць тэг"
+
+#: mainform.rremovetagtitle
+msgid "Remove tag"
+msgstr "Выдаліць тэг"
+
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
@@ -711,6 +719,10 @@ msgstr "Нататка"
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
 msgstr "Панэль стану"
+
+#: tformnotetask.ashowtags.caption
+msgid "Show tags"
+msgstr "Тэгі"
 
 #: tformnotetask.ashowtime.caption
 msgid "Show time"
