@@ -198,7 +198,6 @@ begin
   FDateOriginal := string.Empty;
   FTags := TStringList.Create;
   FTags.Duplicates := dupIgnore;
-  FTags.Sorted := True;
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -239,7 +238,10 @@ begin
   FAmountOriginal := Original.FAmountOriginal;
   FDateOriginal := Original.FDateOriginal;
   if (not Assigned(FTags)) then
+  begin
     FTags := TStringList.Create;
+    FTags.Duplicates := dupIgnore;
+  end;
   if (Assigned(Original.FTags)) then
     FTags.Assign(Original.FTags)
   else
@@ -248,8 +250,8 @@ end;
 
 procedure TTask.FillTags;
 begin
-  FillTagsFromString(FTags, FText);
-  FillTagsFromString(FTags, FNote);
+  FillTagsFromString(FTags, FText, True);
+  FillTagsFromString(FTags, FNote, True);
 end;
 
 function TTask.MatchesFilter(const Filter: string; DisplayTime: boolean): boolean;
@@ -258,7 +260,7 @@ var
 
   function StartsWithOperator(const S: string; out Op, Rest: string): boolean;
   const
-    Ops: array[0..7] of string = ('>=', '<=', '<>', '!=', '=', '>', '<', '!');
+    Ops: array[0..8] of string = ('>=', '<=', '<>', '!=', '=', '>', '<', '!', '#');
   var
     i: integer;
   begin
@@ -314,6 +316,51 @@ var
     end;
   end;
 
+  function CompareWithTags(const A: string; Op: string; OpAnd: boolean = False): boolean;
+  var
+    i: integer;
+  begin
+    Result := False;
+    for i := 0 to FTags.Count - 1 do
+    begin
+      if Op = '#' then
+      begin
+        if A = FTags[i] then
+        begin
+          if not OpAnd then exit(True);
+        end
+        else
+        begin
+          if OpAnd then exit(False);
+        end;
+      end
+      else
+      if Op = string.Empty then
+      begin
+        if (Pos(A, FTags[i]) > 0) then
+        begin
+          if not OpAnd then exit(True);
+        end
+        else
+        begin
+          if OpAnd then exit(False);
+        end;
+      end
+      else
+      begin
+        if CompareWithOperator(A, Op, FTags[i]) then
+        begin
+          if not OpAnd then exit(True);
+        end
+        else
+        begin
+          if OpAnd then exit(False);
+        end;
+
+      end;
+    end;
+  end;
+
 begin
   TrimFilter := Trim(Filter);
   if TrimFilter = string.Empty then
@@ -326,10 +373,17 @@ begin
 
     DateAsStr := DateTimeToString(FDate, DisplayTime);
     // Compare with operator
+    if (Oper = '#') then
+    begin
+      if CompareWithTags(ValuePart, Oper) then
+        Exit(True);
+    end
+    else
     if (Oper = '!') then
     begin
       if CompareWithOperator(FText, Oper, ValuePart) and CompareWithOperator(FNote, Oper, ValuePart) and
-        CompareWithOperator(FloatToStr(FAmount), Oper, ValuePart) and CompareWithOperator(DateAsStr, Oper, ValuePart) then Exit(True);
+        CompareWithOperator(FloatToStr(FAmount), Oper, ValuePart) and CompareWithOperator(DateAsStr, Oper, ValuePart) and
+        CompareWithTags(ValuePart, Oper, True) then Exit(True);
     end
     else
     begin
@@ -344,6 +398,7 @@ begin
       if CompareWithOperator(FNote, Oper, ValuePart) then Exit(True);
       if CompareWithOperator(FloatToStr(FAmount), Oper, ValuePart) then Exit(True);
       if CompareWithOperator(DateAsStr, Oper, ValuePart) then Exit(True);
+      if CompareWithTags(ValuePart, Oper) then Exit(True);
     end;
   end
   else
@@ -361,8 +416,8 @@ begin
     if (Pos(LowerCase(TrimFilter), LowerCase(FloatToStr(FAmount))) > 0) then Exit(True);
     DateAsStr := DateTimeToString(FDate, DisplayTime);
     if (Pos(LowerCase(TrimFilter), LowerCase(DateAsStr)) > 0) then Exit(True);
+    if CompareWithTags(LowerCase(TrimFilter), string.Empty) then Exit(True);
   end;
-
   Result := False;
 end;
 
@@ -496,7 +551,6 @@ var
   i, j: integer;
   addCompleted: boolean;
 begin
-  //Result := TStringList.Create;
   try
     UpdateGroup;
     addCompleted := False;
@@ -1672,6 +1726,9 @@ begin
   begin
     Task.FillTags;
     FTags.AddStrings(Task.Tags);
+
+    FillTagsFromString(FTags, Task.FText);
+    FillTagsFromString(FTags, Task.FNote);
   end
   else
   begin
@@ -1681,6 +1738,9 @@ begin
       begin
         FGroupList[i][j].FillTags;
         FTags.AddStrings(FGroupList[i][j].Tags);
+
+        FillTagsFromString(FTags, FGroupList[i][j].FText);
+        FillTagsFromString(FTags, FGroupList[i][j].FNote);
       end;
   end;
 end;
@@ -1826,6 +1886,8 @@ begin
   if Assigned(FTags) then
   begin
     FInitTags := TStringList.Create;
+    FInitTags.Duplicates := dupIgnore;
+    FInitTags.Sorted := True;
     FInitTags.Assign(FTags);
   end;
 end;
@@ -1895,6 +1957,8 @@ begin
   if Assigned(FInitTags) then
   begin
     FTags := TStringList.Create;
+    FTags.Duplicates := dupIgnore;
+    FTags.Sorted := True;
     FTags.Assign(FInitTags);
   end;
 

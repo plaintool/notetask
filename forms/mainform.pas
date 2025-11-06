@@ -176,7 +176,6 @@ type
     menuNew: TMenuItem;
     openDialog: TOpenDialog;
     pageSetupDialog: TPageSetupDialog;
-    panelTags: TPanel;
     panelTabs: TPanel;
     panelNote: TPanel;
     Popup: TPopupMenu;
@@ -187,6 +186,7 @@ type
     printDialog: TPrintDialog;
     saveDialog: TSaveDialog;
     saveNotesDialog: TSaveDialog;
+    panelTags: TScrollBox;
     Separator1: TMenuItem;
     menuExit: TMenuItem;
     Separator10: TMenuItem;
@@ -773,9 +773,12 @@ begin
   // Init components
   editTags := TTagEdit.Create(Self);
   editTags.Parent := panelTags;
-  editTags.Align := alClient;
+  editTags.Align := alTop;
+  editTags.AutoSizeHeight := True;
   editTags.DragIndicatorColor := clRed;
   editTags.TagHoverColor := clNone;
+  editTags.AutoColorSeed := 2166136267;
+  editTags.BackSpaceEditTag := True;
   editTags.OnChange := @editTagsChange;
   editTags.OnKeyDown := @editTagsKeyDown;
   editTags.OnTagClick := @editTagsTagClick;
@@ -6879,7 +6882,7 @@ var
   i: integer;
   SortedState: boolean;
 begin
-  if FillTags then
+  if FillTags and (taskGrid.Row > 0) then
     Tasks.FillTags(Tasks.GetTask(taskGrid.Row));
   SortedState := filterBox.Sorted;
   filterBox.Sorted := False;

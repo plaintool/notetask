@@ -283,6 +283,10 @@ begin
       else
         Result := string.Empty; // If the completion date is missing, return an empty string
     else
+      // Add Tags to TextString
+      if (Task.Tags.Count > 0) then
+        TextString := TextString + StringListToBacktickString(Task.Tags);
+
       // Forming the task string considering the completion date and Note
       if (DoneString = string.Empty) then
       begin

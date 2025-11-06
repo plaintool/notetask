@@ -82,13 +82,17 @@ function HasScheme(const URL: string): boolean;
 
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
 
-procedure FillTagsFromString(var List: TStringList; const S: string);
+procedure FillTagsFromString(var List: TStringList; var S: string; Backtick: boolean = False);
 
 procedure ReplaceStartsWith(var List: TStringList; const S: string);
+
+function StringListToBacktickString(List: TStringList): string;
 
 procedure ParseGroupName(const Value: string; out NameText, HintText: string);
 
 function ReplaceLineBreaks(const S: string): string;
+
+function DeleteFirstChar(const S: string; const Ch: Char): string;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
 
@@ -738,17 +742,30 @@ begin
   end;
 end;
 
-procedure FillTagsFromString(var List: TStringList; const S: string);
+procedure FillTagsFromString(var List: TStringList; var S: string; Backtick: boolean = False);
 var
   i, Start: integer;
   WordStr: string;
   HasAlphaNum: boolean;
+  NewS: string; // Used to build modified string when Backtick is True
+  HasRelevantChars: boolean; // Optimization flag
 begin
+  // Initial optimization check: skip processing if string doesn't contain relevant characters
+  if Backtick then
+    HasRelevantChars := Pos('`', S) > 0
+  else
+    HasRelevantChars := (Pos('@', S) > 0) or (Pos('#', S) > 0) or (Pos('%', S) > 0) or (Pos('+', S) > 0) or (Pos('$', S) > 0);
+
+  if not HasRelevantChars then
+    Exit;
+
   i := 1;
+  NewS := string.Empty; // Initialize new string for Backtick mode
+
   while i <= Length(S) do
   begin
     // Check for backtick tag first
-    if S[i] = '`' then
+    if (S[i] = '`') and Backtick then
     begin
       Start := i;
       Inc(i);
@@ -765,15 +782,25 @@ begin
       begin
         WordStr := Copy(S, Start, i - Start + 1);
         // Add the tag if it meets length requirements and has no line breaks
-        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and (Pos(#13, WordStr) = 0) and (Pos(#10, WordStr) = 0) then
-          ReplaceStartsWith(List, WordStr);
-        Inc(i); // Move past the closing backtick
-      end
-      else
-        Inc(i); // Move forward if no valid closing backtick found
-    end
-    // Check for prefix tags (@, #, %, +, $)
-    else if (S[i] in ['@', '#', '%', '+', '$']) and ((i = 1) or (S[i - 1] in [#32, #13, #10])) then
+        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and (Pos(#13, WordStr) = 0) and
+          (Pos(#10, WordStr) = 0) then
+        begin
+          List.Add(StringReplace(WordStr, '`', '', [rfReplaceAll]));
+
+          // Remove single preceding space from NewS if present
+          if (Length(NewS) > 0) and (NewS[Length(NewS)] = ' ') then
+            SetLength(NewS, Length(NewS) - 1);
+
+          // Skip adding this content to NewS (effectively removing it)
+          Inc(i); // Move past the closing backtick
+          Continue; // Skip to next iteration without adding to NewS
+        end;
+      end;
+      // If no valid backtick tag found, fall through to normal processing
+    end;
+
+    // Process regular prefix tags when Backtick is False, or when in Backtick mode but no valid backtick tag was found
+    if (not Backtick) and (S[i] in ['@', '#', '%', '+', '$']) and ((i = 1) or (S[i - 1] in [#32, #13, #10])) then
     begin
       Start := i;
       Inc(i);
@@ -781,7 +808,6 @@ begin
       // Also check that we have at least one alphanumeric character
       HasAlphaNum := False;
       while (i <= Length(S)) and (S[i] in ['0'..'9', 'A'..'Z', 'a'..'z', '-', '_']) and (i - Start < MaxTagLength) do
-        // Limit total length to MaxTagLength characters
       begin
         if S[i] in ['0'..'9', 'A'..'Z', 'a'..'z'] then
           HasAlphaNum := True;
@@ -794,24 +820,62 @@ begin
         ReplaceStartsWith(List, WordStr);
     end
     else
+    begin
+      // Add current character to NewS when in Backtick mode
+      if Backtick then
+        NewS := NewS + S[i];
       Inc(i);
+    end;
   end;
+
+  // Update original string with modified version when in Backtick mode
+  if Backtick then
+    S := NewS;
 end;
 
 procedure ReplaceStartsWith(var List: TStringList; const S: string);
 var
   i: integer;
+  LowerS, LowerItem: string;
 begin
+  LowerS := LowerCase(S);
   // Iterate backwards to safely remove items while looping
   for i := List.Count - 1 downto 0 do
   begin
-    // If the item is at the start of the string S, remove it
-    if (Pos(LowerCase(List[i]), LowerCase(S)) = 1) then
+    LowerItem := LowerCase(List[i]);
+    // Check if string S starts with the list item (case insensitive)
+    if (Length(LowerItem) <= Length(LowerS)) and (Copy(LowerS, 1, Length(LowerItem)) = LowerItem) then
       List.Delete(i);
   end;
 
   // Add the string to the list
   List.Add(S);
+end;
+
+function StringListToBacktickString(List: TStringList): string;
+var
+  i: integer;
+  SB: TStringBuilder;
+begin
+  if List.Count = 0 then
+  begin
+    Result := string.Empty;
+    Exit;
+  end;
+
+  SB := TStringBuilder.Create;
+  try
+    for i := 0 to List.Count - 1 do
+    begin
+      SB.Append(' ');
+      SB.Append('`');
+      SB.Append(List[i]);
+      SB.Append('`');
+    end;
+    Result := SB.ToString;
+  finally
+    SB.Free;
+  end;
 end;
 
 procedure ParseGroupName(const Value: string; out NameText, HintText: string);
@@ -844,6 +908,14 @@ begin
   ResultStr := StringReplace(ResultStr, #13, '<br>', [rfReplaceAll]);
   ResultStr := StringReplace(ResultStr, #10, '<br>', [rfReplaceAll]);
   Result := ResultStr;
+end;
+
+function DeleteFirstChar(const S: string; const Ch: Char): string;
+begin
+  if (S <> '') and (S[1] = Ch) then
+    Result := Copy(S, 2, MaxInt)
+  else
+    Result := S;
 end;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);

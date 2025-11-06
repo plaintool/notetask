@@ -48,10 +48,12 @@ type
     FTagHoverUnderline: boolean;
     FCloseButtons: boolean;
     FCloseButtonOnHover: boolean;
+    FBackspaceEditTag: boolean;
     FReadOnly: boolean;
     FEnabled: boolean;
 
     FAutoColorBrigtness: integer;
+    FAutoColorSeed: longword;
     FBorderWidth: integer;
     FRoundCorners: integer;
     FTagBorderWidth: integer;
@@ -143,12 +145,14 @@ type
     property TagHoverUnderline: boolean read FTagHoverUnderline write FTagHoverUnderline default True;
     property CloseButtons: boolean read FCloseButtons write FCloseButtons default True;
     property CloseButtonOnHover: boolean read FCloseButtonOnHover write FCloseButtonOnHover default True;
+    property BackSpaceEditTag: boolean read FBackspaceEditTag write FBackspaceEditTag default False;
     property TagColor: TColor read FTagColor write FTagColor default clNone;
     property TagSuffixColor: TColor read FTagSuffixColor write FTagSuffixColor default clWhite;
     property TagHoverColor: TColor read FTagHoverColor write FTagHoverColor default clMenuHighlight;
     property TagBorderColor: TColor read FTagBorderColor write FTagBorderColor default clNone;
     property DragIndicatorColor: TColor read FDragIndicatorColor write FDragIndicatorColor default clHighlight;
     property AutoColorBrigtness: integer read FAutoColorBrigtness write FAutoColorBrigtness default 80;
+    property AutoColorSeed: longword read FAutoColorSeed write FAutoColorSeed default 0;
     property TagBorderWidth: integer read FTagBorderWidth write FTagBorderWidth default 2;
     property BorderColor: TColor read FBorderColor write FBorderColor default clWindowFrame;
     property BorderWidth: integer read FBorderWidth write FBorderWidth default 0;
@@ -204,11 +208,15 @@ begin
   FReadOnly := False;
   FEnabled := True;
   FAutoSizeHeight := False;
+  Randomize;
+  // 2166136267
+  FAutoColorSeed := Random(High(longword));
   FAllowReorder := True;
   FFont := TFont.Create;
   FFont.OnChange := @FontChanged;
   FParentFont := True;
   FTagHoverUnderline := True;
+  FBackSpaceEditTag := False;
   FCloseButtons := True;
   FCloseButtonOnHover := True;
   PopupMenu := nil;
@@ -635,7 +643,7 @@ begin
   if BrightnessPercent > 100 then BrightnessPercent := 100;
 
   // Generate stable hash (FNV-1a)
-  Hash := 2166136267;
+  Hash := FAutoColorSeed;
   if TagName <> string.Empty then
     for i := 1 to Length(TagName) do
       Hash := longword(uint64(Hash xor Ord(TagName[i])) * 16777619);
@@ -995,10 +1003,16 @@ begin
   end;
 
   // Backspace removes last tag if edit is empty
-  if (Key = VK_BACK) and (FEdit.Text = string.Empty) and (FTags.Count > 0) and RemovalConfirmed(FTags.Count - 1) then
+  if (Key = VK_BACK) and (FEdit.Text = string.Empty) and (FTags.Count > 0) and (FBackspaceEditTag or
+    RemovalConfirmed(FTags.Count - 1)) then
   begin
     ATag := FTags[FTags.Count - 1];
     FTags.Delete(FTags.Count - 1);
+    if FBackSpaceEditTag then
+    begin
+      FEdit.Text := ATag;
+      FEdit.SelStart := FEdit.GetTextLen;
+    end;
     if Assigned(FOnTagRemove) then
       FOnTagRemove(Self, ATag);
     if Assigned(FOnChange) then
