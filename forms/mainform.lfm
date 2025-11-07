@@ -286,6 +286,7 @@ object formNotetask: TformNotetask
     VertScrollBar.Tracking = True
     Align = alBottom
     BorderStyle = bsNone
+    ParentBackground = False
     TabOrder = 6
   end
   object MainMenu: TMainMenu

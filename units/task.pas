@@ -469,10 +469,10 @@ begin
     TaskStrings.Free;
   end;
 
-  FillTags;
-
   CreateBackupInit;
   ChangeGroup(0, True);
+
+  FillTags;
 end;
 
 destructor TTasks.Destroy;
@@ -1464,13 +1464,17 @@ begin
         for j := Rect.Left to Rect.Right do
         begin
           if (j = 1) and (Grid.Columns[j - 1].Visible) then pDone := GetTask(i).ToString(j).Trim;
-          if (j = 2) and (Grid.Columns[j - 1].Visible) then pText := GetTask(i).ToString(j);
+          if (j = 2) and (Grid.Columns[j - 1].Visible) then
+          begin
+            pText := GetTask(i).ToString(j);
+            if Rect.Width > 1 then pText := pText + StringListToBacktickString(GetTask(i).Tags, not EndsWith(pText));
+          end;
           if (j = 3) and ((Grid.Columns[j - 1].Visible) or NoteVisible) then pNote := GetTask(i).ToString(j);
           if (j = 4) and (Grid.Columns[j - 1].Visible) then pAmount := GetTask(i).ToString(j).Trim;
           if (j = 5) and (Grid.Columns[j - 1].Visible) then pDate := GetTask(i).ToString(j).Trim;
         end;
         Row1 := (pDone + ' ' + pDate).Trim;
-        Row2 := (pText + ' ' + pNote);
+        Row2 := (pText + ifthen(StartsWith(pNote), '', ' ') + pNote);
 
         if (pDate <> string.Empty) and ((Row2 <> string.Empty) or (pAmount <> string.Empty)) then
           Row1 += ', '
@@ -1726,6 +1730,7 @@ var
 begin
   if (Assigned(Task)) then
   begin
+    // One Task
     Task.FillTags;
     FTags.AddStrings(Task.Tags);
 
@@ -1735,6 +1740,18 @@ begin
   else
   begin
     FTags.Clear;
+
+    // Current list
+    //for i := 0 to High(FTaskList) do
+    //begin
+    //  FTaskList[i].FillTags;
+    //  FTags.AddStrings(FTaskList[i].Tags);
+
+    //  FillTagsFromString(FTags, FTaskList[i].FText);
+    //  FillTagsFromString(FTags, FTaskList[i].FNote);
+    //end;
+
+    // All Groups
     for i := 0 to High(FGroupList) do
       for j := 0 to High(FGroupList[i]) do
       begin

@@ -223,6 +223,8 @@ begin
     Result.FStar := True
   else
     Result.FStar := False;
+
+  Result.FillTags;
 end;
 
 function TaskToString(Task: TTask; Col: integer = 0; AddEmptyCompletion: boolean = True): string;
@@ -285,7 +287,7 @@ begin
     else
       // Add Tags to TextString
       if (Task.Tags.Count > 0) then
-        TextString := TextString + StringListToBacktickString(Task.Tags);
+        TextString := TextString + StringListToBacktickString(Task.Tags, not EndsWith(TextString));
 
       // Forming the task string considering the completion date and Note
       if (DoneString = string.Empty) then

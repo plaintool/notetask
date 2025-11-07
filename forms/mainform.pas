@@ -613,7 +613,7 @@ type
     procedure RestoreSelectedState(aRowMem: boolean = True; aRowMemPriority: boolean = True; aFocusMemo: boolean = False);
     procedure GridAdjustScrollBars;
     procedure GridInvalidate;
-    procedure FreeFile;
+    function FreeFile: boolean;
     function LastRowHeight(aRow: integer): integer;
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
@@ -2155,6 +2155,7 @@ begin
     VK_ESCAPE:
       if taskGrid.Visible and taskGrid.CanFocus then
         taskGrid.SetFocus;
+    else
   end;
   filterBox.OnChange(Self);
 end;
@@ -3763,6 +3764,7 @@ end;
 procedure TformNotetask.editTagsChange(Sender: TObject);
 begin
   Tasks.GetTask(taskGrid.Row).Tags.Assign(editTags.Items);
+  SetFilter;
   SetChanged;
 end;
 
@@ -3779,7 +3781,11 @@ begin
     editTags.EditBox.ClearSelection;
     Key := 0;
     {$ENDIF}
-  end;
+  end
+  else
+  if Key = VK_ESCAPE then // Escape
+    if taskGrid.Visible and taskGrid.CanFocus then
+      taskGrid.SetFocus;
 end;
 
 procedure TformNotetask.editTagsTagClick(Sender: TObject; const TagText: string);
@@ -6302,7 +6308,7 @@ begin
   Application.ProcessMessages;
 end;
 
-procedure TformNotetask.FreeFile;
+function TformNotetask.FreeFile: boolean;
 begin
   // Release the reserved file stream if it exists
   if Assigned(FSReserved) then
@@ -6311,9 +6317,11 @@ begin
       FSReserved.Free;
     except
       // Ignore any unexpected error during destruction
+      Result := False;
     end;
     FSReserved := nil;
   end;
+  Result := True;
 end;
 
 procedure TformNotetask.SetBiDiRightToLeft(Value: boolean);
@@ -6804,6 +6812,8 @@ begin
   if (not ShowTags) then exit;
 
   tags := TStringList.Create;
+  tags.Sorted := True;
+  tags.Duplicates := dupIgnore;
   try
     if Assigned(Tasks) and (taskGrid.RowCount > 1) then
     begin

@@ -86,13 +86,17 @@ procedure FillTagsFromString(var List: TStringList; var S: string; Backtick: boo
 
 procedure ReplaceStartsWith(var List: TStringList; const S: string);
 
-function StringListToBacktickString(List: TStringList): string;
+function StringListToBacktickString(List: TStringList; LeadingSpace: boolean = True): string;
 
 procedure ParseGroupName(const Value: string; out NameText, HintText: string);
 
 function ReplaceLineBreaks(const S: string): string;
 
-function DeleteFirstChar(const S: string; const Ch: Char): string;
+function DeleteFirstChar(const S: string; const Ch: char): string;
+
+function EndsWith(const S: string; const Ch: char = ' '): boolean;
+
+function StartsWith(const S: string; const Ch: char = ' '): boolean;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
 
@@ -852,7 +856,7 @@ begin
   List.Add(S);
 end;
 
-function StringListToBacktickString(List: TStringList): string;
+function StringListToBacktickString(List: TStringList; LeadingSpace: boolean = True): string;
 var
   i: integer;
   SB: TStringBuilder;
@@ -867,7 +871,8 @@ begin
   try
     for i := 0 to List.Count - 1 do
     begin
-      SB.Append(' ');
+      if LeadingSpace then
+        SB.Append(' ');
       SB.Append('`');
       SB.Append(List[i]);
       SB.Append('`');
@@ -910,12 +915,24 @@ begin
   Result := ResultStr;
 end;
 
-function DeleteFirstChar(const S: string; const Ch: Char): string;
+function DeleteFirstChar(const S: string; const Ch: char): string;
 begin
   if (S <> '') and (S[1] = Ch) then
     Result := Copy(S, 2, MaxInt)
   else
     Result := S;
+end;
+
+function EndsWith(const S: string; const Ch: char = ' '): boolean;
+begin
+  // Return True if string ends with specified char
+  Result := (S <> string.Empty) and (S[Length(S)] = Ch);
+end;
+
+function StartsWith(const S: string; const Ch: char = ' '): boolean;
+begin
+  // Return True if string starts with specified char
+  Result := (S <> string.Empty) and (S[1] = Ch);
 end;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
