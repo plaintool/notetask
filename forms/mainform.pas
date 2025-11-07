@@ -778,6 +778,7 @@ begin
   editTags.DragIndicatorColor := clRed;
   editTags.TagHoverColor := clNone;
   editTags.AutoColorSeed := 2166136267;
+  editTags.AutoColorBrigtness := 100;
   editTags.BackSpaceEditTag := True;
   editTags.OnChange := @editTagsChange;
   editTags.OnKeyDown := @editTagsKeyDown;

@@ -635,6 +635,7 @@ function TTagEdit.RandTagColor(const TagName: string; BrightnessPercent: integer
 var
   Hash: longword;
   R, G, B: byte;
+  Rf, Gf, Bf, MaxValf: single;
   S: single;
   i, MaxVal, MinVal: integer;
 begin
@@ -667,13 +668,34 @@ begin
   end;
 
   // --- Apply brightness adjustment ---
-  // Convert BrightnessPercent (0–100) to S (0.0–2.0)
-  // 50% = original color, >50 brighten, <50 darken
-  S := 0.5 + (BrightnessPercent / 100);
+  // Convert BrightnessPercent (0-100) to scale factor with minimum brightness
+  // 0% = dark but not completely black, 100% = very bright
+  S := 0.3 + (BrightnessPercent / 100) * 1.7;  // Range: 0.3 to 2.0
 
-  R := Min(255, Round(R * S));
-  G := Min(255, Round(G * S));
-  B := Min(255, Round(B * S));
+  // Use floating point for brightness calculation to avoid overflow
+  Rf := R * S;
+  Gf := G * S;
+  Bf := B * S;
+
+  // --- Avoid too white colors ---
+  // If maximum channel value exceeds 240, scale down all channels proportionally
+  // This prevents colors from being too close to white while preserving hue
+  MaxValf := Rf;
+  if Gf > MaxValf then MaxValf := Gf;
+  if Bf > MaxValf then MaxValf := Bf;
+
+  if MaxValf > 240 then
+  begin
+    // Scale all channels down proportionally to maintain color balance
+    Rf := Rf * 240 / MaxValf;
+    Gf := Gf * 240 / MaxValf;
+    Bf := Bf * 240 / MaxValf;
+  end;
+
+  // Convert back to byte with clamping
+  R := Min(255, Round(Rf));
+  G := Min(255, Round(Gf));
+  B := Min(255, Round(Bf));
 
   Result := RGBToColor(R, G, B);
 end;
