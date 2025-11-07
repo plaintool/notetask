@@ -149,9 +149,12 @@ type
     procedure UndoBackupInit;
     function CalcDateDiff(const StartDate, EndDate: TDateTime): string;
     function CalcDateDiffAccuracy(const StartDate, EndDate: TDateTime): string;
-    function CalcCount(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): integer;
-    function CalcSum(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): double;
-    function CalcDuration(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): string;
+    function CalcCount(Archive, Done: boolean; Filter: string; StartIndex: integer = 0; EndIndex: integer = 0;
+      aDisplayTime: boolean = True): integer;
+    function CalcSum(Archive, Done: boolean; Filter: string; StartIndex: integer = 0; EndIndex: integer = 0;
+      aDisplayTime: boolean = True): double;
+    function CalcDuration(Archive, Done: boolean; Filter: string; StartIndex: integer = 0; EndIndex: integer = 0;
+      aDisplayTime: boolean = True): string;
 
     procedure FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder;
       SortColumn: integer; Filter: string);
@@ -320,12 +323,12 @@ var
   var
     i: integer;
   begin
-    Result := False;
+    Result := OpAnd;
     for i := 0 to FTags.Count - 1 do
     begin
       if Op = '#' then
       begin
-        if A = FTags[i] then
+        if Pos(LowerCase(A), LowerCase(FTags[i])) > 0 then
         begin
           if not OpAnd then exit(True);
         end
@@ -337,7 +340,7 @@ var
       else
       if Op = string.Empty then
       begin
-        if (Pos(A, FTags[i]) > 0) then
+        if Pos(LowerCase(A), LowerCase(FTags[i])) > 0 then
         begin
           if not OpAnd then exit(True);
         end
@@ -348,7 +351,7 @@ var
       end
       else
       begin
-        if CompareWithOperator(A, Op, FTags[i]) then
+        if CompareWithOperator(FTags[i], Op, A) then
         begin
           if not OpAnd then exit(True);
         end
@@ -356,7 +359,6 @@ var
         begin
           if OpAnd then exit(False);
         end;
-
       end;
     end;
   end;
@@ -2129,7 +2131,8 @@ begin
   Result := Trim(Result);
 end;
 
-function TTasks.CalcCount(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): integer;
+function TTasks.CalcCount(Archive, Done: boolean; Filter: string; StartIndex: integer = 0; EndIndex: integer = 0;
+  aDisplayTime: boolean = True): integer;
 var
   I, Ind: integer;
 begin
@@ -2138,7 +2141,8 @@ begin
   begin
     for I := 0 to Count - 1 do
     begin
-      if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) then
+      if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) and
+        (FTaskList[I].MatchesFilter(Filter, aDisplayTime)) then
         Result += 1;
     end;
   end
@@ -2153,7 +2157,8 @@ begin
   end;
 end;
 
-function TTasks.CalcSum(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): double;
+function TTasks.CalcSum(Archive, Done: boolean; Filter: string; StartIndex: integer = 0; EndIndex: integer = 0;
+  aDisplayTime: boolean = True): double;
 var
   I, Ind: integer;
 begin
@@ -2162,7 +2167,8 @@ begin
   begin
     for I := 0 to Count - 1 do
     begin
-      if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) then
+      if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True)) and
+        (FTaskList[I].MatchesFilter(Filter, aDisplayTime)) then
         Result += FTaskList[I].Amount;
     end;
   end
@@ -2177,7 +2183,8 @@ begin
   end;
 end;
 
-function TTasks.CalcDuration(Archive, Done: boolean; StartIndex: integer = 0; EndIndex: integer = 0): string;
+function TTasks.CalcDuration(Archive, Done: boolean; Filter: string; StartIndex: integer = 0; EndIndex: integer = 0;
+  aDisplayTime: boolean = True): string;
 var
   I, Ind: integer;
   TotalDuration: TDateTime;
@@ -2189,7 +2196,7 @@ begin
     for I := 0 to Count - 1 do
     begin
       if ((Archive = True) or (FTaskList[I].Archive = False)) and ((Done = False) or (FTaskList[I].Done = True) or
-        (FTaskList[I].Archive = True)) then
+        (FTaskList[I].Archive = True)) and (FTaskList[I].MatchesFilter(Filter, aDisplayTime)) then
         TotalDuration += (FTaskList[I].FDateEnd - FTaskList[I].FDateStart);
     end;
   end
@@ -2414,74 +2421,74 @@ begin
     // Fill the grid with tasks
     for I := 0 to Count - 1 do
     begin
-      if (Grid.RowCount > RowIndex) then
-        Grid.Cells[0, RowIndex] := (I + 1).ToString;
-
-      // Duration calculation
-      if (ShowDuration) then
-      begin
-        // Clear task dates
-        FTaskList[I].FDateStart := 0;
-        FTaskList[I].FDateEnd := 0;
-
-        // Check if the task's date is earlier than the current minimum date
-        if (FTaskList[I].Date > 0) and (FTaskList[I].Date < MinDate) then
-          MinDate := FTaskList[I].Date;
-
-        // For non-initial tasks, check previous tasks to adjust the minimum date further if needed
-        if (i > 0) and (FTaskList[I].Date > 0) and (FTaskList[I].Date < LastDate) then
-        begin
-          // Loop through previous tasks to find a suitable minimum date
-          for j := i - 1 downto 0 do
-          begin
-            MinDate := FTaskList[J].Date;
-            // Break the loop if a valid previous task date is found
-            if (FTaskList[J].Date > 0) and (FTaskList[J].Date <= FTaskList[I].Date) then
-              break;
-          end;
-        end;
-
-        // Update the maximum date if the current task date is later than the current maximum
-        if (FTaskList[I].Date > MaxDate) then
-          MaxDate := FTaskList[I].Date;
-
-        // Calculate and display the date difference if applicable
-        if FTaskList[I].Date > 0 then
-        begin
-          if (LastDate > 0) then
-          begin
-            StartDate := LastDate;
-            EndDate := FTaskList[I].Date;
-            DateDiff := CalcDateDiff(StartDate, EndDate);
-
-            // If the date difference is invalid, recalculate with the minimum date
-            if (DateDiff = '-') and (MinDate > 0) and (LastDate <> IfThen(displaytime, Now, Date)) then
-            begin
-              StartDate := MinDate;
-              EndDate := FTaskList[I].Date;
-              DateDiff := CalcDateDiff(StartDate, EndDate);
-
-              MinDate := FTaskList[I].Date;
-            end;
-
-            // Display the calculated date difference in the grid
-            if (DateDiff <> '-') and (Grid.RowCount > RowIndex) and ((RowIndex > 1) or (DateDiff <> '0' + rseconds)) then
-            begin
-              AddDatesInterval(I);
-              Grid.Cells[0, RowIndex] := (I + 1).ToString + '. ' + DateDiff;
-            end;
-          end;
-        end;
-
-        // Update LastDate to the current task's date for the next iteration
-        if FTaskList[I].Date > 0 then
-          LastDate := FTaskList[I].Date;
-      end;
-
-      // Fill task in grid for archive or not
       if ((ShowArchive = True) or (FTaskList[I].Archive = False)) and ((Filter = string.Empty) or
         (FTaskList[I].MatchesFilter(Filter, DisplayTime))) then
       begin
+        if (Grid.RowCount > RowIndex) then
+          Grid.Cells[0, RowIndex] := (I + 1).ToString;
+
+        // Duration calculation
+        if (ShowDuration) then
+        begin
+          // Clear task dates
+          FTaskList[I].FDateStart := 0;
+          FTaskList[I].FDateEnd := 0;
+
+          // Check if the task's date is earlier than the current minimum date
+          if (FTaskList[I].Date > 0) and (FTaskList[I].Date < MinDate) then
+            MinDate := FTaskList[I].Date;
+
+          // For non-initial tasks, check previous tasks to adjust the minimum date further if needed
+          if (i > 0) and (FTaskList[I].Date > 0) and (FTaskList[I].Date < LastDate) then
+          begin
+            // Loop through previous tasks to find a suitable minimum date
+            for j := i - 1 downto 0 do
+            begin
+              MinDate := FTaskList[J].Date;
+              // Break the loop if a valid previous task date is found
+              if (FTaskList[J].Date > 0) and (FTaskList[J].Date <= FTaskList[I].Date) then
+                break;
+            end;
+          end;
+
+          // Update the maximum date if the current task date is later than the current maximum
+          if (FTaskList[I].Date > MaxDate) then
+            MaxDate := FTaskList[I].Date;
+
+          // Calculate and display the date difference if applicable
+          if FTaskList[I].Date > 0 then
+          begin
+            if (LastDate > 0) then
+            begin
+              StartDate := LastDate;
+              EndDate := FTaskList[I].Date;
+              DateDiff := CalcDateDiff(StartDate, EndDate);
+
+              // If the date difference is invalid, recalculate with the minimum date
+              if (DateDiff = '-') and (MinDate > 0) and (LastDate <> IfThen(displaytime, Now, Date)) then
+              begin
+                StartDate := MinDate;
+                EndDate := FTaskList[I].Date;
+                DateDiff := CalcDateDiff(StartDate, EndDate);
+
+                MinDate := FTaskList[I].Date;
+              end;
+
+              // Display the calculated date difference in the grid
+              if (DateDiff <> '-') and (Grid.RowCount > RowIndex) and ((RowIndex > 1) or (DateDiff <> '0' + rseconds)) then
+              begin
+                AddDatesInterval(I);
+                Grid.Cells[0, RowIndex] := (I + 1).ToString + '. ' + DateDiff;
+              end;
+            end;
+          end;
+
+          // Update LastDate to the current task's date for the next iteration
+          if FTaskList[I].Date > 0 then
+            LastDate := FTaskList[I].Date;
+        end;
+
+        // Fill task in grid for archive or not
         Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].Done));
         Grid.Cells[2, RowIndex] := FTaskList[I].Text;
         Grid.Cells[3, RowIndex] := FTaskList[I].Note;

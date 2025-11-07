@@ -6189,6 +6189,9 @@ begin
   if (aRowMem) and (Length(FLoadedRowMem) > 0) then
     CopyToArray(FLastRowMem, FLoadedRowMem);
 
+  if (FLoadedSelectedTab < 0) and (groupTabs.Tabs.Count > 0) then
+    FLoadedSelectedTab := 0;
+
   // Restore last open tab and rows
   if (FLoadedSelectedTab >= 0) then
   begin
@@ -6729,13 +6732,13 @@ begin
   // Task counts
   if (taskGrid.Selection.Height = 0) then
   begin
-    CurAll := Tasks.CalcCount(ShowArchived, False);
-    CurDone := Tasks.CalcCount(ShowArchived, True);
+    CurAll := Tasks.CalcCount(ShowArchived, False, FilterBox.Text, 0, 0, FShowTime);
+    CurDone := Tasks.CalcCount(ShowArchived, True, FilterBox.Text, 0, 0, FShowTime);
   end
   else
   begin
-    CurAll := Tasks.CalcCount(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
-    CurDone := Tasks.CalcCount(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+    CurAll := Tasks.CalcCount(ShowArchived, False, FilterBox.Text, taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowTime);
+    CurDone := Tasks.CalcCount(ShowArchived, True, FilterBox.Text, taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowTime);
   end;
   if (CurAll = CurDone) or (CurDone = 0) then
     statusBar.Panels[3].Text := CurAll.ToString + rrows
@@ -6747,13 +6750,13 @@ begin
   begin
     if (taskGrid.Selection.Height = 0) then
     begin
-      SumAll := Tasks.CalcSum(ShowArchived, False);
-      SumDone := Tasks.CalcSum(ShowArchived, True);
+      SumAll := Tasks.CalcSum(ShowArchived, False, FilterBox.Text, 0, 0, FShowTime);
+      SumDone := Tasks.CalcSum(ShowArchived, True, FilterBox.Text, 0, 0, FShowTime);
     end
     else
     begin
-      SumAll := Tasks.CalcSum(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
-      SumDone := Tasks.CalcSum(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+      SumAll := Tasks.CalcSum(ShowArchived, False, FilterBox.Text, taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowTime);
+      SumDone := Tasks.CalcSum(ShowArchived, True, FilterBox.Text, taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowTime);
     end;
     if (SumAll <> 0) then
     begin
@@ -6775,13 +6778,14 @@ begin
   begin
     if (taskGrid.Selection.Height = 0) then
     begin
-      DurationAll := Tasks.CalcDuration(ShowArchived, False);
-      DurationCurrent := Tasks.CalcDuration(ShowArchived, True);
+      DurationAll := Tasks.CalcDuration(ShowArchived, False, FilterBox.Text, 0, 0, FShowTime);
+      DurationCurrent := Tasks.CalcDuration(ShowArchived, True, FilterBox.Text, 0, 0, FShowTime);
     end
     else
     begin
-      DurationAll := Tasks.CalcDuration(ShowArchived, False, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
-      DurationCurrent := Tasks.CalcDuration(ShowArchived, True, taskGrid.Selection.Top, taskGrid.Selection.Bottom);
+      DurationAll := Tasks.CalcDuration(ShowArchived, False, FilterBox.Text, taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowTime);
+      DurationCurrent := Tasks.CalcDuration(ShowArchived, True, FilterBox.Text, taskGrid.Selection.Top,
+        taskGrid.Selection.Bottom, FShowTime);
     end;
     if (DurationAll = DurationCurrent) or (DurationCurrent = string.Empty) then
       statusBar.Panels[5].Text := DurationAll
