@@ -1679,7 +1679,7 @@ begin
         if task.Tags.Count > 0 then
         begin
           BitTags := editTags.GetTagsBitmap(task.Tags, Max(Font.Size div 2 + 2, 8), Min(ARect.Width, 500),
-            ARect.Height, 2, ifthen(gdSelected in aState, 50, 30));
+            ARect.Height, 2, ifthen(gdSelected in aState, 50, 30), ColorToRGB(bgFill));
           try
             BitTags.TransparentColor := clWhite;
             BitTags.Transparent := True;

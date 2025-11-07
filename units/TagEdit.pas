@@ -125,7 +125,8 @@ type
     procedure FixDesignFontsPPI(const ADesignTimePPI: integer); override;
     function Focused: boolean; override;
     function GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;
-      ADimness: integer = 0): TBitmap;
+      ADimness: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
+    procedure ApplyDimnessEffect(ABitmap: TBitmap; ADimness: integer; ABlendColor: TColor = clWhite);
   published
     property Align;
     property Anchors;
@@ -568,6 +569,7 @@ var
   LastRect: TRect;
   EditBottom: integer;
 begin
+  LastRect := Rect(0, 0, 0, 0);
   if FTags.Count = 0 then
   begin
     // Minimum height for empty control (edit box + padding)
@@ -762,8 +764,10 @@ var
   i: integer;
   R: TRect;
   s, Part1, Part2: string;
-  X, Y, W, H, M, SepW: integer;
-  Color1, Color2: TColor;
+  X, Y, W, H, M: integer;
+  SepW: integer = 0;
+  Color1: Tcolor = clNone;
+  Color2: TColor = clNone;
   HasColon, Hover: boolean;
 begin
   ACanvas.Font.Assign(Font);
@@ -1334,17 +1338,13 @@ begin
 end;
 
 function TTagEdit.GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;
-  ADimness: integer = 0): TBitmap;
+  ADimness: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
 var
   TempBitmap: TBitmap;
-  X, Y: integer;
-  PixelColor: TColor;
-  R, G, B: byte;
-  DimFactor: double;
   TempTagRects: array of TRect = ();
   I: integer;
   MaxX, UsedWidth: integer;
-  MaxY, UsedHeight: integer;
+  MaxY: integer;
   SingleLine: boolean;
 begin
   Result := TBitmap.Create;
@@ -1401,7 +1401,6 @@ begin
 
       // Add padding
       UsedWidth := MaxX + Scale(4);
-      UsedHeight := MaxY + Scale(4);
 
       // Determine final dimensions
       if SingleLine and (UsedWidth < AWidth) then
@@ -1414,59 +1413,67 @@ begin
       end;
 
       Result.Height := AHeight;
-
-      // Ensure we don't exceed temporary bitmap dimensions
-      if Result.Height > TempBitmap.Height then
-        Result.Height := TempBitmap.Height;
-
       Result.PixelFormat := pf24bit;
 
       // Draw background
       Result.Canvas.Brush.Color := clWhite;
       Result.Canvas.FillRect(0, 0, Result.Width, Result.Height);
 
-      // Apply dimness effect if needed
+      // Copy content from temp bitmap
+      Result.Canvas.CopyRect(Rect(0, 0, Result.Width, Result.Height),
+        TempBitmap.Canvas, Rect(0, 0, Result.Width, Result.Height));
+
+      // Apply dimness effect if needed (optimized version)
       if (ADimness > 0) and (ADimness <= 100) then
       begin
-        DimFactor := ADimness / 100.0;
-        for Y := 0 to Result.Height - 1 do
-        begin
-          for X := 0 to Result.Width - 1 do
-          begin
-            if (X < TempBitmap.Width) and (Y < TempBitmap.Height) then
-            begin
-              PixelColor := TempBitmap.Canvas.Pixels[X, Y];
-
-              // If pixel is not white, apply dimming effect
-              if PixelColor <> clWhite then
-              begin
-                R := GetRValue(PixelColor);
-                G := GetGValue(PixelColor);
-                B := GetBValue(PixelColor);
-
-                // Blend towards white based on dimness factor
-                R := Min(255, R + Round((255 - R) * DimFactor));
-                G := Min(255, G + Round((255 - G) * DimFactor));
-                B := Min(255, B + Round((255 - B) * DimFactor));
-
-                Result.Canvas.Pixels[X, Y] := RGBToColor(R, G, B);
-              end;
-            end;
-          end;
-        end;
-      end
-      else
-      begin
-        // No dimness - copy only the used area
-        Result.Canvas.CopyRect(Rect(0, 0, Result.Width, Result.Height),
-          TempBitmap.Canvas, Rect(0, 0, Result.Width, Result.Height));
+        ApplyDimnessEffect(Result, ADimness, ABlendColor);
       end;
+
     finally
       TempBitmap.Free;
     end;
   except
     Result.Free;
     raise;
+  end;
+end;
+
+procedure TTagEdit.ApplyDimnessEffect(ABitmap: TBitmap; ADimness: integer; ABlendColor: TColor = clWhite);
+var
+  X, Y: integer;
+  SrcColor: TColor;
+  R1, G1, B1: byte;
+  Alpha: double;
+  BlendR, BlendG, BlendB: byte;
+begin
+  if ADimness <= 0 then Exit;
+  if ABlendColor < 0 then ABlendColor := clWhite;
+  Alpha := ADimness / 100.0;
+
+  // Extract RGB components from blend color
+  BlendR := GetRValue(ABlendColor);
+  BlendG := GetGValue(ABlendColor);
+  BlendB := GetBValue(ABlendColor);
+
+  // Blend the bitmap with specified color
+  for Y := 0 to ABitmap.Height - 1 do
+  begin
+    for X := 0 to ABitmap.Width - 1 do
+    begin
+      SrcColor := ABitmap.Canvas.Pixels[X, Y];
+
+      // Only process non-white pixels (or you can remove this condition for complete blending)
+      if SrcColor <> clWhite then
+      begin
+        R1 := GetRValue(SrcColor);
+        G1 := GetGValue(SrcColor);
+        B1 := GetBValue(SrcColor);
+
+        // Alpha blending: result = src * (1-alpha) + blend_color * alpha
+        ABitmap.Canvas.Pixels[X, Y] := RGBToColor(Round(R1 * (1 - Alpha) + BlendR * Alpha),
+          Round(G1 * (1 - Alpha) + BlendG * Alpha), Round(B1 * (1 - Alpha) + BlendB * Alpha));
+      end;
+    end;
   end;
 end;
 
