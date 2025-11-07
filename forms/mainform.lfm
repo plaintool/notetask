@@ -230,7 +230,6 @@ object formNotetask: TformNotetask
       Constraints.MinWidth = 20
       DropDownCount = 10
       ItemHeight = 15
-      Sorted = True
       TabOrder = 1
       TextHint = 'Type to filter...'
       OnChange = filterBoxChange

@@ -142,7 +142,7 @@ type
     procedure MoveTask(OldIndex, NewIndex: integer);
     procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
     function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;
-    procedure FillTags(Task: TTask = nil);
+    procedure FillTags;
     procedure CreateBackup;
     procedure UndoBackup;
     procedure CreateBackupInit;
@@ -461,7 +461,6 @@ begin
   FGroupHintList := TStringList.Create;
   FTags := TStringList.Create;
   FTags.Duplicates := dupIgnore;
-  FTags.Sorted := True;
 
   if Assigned(TaskStrings) then
   begin
@@ -1467,7 +1466,8 @@ begin
           if (j = 2) and (Grid.Columns[j - 1].Visible) then
           begin
             pText := GetTask(i).ToString(j);
-            if Rect.Width > 1 then pText := pText + StringListToBacktickString(GetTask(i).Tags, not EndsWith(pText));
+            if Rect.Width > 1 then pText := pText + StringListToBacktickString(GetTask(i).Tags,
+                (pText <> string.Empty) and not EndsWith(pText));
           end;
           if (j = 3) and ((Grid.Columns[j - 1].Visible) or NoteVisible) then pNote := GetTask(i).ToString(j);
           if (j = 4) and (Grid.Columns[j - 1].Visible) then pAmount := GetTask(i).ToString(j).Trim;
@@ -1724,43 +1724,36 @@ begin
   end;
 end;
 
-procedure TTasks.FillTags(Task: TTask = nil);
+procedure TTasks.FillTags;
 var
   i, j: integer;
+  Up, Down: TStringList;
 begin
-  if (Assigned(Task)) then
-  begin
-    // One Task
-    Task.FillTags;
-    FTags.AddStrings(Task.Tags);
-
-    FillTagsFromString(FTags, Task.FText);
-    FillTagsFromString(FTags, Task.FNote);
-  end
-  else
-  begin
-    FTags.Clear;
-
-    // Current list
-    //for i := 0 to High(FTaskList) do
-    //begin
-    //  FTaskList[i].FillTags;
-    //  FTags.AddStrings(FTaskList[i].Tags);
-
-    //  FillTagsFromString(FTags, FTaskList[i].FText);
-    //  FillTagsFromString(FTags, FTaskList[i].FNote);
-    //end;
-
+  Up := TStringList.Create;
+  Up.Sorted := True;
+  Up.Duplicates := dupIgnore;
+  Down := TStringList.Create;
+  Down.Sorted := True;
+  Down.Duplicates := dupIgnore;
+  try
     // All Groups
     for i := 0 to High(FGroupList) do
       for j := 0 to High(FGroupList[i]) do
       begin
         FGroupList[i][j].FillTags;
-        FTags.AddStrings(FGroupList[i][j].Tags);
+        Up.AddStrings(FGroupList[i][j].Tags);
 
-        FillTagsFromString(FTags, FGroupList[i][j].FText);
-        FillTagsFromString(FTags, FGroupList[i][j].FNote);
+        FillTagsFromString(Down, FGroupList[i][j].FText);
+        FillTagsFromString(Down, FGroupList[i][j].FNote);
       end;
+
+    // Add Tags
+    FTags.Clear;
+    FTags.AddStrings(Up);
+    FTags.AddStrings(Down);
+  finally
+    Up.Free;
+    Down.Free;
   end;
 end;
 
@@ -1906,7 +1899,6 @@ begin
   begin
     FInitTags := TStringList.Create;
     FInitTags.Duplicates := dupIgnore;
-    FInitTags.Sorted := True;
     FInitTags.Assign(FTags);
   end;
 end;
@@ -1977,7 +1969,6 @@ begin
   begin
     FTags := TStringList.Create;
     FTags.Duplicates := dupIgnore;
-    FTags.Sorted := True;
     FTags.Assign(FInitTags);
   end;
 

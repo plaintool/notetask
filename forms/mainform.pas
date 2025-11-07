@@ -6897,7 +6897,7 @@ var
   SortedState: boolean;
 begin
   if FillTags and (taskGrid.Row > 0) then
-    Tasks.FillTags(Tasks.GetTask(taskGrid.Row));
+    Tasks.FillTags;
   SortedState := filterBox.Sorted;
   filterBox.Sorted := False;
   filterBox.Items.Assign(Tasks.Tags);
