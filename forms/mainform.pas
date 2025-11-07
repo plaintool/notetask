@@ -777,6 +777,8 @@ begin
   editTags.AutoSizeHeight := True;
   editTags.DragIndicatorColor := clRed;
   editTags.TagHoverColor := clNone;
+  editTags.TagSuffixColor := $FEFEFE;
+  editTags.RoundCorners := 20;
   editTags.AutoColorSeed := 2166136267;
   editTags.AutoColorBrigtness := 100;
   editTags.BackSpaceEditTag := True;
@@ -1559,6 +1561,7 @@ var
   FS: TFormatSettings;
   ImgIndex: integer;
   ImgX, ImgY: integer;
+  BitTags: TBitmap;
 begin
   grid := Sender as TStringGrid;
   bgFill := clWhite;
@@ -1668,8 +1671,29 @@ begin
     else
       S := grid.Cells[ACol, ARow];
 
+    if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
+    begin
+      if (aCol = 2) then
+      begin
+        task := Tasks.GetTask(ARow);
+        if task.Tags.Count > 0 then
+        begin
+          BitTags := editTags.GetTagsBitmap(task.Tags, Max(Font.Size div 2 + 2, 8), Min(ARect.Width, 500),
+            ARect.Height, 2, ifthen(gdSelected in aState, 50, 30));
+          try
+            BitTags.TransparentColor := clWhite;
+            BitTags.Transparent := True;
+            grid.canvas.Draw(aRect.Right - BitTags.Width - 5, aRect.Top, BitTags);
+          finally
+            BitTags.Free;
+          end;
+        end;
+      end;
+    end;
+
     if Length(S) > 0 then
     begin
+      grid.canvas.Brush.Style := bsClear;
       drawrect := aRect;
       drawrect.Inflate(-4, 0);
 
