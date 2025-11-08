@@ -98,6 +98,8 @@ function EndsWith(const S: string; const Ch: char = ' '): boolean;
 
 function StartsWith(const S: string; const Ch: char = ' '): boolean;
 
+procedure StringListRemove(AList: TStringList; const AName: string);
+
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
 
 procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
@@ -933,6 +935,18 @@ function StartsWith(const S: string; const Ch: char = ' '): boolean;
 begin
   // Return True if string starts with specified char
   Result := (S <> string.Empty) and (S[1] = Ch);
+end;
+
+procedure StringListRemove(AList: TStringList; const AName: string);
+var
+  Index: integer;
+begin
+  Index := AList.IndexOf(AName);
+  while Index <> -1 do
+  begin
+    AList.Delete(Index);
+    Index := AList.IndexOf(AName);
+  end;
 end;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);

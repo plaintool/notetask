@@ -89,10 +89,6 @@ type
     procedure SetReadOnly(Value: boolean);
     procedure TagsChanged(Sender: TObject);
     function RemovalConfirmed(idx: integer): boolean;
-    procedure DrawTags;
-    procedure DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
-      AAvailWidth: integer; AHoverIndex: integer = -1; AFontSize: integer = -1; AIndent: integer = 4;
-      AShowCloseButtons: boolean = False; var ATagRects: array of TRect);
     function GetTagHeight(AFontSize: integer = -1): integer;
     function GetTagRect(Index: integer): TRect;
     function TagAtPos(const P: TPoint): integer;
@@ -103,12 +99,15 @@ type
     procedure UpdateAutoHeight;
     procedure SetTagColors(Value: TTagColorItems);
     function Scale(const AValue: integer): integer;
-    function RandTagColor(const TagName: string; BrightnessPercent: integer = 70): TColor;
-    function FindTagColor(const S: string): TColor;
     function GetContrastTextColor(BackColor, FontColor: TColor; MidLevel: integer = 128): TColor;
     procedure HandlePopupMenu(Sender: TObject);
+    function RandTagColor(const TagName: string; BrightnessPercent: integer = 70): TColor;
+    function FindTagColor(const S: string): TColor;
+    procedure DrawTags;
+    procedure DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
+      AAvailWidth: integer; AHoverIndex: integer = -1; AFontSize: integer = -1; AIndent: integer = 4;
+      AShowCloseButtons: boolean = False; var ATagRects: array of TRect);
   protected
-    procedure Paint; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
@@ -117,6 +116,7 @@ type
     procedure Resize; override;
     procedure SetColor(Value: TColor); override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: boolean); override;
+    procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -638,87 +638,6 @@ begin
   UpdateAutoHeight;
 end;
 
-function TTagEdit.RandTagColor(const TagName: string; BrightnessPercent: integer = 70): TColor;
-var
-  Hash: longword;
-  R, G, B: byte;
-  Rf, Gf, Bf, MaxValf: single;
-  S: single;
-  i, MaxVal, MinVal: integer;
-begin
-  // Clamp brightness range to [0..100]
-  if BrightnessPercent < 0 then BrightnessPercent := 0;
-  if BrightnessPercent > 100 then BrightnessPercent := 100;
-
-  // Generate stable hash (FNV-1a)
-  Hash := FAutoColorSeed;
-  if TagName <> string.Empty then
-    for i := 1 to Length(TagName) do
-      Hash := longword(uint64(Hash xor Ord(TagName[i])) * 16777619);
-
-  // Extract RGB components from hash
-  R := (Hash and $FF);
-  G := (Hash shr 8) and $FF;
-  B := (Hash shr 16) and $FF;
-
-  // Boost saturation slightly if too gray
-  MaxVal := MaxIntValue([R, G, B]);
-  MinVal := MinIntValue([R, G, B]);
-  if (MaxVal - MinVal) < 60 then
-  begin
-    if MaxVal < 200 then
-    begin
-      R := Min(255, R + 60);
-      G := Min(255, G + 40);
-      B := Min(255, B + 40);
-    end;
-  end;
-
-  // --- Apply brightness adjustment ---
-  // Convert BrightnessPercent (0-100) to scale factor with minimum brightness
-  // 0% = dark but not completely black, 100% = very bright
-  S := 0.3 + (BrightnessPercent / 100) * 1.7;  // Range: 0.3 to 2.0
-
-  // Use floating point for brightness calculation to avoid overflow
-  Rf := R * S;
-  Gf := G * S;
-  Bf := B * S;
-
-  // --- Avoid too white colors ---
-  // If maximum channel value exceeds 240, scale down all channels proportionally
-  // This prevents colors from being too close to white while preserving hue
-  MaxValf := Rf;
-  if Gf > MaxValf then MaxValf := Gf;
-  if Bf > MaxValf then MaxValf := Bf;
-
-  if MaxValf > 240 then
-  begin
-    // Scale all channels down proportionally to maintain color balance
-    Rf := Rf * 240 / MaxValf;
-    Gf := Gf * 240 / MaxValf;
-    Bf := Bf * 240 / MaxValf;
-  end;
-
-  // Convert back to byte with clamping
-  R := Min(255, Round(Rf));
-  G := Min(255, Round(Gf));
-  B := Min(255, Round(Bf));
-
-  Result := RGBToColor(R, G, B);
-end;
-
-function TTagEdit.FindTagColor(const S: string): TColor;
-var
-  i: integer;
-begin
-  Result := clNone;
-  for i := 0 to TagColors.Count - 1 do
-  begin
-    if Pos(UpperCase(TagColors[i].TagName), UpperCase(S)) > 0 then
-      Exit(TagColors[i].Color);
-  end;
-end;
-
 function TTagEdit.GetContrastTextColor(BackColor, FontColor: TColor; MidLevel: integer = 128): TColor;
 var
   Rb, Gb, Bb: byte; // background
@@ -761,253 +680,6 @@ begin
   end
   else
     Result := FontColor;
-end;
-
-procedure TTagEdit.DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
-  AAvailWidth: integer; AHoverIndex: integer = -1; AFontSize: integer = -1; AIndent: integer = 4;
-  AShowCloseButtons: boolean = False; var ATagRects: array of TRect);
-var
-  i: integer;
-  R: TRect;
-  s, Part1, Part2: string;
-  X, Y, W, H, M: integer;
-  SepW: integer = 0;
-  Color1: Tcolor = clNone;
-  Color2: TColor = clNone;
-  HasColon, Hover: boolean;
-begin
-  ACanvas.Font.Assign(Font);
-  if AFontSize > -1 then
-    ACanvas.Font.Size := AFontSize;
-  ACanvas.AntialiasingMode := amOn;
-
-  // If ATagRects is passed, ensure it has the correct length
-  if Length(ATagRects) <> ATags.Count then
-    Exit;
-
-  X := Scale(AIndent);
-  Y := Scale(AIndent);
-  H := ATagHeight;
-
-  for i := 0 to ATags.Count - 1 do
-  begin
-    s := ATags[i];
-    Hover := (i = AHoverIndex) and ((FTagHoverColor <> clNone) or FTagHoverUnderline);
-
-    // Split tag by colon
-    HasColon := Pos(':', s) > 0;
-    if HasColon then
-    begin
-      Part1 := Trim(Copy(s, 1, Pos(':', s) - 1)) + ' ';
-      Part2 := Trim(Copy(s, Pos(':', s) + 1, MaxInt));
-    end
-    else
-    begin
-      Part1 := s;
-      Part2 := '';
-    end;
-
-    M := ATagHeight;
-    W := ACanvas.TextWidth(s) + M;
-
-    if (i > 0) and ((X + W) > AAvailWidth) then
-    begin
-      X := Scale(AIndent);
-      Y := Y + H + Scale(AIndent);
-    end;
-
-    R := Rect(X, Y, X + W, Y + H);
-
-    // Store the calculated rect in the provided array
-    if i < Length(ATagRects) then
-      ATagRects[i] := R;
-
-    ACanvas.Pen.Width := FTagBorderWidth;
-    ACanvas.Pen.Color := FTagBorderColor;
-    if FTagBorderWidth <= 0 then
-      ACanvas.Pen.Style := psClear
-    else
-      ACanvas.Pen.Style := psSolid;
-
-    if HasColon then
-    begin
-      if Hover and (FTagHoverColor <> clNone) then
-        Color1 := FTagHoverColor
-      else
-      begin
-        Color1 := FindTagColor(Part1);
-        if Color1 = clNone then
-        begin
-          if FTagColor <> clNone then
-            Color1 := FTagColor
-          else
-            Color1 := RandTagColor(Part1, FAutoColorBrigtness);
-        end;
-      end;
-
-      Color2 := FindTagColor(Part2);
-      if Color2 = clNone then
-      begin
-        if FTagSuffixColor <> clNone then
-          Color2 := FTagSuffixColor
-        else
-          Color2 := RandTagColor(Part2, FAutoColorBrigtness);
-      end;
-
-      if Hover and (FTagHoverColor <> clNone) then
-        ACanvas.Pen.Color := FTagHoverColor
-      else
-      if FTagBorderColor = clNone then
-        ACanvas.Pen.Color := Color1;
-
-      SepW := ACanvas.TextWidth(Part1) + Scale(6); // width of first part + left padding
-
-      // Left part background
-      ACanvas.Brush.Color := Color1;
-      ACanvas.RoundRect(R.Left, R.Top, R.Left + SepW, R.Bottom, FRoundCorners, FRoundCorners);
-
-      // Right part background
-      ACanvas.Brush.Color := Color2;
-      ACanvas.RoundRect(R.Left + SepW, R.Top, R.Right, R.Bottom, FRoundCorners, FRoundCorners);
-
-      // Fill junction to avoid double-rounded corner visual
-      ACanvas.Brush.Color := Color1;
-      ACanvas.FillRect(R.Left + SepW - FRoundCorners, R.Top, R.Left + SepW, R.Bottom - 1);
-      ACanvas.Brush.Color := Color2;
-      ACanvas.FillRect(R.Left + SepW, R.Top, R.Left + SepW + FRoundCorners, R.Bottom - 1);
-
-      if (FTagBorderWidth > 0) then
-      begin
-        ACanvas.Brush.Color := ACanvas.Pen.Color;
-        ACanvas.FillRect(R.Left + SepW - FRoundCorners, R.Top - (FTagBorderWidth div 2), R.Left + SepW + FRoundCorners,
-          R.Top + FTagBorderWidth - (FTagBorderWidth div 2));
-        ACanvas.FillRect(R.Left + SepW - FRoundCorners, R.Bottom - (FTagBorderWidth div 2) - 1, R.Left +
-          SepW + FRoundCorners, R.Bottom + FTagBorderWidth - (FTagBorderWidth div 2) - 1);
-      end;
-    end
-    else
-    begin
-      if Hover and (FTagHoverColor <> clNone) then
-        ACanvas.Brush.Color := FTagHoverColor
-      else
-      begin
-        ACanvas.Brush.Color := FindTagColor(s);
-        if ACanvas.Brush.Color = clNone then
-        begin
-          if FTagColor <> clNone then
-            ACanvas.Brush.Color := FTagColor
-          else
-            ACanvas.Brush.Color := RandTagColor(s, FAutoColorBrigtness);
-        end;
-      end;
-
-      if Hover and (FTagHoverColor <> clNone) then
-        ACanvas.Pen.Color := FTagHoverColor
-      else
-      if FTagBorderColor = clNone then
-        ACanvas.Pen.Color := ACanvas.Brush.Color;
-
-      ACanvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, FRoundCorners, FRoundCorners);
-    end;
-
-    // Calculate shift
-    if (FReadOnly) or (not AShowCloseButtons) or (FCloseButtonOnHover and not Hover) then
-      M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3) + 2)
-    else
-      M := 0;
-
-    // Draw text
-    ACanvas.Brush.Style := bsClear;
-    ACanvas.Font.Underline := FTagHoverUnderline and Hover;
-    if HasColon then
-    begin
-      ACanvas.Font.Color := GetContrastTextColor(Color1, Font.Color);
-      ACanvas.TextOut(R.Left + Scale(AIndent), R.Top + Scale(3), Part1);
-
-      ACanvas.Font.Color := GetContrastTextColor(Color2, Font.Color);
-      ACanvas.TextOut(R.Left + SepW + Scale(AIndent div 2) + M div 3, R.Top + Scale(3), Part2);
-    end
-    else
-    begin
-      ACanvas.Font.Color := GetContrastTextColor(ACanvas.Brush.Color, Font.Color, 128);
-      ACanvas.TextOut(R.Left + Scale(AIndent) + M div 2, R.Top + Scale(3), s);
-    end;
-
-    // Draw '×' button if enabled
-    if AShowCloseButtons and (not FReadOnly) and (FCloseButtons) and (not FCloseButtonOnHover or Hover) then
-    begin
-      ACanvas.Font.Underline := False;
-      M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3) + 2);
-      ACanvas.TextOut(R.Right - M, R.Top + Scale(AIndent), '×');
-    end;
-
-    Inc(X, W + Scale(AIndent));
-  end;
-end;
-
-procedure TTagEdit.DrawTags;
-var
-  AvailWidth: integer;
-begin
-  // Calculate available width considering borders
-  AvailWidth := ClientWidth - Scale(8);
-  if FBorderWidth > 0 then
-    Dec(AvailWidth, 2 * FBorderWidth);
-
-  // Initialize FTagRects array
-  SetLength(FTagRects, FTags.Count);
-
-  DrawTagsToCanvas(FTags, Canvas, GetTagHeight, AvailWidth, FHoverIndex, -1, 4, True, FTagRects);
-
-  if not (csDesigning in ComponentState) then
-    UpdateEditPosition;
-end;
-
-procedure TTagEdit.Paint;
-var
-  BorderRect, R: TRect;
-begin
-  // Draw component background
-  Canvas.Brush.Color := Color;
-  Canvas.FillRect(ClientRect);
-
-  // Draw component border if needed
-  if FBorderWidth > 0 then
-  begin
-    Canvas.Pen.Width := FBorderWidth;
-    Canvas.Pen.Color := FBorderColor;
-    Canvas.Pen.Style := psSolid;
-    BorderRect := ClientRect;
-    Canvas.Rectangle(BorderRect);
-  end;
-
-  DrawTags;
-
-  // Draw drag indicator
-  if not (csDesigning in ComponentState) and FDragging and (FDropIndex >= 0) and (FDropIndex <= FTags.Count) then
-  begin
-    Canvas.Pen.Width := 2;
-    Canvas.Pen.Color := FDragIndicatorColor;
-    Canvas.Pen.Style := psSolid;
-    if FDropIndex < FTags.Count then
-    begin
-      R := GetTagRect(FDropIndex);
-      Canvas.MoveTo(R.Left - Scale(2), R.Top);
-      Canvas.LineTo(R.Left - Scale(2), R.Bottom);
-    end
-    else if FTags.Count > 0 then
-    begin
-      R := GetTagRect(FTags.Count - 1);
-      Canvas.MoveTo(R.Right + Scale(2), R.Top);
-      Canvas.LineTo(R.Right + Scale(2), R.Bottom);
-    end
-    else
-    begin
-      // No Items - show indicator at start
-      Canvas.MoveTo(Scale(2), Scale(4));
-      Canvas.LineTo(Scale(2), Scale(4) + GetTagHeight);
-    end;
-  end;
 end;
 
 function TTagEdit.TagAtPos(const P: TPoint): integer;
@@ -1104,7 +776,7 @@ begin
     if (not FReadOnly) and (FCloseButtons) and (idx >= 0) then
     begin
       R := GetTagRect(idx);
-      M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3) + 2);
+      M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3)+4);
       // Click near right edge removes the tag - do it immediately
       if (X > R.Right - M) and RemovalConfirmed(idx) then
       begin
@@ -1344,6 +1016,334 @@ begin
   end
   else
     inherited DoContextPopup(MousePos, Handled);
+end;
+
+function TTagEdit.RandTagColor(const TagName: string; BrightnessPercent: integer = 70): TColor;
+var
+  Hash: longword;
+  R, G, B: byte;
+  Rf, Gf, Bf, MaxValf: single;
+  S: single;
+  i, MaxVal, MinVal: integer;
+begin
+  // Clamp brightness range to [0..100]
+  if BrightnessPercent < 0 then BrightnessPercent := 0;
+  if BrightnessPercent > 100 then BrightnessPercent := 100;
+
+  // Generate stable hash (FNV-1a)
+  Hash := FAutoColorSeed;
+  if TagName <> string.Empty then
+    for i := 1 to Length(TagName) do
+      Hash := longword(uint64(Hash xor Ord(TagName[i])) * 16777619);
+
+  // Extract RGB components from hash
+  R := (Hash and $FF);
+  G := (Hash shr 8) and $FF;
+  B := (Hash shr 16) and $FF;
+
+  // Boost saturation slightly if too gray
+  MaxVal := MaxIntValue([R, G, B]);
+  MinVal := MinIntValue([R, G, B]);
+  if (MaxVal - MinVal) < 60 then
+  begin
+    if MaxVal < 200 then
+    begin
+      R := Min(255, R + 60);
+      G := Min(255, G + 40);
+      B := Min(255, B + 40);
+    end;
+  end;
+
+  // --- Apply brightness adjustment ---
+  // Convert BrightnessPercent (0-100) to scale factor with minimum brightness
+  // 0% = dark but not completely black, 100% = very bright
+  S := 0.3 + (BrightnessPercent / 100) * 1.7;  // Range: 0.3 to 2.0
+
+  // Use floating point for brightness calculation to avoid overflow
+  Rf := R * S;
+  Gf := G * S;
+  Bf := B * S;
+
+  // --- Avoid too white colors ---
+  // If maximum channel value exceeds 240, scale down all channels proportionally
+  // This prevents colors from being too close to white while preserving hue
+  MaxValf := Rf;
+  if Gf > MaxValf then MaxValf := Gf;
+  if Bf > MaxValf then MaxValf := Bf;
+
+  if MaxValf > 240 then
+  begin
+    // Scale all channels down proportionally to maintain color balance
+    Rf := Rf * 240 / MaxValf;
+    Gf := Gf * 240 / MaxValf;
+    Bf := Bf * 240 / MaxValf;
+  end;
+
+  // Convert back to byte with clamping
+  R := Min(255, Round(Rf));
+  G := Min(255, Round(Gf));
+  B := Min(255, Round(Bf));
+
+  Result := RGBToColor(R, G, B);
+end;
+
+function TTagEdit.FindTagColor(const S: string): TColor;
+var
+  i: integer;
+begin
+  Result := clNone;
+  for i := 0 to TagColors.Count - 1 do
+  begin
+    if Pos(UpperCase(TagColors[i].TagName), UpperCase(S)) > 0 then
+      Exit(TagColors[i].Color);
+  end;
+end;
+
+procedure TTagEdit.Paint;
+var
+  BorderRect, R: TRect;
+begin
+  // Draw component background
+  Canvas.Brush.Color := Color;
+  Canvas.FillRect(ClientRect);
+
+  // Draw component border if needed
+  if FBorderWidth > 0 then
+  begin
+    Canvas.Pen.Width := FBorderWidth;
+    Canvas.Pen.Color := FBorderColor;
+    Canvas.Pen.Style := psSolid;
+    BorderRect := ClientRect;
+    Canvas.Rectangle(BorderRect);
+  end;
+
+  DrawTags;
+
+  // Draw drag indicator
+  if not (csDesigning in ComponentState) and FDragging and (FDropIndex >= 0) and (FDropIndex <= FTags.Count) then
+  begin
+    Canvas.Pen.Width := 2;
+    Canvas.Pen.Color := FDragIndicatorColor;
+    Canvas.Pen.Style := psSolid;
+    if FDropIndex < FTags.Count then
+    begin
+      R := GetTagRect(FDropIndex);
+      Canvas.MoveTo(R.Left - Scale(2), R.Top);
+      Canvas.LineTo(R.Left - Scale(2), R.Bottom);
+    end
+    else if FTags.Count > 0 then
+    begin
+      R := GetTagRect(FTags.Count - 1);
+      Canvas.MoveTo(R.Right + Scale(2), R.Top);
+      Canvas.LineTo(R.Right + Scale(2), R.Bottom);
+    end
+    else
+    begin
+      // No Items - show indicator at start
+      Canvas.MoveTo(Scale(2), Scale(4));
+      Canvas.LineTo(Scale(2), Scale(4) + GetTagHeight);
+    end;
+  end;
+end;
+
+procedure TTagEdit.DrawTags;
+var
+  AvailWidth: integer;
+begin
+  // Calculate available width considering borders
+  AvailWidth := ClientWidth - Scale(8);
+  if FBorderWidth > 0 then
+    Dec(AvailWidth, 2 * FBorderWidth);
+
+  // Initialize FTagRects array
+  SetLength(FTagRects, FTags.Count);
+
+  DrawTagsToCanvas(FTags, Canvas, GetTagHeight, AvailWidth, FHoverIndex, -1, 4, True, FTagRects);
+
+  if not (csDesigning in ComponentState) then
+    UpdateEditPosition;
+end;
+
+procedure TTagEdit.DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
+  AAvailWidth: integer; AHoverIndex: integer = -1; AFontSize: integer = -1; AIndent: integer = 4;
+  AShowCloseButtons: boolean = False; var ATagRects: array of TRect);
+var
+  i: integer;
+  R: TRect;
+  s, Part1, Part2: string;
+  X, Y, W, H, M: integer;
+  SepW: integer = 0;
+  Color1: Tcolor = clNone;
+  Color2: TColor = clNone;
+  HasColon, Hover: boolean;
+begin
+  ACanvas.Font.Assign(Font);
+  if AFontSize > -1 then
+    ACanvas.Font.Size := AFontSize;
+  ACanvas.AntialiasingMode := amOn;
+
+  // If ATagRects is passed, ensure it has the correct length
+  if Length(ATagRects) <> ATags.Count then
+    Exit;
+
+  X := Scale(AIndent);
+  Y := Scale(AIndent);
+  H := ATagHeight;
+
+  for i := 0 to ATags.Count - 1 do
+  begin
+    s := ATags[i];
+    Hover := (i = AHoverIndex) and ((FTagHoverColor <> clNone) or FTagHoverUnderline);
+
+    // Split tag by colon
+    HasColon := Pos(':', s) > 0;
+    if HasColon then
+    begin
+      Part1 := Trim(Copy(s, 1, Pos(':', s) - 1)) + ' ';
+      Part2 := Trim(Copy(s, Pos(':', s) + 1, MaxInt));
+    end
+    else
+    begin
+      Part1 := s;
+      Part2 := '';
+    end;
+
+    M := ATagHeight;
+    W := ACanvas.TextWidth(s) + M;
+
+    if (i > 0) and ((X + W) > AAvailWidth) then
+    begin
+      X := Scale(AIndent);
+      Y := Y + H + Scale(AIndent);
+    end;
+
+    R := Rect(X, Y, X + W, Y + H);
+
+    // Store the calculated rect in the provided array
+    if i < Length(ATagRects) then
+      ATagRects[i] := R;
+
+    ACanvas.Pen.Width := FTagBorderWidth;
+    ACanvas.Pen.Color := FTagBorderColor;
+    if FTagBorderWidth <= 0 then
+      ACanvas.Pen.Style := psClear
+    else
+      ACanvas.Pen.Style := psSolid;
+
+    if HasColon then
+    begin
+      if Hover and (FTagHoverColor <> clNone) then
+        Color1 := FTagHoverColor
+      else
+      begin
+        Color1 := FindTagColor(Part1);
+        if Color1 = clNone then
+        begin
+          if FTagColor <> clNone then
+            Color1 := FTagColor
+          else
+            Color1 := RandTagColor(Part1, FAutoColorBrigtness);
+        end;
+      end;
+
+      Color2 := FindTagColor(Part2);
+      if Color2 = clNone then
+      begin
+        if FTagSuffixColor <> clNone then
+          Color2 := FTagSuffixColor
+        else
+          Color2 := RandTagColor(Part2, FAutoColorBrigtness);
+      end;
+
+      if Hover and (FTagHoverColor <> clNone) then
+        ACanvas.Pen.Color := FTagHoverColor
+      else
+      if FTagBorderColor = clNone then
+        ACanvas.Pen.Color := Color1;
+
+      SepW := ACanvas.TextWidth(Part1) + Scale(6); // width of first part + left padding
+
+      // Left part background
+      ACanvas.Brush.Color := Color1;
+      ACanvas.RoundRect(R.Left, R.Top, R.Left + SepW, R.Bottom, FRoundCorners, FRoundCorners);
+
+      // Right part background
+      ACanvas.Brush.Color := Color2;
+      ACanvas.RoundRect(R.Left + SepW, R.Top, R.Right, R.Bottom, FRoundCorners, FRoundCorners);
+
+      // Fill junction to avoid double-rounded corner visual
+      ACanvas.Brush.Color := Color1;
+      ACanvas.FillRect(R.Left + SepW - FRoundCorners, R.Top, R.Left + SepW, R.Bottom - 1);
+      ACanvas.Brush.Color := Color2;
+      ACanvas.FillRect(R.Left + SepW, R.Top, R.Left + SepW + FRoundCorners, R.Bottom - 1);
+
+      if (FTagBorderWidth > 0) then
+      begin
+        ACanvas.Brush.Color := ACanvas.Pen.Color;
+        ACanvas.FillRect(R.Left + SepW - FRoundCorners, R.Top - (FTagBorderWidth div 2), R.Left + SepW + FRoundCorners,
+          R.Top + FTagBorderWidth - (FTagBorderWidth div 2));
+        ACanvas.FillRect(R.Left + SepW - FRoundCorners, R.Bottom - (FTagBorderWidth div 2) - 1, R.Left +
+          SepW + FRoundCorners, R.Bottom + FTagBorderWidth - (FTagBorderWidth div 2) - 1);
+      end;
+    end
+    else
+    begin
+      if Hover and (FTagHoverColor <> clNone) then
+        ACanvas.Brush.Color := FTagHoverColor
+      else
+      begin
+        ACanvas.Brush.Color := FindTagColor(s);
+        if ACanvas.Brush.Color = clNone then
+        begin
+          if FTagColor <> clNone then
+            ACanvas.Brush.Color := FTagColor
+          else
+            ACanvas.Brush.Color := RandTagColor(s, FAutoColorBrigtness);
+        end;
+      end;
+
+      if Hover and (FTagHoverColor <> clNone) then
+        ACanvas.Pen.Color := FTagHoverColor
+      else
+      if FTagBorderColor = clNone then
+        ACanvas.Pen.Color := ACanvas.Brush.Color;
+
+      ACanvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, FRoundCorners, FRoundCorners);
+    end;
+
+    // Calculate shift
+    if (FReadOnly) or (not AShowCloseButtons) or (FCloseButtonOnHover and not Hover) then
+      M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3) + 2)
+    else
+      M := 0;
+
+    // Draw text
+    ACanvas.Brush.Style := bsClear;
+    ACanvas.Font.Underline := FTagHoverUnderline and Hover;
+    if HasColon then
+    begin
+      ACanvas.Font.Color := GetContrastTextColor(Color1, Font.Color);
+      ACanvas.TextOut(R.Left + Scale(Max(AIndent, 4)), R.Top + Scale(3), Part1);
+
+      ACanvas.Font.Color := GetContrastTextColor(Color2, Font.Color);
+      ACanvas.TextOut(R.Left + SepW + Scale(2 + AIndent), R.Top + Scale(3), Part2);
+    end
+    else
+    begin
+      ACanvas.Font.Color := GetContrastTextColor(ACanvas.Brush.Color, Font.Color, 128);
+      ACanvas.TextOut(R.Left + Scale(AIndent) + M div 2, R.Top + Scale(3), s);
+    end;
+
+    // Draw '×' button if enabled
+    if AShowCloseButtons and (not FReadOnly) and (FCloseButtons) and (not FCloseButtonOnHover or Hover) then
+    begin
+      ACanvas.Font.Underline := False;
+      M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3) + 2);
+      ACanvas.TextOut(R.Right - M, R.Top + Scale(AIndent), '×');
+    end;
+
+    Inc(X, W + Scale(AIndent));
+  end;
 end;
 
 function TTagEdit.GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;

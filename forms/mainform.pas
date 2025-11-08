@@ -330,10 +330,11 @@ type
     procedure memoNoteExit(Sender: TObject);
     procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure memoNoteChange(Sender: TObject);
-    procedure editTagsChange(Sender: TObject);
     procedure editTagsKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure editTagsTagClick(Sender: TObject; const TagText: string);
-
+    procedure editTagsChange(Sender: TObject);
+    procedure editTagsTagAdd(Sender: TObject; const TagText: string);
+    procedure editTagsTagRemove(Sender: TObject; const TagText: string);
     procedure groupTabsChange(Sender: TObject);
     procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure groupTabsMouseLeave(Sender: TObject);
@@ -785,6 +786,8 @@ begin
   editTags.OnChange := @editTagsChange;
   editTags.OnKeyDown := @editTagsKeyDown;
   editTags.OnTagClick := @editTagsTagClick;
+  editTags.OnTagAdd := @editTagsTagAdd;
+  editTags.OnTagRemove := @editTagsTagRemove;
 
   // Initialize variables
   FBackup := True;
@@ -2148,6 +2151,7 @@ begin
   if (LastTab = FindGroupRealIndex(groupTabs.TabIndex)) then
     taskGrid.Row := Tasks.ReverseMap(LastTask);
 
+  taskGrid.ClearSelections;
   SetInfo;
   SetNote;
   SetTags;
@@ -3825,13 +3829,6 @@ begin
   SetChanged;
 end;
 
-procedure TformNotetask.editTagsChange(Sender: TObject);
-begin
-  Tasks.GetTask(taskGrid.Row).Tags.Assign(editTags.Items);
-  SetFilter;
-  SetChanged;
-end;
-
 procedure TformNotetask.editTagsKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if editTags.ReadOnly then exit
@@ -3856,6 +3853,46 @@ procedure TformNotetask.editTagsTagClick(Sender: TObject; const TagText: string)
 begin
   filterBox.Text := TagText;
   filterBoxChange(Self);
+end;
+
+procedure TformNotetask.editTagsChange(Sender: TObject);
+begin
+  if taskGrid.Selection.Height = 0 then
+  begin
+    Tasks.GetTask(taskGrid.Row).Tags.Assign(editTags.Items);
+    SetFilter;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.editTagsTagAdd(Sender: TObject; const TagText: string);
+var
+  i: integer;
+begin
+  if taskGrid.Selection.Height > 0 then
+  begin
+    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+      if Tasks.Map(i) > -1 then
+        Tasks.GetTask(i).Tags.Add(TagText);
+
+    SetFilter;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.editTagsTagRemove(Sender: TObject; const TagText: string);
+var
+  i: integer;
+begin
+  if taskGrid.Selection.Height > 0 then
+  begin
+    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+      if Tasks.Map(i) > -1 then
+        StringListRemove(Tasks.GetTask(i).Tags, TagText);
+
+    SetFilter;
+    SetChanged;
+  end;
 end;
 
 procedure TformNotetask.memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -6889,18 +6926,23 @@ begin
           if Tasks.Map(i) > -1 then
             tags.AddStrings(Tasks.GetTask(i).Tags);
         editTags.Items.Assign(tags);
-        editTags.ReadOnly := True;
-        editTags.Color := clGray;
+        editTags.ReadOnly := FReadOnly;
+        editTags.AllowReorder := False;
+        editTags.Color := clDefault;
       end
       else if Tasks.Map(taskGrid.Row) > -1 then
       begin
         // Single row selected — set editable tag
         editTags.Items.Assign(Tasks.GetTask(taskGrid.Row).Tags);
         editTags.ReadOnly := FReadOnly;
+        editTags.AllowReorder := True;
         editTags.Color := clDefault;
       end
       else
+      begin
         editTags.Items.Clear;
+        editTags.ReadOnly := True;
+      end;
     end
     else
     begin
@@ -6942,7 +6984,10 @@ begin
         memoNote.Color := clDefault;
       end
       else
+      begin
         memoNote.Text := string.Empty;
+        memoNote.ReadOnly := True;
+      end;
     end
     else
     begin
