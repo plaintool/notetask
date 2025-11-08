@@ -1736,16 +1736,27 @@ begin
   Down.Sorted := True;
   Down.Duplicates := dupIgnore;
   try
+    // Current group
+    for i := 0 to High(FTaskList) do
+    begin
+      FTaskList[i].FillTags;
+      Up.AddStrings(FTaskList[i].Tags);
+
+      FillTagsFromString(Down, FTaskList[i].FText);
+      FillTagsFromString(Down, FTaskList[i].FNote);
+    end;
+
     // All Groups
     for i := 0 to High(FGroupList) do
-      for j := 0 to High(FGroupList[i]) do
-      begin
-        FGroupList[i][j].FillTags;
-        Up.AddStrings(FGroupList[i][j].Tags);
+      if SelectedGroup <> i then
+        for j := 0 to High(FGroupList[i]) do
+        begin
+          FGroupList[i][j].FillTags;
+          Up.AddStrings(FGroupList[i][j].Tags);
 
-        FillTagsFromString(Down, FGroupList[i][j].FText);
-        FillTagsFromString(Down, FGroupList[i][j].FNote);
-      end;
+          FillTagsFromString(Down, FGroupList[i][j].FText);
+          FillTagsFromString(Down, FGroupList[i][j].FNote);
+        end;
 
     // Add Tags
     FTags.Clear;

@@ -1052,7 +1052,7 @@ begin
     Key := 0;
   end
   else
-  if (Shift = [ssCtrl, ssShift]) and (Key = VK_TAB) then // Ctrl + Shift + Tab
+  if (ssShift in Shift) and (Key = VK_TAB) then // Ctrl + Shift + Tab
   begin
     aOutdentTasks.Execute;
     Key := 0;
@@ -1512,7 +1512,8 @@ begin
       if (Cell.X > 0) and (Cell.X < 5) then
         taskGrid.Col := Cell.X;
 
-      if (taskGrid.CanFocus and taskGrid.Visible) then taskGrid.SetFocus;
+      if Visible and taskGrid.Visible and taskGrid.CanFocus then
+        taskGrid.SetFocus;
     end;
     Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
   end;
@@ -1562,6 +1563,8 @@ var
   ImgIndex: integer;
   ImgX, ImgY: integer;
   BitTags: TBitmap;
+  TagsWidth: integer;
+  OriginalLeft, OriginalRight: integer;
 begin
   grid := Sender as TStringGrid;
   bgFill := clWhite;
@@ -1683,7 +1686,11 @@ begin
           try
             BitTags.TransparentColor := clWhite;
             BitTags.Transparent := True;
-            grid.canvas.Draw(aRect.Right - BitTags.Width - 5, aRect.Top, BitTags);
+            TagsWidth := BitTags.Width;
+            if taskGrid.BiDiMode = bdLeftToRight then
+              grid.canvas.Draw(aRect.Right - TagsWidth - 5, aRect.Top, BitTags)
+            else
+              grid.canvas.Draw(aRect.Left + 5, aRect.Top, BitTags);
           finally
             BitTags.Free;
           end;
@@ -1697,17 +1704,43 @@ begin
       drawrect := aRect;
       drawrect.Inflate(-4, 0);
 
+      // Save original boundaries
+      OriginalLeft := drawrect.Left;
+      OriginalRight := drawrect.Right;
+
+      // Reduce text area by TagsWidth for text measurement
+      if TagsWidth < drawrect.Width then
+      begin
+        if FBiDiRightToLeft then
+          drawrect.Left := OriginalLeft + TagsWidth  // For RTL: reserve space on the left
+        else
+          drawrect.Right := OriginalRight - TagsWidth; // For LTR: reserve space on the right
+      end;
+
+      // First pass: calculate text size
       flags := DT_CALCRECT;
       if FBiDiRightToLeft then
-        flags := flags + DT_RIGHT
+        flags := flags or DT_RIGHT
       else
-        flags := flags + DT_LEFT;
+        flags := flags or DT_LEFT;
       if FWordWrap then
         flags := flags or DT_WORDBREAK;
 
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
 
-      drawrect.Right := aRect.Right - 4;
+      // Second pass: actual text drawing
+      // Restore the reduced area for drawing
+      drawrect.Left := OriginalLeft;
+      drawrect.Right := OriginalRight;
+
+      if TagsWidth < drawrect.Width then
+      begin
+        if FBiDiRightToLeft then
+          drawrect.Left := OriginalLeft + TagsWidth
+        else
+          drawrect.Right := OriginalRight - TagsWidth;
+      end;
+
       flags := DT_NOPREFIX;
       if FBiDiRightToLeft then
         flags := flags or DT_RIGHT
@@ -1721,6 +1754,7 @@ begin
 
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
     end;
+
   end;
 end;
 
@@ -2178,7 +2212,7 @@ begin
       end;
 
     VK_ESCAPE:
-      if taskGrid.Visible and taskGrid.CanFocus then
+      if Visible and taskGrid.Visible and taskGrid.CanFocus then
         taskGrid.SetFocus;
     else
   end;
@@ -2661,7 +2695,8 @@ begin
   else
     taskGrid.Row := taskGrid.Row + 1;
 
-  if (taskGrid.CanFocus) then taskGrid.SetFocus;
+  if Visible and taskGrid.Visible and taskGrid.CanFocus then
+    taskGrid.SetFocus;
   SetInfo;
   SetChanged;
   SetNote;
@@ -3102,12 +3137,12 @@ begin
   begin
     if filterBox.Focused then
     begin
-      if taskGrid.Visible and taskGrid.CanFocus then
+      if Visible and taskGrid.Visible and taskGrid.CanFocus then
         taskGrid.SetFocus;
     end
     else
     begin
-      if filterBox.Visible and filterBox.CanFocus then
+      if Visible and filterBox.Visible and filterBox.CanFocus then
         filterBox.SetFocus;
     end;
   end;
@@ -3653,7 +3688,7 @@ begin
     Key := 0;
   end
   else
-  if (Shift = [ssCtrl]) and (Key = VK_TAB) then // Ctrl + Tab
+  if not (ssCtrl in Shift) and not (ssShift in Shift) and (Key = VK_TAB) then // Tab
   begin
     SelectNext(ActiveControl, True, True);
     Key := 0;
@@ -3686,7 +3721,7 @@ begin
     Key := 0;
   end
   else
-  if (Key = VK_TAB) then // Tab
+  if (ssCtrl in Shift) and (Key = VK_TAB) then // Tab
   begin
     MemoNoteIndent;
     Key := 0;
@@ -3775,7 +3810,11 @@ begin
     MemoNoteBackup;
     PasteWithLineEnding(memoNote);
     Key := 0;
-  end;
+  end
+  else
+  if Key = VK_ESCAPE then // Escape
+    if Visible and taskGrid.Visible and taskGrid.CanFocus then
+      taskGrid.SetFocus;
 end;
 
 procedure TformNotetask.memoNoteChange(Sender: TObject);
@@ -4862,7 +4901,8 @@ begin
     taskGrid.EditorMode := False;
     FIsEditing := False;
     ResetRowHeight;
-    if taskGrid.CanFocus then taskGrid.SetFocus;
+    if Visible and taskGrid.Visible and taskGrid.CanFocus then
+      taskGrid.SetFocus;
   end;
 end;
 
@@ -6275,13 +6315,13 @@ begin
     // Restore memo note SelLength
     if (FLoadedMemoNoteSelLength > 0) then
     begin
-      if (memoNote.CanFocus) then memoNote.SetFocus;
+      if memoNote.CanFocus then memoNote.SetFocus;
       memoNote.SelLength := FLoadedMemoNoteSelLength;
       FLoadedMemoNoteSelLength := 0;
     end;
 
     // Restore memo note scroll position
-    if (FLoadedMemoNoteScroll > 0) then
+    if FLoadedMemoNoteScroll > 0 then
     begin
       MemoNoteSetScrollPosition(FLoadedMemoNoteScroll);
       FLoadedMemoNoteScroll := 0;
@@ -6367,7 +6407,6 @@ begin
     memoNote.BorderSpacing.Left := 0;
     memoNote.BorderSpacing.Right := 10;
     editTags.BiDiMode := bdRightToLeft;
-    ;
     SetCursorTo(panelNote, 'RIGHTARROW');
   end
   else
@@ -6382,6 +6421,7 @@ begin
     memoNote.BorderSpacing.Left := 10;
     memoNote.BorderSpacing.Right := 0;
     memoNote.BiDiMode := bdLeftToRight;
+    editTags.BiDiMode := bdLeftToRight;
     SetCursorTo(panelNote, 'LEFTARROW');
   end;
 end;

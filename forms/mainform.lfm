@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -68,7 +67,7 @@ object formNotetask: TformNotetask
     Options = [goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goRowMoving, goEditing, goThumbTracking, goColSpanning, goSmoothScroll, goFixedRowNumbering, goHeaderHotTracking, goAutoAddRowsSkipContentCheck, goRowHighlight]
     Options2 = [goEditorParentFont]
     RowCount = 2
-    TabOrder = 1
+    TabOrder = 0
     TitleImageList = TitleImages
     UseXORFeatures = True
     OnCheckboxToggled = taskGridCheckboxToggled
@@ -189,7 +188,7 @@ object formNotetask: TformNotetask
     ClientHeight = 24
     ClientWidth = 851
     ParentBackground = False
-    TabOrder = 0
+    TabOrder = 6
     Visible = False
     object SplitFilter: TSplitter
       Left = 639
@@ -231,7 +230,7 @@ object formNotetask: TformNotetask
       Constraints.MinWidth = 20
       DropDownCount = 10
       ItemHeight = 15
-      TabOrder = 1
+      TabOrder = 2
       TextHint = 'Type to filter...'
       OnChange = filterBoxChange
       OnKeyDown = filterBoxKeyDown
@@ -287,7 +286,7 @@ object formNotetask: TformNotetask
     Align = alBottom
     BorderStyle = bsNone
     ParentBackground = False
-    TabOrder = 6
+    TabOrder = 4
   end
   object MainMenu: TMainMenu
     Left = 160
@@ -923,7 +922,7 @@ object formNotetask: TformNotetask
     object aOutdentTasks: TAction
       Category = 'Task'
       Caption = 'Outdent tasks'
-      ShortCut = 24585
+      ShortCut = 8201
       OnExecute = aOutdentTasksExecute
     end
     object aChatGpt: TAction

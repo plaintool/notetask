@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------------------
+//  TTagEdit © 2025 by Alexander Tverskoy
+//  Licensed under the MIT License
+//  You may obtain a copy of the License at https://opensource.org/licenses/MIT
+//-----------------------------------------------------------------------------------
+
 unit TagEdit;
 
 {$mode objfpc}{$H+}
@@ -1058,13 +1064,16 @@ begin
     begin
       FEdit.Text := ATag;
       FEdit.SelStart := FEdit.GetTextLen;
+      UpdateEditPosition;
+      Repaint;
     end;
     if Assigned(FOnTagRemove) then
       FOnTagRemove(Sender, ATag);
     if Assigned(FOnChange) then
       FOnChange(Sender);
-    Invalidate;
     UpdateAutoHeight;
+    Invalidate;
+    Key := 0;
   end;
 
   if Assigned(OnKeyDown) then
