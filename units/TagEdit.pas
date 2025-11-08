@@ -105,8 +105,8 @@ type
     function FindTagColor(const S: string): TColor;
     procedure DrawTags;
     procedure DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
-      AAvailWidth: integer; AHoverIndex: integer = -1; AFontSize: integer = -1; AIndent: integer = 4;
-      AShowCloseButtons: boolean = False; var ATagRects: array of TRect);
+      AAvailWidth: integer; AHoverIndex: integer = -1; AShowCloseButtons: boolean = True; var ATagRects: array of TRect;
+      AFontSize: integer = -1; AIndent: integer = 4; ADimness: integer = 0; ABlendColor: TColor = clNone);
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: integer); override;
@@ -132,7 +132,7 @@ type
     function Focused: boolean; override;
     function GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;
       ADimness: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
-    procedure ApplyDimnessEffect(ABitmap: TBitmap; ADimness: integer; ABlendColor: TColor = clWhite);
+    function BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
   published
     property Align;
     property Anchors;
@@ -776,7 +776,7 @@ begin
     if (not FReadOnly) and (FCloseButtons) and (idx >= 0) then
     begin
       R := GetTagRect(idx);
-      M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3)+4);
+      M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3) + 4);
       // Click near right edge removes the tag - do it immediately
       if (X > R.Right - M) and RemovalConfirmed(idx) then
       begin
@@ -1158,15 +1158,15 @@ begin
   // Initialize FTagRects array
   SetLength(FTagRects, FTags.Count);
 
-  DrawTagsToCanvas(FTags, Canvas, GetTagHeight, AvailWidth, FHoverIndex, -1, 4, True, FTagRects);
+  DrawTagsToCanvas(FTags, Canvas, GetTagHeight, AvailWidth, FHoverIndex, FCloseButtons, FTagRects);
 
   if not (csDesigning in ComponentState) then
     UpdateEditPosition;
 end;
 
 procedure TTagEdit.DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
-  AAvailWidth: integer; AHoverIndex: integer = -1; AFontSize: integer = -1; AIndent: integer = 4;
-  AShowCloseButtons: boolean = False; var ATagRects: array of TRect);
+  AAvailWidth: integer; AHoverIndex: integer = -1; AShowCloseButtons: boolean = True; var ATagRects: array of TRect;
+  AFontSize: integer = -1; AIndent: integer = 4; ADimness: integer = 0; ABlendColor: TColor = clNone);
 var
   i: integer;
   R: TRect;
@@ -1175,6 +1175,8 @@ var
   SepW: integer = 0;
   Color1: Tcolor = clNone;
   Color2: TColor = clNone;
+  FontColor1: Tcolor = clNone;
+  FontColor2: TColor = clNone;
   HasColon, Hover: boolean;
 begin
   ACanvas.Font.Assign(Font);
@@ -1261,6 +1263,18 @@ begin
       if FTagBorderColor = clNone then
         ACanvas.Pen.Color := Color1;
 
+      FontColor1 := GetContrastTextColor(Color1, Font.Color);
+      FontColor2 := GetContrastTextColor(Color2, Font.Color);
+
+      if ABlendColor <> clNone then
+      begin
+        Color1 := BlendColors(Color1, ABlendColor, ADimness);
+        Color2 := BlendColors(Color2, ABlendColor, ADimness);
+        ACanvas.Pen.Color := BlendColors(ACanvas.Pen.Color, ABlendColor, ADimness);
+        FontColor1 := BlendColors(FontColor1, ABlendColor, ADimness);
+        FontColor2 := BlendColors(FontColor2, ABlendColor, ADimness);
+      end;
+
       SepW := ACanvas.TextWidth(Part1) + Scale(6); // width of first part + left padding
 
       // Left part background
@@ -1308,6 +1322,15 @@ begin
       if FTagBorderColor = clNone then
         ACanvas.Pen.Color := ACanvas.Brush.Color;
 
+      ACanvas.Font.Color := GetContrastTextColor(ACanvas.Brush.Color, Font.Color, 128);
+
+      if ABlendColor <> clNone then
+      begin
+        ACanvas.Brush.Color := BlendColors(ACanvas.Brush.Color, ABlendColor, ADimness);
+        ACanvas.Pen.Color := BlendColors(ACanvas.Pen.Color, ABlendColor, ADimness);
+        ACanvas.Font.Color := BlendColors(ACanvas.Font.Color, ABlendColor, ADimness);
+      end;
+
       ACanvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, FRoundCorners, FRoundCorners);
     end;
 
@@ -1322,17 +1345,14 @@ begin
     ACanvas.Font.Underline := FTagHoverUnderline and Hover;
     if HasColon then
     begin
-      ACanvas.Font.Color := GetContrastTextColor(Color1, Font.Color);
+      ACanvas.Font.Color := FontColor1;
       ACanvas.TextOut(R.Left + Scale(Max(AIndent, 4)), R.Top + Scale(3), Part1);
 
-      ACanvas.Font.Color := GetContrastTextColor(Color2, Font.Color);
-      ACanvas.TextOut(R.Left + SepW + Scale(2 + AIndent), R.Top + Scale(3), Part2);
+      ACanvas.Font.Color := FontColor2;
+      ACanvas.TextOut(R.Left + SepW + Scale(AIndent div 2) + M div 3, R.Top + Scale(3), Part2);
     end
     else
-    begin
-      ACanvas.Font.Color := GetContrastTextColor(ACanvas.Brush.Color, Font.Color, 128);
       ACanvas.TextOut(R.Left + Scale(AIndent) + M div 2, R.Top + Scale(3), s);
-    end;
 
     // Draw '×' button if enabled
     if AShowCloseButtons and (not FReadOnly) and (FCloseButtons) and (not FCloseButtonOnHover or Hover) then
@@ -1382,10 +1402,12 @@ begin
         TempBitmap.Canvas,
         GetTagHeight(AFontSize) - ATagHeightDelta, // Calculate tag height based on font size
         AWidth - Scale(8), -1, // No hover effects
+        False, // No close buttons for preview
+        TempTagRects,
         AFontSize,
         1,
-        False, // No close buttons for preview
-        TempTagRects
+        ADimness,
+        ABlendColor
         );
 
       // Calculate actual used width and height
@@ -1431,13 +1453,6 @@ begin
       // Copy content from temp bitmap
       Result.Canvas.CopyRect(Rect(0, 0, Result.Width, Result.Height),
         TempBitmap.Canvas, Rect(0, 0, Result.Width, Result.Height));
-
-      // Apply dimness effect if needed (optimized version)
-      if (ADimness > 0) and (ADimness <= 100) then
-      begin
-        ApplyDimnessEffect(Result, ADimness, ABlendColor);
-      end;
-
     finally
       TempBitmap.Free;
     end;
@@ -1447,43 +1462,38 @@ begin
   end;
 end;
 
-procedure TTagEdit.ApplyDimnessEffect(ABitmap: TBitmap; ADimness: integer; ABlendColor: TColor = clWhite);
+function TTagEdit.BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
 var
-  X, Y: integer;
-  SrcColor: TColor;
   R1, G1, B1: byte;
+  R2, G2, B2: byte;
   Alpha: double;
-  BlendR, BlendG, BlendB: byte;
 begin
-  if ADimness <= 0 then Exit;
-  if ABlendColor < 0 then ABlendColor := clWhite;
-  Alpha := ADimness / 100.0;
+  // Return original color if no blending needed
+  if Intensity <= 0 then
+    Exit(Color1);
 
-  // Extract RGB components from blend color
-  BlendR := GetRValue(ABlendColor);
-  BlendG := GetGValue(ABlendColor);
-  BlendB := GetBValue(ABlendColor);
+  // Return full blend color if maximum intensity
+  if Intensity >= 100 then
+    Exit(Color2);
 
-  // Blend the bitmap with specified color
-  for Y := 0 to ABitmap.Height - 1 do
-  begin
-    for X := 0 to ABitmap.Width - 1 do
-    begin
-      SrcColor := ABitmap.Canvas.Pixels[X, Y];
+  // Calculate blend factor (0.0 to 1.0)
+  Alpha := Intensity / 100.0;
 
-      // Only process non-white pixels (or you can remove this condition for complete blending)
-      if SrcColor <> clWhite then
-      begin
-        R1 := GetRValue(SrcColor);
-        G1 := GetGValue(SrcColor);
-        B1 := GetBValue(SrcColor);
+  // Extract RGB components from first color
+  Color1 := ColorToRGB(Color1);
+  R1 := GetRValue(Color1);
+  G1 := GetGValue(Color1);
+  B1 := GetBValue(Color1);
 
-        // Alpha blending: result = src * (1-alpha) + blend_color * alpha
-        ABitmap.Canvas.Pixels[X, Y] := RGBToColor(Round(R1 * (1 - Alpha) + BlendR * Alpha),
-          Round(G1 * (1 - Alpha) + BlendG * Alpha), Round(B1 * (1 - Alpha) + BlendB * Alpha));
-      end;
-    end;
-  end;
+  // Extract RGB components from second color
+  Color2 := ColorToRGB(Color2);
+  R2 := GetRValue(Color2);
+  G2 := GetGValue(Color2);
+  B2 := GetBValue(Color2);
+
+  // Linear interpolation: result = color1 * (1-alpha) + color2 * alpha
+  Result := RGBToColor(Round(R1 * (1 - Alpha) + R2 * Alpha), Round(G1 * (1 - Alpha) + G2 * Alpha),
+    Round(B1 * (1 - Alpha) + B2 * Alpha));
 end;
 
 end.
