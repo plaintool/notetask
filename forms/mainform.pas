@@ -2407,7 +2407,7 @@ begin
     exit;
   end
   else
-  if editTags.Focused and not editTags.ReadOnly then
+  if editTags.Focused and not editTags.ReadOnly and editTags.EditBox.CanUndo then
   begin
     editTags.EditBox.Undo;
     exit;
@@ -3844,6 +3844,18 @@ begin
     {$ENDIF}
   end
   else
+  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_Z) then // Ctrl + Shift + Z
+  begin
+    aUndoAll.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
+  begin
+    aUndo.Execute;
+    Key := 0;
+  end
+  else
   if Key = VK_ESCAPE then // Escape
     if taskGrid.Visible and taskGrid.CanFocus then
       taskGrid.SetFocus;
@@ -3859,6 +3871,7 @@ procedure TformNotetask.editTagsChange(Sender: TObject);
 begin
   if taskGrid.Selection.Height = 0 then
   begin
+    Tasks.CreateBackup;
     Tasks.GetTask(taskGrid.Row).Tags.Assign(editTags.Items);
     SetFilter;
     SetChanged;
@@ -3871,6 +3884,7 @@ var
 begin
   if taskGrid.Selection.Height > 0 then
   begin
+    Tasks.CreateBackup;
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
       if Tasks.Map(i) > -1 then
         Tasks.GetTask(i).Tags.Add(TagText);
@@ -3886,6 +3900,7 @@ var
 begin
   if taskGrid.Selection.Height > 0 then
   begin
+    Tasks.CreateBackup;
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
       if Tasks.Map(i) > -1 then
         StringListRemove(Tasks.GetTask(i).Tags, TagText);
