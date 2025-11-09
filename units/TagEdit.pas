@@ -1244,6 +1244,8 @@ begin
     begin
       Part1 := Trim(Copy(s, 1, Pos(':', s) - 1)) + ' ';
       Part2 := Trim(Copy(s, Pos(':', s) + 1, MaxInt));
+      if Trim(Part2) = string.Empty then
+        HasColon := False;
     end
     else
     begin
@@ -1253,6 +1255,7 @@ begin
 
     M := ATagHeight;
     W := ACanvas.TextWidth(s) + M;
+    if HasColon and (ACanvas.TextWidth(Part2) < ACanvas.TextWidth('...')) then W += ACanvas.TextWidth('.....');
 
     if (i > 0) and ((X + W) > AAvailWidth) then
     begin
@@ -1285,7 +1288,7 @@ begin
           if FTagColor <> clNone then
             Color1 := FTagColor
           else
-            Color1 := RandTagColor(Part1, FAutoColorBrigtness);
+            Color1 := RandTagColor(Trim(Part1), FAutoColorBrigtness);
         end;
       end;
 
@@ -1295,7 +1298,7 @@ begin
         if FTagSuffixColor <> clNone then
           Color2 := FTagSuffixColor
         else
-          Color2 := RandTagColor(Part2, FAutoColorBrigtness);
+          Color2 := RandTagColor(Trim(Part2), FAutoColorBrigtness);
       end;
 
       if Hover and (FTagHoverColor <> clNone) then
@@ -1353,7 +1356,7 @@ begin
           if FTagColor <> clNone then
             ACanvas.Brush.Color := FTagColor
           else
-            ACanvas.Brush.Color := RandTagColor(s, FAutoColorBrigtness);
+            ACanvas.Brush.Color := RandTagColor(Trim(s), FAutoColorBrigtness);
         end;
       end;
 
