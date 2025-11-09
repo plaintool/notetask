@@ -1234,6 +1234,8 @@ begin
   // Check if the hint is requested for the TabControl
   if HintInfo.HintControl is TNoteBookStringsTabControl then
   begin
+    Application.HintPause := 100;
+
     // Determine which tab is under the mouse cursor
     TabIndex := groupTabs.IndexOfTabAt(HintInfo.CursorPos.X, 5);
 
@@ -1242,19 +1244,19 @@ begin
       // For testing, just show the tab's caption as the hint
       HintStr := Tasks.GetGroupHint(FindGroupRealIndex(TabIndex));
 
-      // Allow the hint to be displayed
-      CanShow := True;
-      Application.HintPause := 100;
-      Application.HintHidePause := MaxInt;
+      if (Trim(HintStr)) <> string.Empty then
+      begin
+        // Allow the hint to be displayed
+        CanShow := True;
+        HintInfo.HideTimeout := MaxInt;
+      end;
     end
     else
-    begin
       // Mouse is not over a tab, do not show hint
       CanShow := False;
-      Application.HintPause := 500;
-      Application.HintHidePause := 2500;
-    end;
-  end;
+  end
+  else
+    Application.HintPause := 500;
 end;
 
 procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
@@ -2004,6 +2006,7 @@ begin
     end;
   end;
   // Hide hint if long move
+  Application.HintPause := 100;
   if (target <> FLastTabTarget) then
     Application.HideHint;
   FLastTabMouseX := X;
@@ -2013,6 +2016,7 @@ end;
 procedure TformNotetask.groupTabsMouseLeave(Sender: TObject);
 begin
   FLastTabMouseX := 0;
+  Application.HintPause := 500;
   DisableDrag;
 end;
 

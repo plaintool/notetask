@@ -790,6 +790,18 @@ msgstr ""
 msgid "WindowsCRLF"
 msgstr ""
 
+#: tformnotetask.filterbox.hint
+msgid ""
+"The filter searches text in any field.\n"
+"- Tags can be chosen from a dropdown list.\n"
+"- Use # at the start to search only in tags.\n"
+"- The list also includes text tags starting with @, #, %, +, or $.\n"
+"- Use ! at the start for negation (not contains).\n"
+"- Supports =, !=, >, <, >=, <= for amounts and dates.\n"
+"- 1 / 0 filter by task completion.\n"
+"- * / !* filter by task favorite."
+msgstr ""
+
 #: tformnotetask.filterbox.texthint
 msgctxt "tformnotetask.filterbox.texthint"
 msgid "Type to filter..."

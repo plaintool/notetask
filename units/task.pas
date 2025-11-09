@@ -285,26 +285,37 @@ var
     DateA, DateB: TDateTime;
   begin
     // Try numeric comparison first
-    if TryStrToFloat(A, NumA) and TryStrToFloat(B, NumB) then
+    if TryStrToFloat(B, NumB) then
     begin
-      if Op = '=' then Result := NumA = NumB
-      else if Op = '>' then Result := NumA > NumB
-      else if Op = '<' then Result := NumA < NumB
-      else if Op = '>=' then Result := NumA >= NumB
-      else if Op = '<=' then Result := NumA <= NumB
-      else if (Op = '<>') or (Op = '!=') then Result := NumA <> NumB
+      if TryStrToFloat(A, NumA) then
+      begin
+        if Op = '=' then Result := NumA = NumB
+        else if Op = '>' then Result := NumA > NumB
+        else if Op = '<' then Result := NumA < NumB
+        else if Op = '>=' then Result := NumA >= NumB
+        else if Op = '<=' then Result := NumA <= NumB
+        else if (Op = '<>') or (Op = '!=') then Result := NumA <> NumB
+        else
+          Result := False;
+      end
       else
         Result := False;
     end
-    else if TryStrToDate(A, DateA) and TryStrToDate(B, DateB) then
+    else
+    if TryStrToDate(B, DateB) then
     begin
-      // Date comparison
-      if Op = '=' then Result := DateA = DateB
-      else if Op = '>' then Result := DateA > DateB
-      else if Op = '<' then Result := DateA < DateB
-      else if Op = '>=' then Result := DateA >= DateB
-      else if Op = '<=' then Result := DateA <= DateB
-      else if (Op = '<>') or (Op = '!=') then Result := DateA <> DateB
+      if TryStrToDate(A, DateA) then
+      begin
+        // Date comparison
+        if Op = '=' then Result := DateA = DateB
+        else if Op = '>' then Result := DateA > DateB
+        else if Op = '<' then Result := DateA < DateB
+        else if Op = '>=' then Result := DateA >= DateB
+        else if Op = '<=' then Result := DateA <= DateB
+        else if (Op = '<>') or (Op = '!=') then Result := DateA <> DateB
+        else
+          Result := False;
+      end
       else
         Result := False;
     end

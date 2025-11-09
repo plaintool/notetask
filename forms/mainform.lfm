@@ -10,6 +10,7 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
+  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -219,6 +220,7 @@ object formNotetask: TformNotetask
     object filterBox: TComboBox
       Left = 644
       Height = 23
+      Hint = 'The filter searches text in any field.'#13#10'- Tags can be chosen from a dropdown list.'#13#10'- Use # at the start to search only in tags.'#13#10'- The list also includes text tags starting with @, #, %, +, or $.'#13#10'- Use ! at the start for negation (not contains).'#13#10'- Supports =, !=, >, <, >=, <= for amounts and dates.'#13#10'- 1 / 0 filter by task completion.'#13#10'- * / !* filter by task favorite.'
       Top = 0
       Width = 190
       Align = alRight
@@ -230,6 +232,8 @@ object formNotetask: TformNotetask
       Constraints.MinWidth = 20
       DropDownCount = 10
       ItemHeight = 15
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 2
       TextHint = 'Type to filter...'
       OnChange = filterBoxChange
