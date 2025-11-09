@@ -397,18 +397,22 @@ begin
     else
     begin
       // Special case for Done field (0/1)
-      if (ValuePart = '1') or (ValuePart = '0') then
+      if (Oper = '=') and ((ValuePart = '1') or (ValuePart = '0')) then
+      begin
         if FDone = (ValuePart = '1') then
           Exit(True)
         else
           Exit(False);
+      end;
 
       // Special case for Star field (0/1)
-      if (ValuePart = '*') then
+      if (Oper = '=') and (ValuePart = '*') then
+      begin
         if FStar then
           Exit(True)
         else
           Exit(False);
+      end;
 
       if CompareWithOperator(FText, Oper, ValuePart) then Exit(True);
       if CompareWithOperator(FNote, Oper, ValuePart) then Exit(True);
@@ -421,17 +425,21 @@ begin
   begin
     // Special case for Done field
     if (TrimFilter = '1') or (TrimFilter = '0') then
+    begin
       if FDone = (TrimFilter = '1') then
         Exit(True)
       else
         Exit(False);
+    end;
 
     // Special case for Star field (0/1)
     if (ValuePart = '*') then
+    begin
       if FStar then
         Exit(True)
       else
         Exit(False);
+    end;
 
     // No operator, simple substring search
     if (Pos(ULower(TrimFilter), ULower(FText)) > 0) then Exit(True);
