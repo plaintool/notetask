@@ -509,6 +509,7 @@ type
     FLastRowMem: array of integer;
     FLastTabMouseX: integer;
     FLastTabTarget: integer;
+    FLastTabFilter: integer;
     FGroupIndexMap: array of integer;
     FDragTab: integer;
     FNoteSelecting: boolean;
@@ -811,6 +812,7 @@ begin
   FDragTab := -1;
   FSortColumn := 0;
   FMemoSelStartClicked := -1;
+  FLastTabFilter := -1;
   FSortOrder := soAscending;
   FKeyPressed := string.Empty;
   FEncrypted := False;
@@ -2144,12 +2146,20 @@ var
 begin
   LastTask := Tasks.Map(taskGrid.Row);
   LastTab := FindGroupRealIndex(groupTabs.TabIndex);
+  if (Trim(filterBox.Text) <> string.Empty) and (FLastTabFilter < 0) then
+  begin
+    FLastTabFilter := LastTab;
+  end;
 
   SetTabs;
   FillGrid;
 
   if (LastTab = FindGroupRealIndex(groupTabs.TabIndex)) then
     taskGrid.Row := Tasks.ReverseMap(LastTask);
+
+  if Trim(filterBox.Text) = string.Empty then
+    FLastTabFilter := -1;
+
 
   taskGrid.ClearSelections;
   SetInfo;
@@ -7100,6 +7110,8 @@ begin
 
     groupTabs.Tabs := Clean;
     SetTabsVisible;
+
+    if (LastRealIndex < 0) and (FLastTabFilter >= 0) then LastRealIndex := FLastTabFilter;
 
     if (Change) and (groupTabs.Visible) and (LastRealIndex >= 0) then
     begin
