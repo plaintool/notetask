@@ -20,6 +20,7 @@ uses
   Types,
   Forms,
   Dialogs,
+  Clipbrd,
   LCLType,
   LCLIntf,
   TagColorItems;
@@ -130,6 +131,7 @@ type
     procedure ScaleFontsPPI(const AToPPI: integer; const AProportion: double); override;
     procedure FixDesignFontsPPI(const ADesignTimePPI: integer); override;
     function Focused: boolean; override;
+    procedure CopyHoverText;
     function GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;
       ADimness: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
     function BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
@@ -154,9 +156,9 @@ type
     property BackSpaceEditTag: boolean read FBackspaceEditTag write FBackspaceEditTag default False;
     property TagColor: TColor read FTagColor write FTagColor default clNone;
     property TagSuffixColor: TColor read FTagSuffixColor write FTagSuffixColor default clWhite;
-    property TagHoverColor: TColor read FTagHoverColor write FTagHoverColor default clMenuHighlight;
+    property TagHoverColor: TColor read FTagHoverColor write FTagHoverColor default clHighlight;
     property TagBorderColor: TColor read FTagBorderColor write FTagBorderColor default clNone;
-    property DragIndicatorColor: TColor read FDragIndicatorColor write FDragIndicatorColor default clHighlight;
+    property DragIndicatorColor: TColor read FDragIndicatorColor write FDragIndicatorColor default clRed;
     property AutoColorBrigtness: integer read FAutoColorBrigtness write FAutoColorBrigtness default 80;
     property AutoColorSeed: longword read FAutoColorSeed write FAutoColorSeed default 0;
     property TagBorderWidth: integer read FTagBorderWidth write FTagBorderWidth default 2;
@@ -214,8 +216,8 @@ begin
   FReadOnly := False;
   FEnabled := True;
   FAutoSizeHeight := False;
-  Randomize;
   // 2166136267
+  Randomize;
   FAutoColorSeed := Random(High(longword));
   FAllowReorder := True;
   FFont := TFont.Create;
@@ -229,10 +231,10 @@ begin
 
   FTagColor := clNone;
   FTagSuffixColor := clWhite;
-  FTagHoverColor := clMenuHighlight;
+  FTagHoverColor := clHighlight;
   FTagBorderColor := clNone;
   FTagBorderWidth := 2;
-  FDragIndicatorColor := clHighlight;
+  FDragIndicatorColor := clRed;
   FBorderColor := clWindowFrame;
   FEditMinWidth := Scale(50);
   FRoundCorners := Scale(5);
@@ -709,6 +711,33 @@ begin
   begin
     FHoverIndex := NewHoverIndex;
     Invalidate;
+  end;
+end;
+
+procedure TTagEdit.CopyHoverText;
+var
+  MousePos: TPoint;
+  TagIndex: integer;
+begin
+  // Get current mouse position relative to the control
+  MousePos := ScreenToClient(Mouse.CursorPos);
+
+  // Find which tag is under the cursor
+  TagIndex := TagAtPos(MousePos);
+
+  // Check if we found a valid tag
+  if (TagIndex >= 0) and (TagIndex < FTags.Count) then
+  begin
+    // Copy tag text to clipboard
+    Clipboard.AsText := FTags[TagIndex];
+
+    // Optional: Provide visual feedback
+    // ShowMessage('Copied: ' + FTags[TagIndex]);
+  end
+  else
+  begin
+    // Optional: Handle case when no tag is under cursor
+    // ShowMessage('No tag under cursor to copy');
   end;
 end;
 

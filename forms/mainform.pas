@@ -780,7 +780,7 @@ begin
   editTags.DragIndicatorColor := clRed;
   editTags.TagHoverColor := clNone;
   editTags.TagSuffixColor := $FEFEFE;
-  editTags.RoundCorners := 20;
+  editTags.RoundCorners := 25;
   editTags.AutoColorSeed := 2166136267;
   editTags.AutoColorBrigtness := 100;
   editTags.BackSpaceEditTag := True;
@@ -925,6 +925,8 @@ begin
     {$IFDEF UNIX}
     Application.ProcessMessages;
     WindowState := FWindowStateLoaded;
+    {$ELSE}
+    Application.ProcessMessages;
     {$ENDIF}
   end;
 
@@ -1407,7 +1409,7 @@ end;
 procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
 begin
   taskGridResize(Sender);
-  CalcRowHeights;
+  CalcRowHeights(0, True);
   EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 2, -2, -2, 0);
 end;
@@ -1570,7 +1572,7 @@ var
   ImgIndex: integer;
   ImgX, ImgY: integer;
   BitTags: TBitmap;
-  TagsWidth: integer;
+  TagsWidth: integer = 0;
   OriginalLeft, OriginalRight: integer;
 begin
   grid := Sender as TStringGrid;
@@ -1694,6 +1696,7 @@ begin
             BitTags.TransparentColor := clWhite;
             BitTags.Transparent := True;
             TagsWidth := BitTags.Width;
+            task.TagsWidth := TagsWidth;
             if taskGrid.BiDiMode = bdLeftToRight then
               grid.canvas.Draw(aRect.Right - TagsWidth - 5, aRect.Top, BitTags)
             else
@@ -3864,9 +3867,15 @@ begin
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
+  if (ssCtrl in Shift) and (Key = VK_Z) and (not editTags.EditBox.Focused) then // Ctrl + Z
   begin
     aUndo.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_C) and ((not editTags.EditBox.Focused) or (editTags.EditBox.SelLength = 0)) then // Ctrl + C
+  begin
+    editTags.CopyHoverText;
     Key := 0;
   end
   else
@@ -5854,7 +5863,7 @@ begin
       if (not Outdent) then
       begin
         taskGrid.Cells[2, RowIndex] := IndentStr + taskGrid.Cells[2, RowIndex];
-        CalcRowHeights();
+        CalcRowHeights;
       end
       else
         taskGrid.Cells[2, RowIndex] := TrimLeadingSpaces(taskGrid.Cells[2, RowIndex], Length(unicodestring(IndentStr)));
@@ -6692,6 +6701,7 @@ var
     row: integer;
     drawrect: TRect;
     Text: string;
+    task: TTask;
     flags: cardinal;
     h: integer;
   begin
@@ -6701,6 +6711,19 @@ var
       drawrect.Inflate(-4, 0);
 
       Text := taskGrid.Cells[col, row];
+
+      // Reduce text area by TagsWidth for text measurement
+      if (col = 2) then
+      begin
+        task := Tasks.GetTask(row);
+        if task.TagsWidth < drawrect.Width then
+        begin
+          if FBiDiRightToLeft then
+            drawrect.Left := drawrect.Left + task.TagsWidth  // For RTL: reserve space on the left
+          else
+            drawrect.Right := drawrect.Right - task.TagsWidth; // For LTR: reserve space on the right
+        end;
+      end;
 
       flags := DT_CALCRECT;
       if FBiDiRightToLeft then

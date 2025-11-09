@@ -41,6 +41,7 @@ type
     FDateStart: TDateTime; // Calculated start time interval
     FDateEnd: TDateTime; // Calculated end time interval
     FTags: TStringList; // List of detected tags
+    FTagsWidth: integer;
     constructor Create;
     constructor Create(const TaskString: string); // Constructor that takes a task string
     destructor Destroy; override; // Destructor
@@ -73,6 +74,7 @@ type
     property DateTimeStr: string read GetDateTime;
     property DateTimeStrISO: string read GetDateTimeISO;
     property Tags: TStringList read FTags write FTags;
+    property TagsWidth: integer read FTagsWidth write FTagsWidth;
   end;
 
   // Class representing a collection of tasks
@@ -201,6 +203,7 @@ begin
   FDateOriginal := string.Empty;
   FTags := TStringList.Create;
   FTags.Duplicates := dupIgnore;
+  FTagsWidth := 0;
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -249,6 +252,7 @@ begin
     FTags.Assign(Original.FTags)
   else
     FTags.Clear;
+  FTagsWidth := Original.FTagsWidth;
 end;
 
 procedure TTask.FillTags;
