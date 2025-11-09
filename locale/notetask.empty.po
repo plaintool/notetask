@@ -79,6 +79,16 @@ msgstr ""
 msgid "Enter the group name:"
 msgstr ""
 
+#: mainform.renternewtag
+msgid "Enter new tag..."
+msgstr ""
+
+#: mainform.renternewtaghint
+msgid ""
+"The tag is added to or removed from all selected tasks.\n"
+"Colon separates the tag from the suffix."
+msgstr ""
+
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr ""

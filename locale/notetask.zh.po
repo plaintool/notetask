@@ -79,6 +79,18 @@ msgstr "已加密"
 msgid "Enter the group name:"
 msgstr "输入组名称："
 
+#: mainform.renternewtag
+msgid "Enter new tag..."
+msgstr "请输入新标签..."
+
+#: mainform.renternewtaghint
+msgid ""
+"The tag is added to or removed from all selected tasks.\n"
+"Colon separates the tag from the suffix."
+msgstr ""
+"标签会被添加到或从所有选定任务中移除。\n"
+"冒号将标签与后缀分开。"
+
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "在磁盘上找不到请求的文件。"

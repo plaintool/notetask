@@ -79,6 +79,18 @@ msgstr "暗号化済み"
 msgid "Enter the group name:"
 msgstr "グループ名を入力してください:"
 
+#: mainform.renternewtag
+msgid "Enter new tag..."
+msgstr "新しいタグを入力してください..."
+
+#: mainform.renternewtaghint
+msgid ""
+"The tag is added to or removed from all selected tasks.\n"
+"Colon separates the tag from the suffix."
+msgstr ""
+"タグはすべての選択されたタスクに追加または削除されます。\n"
+"コロンはタグをサフィックスから区切ります。"
+
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "要求されたファイルはディスク上に見つかりませんでした。"

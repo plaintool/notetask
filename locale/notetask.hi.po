@@ -79,6 +79,18 @@ msgstr "एन्क्रिप्टेड"
 msgid "Enter the group name:"
 msgstr "समूह का नाम दर्ज करें:"
 
+#: mainform.renternewtag
+msgid "Enter new tag..."
+msgstr "नया टैग दर्ज करें..."
+
+#: mainform.renternewtaghint
+msgid ""
+"The tag is added to or removed from all selected tasks.\n"
+"Colon separates the tag from the suffix."
+msgstr ""
+"टैग सभी चयनित कार्यों में जोड़ा या हटाया जाता है।\n"
+"कोलन टैग को प्रत्यय से अलग करता है।"
+
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "अनुरोधित फ़ाइल डिस्क पर नहीं मिली।"

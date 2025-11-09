@@ -79,6 +79,18 @@ msgstr "Verschlüsselt"
 msgid "Enter the group name:"
 msgstr "Geben Sie den Gruppennamen ein:"
 
+#: mainform.renternewtag
+msgid "Enter new tag..."
+msgstr "Geben Sie ein neues Tag ein..."
+
+#: mainform.renternewtaghint
+msgid ""
+"The tag is added to or removed from all selected tasks.\n"
+"Colon separates the tag from the suffix."
+msgstr ""
+"Das Tag wird zu allen ausgewählten Aufgaben hinzugefügt oder daraus entfernt.\n"
+"Doppelpunkt trennt das Tag vom Suffix."
+
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "Die angeforderte Datei wurde auf der Festplatte nicht gefunden."

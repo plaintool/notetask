@@ -79,6 +79,18 @@ msgstr "Crittografato"
 msgid "Enter the group name:"
 msgstr "Inserisci il nome del gruppo:"
 
+#: mainform.renternewtag
+msgid "Enter new tag..."
+msgstr "Inserisca un nuovo tag..."
+
+#: mainform.renternewtaghint
+msgid ""
+"The tag is added to or removed from all selected tasks.\n"
+"Colon separates the tag from the suffix."
+msgstr ""
+"Il tag viene aggiunto o rimosso da tutte le attività selezionate.\n"
+"I due punti separano il tag dal suffisso."
+
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "Il file richiesto non è stato trovato sul disco."

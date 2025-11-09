@@ -746,6 +746,8 @@ resourcestring
   rchatgpt = 'https://chatgpt.com?q=';
   rdeletegroupconfirm = 'Are you sure you want to delete this group? This will also delete all tasks within this group.';
   rremovetagtitle = 'Remove tag';
+  renternewtag = 'Enter new tag...';
+  renternewtaghint = 'The tag is added to or removed from all selected tasks.' + sLineBreak + 'Colon separates the tag from the suffix.';
   rremovetag = 'Are you sure you want to remove tag';
   rentergroupname = 'Enter the group name:';
   rconfirmation = 'Confirmation';
@@ -784,6 +786,7 @@ begin
   editTags.AutoColorSeed := 2166136267;
   editTags.AutoColorBrigtness := 100;
   editTags.BackSpaceEditTag := True;
+  editTags.ShowHint := True;
   editTags.OnChange := @editTagsChange;
   editTags.OnKeyDown := @editTagsKeyDown;
   editTags.OnTagClick := @editTagsTagClick;
@@ -7222,6 +7225,8 @@ begin
   begin
     editTags.RemoveConfirmMessage := rremovetag;
     editTags.RemoveConfirmTitle := rremovetagtitle;
+    editTags.TextHint := renternewtag;
+    editTags.Hint := renternewtaghint;
   end;
 
   if (Assigned(Tasks)) and (Tasks.GroupNames[0] = string.Empty) and (groupTabs.Tabs.Count > 0) then

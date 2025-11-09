@@ -79,6 +79,18 @@ msgstr "Зашифровано"
 msgid "Enter the group name:"
 msgstr "Введите название группы:"
 
+#: mainform.renternewtag
+msgid "Enter new tag..."
+msgstr "Введите новый тег..."
+
+#: mainform.renternewtaghint
+msgid ""
+"The tag is added to or removed from all selected tasks.\n"
+"Colon separates the tag from the suffix."
+msgstr ""
+"Тег добавляется или удаляется из всех выделенных задач.\n"
+"Двоеточие отделяет тег от суффикса."
+
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "Запрошенный файл не найден на диске."

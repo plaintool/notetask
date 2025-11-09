@@ -79,6 +79,18 @@ msgstr "Chiffré"
 msgid "Enter the group name:"
 msgstr "Entrez le nom du groupe :"
 
+#: mainform.renternewtag
+msgid "Enter new tag..."
+msgstr "Entrez une nouvelle étiquette..."
+
+#: mainform.renternewtaghint
+msgid ""
+"The tag is added to or removed from all selected tasks.\n"
+"Colon separates the tag from the suffix."
+msgstr ""
+"Le tag est ajouté ou supprimé de toutes les tâches sélectionnées.\n"
+"Les deux-points séparent le tag du suffixe."
+
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
 msgstr "Le fichier demandé n'a pas été trouvé sur le disque."
