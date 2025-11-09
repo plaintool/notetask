@@ -66,6 +66,8 @@ function GetConsoleEncoding: string;
 
 function IsUTF8Char(const S: string; CharIndex: integer; FindChar: string = ' '): boolean;
 
+function ULower(Value: string): unicodestring;
+
 function IsLetterOrDigit(ch: widechar): boolean;
 
 function RepeatString(const S: string; Count: integer): string;
@@ -81,6 +83,8 @@ function IsURL(const S: string): boolean;
 function HasScheme(const URL: string): boolean;
 
 function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
+
+function RemoveBacktickBlocks(const S: string): string;
 
 procedure FillTagsFromString(var List: TStringList; var S: string; Backtick: boolean = False);
 
@@ -100,7 +104,7 @@ function StartsWith(const S: string; const Ch: char = ' '): boolean;
 
 procedure StringListRemove(AList: TStringList; const AName: string);
 
-function ULower(Value: string): unicodestring;
+function RemoveFirstSubstring(const S, SubStr: string; Reverse: boolean = False): string;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
 
@@ -561,6 +565,11 @@ begin
   Result := (ch = FindChar);
 end;
 
+function ULower(Value: string): unicodestring;
+begin
+  Result := UnicodeLowerCase(unicodestring(Value));
+end;
+
 function IsLetterOrDigit(ch: widechar): boolean;
 begin
   Result := (ch in ['0'..'9', 'A'..'Z', 'a'..'z']) or (ch > #127);
@@ -748,6 +757,71 @@ begin
     if i < High(Parts) then
       Result += Separator;
   end;
+end;
+
+function RemoveBacktickBlocks(const S: string): string;
+const
+  MaxTagLength = 50; // Maximum allowed length for backtick blocks
+var
+  i, Start: integer;
+  WordStr: string;
+  NewS: string;
+  HasRelevantChars: boolean;
+begin
+  Result := S; // Initialize result with original string
+
+  // Optimization: skip processing if string doesn't contain backticks
+  HasRelevantChars := Pos('`', S) > 0;
+  if not HasRelevantChars then
+    Exit;
+
+  i := 1;
+  NewS := string.Empty; // Initialize new string for building cleaned result
+
+  while i <= Length(S) do
+  begin
+    // Check for backtick character
+    if S[i] = '`' then
+    begin
+      Start := i; // Mark the start position of potential block
+      Inc(i);
+
+      // Scan until closing backtick, line break, or max length reached
+      while (i <= Length(S)) and (S[i] <> '`') and (i - Start < MaxTagLength) do
+      begin
+        if S[i] in [#13, #10] then
+          Break; // Stop scanning at line breaks
+        Inc(i);
+      end;
+
+      // Check if we found a valid closing backtick
+      if (i <= Length(S)) and (S[i] = '`') then
+      begin
+        WordStr := Copy(S, Start, i - Start + 1); // Extract the block content
+
+        // Validate block: length requirements and no line breaks
+        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and (Pos(#13, WordStr) = 0) and
+          (Pos(#10, WordStr) = 0) then
+        begin
+          // Remove single preceding space from NewS if present
+          if (Length(NewS) > 0) and (NewS[Length(NewS)] = ' ') then
+            SetLength(NewS, Length(NewS) - 1);
+
+          // Skip adding this block to NewS (effectively removing it)
+          Inc(i); // Move past the closing backtick
+          Continue; // Skip to next iteration without processing current position
+        end;
+      end;
+      // If no valid backtick block found, fall through to normal character processing
+    end;
+
+    // Add current character to result string (not part of valid backtick block)
+    NewS := NewS + S[i];
+    Inc(i);
+  end;
+
+  // Return cleaned version
+  Result := NewS;
 end;
 
 procedure FillTagsFromString(var List: TStringList; var S: string; Backtick: boolean = False);
@@ -951,9 +1025,40 @@ begin
   end;
 end;
 
-function ULower(Value: string): unicodestring;
+function RemoveFirstSubstring(const S, SubStr: string; Reverse: boolean = False): string;
+var
+  Position, I: integer;
 begin
-  Result := UnicodeLowerCase(unicodestring(Value));
+  Result := S;
+
+  // If substring is empty, return original string
+  if SubStr = '' then
+    Exit;
+
+  if not Reverse then
+  begin
+    // Find first occurrence from start
+    Position := Pos(SubStr, S);
+    if Position > 0 then
+      Result := Copy(S, 1, Position - 1) + Copy(S, Position + Length(SubStr), MaxInt);
+  end
+  else
+  begin
+    // Find first occurrence from end
+    Position := 0;
+    // Search backwards through the string
+    for I := Length(S) - Length(SubStr) + 1 downto 1 do
+    begin
+      if Copy(S, I, Length(SubStr)) = SubStr then
+      begin
+        Position := I;
+        Break;
+      end;
+    end;
+
+    if Position > 0 then
+      Result := Copy(S, 1, Position - 1) + Copy(S, Position + Length(SubStr), MaxInt);
+  end;
 end;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);

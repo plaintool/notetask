@@ -35,7 +35,7 @@ uses formattool;
 function TaskFromString(const TaskString: string): TTask;
 var
   PartNote, PartDate, PartSpace: TStringArray; // Use TStringArray for compatibility
-  CompletedStr: string;
+  CompletedStr, CleanedText: string;
 
   function TestParts(Part: TStringArray; var Result1: TTask; const Separator: string = ','): boolean;
   begin
@@ -200,23 +200,28 @@ begin
   Result.FNote := StringReplace(Result.FNote, '<br>', sLineBreak, [rfReplaceAll]);
 
   // Check if Text starts and ends with '~~'
-  if Result.FText.TrimLeft.StartsWith('~~') and Result.FText.TrimRight.EndsWith('~~') then
+  CleanedText := Trim(RemoveBacktickBlocks(Result.FText));
+  if CleanedText.StartsWith('~~') and CleanedText.EndsWith('~~') then
   begin
     Result.FArchive := True;
     Result.FText := Trim(Result.FText);
     // Remove '~~' from the start and end of the Text
-    Result.FText := Result.FText.Substring(2, Length(Result.FText) - 4);
+    Result.FText := RemoveFirstSubstring(Result.FText, '~~');
+    Result.FText := RemoveFirstSubstring(Result.FText, '~~', True);
+
+    CleanedText := CleanedText.Substring(2, Length(CleanedText) - 4);
   end
   else
     Result.FArchive := False;
 
   // Check if Text starts and ends with '**'
-  if Result.FText.TrimLeft.StartsWith('**') and Result.FText.TrimRight.EndsWith('**') then
+  if CleanedText.StartsWith('**') and CleanedText.EndsWith('**') then
   begin
     Result.FStar := True;
     Result.FText := Trim(Result.FText);
     // Remove '**' from the start and end of the Text
-    Result.FText := Result.FText.Substring(2, Length(Result.FText) - 4);
+    Result.FText := RemoveFirstSubstring(Result.FText, '**');
+    Result.FText := RemoveFirstSubstring(Result.FText, '**', True);
   end
   else
   if StartsWithBracketAZ(Result.FText.TrimLeft) then
