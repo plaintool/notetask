@@ -311,9 +311,9 @@ var
     else
     begin
       // String comparison
-      if Op = '=' then Result := A = B
-      else if (Op = '<>') or (Op = '!=') then Result := A <> B
-      else if Op = '!' then Result := Pos(LowerCase(B), LowerCase(A)) = 0
+      if Op = '=' then Result := ULower(A) = ULower(B)
+      else if (Op = '<>') or (Op = '!=') then Result := ULower(A) <> ULower(B)
+      else if Op = '!' then Result := Pos(ULower(B), ULower(A)) = 0
       else
         Result := False;
     end;
@@ -328,7 +328,7 @@ var
     begin
       if Op = '#' then
       begin
-        if Pos(LowerCase(A), LowerCase(FTags[i])) > 0 then
+        if Pos(ULower(A), ULower(FTags[i])) > 0 then
         begin
           if not OpAnd then exit(True);
         end
@@ -340,7 +340,7 @@ var
       else
       if Op = string.Empty then
       begin
-        if Pos(LowerCase(A), LowerCase(FTags[i])) > 0 then
+        if Pos(ULower(A), ULower(FTags[i])) > 0 then
         begin
           if not OpAnd then exit(True);
         end
@@ -383,6 +383,13 @@ begin
     else
     if (Oper = '!') then
     begin
+      // Special case for Star field (0/1)
+      if (ValuePart = '*') then
+        if FStar then
+          Exit(False)
+        else
+          Exit(True);
+
       if CompareWithOperator(FText, Oper, ValuePart) and CompareWithOperator(FNote, Oper, ValuePart) and
         CompareWithOperator(FloatToStr(FAmount), Oper, ValuePart) and CompareWithOperator(DateAsStr, Oper, ValuePart) and
         CompareWithTags(ValuePart, Oper, True) then Exit(True);
@@ -392,6 +399,13 @@ begin
       // Special case for Done field (0/1)
       if (ValuePart = '1') or (ValuePart = '0') then
         if FDone = (ValuePart = '1') then
+          Exit(True)
+        else
+          Exit(False);
+
+      // Special case for Star field (0/1)
+      if (ValuePart = '*') then
+        if FStar then
           Exit(True)
         else
           Exit(False);
@@ -412,13 +426,20 @@ begin
       else
         Exit(False);
 
+    // Special case for Star field (0/1)
+    if (ValuePart = '*') then
+      if FStar then
+        Exit(True)
+      else
+        Exit(False);
+
     // No operator, simple substring search
-    if (Pos(LowerCase(TrimFilter), LowerCase(FText)) > 0) then Exit(True);
-    if (Pos(LowerCase(TrimFilter), LowerCase(FNote)) > 0) then Exit(True);
-    if (Pos(LowerCase(TrimFilter), LowerCase(FloatToStr(FAmount))) > 0) then Exit(True);
+    if (Pos(ULower(TrimFilter), ULower(FText)) > 0) then Exit(True);
+    if (Pos(ULower(TrimFilter), ULower(FNote)) > 0) then Exit(True);
+    if (Pos(ULower(TrimFilter), ULower(FloatToStr(FAmount))) > 0) then Exit(True);
     DateAsStr := DateTimeToString(FDate, DisplayTime);
-    if (Pos(LowerCase(TrimFilter), LowerCase(DateAsStr)) > 0) then Exit(True);
-    if CompareWithTags(LowerCase(TrimFilter), string.Empty) then Exit(True);
+    if (Pos(ULower(TrimFilter), ULower(DateAsStr)) > 0) then Exit(True);
+    if CompareWithTags(TrimFilter, string.Empty) then Exit(True);
   end;
   Result := False;
 end;

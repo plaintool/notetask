@@ -100,6 +100,8 @@ function StartsWith(const S: string; const Ch: char = ' '): boolean;
 
 procedure StringListRemove(AList: TStringList; const AName: string);
 
+function ULower(Value: string): unicodestring;
+
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
 
 procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
@@ -947,6 +949,11 @@ begin
     AList.Delete(Index);
     Index := AList.IndexOf(AName);
   end;
+end;
+
+function ULower(Value: string): unicodestring;
+begin
+  Result := UnicodeLowerCase(unicodestring(Value));
 end;
 
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
