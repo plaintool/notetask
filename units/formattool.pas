@@ -92,6 +92,8 @@ procedure ReplaceStartsWith(var List: TStringList; const S: string);
 
 function StringListToBacktickString(List: TStringList; LeadingSpace: boolean = True): string;
 
+procedure AddPrefixTags(List: TStringList);
+
 procedure ParseGroupName(const Value: string; out NameText, HintText: string);
 
 function ReplaceLineBreaks(const S: string): string;
@@ -958,6 +960,23 @@ begin
     Result := SB.ToString;
   finally
     SB.Free;
+  end;
+end;
+
+procedure AddPrefixTags(List: TStringList);
+var
+  i: integer;
+  Tag, Prefix: string;
+begin
+  for i := 0 to List.Count - 1 do
+  begin
+    Tag := List[i];
+    if Pos(':', Tag) > 0 then
+    begin
+      Prefix := Copy(Tag, 1, Pos(':', Tag) - 1);
+      if List.IndexOf(Prefix) = -1 then
+        List.Add(Prefix); // add prefix if not already exists
+    end;
   end;
 end;
 

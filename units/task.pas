@@ -385,16 +385,23 @@ begin
 
   if StartsWithOperator(TrimFilter, Oper, ValuePart) then
   begin
-    if ValuePart = string.Empty then
-      Exit(True); // Empty filter matches everything
-
     DateAsStr := DateTimeToString(FDate, DisplayTime);
     // Compare with operator
     if (Oper = '#') then
     begin
-      if CompareWithTags(ValuePart, Oper) then
-        Exit(True);
+      if ValuePart <> string.Empty then
+      begin
+        if CompareWithTags(ValuePart, Oper) then
+          Exit(True);
+      end
+      else
+      begin
+        if FTags.Count = 0 then Exit(True);
+      end;
     end
+    else
+    if ValuePart = string.Empty then
+      Exit(True) // Empty filter matches everything
     else
     if (Oper = '!') then
     begin
@@ -1801,6 +1808,9 @@ begin
           FillTagsFromString(Down, FGroupList[i][j].FText);
           FillTagsFromString(Down, FGroupList[i][j].FNote);
         end;
+
+    // Add prefixes
+    AddPrefixTags(Up);
 
     // Add Tags
     FTags.Clear;
