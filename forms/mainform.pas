@@ -704,11 +704,11 @@ var
 const
   DefRowHeight = 22;
 
-  TagsColorBrigtness = 100;
+  TagsColorBrigtness = 80;
+  TagsColorSaturation = 80;
   TagsDimnessSelected = 55;
   TagsDimnessColor = 45;
   TagsDimness = 35;
-  TagsDesaturate = 0;
 
   IndentStr = '  ';
   CommentSlashStr = '//';
@@ -795,6 +795,7 @@ begin
   editTags.RoundCorners := 25;
   editTags.AutoColorSeed := 1887060975;
   editTags.AutoColorBrigtness := TagsColorBrigtness;
+  editTags.AutoColorSaturation := TagsColorSaturation;
   editTags.BackSpaceEditTag := True;
   editTags.ShowHint := True;
   editTags.PopupMenu := PopupTags;
@@ -1706,7 +1707,7 @@ begin
         begin
           BitTags := editTags.GetTagsBitmap(task.Tags, Max(Font.Size div 2 + 2, 8), Min(ARect.Width, 500),
             ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected, ifthen(bgFill <> clWhite, TagsDimnessColor, TagsDimness)),
-            ColorToRGB(bgFill), TagsDesaturate);
+            ColorToRGB(bgFill));
           try
             BitTags.TransparentColor := clWhite;
             BitTags.Transparent := True;
