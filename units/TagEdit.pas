@@ -94,6 +94,7 @@ type
     function RemovalConfirmed(idx: integer): boolean;
     function GetTagHeight(AFontSize: integer = -1): integer;
     function GetTagRect(Index: integer): TRect;
+    function GetHoveredTag: string;
     function TagAtPos(const P: TPoint): integer;
     procedure UpdateEditPosition;
     procedure UpdateHoverState(X, Y: integer);
@@ -148,6 +149,7 @@ type
     property Height default 32;
     property Width default 300;
     property Tag default 0;
+    property HoveredTag: string read GetHoveredTag;
     property Color read FColor write SetColor default clWindow;
     property Font: TFont read FFont write SetFont;
     property AutoSizeHeight: boolean read FAutoSizeHeight write SetAutoSizeHeight default False;
@@ -508,6 +510,14 @@ begin
     Result := FTagRects[Index]
   else
     Result := Rect(0, 0, 0, 0);
+end;
+
+function TTagEdit.GetHoveredTag: string;
+begin
+  if (FHoverIndex >= 0) then
+    Result := FTags[FHoverIndex]
+  else
+    Result := string.Empty;
 end;
 
 procedure TTagEdit.UpdateEditPosition;
@@ -990,8 +1000,10 @@ begin
   inherited MouseLeave;
   if csDesigning in ComponentState then exit;
 
+  // Don't clear hover if form inactive or popup menu opened
   Form := GetParentForm(Self);
-  if (Form <> nil) and (not Form.Active) then Exit;
+  if (Assigned(Form) and (not Form.Active)) then Exit;
+  if Assigned(PopupMenu) and (PopupMenu.PopupComponent = Self) then Exit;
 
   if (FHoverIndex <> -1) then
   begin

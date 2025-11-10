@@ -774,6 +774,11 @@ msgctxt "tformnotetask.contextcopystatusbar.caption"
 msgid "Copy"
 msgstr "Copier"
 
+#: tformnotetask.contextcopytag.caption
+msgctxt "tformnotetask.contextcopytag.caption"
+msgid "Copy"
+msgstr "Copier"
+
 #: tformnotetask.contextmacintoshcr.caption
 msgid "MacintoshCR"
 msgstr ""

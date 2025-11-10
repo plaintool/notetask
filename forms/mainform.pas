@@ -90,6 +90,7 @@ type
     ActionList: TActionList;
     contextAskChatGPT1: TMenuItem;
     contextCopy1: TMenuItem;
+    contextCopyTag: TMenuItem;
     contextWindowsCRLF: TMenuItem;
     contextANSI: TMenuItem;
     contextCut1: TMenuItem;
@@ -120,7 +121,7 @@ type
     contextDuplicateTasks: TMenuItem;
     contextOutdentTasks: TMenuItem;
     contextSaveNotesAs: TMenuItem;
-    ContextCopyStatusbar: TMenuItem;
+    contextCopyStatusbar: TMenuItem;
     menuDuplicateTasks: TMenuItem;
     contextRunPowershell: TMenuItem;
     contextIndentTasks: TMenuItem;
@@ -183,6 +184,7 @@ type
     PopupMemo: TPopupMenu;
     PopupStatusbar: TPopupMenu;
     PopupLineEnding: TPopupMenu;
+    PopupTags: TPopupMenu;
     printDialog: TPrintDialog;
     saveDialog: TSaveDialog;
     saveNotesDialog: TSaveDialog;
@@ -309,6 +311,7 @@ type
     procedure aFilterExecute(Sender: TObject);
     procedure aShowTagsExecute(Sender: TObject);
     procedure aSplitTasksExecute(Sender: TObject);
+    procedure contextCopyTagClick(Sender: TObject);
     procedure filterBoxChange(Sender: TObject);
     procedure filterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure filterClearClick(Sender: TObject);
@@ -347,7 +350,7 @@ type
     procedure panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure SplitFilterChangeBounds(Sender: TObject);
     procedure statusBarContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
-    procedure ContextCopyStatusbarClick(Sender: TObject);
+    procedure contextCopyStatusbarClick(Sender: TObject);
     procedure contextANSIClick(Sender: TObject);
     procedure contextASCIIClick(Sender: TObject);
     procedure contextMacintoshCRClick(Sender: TObject);
@@ -783,10 +786,11 @@ begin
   editTags.TagHoverColor := clNone;
   editTags.TagSuffixColor := $FEFEFE;
   editTags.RoundCorners := 25;
-  editTags.AutoColorSeed := 2166136267;
+  editTags.AutoColorSeed := 1887060975;
   editTags.AutoColorBrigtness := 100;
   editTags.BackSpaceEditTag := True;
   editTags.ShowHint := True;
+  editTags.PopupMenu := PopupTags;
   editTags.OnChange := @editTagsChange;
   editTags.OnKeyDown := @editTagsKeyDown;
   editTags.OnTagClick := @editTagsTagClick;
@@ -2256,7 +2260,7 @@ begin
   UpdateComboRegion(filterBox);
 end;
 
-procedure TformNotetask.ContextCopyStatusbarClick(Sender: TObject);
+procedure TformNotetask.contextCopyStatusbarClick(Sender: TObject);
 var
   PanelText: string;
 begin
@@ -2266,6 +2270,11 @@ begin
     if PanelText <> string.Empty then
       Clipboard.AsText := PanelText;
   end;
+end;
+
+procedure TformNotetask.contextCopyTagClick(Sender: TObject);
+begin
+    Clipboard.AsText := editTags.HoveredTag;
 end;
 
 procedure TformNotetask.contextWindowsCRLFClick(Sender: TObject);

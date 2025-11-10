@@ -1301,9 +1301,9 @@ object formNotetask: TformNotetask
   object PopupStatusbar: TPopupMenu
     Left = 160
     Top = 392
-    object ContextCopyStatusbar: TMenuItem
+    object contextCopyStatusbar: TMenuItem
       Caption = 'Copy'
-      OnClick = ContextCopyStatusbarClick
+      OnClick = contextCopyStatusbarClick
     end
   end
   object PopupLineEnding: TPopupMenu
@@ -1358,6 +1358,14 @@ object formNotetask: TformNotetask
       Caption = 'UTF-16 LE BOM'
       RadioItem = True
       OnClick = contextUTF16LEBOMClick
+    end
+  end
+  object PopupTags: TPopupMenu
+    Left = 264
+    Top = 312
+    object contextCopyTag: TMenuItem
+      Caption = 'Copy'
+      OnClick = contextCopyTagClick
     end
   end
 end
