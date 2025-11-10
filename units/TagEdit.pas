@@ -110,8 +110,7 @@ type
     procedure DrawTags;
     procedure DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
       AAvailWidth: integer; AHoverIndex: integer = -1; AShowCloseButtons: boolean = True; var ATagRects: array of TRect;
-      AFontSize: integer = -1; AIndent: integer = 4; ADimness: integer = 0; ABlendColor: TColor = clNone);
-    function BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
+      AFontSize: integer = -1; AIndent: integer = 4; ADimness: integer = 0; ABlendColor: TColor = clNone; ADesaturate: integer = 0);
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: integer); override;
@@ -137,8 +136,11 @@ type
     function Focused: boolean; override;
     procedure CopyHoverText;
     procedure FinishEdit;
+    function BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
+    function GetGrayWithSameLuminance(SourceColor: TColor): TColor;
+    function DesaturateColor(SourceColor: TColor; Factor: double): TColor;
     function GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;
-      ADimness: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
+      ADimness: integer = 0; ABlendColor: TColor = clWhite; ADesaturate: integer = 0): TBitmap;
   published
     property Align;
     property Anchors;
@@ -1225,7 +1227,7 @@ end;
 
 procedure TTagEdit.DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
   AAvailWidth: integer; AHoverIndex: integer = -1; AShowCloseButtons: boolean = True; var ATagRects: array of TRect;
-  AFontSize: integer = -1; AIndent: integer = 4; ADimness: integer = 0; ABlendColor: TColor = clNone);
+  AFontSize: integer = -1; AIndent: integer = 4; ADimness: integer = 0; ABlendColor: TColor = clNone; ADesaturate: integer = 0);
 var
   i: integer;
   R: TRect;
@@ -1325,11 +1327,14 @@ begin
       if FTagBorderColor = clNone then
         ACanvas.Pen.Color := Color1;
 
-      FontColor1 := GetContrastTextColor(Color1, Font.Color);
-      FontColor2 := GetContrastTextColor(Color2, Font.Color);
+      FontColor1 := GetContrastTextColor(Color1, Font.Color, 150);
+      FontColor2 := GetContrastTextColor(Color2, Font.Color, 150);
 
       if ABlendColor <> clNone then
       begin
+        Color1 := DesaturateColor(Color1, ADesaturate);
+        Color2 := DesaturateColor(Color2, ADesaturate);
+        ACanvas.Pen.Color := DesaturateColor(ACanvas.Pen.Color, ADesaturate);
         Color1 := BlendColors(Color1, ABlendColor, ADimness);
         Color2 := BlendColors(Color2, ABlendColor, ADimness);
         ACanvas.Pen.Color := BlendColors(ACanvas.Pen.Color, ABlendColor, ADimness);
@@ -1384,10 +1389,12 @@ begin
       if FTagBorderColor = clNone then
         ACanvas.Pen.Color := ACanvas.Brush.Color;
 
-      ACanvas.Font.Color := GetContrastTextColor(ACanvas.Brush.Color, Font.Color, 128);
+      ACanvas.Font.Color := GetContrastTextColor(ACanvas.Brush.Color, Font.Color, 150);
 
       if ABlendColor <> clNone then
       begin
+        ACanvas.Brush.Color := DesaturateColor(ACanvas.Brush.Color, ADesaturate);
+        ACanvas.Pen.Color := DesaturateColor(ACanvas.Pen.Color, ADesaturate);
         ACanvas.Brush.Color := BlendColors(ACanvas.Brush.Color, ABlendColor, ADimness);
         ACanvas.Pen.Color := BlendColors(ACanvas.Pen.Color, ABlendColor, ADimness);
         ACanvas.Font.Color := BlendColors(ACanvas.Font.Color, ABlendColor, ADimness);
@@ -1429,7 +1436,7 @@ begin
 end;
 
 function TTagEdit.GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;
-  ADimness: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
+  ADimness: integer = 0; ABlendColor: TColor = clWhite; ADesaturate: integer = 0): TBitmap;
 var
   TempBitmap: TBitmap;
   TempTagRects: array of TRect = ();
@@ -1469,7 +1476,8 @@ begin
         AFontSize,
         1,
         ADimness,
-        ABlendColor
+        ABlendColor,
+        ADesaturate
         );
 
       // Calculate actual used width and height
@@ -1556,6 +1564,76 @@ begin
   // Linear interpolation: result = color1 * (1-alpha) + color2 * alpha
   Result := RGBToColor(Round(R1 * (1 - Alpha) + R2 * Alpha), Round(G1 * (1 - Alpha) + G2 * Alpha),
     Round(B1 * (1 - Alpha) + B2 * Alpha));
+end;
+
+function TTagEdit.GetGrayWithSameLuminance(SourceColor: TColor): TColor;
+var
+  R, G, B: byte;
+  Luminance: integer;
+begin
+  // Extract RGB components from TColor
+  R := GetRValue(SourceColor);
+  G := GetGValue(SourceColor);
+  B := GetBValue(SourceColor);
+
+  // Calculate perceived luminance using standard weights
+  // Human eye is most sensitive to green, then red, then blue
+  Luminance := Round(0.299 * R + 0.587 * G + 0.114 * B);
+
+  // Ensure luminance stays within valid byte range (0-255)
+  Luminance := EnsureRange(Luminance, 0, 255);
+
+  // Return gray color with calculated luminance (R=G=B)
+  Result := RGB(Luminance, Luminance, Luminance);
+end;
+
+function TTagEdit.DesaturateColor(SourceColor: TColor; Factor: double): TColor;
+var
+  R, G, B: byte;
+  GrayColor: TColor;
+  GrayR, GrayG, GrayB: byte;
+  NewR, NewG, NewB: integer;
+  MixFactor: double;
+begin
+  // Validate and clamp percentage factor (0-100)
+  if Factor <= 0 then
+  begin
+    Result := SourceColor; // No desaturation, return original color
+    Exit;
+  end
+  else if Factor >= 100 then
+  begin
+    // Full desaturation, return gray with same luminance
+    Result := GetGrayWithSameLuminance(SourceColor);
+    Exit;
+  end;
+
+  // Convert percentage to mixing factor (0.01-0.99)
+  MixFactor := Factor / 100.0;
+
+  // Extract RGB components from source color
+  R := GetRValue(SourceColor);
+  G := GetGValue(SourceColor);
+  B := GetBValue(SourceColor);
+
+  // Get gray color with same luminance as source
+  GrayColor := GetGrayWithSameLuminance(SourceColor);
+  GrayR := GetRValue(GrayColor);
+  GrayG := GetGValue(GrayColor);
+  GrayB := GetBValue(GrayColor);
+
+  // Linear interpolation between source color and gray
+  NewR := Round(R * (1 - MixFactor) + GrayR * MixFactor);
+  NewG := Round(G * (1 - MixFactor) + GrayG * MixFactor);
+  NewB := Round(B * (1 - MixFactor) + GrayB * MixFactor);
+
+  // Ensure RGB values stay within valid range (0-255)
+  NewR := EnsureRange(NewR, 0, 255);
+  NewG := EnsureRange(NewG, 0, 255);
+  NewB := EnsureRange(NewB, 0, 255);
+
+  // Return the desaturated color
+  Result := RGB(NewR, NewG, NewB);
 end;
 
 end.
