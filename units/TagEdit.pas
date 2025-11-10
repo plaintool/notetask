@@ -111,6 +111,7 @@ type
     procedure DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
       AAvailWidth: integer; AHoverIndex: integer = -1; AShowCloseButtons: boolean = True; var ATagRects: array of TRect;
       AFontSize: integer = -1; AIndent: integer = 4; ADimness: integer = 0; ABlendColor: TColor = clNone);
+    function BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: integer); override;
@@ -135,9 +136,9 @@ type
     procedure FixDesignFontsPPI(const ADesignTimePPI: integer); override;
     function Focused: boolean; override;
     procedure CopyHoverText;
+    procedure FinishEdit;
     function GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;
       ADimness: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
-    function BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
   published
     property Align;
     property Anchors;
@@ -763,6 +764,12 @@ begin
   end;
 end;
 
+procedure TTagEdit.FinishEdit;
+begin
+  if FEdit.Text <> string.Empty then
+    AddTag(Trim(FEdit.Text));
+end;
+
 procedure TTagEdit.EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   ATag: string;
@@ -806,8 +813,7 @@ end;
 procedure TTagEdit.EditExit(Sender: TObject);
 begin
   // When leaving the edit, add tag if not empty
-  if FEdit.Text <> string.Empty then
-    AddTag(Trim(FEdit.Text));
+  FinishEdit;
 end;
 
 procedure TTagEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer);

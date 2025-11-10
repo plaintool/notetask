@@ -329,6 +329,7 @@ var
       if Op = '=' then Result := ULower(A) = ULower(B)
       else if (Op = '<>') or (Op = '!=') then Result := ULower(A) <> ULower(B)
       else if Op = '!' then Result := Pos(ULower(B), ULower(A)) = 0
+      else if Op = '#' then Result := Pos(ULower('#' + B), ULower(A)) > 0
       else
         Result := False;
     end;
@@ -391,7 +392,8 @@ begin
     begin
       if ValuePart <> string.Empty then
       begin
-        if CompareWithTags(ValuePart, Oper) then
+        if CompareWithOperator(FText, Oper, ValuePart) or CompareWithOperator(FNote, Oper, ValuePart) or
+          CompareWithTags(ValuePart, Oper) then
           Exit(True);
       end
       else

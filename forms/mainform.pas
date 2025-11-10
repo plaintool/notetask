@@ -703,6 +703,10 @@ var
 
 const
   DefRowHeight = 22;
+  Dimness = 35;
+  DimnessColor = 45;
+  DimnessSelected = 55;
+  ColorBrigtness = 100;
   IndentStr = '  ';
   CommentSlashStr = '//';
   CommentHashStr = '#';
@@ -787,7 +791,7 @@ begin
   editTags.TagSuffixColor := $FEFEFE;
   editTags.RoundCorners := 25;
   editTags.AutoColorSeed := 1887060975;
-  editTags.AutoColorBrigtness := 100;
+  editTags.AutoColorBrigtness := ColorBrigtness;
   editTags.BackSpaceEditTag := True;
   editTags.ShowHint := True;
   editTags.PopupMenu := PopupTags;
@@ -1698,7 +1702,8 @@ begin
         if task.Tags.Count > 0 then
         begin
           BitTags := editTags.GetTagsBitmap(task.Tags, Max(Font.Size div 2 + 2, 8), Min(ARect.Width, 500),
-            ARect.Height, 2, ifthen(gdSelected in aState, 50, 30), ColorToRGB(bgFill));
+            ARect.Height, 2, ifthen((gdSelected in aState), DimnessSelected, ifthen(bgFill <> clWhite, DimnessColor, Dimness)),
+            ColorToRGB(bgFill));
           try
             BitTags.TransparentColor := clWhite;
             BitTags.Transparent := True;
@@ -1961,6 +1966,7 @@ end;
 procedure TformNotetask.groupTabsChange(Sender: TObject);
 begin
   EditComplite;
+  editTags.FinishEdit;
 
   if (Length(FLastRowMem) > Tasks.SelectedGroup) then
     FLastRowMem[Tasks.SelectedGroup] := taskGrid.Row;
@@ -2274,7 +2280,7 @@ end;
 
 procedure TformNotetask.contextCopyTagClick(Sender: TObject);
 begin
-    Clipboard.AsText := editTags.HoveredTag;
+  Clipboard.AsText := editTags.HoveredTag;
 end;
 
 procedure TformNotetask.contextWindowsCRLFClick(Sender: TObject);

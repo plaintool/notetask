@@ -88,7 +88,7 @@ function RemoveBacktickBlocks(const S: string): string;
 
 procedure FillTagsFromString(var List: TStringList; var S: string; Backtick: boolean = False);
 
-procedure ReplaceStartsWith(var List: TStringList; const S: string);
+procedure ReplaceListStartsWith(var List: TStringList; const S: string);
 
 function StringListToBacktickString(List: TStringList; LeadingSpace: boolean = True): string;
 
@@ -831,6 +831,7 @@ var
   i, Start: integer;
   WordStr: string;
   HasAlphaNum: boolean;
+  Num: double;
   NewS: string; // Used to build modified string when Backtick is True
   HasRelevantChars: boolean; // Optimization flag
 begin
@@ -900,8 +901,8 @@ begin
 
       WordStr := Copy(S, Start, i - Start);
       // Add tag if length is valid and contains at least one alphanumeric character
-      if (Length(WordStr) > 1) and (Length(WordStr) <= MaxTagLength) and HasAlphaNum then
-        ReplaceStartsWith(List, WordStr);
+      if (Length(WordStr) > 1) and (Length(WordStr) <= MaxTagLength) and HasAlphaNum and not TryStrToFloat(WordStr, Num) then
+        List.Add(WordStr);
     end
     else
     begin
@@ -917,7 +918,7 @@ begin
     S := NewS;
 end;
 
-procedure ReplaceStartsWith(var List: TStringList; const S: string);
+procedure ReplaceListStartsWith(var List: TStringList; const S: string);
 var
   i: integer;
   LowerS, LowerItem: string;
