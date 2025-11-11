@@ -1426,7 +1426,8 @@ end;
 procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
 begin
   taskGridResize(Sender);
-  CalcRowHeights(0, True);
+  if IsColumn then
+    CalcRowHeights(0, True);
   EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 2, -2, -2, 0);
 end;
