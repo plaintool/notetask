@@ -338,6 +338,7 @@ type
     procedure editTagsChange(Sender: TObject);
     procedure editTagsTagAdd(Sender: TObject; const TagText: string);
     procedure editTagsTagRemove(Sender: TObject; const TagText: string);
+    procedure editTagsTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
     procedure groupTabsChange(Sender: TObject);
     procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure groupTabsMouseLeave(Sender: TObject);
@@ -799,11 +800,12 @@ begin
   editTags.BackSpaceEditTag := True;
   editTags.ShowHint := True;
   editTags.PopupMenu := PopupTags;
-  editTags.OnChange := @editTagsChange;
   editTags.OnKeyDown := @editTagsKeyDown;
   editTags.OnTagClick := @editTagsTagClick;
+  editTags.OnChange := @editTagsChange;
   editTags.OnTagAdd := @editTagsTagAdd;
   editTags.OnTagRemove := @editTagsTagRemove;
+  editTags.OnTagReorder := @editTagsTagReorder;
 
   // Initialize variables
   FBackup := True;
@@ -3955,6 +3957,21 @@ begin
   end;
 end;
 
+procedure TformNotetask.editTagsTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
+var
+  i: integer;
+begin
+  if taskGrid.Selection.Height > 0 then
+  begin
+    Tasks.CreateBackup;
+    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+      if Tasks.Map(i) > -1 then
+        Tasks.GetTask(i).Tags.Assign(editTags.Items);
+
+    SetChanged;
+  end;
+end;
+
 procedure TformNotetask.memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   if not (ssDouble in Shift) then
@@ -6982,8 +6999,9 @@ end;
 
 procedure TformNotetask.SetTags;
 var
-  i: integer;
+  i, Count: integer;
   tags: TStringList;
+  HasDiff: boolean = False;
 begin
   if (not ShowTags) then exit;
 
@@ -6998,10 +7016,18 @@ begin
         // Multiple rows selected — concatenate tags and set read-only
         for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
           if Tasks.Map(i) > -1 then
+          begin
+            Count := tags.Count;
             tags.AddStrings(Tasks.GetTask(i).Tags);
-        editTags.Items.Assign(tags);
+            if (i > taskGrid.Selection.Top) and (tags.Count <> Count) then
+              HasDiff := True;
+          end;
+        if (not HasDiff) then
+          editTags.Items.Assign(Tasks.GetTask(taskGrid.Selection.Bottom).Tags)
+        else
+          editTags.Items.Assign(tags);
         editTags.ReadOnly := FReadOnly;
-        editTags.AllowReorder := False;
+        editTags.AllowReorder := not HasDiff;
         editTags.Color := clDefault;
       end
       else if Tasks.Map(taskGrid.Row) > -1 then
