@@ -1978,14 +1978,11 @@ begin
   if (Length(FLastRowMem) > Tasks.SelectedGroup) then
     FLastRowMem[Tasks.SelectedGroup] := taskGrid.Row;
 
-  Tasks.ChangeGroup(FindGroupRealIndex(groupTabs.TabIndex), True);
-
   if (groupTabs.TabIndex >= 0) then
     Tasks.ChangeGroup(FindGroupRealIndex(groupTabs.TabIndex), True);
 
   FillGrid;
 
-  taskGrid.Col := 2;
   if (Length(FLastRowMem) > Tasks.SelectedGroup) then
     taskGrid.Row := FLastRowMem[Tasks.SelectedGroup]
   else
@@ -4385,7 +4382,8 @@ begin
   SetNote;
   SetTags;
   SetTabs;
-  RestoreSelectedState;
+  if Self.Visible then
+    RestoreSelectedState;
 end;
 
 procedure TformNotetask.AlignBottomControls;
@@ -6552,13 +6550,16 @@ end;
 procedure TformNotetask.SetShowArchived(Value: boolean);
 var
   LastTask: integer;
+  LastTab: integer;
 begin
   LastTask := Tasks.Map(taskGrid.Row);
+  LastTab := FindGroupRealIndex(groupTabs.TabIndex);
   FShowArchived := Value;
   aShowArchived.Checked := FShowArchived;
   SetTabs;
   FillGrid;
-  taskGrid.Row := Tasks.ReverseMap(LastTask);
+  if (LastTab = FindGroupRealIndex(groupTabs.TabIndex)) then
+    taskGrid.Row := Tasks.ReverseMap(LastTask);
   ResetRowHeight;
   SetInfo;
   SetNote;
@@ -6720,8 +6721,16 @@ end;
 
 procedure TformNotetask.FillGrid;
 begin
+  taskGrid.OnSelectCell := nil;
+  taskGrid.OnSelection := nil;
+  taskGrid.OnSelectEditor := nil;
+
   Tasks.FillGrid(taskGrid, FShowArchived, FShowDuration, FShowTime, SortOrder, SortColumn, FilterBox.Text);
   CalcRowHeights;
+
+  taskGrid.OnSelectEditor := @taskGridSelectEditor;
+  taskGrid.OnSelection := @taskGridSelection;
+  taskGrid.OnSelectCell := @taskGridSelectCell;
 end;
 
 procedure TformNotetask.CalcDefaultColWidth;
