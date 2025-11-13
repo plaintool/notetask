@@ -949,9 +949,10 @@ begin
 
   SetCaption;
 
-  CalcRowHeights(0, True);
-
   RestoreSelectedState(True, True, True);
+
+  // The sequence is critical: configure the settings after the state has been loaded
+  CalcRowHeights(0, True);
 
   if (ReadOnly) then ShowMessage(rfilereadonly);
 end;
