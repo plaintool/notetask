@@ -107,6 +107,7 @@ type
     function GetGroupName(Index: integer): string;
     function GetGroupHint(Index: integer): string;
     function GetGroupFiltered(Index: integer; ShowArchive: boolean; Filter: string; DisplayTime: boolean): boolean;
+    function HasDuplicateMatches(const Value: string): Boolean;
     function GetTaskCount(GroupIndex: integer): integer;
     function GetTaskInGroup(GroupIndex, TaskIndex: integer): TTask;
     procedure InitMap(Length: integer);
@@ -692,6 +693,28 @@ begin
 
   // If no matching task is found, hide the group
   Result := True;
+end;
+
+function TTasks.HasDuplicateMatches(const Value: string): boolean;
+var
+  i: integer;
+  MatchCount: integer;
+begin
+  MatchCount := 0;
+  for i := 0 to High(FTaskList) do
+  begin
+    if (FTaskList[i].Text = Value) or (FTaskList[i].Note = Value) or (FTaskList[i].GetAmount = Value) or
+      (FTaskList[i].GetDate = Value) then
+    begin
+      Inc(MatchCount);
+      if MatchCount >= 2 then
+      begin
+        Result := True;
+        Exit; // Exit early when second match is found
+      end;
+    end;
+  end;
+  Result := False;
 end;
 
 function TTasks.GetTaskCount(GroupIndex: integer): integer;

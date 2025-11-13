@@ -509,7 +509,9 @@ type
     FLastSelectionHeight: integer;
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
     FLastRowHeights: array of integer;
-    FLastRow: integer;
+    FLastRow, FLastCol: integer;
+    FLastText: string;
+    FLastTextMatch: boolean;
     FLastRowMem: array of integer;
     FLastTabMouseX: integer;
     FLastTabTarget: integer;
@@ -554,6 +556,8 @@ type
     procedure EditCell(aCol: integer = -1; aRow: integer = -1);
     procedure EditComplite(aEnter: boolean = False; aEscape: boolean = False);
     procedure DisableDrag;
+    procedure DisableGridEvents;
+    procedure EnableGridEvents;
     procedure SetCaption;
     procedure SetInfo;
     procedure SetTags;
@@ -621,6 +625,7 @@ type
     procedure GridInvalidate;
     function FreeFile: boolean;
     function LastRowHeight(aRow: integer): integer;
+    procedure ChangeLastText(const Value: string; aCol: integer = -1; aRow: integer = -1);
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
     function IsCanClose: boolean;
@@ -731,6 +736,7 @@ const
   clGrayLight = TColor($FAFAFA); // RGB(250,250,250)
   clGrayDark = TColor($E9E9E9); // RGB(233,233,233)
   clGrayHighlight = TColor($E3E3E3); // RGB(227,227,227)
+  clDuplicateHighlight = TColor($BBFFFF); // RGB(204, 255, 255)
 
 resourcestring
   rapp = 'Notetask';
@@ -830,6 +836,7 @@ begin
   FSortColumn := 0;
   FMemoSelStartClicked := -1;
   FLastTabFilter := -1;
+  FLastTextMatch := False;
   FSortOrder := soAscending;
   FKeyPressed := string.Empty;
   FEncrypted := False;
@@ -1730,7 +1737,14 @@ begin
 
     if Length(S) > 0 then
     begin
-      grid.canvas.Brush.Style := bsClear;
+      if not (gdSelected in aState) and (FLastText <> string.Empty) and (S = FLastText) and
+        (taskGrid.Selection.Height = 0) and ((aCol <> FLastCol) or (aRow <> FLastRow)) then
+      begin
+        grid.canvas.Brush.Style := bsSolid;
+        grid.canvas.Brush.Color := clDuplicateHighlight;
+      end
+      else
+        grid.canvas.Brush.Style := bsClear;
       drawrect := aRect;
       drawrect.Inflate(-4, 0);
 
@@ -1957,12 +1971,18 @@ begin
   if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
     SetInfo;
 
-  if (aRow <> FLastRow) or (taskGrid.Selection.Height <> FLastSelectionHeight) then
+  if (aCol <> FLastCol) or (aRow <> FLastRow) or (taskGrid.Selection.Height <> FLastSelectionHeight) then
   begin
-    SetNote;
-    SetTags;
+    if (aRow <> FLastRow) or (taskGrid.Selection.Height <> FLastSelectionHeight) then
+    begin
+      SetNote;
+      SetTags;
+    end;
+
+    FLastCol := aCol;
+    FLastRow := aRow;
+    ChangeLastText(taskGrid.Cells[aCol, aRow], aCol, aRow);
   end;
-  FLastRow := aRow;
 
   // Save row to mem
   if Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex) then
@@ -5014,6 +5034,7 @@ begin
 
     taskGrid.EditorMode := False;
     FIsEditing := False;
+    ChangeLastText(taskGrid.Cells[taskGrid.Col, taskGrid.Row]);
     ResetRowHeight;
     if Visible and taskGrid.Visible and taskGrid.CanFocus then
       taskGrid.SetFocus;
@@ -5342,25 +5363,30 @@ begin
     Tasks.CreateBackup;
   end;
 
-  Original := taskGrid.Selection;
-  taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
-  Tasks.CopyToClipboard(taskGrid, FShowNote, @Value);
-  Back := taskGrid.Selection;
-  if (SortOrder = soAscending) then
-  begin
-    taskGrid.Row := taskGrid.Selection.Bottom;
-    taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Bottom, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
-  end
-  else
-  begin
-    taskGrid.Row := taskGrid.Selection.Top;
-    taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Top);
+  DisableGridEvents;
+  try
+    Original := taskGrid.Selection;
+    taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
+    Tasks.CopyToClipboard(taskGrid, FShowNote, @Value);
+    Back := taskGrid.Selection;
+    if (SortOrder = soAscending) then
+    begin
+      taskGrid.Row := taskGrid.Selection.Bottom;
+      taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Bottom, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
+    end
+    else
+    begin
+      taskGrid.Row := taskGrid.Selection.Top;
+      taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Top);
+    end;
+    Tasks.PasteFromClipboard(taskGrid, SortOrder, False, @Value);
+    if (SortOrder = soAscending) then
+      Sel := TGridRect.Create(Original.Left, Back.Bottom + 1, Original.Right, Back.Bottom + Back.Height + 1)
+    else
+      Sel := TGridRect.Create(Original.Left, Back.Top, Original.Right, Back.Bottom);
+  finally
+    EnableGridEvents;
   end;
-  Tasks.PasteFromClipboard(taskGrid, SortOrder, False, @Value);
-  if (SortOrder = soAscending) then
-    Sel := TGridRect.Create(Original.Left, Back.Bottom + 1, Original.Right, Back.Bottom + Back.Height + 1)
-  else
-    Sel := TGridRect.Create(Original.Left, Back.Top, Original.Right, Back.Bottom);
   FillGrid;
   if (SortColumn = 0) then
   begin
@@ -5400,34 +5426,39 @@ begin
         Tasks.CreateBackup;
       end;
 
-      Task := Tasks.GetTask(taskGrid.Selection.Top);
-      MaxDate := Task.Date;
-      for i := taskGrid.Selection.Top + 1 to taskGrid.Selection.Bottom do
-      begin
-        Target := Tasks.GetTask(i);
-        if (task.Text <> Target.Text) then
-          Task.Text := Task.Text + FLineEnding.Value + Target.Text;
-        if (task.Note <> Target.Note) then
-          Task.Note := Task.Note + FLineEnding.Value + Target.Note;
-        Task.Amount := Task.Amount + Target.Amount;
-
-        if (Target.Date > MaxDate) then
+      DisableGridEvents;
+      try
+        Task := Tasks.GetTask(taskGrid.Selection.Top);
+        MaxDate := Task.Date;
+        for i := taskGrid.Selection.Top + 1 to taskGrid.Selection.Bottom do
         begin
-          MaxDate := Target.Date;
-          Task.Date := MaxDate;
-        end;
-        if Target.Done = False then
-          Task.Done := False;
-        if Target.Archive = False then
-          Task.Archive := False;
-        if Target.Star = True then
-          Task.Star := True;
-      end;
-      for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top + 1 do
-        Tasks.DeleteTask(i);
+          Target := Tasks.GetTask(i);
+          if (task.Text <> Target.Text) then
+            Task.Text := Task.Text + FLineEnding.Value + Target.Text;
+          if (task.Note <> Target.Note) then
+            Task.Note := Task.Note + FLineEnding.Value + Target.Note;
+          Task.Amount := Task.Amount + Target.Amount;
 
-      // Mem selection
-      Sel := taskGrid.Selection;
+          if (Target.Date > MaxDate) then
+          begin
+            MaxDate := Target.Date;
+            Task.Date := MaxDate;
+          end;
+          if Target.Done = False then
+            Task.Done := False;
+          if Target.Archive = False then
+            Task.Archive := False;
+          if Target.Star = True then
+            Task.Star := True;
+        end;
+        for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top + 1 do
+          Tasks.DeleteTask(i);
+
+        // Mem selection
+        Sel := taskGrid.Selection;
+      finally
+        EnableGridEvents;
+      end;
 
       FillGrid;
       SetNote;
@@ -5480,6 +5511,7 @@ begin
 
   Lines := TStringList.Create;
   Lines2 := TStringList.Create;
+  DisableGridEvents;
   try
     Lines.LineBreak := FLineEnding.Value;
     Lines2.LineBreak := FLineEnding.Value;
@@ -5528,7 +5560,6 @@ begin
       end;
 
       // Create new tasks
-
       for j := 1 to Lines.Count - 1 do
       begin
         NewTask := TTask.Create;
@@ -5565,6 +5596,7 @@ begin
       index := index + Lines.Count - 1;
     end;
   finally
+    EnableGridEvents;
     Lines.Free;
     Lines2.Free;
     SetLength(TasksToSplit, 0);
@@ -5649,16 +5681,22 @@ begin
         Tasks.CreateBackup;
       end;
 
-      // Delete rows from the end to avoid index shifting
-      for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
-      begin
-        RowIndex := i;
-        if (RowIndex > 0) and (RowIndex <= Tasks.Count) and (taskGrid.RowCount > RowIndex) then
+      DisableGridEvents;
+      try
+        // Delete rows from the end to avoid index shifting
+        for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
         begin
-          // Remove the task from the collection
-          taskGrid.DeleteRow(RowIndex);
+          RowIndex := i;
+          if (RowIndex > 0) and (RowIndex <= Tasks.Count) and (taskGrid.RowCount > RowIndex) then
+          begin
+            // Remove the task from the collection
+            taskGrid.DeleteRow(RowIndex);
+          end;
         end;
+      finally
+        EnableGridEvents;
       end;
+
       taskGrid.ClearSelections;
       FillGrid;
       SetInfo;
@@ -5731,15 +5769,20 @@ begin
         Tasks.CreateBackup;
       end;
 
-      // Archive tasks from the end to avoid index shifting
-      for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
-      begin
-        RowIndex := i;
-        if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+      DisableGridEvents;
+      try
+        // Archive tasks from the end to avoid index shifting
+        for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
         begin
-          // Archive the task from the collection
-          Tasks.ArchiveTask(RowIndex);
+          RowIndex := i;
+          if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+          begin
+            // Archive the task from the collection
+            Tasks.ArchiveTask(RowIndex);
+          end;
         end;
+      finally
+        EnableGridEvents;
       end;
       FillGrid;
       ResetRowHeight;
@@ -5770,26 +5813,32 @@ begin
       GridBackupSelection;
       Tasks.CreateBackup;
     end;
-    // Mark tasks as completed from the end to avoid index shifting
-    for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
-    begin
-      RowIndex := i;
-      if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
+
+    DisableGridEvents;
+    try
+      // Mark tasks as completed from the end to avoid index shifting
+      for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
       begin
-        // Mark the task as completed in the collection
-        Tasks.CompleteTask(RowIndex, False);
-
-        if Tasks.GetTask(RowIndex).Done then
+        RowIndex := i;
+        if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
         begin
-          taskGrid.Cells[1, RowIndex] := '1';
-          if (taskGrid.Columns.Items[4].Visible) and (taskGrid.Cells[5, RowIndex] = string.Empty) then
-            taskGrid.Cells[5, RowIndex] := DateTimeToString(Now, FShowTime);
-        end
-        else
-          taskGrid.Cells[1, RowIndex] := '0';
+          // Mark the task as completed in the collection
+          Tasks.CompleteTask(RowIndex, False);
 
-        Tasks.SetTask(taskGrid, RowIndex, False, FShowTime); // Backup created on start
+          if Tasks.GetTask(RowIndex).Done then
+          begin
+            taskGrid.Cells[1, RowIndex] := '1';
+            if (taskGrid.Columns.Items[4].Visible) and (taskGrid.Cells[5, RowIndex] = string.Empty) then
+              taskGrid.Cells[5, RowIndex] := DateTimeToString(Now, FShowTime);
+          end
+          else
+            taskGrid.Cells[1, RowIndex] := '0';
+
+          Tasks.SetTask(taskGrid, RowIndex, False, FShowTime); // Backup created on start
+        end;
       end;
+    finally
+      EnableGridEvents;
     end;
     if ShowDuration then FillGrid;
     SetChanged; // Mark that data has changed
@@ -6722,16 +6771,10 @@ end;
 
 procedure TformNotetask.FillGrid;
 begin
-  taskGrid.OnSelectCell := nil;
-  taskGrid.OnSelection := nil;
-  taskGrid.OnSelectEditor := nil;
-
+  DisableGridEvents;
   Tasks.FillGrid(taskGrid, FShowArchived, FShowDuration, FShowTime, SortOrder, SortColumn, FilterBox.Text);
   CalcRowHeights;
-
-  taskGrid.OnSelectEditor := @taskGridSelectEditor;
-  taskGrid.OnSelection := @taskGridSelection;
-  taskGrid.OnSelectCell := @taskGridSelectCell;
+  EnableGridEvents;
 end;
 
 procedure TformNotetask.CalcDefaultColWidth;
@@ -6885,6 +6928,32 @@ begin
     Result := taskGrid.DefaultRowHeight;
 end;
 
+procedure TformNotetask.ChangeLastText(const Value: string; aCol: integer = -1; aRow: integer = -1);
+begin
+  if aCol < 0 then aCol := taskGrid.Col;
+  if aRow < 0 then aRow := taskGrid.Row;
+  if (aCol > 0) and (aRow > 0) then
+  begin
+    if (FLastText <> string.Empty) or (Value <> string.Empty) then
+    begin
+      FLastText := Value;
+      if Tasks.HasDuplicateMatches(FLastText) and (taskGrid.Selection.Height = 0) then
+      begin
+        GridInvalidate;
+        FLastTextMatch := True;
+      end
+      else
+      begin
+        if FLastTextMatch then
+          GridInvalidate;
+        FLastTextMatch := False;
+      end;
+    end;
+  end
+  else
+    FLastText := string.Empty;
+end;
+
 procedure TformNotetask.SetCaption;
 var
   NewCaption: string;
@@ -7033,10 +7102,13 @@ begin
             if (i > taskGrid.Selection.Top) and (tags.Count <> Count) then
               HasDiff := True;
           end;
-        if (not HasDiff) then
-          editTags.Items.Assign(Tasks.GetTask(taskGrid.Selection.Bottom).Tags)
-        else
-          editTags.Items.Assign(tags);
+        if (tags.Count > 0) then
+        begin
+          if (not HasDiff) and (Tasks.Map(taskGrid.Selection.Top) > -1) then
+            editTags.Items.Assign(Tasks.GetTask(taskGrid.Selection.Top).Tags)
+          else
+            editTags.Items.Assign(tags);
+        end;
         editTags.ReadOnly := FReadOnly;
         editTags.AllowReorder := not HasDiff;
         editTags.Color := clDefault;
@@ -7328,6 +7400,20 @@ begin
     FDragTab := -1;
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TformNotetask.DisableGridEvents;
+begin
+  taskGrid.OnSelectCell := nil;
+  taskGrid.OnSelection := nil;
+  taskGrid.OnSelectEditor := nil;
+end;
+
+procedure TformNotetask.EnableGridEvents;
+begin
+  taskGrid.OnSelectEditor := @taskGridSelectEditor;
+  taskGrid.OnSelection := @taskGridSelection;
+  taskGrid.OnSelectCell := @taskGridSelectCell;
 end;
 
 function TformNotetask.IsCanClose: boolean;
