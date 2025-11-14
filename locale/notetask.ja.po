@@ -86,10 +86,12 @@ msgstr "新しいタグを入力してください..."
 #: mainform.renternewtaghint
 msgid ""
 "The tag is added to or removed from all selected tasks.\n"
-"Colon separates the tag from the suffix."
+"Colon separates the tag from the suffix.\n"
+"Semicolon allows adding multiple tags."
 msgstr ""
-"タグはすべての選択されたタスクに追加または削除されます。\n"
-"コロンはタグをサフィックスから区切ります。"
+"タグは選択されたすべてのタスクに追加または削除されます。\n"
+"コロンはタグとサフィックスを区切ります。\n"
+"セミコロンで複数のタグを追加できます。"
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."

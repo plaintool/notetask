@@ -86,10 +86,12 @@ msgstr "새 태그를 입력하십시오..."
 #: mainform.renternewtaghint
 msgid ""
 "The tag is added to or removed from all selected tasks.\n"
-"Colon separates the tag from the suffix."
+"Colon separates the tag from the suffix.\n"
+"Semicolon allows adding multiple tags."
 msgstr ""
-"태그는 선택한 모든 작업에 추가되거나 제거됩니다.\n"
-"콜론은 태그를 접미사와 구분합니다."
+"태그는 선택된 모든 작업에 추가되거나 제거됩니다.\n"
+"콜론은 태그와 접미사를 구분합니다.\n"
+"세미콜론을 사용하면 여러 태그를 추가할 수 있습니다."
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."

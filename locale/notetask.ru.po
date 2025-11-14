@@ -86,10 +86,12 @@ msgstr "Введите новый тег..."
 #: mainform.renternewtaghint
 msgid ""
 "The tag is added to or removed from all selected tasks.\n"
-"Colon separates the tag from the suffix."
+"Colon separates the tag from the suffix.\n"
+"Semicolon allows adding multiple tags."
 msgstr ""
 "Тег добавляется или удаляется из всех выделенных задач.\n"
-"Двоеточие отделяет тег от суффикса."
+"Двоеточие отделяет тег от суффикса.\n"
+"Точка с запятой позволяет добавлять несколько тегов."
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."

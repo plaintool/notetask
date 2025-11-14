@@ -86,10 +86,12 @@ msgstr "أدخل وسمًا جديدًا..."
 #: mainform.renternewtaghint
 msgid ""
 "The tag is added to or removed from all selected tasks.\n"
-"Colon separates the tag from the suffix."
+"Colon separates the tag from the suffix.\n"
+"Semicolon allows adding multiple tags."
 msgstr ""
 "يتم إضافة الوسم أو إزالته من جميع المهام المحددة.\n"
-"الفاصلة المنقوطة تفصل الوسم عن اللاحقة."
+"يفصل النقطتان الوسم عن اللاحقة.\n"
+"يسمح الفاصلة المنقوطة بإضافة عدة وسوم."
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."

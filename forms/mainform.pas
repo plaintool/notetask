@@ -764,7 +764,8 @@ resourcestring
   rdeletegroupconfirm = 'Are you sure you want to delete this group? This will also delete all tasks within this group.';
   rremovetagtitle = 'Remove tag';
   renternewtag = 'Enter new tag...';
-  renternewtaghint = 'The tag is added to or removed from all selected tasks.' + sLineBreak + 'Colon separates the tag from the suffix.';
+  renternewtaghint = 'The tag is added to or removed from all selected tasks.' + sLineBreak +
+    'Colon separates the tag from the suffix.' + sLineBreak + 'Semicolon allows adding multiple tags.';
   rremovetag = 'Are you sure you want to remove tag';
   rentergroupname = 'Enter the group name:';
   rconfirmation = 'Confirmation';

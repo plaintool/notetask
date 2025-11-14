@@ -86,10 +86,12 @@ msgstr "请输入新标签..."
 #: mainform.renternewtaghint
 msgid ""
 "The tag is added to or removed from all selected tasks.\n"
-"Colon separates the tag from the suffix."
+"Colon separates the tag from the suffix.\n"
+"Semicolon allows adding multiple tags."
 msgstr ""
-"标签会被添加到或从所有选定任务中移除。\n"
-"冒号将标签与后缀分开。"
+"标签会在所有选定任务中添加或移除。\n"
+"冒号将标签与后缀分开。\n"
+"分号允许添加多个标签。"
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."

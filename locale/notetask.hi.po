@@ -86,10 +86,12 @@ msgstr "नया टैग दर्ज करें..."
 #: mainform.renternewtaghint
 msgid ""
 "The tag is added to or removed from all selected tasks.\n"
-"Colon separates the tag from the suffix."
+"Colon separates the tag from the suffix.\n"
+"Semicolon allows adding multiple tags."
 msgstr ""
-"टैग सभी चयनित कार्यों में जोड़ा या हटाया जाता है।\n"
-"कोलन टैग को प्रत्यय से अलग करता है।"
+"टैग को सभी चयनित कार्यों में जोड़ा या हटाया जाता है।\n"
+"कोलन टैग को प्रत्यय से अलग करता है।\n"
+"सेमीकोलन कई टैग जोड़ने की अनुमति देता है।"
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."

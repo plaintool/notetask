@@ -779,14 +779,33 @@ end;
 procedure TTagEdit.EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   ATag: string;
+  SL: TStringList;
+  i: integer;
+  s: string;
 begin
   if csDesigning in ComponentState then exit;
 
-  // Enter adds a new tag
+  // Enter adds a new tag (handles multiple tags separated by ';')
   if Key = VK_RETURN then
   begin
     if FEdit.Text <> string.Empty then
-      AddTag(Trim(FEdit.Text));
+    begin
+      SL := TStringList.Create;
+      try
+        // Split by semicolon
+        ExtractStrings([';'], [], PChar(FEdit.Text), SL);
+
+        for i := 0 to SL.Count - 1 do
+        begin
+          s := Trim(SL[i]);
+          if s <> '' then
+            AddTag(s); // add every tag
+        end;
+      finally
+        SL.Free;
+      end;
+      FEdit.Clear; // clear input after adding
+    end;
     Key := 0;
   end;
 
