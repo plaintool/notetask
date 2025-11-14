@@ -5444,7 +5444,6 @@ begin
           if (task.Note <> Target.Note) then
             Task.Note := Task.Note + FLineEnding.Value + Target.Note;
           Task.Amount := Task.Amount + Target.Amount;
-
           if (Target.Date > MaxDate) then
           begin
             MaxDate := Target.Date;
@@ -5456,6 +5455,12 @@ begin
             Task.Archive := False;
           if Target.Star = True then
             Task.Star := True;
+          if Task.Tags.Count > 0 then
+          begin
+            Task.Tags.Sorted := True;
+            Task.Tags.AddStrings(Target.Tags);
+            Task.Tags.Sorted := False;
+          end;
         end;
         for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top + 1 do
           Tasks.DeleteTask(i);
