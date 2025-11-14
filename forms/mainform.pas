@@ -2578,7 +2578,13 @@ begin
     exit;
   end
   else
-  if editTags.Focused then
+  if editTags.HoveredTag <> string.Empty then
+  begin
+    Clipboard.AsText := editTags.HoveredTag;
+    exit;
+  end
+  else
+  if editTags.EditBox.Focused then
   begin
     editTags.EditBox.CopyToClipboard;
     exit;
