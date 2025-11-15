@@ -210,6 +210,7 @@ begin
     ItemSettings.Add('ShowStatusBar', Form.ShowStatusBar);
     ItemSettings.Add('ShowArchived', Form.ShowArchived);
     ItemSettings.Add('NoteHeight', Form.ScaleFormTo96(Form.panelNote.Height));
+    ItemSettings.Add('TagsHeight', Form.ScaleFormTo96(Form.panelTags.Height));
     ItemSettings.Add('FilterWidth', Form.ScaleFormTo96(Form.filterBox.Width));
     ItemSettings.Add('ShowColumnDone', Form.ShowColumnDone);
     ItemSettings.Add('ShowColumnTask', Form.ShowColumnTask);
@@ -336,6 +337,9 @@ begin
 
       if ItemSettings.FindPath('NoteHeight') <> nil then
         Form.panelNote.Height := Form.Scale96ToForm(ItemSettings.FindPath('NoteHeight').AsInteger);
+
+      if ItemSettings.FindPath('TagsHeight') <> nil then
+        Form.panelTags.Height := Form.Scale96ToForm(ItemSettings.FindPath('TagsHeight').AsInteger);
 
       if ItemSettings.FindPath('FilterWidth') <> nil then
         Form.filterBox.Width := Form.Scale96ToForm(ItemSettings.FindPath('FilterWidth').AsInteger);

@@ -1333,20 +1333,23 @@ begin
     HasColon := Pos(':', s) > 0;
     if HasColon then
     begin
-      Part1 := Trim(Copy(s, 1, Pos(':', s) - 1)) + ' ';
+      Part1 := Trim(Copy(s, 1, Pos(':', s) - 1));
       Part2 := Trim(Copy(s, Pos(':', s) + 1, MaxInt));
+      if Trim(Part1) = string.Empty then
+      begin
+        HasColon := False;
+        Part1 := Part2;
+      end;
       if Trim(Part2) = string.Empty then
         HasColon := False;
     end
     else
     begin
       Part1 := s;
-      Part2 := '';
+      Part2 := string.Empty;
     end;
 
-    M := ATagHeight;
-    W := ACanvas.TextWidth(s) + M;
-    if HasColon and (ACanvas.TextWidth(Part2) < ACanvas.TextWidth('...')) then W += ACanvas.TextWidth('.....');
+    W := ACanvas.TextWidth(s) + ATagHeight;
 
     if (i > 0) and ((X + W) > AAvailWidth) then
     begin
@@ -1410,7 +1413,7 @@ begin
         FontColor2 := BlendColors(FontColor2, ABlendColor, ABlend);
       end;
 
-      SepW := ACanvas.TextWidth(Part1) + Scale(6); // width of first part + left padding
+      SepW := ACanvas.TextWidth(Part1 + ' ') + Scale(6); // width of first part + left padding
 
       // Left part background
       ACanvas.Brush.Color := Color1;
@@ -1422,17 +1425,25 @@ begin
 
       // Fill junction to avoid double-rounded corner visual
       ACanvas.Brush.Color := Color1;
-      ACanvas.FillRect(R.Left + SepW - FRoundCorners, R.Top, R.Left + SepW, R.Bottom - 1);
+      ACanvas.FillRect(R.Left + Min(FRoundCorners, SepW div 2), R.Top, R.Left + SepW, R.Bottom - 1);
       ACanvas.Brush.Color := Color2;
-      ACanvas.FillRect(R.Left + SepW, R.Top, R.Left + SepW + FRoundCorners, R.Bottom - 1);
+      ACanvas.FillRect(R.Left + SepW, R.Top, R.Right - Min(FRoundCorners, R.Height div 2), R.Bottom - 1);
 
       if (FTagBorderWidth > 0) then
       begin
         ACanvas.Brush.Color := ACanvas.Pen.Color;
-        ACanvas.FillRect(R.Left + SepW - FRoundCorners, R.Top - (FTagBorderWidth div 2), R.Left + SepW + FRoundCorners,
+
+        ACanvas.FillRect(
+          R.Left + Min(FRoundCorners, SepW div 2),
+          R.Top - (FTagBorderWidth div 2),
+          R.Right - Min(FRoundCorners, R.Height div 2),
           R.Top + FTagBorderWidth - (FTagBorderWidth div 2));
-        ACanvas.FillRect(R.Left + SepW - FRoundCorners, R.Bottom - (FTagBorderWidth div 2) - 1, R.Left +
-          SepW + FRoundCorners, R.Bottom + FTagBorderWidth - (FTagBorderWidth div 2) - 1);
+
+        ACanvas.FillRect(
+          R.Left + Min(FRoundCorners, SepW div 2),
+          R.Bottom - (FTagBorderWidth div 2) - 1,
+          R.Right - Min(FRoundCorners, R.Height div 2),
+          R.Bottom + FTagBorderWidth - (FTagBorderWidth div 2) - 1);
       end;
     end
     else
@@ -1481,13 +1492,13 @@ begin
     if HasColon then
     begin
       ACanvas.Font.Color := FontColor1;
-      ACanvas.TextOut(R.Left + Scale(Max(AIndent, 4)), R.Top + Scale(3), Part1);
+      ACanvas.TextOut(R.Left + Scale(Max(AIndent, 4)), R.Top + Scale(2), Part1);
 
       ACanvas.Font.Color := FontColor2;
-      ACanvas.TextOut(R.Left + SepW + Scale(AIndent div 2) + M div 3, R.Top + Scale(3), Part2);
+      ACanvas.TextOut(R.Left + SepW + M div 3, R.Top + Scale(2), Part2);
     end
     else
-      ACanvas.TextOut(R.Left + Scale(AIndent) + M div 2, R.Top + Scale(3), s);
+      ACanvas.TextOut(R.Left + Scale(AIndent) + M div 2, R.Top + Scale(2), s);
 
     // Draw '×' button if enabled
     if AShowCloseButtons and (not FReadOnly) and (FCloseButtons) and (not FCloseButtonOnHover or Hover) then
