@@ -156,12 +156,12 @@ msgid "Read-only"
 msgstr "Толькі для чытання"
 
 #: mainform.rremovetag
-msgid "Are you sure you want to remove tag"
-msgstr "Вы ўпэўнены, што хочаце выдаліць тэг"
+msgid "Are you sure you want to remove tag(s)"
+msgstr "Вы ўпэўнены, што хочаце выдаліць тэг(і)"
 
 #: mainform.rremovetagtitle
-msgid "Remove tag"
-msgstr "Выдаліць тэг"
+msgid "Remove tag(s)"
+msgstr "Выдаліць тэг(і)"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"
@@ -466,6 +466,7 @@ msgid "Date time"
 msgstr "Дата і час"
 
 #: tformnotetask.adelete.caption
+msgctxt "tformnotetask.adelete.caption"
 msgid "Delete"
 msgstr "Выдаліць"
 
@@ -780,6 +781,11 @@ msgstr "Капіраваць"
 msgctxt "tformnotetask.contextcopytag.caption"
 msgid "Copy"
 msgstr "Капіраваць"
+
+#: tformnotetask.contextdeletetags.caption
+msgctxt "tformnotetask.contextdeletetags.caption"
+msgid "Delete"
+msgstr "Выдаліць"
 
 #: tformnotetask.contextmacintoshcr.caption
 msgid "MacintoshCR"

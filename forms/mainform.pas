@@ -139,6 +139,7 @@ type
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     menuFilter: TMenuItem;
+    contextDeleteTags: TMenuItem;
     menuSplitTasks: TMenuItem;
     menuSaveNotesAs: TMenuItem;
     menuRunPowershell: TMenuItem;
@@ -311,7 +312,8 @@ type
     procedure aFilterExecute(Sender: TObject);
     procedure aShowTagsExecute(Sender: TObject);
     procedure aSplitTasksExecute(Sender: TObject);
-    procedure contextCopyTagClick(Sender: TObject);
+    procedure contextCopyTagsClick(Sender: TObject);
+    procedure contextDeleteTagsClick(Sender: TObject);
     procedure filterBoxChange(Sender: TObject);
     procedure filterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure filterClearClick(Sender: TObject);
@@ -734,6 +736,7 @@ const
   clDarkBlue = TColor($B40000); // RGB(0,0,180)
   clGray = TColor($F0F0F0); // RGB(240,240,240)
   clGrayLight = TColor($FAFAFA); // RGB(250,250,250)
+  clGrayWhite = TColor($FEFEFE); // RGB(254,254,254)
   clGrayDark = TColor($E9E9E9); // RGB(233,233,233)
   clGrayHighlight = TColor($E3E3E3); // RGB(227,227,227)
   clDuplicateHighlight = TColor($BBFFFF); // RGB(204, 255, 255)
@@ -762,11 +765,11 @@ resourcestring
   rnumstringtoolarge = 'The line number is out of the allowed range.';
   rchatgpt = 'https://chatgpt.com?q=';
   rdeletegroupconfirm = 'Are you sure you want to delete this group? This will also delete all tasks within this group.';
-  rremovetagtitle = 'Remove tag';
+  rremovetagtitle = 'Remove tag(s)';
   renternewtag = 'Enter new tag...';
   renternewtaghint = 'The tag is added to or removed from all selected tasks.' + sLineBreak +
     'Colon separates the tag from the suffix.' + sLineBreak + 'Semicolon allows adding multiple tags.';
-  rremovetag = 'Are you sure you want to remove tag';
+  rremovetag = 'Are you sure you want to remove tag(s)';
   rentergroupname = 'Enter the group name:';
   rconfirmation = 'Confirmation';
   rgototask = 'Go to task';
@@ -798,8 +801,9 @@ begin
   editTags.Align := alTop;
   editTags.AutoSizeHeight := True;
   editTags.DragIndicatorColor := clRed;
+  editTags.SelectionRectColor := clRed;
   editTags.TagHoverColor := clNone;
-  editTags.TagSuffixColor := $FEFEFE;
+  editTags.TagSuffixColor := clGrayWhite;
   editTags.RoundCorners := 25;
   editTags.AutoColorSeed := 1887060975;
   editTags.AutoColorBrigtness := TagsColorBrigtness;
@@ -2304,9 +2308,22 @@ begin
   end;
 end;
 
-procedure TformNotetask.contextCopyTagClick(Sender: TObject);
+procedure TformNotetask.contextCopyTagsClick(Sender: TObject);
 begin
-  Clipboard.AsText := editTags.HoveredTag;
+  if editTags.SelectedTags.Count > 0 then
+    Clipboard.AsText := editTags.SelectedTags.DelimitedText
+  else
+  if editTags.HoveredTag <> string.Empty then
+    Clipboard.AsText := editTags.HoveredTag;
+end;
+
+procedure TformNotetask.contextDeleteTagsClick(Sender: TObject);
+begin
+  if editTags.SelectedTags.Count > 0 then
+    editTags.RemoveSelectedTags
+  else
+  if editTags.HoveredTag <> string.Empty then
+    editTags.RemoveTag(editTags.HoveredTag, True);
 end;
 
 procedure TformNotetask.contextWindowsCRLFClick(Sender: TObject);
@@ -2579,6 +2596,12 @@ begin
     exit;
   end
   else
+  if editTags.SelectedTags.Count > 0 then
+  begin
+    Clipboard.AsText := editTags.SelectedTags.DelimitedText;
+    exit;
+  end
+  else
   if editTags.HoveredTag <> string.Empty then
   begin
     Clipboard.AsText := editTags.HoveredTag;
@@ -2659,13 +2682,6 @@ begin
       MemoNoteBackup;
       memoNote.ClearSelection;
     end;
-    exit;
-  end
-  else
-  if editTags.Focused then
-  begin
-    if not editTags.ReadOnly then
-      editTags.EditBox.ClearSelection;
     exit;
   end;
 
@@ -3920,12 +3936,6 @@ begin
   if (ssCtrl in Shift) and (Key = VK_Z) and (not editTags.EditBox.Focused) then // Ctrl + Z
   begin
     aUndo.Execute;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_C) and ((not editTags.EditBox.Focused) or (editTags.EditBox.SelLength = 0)) then // Ctrl + C
-  begin
-    editTags.CopyHoverText;
     Key := 0;
   end
   else
@@ -7145,6 +7155,7 @@ begin
       editTags.ReadOnly := True;
     end;
   finally
+    editTags.ClearSelection;
     tags.Free;
   end;
 end;

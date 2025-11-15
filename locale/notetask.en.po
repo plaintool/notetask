@@ -156,12 +156,12 @@ msgid "Read-only"
 msgstr "Read-only"
 
 #: mainform.rremovetag
-msgid "Are you sure you want to remove tag"
-msgstr "Are you sure you want to remove tag"
+msgid "Are you sure you want to remove tag(s)"
+msgstr "Are you sure you want to remove tag(s)"
 
 #: mainform.rremovetagtitle
-msgid "Remove tag"
-msgstr "Remove tag"
+msgid "Remove tag(s)"
+msgstr "Remove tag(s)"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"
@@ -466,6 +466,7 @@ msgid "Date time"
 msgstr "Date time"
 
 #: tformnotetask.adelete.caption
+msgctxt "tformnotetask.adelete.caption"
 msgid "Delete"
 msgstr "Delete"
 
@@ -780,6 +781,11 @@ msgstr "Copy"
 msgctxt "tformnotetask.contextcopytag.caption"
 msgid "Copy"
 msgstr "Copy"
+
+#: tformnotetask.contextdeletetags.caption
+msgctxt "tformnotetask.contextdeletetags.caption"
+msgid "Delete"
+msgstr "Delete"
 
 #: tformnotetask.contextmacintoshcr.caption
 msgid "MacintoshCR"

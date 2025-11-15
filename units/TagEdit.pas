@@ -47,6 +47,7 @@ type
 
     FAutoSizeHeight: boolean;
     FAllowReorder: boolean;
+    FAllowSelect: boolean;
     FTagHoverUnderline: boolean;
     FCloseButtons: boolean;
     FCloseButtonOnHover: boolean;
@@ -85,6 +86,16 @@ type
     FOnTagPopup: TTagPopupEvent;
     FOnChange: TNotifyEvent;
 
+    // Selection support
+    FSelectionColor: TColor;
+    FSelectionRectColor: TColor;
+    FSelectionRectPenStyle: TPenStyle;
+    FSelectionRectWidth: integer;
+    FSelectedTags: TStringList;
+    FSelecting: boolean;
+    FSelectionStart: TPoint;
+    FSelectionRect: TRect;
+
     procedure EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure EditExit(Sender: TObject);
     function GetTags: TStringList;
@@ -94,7 +105,7 @@ type
     procedure SetReadOnly(Value: boolean);
     procedure SetTextHint(Value: TTranslateString);
     procedure TagsChanged(Sender: TObject);
-    function RemovalConfirmed(idx: integer): boolean;
+    function RemovalConfirmed(idx: integer = -1): boolean;
     function GetTagHeight(AFontSize: integer = -1): integer;
     function GetTagRect(Index: integer): TRect;
     function GetHoveredTag: string;
@@ -113,7 +124,17 @@ type
     procedure DrawTags;
     procedure DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
       AAvailWidth: integer; AHoverIndex: integer = -1; AShowCloseButtons: boolean = True; var ATagRects: array of TRect;
-      AFontSize: integer = -1; AIndent: integer = 4; ABlend: integer = 0; ABlendColor: TColor = clNone);
+      AFontSize: integer = -1; AIndent: integer = 4; ABlend: integer = 0; ABlendColor: TColor = clNone; ADrawSelection: boolean = True);
+
+    // Selection methods
+    procedure SetSelectionColor(Value: TColor);
+    function IsInSelectionRect(const R: TRect): boolean;
+    procedure UpdateSelection(X, Y: integer);
+    function GetSelectedTags: TStringList;
+
+    procedure EditMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure EditMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+    procedure EditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: integer); override;
@@ -128,7 +149,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AddTag(const ATag: string);
-    procedure RemoveTag(const ATag: string);
+    procedure RemoveTag(const ATag: string; AConfirm: boolean = False);
     property EditBox: TEdit read FEdit;
     procedure ParentFontChange(Sender: TObject);
     procedure FontChanged(Sender: TObject); override;
@@ -138,11 +159,15 @@ type
     procedure FixDesignFontsPPI(const ADesignTimePPI: integer); override;
     function Focused: boolean; override;
     procedure CopyHoverText;
+    procedure RemoveSelectedTags;
     procedure FinishEdit;
     function BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
     function GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;
       ABlend: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
     property HoveredTag: string read GetHoveredTag;
+    procedure ClearSelection;
+    procedure SelectAll;
+    property SelectedTags: TStringList read GetSelectedTags;
   published
     property Align;
     property Anchors;
@@ -158,6 +183,7 @@ type
     property Font: TFont read FFont write SetFont;
     property AutoSizeHeight: boolean read FAutoSizeHeight write SetAutoSizeHeight default False;
     property AllowReorder: boolean read FAllowReorder write FAllowReorder default True;
+    property AllowSelect: boolean read FAllowSelect write FAllowSelect default True;
     property TagHoverUnderline: boolean read FTagHoverUnderline write FTagHoverUnderline default True;
     property CloseButtons: boolean read FCloseButtons write FCloseButtons default True;
     property CloseButtonOnHover: boolean read FCloseButtonOnHover write FCloseButtonOnHover default True;
@@ -183,6 +209,12 @@ type
     property ReadOnly: boolean read FReadOnly write SetReadOnly default False;
     property Enabled: boolean read FEnabled write SetEnabled;
     property TagColors: TTagColorItems read FTagColors write SetTagColors;
+
+    // Selection property
+    property SelectionColor: TColor read FSelectionColor write SetSelectionColor default clHighlight;
+    property SelectionRectColor: TColor read FSelectionRectColor write FSelectionRectColor default clHighlight;
+    property SelectionRectPenStyle: TPenStyle read FSelectionRectPenStyle write FSelectionRectPenStyle default psDash;
+    property SelectionRectWidth: integer read FSelectionRectWidth write FSelectionRectWidth default 1;
 
     property Items: TStringList read GetTags write SetTags;
 
@@ -219,6 +251,18 @@ begin
   FTags.Add('IDE:Lazarus');
   FTags.Add('Free Pascal');
 
+  // Initialize selection
+  FSelectedTags := TStringList.Create;
+  FSelectedTags.CaseSensitive := True;
+  FSelectedTags.Delimiter := ';';
+  FSelectionColor := clHighlight;
+  FSelectionRectColor := clHighlight;
+  FSelectionRectPenStyle := psDash;
+  FSelectionRectWidth := 1;
+  FSelecting := False;
+  FSelectionRect := Rect(0, 0, 0, 0);
+  FMouseDownPos := Point(-1, -1);
+
   Height := Scale(32);
   Width := Scale(300);
   FColor := clWindow;
@@ -231,6 +275,7 @@ begin
   Randomize;
   FAutoColorSeed := Random(High(longword));
   FAllowReorder := True;
+  FAllowSelect := True;
   FFont := TFont.Create;
   FFont.OnChange := @FontChanged;
   FParentFont := True;
@@ -252,7 +297,6 @@ begin
   FAutoColorBrigtness := 80;
   FAutoColorSaturation := 80;
   FTextHint := 'Enter new tag...';
-
   // Create inner edit control
   FEdit := TEdit.Create(Self);
   if not (csDesigning in ComponentState) then
@@ -270,11 +314,15 @@ begin
     FEdit.Color := Color;
     FEdit.Left := 4;
     FEdit.Top := 4;
+
+    FEdit.OnMouseDown := @EditMouseDown;
+    FEdit.OnMouseMove := @EditMouseMove;
+    FEdit.OnMouseUp := @EditMouseUp;
   end;
 
   FRemoveConfirm := True;
-  FRemoveConfirmMessage := 'Are you sure you want to remove tag';
-  FRemoveConfirmTitle := 'Remove tag';
+  FRemoveConfirmMessage := 'Are you sure you want to remove tag(s)';
+  FRemoveConfirmTitle := 'Remove tag(s)';
 
   FDragging := False;
   FDragIndex := -1;
@@ -290,6 +338,7 @@ begin
   FFont.Free;
   FEdit.Free;
   FTagColors.Free;
+  FSelectedTags.Free;
   inherited Destroy;
 end;
 
@@ -467,21 +516,68 @@ begin
   UpdateAutoHeight;
 end;
 
-function TTagEdit.RemovalConfirmed(idx: integer): boolean;
+function TTagEdit.RemovalConfirmed(idx: integer = -1): boolean;
 begin
   if not RemoveConfirm then
     exit(True);
-  Result := MessageDlg(FRemoveConfirmTitle, FRemoveConfirmMessage + ' "' + FTags[idx] + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrYes;
+  if (idx >= 0) then
+    Result := MessageDlg(FRemoveConfirmTitle, FRemoveConfirmMessage + ' "' + FTags[idx] + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrYes
+  else
+    Result := MessageDlg(FRemoveConfirmTitle, FRemoveConfirmMessage + '?', mtConfirmation, [mbYes, mbNo], 0) = mrYes;
 end;
 
 procedure TTagEdit.AddTag(const ATag: string);
-begin
-  if (ATag <> string.Empty) and (FTags.IndexOf(ATag) = -1) then
+var
+  SL: TStringList;
+  i: integer;
+  s: string;
+  TagsAdded: boolean;
+
+  procedure AddSingleTag(const Value: string);
   begin
-    FTags.Add(ATag);
-    FEdit.Text := string.Empty;
+    // Check for empty and duplicate
+    if (Value = string.Empty) or (FTags.IndexOf(Value) <> -1) then
+      Exit;
+
+    FTags.Add(Value);
+    TagsAdded := True;
+
+    // Call OnTagAdd event for each tag
     if Assigned(FOnTagAdd) then
-      FOnTagAdd(Self, ATag);
+      FOnTagAdd(Self, Value);
+  end;
+
+begin
+  if ATag = string.Empty then
+    Exit;
+
+  TagsAdded := False;
+
+  // Check if the tag contains semicolons (multiple tags)
+  if Pos(';', ATag) > 0 then
+  begin
+    SL := TStringList.Create;
+    try
+      // Split by semicolon
+      ExtractStrings([';'], [], PChar(ATag), SL);
+
+      for i := 0 to SL.Count - 1 do
+      begin
+        s := Trim(SL[i]);
+        if s <> '' then
+          AddSingleTag(s);
+      end;
+    finally
+      SL.Free;
+    end;
+  end
+  else
+    AddSingleTag(ATag);
+
+  // Only update UI and call events if tags were actually added
+  if TagsAdded then
+  begin
+    FEdit.Clear; // RemoveSelectedTags input after adding
     if Assigned(FOnChange) then
       FOnChange(Self);
     Invalidate;
@@ -489,11 +585,14 @@ begin
   end;
 end;
 
-procedure TTagEdit.RemoveTag(const ATag: string);
+procedure TTagEdit.RemoveTag(const ATag: string; AConfirm: boolean = False);
 var
   i: integer;
 begin
   i := FTags.IndexOf(ATag);
+
+  if AConfirm and not RemovalConfirmed(i) then exit;
+
   if i >= 0 then
   begin
     FTags.Delete(i);
@@ -504,6 +603,41 @@ begin
     Invalidate;
     UpdateAutoHeight;
   end;
+end;
+
+procedure TTagEdit.RemoveSelectedTags;
+var
+  I: integer;
+  TagToRemove: string;
+begin
+  if FSelectedTags.Count = 0 then
+    Exit;
+
+  if not RemovalConfirmed then exit;
+
+  // Remove tags from the main list
+  for I := FSelectedTags.Count - 1 downto 0 do
+  begin
+    TagToRemove := FSelectedTags[I];
+
+    // Call OnTagRemove event if assigned
+    if Assigned(FOnTagRemove) then
+      FOnTagRemove(Self, TagToRemove);
+
+    // Remove from main tags list
+    FTags.Delete(FTags.IndexOf(TagToRemove));
+  end;
+
+  // Clear selection
+  FSelectedTags.Clear;
+
+  // Call OnChange event if assigned
+  if Assigned(FOnChange) then
+    FOnChange(Self);
+
+  // Update visual
+  Invalidate;
+  UpdateAutoHeight;
 end;
 
 function TTagEdit.GetTagHeight(AFontSize: integer = -1): integer;
@@ -779,9 +913,6 @@ end;
 procedure TTagEdit.EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   ATag: string;
-  SL: TStringList;
-  i: integer;
-  s: string;
 begin
   if csDesigning in ComponentState then exit;
 
@@ -789,26 +920,10 @@ begin
   if Key = VK_RETURN then
   begin
     if FEdit.Text <> string.Empty then
-    begin
-      SL := TStringList.Create;
-      try
-        // Split by semicolon
-        ExtractStrings([';'], [], PChar(FEdit.Text), SL);
-
-        for i := 0 to SL.Count - 1 do
-        begin
-          s := Trim(SL[i]);
-          if s <> '' then
-            AddTag(s); // add every tag
-        end;
-      finally
-        SL.Free;
-      end;
-      FEdit.Clear; // clear input after adding
-    end;
+      AddTag(FEdit.Text);
     Key := 0;
-  end;
-
+  end
+  else
   // Backspace removes last tag if edit is empty
   if (Key = VK_BACK) and (FEdit.Text = string.Empty) and (FTags.Count > 0) and (FBackspaceEditTag or
     RemovalConfirmed(FTags.Count - 1)) then
@@ -829,10 +944,150 @@ begin
     UpdateAutoHeight;
     Invalidate;
     Key := 0;
+  end
+  else
+  if (Key = VK_DELETE) and (SelectedTags.Count > 0) then
+  begin
+    RemoveSelectedTags;
+    Key := 0;
+  end
+  else
+  if (Key = VK_ESCAPE) then
+  begin
+    if (SelectedTags.Count > 0) then
+    begin
+      ClearSelection;
+      Key := 0;
+    end;
+    if (FEdit.Text <> string.Empty) then
+    begin
+      FEdit.Text := string.Empty;
+      Key := 0;
+    end;
+  end
+  else if (FAllowSelect) and (ssCtrl in Shift) and (Key = VK_A) and (FEdit.Text = string.Empty) then
+  begin
+    SelectAll;
+    Key := 0;
   end;
 
   if Assigned(OnKeyDown) then
     OnKeyDown(Sender, Key, Shift);
+end;
+
+procedure TTagEdit.EditMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+var
+  GlobalPos: TPoint;
+begin
+  if csDesigning in ComponentState then exit;
+
+  // RemoveSelectedTags selection if exists
+  if FSelectedTags.Count > 0 then ClearSelection;
+
+  // If Edit has text, let it handle the click normally for text editing
+  if FEdit.Text <> string.Empty then
+  begin
+    // Just ensure Edit has focus for text editing
+    if FEdit.CanFocus then
+      FEdit.SetFocus;
+    Exit;
+  end;
+
+  // Convert coordinates from FEdit coordinate system to TTagEdit coordinate system
+  GlobalPos := FEdit.ClientToScreen(Point(X, Y));
+  GlobalPos := Self.ScreenToClient(GlobalPos);
+
+  // Store mouse down position for drag detection
+  FMouseDownPos := GlobalPos;
+
+  // Don't start selection immediately - wait for mouse movement
+  // Just store the position for potential selection start
+end;
+
+procedure TTagEdit.EditMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+var
+  GlobalPos: TPoint;
+  DragThreshold: integer;
+begin
+  if csDesigning in ComponentState then exit;
+
+  // If Edit has text, let it handle mouse movement normally
+  if FEdit.Text <> '' then
+    Exit;
+
+  // Convert coordinates from FEdit coordinate system to TTagEdit coordinate system
+  GlobalPos := FEdit.ClientToScreen(Point(X, Y));
+  GlobalPos := Self.ScreenToClient(GlobalPos);
+
+  // Check if we should start selection (mouse moved with button pressed beyond threshold)
+  if (FAllowSelect) and (ssLeft in Shift) and (FMouseDownPos.X <> -1) then
+  begin
+    DragThreshold := Scale(2); // pixels threshold to start selection
+
+    if (Abs(GlobalPos.X - FMouseDownPos.X) > DragThreshold) or (Abs(GlobalPos.Y - FMouseDownPos.Y) > DragThreshold) then
+    begin
+      // Start selection in parent component
+      FSelecting := True;
+      FEdit.Visible := False;
+
+      FSelectionStart := FMouseDownPos;
+      FSelectionRect := Rect(FMouseDownPos.X, FMouseDownPos.Y, GlobalPos.X, GlobalPos.Y);
+
+      // RemoveSelectedTags previous selection unless Ctrl is pressed
+      if not (ssCtrl in Shift) then
+        ClearSelection;
+    end;
+  end;
+
+  // Update selection if we're in selection mode
+  if FSelecting then
+  begin
+    UpdateSelection(GlobalPos.X, GlobalPos.Y);
+  end
+  else
+  begin
+    // Call the MouseMove method for hover effects
+    MouseMove(Shift, GlobalPos.X, GlobalPos.Y);
+  end;
+end;
+
+procedure TTagEdit.EditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+var
+  GlobalPos: TPoint;
+begin
+  if csDesigning in ComponentState then exit;
+
+  // Convert coordinates from FEdit coordinate system to TTagEdit coordinate system
+  GlobalPos := FEdit.ClientToScreen(Point(X, Y));
+  GlobalPos := Self.ScreenToClient(GlobalPos);
+
+  // If it was a simple click (not a drag) and Edit is empty, focus the Edit
+  if (FEdit.Text = string.Empty) and (not FSelecting) and (FMouseDownPos.X <> -1) then
+  begin
+    // Check if it was a simple click (minimal movement)
+    if (Abs(GlobalPos.X - FMouseDownPos.X) <= Scale(2)) and (Abs(GlobalPos.Y - FMouseDownPos.Y) <= Scale(2)) then
+    begin
+      if FEdit.CanFocus then
+        FEdit.SetFocus;
+    end;
+  end;
+
+  // End selection if we were selecting
+  if FSelecting then
+  begin
+    FSelecting := False;
+    FEdit.Visible := Enabled and not ReadOnly;
+    if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+
+    FSelectionRect := Rect(0, 0, 0, 0);
+    Invalidate;
+  end;
+
+  // Reset mouse down position
+  FMouseDownPos := Point(-1, -1);
+
+  // Call the MouseUp method for any cleanup
+  MouseUp(Button, Shift, GlobalPos.X, GlobalPos.Y);
 end;
 
 procedure TTagEdit.EditExit(Sender: TObject);
@@ -841,13 +1096,83 @@ begin
   FinishEdit;
 end;
 
+procedure TTagEdit.SetSelectionColor(Value: TColor);
+begin
+  if FSelectionColor <> Value then
+  begin
+    FSelectionColor := Value;
+    Invalidate;
+  end;
+end;
+
+function TTagEdit.IsInSelectionRect(const R: TRect): boolean;
+begin
+  Result := (FSelectionRect.Left <= R.Right) and (FSelectionRect.Right >= R.Left) and (FSelectionRect.Top <= R.Bottom) and
+    (FSelectionRect.Bottom >= R.Top);
+end;
+
+procedure TTagEdit.UpdateSelection(X, Y: integer);
+var
+  I: integer;
+  TagRect: TRect;
+begin
+  // Update selection rectangle
+  FSelectionRect := Rect(Min(FSelectionStart.X, X), Min(FSelectionStart.Y, Y), Max(FSelectionStart.X, X), Max(FSelectionStart.Y, Y));
+
+  // Update selected tags based on selection rectangle
+  for I := 0 to FTags.Count - 1 do
+  begin
+    TagRect := GetTagRect(I);
+    if IsInSelectionRect(TagRect) then
+    begin
+      // Add to selection if not already selected
+      if FSelectedTags.IndexOf(FTags[I]) = -1 then
+        FSelectedTags.Add(FTags[I]);
+    end
+    else
+    begin
+      // Remove from selection if no longer in selection rect
+      if FSelectedTags.IndexOf(FTags[I]) <> -1 then
+        FSelectedTags.Delete(FSelectedTags.IndexOf(FTags[I]));
+    end;
+  end;
+  Invalidate;
+end;
+
+procedure TTagEdit.ClearSelection;
+begin
+  if FSelectedTags.Count > 0 then
+  begin
+    FSelectedTags.Clear;
+    Invalidate;
+  end;
+end;
+
+procedure TTagEdit.SelectAll;
+var
+  I: integer;
+begin
+  FSelectedTags.Clear;
+  for I := 0 to FTags.Count - 1 do
+    FSelectedTags.Add(FTags[I]);
+  Invalidate;
+end;
+
+function TTagEdit.GetSelectedTags: TStringList;
+begin
+  Result := FSelectedTags;
+end;
+
 procedure TTagEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
   idx, M: integer;
   R: TRect;
+  IsEditArea: boolean;
 begin
   inherited MouseDown(Button, Shift, X, Y);
   if csDesigning in ComponentState then exit;
+
+  FMouseDownPos := Point(X, Y);
 
   if Button = mbLeft then
   begin
@@ -855,8 +1180,13 @@ begin
     FMouseDownIndex := idx;
     FMouseDownPos := Point(X, Y);
 
+    // Check if mouse down is in edit area or empty space (not on a tag)
+    IsEditArea := (idx = -1) and (FEdit.Visible) and (X >= FEdit.Left) and (X <= FEdit.Left + FEdit.Width) and
+      (Y >= FEdit.Top) and (Y <= FEdit.Top + FEdit.Height);
+
     if (not FReadOnly) and (FCloseButtons) and (idx >= 0) then
     begin
+      // Existing close button logic
       R := GetTagRect(idx);
       M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3) + 4);
       // Click near right edge removes the tag - do it immediately
@@ -864,10 +1194,27 @@ begin
       begin
         RemoveTag(FTags[idx]);
         FMouseDownIndex := -1; // Reset since we handled it
+        if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+        exit;
       end;
     end;
-    if FEdit.Visible and FEdit.CanFocus then
-      FEdit.SetFocus;
+
+    // Start selection if clicking in empty space or edit area
+    if (FAllowSelect) and (not FAllowReorder or (idx = -1) or IsEditArea) then
+    begin
+      FSelecting := True;
+      FEdit.Visible := False;
+
+      FSelectionStart := Point(X, Y);
+      FSelectionRect := Rect(X, Y, X, Y);
+
+      // RemoveSelectedTags previous selection unless Ctrl is pressed
+      if not (ssCtrl in Shift) then
+        ClearSelection;
+
+      if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+    end;
+
   end;
 end;
 
@@ -887,8 +1234,15 @@ begin
   if csDesigning in ComponentState then exit;
 
   // Update hover state
-  if not FDragging then
+  if not FDragging and not FSelecting then
     UpdateHoverState(X, Y);
+
+  // Handle selection
+  if FSelecting and (ssLeft in Shift) then
+  begin
+    UpdateSelection(X, Y);
+    Exit;
+  end;
 
   // Start dragging only if mouse moved beyond threshold and we have a valid tag index
   if FAllowReorder and not FReadOnly and not FDragging and (ssLeft in Shift) and (FMouseDownIndex >= 0) then
@@ -899,6 +1253,8 @@ begin
       FDragging := True;
       FDragIndex := FMouseDownIndex;
       FDropIndex := FMouseDownIndex;
+      // RemoveSelectedTags selection when starting drag
+      ClearSelection;
       Invalidate;
     end;
   end;
@@ -966,14 +1322,33 @@ var
   TempTag: string;
   idx, M: integer;
   R: TRect;
+  DragThreshold: integer;
 begin
   inherited MouseUp(Button, Shift, X, Y);
   if csDesigning in ComponentState then exit;
 
   if Button = mbLeft then
   begin
+    // Handle selection completion
+    if FSelecting then
+    begin
+      FSelecting := False;
+      FEdit.Visible := FEnabled and not FReadOnly;
+      if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+
+      // If selection rectangle is very small, treat as click
+      DragThreshold := Scale(2);
+      if (Abs(X - FSelectionStart.X) < DragThreshold) and (Abs(Y - FSelectionStart.Y) < DragThreshold) then
+      begin
+        // Single click in empty space - RemoveSelectedTags selection
+        ClearSelection;
+      end;
+
+      FSelectionRect := Rect(0, 0, 0, 0);
+      Invalidate;
+    end
     // Handle click event if we didn't drag and it's the same tag we pressed
-    if not FDragging and (FMouseDownIndex >= 0) then
+    else if not FDragging and (FMouseDownIndex >= 0) then
     begin
       idx := TagAtPos(Point(X, Y));
       if (idx = FMouseDownIndex) and (idx >= 0) then
@@ -986,9 +1361,27 @@ begin
         // Don't trigger click for remove button area (already handled in MouseDown)
         if not (X > R.Right - M) then
         begin
-          // Generate OnTagClick event
-          if Assigned(FOnTagClick) then
-            FOnTagClick(Self, FTags[idx]);
+          // Handle selection on click
+          if (FAllowSelect) and (ssCtrl in Shift) then
+          begin
+            // Toggle selection with Ctrl
+            if FSelectedTags.IndexOf(FTags[idx]) = -1 then
+              FSelectedTags.Add(FTags[idx])
+            else
+              FSelectedTags.Delete(FSelectedTags.IndexOf(FTags[idx]));
+          end
+          else
+          begin
+            // Select single tag without Ctrl
+            if (FSelectedTags.Count > 0) then
+              ClearSelection;
+
+            // Generate OnTagClick event
+            if Assigned(FOnTagClick) and (not FSelecting) then
+              FOnTagClick(Self, FTags[idx]);
+          end;
+
+          Invalidate;
         end;
       end;
     end;
@@ -1234,6 +1627,8 @@ end;
 procedure TTagEdit.Paint;
 var
   BorderRect, R: TRect;
+  //I: integer;
+  //TagRect: TRect;
 begin
   // Draw component background
   Canvas.Brush.Color := Color;
@@ -1250,6 +1645,16 @@ begin
   end;
 
   DrawTags;
+
+  // Draw selection rectangle during selection
+  if FSelecting and not IsRectEmpty(FSelectionRect) then
+  begin
+    Canvas.Brush.Style := bsClear;
+    Canvas.Pen.Color := FSelectionRectColor;
+    Canvas.Pen.Style := FSelectionRectPenStyle;
+    Canvas.Pen.Width := FSelectionRectWidth;
+    Canvas.Rectangle(FSelectionRect);
+  end;
 
   // Draw drag indicator
   if not (csDesigning in ComponentState) and FDragging and (FDropIndex >= 0) and (FDropIndex <= FTags.Count) then
@@ -1298,7 +1703,7 @@ end;
 
 procedure TTagEdit.DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
   AAvailWidth: integer; AHoverIndex: integer = -1; AShowCloseButtons: boolean = True; var ATagRects: array of TRect;
-  AFontSize: integer = -1; AIndent: integer = 4; ABlend: integer = 0; ABlendColor: TColor = clNone);
+  AFontSize: integer = -1; AIndent: integer = 4; ABlend: integer = 0; ABlendColor: TColor = clNone; ADrawSelection: boolean = True);
 var
   i: integer;
   R: TRect;
@@ -1310,6 +1715,7 @@ var
   FontColor1: Tcolor = clNone;
   FontColor2: TColor = clNone;
   HasColon, Hover: boolean;
+  IsSelected: boolean;
 begin
   ACanvas.Font.Assign(Font);
   if AFontSize > -1 then
@@ -1328,6 +1734,7 @@ begin
   begin
     s := ATags[i];
     Hover := (i = AHoverIndex) and ((FTagHoverColor <> clNone) or FTagHoverUnderline);
+    IsSelected := FSelectedTags.IndexOf(s) <> -1;
 
     // Split tag by colon
     HasColon := Pos(':', s) > 0;
@@ -1415,6 +1822,15 @@ begin
 
       SepW := ACanvas.TextWidth(Part1 + ' ') + Scale(6); // width of first part + left padding
 
+      if ADrawSelection and IsSelected then
+      begin
+        ACanvas.Brush.Color := FSelectionColor;
+        ACanvas.FillRect(R.Left - Scale(3), R.Top - Scale(3), R.Right + Scale(3), R.Bottom + Scale(3));
+        Color1 := BlendColors(Color1, FSelectionColor, 30);
+        Color2 := BlendColors(Color2, FSelectionColor, 30);
+        ACanvas.Pen.Color := BlendColors(ACanvas.Pen.Color, FSelectionColor, 30);
+      end;
+
       // Left part background
       ACanvas.Brush.Color := Color1;
       ACanvas.RoundRect(R.Left, R.Top, R.Left + SepW, R.Bottom, FRoundCorners, FRoundCorners);
@@ -1449,16 +1865,16 @@ begin
     else
     begin
       if Hover and (FTagHoverColor <> clNone) then
-        ACanvas.Brush.Color := FTagHoverColor
+        Color1 := FTagHoverColor
       else
       begin
-        ACanvas.Brush.Color := FindTagColor(s);
-        if ACanvas.Brush.Color = clNone then
+        Color1 := FindTagColor(s);
+        if Color1 = clNone then
         begin
           if FTagColor <> clNone then
-            ACanvas.Brush.Color := FTagColor
+            Color1 := FTagColor
           else
-            ACanvas.Brush.Color := RandTagColor(Trim(s), FAutoColorBrigtness, FAutoColorSaturation);
+            Color1 := RandTagColor(Trim(s), FAutoColorBrigtness, FAutoColorSaturation);
         end;
       end;
 
@@ -1466,17 +1882,26 @@ begin
         ACanvas.Pen.Color := FTagHoverColor
       else
       if FTagBorderColor = clNone then
-        ACanvas.Pen.Color := ACanvas.Brush.Color;
+        ACanvas.Pen.Color := Color1;
 
-      ACanvas.Font.Color := GetContrastTextColor(ACanvas.Brush.Color, Font.Color, 150);
+      ACanvas.Font.Color := GetContrastTextColor(Color1, Font.Color, 150);
 
       if ABlendColor <> clNone then
       begin
-        ACanvas.Brush.Color := BlendColors(ACanvas.Brush.Color, ABlendColor, ABlend);
+        Color1 := BlendColors(Color1, ABlendColor, ABlend);
         ACanvas.Pen.Color := BlendColors(ACanvas.Pen.Color, ABlendColor, ABlend);
         ACanvas.Font.Color := BlendColors(ACanvas.Font.Color, ABlendColor, ABlend);
       end;
 
+      if ADrawSelection and IsSelected then
+      begin
+        ACanvas.Brush.Color := FSelectionColor;
+        ACanvas.FillRect(R.Left - Scale(3), R.Top - Scale(3), R.Right + Scale(3), R.Bottom + Scale(3));
+        Color1 := BlendColors(Color1, FSelectionColor, 30);
+        ACanvas.Pen.Color := BlendColors(ACanvas.Pen.Color, FSelectionColor, 30);
+      end;
+
+      ACanvas.Brush.Color := Color1;
       ACanvas.RoundRect(R.Left, R.Top, R.Right, R.Bottom, FRoundCorners, FRoundCorners);
     end;
 
@@ -1553,7 +1978,8 @@ begin
         AFontSize,
         1,
         ABlend,
-        ABlendColor
+        ABlendColor,
+        False
         );
 
       // Calculate actual used width and height

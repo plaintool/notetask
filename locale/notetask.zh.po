@@ -156,11 +156,11 @@ msgid "Read-only"
 msgstr "只读"
 
 #: mainform.rremovetag
-msgid "Are you sure you want to remove tag"
+msgid "Are you sure you want to remove tag(s)"
 msgstr "您确定要删除标签"
 
 #: mainform.rremovetagtitle
-msgid "Remove tag"
+msgid "Remove tag(s)"
 msgstr "删除标签"
 
 #: mainform.rrows
@@ -466,6 +466,7 @@ msgid "Date time"
 msgstr "日期时间"
 
 #: tformnotetask.adelete.caption
+msgctxt "tformnotetask.adelete.caption"
 msgid "Delete"
 msgstr "删除"
 
@@ -780,6 +781,11 @@ msgstr "复制"
 msgctxt "tformnotetask.contextcopytag.caption"
 msgid "Copy"
 msgstr "复制"
+
+#: tformnotetask.contextdeletetags.caption
+msgctxt "tformnotetask.contextdeletetags.caption"
+msgid "Delete"
+msgstr "删除"
 
 #: tformnotetask.contextmacintoshcr.caption
 msgid "MacintoshCR"

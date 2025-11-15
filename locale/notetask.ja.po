@@ -156,11 +156,11 @@ msgid "Read-only"
 msgstr "読み取り専用"
 
 #: mainform.rremovetag
-msgid "Are you sure you want to remove tag"
-msgstr "タグを削除します"
+msgid "Are you sure you want to remove tag(s)"
+msgstr "タグを削除してもよろしいです"
 
 #: mainform.rremovetagtitle
-msgid "Remove tag"
+msgid "Remove tag(s)"
 msgstr "タグを削除"
 
 #: mainform.rrows
@@ -466,6 +466,7 @@ msgid "Date time"
 msgstr "日付 時間"
 
 #: tformnotetask.adelete.caption
+msgctxt "tformnotetask.adelete.caption"
 msgid "Delete"
 msgstr "削除"
 
@@ -780,6 +781,11 @@ msgstr "コピー"
 msgctxt "tformnotetask.contextcopytag.caption"
 msgid "Copy"
 msgstr "コピー"
+
+#: tformnotetask.contextdeletetags.caption
+msgctxt "tformnotetask.contextdeletetags.caption"
+msgid "Delete"
+msgstr "削除"
 
 #: tformnotetask.contextmacintoshcr.caption
 msgid "MacintoshCR"

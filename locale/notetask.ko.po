@@ -156,11 +156,11 @@ msgid "Read-only"
 msgstr "읽기 전용"
 
 #: mainform.rremovetag
-msgid "Are you sure you want to remove tag"
-msgstr "태그를 제거합니다"
+msgid "Are you sure you want to remove tag(s)"
+msgstr "태그를 제거하시겠습니까"
 
 #: mainform.rremovetagtitle
-msgid "Remove tag"
+msgid "Remove tag(s)"
 msgstr "태그 제거"
 
 #: mainform.rrows
@@ -466,6 +466,7 @@ msgid "Date time"
 msgstr "날짜 시간"
 
 #: tformnotetask.adelete.caption
+msgctxt "tformnotetask.adelete.caption"
 msgid "Delete"
 msgstr "삭제"
 
@@ -780,6 +781,11 @@ msgstr "복사"
 msgctxt "tformnotetask.contextcopytag.caption"
 msgid "Copy"
 msgstr "복사"
+
+#: tformnotetask.contextdeletetags.caption
+msgctxt "tformnotetask.contextdeletetags.caption"
+msgid "Delete"
+msgstr "삭제"
 
 #: tformnotetask.contextmacintoshcr.caption
 msgid "MacintoshCR"
