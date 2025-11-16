@@ -7257,6 +7257,7 @@ begin
   aMoveTaskBottom.Enabled := not Value;
   aIndentTasks.Enabled := not Value;
   aOutdentTasks.Enabled := not Value;
+  contextDeleteTags.Enabled := not Value;
 end;
 
 procedure TformNotetask.SetTabs(Change: boolean = True);

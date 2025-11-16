@@ -672,7 +672,7 @@ begin
   FUpdatingEdit := True;
   try
     // Calculate available width considering borders
-    AvailWidth := ClientWidth - Scale(8);
+    AvailWidth := ClientWidth - FBorderWidth - Scale(8);
     if FBorderWidth > 0 then
       Dec(AvailWidth, 2 * FBorderWidth);
 
@@ -690,7 +690,7 @@ begin
       else
       begin
         // If insufficient space - move to new line
-        NewLeft := Scale(4);
+        NewLeft := FBorderWidth + Scale(4);
         NewTop := LastRect.Bottom + Scale(4);
       end;
     end
@@ -712,7 +712,7 @@ begin
     end;
 
     // Set Edit width
-    FEdit.Width := ClientWidth - FEdit.Left - Scale(4);
+    FEdit.Width := ClientWidth - FBorderWidth - FEdit.Left - Scale(4);
     if FEdit.Width < FEditMinWidth then
       FEdit.Width := FEditMinWidth;
     FEdit.Height := GetTagHeight;
@@ -758,8 +758,8 @@ begin
   Canvas.Font.Assign(Font);
   H := GetTagHeight;
 
-  X := Scale(4);
-  Y := Scale(4);
+  X := Scale(4) + FBorderWidth;
+  Y := Scale(4) + FBorderWidth;
 
   // Simulate tag layout to find bottom position
   for I := 0 to FTags.Count - 1 do
@@ -769,7 +769,7 @@ begin
     // Wrap to next line if tag doesn't fit
     if (I > 0) and ((X + W) > AvailWidth) then
     begin
-      X := Scale(4);
+      X := Scale(4) + FBorderWidth;
       Y := Y + H + Scale(4);
     end;
 
@@ -786,7 +786,7 @@ begin
   // Return total height including borders
   Result := EditBottom;
   if FBorderWidth > 0 then
-    Inc(Result, 2 * FBorderWidth);
+    Inc(Result, FBorderWidth);
 end;
 
 procedure TTagEdit.UpdateAutoHeight;
@@ -1626,9 +1626,7 @@ end;
 
 procedure TTagEdit.Paint;
 var
-  BorderRect, R: TRect;
-  //I: integer;
-  //TagRect: TRect;
+  R: TRect;
 begin
   // Draw component background
   Canvas.Brush.Color := Color;
@@ -1637,11 +1635,29 @@ begin
   // Draw component border if needed
   if FBorderWidth > 0 then
   begin
-    Canvas.Pen.Width := FBorderWidth;
-    Canvas.Pen.Color := FBorderColor;
-    Canvas.Pen.Style := psSolid;
-    BorderRect := ClientRect;
-    Canvas.Rectangle(BorderRect);
+    Canvas.Brush.Color := FBorderColor;
+    Canvas.Brush.Style := bsSolid;
+    Canvas.Pen.Style := psClear;
+
+    // Top side
+    Canvas.FillRect(
+      Rect(ClientRect.Left, ClientRect.Top, ClientRect.Right, ClientRect.Top + FBorderWidth)
+      );
+
+    // Bottom side
+    Canvas.FillRect(
+      Rect(ClientRect.Left, ClientRect.Bottom - FBorderWidth, ClientRect.Right, ClientRect.Bottom)
+      );
+
+    // Left side
+    Canvas.FillRect(
+      Rect(ClientRect.Left, ClientRect.Top + FBorderWidth, ClientRect.Left + FBorderWidth, ClientRect.Bottom - FBorderWidth)
+      );
+
+    // Right side
+    Canvas.FillRect(
+      Rect(ClientRect.Right - FBorderWidth, ClientRect.Top + FBorderWidth, ClientRect.Right, ClientRect.Bottom - FBorderWidth)
+      );
   end;
 
   DrawTags;
@@ -1726,8 +1742,8 @@ begin
   if Length(ATagRects) <> ATags.Count then
     Exit;
 
-  X := Scale(AIndent);
-  Y := Scale(AIndent);
+  X := Scale(AIndent) + FBorderWidth;
+  Y := Scale(AIndent) + FBorderWidth;
   H := ATagHeight;
 
   for i := 0 to ATags.Count - 1 do
@@ -1760,7 +1776,7 @@ begin
 
     if (i > 0) and ((X + W) > AAvailWidth) then
     begin
-      X := Scale(AIndent);
+      X := Scale(AIndent) + FBorderWidth;
       Y := Y + H + Scale(AIndent);
     end;
 
