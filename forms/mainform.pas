@@ -1428,7 +1428,6 @@ begin
   if (not IsColumn) then
   begin
     Tasks.DeleteTask(tIndex);
-    if (taskGrid.RowCount > 0) and (taskGrid.Row > 0) then taskGrid.Row := taskGrid.Row - 1;
     if ShowDuration then FillGrid;
     SetInfo;
     SetNote;
