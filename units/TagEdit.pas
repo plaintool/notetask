@@ -1436,6 +1436,17 @@ begin
     FHoverIndex := -1;
     Invalidate;
   end;
+
+  {$IFDEF UNIX}
+  if FSelecting then
+  begin
+    FSelecting := False;
+    FEdit.Visible := FEnabled and not FReadOnly;
+    if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+    FSelectionRect := Rect(0, 0, 0, 0);
+    Invalidate;
+  end
+  {$ENDIF}
 end;
 
 procedure TTagEdit.HandlePopupMenu(Sender: TObject);
