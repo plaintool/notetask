@@ -3228,6 +3228,16 @@ begin
     end
     else
     begin
+      if (Length(filterBox.Text) = 0) then
+      begin
+        if Assigned(Memo) and (Memo.SelText <> string.Empty) then
+          filterBox.Text := Memo.SelText
+        else
+        if memoNote.Visible and memoNote.Focused and (memoNote.SelText <> string.Empty) then
+          filterBox.Text := memoNote.SelText;
+        filterBoxChange(Self);
+      end;
+
       if Visible and filterBox.Visible and filterBox.CanFocus then
         filterBox.SetFocus;
     end;
