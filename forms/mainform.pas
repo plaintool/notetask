@@ -6444,7 +6444,7 @@ begin
   if (aRowMem) and (Length(FLoadedRowMem) > 0) then
     CopyToArray(FLastRowMem, FLoadedRowMem);
 
-  if (FLoadedSelectedTab < 0) and (groupTabs.Tabs.Count > 0) then
+  if (groupTabs.Tabs.Count > 0) and ((FLoadedSelectedTab < 0) or (FLoadedSelectedTab >= groupTabs.Tabs.Count)) then
     FLoadedSelectedTab := 0;
 
   // Restore last open tab and rows
