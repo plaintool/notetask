@@ -1944,13 +1944,13 @@ begin
     if HasColon then
     begin
       ACanvas.Font.Color := FontColor1;
-      ACanvas.TextOut(R.Left + Scale(Max(AIndent, 4)), R.Top + Scale(2), Part1);
+      ACanvas.TextOut(R.Left + Scale(Max(AIndent, 4)), R.Top + Scale(3), Part1);
 
       ACanvas.Font.Color := FontColor2;
-      ACanvas.TextOut(R.Left + SepW + M div 3, R.Top + Scale(2), Part2);
+      ACanvas.TextOut(R.Left + SepW + M div 4, R.Top + Scale(3), Part2);
     end
     else
-      ACanvas.TextOut(R.Left + Scale(AIndent) + M div 2, R.Top + Scale(2), s);
+      ACanvas.TextOut(R.Left + Scale(6) + M div 4, R.Top + Scale(3), s);
 
     // Draw '×' button if enabled
     if AShowCloseButtons and (not FReadOnly) and (FCloseButtons) and (not FCloseButtonOnHover or Hover) then
