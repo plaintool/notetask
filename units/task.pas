@@ -266,24 +266,6 @@ function TTask.MatchesFilter(const Filter: string; DisplayTime: boolean): boolea
 var
   TrimFilter, Oper, ValuePart, DateAsStr: string;
 
-  function StartsWithOperator(const S: string; out Op, Rest: string): boolean;
-  const
-    Ops: array[0..8] of string = ('>=', '<=', '<>', '!=', '=', '>', '<', '!', '#');
-  var
-    i: integer;
-  begin
-    for i := 0 to High(Ops) do
-      if StartsText(Ops[i], S) then
-      begin
-        Op := Ops[i];
-        Rest := Trim(System.Copy(S, Length(Ops[i]) + 1, MaxInt));
-        Exit(True);
-      end;
-    Op := string.Empty;
-    Rest := S;
-    Result := False;
-  end;
-
   function CompareWithOperator(const A: string; Op: string; const B: string): boolean;
   var
     NumA, NumB: double;

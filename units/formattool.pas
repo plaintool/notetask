@@ -18,6 +18,7 @@ uses
   Process,
   RegExpr,
   Math,
+  StrUtils,
   LazUTF8,
   lineending;
 
@@ -39,6 +40,8 @@ function FloatToString(Value: double): string; overload;
 function FloatToString(Value: double; FS: TFormatSettings): string; overload;
 
 function SplitByFirstSpaces(const S: string; Count: integer = 1): TStringArray;
+
+function StartsWithOperator(const S: string; out Op, Rest: string): boolean;
 
 function StartsWithBracketAZ(const S: string): boolean;
 
@@ -267,6 +270,24 @@ begin
   // Add whatever is left as the last part
   SetLength(Result, Length(Result) + 1);
   Result[High(Result)] := Remaining;
+end;
+
+function StartsWithOperator(const S: string; out Op, Rest: string): boolean;
+const
+  Ops: array[0..8] of string = ('>=', '<=', '<>', '!=', '=', '>', '<', '!', '#');
+var
+  i: integer;
+begin
+  for i := 0 to High(Ops) do
+    if StartsText(Ops[i], S) then
+    begin
+      Op := Ops[i];
+      Rest := Trim(System.Copy(S, Length(Ops[i]) + 1, MaxInt));
+      Exit(True);
+    end;
+  Op := string.Empty;
+  Rest := S;
+  Result := False;
 end;
 
 function StartsWithBracketAZ(const S: string): boolean;

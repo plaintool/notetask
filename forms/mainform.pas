@@ -2768,12 +2768,21 @@ end;
 procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
 var
   Ind: integer;
+  TaskText, Oper, Value: string;
 begin
   if Screen.ActiveForm <> Self then exit;
 
   EditComplite;
   GridBackupSelection;
-  Ind := Tasks.InsertTask('[ ]', taskGrid.Row);
+
+  TaskText := '[ ]';
+  if Length(filterBox.Text) > 0 then
+  begin
+    StartsWithOperator(filterBox.Text, Oper, Value);
+    if (Length(Oper) = 0) or (Oper = '#') or (Oper = '=') then
+      TaskText += ' `' + Value + '`';
+  end;
+  Ind := Tasks.InsertTask(TaskText, taskGrid.Row);
   FillGrid;
   ResetRowHeight;
   if (Ind > 0) then
