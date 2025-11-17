@@ -608,7 +608,7 @@ type
     procedure MemoBackup;
     procedure MemoUndo;
     procedure MemoDelKey(aMemoNote: boolean = True);
-    procedure EditSelForDel(TargetEdit: TCustomEdit);
+    function CalcDeleteCount(const S: string; SelStart: integer): integer;
     function IsExecuteValueNote(memoPriority: boolean = False): boolean;
     function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
@@ -3953,7 +3953,7 @@ begin
     {$IFDEF UNIX}
     {$ELSE}
     if (editTags.EditBox.SelLength = 0) then
-      EditSelForDel(editTags.EditBox);
+      editTags.EditBox.SelLength := CalcDeleteCount(editTags.EditBox.Text, editTags.EditBox.SelStart);
     editTags.EditBox.ClearSelection;
     Key := 0;
     {$ENDIF}
@@ -6371,28 +6371,28 @@ begin
   FMemoSelLengthBackup := SelLength;
 end;
 
-procedure TformNotetask.EditSelForDel(TargetEdit: TCustomEdit);
+function TformNotetask.CalcDeleteCount(const S: string; SelStart: integer): integer;
 var
   Len, DeleteCount, Pos: integer;
 begin
-  Len := TargetEdit.GetTextLen;
+  Len := Length(S);
   DeleteCount := 0;
-  Pos := TargetEdit.SelStart + 1; // 1-based indexing
+  Pos := SelStart + 1; // 1-based indexing
 
   while Pos <= Len do
   begin
-    if IsUTF8Char(TargetEdit.Text, Pos, ' ') then
+    if IsUTF8Char(S, Pos, ' ') then
     begin
       // If space, extend deletion
       Inc(DeleteCount);
       Inc(Pos);
     end
-    else if (IsUTF8Char(TargetEdit.Text, Pos, #13)) or (IsUTF8Char(TargetEdit.Text, Pos, #10)) then
+    else if (IsUTF8Char(S, Pos, #13)) or (IsUTF8Char(S, Pos, #10)) then
     begin
       // If CR, delete it and check for following LF
       Inc(DeleteCount);
       Inc(Pos);
-      if (Pos <= Len) and (IsUTF8Char(TargetEdit.Text, Pos, #10)) then
+      if (Pos <= Len) and (IsUTF8Char(S, Pos, #10)) then
       begin
         Inc(DeleteCount);
         Inc(Pos);
@@ -6405,28 +6405,38 @@ begin
       Break; // any other char, stop loop
     end;
   end;
-  TargetEdit.SelLength := DeleteCount;
+  Result := DeleteCount;
 end;
 
 procedure TformNotetask.MemoDelKey(aMemoNote: boolean = True);
 var
   TargetMemo: Tmemo;
+  DeleteCount: integer;
 begin
   if aMemoNote then
     TargetMemo := memoNote
   else
     TargetMemo := Memo;
 
-  if TargetMemo.SelLength = 0 then
-    EditSelForDel(TargetMemo)
-  else
-  begin
-    if aMemoNote then
-      MemoNoteBackup
+  TargetMemo.Lines.BeginUpdate;
+  try
+    if TargetMemo.SelLength = 0 then
+    begin
+      DeleteCount := CalcDeleteCount(TargetMemo.Text, TargetMemo.SelStart);
+      TargetMemo.SelLength := DeleteCount;
+      TargetMemo.ClearSelection;
+    end
     else
-      MemoBackup;
+    begin
+      if aMemoNote then
+        MemoNoteBackup
+      else
+        MemoBackup;
+      TargetMemo.ClearSelection;
+    end;
+  finally
+    TargetMemo.Lines.EndUpdate;
   end;
-  TargetMemo.ClearSelection;
 end;
 
 function TformNotetask.GetScrollPosition: integer;
