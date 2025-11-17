@@ -3224,7 +3224,11 @@ begin
     if filterBox.Focused then
     begin
       if Visible and taskGrid.Visible and taskGrid.CanFocus then
+      begin
+        filterBox.Clear;
+        filterBoxChange(Self);
         taskGrid.SetFocus;
+      end;
     end
     else
     begin
