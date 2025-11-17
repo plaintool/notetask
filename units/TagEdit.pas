@@ -532,57 +532,48 @@ var
   i: integer;
   s: string;
   TagsAdded: boolean;
-
-  procedure AddSingleTag(const Value: string);
-  begin
-    // Check for empty and duplicate
-    if (Value = string.Empty) or (FTags.IndexOf(Value) <> -1) then
-      Exit;
-
-    FTags.Add(Value);
-    TagsAdded := True;
-
-    // Call OnTagAdd event for each tag
-    if Assigned(FOnTagAdd) then
-      FOnTagAdd(Self, Value);
-  end;
-
+  EditValue: string;
 begin
   if ATag = string.Empty then
     Exit;
 
   TagsAdded := False;
+  EditValue := FEdit.Text;
+  FEdit.Clear;
+  SL := TStringList.Create;
+  try
+    // Split by semicolon if present, otherwise just add the single tag
+    if Pos(';', ATag) > 0 then
+      ExtractStrings([';'], [], PChar(ATag), SL)
+    else
+      SL.Add(ATag);
 
-  // Check if the tag contains semicolons (multiple tags)
-  if Pos(';', ATag) > 0 then
-  begin
-    SL := TStringList.Create;
-    try
-      // Split by semicolon
-      ExtractStrings([';'], [], PChar(ATag), SL);
-
-      for i := 0 to SL.Count - 1 do
+    for i := 0 to SL.Count - 1 do
+    begin
+      s := Trim(SL[i]);
+      // Skip empty or duplicate tags
+      if (s <> '') and (FTags.IndexOf(s) = -1) then
       begin
-        s := Trim(SL[i]);
-        if s <> '' then
-          AddSingleTag(s);
+        FTags.Add(s);
+        TagsAdded := True;
+        if Assigned(FOnTagAdd) then
+          FOnTagAdd(Self, s);
       end;
-    finally
-      SL.Free;
     end;
-  end
-  else
-    AddSingleTag(ATag);
+  finally
+    SL.Free;
+  end;
 
-  // Only update UI and call events if tags were actually added
+  // Update UI and call events if tags were added
   if TagsAdded then
   begin
-    FEdit.Clear; // RemoveSelectedTags input after adding
     if Assigned(FOnChange) then
       FOnChange(Self);
     Invalidate;
     UpdateAutoHeight;
-  end;
+  end
+  else
+    FEdit.Text := EditValue;
 end;
 
 procedure TTagEdit.RemoveTag(const ATag: string; AConfirm: boolean = False);
@@ -896,11 +887,6 @@ begin
 
     // Optional: Provide visual feedback
     // ShowMessage('Copied: ' + FTags[TagIndex]);
-  end
-  else
-  begin
-    // Optional: Handle case when no tag is under cursor
-    // ShowMessage('No tag under cursor to copy');
   end;
 end;
 
