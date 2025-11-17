@@ -7387,7 +7387,7 @@ begin
     editTags.RemoveConfirmMessage := rremovetag;
     editTags.RemoveConfirmTitle := rremovetagtitle;
     editTags.TextHint := renternewtag;
-    editTags.Hint := renternewtaghint;
+    editTags.EditBox.Hint := renternewtaghint;
   end;
 
   if (Assigned(Tasks)) and (Tasks.GroupNames[0] = string.Empty) and (groupTabs.Tabs.Count > 0) then
