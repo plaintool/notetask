@@ -2682,6 +2682,19 @@ begin
       memoNote.ClearSelection;
     end;
     exit;
+  end
+  else
+  if editTags.Focused then
+  begin
+    {$IFDEF UNIX}
+    if not editTags.ReadOnly then
+    begin
+      if editTags.EditBox.SelLength = 0 then
+        editTags.EditBox.SelLength := CalcDeleteCount(editTags.EditBox.Text, editTags.EditBox.SelStart);
+      editTags.EditBox.ClearSelection;
+    end;
+    {$ENDIF}
+    exit;
   end;
 
   if taskGrid.RowCount < 2 then exit;
