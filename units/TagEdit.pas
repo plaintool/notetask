@@ -119,7 +119,7 @@ type
     function Scale(const AValue: integer): integer;
     function GetContrastTextColor(BackColor, FontColor: TColor; MidLevel: integer = 128): TColor;
     procedure HandlePopupMenu(Sender: TObject);
-    function RandTagColor(const TagName: string; Brightness, Saturation: integer): TColor;
+    function RandTagColor(const ATag: string; Brightness, Saturation: integer): TColor;
     function FindTagColor(const S: string): TColor;
     procedure DrawTags;
     procedure DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
@@ -1508,12 +1508,13 @@ begin
     inherited DoContextPopup(MousePos, Handled);
 end;
 
-function TTagEdit.RandTagColor(const TagName: string; Brightness, Saturation: integer): TColor;
+function TTagEdit.RandTagColor(const ATag: string; Brightness, Saturation: integer): TColor;
 var
   Hash: longword;
   R, G, B: byte;
   H, S_val, L: single;
   i: integer;
+  TagName: string;
 
 // Helper functions for RGB/HSL conversion
   procedure RGBToHSL(R, G, B: byte; out H, S, L: single);
@@ -1597,6 +1598,7 @@ var
 
 begin
   // Generate stable hash (FNV-1a)
+  TagName := lowercase(ATag);
   Hash := FAutoColorSeed;
   if TagName <> string.Empty then
     for i := 1 to Length(TagName) do

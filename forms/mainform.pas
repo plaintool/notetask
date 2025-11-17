@@ -805,7 +805,7 @@ begin
   editTags.TagHoverColor := clNone;
   editTags.TagSuffixColor := clGrayWhite;
   editTags.RoundCorners := 25;
-  editTags.AutoColorSeed := 1887060975;
+  editTags.AutoColorSeed := 14;
   editTags.AutoColorBrigtness := TagsColorBrigtness;
   editTags.AutoColorSaturation := TagsColorSaturation;
   editTags.BackSpaceEditTag := True;
