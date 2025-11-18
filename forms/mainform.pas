@@ -801,7 +801,7 @@ begin
   editTags.Align := alTop;
   editTags.AutoSizeHeight := True;
   editTags.DragIndicatorColor := clRed;
-  editTags.SelectionRectColor := clRed;
+  editTags.SelectionRectColor := clSilver;
   editTags.TagHoverColor := clNone;
   editTags.TagSuffixColor := clGrayWhite;
   editTags.RoundCorners := 25;

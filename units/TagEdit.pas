@@ -1,5 +1,6 @@
 //-----------------------------------------------------------------------------------
 //  TTagEdit © 2025 by Alexander Tverskoy
+//  https://github.com/plaintool/TagEdit
 //  Licensed under the MIT License
 //  You may obtain a copy of the License at https://opensource.org/licenses/MIT
 //-----------------------------------------------------------------------------------
@@ -30,20 +31,25 @@ type
   TTagReorderEvent = procedure(Sender: TObject; const TagText: string; const NewIndex: integer) of object;
   TTagPopupEvent = procedure(Sender: TObject; const TagText: string; var Handled: boolean) of object;
 
-  TTagEdit = class(TCustomControl)
+  { TCustomTagEdit }
+
+  TCustomTagEdit = class(TCustomControl)
   private
     FTags: TStringList;
     FTagRects: array of TRect;
+    FTagColors: TTagColorItems;
+    FSelectedTags: TStringList;
 
     FEdit: TEdit;
     FColor: TColor;
     FTagColor: TColor;
     FTagSuffixColor: TColor;
+    FTagHoverColor: TColor;
     FTagBorderColor: TColor;
     FBorderColor: TColor;
-    FTagHoverColor: TColor;
+    FSelectionColor: TColor;
+    FSelectionRectColor: TColor;
     FDragIndicatorColor: TColor;
-    FTagColors: TTagColorItems;
 
     FAutoSizeHeight: boolean;
     FAllowReorder: boolean;
@@ -62,6 +68,12 @@ type
     FRoundCorners: integer;
     FTagBorderWidth: integer;
     FEditMinWidth: integer;
+
+    FSelecting: boolean;
+    FSelectionRectPenStyle: TPenStyle;
+    FSelectionRectWidth: integer;
+    FSelectionStart: TPoint;
+    FSelectionRect: TRect;
 
     FDragging: boolean;
     FDragIndex: integer;
@@ -86,120 +98,86 @@ type
     FOnTagPopup: TTagPopupEvent;
     FOnChange: TNotifyEvent;
 
-    // Selection support
-    FSelectionColor: TColor;
-    FSelectionRectColor: TColor;
-    FSelectionRectPenStyle: TPenStyle;
-    FSelectionRectWidth: integer;
-    FSelectedTags: TStringList;
-    FSelecting: boolean;
-    FSelectionStart: TPoint;
-    FSelectionRect: TRect;
-
-    procedure EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure EditExit(Sender: TObject);
     function GetTags: TStringList;
+    function GetTagHeight(AFontSize: integer = -1): integer;
+    function GetTagRect(Index: integer): TRect;
+    function GetHoveredTag: string;
+    function GetSelectedTags: TStringList;
+
     procedure SetTags(Value: TStringList);
     procedure SetFont(Value: TFont);
     procedure SetParentFont(Value: boolean);
     procedure SetReadOnly(Value: boolean);
     procedure SetTextHint(Value: TTranslateString);
-    procedure TagsChanged(Sender: TObject);
+    procedure SetSelectionColor(Value: TColor);
+    procedure SetTagColors(Value: TTagColorItems);
+
     function RemovalConfirmed(idx: integer = -1): boolean;
-    function GetTagHeight(AFontSize: integer = -1): integer;
-    function GetTagRect(Index: integer): TRect;
-    function GetHoveredTag: string;
     function TagAtPos(const P: TPoint): integer;
     procedure UpdateEditPosition;
     procedure UpdateHoverState(X, Y: integer);
     function CoalesceInt(const A, B: integer; const C: integer = 0): integer;
     procedure SetAutoSizeHeight(Value: boolean);
+    function CalculateAutoHeight: integer;
+    function IsInSelectionRect(const R: TRect): boolean;
+    procedure UpdateSelection(X, Y: integer);
     procedure UpdateAutoHeight;
-    procedure SetTagColors(Value: TTagColorItems);
     function Scale(const AValue: integer): integer;
     function GetContrastTextColor(BackColor, FontColor: TColor; MidLevel: integer = 128): TColor;
-    procedure HandlePopupMenu(Sender: TObject);
     function RandTagColor(const ATag: string; Brightness, Saturation: integer): TColor;
     function FindTagColor(const S: string): TColor;
     procedure DrawTags;
     procedure DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
       AAvailWidth: integer; AHoverIndex: integer = -1; AShowCloseButtons: boolean = True; var ATagRects: array of TRect;
       AFontSize: integer = -1; AIndent: integer = 4; ABlend: integer = 0; ABlendColor: TColor = clNone; ADrawSelection: boolean = True);
-
-    // Selection methods
-    procedure SetSelectionColor(Value: TColor);
-    function IsInSelectionRect(const R: TRect): boolean;
-    procedure UpdateSelection(X, Y: integer);
-    function GetSelectedTags: TStringList;
-
-    procedure EditMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure EditMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
-    procedure EditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
   protected
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
-    procedure MouseMove(Shift: TShiftState; X, Y: integer); override;
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
-    procedure MouseLeave; override;
     procedure SetEnabled(Value: boolean); override;
+    procedure SetParent(AParent: TWinControl); override;
     procedure Resize; override;
     procedure SetColor(Value: TColor); override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: boolean); override;
     procedure Paint; override;
-  public
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure AddTag(const ATag: string);
-    procedure RemoveTag(const ATag: string; AConfirm: boolean = False);
-    property EditBox: TEdit read FEdit;
-    procedure ParentFontChange(Sender: TObject);
+
+    // Event handlers
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
+    procedure MouseLeave; override;
+    procedure EditMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure EditMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+    procedure EditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure EditExit(Sender: TObject);
+    procedure TagsChanged(Sender: TObject);
     procedure FontChanged(Sender: TObject); override;
-    procedure SetParent(AParent: TWinControl); override;
-    function CalculateAutoHeight: integer;
-    procedure ScaleFontsPPI(const AToPPI: integer; const AProportion: double); override;
-    procedure FixDesignFontsPPI(const ADesignTimePPI: integer); override;
-    function Focused: boolean; override;
-    procedure CopyHoverText;
-    procedure RemoveSelectedTags;
-    procedure FinishEdit;
-    function BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
-    function GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;
-      ABlend: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
-    property HoveredTag: string read GetHoveredTag;
-    procedure ClearSelection;
-    procedure SelectAll;
-    property SelectedTags: TStringList read GetSelectedTags;
-  published
-    property Align;
-    property Anchors;
-    property Visible;
-    property ShowHint;
-    property PopupMenu;
-    property DoubleBuffered;
-    property ParentDoubleBuffered;
+    procedure ParentFontChange(Sender: TObject);
+    procedure HandlePopupMenu(Sender: TObject);
+
+    // Properties
     property Height default 32;
     property Width default 300;
     property Tag default 0;
     property Color read FColor write SetColor default clWindow;
     property Font: TFont read FFont write SetFont;
-    property AutoSizeHeight: boolean read FAutoSizeHeight write SetAutoSizeHeight default False;
     property AllowReorder: boolean read FAllowReorder write FAllowReorder default True;
     property AllowSelect: boolean read FAllowSelect write FAllowSelect default True;
-    property TagHoverUnderline: boolean read FTagHoverUnderline write FTagHoverUnderline default True;
+    property AutoSizeHeight: boolean read FAutoSizeHeight write SetAutoSizeHeight default False;
+    property AutoColorBrigtness: integer read FAutoColorBrigtness write FAutoColorBrigtness default 80;
+    property AutoColorSaturation: integer read FAutoColorSaturation write FAutoColorSaturation default 80;
+    property AutoColorSeed: longword read FAutoColorSeed write FAutoColorSeed default 0;
     property CloseButtons: boolean read FCloseButtons write FCloseButtons default True;
     property CloseButtonOnHover: boolean read FCloseButtonOnHover write FCloseButtonOnHover default True;
+    property TagHoverUnderline: boolean read FTagHoverUnderline write FTagHoverUnderline default True;
     property BackSpaceEditTag: boolean read FBackspaceEditTag write FBackspaceEditTag default False;
     property TagColor: TColor read FTagColor write FTagColor default clNone;
     property TagSuffixColor: TColor read FTagSuffixColor write FTagSuffixColor default clWhite;
     property TagHoverColor: TColor read FTagHoverColor write FTagHoverColor default clHighlight;
     property TagBorderColor: TColor read FTagBorderColor write FTagBorderColor default clNone;
     property DragIndicatorColor: TColor read FDragIndicatorColor write FDragIndicatorColor default clRed;
-    property AutoColorBrigtness: integer read FAutoColorBrigtness write FAutoColorBrigtness default 80;
-    property AutoColorSaturation: integer read FAutoColorSaturation write FAutoColorSaturation default 80;
-    property AutoColorSeed: longword read FAutoColorSeed write FAutoColorSeed default 0;
-    property TagBorderWidth: integer read FTagBorderWidth write FTagBorderWidth default 2;
     property BorderColor: TColor read FBorderColor write FBorderColor default clWindowFrame;
     property BorderWidth: integer read FBorderWidth write FBorderWidth default 0;
     property RoundCorners: integer read FRoundCorners write FRoundCorners default 5;
+    property TagBorderWidth: integer read FTagBorderWidth write FTagBorderWidth default 2;
     property EditMinWidth: integer read FEditMinWidth write FEditMinWidth default 50;
     property RemoveConfirm: boolean read FRemoveConfirm write FRemoveConfirm default True;
     property RemoveConfirmTitle: TTranslateString read FRemoveConfirmTitle write FRemoveConfirmTitle;
@@ -209,14 +187,15 @@ type
     property ReadOnly: boolean read FReadOnly write SetReadOnly default False;
     property Enabled: boolean read FEnabled write SetEnabled;
     property TagColors: TTagColorItems read FTagColors write SetTagColors;
-
-    // Selection property
+    property HoveredTag: string read GetHoveredTag;
     property SelectionColor: TColor read FSelectionColor write SetSelectionColor default clHighlight;
     property SelectionRectColor: TColor read FSelectionRectColor write FSelectionRectColor default clHighlight;
     property SelectionRectPenStyle: TPenStyle read FSelectionRectPenStyle write FSelectionRectPenStyle default psDash;
     property SelectionRectWidth: integer read FSelectionRectWidth write FSelectionRectWidth default 1;
 
+    property EditBox: TEdit read FEdit;
     property Items: TStringList read GetTags write SetTags;
+    property SelectedTags: TStringList read GetSelectedTags;
 
     property OnTagClick: TTagEvent read FOnTagClick write FOnTagClick;
     property OnTagPopup: TTagPopupEvent read FOnTagPopup write FOnTagPopup;
@@ -224,23 +203,125 @@ type
     property OnTagAdd: TTagEvent read FOnTagAdd write FOnTagAdd;
     property OnTagRemove: TTagEvent read FOnTagRemove write FOnTagRemove;
     property OnTagReorder: TTagReorderEvent read FOnTagReorder write FOnTagReorder;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure AddTag(const ATag: string);
+    procedure RemoveTag(const ATag: string; AConfirm: boolean = False);
+    function Focused: boolean; override;
+    procedure CopyHoverText;
+    procedure RemoveSelectedTags;
+    procedure FinishEdit;
+    procedure SelectAll;
+    procedure ClearSelection;
+    procedure ScaleFontsPPI(const AToPPI: integer; const AProportion: double); override;
+    procedure FixDesignFontsPPI(const ADesignTimePPI: integer); override;
+    function BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
+    function GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;
+      ABlend: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
+  end;
+
+  { TTagEdit }
+
+  TTagEdit = class(TCustomTagEdit)
+  public
+    property EditBox;
+    property HoveredTag;
+    property SelectedTags;
+  published
+    property Align;
+    property Anchors;
+    property BidiMode;
+    property BorderSpacing;
+    property BorderWidth;
+    property BorderColor;
+    property RoundCorners;
+    property Constraints;
+    property Cursor;
+    property DragCursor;
+    property DragKind;
+    property DragMode;
+    property Enabled;
+    property HelpContext;
+    property HelpKeyword;
+    property HelpType;
+    property Hint;
+    property Font;
+    property Visible;
+    property DoubleBuffered;
+    property ParentDoubleBuffered;
+    property ParentBiDiMode;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Height;
+    property Width;
+    property Tag;
+    property Color;
+    property AutoSizeHeight;
+    property AllowReorder;
+    property AllowSelect;
+    property TagHoverUnderline;
+    property CloseButtons;
+    property CloseButtonOnHover;
+    property BackSpaceEditTag;
+    property TagColor;
+    property TagSuffixColor;
+    property TagHoverColor;
+    property TagBorderColor;
+    property TagBorderWidth;
+    property DragIndicatorColor;
+    property AutoColorBrigtness;
+    property AutoColorSaturation;
+    property AutoColorSeed;
+    property EditMinWidth;
+    property RemoveConfirm;
+    property RemoveConfirmTitle;
+    property RemoveConfirmMessage;
+    property TextHint;
+    property ParentFont;
+    property ReadOnly;
+    property TagColors;
+    property SelectionColor;
+    property SelectionRectColor;
+    property SelectionRectPenStyle;
+    property SelectionRectWidth;
+    property Items;
+    // events
+    property OnTagClick;
+    property OnTagPopup;
+    property OnChange;
+    property OnTagAdd;
+    property OnTagRemove;
+    property OnTagReorder;
+    property OnChangeBounds;
     property OnClick;
+    property OnContextPopup;
     property OnDblClick;
+    property OnEditingDone;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
     property OnMouseDown;
-    property OnMouseUp;
-    property OnMouseMove;
     property OnMouseEnter;
     property OnMouseLeave;
-    property OnKeyDown;
-    property OnKeyUp;
-    property OnKeyPress;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseWheelDown;
+    property OnMouseWheelUp;
+    property OnResize;
+    property OnShowHint;
+    property OnUTF8KeyPress;
   end;
 
 implementation
 
-{ TTagEdit }
+{ TCustomTagEdit }
 
-constructor TTagEdit.Create(AOwner: TComponent);
+constructor TCustomTagEdit.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FTagColors := TTagColorItems.Create(Self);
@@ -271,7 +352,7 @@ begin
   FReadOnly := False;
   FEnabled := True;
   FAutoSizeHeight := False;
-  // 2166136267
+
   Randomize;
   FAutoColorSeed := Random(High(longword));
   FAllowReorder := True;
@@ -296,7 +377,7 @@ begin
   FRoundCorners := Scale(5);
   FAutoColorBrigtness := 80;
   FAutoColorSaturation := 80;
-  FTextHint := 'Enter new tag...';
+
   // Create inner edit control
   FEdit := TEdit.Create(Self);
   if not (csDesigning in ComponentState) then
@@ -332,7 +413,7 @@ begin
   FMouseDownIndex := -1;
 end;
 
-destructor TTagEdit.Destroy;
+destructor TCustomTagEdit.Destroy;
 begin
   FTags.Free;
   FFont.Free;
@@ -342,25 +423,45 @@ begin
   inherited Destroy;
 end;
 
-procedure TTagEdit.SetTagColors(Value: TTagColorItems);
+function TCustomTagEdit.GetTagHeight(AFontSize: integer = -1): integer;
 begin
-  FTagColors.Assign(Value);
-  Invalidate;
+  Result := Scale(ifthen(AFontSize > -1, AFontSize, CoalesceInt(Font.Size, Screen.SystemFont.Size, 8)) * 2 + 6);
 end;
 
-function TTagEdit.GetTags: TStringList;
+function TCustomTagEdit.GetTagRect(Index: integer): TRect;
+begin
+  if (Index >= 0) and (Index <= High(FTagRects)) then
+    Result := FTagRects[Index]
+  else
+    Result := Rect(0, 0, 0, 0);
+end;
+
+function TCustomTagEdit.GetHoveredTag: string;
+begin
+  if (FHoverIndex >= 0) then
+    Result := FTags[FHoverIndex]
+  else
+    Result := string.Empty;
+end;
+
+function TCustomTagEdit.GetSelectedTags: TStringList;
+begin
+  Result := FSelectedTags;
+end;
+
+function TCustomTagEdit.GetTags: TStringList;
 begin
   Result := FTags;
 end;
 
-procedure TTagEdit.SetTags(Value: TStringList);
+procedure TCustomTagEdit.SetTags(Value: TStringList);
 begin
   FTags.Assign(Value);
   Invalidate;
   UpdateAutoHeight;
 end;
 
-procedure TTagEdit.SetColor(Value: TColor);
+procedure TCustomTagEdit.SetColor(Value: TColor);
 begin
   inherited;
   FColor := Value;
@@ -368,14 +469,53 @@ begin
     FEdit.Color := Value;
 end;
 
-procedure TTagEdit.SetTextHint(Value: TTranslateString);
+procedure TCustomTagEdit.SetTagColors(Value: TTagColorItems);
+begin
+  FTagColors.Assign(Value);
+  Invalidate;
+end;
+
+procedure TCustomTagEdit.SetSelectionColor(Value: TColor);
+begin
+  if FSelectionColor <> Value then
+  begin
+    FSelectionColor := Value;
+    Invalidate;
+  end;
+end;
+
+procedure TCustomTagEdit.SetTextHint(Value: TTranslateString);
 begin
   FTextHint := Value;
   if Assigned(FEdit) then
     FEdit.TextHint := Value;
 end;
 
-procedure TTagEdit.SetFont(Value: TFont);
+procedure TCustomTagEdit.SetReadOnly(Value: boolean);
+begin
+  FReadOnly := Value;
+  FEdit.Visible := not Value and FEnabled;
+  Invalidate;
+end;
+
+procedure TCustomTagEdit.SetEnabled(Value: boolean);
+begin
+  inherited;
+  FEnabled := Value;
+  FEdit.Visible := Value and not FReadOnly;
+end;
+
+procedure TCustomTagEdit.SetAutoSizeHeight(Value: boolean);
+begin
+  if FAutoSizeHeight <> Value then
+  begin
+    FAutoSizeHeight := Value;
+    if FAutoSizeHeight then
+      UpdateAutoHeight;
+  end;
+end;
+
+procedure TCustomTagEdit.SetFont(Value: TFont);
 begin
   if Value <> nil then
   begin
@@ -387,7 +527,7 @@ begin
   end;
 end;
 
-procedure TTagEdit.SetParent(AParent: TWinControl);
+procedure TCustomTagEdit.SetParent(AParent: TWinControl);
 begin
   inherited SetParent(AParent);
   if FParentFont and (AParent <> nil) then
@@ -398,7 +538,7 @@ begin
   end;
 end;
 
-procedure TTagEdit.SetParentFont(Value: boolean);
+procedure TCustomTagEdit.SetParentFont(Value: boolean);
 begin
   FParentFont := Value;
 
@@ -434,33 +574,12 @@ begin
   UpdateAutoHeight;
 end;
 
-procedure TTagEdit.ParentFontChange(Sender: TObject);
-begin
-  if FParentFont and (Parent <> nil) then
-  begin
-    FFont.Assign(Parent.Font);
-    FEdit.Font.Assign(Parent.Font);
-    Invalidate;
-    UpdateAutoHeight;
-  end;
-end;
-
-procedure TTagEdit.FontChanged(Sender: TObject);
-begin
-  inherited;
-  FEdit.Font.Assign(Font);
-  if (Assigned(Parent)) and (not FFont.IsEqual(Parent.Font)) and (not FFont.IsDefault) then
-    FParentFont := False;
-  Invalidate;
-  UpdateAutoHeight;
-end;
-
-function TTagEdit.Scale(const AValue: integer): integer;
+function TCustomTagEdit.Scale(const AValue: integer): integer;
 begin
   Result := Scale96ToScreen(AValue);
 end;
 
-procedure TTagEdit.ScaleFontsPPI(const AToPPI: integer; const AProportion: double);
+procedure TCustomTagEdit.ScaleFontsPPI(const AToPPI: integer; const AProportion: double);
 begin
   inherited ScaleFontsPPI(AToPPI, AProportion);
   if ((not FParentFont) and (FFont.Size <= 0)) or ((FParentFont) and (Assigned(Parent)) and (Parent.Font.Size <= 0)) then
@@ -470,7 +589,7 @@ begin
     DoScaleFontPPI(Parent.Font, AToPPI, AProportion);
 end;
 
-procedure TTagEdit.FixDesignFontsPPI(const ADesignTimePPI: integer);
+procedure TCustomTagEdit.FixDesignFontsPPI(const ADesignTimePPI: integer);
 begin
   inherited FixDesignFontsPPI(ADesignTimePPI);
   if ((not FParentFont) and (FFont.Size <= 0)) or ((FParentFont) and (Assigned(Parent)) and (Parent.Font.Size <= 0)) then
@@ -480,43 +599,12 @@ begin
     DoFixDesignFontPPI(Parent.Font, ADesignTimePPI);
 end;
 
-function TTagEdit.Focused: boolean;
+function TCustomTagEdit.Focused: boolean;
 begin
   Result := FEdit.Focused;
 end;
 
-procedure TTagEdit.SetReadOnly(Value: boolean);
-begin
-  FReadOnly := Value;
-  FEdit.Visible := not Value and FEnabled;
-  Invalidate;
-end;
-
-procedure TTagEdit.SetEnabled(Value: boolean);
-begin
-  inherited;
-  FEnabled := Value;
-  FEdit.Visible := Value and not FReadOnly;
-end;
-
-procedure TTagEdit.SetAutoSizeHeight(Value: boolean);
-begin
-  if FAutoSizeHeight <> Value then
-  begin
-    FAutoSizeHeight := Value;
-    if FAutoSizeHeight then
-      UpdateAutoHeight;
-  end;
-end;
-
-procedure TTagEdit.TagsChanged(Sender: TObject);
-begin
-  FHoverIndex := -1; // Reset hover state when Items change
-  Invalidate;
-  UpdateAutoHeight;
-end;
-
-function TTagEdit.RemovalConfirmed(idx: integer = -1): boolean;
+function TCustomTagEdit.RemovalConfirmed(idx: integer = -1): boolean;
 begin
   if not RemoveConfirm then
     exit(True);
@@ -526,7 +614,7 @@ begin
     Result := MessageDlg(FRemoveConfirmTitle, FRemoveConfirmMessage + '?', mtConfirmation, [mbYes, mbNo], 0) = mrYes;
 end;
 
-procedure TTagEdit.AddTag(const ATag: string);
+procedure TCustomTagEdit.AddTag(const ATag: string);
 var
   SL: TStringList;
   i: integer;
@@ -576,7 +664,7 @@ begin
     FEdit.Text := EditValue;
 end;
 
-procedure TTagEdit.RemoveTag(const ATag: string; AConfirm: boolean = False);
+procedure TCustomTagEdit.RemoveTag(const ATag: string; AConfirm: boolean = False);
 var
   i: integer;
 begin
@@ -596,7 +684,7 @@ begin
   end;
 end;
 
-procedure TTagEdit.RemoveSelectedTags;
+procedure TCustomTagEdit.RemoveSelectedTags;
 var
   I: integer;
   TagToRemove: string;
@@ -631,28 +719,7 @@ begin
   UpdateAutoHeight;
 end;
 
-function TTagEdit.GetTagHeight(AFontSize: integer = -1): integer;
-begin
-  Result := Scale(ifthen(AFontSize > -1, AFontSize, CoalesceInt(Font.Size, Screen.SystemFont.Size, 8)) * 2 + 6);
-end;
-
-function TTagEdit.GetTagRect(Index: integer): TRect;
-begin
-  if (Index >= 0) and (Index <= High(FTagRects)) then
-    Result := FTagRects[Index]
-  else
-    Result := Rect(0, 0, 0, 0);
-end;
-
-function TTagEdit.GetHoveredTag: string;
-begin
-  if (FHoverIndex >= 0) then
-    Result := FTags[FHoverIndex]
-  else
-    Result := string.Empty;
-end;
-
-procedure TTagEdit.UpdateEditPosition;
+procedure TCustomTagEdit.UpdateEditPosition;
 var
   LastRect: TRect;
   NewLeft, NewTop: integer;
@@ -712,7 +779,7 @@ begin
   end;
 end;
 
-function TTagEdit.CoalesceInt(const A, B: integer; const C: integer = 0): integer;
+function TCustomTagEdit.CoalesceInt(const A, B: integer; const C: integer = 0): integer;
 begin
   if A > 0 then
     Result := A
@@ -723,7 +790,7 @@ begin
     Result := C;
 end;
 
-function TTagEdit.CalculateAutoHeight: integer;
+function TCustomTagEdit.CalculateAutoHeight: integer;
 var
   I: integer;
   X, Y, W, H: integer;
@@ -780,7 +847,7 @@ begin
     Inc(Result, FBorderWidth);
 end;
 
-procedure TTagEdit.UpdateAutoHeight;
+procedure TCustomTagEdit.UpdateAutoHeight;
 begin
   if FAutoSizeHeight and (not (Align in [alClient, alRight, alLeft])) then
   begin
@@ -788,13 +855,13 @@ begin
   end;
 end;
 
-procedure TTagEdit.Resize;
+procedure TCustomTagEdit.Resize;
 begin
   inherited Resize;
   UpdateAutoHeight;
 end;
 
-function TTagEdit.GetContrastTextColor(BackColor, FontColor: TColor; MidLevel: integer = 128): TColor;
+function TCustomTagEdit.GetContrastTextColor(BackColor, FontColor: TColor; MidLevel: integer = 128): TColor;
 var
   Rb, Gb, Bb: byte; // background
   Rf, Gf, Bf: byte; // font
@@ -838,7 +905,7 @@ begin
     Result := FontColor;
 end;
 
-function TTagEdit.TagAtPos(const P: TPoint): integer;
+function TCustomTagEdit.TagAtPos(const P: TPoint): integer;
 var
   i: integer;
   R: TRect;
@@ -855,7 +922,7 @@ begin
   Result := -1;
 end;
 
-procedure TTagEdit.UpdateHoverState(X, Y: integer);
+procedure TCustomTagEdit.UpdateHoverState(X, Y: integer);
 var
   NewHoverIndex: integer;
 begin
@@ -868,7 +935,41 @@ begin
   end;
 end;
 
-procedure TTagEdit.CopyHoverText;
+function TCustomTagEdit.IsInSelectionRect(const R: TRect): boolean;
+begin
+  Result := (FSelectionRect.Left <= R.Right) and (FSelectionRect.Right >= R.Left) and (FSelectionRect.Top <= R.Bottom) and
+    (FSelectionRect.Bottom >= R.Top);
+end;
+
+procedure TCustomTagEdit.UpdateSelection(X, Y: integer);
+var
+  I: integer;
+  TagRect: TRect;
+begin
+  // Update selection rectangle
+  FSelectionRect := Rect(Min(FSelectionStart.X, X), Min(FSelectionStart.Y, Y), Max(FSelectionStart.X, X), Max(FSelectionStart.Y, Y));
+
+  // Update selected tags based on selection rectangle
+  for I := 0 to FTags.Count - 1 do
+  begin
+    TagRect := GetTagRect(I);
+    if IsInSelectionRect(TagRect) then
+    begin
+      // Add to selection if not already selected
+      if FSelectedTags.IndexOf(FTags[I]) = -1 then
+        FSelectedTags.Add(FTags[I]);
+    end
+    else
+    begin
+      // Remove from selection if no longer in selection rect
+      if FSelectedTags.IndexOf(FTags[I]) <> -1 then
+        FSelectedTags.Delete(FSelectedTags.IndexOf(FTags[I]));
+    end;
+  end;
+  Invalidate;
+end;
+
+procedure TCustomTagEdit.CopyHoverText;
 var
   MousePos: TPoint;
   TagIndex: integer;
@@ -890,13 +991,60 @@ begin
   end;
 end;
 
-procedure TTagEdit.FinishEdit;
+procedure TCustomTagEdit.FinishEdit;
 begin
   if FEdit.Text <> string.Empty then
     AddTag(Trim(FEdit.Text));
 end;
 
-procedure TTagEdit.EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+procedure TCustomTagEdit.ClearSelection;
+begin
+  if FSelectedTags.Count > 0 then
+  begin
+    FSelectedTags.Clear;
+    Invalidate;
+  end;
+end;
+
+procedure TCustomTagEdit.SelectAll;
+var
+  I: integer;
+begin
+  FSelectedTags.Clear;
+  for I := 0 to FTags.Count - 1 do
+    FSelectedTags.Add(FTags[I]);
+  Invalidate;
+end;
+
+procedure TCustomTagEdit.ParentFontChange(Sender: TObject);
+begin
+  if FParentFont and (Parent <> nil) then
+  begin
+    FFont.Assign(Parent.Font);
+    FEdit.Font.Assign(Parent.Font);
+    Invalidate;
+    UpdateAutoHeight;
+  end;
+end;
+
+procedure TCustomTagEdit.FontChanged(Sender: TObject);
+begin
+  inherited;
+  FEdit.Font.Assign(Font);
+  if (Assigned(Parent)) and (not FFont.IsEqual(Parent.Font)) and (not FFont.IsDefault) then
+    FParentFont := False;
+  Invalidate;
+  UpdateAutoHeight;
+end;
+
+procedure TCustomTagEdit.TagsChanged(Sender: TObject);
+begin
+  FHoverIndex := -1; // Reset hover state when Items change
+  Invalidate;
+  UpdateAutoHeight;
+end;
+
+procedure TCustomTagEdit.EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   ATag: string;
 begin
@@ -961,7 +1109,7 @@ begin
     OnKeyDown(Sender, Key, Shift);
 end;
 
-procedure TTagEdit.EditMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+procedure TCustomTagEdit.EditMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
   GlobalPos: TPoint;
 begin
@@ -979,7 +1127,7 @@ begin
     Exit;
   end;
 
-  // Convert coordinates from FEdit coordinate system to TTagEdit coordinate system
+  // Convert coordinates from FEdit coordinate system to TCustomTagEdit coordinate system
   GlobalPos := FEdit.ClientToScreen(Point(X, Y));
   GlobalPos := Self.ScreenToClient(GlobalPos);
 
@@ -990,7 +1138,7 @@ begin
   // Just store the position for potential selection start
 end;
 
-procedure TTagEdit.EditMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+procedure TCustomTagEdit.EditMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
   GlobalPos: TPoint;
   DragThreshold: integer;
@@ -1001,7 +1149,7 @@ begin
   if FEdit.Text <> '' then
     Exit;
 
-  // Convert coordinates from FEdit coordinate system to TTagEdit coordinate system
+  // Convert coordinates from FEdit coordinate system to TCustomTagEdit coordinate system
   GlobalPos := FEdit.ClientToScreen(Point(X, Y));
   GlobalPos := Self.ScreenToClient(GlobalPos);
 
@@ -1037,13 +1185,13 @@ begin
   end;
 end;
 
-procedure TTagEdit.EditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+procedure TCustomTagEdit.EditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
   GlobalPos: TPoint;
 begin
   if csDesigning in ComponentState then exit;
 
-  // Convert coordinates from FEdit coordinate system to TTagEdit coordinate system
+  // Convert coordinates from FEdit coordinate system to TCustomTagEdit coordinate system
   GlobalPos := FEdit.ClientToScreen(Point(X, Y));
   GlobalPos := Self.ScreenToClient(GlobalPos);
 
@@ -1076,80 +1224,13 @@ begin
   MouseUp(Button, Shift, GlobalPos.X, GlobalPos.Y);
 end;
 
-procedure TTagEdit.EditExit(Sender: TObject);
+procedure TCustomTagEdit.EditExit(Sender: TObject);
 begin
   // When leaving the edit, add tag if not empty
   FinishEdit;
 end;
 
-procedure TTagEdit.SetSelectionColor(Value: TColor);
-begin
-  if FSelectionColor <> Value then
-  begin
-    FSelectionColor := Value;
-    Invalidate;
-  end;
-end;
-
-function TTagEdit.IsInSelectionRect(const R: TRect): boolean;
-begin
-  Result := (FSelectionRect.Left <= R.Right) and (FSelectionRect.Right >= R.Left) and (FSelectionRect.Top <= R.Bottom) and
-    (FSelectionRect.Bottom >= R.Top);
-end;
-
-procedure TTagEdit.UpdateSelection(X, Y: integer);
-var
-  I: integer;
-  TagRect: TRect;
-begin
-  // Update selection rectangle
-  FSelectionRect := Rect(Min(FSelectionStart.X, X), Min(FSelectionStart.Y, Y), Max(FSelectionStart.X, X), Max(FSelectionStart.Y, Y));
-
-  // Update selected tags based on selection rectangle
-  for I := 0 to FTags.Count - 1 do
-  begin
-    TagRect := GetTagRect(I);
-    if IsInSelectionRect(TagRect) then
-    begin
-      // Add to selection if not already selected
-      if FSelectedTags.IndexOf(FTags[I]) = -1 then
-        FSelectedTags.Add(FTags[I]);
-    end
-    else
-    begin
-      // Remove from selection if no longer in selection rect
-      if FSelectedTags.IndexOf(FTags[I]) <> -1 then
-        FSelectedTags.Delete(FSelectedTags.IndexOf(FTags[I]));
-    end;
-  end;
-  Invalidate;
-end;
-
-procedure TTagEdit.ClearSelection;
-begin
-  if FSelectedTags.Count > 0 then
-  begin
-    FSelectedTags.Clear;
-    Invalidate;
-  end;
-end;
-
-procedure TTagEdit.SelectAll;
-var
-  I: integer;
-begin
-  FSelectedTags.Clear;
-  for I := 0 to FTags.Count - 1 do
-    FSelectedTags.Add(FTags[I]);
-  Invalidate;
-end;
-
-function TTagEdit.GetSelectedTags: TStringList;
-begin
-  Result := FSelectedTags;
-end;
-
-procedure TTagEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+procedure TCustomTagEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
   idx, M: integer;
   R: TRect;
@@ -1204,7 +1285,7 @@ begin
   end;
 end;
 
-procedure TTagEdit.MouseMove(Shift: TShiftState; X, Y: integer);
+procedure TCustomTagEdit.MouseMove(Shift: TShiftState; X, Y: integer);
 var
   idx: integer;
   NewDropIndex: integer;
@@ -1303,7 +1384,7 @@ begin
   end;
 end;
 
-procedure TTagEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+procedure TCustomTagEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
   TempTag: string;
   idx, M: integer;
@@ -1405,7 +1486,7 @@ begin
   end;
 end;
 
-procedure TTagEdit.MouseLeave;
+procedure TCustomTagEdit.MouseLeave;
 var
   Form: TCustomForm;
 begin
@@ -1435,7 +1516,7 @@ begin
   {$ENDIF}
 end;
 
-procedure TTagEdit.HandlePopupMenu(Sender: TObject);
+procedure TCustomTagEdit.HandlePopupMenu(Sender: TObject);
 var
   MousePos: TPoint;
   TagIndex: integer;
@@ -1470,7 +1551,7 @@ begin
   end;
 end;
 
-procedure TTagEdit.DoContextPopup(MousePos: TPoint; var Handled: boolean);
+procedure TCustomTagEdit.DoContextPopup(MousePos: TPoint; var Handled: boolean);
 var
   TagIndex: integer;
 begin
@@ -1494,7 +1575,7 @@ begin
     inherited DoContextPopup(MousePos, Handled);
 end;
 
-function TTagEdit.RandTagColor(const ATag: string; Brightness, Saturation: integer): TColor;
+function TCustomTagEdit.RandTagColor(const ATag: string; Brightness, Saturation: integer): TColor;
 var
   Hash: longword;
   R, G, B: byte;
@@ -1611,7 +1692,7 @@ begin
   Result := RGBToColor(R, G, B);
 end;
 
-function TTagEdit.FindTagColor(const S: string): TColor;
+function TCustomTagEdit.FindTagColor(const S: string): TColor;
 var
   i: integer;
 begin
@@ -1623,7 +1704,7 @@ begin
   end;
 end;
 
-procedure TTagEdit.Paint;
+procedure TCustomTagEdit.Paint;
 var
   R: TRect;
 begin
@@ -1698,7 +1779,7 @@ begin
   end;
 end;
 
-procedure TTagEdit.DrawTags;
+procedure TCustomTagEdit.DrawTags;
 var
   AvailWidth: integer;
 begin
@@ -1716,7 +1797,7 @@ begin
     UpdateEditPosition;
 end;
 
-procedure TTagEdit.DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
+procedure TCustomTagEdit.DrawTagsToCanvas(const ATags: TStringList; ACanvas: TCanvas; ATagHeight: integer;
   AAvailWidth: integer; AHoverIndex: integer = -1; AShowCloseButtons: boolean = True; var ATagRects: array of TRect;
   AFontSize: integer = -1; AIndent: integer = 4; ABlend: integer = 0; ABlendColor: TColor = clNone; ADrawSelection: boolean = True);
 var
@@ -1952,8 +2033,8 @@ begin
   end;
 end;
 
-function TTagEdit.GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer; ATagHeightDelta: integer = 0;
-  ABlend: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
+function TCustomTagEdit.GetTagsBitmap(ATags: TStringList; AFontSize, AWidth, AHeight: integer;
+  ATagHeightDelta: integer = 0; ABlend: integer = 0; ABlendColor: TColor = clWhite): TBitmap;
 var
   TempBitmap: TBitmap;
   TempTagRects: array of TRect = ();
@@ -2049,7 +2130,7 @@ begin
   end;
 end;
 
-function TTagEdit.BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
+function TCustomTagEdit.BlendColors(Color1, Color2: TColor; Intensity: integer): TColor;
 var
   R1, G1, B1: byte;
   R2, G2, B2: byte;
