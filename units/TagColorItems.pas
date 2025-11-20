@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------------
-//  TTagEdit © 2025 by Alexander Tverskoy
+//  TagColorItems © 2025 by Alexander Tverskoy
 //  https://github.com/plaintool/TagEdit
 //  Licensed under the MIT License
 //  You may obtain a copy of the License at https://opensource.org/licenses/MIT

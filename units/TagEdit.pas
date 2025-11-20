@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------------
-//  TTagEdit © 2025 by Alexander Tverskoy
+//  TagEdit © 2025 by Alexander Tverskoy
 //  https://github.com/plaintool/TagEdit
 //  Licensed under the MIT License
 //  You may obtain a copy of the License at https://opensource.org/licenses/MIT
@@ -24,7 +24,8 @@ uses
   Clipbrd,
   LCLType,
   LCLIntf,
-  TagColorItems;
+  TagColorItems,
+  TagCheckPopup;
 
 type
   TTagEvent = procedure(Sender: TObject; const TagText: string) of object;
@@ -42,6 +43,7 @@ type
     FSuggestedTags: TStringList;
 
     FEdit: TEdit;
+    FCheckListButton: TCheckListButton;
     FColor: TColor;
     FTagColor: TColor;
     FTagSuffixColor: TColor;
@@ -55,6 +57,7 @@ type
     FAutoSizeHeight: boolean;
     FAllowReorder: boolean;
     FAllowSelect: boolean;
+    FAllowSuggest: boolean;
     FTagHoverUnderline: boolean;
     FCloseButtons: boolean;
     FCloseButtonOnHover: boolean;
@@ -106,6 +109,7 @@ type
     function GetHoveredTag: string;
 
     procedure SetTags(Value: TStringList);
+    procedure SetSuggestedTags(Value: TStringList);
     procedure SetFont(Value: TFont);
     procedure SetParentFont(Value: boolean);
     procedure SetReadOnly(Value: boolean);
@@ -116,6 +120,7 @@ type
     function RemovalConfirmed(idx: integer = -1): boolean;
     function TagAtPos(const P: TPoint): integer;
     procedure UpdateEditPosition;
+    procedure UpdateCheckList;
     procedure UpdateHoverState(X, Y: integer);
     function CoalesceInt(const A, B: integer; const C: integer = 0): integer;
     procedure SetAutoSizeHeight(Value: boolean);
@@ -149,6 +154,8 @@ type
     procedure EditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure EditExit(Sender: TObject);
+    procedure SuggestedChanged(Sender: TObject);
+    procedure CheckListItemChecked(Sender: TObject; Index: integer; Checked: boolean);
     procedure TagsChanged(Sender: TObject);
     procedure FontChanged(Sender: TObject); override;
     procedure ParentFontChange(Sender: TObject);
@@ -162,6 +169,7 @@ type
     property Font: TFont read FFont write SetFont;
     property AllowReorder: boolean read FAllowReorder write FAllowReorder default True;
     property AllowSelect: boolean read FAllowSelect write FAllowSelect default True;
+    property AllowSuggest: boolean read FAllowSuggest write FAllowSuggest default False;
     property AutoSizeHeight: boolean read FAutoSizeHeight write SetAutoSizeHeight default False;
     property AutoColorBrigtness: integer read FAutoColorBrigtness write FAutoColorBrigtness default 80;
     property AutoColorSaturation: integer read FAutoColorSaturation write FAutoColorSaturation default 80;
@@ -197,7 +205,7 @@ type
     property EditBox: TEdit read FEdit;
     property Items: TStringList read GetTags write SetTags;
     property SelectedTags: TStringList read FSelectedTags;
-    property SuggestedTags: TStringList read FSuggestedTags write FSuggestedTags;
+    property SuggestedItems: TStringList read FSuggestedTags write SetSuggestedTags;
 
     property OnTagClick: TTagEvent read FOnTagClick write FOnTagClick;
     property OnTagPopup: TTagPopupEvent read FOnTagPopup write FOnTagPopup;
@@ -233,6 +241,10 @@ type
   published
     property Align;
     property Anchors;
+    property AllowReorder;
+    property AllowSelect;
+    property AllowSuggest;
+    property AutoSizeHeight;
     property BidiMode;
     property BorderSpacing;
     property BorderWidth;
@@ -260,9 +272,6 @@ type
     property Width;
     property Tag;
     property Color;
-    property AutoSizeHeight;
-    property AllowReorder;
-    property AllowSelect;
     property TagHoverUnderline;
     property CloseButtons;
     property CloseButtonOnHover;
@@ -288,7 +297,7 @@ type
     property SelectionRectColor;
     property SelectionRectPenStyle;
     property SelectionRectWidth;
-    property SuggestedTags;
+    property SuggestedItems;
     property Items;
     // events
     property OnTagClick;
@@ -352,6 +361,7 @@ begin
   FSuggestedTags.Sorted := True;
   FSuggestedTags.Duplicates := dupIgnore;
   FSuggestedTags.Delimiter := ';';
+  FSuggestedTags.OnChange := @SuggestedChanged;
 
   Height := Scale(32);
   Width := Scale(300);
@@ -366,6 +376,7 @@ begin
   FAutoColorSeed := Random(High(longword));
   FAllowReorder := True;
   FAllowSelect := True;
+  FAllowSuggest := False;
   FFont := TFont.Create;
   FFont.OnChange := @FontChanged;
   FParentFont := True;
@@ -389,10 +400,12 @@ begin
 
   // Create inner edit control
   FEdit := TEdit.Create(Self);
+  FCheckListButton := TCheckListButton.Create(Self);
   if not (csDesigning in ComponentState) then
   begin
     FEdit.Parent := Self;
     FEdit.DoubleBuffered := FDoubleBuffered;
+    FEdit.AutoSize := False;
     FEdit.TextHint := FTextHint;
     FEdit.BiDiMode := BiDiMode;
     FEdit.ParentFont := True;
@@ -404,6 +417,16 @@ begin
     FEdit.Color := Color;
     FEdit.Left := 4;
     FEdit.Top := 4;
+
+    FCheckListButton.Parent := Self;
+    FCheckListButton.Flat := True;
+    FCheckListButton.Sorted := True;
+    FCheckListButton.Visible := False;
+    FCheckListButton.Caption := '...';
+    FCheckListButton.MultiSelect := True;
+    FCheckListButton.DropDownCount := 15;
+    FCheckListButton.AttachedControl := FEdit;
+    FCheckListButton.OnItemChecked := @CheckListItemChecked;
 
     FEdit.OnMouseDown := @EditMouseDown;
     FEdit.OnMouseMove := @EditMouseMove;
@@ -463,6 +486,11 @@ begin
   FTags.Assign(Value);
   Invalidate;
   UpdateAutoHeight;
+end;
+
+procedure TCustomTagEdit.SetSuggestedTags(Value: TStringList);
+begin
+  FSuggestedTags.Assign(Value);
 end;
 
 procedure TCustomTagEdit.SetColor(Value: TColor);
@@ -773,25 +801,59 @@ begin
       {$ENDIF}
     end;
 
+    if not FAllowSuggest or not FEdit.Visible or (FSuggestedTags.Count = 0) then
+    begin
+      FCheckListButton.Width := 0;
+      FCheckListButton.Visible := False;
+    end
+    else
+    begin
+      if not FCheckListButton.Visible then
+      begin
+        FCheckListButton.Width := Scale(30);
+        FCheckListButton.Visible := True;
+      end;
+    end;
+
     // Set Edit width
-    FEdit.Width := ClientWidth - FBorderWidth - FEdit.Left - Scale(4);
-    if FEdit.Width < FEditMinWidth then
-      FEdit.Width := FEditMinWidth;
-    FEdit.Height := GetTagHeight;
+    FEdit.Width := ClientWidth - FBorderWidth - FEdit.Left - FCheckListButton.Width - Scale(4);
+    if FEdit.Width < FEditMinWidth - FCheckListButton.Width then
+      FEdit.Width := FEditMinWidth - FCheckListButton.Width;
+    FEdit.Height := GetTagHeight - Scale(2);
+
+    // Set CheckListButton
+    if (FAllowSuggest) then
+    begin
+      FCheckListButton.Left := FEdit.Left + FEdit.Width;
+      FCheckListButton.Top := FEdit.Top;
+      FCheckListButton.Height := FEdit.Height;
+    end;
   finally
     FUpdatingEdit := False;
   end;
 end;
 
-function TCustomTagEdit.CoalesceInt(const A, B: integer; const C: integer = 0): integer;
+procedure TCustomTagEdit.UpdateCheckList;
+var
+  i: integer;
 begin
-  if A > 0 then
-    Result := A
-  else
-  if B > 0 then
-    Result := B
-  else
-    Result := C;
+  if not AllowSuggest or not Assigned(FCheckListButton) then exit;
+
+  FCheckListButton.UncheckAll;
+  for i := 0 to FTags.Count - 1 do
+  begin
+    if FCheckListButton.Items.IndexOf(FTags[i]) < 0 then
+      FCheckListButton.Items.Add(FTags[i]);
+    FCheckListButton.CheckedByName[FTags[i]] := True;
+  end;
+end;
+
+procedure TCustomTagEdit.UpdateAutoHeight;
+begin
+  if FAutoSizeHeight and (not (Align in [alClient, alRight, alLeft])) then
+  begin
+    Height := CalculateAutoHeight;
+  end;
 end;
 
 function TCustomTagEdit.CalculateAutoHeight: integer;
@@ -851,12 +913,15 @@ begin
     Inc(Result, FBorderWidth);
 end;
 
-procedure TCustomTagEdit.UpdateAutoHeight;
+function TCustomTagEdit.CoalesceInt(const A, B: integer; const C: integer = 0): integer;
 begin
-  if FAutoSizeHeight and (not (Align in [alClient, alRight, alLeft])) then
-  begin
-    Height := CalculateAutoHeight;
-  end;
+  if A > 0 then
+    Result := A
+  else
+  if B > 0 then
+    Result := B
+  else
+    Result := C;
 end;
 
 procedure TCustomTagEdit.Resize;
@@ -1036,6 +1101,7 @@ procedure TCustomTagEdit.FontChanged(Sender: TObject);
 begin
   inherited;
   FEdit.Font.Assign(Font);
+  FCheckListButton.Font.Assign(Font);
   if (Assigned(Parent)) and (not FFont.IsEqual(Parent.Font)) and (not FFont.IsDefault) then
     FParentFont := False;
   Invalidate;
@@ -1047,6 +1113,63 @@ begin
   FHoverIndex := -1; // Reset hover state when Items change
   Invalidate;
   UpdateAutoHeight;
+  UpdateCheckList;
+end;
+
+procedure TCustomTagEdit.SuggestedChanged(Sender: TObject);
+var
+  i: integer;
+  OldChecked: TStringList;
+begin
+  OldChecked := TStringList.Create;
+  try
+    OldChecked.CaseSensitive := False;
+
+    // Collect checked items by text
+    for i := 0 to FCheckListButton.Items.Count - 1 do
+      if FCheckListButton.Checked[i] then
+        OldChecked.Add(FCheckListButton.Items[i]);
+
+    if (FSuggestedTags.Count = 0) then
+      FCheckListButton.Clear
+    else
+    // Reassign new items
+    if FCheckListButton.Items.Count = 0 then
+      FCheckListButton.Items.Assign(FSuggestedTags)
+    else
+    begin
+      // Add if not exists in FCheckListButton.Items
+      for i := 0 to FSuggestedTags.Count - 1 do
+      begin
+        if FCheckListButton.Items.IndexOf(FSuggestedTags[i]) < 0 then
+          FCheckListButton.Items.Add(FSuggestedTags[i]); // add only new items
+      end;
+
+      // remove items not present in FSuggestedTags — iterate backwards to avoid index shift
+      for i := FCheckListButton.Items.Count - 1 downto 0 do
+      begin
+        if FSuggestedTags.IndexOf(FCheckListButton.Items[i]) < 0 then
+          FCheckListButton.Items.Delete(i);
+      end;
+    end;
+
+    // restore checks where possible
+    for i := 0 to OldChecked.Count - 1 do
+      FCheckListButton.CheckedByName[OldChecked[i]] := True;
+
+    UpdateEditPosition;
+    Invalidate;
+  finally
+    OldChecked.Free;
+  end;
+end;
+
+procedure TCustomTagEdit.CheckListItemChecked(Sender: TObject; Index: integer; Checked: boolean);
+begin
+  if Checked then
+    AddTag(FCheckListButton.Items[Index])
+  else
+    RemoveTag(FCheckListButton.Items[Index]);
 end;
 
 procedure TCustomTagEdit.EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);

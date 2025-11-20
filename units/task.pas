@@ -107,7 +107,7 @@ type
     function GetGroupName(Index: integer): string;
     function GetGroupHint(Index: integer): string;
     function GetGroupFiltered(Index: integer; ShowArchive: boolean; Filter: string; DisplayTime: boolean): boolean;
-    function HasDuplicateMatches(const Value: string): Boolean;
+    function HasDuplicateMatches(const Value: string): boolean;
     function GetTaskCount(GroupIndex: integer): integer;
     function GetTaskInGroup(GroupIndex, TaskIndex: integer): TTask;
     procedure InitMap(Length: integer);

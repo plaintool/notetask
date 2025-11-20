@@ -989,16 +989,32 @@ procedure AddPrefixTags(List: TStringList);
 var
   i: integer;
   Tag, Prefix: string;
+  PrefixesToAdd: TStringList;
 begin
-  for i := 0 to List.Count - 1 do
-  begin
-    Tag := List[i];
-    if Pos(':', Tag) > 0 then
+  // Create temporary list to store prefixes that need to be added
+  PrefixesToAdd := TStringList.Create;
+  try
+    // First, collect all prefixes that need to be added
+    for i := 0 to List.Count - 1 do
     begin
-      Prefix := Copy(Tag, 1, Pos(':', Tag) - 1);
-      if List.IndexOf(Prefix) = -1 then
-        List.Add(Prefix); // add prefix if not already exists
+      Tag := List[i];
+      // Check if tag contains colon (indicates it has a prefix)
+      if Pos(':', Tag) > 0 then
+      begin
+        // Extract prefix (text before the colon)
+        Prefix := Copy(Tag, 1, Pos(':', Tag) - 1);
+        // Add prefix to temporary list if it doesn't exist in original list
+        // and hasn't been already added to the temporary list
+        if (List.IndexOf(Prefix) = -1) and (PrefixesToAdd.IndexOf(Prefix) = -1) then
+          PrefixesToAdd.Add(Prefix);
+      end;
     end;
+
+    // Add all collected prefixes to the original list at once
+    List.AddStrings(PrefixesToAdd);
+  finally
+    // Always free the temporary list to avoid memory leaks
+    PrefixesToAdd.Free;
   end;
 end;
 

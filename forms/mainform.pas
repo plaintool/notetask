@@ -798,6 +798,7 @@ begin
   // Init components
   editTags := TTagEdit.Create(Self);
   editTags.Parent := panelTags;
+  editTags.AllowSuggest := True;
   editTags.Align := alTop;
   editTags.AutoSizeHeight := True;
   editTags.DragIndicatorColor := clRed;
@@ -806,6 +807,7 @@ begin
   editTags.TagSuffixColor := clGrayWhite;
   editTags.RoundCorners := 25;
   editTags.AutoColorSeed := 14;
+  editTags.EditMinWidth := 150;
   editTags.AutoColorBrigtness := TagsColorBrigtness;
   editTags.AutoColorSaturation := TagsColorSaturation;
   editTags.BackSpaceEditTag := True;
@@ -4003,6 +4005,7 @@ begin
     Tasks.GetTask(taskGrid.Row).Tags.Assign(editTags.Items);
     SetFilter;
     SetChanged;
+    GridInvalidate;
   end;
 end;
 
@@ -4019,6 +4022,7 @@ begin
 
     SetFilter;
     SetChanged;
+    GridInvalidate;
   end;
 end;
 
@@ -4035,6 +4039,7 @@ begin
 
     SetFilter;
     SetChanged;
+    GridInvalidate;
   end;
 end;
 
@@ -4050,6 +4055,7 @@ begin
         Tasks.GetTask(i).Tags.Assign(editTags.Items);
 
     SetChanged;
+    GridInvalidate;
   end;
 end;
 
@@ -4182,6 +4188,7 @@ begin
 
     taskGrid.Clean;
     taskGrid.RowCount := 2;
+    editTags.SuggestedItems.Clear;
 
     // Load saved settings for new file
     LoadGridSettings(Self, taskGrid, string.Empty);
@@ -4314,6 +4321,7 @@ begin
   else
     ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
 
+  editTags.SuggestedItems.Clear;
   if Assigned(Tasks) then
     Tasks.Free;
   Tasks := TTasks.Create(TextToStringList(Content));
@@ -7267,6 +7275,7 @@ begin
   SortedState := filterBox.Sorted;
   filterBox.Sorted := False;
   filterBox.Items.Assign(Tasks.Tags);
+  editTags.SuggestedItems := Tasks.Tags;
 
   // Remove ` from each item directly
   for i := 0 to filterBox.Items.Count - 1 do
