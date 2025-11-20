@@ -6431,24 +6431,19 @@ begin
   else
     TargetMemo := Memo;
 
-  TargetMemo.Lines.BeginUpdate;
-  try
-    if TargetMemo.SelLength = 0 then
-    begin
-      DeleteCount := CalcDeleteCount(TargetMemo.Text, TargetMemo.SelStart);
-      TargetMemo.SelLength := DeleteCount;
-      TargetMemo.ClearSelection;
-    end
+  if TargetMemo.SelLength = 0 then
+  begin
+    DeleteCount := CalcDeleteCount(TargetMemo.Text, TargetMemo.SelStart);
+    TargetMemo.SelLength := DeleteCount;
+    TargetMemo.ClearSelection;
+  end
+  else
+  begin
+    if aMemoNote then
+      MemoNoteBackup
     else
-    begin
-      if aMemoNote then
-        MemoNoteBackup
-      else
-        MemoBackup;
-      TargetMemo.ClearSelection;
-    end;
-  finally
-    TargetMemo.Lines.EndUpdate;
+      MemoBackup;
+    TargetMemo.ClearSelection;
   end;
 end;
 
@@ -7469,7 +7464,6 @@ begin
   aUndo.Enabled := FChanged;
   aUndoAll.Enabled := FChanged;
   SetCaption;
-  GridInvalidate;
 end;
 
 procedure TformNotetask.DisableDrag;
