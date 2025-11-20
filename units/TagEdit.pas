@@ -39,6 +39,7 @@ type
     FTagRects: array of TRect;
     FTagColors: TTagColorItems;
     FSelectedTags: TStringList;
+    FSuggestedTags: TStringList;
 
     FEdit: TEdit;
     FColor: TColor;
@@ -58,6 +59,7 @@ type
     FCloseButtons: boolean;
     FCloseButtonOnHover: boolean;
     FBackspaceEditTag: boolean;
+    FTagEditing: boolean;
     FReadOnly: boolean;
     FEnabled: boolean;
 
@@ -102,7 +104,6 @@ type
     function GetTagHeight(AFontSize: integer = -1): integer;
     function GetTagRect(Index: integer): TRect;
     function GetHoveredTag: string;
-    function GetSelectedTags: TStringList;
 
     procedure SetTags(Value: TStringList);
     procedure SetFont(Value: TFont);
@@ -195,7 +196,8 @@ type
 
     property EditBox: TEdit read FEdit;
     property Items: TStringList read GetTags write SetTags;
-    property SelectedTags: TStringList read GetSelectedTags;
+    property SelectedTags: TStringList read FSelectedTags;
+    property SuggestedTags: TStringList read FSuggestedTags write FSuggestedTags;
 
     property OnTagClick: TTagEvent read FOnTagClick write FOnTagClick;
     property OnTagPopup: TTagPopupEvent read FOnTagPopup write FOnTagPopup;
@@ -286,6 +288,7 @@ type
     property SelectionRectColor;
     property SelectionRectPenStyle;
     property SelectionRectWidth;
+    property SuggestedTags;
     property Items;
     // events
     property OnTagClick;
@@ -344,11 +347,17 @@ begin
   FSelectionRect := Rect(0, 0, 0, 0);
   FMouseDownPos := Point(-1, -1);
 
+  FSuggestedTags := TStringList.Create;
+  FSuggestedTags.CaseSensitive := True;
+  FSuggestedTags.Sorted := True;
+  FSuggestedTags.Duplicates := dupIgnore;
+  FSuggestedTags.Delimiter := ';';
+
   Height := Scale(32);
   Width := Scale(300);
   FColor := clWindow;
   ParentColor := False;
-
+  FTagEditing := False;
   FReadOnly := False;
   FEnabled := True;
   FAutoSizeHeight := False;
@@ -442,11 +451,6 @@ begin
     Result := FTags[FHoverIndex]
   else
     Result := string.Empty;
-end;
-
-function TCustomTagEdit.GetSelectedTags: TStringList;
-begin
-  Result := FSelectedTags;
 end;
 
 function TCustomTagEdit.GetTags: TStringList;
@@ -995,6 +999,7 @@ procedure TCustomTagEdit.FinishEdit;
 begin
   if FEdit.Text <> string.Empty then
     AddTag(Trim(FEdit.Text));
+  FTagEditing := False;
 end;
 
 procedure TCustomTagEdit.ClearSelection;
@@ -1055,6 +1060,7 @@ begin
   begin
     if FEdit.Text <> string.Empty then
       AddTag(FEdit.Text);
+    FTagEditing := False;
     Key := 0;
   end
   else
@@ -1068,6 +1074,7 @@ begin
     begin
       FEdit.Text := ATag;
       FEdit.SelStart := FEdit.GetTextLen;
+      FTagEditing := True;
       UpdateEditPosition;
       Repaint;
     end;
@@ -1095,7 +1102,10 @@ begin
     end;
     if (FEdit.Text <> string.Empty) then
     begin
-      FEdit.Text := string.Empty;
+      if not FTagEditing then
+        FEdit.Text := string.Empty
+      else
+        FinishEdit;
       Key := 0;
     end;
   end
