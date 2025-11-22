@@ -639,6 +639,71 @@ var
     end;
   end;
 
+  function HttpGetWget(const AUrl: string): string;
+  var
+    Process: TProcess;
+    OutputStream: TMemoryStream;
+    BytesRead: longint;
+    Buffer: TBytes = ();
+  begin
+    Result := '';
+    SetLength(Buffer, 2048);
+    Process := TProcess.Create(nil);
+    OutputStream := TMemoryStream.Create;
+    try
+      Process.Executable := 'wget';
+      Process.Parameters.Add('-q');
+      Process.Parameters.Add('-O');
+      Process.Parameters.Add('-');
+      Process.Parameters.Add('--header=User-Agent: NotetaskVersionChecker');
+      Process.Parameters.Add(AUrl);
+
+      Process.Options := [poUsePipes, poNoConsole];
+      Process.Execute;
+
+      while Process.Running or (Process.Output.NumBytesAvailable > 0) do
+      begin
+        BytesRead := Process.Output.Read(Buffer[0], Length(Buffer));
+        if BytesRead > 0 then
+          OutputStream.Write(Buffer[0], BytesRead);
+      end;
+
+      Process.WaitOnExit;
+
+      if OutputStream.Size > 0 then
+      begin
+        SetLength(Result, OutputStream.Size);
+        OutputStream.Position := 0;
+        OutputStream.Read(Result[1], OutputStream.Size);
+      end;
+    finally
+      OutputStream.Free;
+      Process.Free;
+    end;
+  end;
+
+  function IsWgetAvailable: boolean;
+  var
+    Process: TProcess;
+  begin
+    Result := False;
+    Process := TProcess.Create(nil);
+    try
+      Process.Executable := 'wget';
+      Process.Parameters.Add('--version');
+      Process.Options := [poWaitOnExit, poNoConsole];
+      try
+        Process.Execute;
+        Process.WaitOnExit;
+        Result := (Process.ExitStatus = 0);
+      except
+        Result := False;
+      end;
+    finally
+      Process.Free;
+    end;
+  end;
+
 {$ENDIF}
 begin
   CurrentVersion := GetAppVersion;
@@ -664,9 +729,13 @@ begin
         begin
           ResponseContent := HttpGetCurl(Url);
         end
+        else if IsWgetAvailable then
+        begin
+          ResponseContent := HttpGetWget(Url);
+        end
         else
         begin
-          ShowMessage(newversioncheckerror + ' ' + 'Please install curl or OpenSSL library!');
+          ShowMessage(newversioncheckerror + ' ' + 'Please install OpenSSL, curl or wget library!');
           Exit;
         end;
       end;
