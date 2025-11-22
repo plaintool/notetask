@@ -57,7 +57,7 @@ type
     FAutoSizeHeight: boolean;
     FAllowReorder: boolean;
     FAllowSelect: boolean;
-    FAllowSuggest: boolean;
+    FAutoSuggest: boolean;
     FTagHoverUnderline: boolean;
     FCloseButtons: boolean;
     FCloseButtonOnHover: boolean;
@@ -120,7 +120,7 @@ type
     function RemovalConfirmed(idx: integer = -1): boolean;
     function TagAtPos(const P: TPoint): integer;
     procedure UpdateEditPosition;
-    procedure UpdateCheckList;
+    procedure UpdateCheckList(AddSuggestions: boolean = True);
     procedure UpdateHoverState(X, Y: integer);
     function CoalesceInt(const A, B: integer; const C: integer = 0): integer;
     procedure SetAutoSizeHeight(Value: boolean);
@@ -129,6 +129,7 @@ type
     procedure UpdateSelection(X, Y: integer);
     procedure UpdateAutoHeight;
     function Scale(const AValue: integer): integer;
+    function IndexOf(const AName: string; AItems: TStrings; ACaseSensitive: boolean = True): integer;
     function GetContrastTextColor(BackColor, FontColor: TColor; MidLevel: integer = 128): TColor;
     function RandTagColor(const ATag: string; Brightness, Saturation: integer): TColor;
     function FindTagColor(const S: string): TColor;
@@ -169,7 +170,7 @@ type
     property Font: TFont read FFont write SetFont;
     property AllowReorder: boolean read FAllowReorder write FAllowReorder default True;
     property AllowSelect: boolean read FAllowSelect write FAllowSelect default True;
-    property AllowSuggest: boolean read FAllowSuggest write FAllowSuggest default False;
+    property AutoSuggest: boolean read FAutoSuggest write FAutoSuggest default False;
     property AutoSizeHeight: boolean read FAutoSizeHeight write SetAutoSizeHeight default False;
     property AutoColorBrigtness: integer read FAutoColorBrigtness write FAutoColorBrigtness default 80;
     property AutoColorSaturation: integer read FAutoColorSaturation write FAutoColorSaturation default 80;
@@ -243,7 +244,7 @@ type
     property Anchors;
     property AllowReorder;
     property AllowSelect;
-    property AllowSuggest;
+    property AutoSuggest;
     property AutoSizeHeight;
     property BidiMode;
     property BorderSpacing;
@@ -339,10 +340,12 @@ begin
   FTagColors := TTagColorItems.Create(Self);
 
   FTags := TStringList.Create;
-  FTags.OnChange := @TagsChanged;
-  FTags.CaseSensitive := True;
   FTags.Add('IDE:Lazarus');
   FTags.Add('Free Pascal');
+  FTags.CaseSensitive := True;
+  FTags.UseLocale := True;
+  FTags.Options := [soUseLocale];
+  FTags.OnChange := @TagsChanged;
 
   // Initialize selection
   FSelectedTags := TStringList.Create;
@@ -376,7 +379,7 @@ begin
   FAutoColorSeed := Random(High(longword));
   FAllowReorder := True;
   FAllowSelect := True;
-  FAllowSuggest := False;
+  FAutoSuggest := False;
   FFont := TFont.Create;
   FFont.OnChange := @FontChanged;
   FParentFont := True;
@@ -452,6 +455,7 @@ begin
   FEdit.Free;
   FTagColors.Free;
   FSelectedTags.Free;
+  FCheckListButton.Free;
   inherited Destroy;
 end;
 
@@ -491,6 +495,7 @@ end;
 procedure TCustomTagEdit.SetSuggestedTags(Value: TStringList);
 begin
   FSuggestedTags.Assign(Value);
+  SuggestedChanged(Self);
 end;
 
 procedure TCustomTagEdit.SetColor(Value: TColor);
@@ -606,158 +611,13 @@ begin
   UpdateAutoHeight;
 end;
 
-function TCustomTagEdit.Scale(const AValue: integer): integer;
-begin
-  Result := Scale96ToScreen(AValue);
-end;
-
-procedure TCustomTagEdit.ScaleFontsPPI(const AToPPI: integer; const AProportion: double);
-begin
-  inherited ScaleFontsPPI(AToPPI, AProportion);
-  if ((not FParentFont) and (FFont.Size <= 0)) or ((FParentFont) and (Assigned(Parent)) and (Parent.Font.Size <= 0)) then
-    FFont.Size := CoalesceInt(Screen.SystemFont.Size, 8);
-  DoScaleFontPPI(FFont, AToPPI, AProportion);
-  if (Assigned(Parent)) and (FParentFont) then
-    DoScaleFontPPI(Parent.Font, AToPPI, AProportion);
-end;
-
-procedure TCustomTagEdit.FixDesignFontsPPI(const ADesignTimePPI: integer);
-begin
-  inherited FixDesignFontsPPI(ADesignTimePPI);
-  if ((not FParentFont) and (FFont.Size <= 0)) or ((FParentFont) and (Assigned(Parent)) and (Parent.Font.Size <= 0)) then
-    FFont.Size := CoalesceInt(Screen.SystemFont.Size, 8);
-  DoFixDesignFontPPI(FFont, ADesignTimePPI);
-  if (Assigned(Parent)) and (FParentFont) then
-    DoFixDesignFontPPI(Parent.Font, ADesignTimePPI);
-end;
-
-function TCustomTagEdit.Focused: boolean;
-begin
-  Result := FEdit.Focused;
-end;
-
-function TCustomTagEdit.RemovalConfirmed(idx: integer = -1): boolean;
-begin
-  if not RemoveConfirm then
-    exit(True);
-  if (idx >= 0) then
-    Result := MessageDlg(FRemoveConfirmTitle, FRemoveConfirmMessage + ' "' + FTags[idx] + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrYes
-  else
-    Result := MessageDlg(FRemoveConfirmTitle, FRemoveConfirmMessage + '?', mtConfirmation, [mbYes, mbNo], 0) = mrYes;
-end;
-
-procedure TCustomTagEdit.AddTag(const ATag: string);
-var
-  SL: TStringList;
-  i: integer;
-  s: string;
-  TagsAdded: boolean;
-  EditValue: string;
-begin
-  if ATag = string.Empty then
-    Exit;
-
-  TagsAdded := False;
-  EditValue := FEdit.Text;
-  FEdit.Clear;
-  SL := TStringList.Create;
-  try
-    // Split by semicolon if present, otherwise just add the single tag
-    if Pos(';', ATag) > 0 then
-      ExtractStrings([';'], [], PChar(ATag), SL)
-    else
-      SL.Add(ATag);
-
-    for i := 0 to SL.Count - 1 do
-    begin
-      s := Trim(SL[i]);
-      // Skip empty or duplicate tags
-      if (s <> '') and (FTags.IndexOf(s) = -1) then
-      begin
-        FTags.Add(s);
-        TagsAdded := True;
-        if Assigned(FOnTagAdd) then
-          FOnTagAdd(Self, s);
-      end;
-    end;
-  finally
-    SL.Free;
-  end;
-
-  // Update UI and call events if tags were added
-  if TagsAdded then
-  begin
-    if Assigned(FOnChange) then
-      FOnChange(Self);
-    Invalidate;
-    UpdateAutoHeight;
-  end
-  else
-    FEdit.Text := EditValue;
-end;
-
-procedure TCustomTagEdit.RemoveTag(const ATag: string; AConfirm: boolean = False);
-var
-  i: integer;
-begin
-  i := FTags.IndexOf(ATag);
-
-  if AConfirm and not RemovalConfirmed(i) then exit;
-
-  if i >= 0 then
-  begin
-    FTags.Delete(i);
-    if Assigned(FOnTagRemove) then
-      FOnTagRemove(Self, ATag);
-    if Assigned(FOnChange) then
-      FOnChange(Self);
-    Invalidate;
-    UpdateAutoHeight;
-  end;
-end;
-
-procedure TCustomTagEdit.RemoveSelectedTags;
-var
-  I: integer;
-  TagToRemove: string;
-begin
-  if FSelectedTags.Count = 0 then
-    Exit;
-
-  if not RemovalConfirmed then exit;
-
-  // Remove tags from the main list
-  for I := FSelectedTags.Count - 1 downto 0 do
-  begin
-    TagToRemove := FSelectedTags[I];
-
-    // Call OnTagRemove event if assigned
-    if Assigned(FOnTagRemove) then
-      FOnTagRemove(Self, TagToRemove);
-
-    // Remove from main tags list
-    FTags.Delete(FTags.IndexOf(TagToRemove));
-  end;
-
-  // Clear selection
-  FSelectedTags.Clear;
-
-  // Call OnChange event if assigned
-  if Assigned(FOnChange) then
-    FOnChange(Self);
-
-  // Update visual
-  Invalidate;
-  UpdateAutoHeight;
-end;
-
 procedure TCustomTagEdit.UpdateEditPosition;
 var
   LastRect: TRect;
   NewLeft, NewTop: integer;
   AvailWidth: integer;
 begin
-  if FUpdatingEdit then Exit;
+  if FUpdatingEdit or (csDesigning in ComponentState) then Exit;
 
   FUpdatingEdit := True;
   try
@@ -801,7 +661,7 @@ begin
       {$ENDIF}
     end;
 
-    if not FAllowSuggest or not FEdit.Visible or (FSuggestedTags.Count = 0) then
+    if (not FEdit.Visible) or (FSuggestedTags.Count = 0) then
     begin
       FCheckListButton.Width := 0;
       FCheckListButton.Visible := False;
@@ -822,7 +682,7 @@ begin
     FEdit.Height := GetTagHeight - Scale(2);
 
     // Set CheckListButton
-    if (FAllowSuggest) then
+    if (FSuggestedTags.Count > 0) then
     begin
       FCheckListButton.Left := FEdit.Left + FEdit.Width;
       FCheckListButton.Top := FEdit.Top;
@@ -833,19 +693,66 @@ begin
   end;
 end;
 
-procedure TCustomTagEdit.UpdateCheckList;
+procedure TCustomTagEdit.UpdateCheckList(AddSuggestions: boolean = True);
 var
   i: integer;
 begin
-  if not AllowSuggest or not Assigned(FCheckListButton) then exit;
+  if not Assigned(FCheckListButton) or (csDesigning in ComponentState) then exit;
 
   FCheckListButton.UncheckAll;
+  if AddSuggestions and FAutoSuggest then
+    for i := 0 to FTags.Count - 1 do
+    begin
+      if (IndexOf(FTags[i], FSuggestedTags) < 0) then
+        FSuggestedTags.Add(FTags[i]);
+
+      if (IndexOf(FTags[i], FCheckListButton.Items) < 0) then
+        FCheckListButton.Items.Add(FTags[i]);
+    end;
+
   for i := 0 to FTags.Count - 1 do
-  begin
-    if FCheckListButton.Items.IndexOf(FTags[i]) < 0 then
-      FCheckListButton.Items.Add(FTags[i]);
     FCheckListButton.CheckedByName[FTags[i]] := True;
+end;
+
+procedure TCustomTagEdit.UpdateHoverState(X, Y: integer);
+var
+  NewHoverIndex: integer;
+begin
+  NewHoverIndex := TagAtPos(Point(X, Y));
+
+  if NewHoverIndex <> FHoverIndex then
+  begin
+    FHoverIndex := NewHoverIndex;
+    Invalidate;
   end;
+end;
+
+procedure TCustomTagEdit.UpdateSelection(X, Y: integer);
+var
+  I: integer;
+  TagRect: TRect;
+begin
+  // Update selection rectangle
+  FSelectionRect := Rect(Min(FSelectionStart.X, X), Min(FSelectionStart.Y, Y), Max(FSelectionStart.X, X), Max(FSelectionStart.Y, Y));
+
+  // Update selected tags based on selection rectangle
+  for I := 0 to FTags.Count - 1 do
+  begin
+    TagRect := GetTagRect(I);
+    if IsInSelectionRect(TagRect) then
+    begin
+      // Add to selection if not already selected
+      if IndexOf(FTags[I], FSelectedTags) = -1 then
+        FSelectedTags.Add(FTags[I]);
+    end
+    else
+    begin
+      // Remove from selection if no longer in selection rect
+      if IndexOf(FTags[I], FSelectedTags) <> -1 then
+        FSelectedTags.Delete(IndexOf(FTags[I], FSelectedTags));
+    end;
+  end;
+  Invalidate;
 end;
 
 procedure TCustomTagEdit.UpdateAutoHeight;
@@ -854,6 +761,174 @@ begin
   begin
     Height := CalculateAutoHeight;
   end;
+end;
+
+function TCustomTagEdit.Scale(const AValue: integer): integer;
+begin
+  Result := Scale96ToScreen(AValue);
+end;
+
+function TCustomTagEdit.IndexOf(const AName: string; AItems: TStrings; ACaseSensitive: boolean = True): integer;
+var
+  i: integer;
+  s1, s2: string;
+begin
+  for i := 0 to AItems.Count - 1 do
+  begin
+    if ACaseSensitive then
+    begin
+      if AItems[i] = AName then
+        Exit(i);
+    end
+    else
+    begin
+      s1 := AItems[i];
+      s2 := AName;
+      if CompareText(s1, s2) = 0 then
+        Exit(i);
+    end;
+  end;
+  Result := -1;
+end;
+
+procedure TCustomTagEdit.ScaleFontsPPI(const AToPPI: integer; const AProportion: double);
+begin
+  inherited ScaleFontsPPI(AToPPI, AProportion);
+  if ((not FParentFont) and (FFont.Size <= 0)) or ((FParentFont) and (Assigned(Parent)) and (Parent.Font.Size <= 0)) then
+    FFont.Size := CoalesceInt(Screen.SystemFont.Size, 8);
+  DoScaleFontPPI(FFont, AToPPI, AProportion);
+  if (Assigned(Parent)) and (FParentFont) then
+    DoScaleFontPPI(Parent.Font, AToPPI, AProportion);
+end;
+
+procedure TCustomTagEdit.FixDesignFontsPPI(const ADesignTimePPI: integer);
+begin
+  inherited FixDesignFontsPPI(ADesignTimePPI);
+  if ((not FParentFont) and (FFont.Size <= 0)) or ((FParentFont) and (Assigned(Parent)) and (Parent.Font.Size <= 0)) then
+    FFont.Size := CoalesceInt(Screen.SystemFont.Size, 8);
+  DoFixDesignFontPPI(FFont, ADesignTimePPI);
+  if (Assigned(Parent)) and (FParentFont) then
+    DoFixDesignFontPPI(Parent.Font, ADesignTimePPI);
+end;
+
+function TCustomTagEdit.Focused: boolean;
+begin
+  Result := FEdit.Focused;
+end;
+
+procedure TCustomTagEdit.AddTag(const ATag: string);
+var
+  SL: TStringList;
+  i: integer;
+  s: string;
+  TagsAdded: boolean;
+  EditValue: string;
+begin
+  if ATag = string.Empty then
+    Exit;
+
+  TagsAdded := False;
+  EditValue := FEdit.Text;
+  FEdit.Clear;
+  SL := TStringList.Create;
+  try
+    // Split by semicolon if present, otherwise just add the single tag
+    if Pos(';', ATag) > 0 then
+      ExtractStrings([';'], [], PChar(ATag), SL)
+    else
+      SL.Add(ATag);
+
+    for i := 0 to SL.Count - 1 do
+    begin
+      s := Trim(SL[i]);
+      // Skip empty or duplicate tags
+      if (s <> '') and (IndexOf(s, FTags) = -1) then
+      begin
+        FTags.Add(s);
+        TagsAdded := True;
+        if Assigned(FOnTagAdd) then
+          FOnTagAdd(Self, s);
+      end;
+    end;
+  finally
+    SL.Free;
+  end;
+
+  // Update UI and call events if tags were added
+  if TagsAdded then
+  begin
+    if Assigned(FOnChange) then
+      FOnChange(Self);
+    Invalidate;
+    UpdateAutoHeight;
+  end
+  else
+    FEdit.Text := EditValue;
+end;
+
+procedure TCustomTagEdit.RemoveTag(const ATag: string; AConfirm: boolean = False);
+var
+  i: integer;
+begin
+  i := IndexOf(ATag, FTags);
+
+  if AConfirm and not RemovalConfirmed(i) then exit;
+
+  if i >= 0 then
+  begin
+    FTags.Delete(i);
+    if Assigned(FOnTagRemove) then
+      FOnTagRemove(Self, ATag);
+    if Assigned(FOnChange) then
+      FOnChange(Self);
+    Invalidate;
+    UpdateAutoHeight;
+  end;
+end;
+
+procedure TCustomTagEdit.RemoveSelectedTags;
+var
+  I: integer;
+  TagToRemove: string;
+begin
+  if FSelectedTags.Count = 0 then
+    Exit;
+
+  if not RemovalConfirmed then exit;
+
+  // Remove tags from the main list
+  for I := FSelectedTags.Count - 1 downto 0 do
+  begin
+    TagToRemove := FSelectedTags[I];
+
+    // Call OnTagRemove event if assigned
+    if Assigned(FOnTagRemove) then
+      FOnTagRemove(Self, TagToRemove);
+
+    // Remove from main tags list
+    FTags.Delete(IndexOf(TagToRemove, FTags));
+  end;
+
+  // Clear selection
+  FSelectedTags.Clear;
+
+  // Call OnChange event if assigned
+  if Assigned(FOnChange) then
+    FOnChange(Self);
+
+  // Update visual
+  Invalidate;
+  UpdateAutoHeight;
+end;
+
+function TCustomTagEdit.RemovalConfirmed(idx: integer = -1): boolean;
+begin
+  if not RemoveConfirm then
+    exit(True);
+  if (idx >= 0) then
+    Result := MessageDlg(FRemoveConfirmTitle, FRemoveConfirmMessage + ' "' + FTags[idx] + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrYes
+  else
+    Result := MessageDlg(FRemoveConfirmTitle, FRemoveConfirmMessage + '?', mtConfirmation, [mbYes, mbNo], 0) = mrYes;
 end;
 
 function TCustomTagEdit.CalculateAutoHeight: integer;
@@ -930,50 +1005,6 @@ begin
   UpdateAutoHeight;
 end;
 
-function TCustomTagEdit.GetContrastTextColor(BackColor, FontColor: TColor; MidLevel: integer = 128): TColor;
-var
-  Rb, Gb, Bb: byte; // background
-  Rf, Gf, Bf: byte; // font
-  Brightness: double;
-  InvR, InvG, InvB: integer;
-begin
-  // Ensure MidLevel in 0..255
-  if MidLevel < 0 then MidLevel := 0;
-  if MidLevel > 255 then MidLevel := 255;
-
-  // Extract RGB from both colors
-  BackColor := ColorToRGB(BackColor);
-  FontColor := ColorToRGB(FontColor);
-
-  Rb := GetRValue(BackColor);
-  Gb := GetGValue(BackColor);
-  Bb := GetBValue(BackColor);
-
-  Rf := GetRValue(FontColor);
-  Gf := GetGValue(FontColor);
-  Bf := GetBValue(FontColor);
-
-  // Calculate perceived brightness of background
-  Brightness := 0.299 * Rb + 0.587 * Gb + 0.114 * Bb;
-
-  // Invert the given font color
-  InvR := 255 - Rf;
-  InvG := 255 - Gf;
-  InvB := 255 - Bf;
-
-  // If background is dark — make inverted color lighter (toward white)
-  // If background is light — make inverted color darker (toward black)
-  if Brightness < MidLevel then
-  begin
-    InvR := EnsureRange(Round(InvR), 0, 255);
-    InvG := EnsureRange(Round(InvG), 0, 255);
-    InvB := EnsureRange(Round(InvB), 0, 255);
-    Result := RGBToColor(InvR, InvG, InvB);
-  end
-  else
-    Result := FontColor;
-end;
-
 function TCustomTagEdit.TagAtPos(const P: TPoint): integer;
 var
   i: integer;
@@ -991,51 +1022,10 @@ begin
   Result := -1;
 end;
 
-procedure TCustomTagEdit.UpdateHoverState(X, Y: integer);
-var
-  NewHoverIndex: integer;
-begin
-  NewHoverIndex := TagAtPos(Point(X, Y));
-
-  if NewHoverIndex <> FHoverIndex then
-  begin
-    FHoverIndex := NewHoverIndex;
-    Invalidate;
-  end;
-end;
-
 function TCustomTagEdit.IsInSelectionRect(const R: TRect): boolean;
 begin
   Result := (FSelectionRect.Left <= R.Right) and (FSelectionRect.Right >= R.Left) and (FSelectionRect.Top <= R.Bottom) and
     (FSelectionRect.Bottom >= R.Top);
-end;
-
-procedure TCustomTagEdit.UpdateSelection(X, Y: integer);
-var
-  I: integer;
-  TagRect: TRect;
-begin
-  // Update selection rectangle
-  FSelectionRect := Rect(Min(FSelectionStart.X, X), Min(FSelectionStart.Y, Y), Max(FSelectionStart.X, X), Max(FSelectionStart.Y, Y));
-
-  // Update selected tags based on selection rectangle
-  for I := 0 to FTags.Count - 1 do
-  begin
-    TagRect := GetTagRect(I);
-    if IsInSelectionRect(TagRect) then
-    begin
-      // Add to selection if not already selected
-      if FSelectedTags.IndexOf(FTags[I]) = -1 then
-        FSelectedTags.Add(FTags[I]);
-    end
-    else
-    begin
-      // Remove from selection if no longer in selection rect
-      if FSelectedTags.IndexOf(FTags[I]) <> -1 then
-        FSelectedTags.Delete(FSelectedTags.IndexOf(FTags[I]));
-    end;
-  end;
-  Invalidate;
 end;
 
 procedure TCustomTagEdit.CopyHoverText;
@@ -1101,7 +1091,8 @@ procedure TCustomTagEdit.FontChanged(Sender: TObject);
 begin
   inherited;
   FEdit.Font.Assign(Font);
-  FCheckListButton.Font.Assign(Font);
+  if (Assigned(FCheckListButton)) then
+    FCheckListButton.Font.Assign(Font);
   if (Assigned(Parent)) and (not FFont.IsEqual(Parent.Font)) and (not FFont.IsDefault) then
     FParentFont := False;
   Invalidate;
@@ -1119,53 +1110,41 @@ end;
 procedure TCustomTagEdit.SuggestedChanged(Sender: TObject);
 var
   i: integer;
-  OldChecked: TStringList;
 begin
-  OldChecked := TStringList.Create;
-  try
-    OldChecked.CaseSensitive := False;
+  if csDesigning in ComponentState then exit;
 
-    // Collect checked items by text
-    for i := 0 to FCheckListButton.Items.Count - 1 do
-      if FCheckListButton.Checked[i] then
-        OldChecked.Add(FCheckListButton.Items[i]);
-
-    if (FSuggestedTags.Count = 0) then
-      FCheckListButton.Clear
-    else
-    // Reassign new items
-    if FCheckListButton.Items.Count = 0 then
-      FCheckListButton.Items.Assign(FSuggestedTags)
-    else
+  if (FSuggestedTags.Count = 0) then
+    FCheckListButton.Clear
+  else
+  // Reassign new items
+  if FCheckListButton.Items.Count = 0 then
+    FCheckListButton.Items.Assign(FSuggestedTags)
+  else
+  begin
+    // Add if not exists in FCheckListButton.Items
+    for i := 0 to FSuggestedTags.Count - 1 do
     begin
-      // Add if not exists in FCheckListButton.Items
-      for i := 0 to FSuggestedTags.Count - 1 do
-      begin
-        if FCheckListButton.Items.IndexOf(FSuggestedTags[i]) < 0 then
-          FCheckListButton.Items.Add(FSuggestedTags[i]); // add only new items
-      end;
-
-      // remove items not present in FSuggestedTags — iterate backwards to avoid index shift
-      for i := FCheckListButton.Items.Count - 1 downto 0 do
-      begin
-        if FSuggestedTags.IndexOf(FCheckListButton.Items[i]) < 0 then
-          FCheckListButton.Items.Delete(i);
-      end;
+      if IndexOf(FSuggestedTags[i], FCheckListButton.Items) < 0 then
+        FCheckListButton.Items.Add(FSuggestedTags[i]); // add only new items
     end;
 
-    // restore checks where possible
-    for i := 0 to OldChecked.Count - 1 do
-      FCheckListButton.CheckedByName[OldChecked[i]] := True;
-
-    UpdateEditPosition;
-    Invalidate;
-  finally
-    OldChecked.Free;
+    // remove items not present in FSuggestedTags — iterate backwards to avoid index shift
+    for i := FCheckListButton.Items.Count - 1 downto 0 do
+    begin
+      if IndexOf(FCheckListButton.Items[i], FSuggestedTags) < 0 then
+        FCheckListButton.Items.Delete(i);
+    end;
   end;
+
+  UpdateCheckList(False);
+  UpdateEditPosition;
+  Invalidate;
 end;
 
 procedure TCustomTagEdit.CheckListItemChecked(Sender: TObject; Index: integer; Checked: boolean);
 begin
+  if csDesigning in ComponentState then exit;
+
   if Checked then
     AddTag(FCheckListButton.Items[Index])
   else
@@ -1565,10 +1544,10 @@ begin
           if (FAllowSelect) and (ssCtrl in Shift) then
           begin
             // Toggle selection with Ctrl
-            if FSelectedTags.IndexOf(FTags[idx]) = -1 then
+            if IndexOf(FTags[idx], FSelectedTags) = -1 then
               FSelectedTags.Add(FTags[idx])
             else
-              FSelectedTags.Delete(FSelectedTags.IndexOf(FTags[idx]));
+              FSelectedTags.Delete(IndexOf(FTags[idx], FSelectedTags));
           end
           else
           begin
@@ -1706,6 +1685,50 @@ begin
   end
   else
     inherited DoContextPopup(MousePos, Handled);
+end;
+
+function TCustomTagEdit.GetContrastTextColor(BackColor, FontColor: TColor; MidLevel: integer = 128): TColor;
+var
+  Rb, Gb, Bb: byte; // background
+  Rf, Gf, Bf: byte; // font
+  Brightness: double;
+  InvR, InvG, InvB: integer;
+begin
+  // Ensure MidLevel in 0..255
+  if MidLevel < 0 then MidLevel := 0;
+  if MidLevel > 255 then MidLevel := 255;
+
+  // Extract RGB from both colors
+  BackColor := ColorToRGB(BackColor);
+  FontColor := ColorToRGB(FontColor);
+
+  Rb := GetRValue(BackColor);
+  Gb := GetGValue(BackColor);
+  Bb := GetBValue(BackColor);
+
+  Rf := GetRValue(FontColor);
+  Gf := GetGValue(FontColor);
+  Bf := GetBValue(FontColor);
+
+  // Calculate perceived brightness of background
+  Brightness := 0.299 * Rb + 0.587 * Gb + 0.114 * Bb;
+
+  // Invert the given font color
+  InvR := 255 - Rf;
+  InvG := 255 - Gf;
+  InvB := 255 - Bf;
+
+  // If background is dark — make inverted color lighter (toward white)
+  // If background is light — make inverted color darker (toward black)
+  if Brightness < MidLevel then
+  begin
+    InvR := EnsureRange(Round(InvR), 0, 255);
+    InvG := EnsureRange(Round(InvG), 0, 255);
+    InvB := EnsureRange(Round(InvB), 0, 255);
+    Result := RGBToColor(InvR, InvG, InvB);
+  end
+  else
+    Result := FontColor;
 end;
 
 function TCustomTagEdit.RandTagColor(const ATag: string; Brightness, Saturation: integer): TColor;
@@ -1963,7 +1986,7 @@ begin
   begin
     s := ATags[i];
     Hover := (i = AHoverIndex) and ((FTagHoverColor <> clNone) or FTagHoverUnderline);
-    IsSelected := FSelectedTags.IndexOf(s) <> -1;
+    IsSelected := IndexOf(s, FSelectedTags) <> -1;
 
     // Split tag by colon
     HasColon := Pos(':', s) > 0;

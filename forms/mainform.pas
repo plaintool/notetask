@@ -798,7 +798,7 @@ begin
   // Init components
   editTags := TTagEdit.Create(Self);
   editTags.Parent := panelTags;
-  editTags.AllowSuggest := True;
+  editTags.AutoSuggest := True;
   editTags.Align := alTop;
   editTags.AutoSizeHeight := True;
   editTags.DragIndicatorColor := clRed;

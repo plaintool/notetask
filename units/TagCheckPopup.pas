@@ -17,6 +17,11 @@ uses
 
 const
   MinHeight = 10;
+  {$IFDEF UNIX}
+  DefaultItemHeight = 23;
+  {$ELSE}
+  DefaultItemHeight = 17;
+  {$ENDIF}
 
 type
   TCheckBoxListClickEvent = procedure(Sender: TObject; Index: integer; Checked: boolean) of object;
@@ -51,6 +56,7 @@ type
   TCheckListButton = class(TSpeedButton)
   private
     FPopupForm: TCheckListForm;
+    FItems: TStrings;
     FAttachedControl: TControl;
     FOnItemChecked: TCheckBoxListClickEvent;
     FOnChange: TCheckBoxListChangeEvent;
@@ -62,7 +68,7 @@ type
     FItemHeight: integer;
     FAllowGrayed: boolean;
     FMultiSelect: boolean;
-    FAddSelfWidth: boolean;
+    FPopupWidthDelta: integer;
     FSorted: boolean;
     FParentColor: boolean;
     FParentFont: boolean;
@@ -86,6 +92,8 @@ type
     function GetState(Index: integer): TCheckBoxState;
     procedure SetState(Index: integer; Value: TCheckBoxState);
     procedure UpdatePopupStyles;
+    function IndexOf(const AName: string; AItems: TStrings; ACaseSensitive: boolean = True): integer;
+    procedure InitializePopupForm; // Lazy initialization
   protected
     procedure Loaded; override;
     procedure ParentFontChanged; override;
@@ -100,6 +108,7 @@ type
     procedure CheckAll;
     procedure UncheckAll;
     procedure Clear;
+    function Scale(const AValue: integer): integer;
     property Checked[Index: integer]: boolean read GetChecked write SetChecked;
     property CheckedByName[AName: string]: boolean read GetCheckedByName write SetCheckedByName;
     property ItemEnabled[Index: integer]: boolean read GetItemEnabled write SetItemEnabled;
@@ -112,7 +121,7 @@ type
     property ItemHeight: integer read FItemHeight write SetItemHeight default 0;
     property AllowGrayed: boolean read FAllowGrayed write SetAllowGrayed default False;
     property MultiSelect: boolean read FMultiSelect write SetMultiSelect default False;
-    property AddSelfWidth: boolean read FAddSelfWidth write FAddSelfWidth default True;
+    property PopupWidthDelta: integer read FPopupWidthDelta write FPopupWidthDelta default 2;
     property Sorted: boolean read FSorted write SetSorted default False;
     property ParentColor: boolean read FParentColor write SetParentColor default True;
     property ParentFont: boolean read FParentFont write SetParentFont default True;
@@ -144,7 +153,8 @@ begin
   begin
     Parent := Self;
     Align := alClient;
-    Options := [];
+    Items.UseLocale := True;
+    TStringList(Items).CaseSensitive := True;
     OnClickCheck := @CheckListBoxClickCheck;
     OnKeyDown := @CheckListBoxKeyDown;
     OnKeyPress := @CheckListBoxKeyPress;
@@ -393,37 +403,72 @@ end;
 constructor TCheckListButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FPopupForm := TCheckListForm.Create(Self);
-  FPopupForm.SpeedButton := Self;
+
+  // Create local storage for items in designer
+  FItems := TStringList.Create;
+
+  // Don't create form in constructor to avoid showing it in designer
+  FPopupForm := nil;
   FAttachedControl := nil;
   FClosing := False;
   FDropDownCount := 8;
   FItemHeight := 0;
   FAllowGrayed := False;
   FMultiSelect := False;
-  FAddSelfWidth := True;
+  FPopupWidthDelta := 2;
   FSorted := False;
   FParentColor := True;
   FParentFont := True;
   FPopupEmpty := True;
   GroupIndex := 1;
   AllowAllUp := True;
-
-  UpdatePopupStyles;
 end;
 
 destructor TCheckListButton.Destroy;
 begin
   FClosing := True;
-  if FPopupForm.Visible then
-    FPopupForm.Hide;
+
+  // Free local items storage
+  FItems.Free;
+
+  // Free form if it was created
+  if Assigned(FPopupForm) then
+  begin
+    if FPopupForm.Visible then
+      FPopupForm.Hide;
+    FPopupForm.Free;
+  end;
+
   inherited Destroy;
+end;
+
+procedure TCheckListButton.InitializePopupForm;
+begin
+  // Create form only when needed and only in runtime
+  if not Assigned(FPopupForm) and not (csDesigning in ComponentState) then
+  begin
+    FPopupForm := TCheckListForm.Create(Self);
+    FPopupForm.SpeedButton := Self;
+
+    // Copy items from local storage to form
+    if FItems.Count > 0 then
+      FPopupForm.CheckListBox.Items.Assign(FItems);
+
+    // Apply properties to form
+    FPopupForm.CheckListBox.AllowGrayed := FAllowGrayed;
+    FPopupForm.CheckListBox.MultiSelect := FMultiSelect;
+    FPopupForm.CheckListBox.Sorted := FSorted;
+
+    UpdatePopupStyles;
+  end;
 end;
 
 procedure TCheckListButton.Loaded;
 begin
   inherited Loaded;
-  UpdatePopupStyles;
+  // Initialize form when component is loaded in runtime
+  if not (csDesigning in ComponentState) then
+    InitializePopupForm;
 end;
 
 procedure TCheckListButton.ParentFontChanged;
@@ -442,14 +487,17 @@ end;
 procedure TCheckListButton.UpdatePopupStyles;
 begin
   if Assigned(FPopupForm) then
-  begin
     FPopupForm.UpdateStylesFromButton;
-  end;
 end;
 
 procedure TCheckListButton.Click;
 begin
+  // Initialize form if needed
+  InitializePopupForm;
+
   // Simple toggle - the form knows when to hide itself
+  if not Assigned(FPopupForm) then Exit;
+
   if FPopupForm.Visible then
     HidePopupForm
   else
@@ -467,6 +515,10 @@ var
   MaxVisibleItems: integer;
   BorderDelta: integer;
 begin
+  // Initialize form if needed
+  InitializePopupForm;
+  if not Assigned(FPopupForm) then Exit;
+
   // Prevent multiple calls
   if FClosing or ((FPopupEmpty = False) and (Items.Count = 0)) then
     Exit;
@@ -494,7 +546,9 @@ begin
   begin
     ActualItemHeight := FPopupForm.CheckListBox.ItemHeight;
     if ActualItemHeight <= 0 then
-      ActualItemHeight := 16; // Default item height
+    begin
+      ActualItemHeight := Scale(DefaultItemHeight); // Default item height
+    end;
   end;
 
   // Calculate form height based on item count and DropDownCount
@@ -511,11 +565,11 @@ begin
     FormHeight := ActualItemHeight * MaxVisibleItems + 8; // 8 pixels for border
 
     // Ensure minimum height
-    if FormHeight < MinHeight then
-      FormHeight := MinHeight;
+    if FormHeight < Scale(MinHeight) then
+      FormHeight := Scale(MinHeight);
   end
   else
-    FormHeight := MinHeight; // Minimum height when no items
+    FormHeight := Scale(MinHeight); // Minimum height when no items
 
   // Show above control if not enough space below
   if P.Y + FormHeight > ScreenHeight then
@@ -527,15 +581,17 @@ begin
     BorderDelta := 1;
 
   // Set form position and size
-  FPopupForm.Left := P.X - 2;
   FPopupForm.Top := P.Y + BorderDelta;
   if not assigned(FAttachedControl) then
-    FPopupForm.Width := Control.Parent.Width
+  begin
+    FPopupForm.Left := P.X + 1;
+    FPopupForm.Width := Control.Parent.Width;
+  end
   else
-  if FAddSelfWidth then
-    FPopupForm.Width := Control.Width + Self.Width + 2
-  else
-    FPopupForm.Width := Control.Width;
+  begin
+    FPopupForm.Left := P.X - 2;
+    FPopupForm.Width := Control.Width + Self.Width + Scale(FPopupWidthDelta);
+  end;
   FPopupForm.Height := FormHeight;
 
   Down := True;
@@ -551,6 +607,8 @@ end;
 
 procedure TCheckListButton.HidePopupForm;
 begin
+  if not Assigned(FPopupForm) then Exit;
+
   Down := False;
   FClosing := True;
   if FPopupForm.Visible then
@@ -567,6 +625,10 @@ var
   i: integer;
   HasSelection: boolean;
 begin
+  // Initialize form if needed
+  InitializePopupForm;
+  if not Assigned(FPopupForm) then Exit;
+
   HasSelection := False;
 
   // Check if any items are selected
@@ -624,7 +686,9 @@ var
   OldOnItemChecked: TCheckBoxListClickEvent;
   OldOnChange: TCheckBoxListChangeEvent;
 begin
-  if Count = 0 then Exit;
+  // Initialize form if needed
+  InitializePopupForm;
+  if not Assigned(FPopupForm) or (Count = 0) then Exit;
 
   // Save old event handlers
   OldOnItemChecked := FOnItemChecked;
@@ -661,7 +725,9 @@ var
   OldOnItemChecked: TCheckBoxListClickEvent;
   OldOnChange: TCheckBoxListChangeEvent;
 begin
-  if Count = 0 then Exit;
+  // Initialize form if needed
+  InitializePopupForm;
+  if not Assigned(FPopupForm) or (Count = 0) then Exit;
 
   // Save old event handlers
   OldOnItemChecked := FOnItemChecked;
@@ -697,7 +763,9 @@ var
   OldOnItemChecked: TCheckBoxListClickEvent;
   OldOnChange: TCheckBoxListChangeEvent;
 begin
-  if Count = 0 then Exit;
+  // Initialize form if needed
+  InitializePopupForm;
+  if not Assigned(FPopupForm) or (Count = 0) then Exit;
 
   // Save old event handlers
   OldOnItemChecked := FOnItemChecked;
@@ -710,6 +778,7 @@ begin
 
     // Clear all items from the checklist
     FPopupForm.CheckListBox.Items.Clear;
+    FItems.Clear; // Also clear local storage
 
   finally
     // Restore event handlers
@@ -722,23 +791,42 @@ begin
     FOnChange(Self);
 end;
 
+function TCheckListButton.Scale(const AValue: integer): integer;
+begin
+  Result := Scale96ToScreen(AValue);
+end;
+
 function TCheckListButton.GetCheckedByName(const AName: string): boolean;
 var
   Index: integer;
 begin
-  Result := False;
-  Index := FPopupForm.CheckListBox.Items.IndexOf(AName);
-  if Index >= 0 then
-    Result := FPopupForm.CheckListBox.Checked[Index];
+  // In designer, always return False since we don't have form states
+  if csDesigning in ComponentState then
+    Result := False
+  else
+  begin
+    InitializePopupForm;
+    if not Assigned(FPopupForm) then Exit(False);
+
+    Result := False;
+    Index := IndexOf(AName, TStringList(FPopupForm.CheckListBox.Items));
+    if Index >= 0 then
+      Result := FPopupForm.CheckListBox.Checked[Index];
+  end;
 end;
 
 procedure TCheckListButton.SetCheckedByName(const AName: string; Value: boolean);
 var
   Index: integer;
 begin
-  if not Assigned(FPopupForm) then exit;
+  // In designer, do nothing since we don't have form states
+  if csDesigning in ComponentState then
+    Exit;
 
-  Index := FPopupForm.CheckListBox.Items.IndexOf(AName);
+  InitializePopupForm;
+  if not Assigned(FPopupForm) then Exit;
+
+  Index := IndexOf(AName, TStringList(FPopupForm.CheckListBox.Items));
   if Index >= 0 then
   begin
     FPopupForm.CheckListBox.Checked[Index] := Value;
@@ -776,7 +864,8 @@ begin
   if FAllowGrayed <> Value then
   begin
     FAllowGrayed := Value;
-    FPopupForm.CheckListBox.AllowGrayed := Value;
+    if Assigned(FPopupForm) then
+      FPopupForm.CheckListBox.AllowGrayed := Value;
   end;
 end;
 
@@ -785,7 +874,8 @@ begin
   if FMultiSelect <> Value then
   begin
     FMultiSelect := Value;
-    FPopupForm.CheckListBox.MultiSelect := Value;
+    if Assigned(FPopupForm) then
+      FPopupForm.CheckListBox.MultiSelect := Value;
   end;
 end;
 
@@ -794,7 +884,8 @@ begin
   if FSorted <> Value then
   begin
     FSorted := Value;
-    FPopupForm.CheckListBox.Sorted := Value;
+    if Assigned(FPopupForm) then
+      FPopupForm.CheckListBox.Sorted := Value;
   end;
 end;
 
@@ -820,24 +911,56 @@ end;
 
 function TCheckListButton.GetItems: TStrings;
 begin
-  Result := FPopupForm.CheckListBox.Items;
+  // In designer, use local storage
+  if csDesigning in ComponentState then
+    Result := FItems
+  else
+  begin
+    // In runtime, use form's items
+    InitializePopupForm;
+    if Assigned(FPopupForm) then
+      Result := FPopupForm.CheckListBox.Items
+    else
+      Result := FItems; // Fallback
+  end;
 end;
 
 procedure TCheckListButton.SetItems(Value: TStrings);
 begin
-  FPopupForm.CheckListBox.Items := Value;
+  // Always update local storage
+  FItems.Assign(Value);
+
+  // Also update form if it exists
+  if Assigned(FPopupForm) then
+    FPopupForm.CheckListBox.Items.Assign(Value);
 end;
 
 function TCheckListButton.GetChecked(Index: integer): boolean;
 begin
-  if (Index >= 0) and (Index < FPopupForm.CheckListBox.Items.Count) then
-    Result := FPopupForm.CheckListBox.Checked[Index]
+  // In designer, always return False since we don't have form states
+  if csDesigning in ComponentState then
+    Result := False
   else
-    Result := False;
+  begin
+    InitializePopupForm;
+    if not Assigned(FPopupForm) then Exit(False);
+
+    if (Index >= 0) and (Index < FPopupForm.CheckListBox.Items.Count) then
+      Result := FPopupForm.CheckListBox.Checked[Index]
+    else
+      Result := False;
+  end;
 end;
 
 procedure TCheckListButton.SetChecked(Index: integer; Value: boolean);
 begin
+  // In designer, do nothing since we don't have form states
+  if csDesigning in ComponentState then
+    Exit;
+
+  InitializePopupForm;
+  if not Assigned(FPopupForm) then Exit;
+
   if (Index >= 0) and (Index < FPopupForm.CheckListBox.Items.Count) then
   begin
     FPopupForm.CheckListBox.Checked[Index] := Value;
@@ -848,14 +971,30 @@ end;
 
 function TCheckListButton.GetState(Index: integer): TCheckBoxState;
 begin
-  if (Index >= 0) and (Index < FPopupForm.CheckListBox.Items.Count) then
-    Result := FPopupForm.CheckListBox.State[Index]
+  // In designer, always return unchecked since we don't have form states
+  if csDesigning in ComponentState then
+    Result := cbUnchecked
   else
-    Result := cbUnchecked;
+  begin
+    InitializePopupForm;
+    if not Assigned(FPopupForm) then Exit(cbUnchecked);
+
+    if (Index >= 0) and (Index < FPopupForm.CheckListBox.Items.Count) then
+      Result := FPopupForm.CheckListBox.State[Index]
+    else
+      Result := cbUnchecked;
+  end;
 end;
 
 procedure TCheckListButton.SetState(Index: integer; Value: TCheckBoxState);
 begin
+  // In designer, do nothing since we don't have form states
+  if csDesigning in ComponentState then
+    Exit;
+
+  InitializePopupForm;
+  if not Assigned(FPopupForm) then Exit;
+
   if (Index >= 0) and (Index < FPopupForm.CheckListBox.Items.Count) then
   begin
     FPopupForm.CheckListBox.State[Index] := Value;
@@ -866,21 +1005,82 @@ end;
 
 function TCheckListButton.GetItemEnabled(Index: integer): boolean;
 begin
-  if (Index >= 0) and (Index < FPopupForm.CheckListBox.Items.Count) then
-    Result := FPopupForm.CheckListBox.ItemEnabled[Index]
+  // In designer, always return True since we don't have form states
+  if csDesigning in ComponentState then
+    Result := True
   else
-    Result := False;
+  begin
+    InitializePopupForm;
+    if not Assigned(FPopupForm) then Exit(True);
+
+    if (Index >= 0) and (Index < FPopupForm.CheckListBox.Items.Count) then
+      Result := FPopupForm.CheckListBox.ItemEnabled[Index]
+    else
+      Result := False;
+  end;
 end;
 
 procedure TCheckListButton.SetItemEnabled(Index: integer; Value: boolean);
 begin
+  // In designer, do nothing since we don't have form states
+  if csDesigning in ComponentState then
+    Exit;
+
+  InitializePopupForm;
+  if not Assigned(FPopupForm) then Exit;
+
   if (Index >= 0) and (Index < FPopupForm.CheckListBox.Items.Count) then
     FPopupForm.CheckListBox.ItemEnabled[Index] := Value;
 end;
 
 function TCheckListButton.GetCount: integer;
 begin
-  Result := FPopupForm.CheckListBox.Items.Count;
+  // Always use local storage count in designer
+  if csDesigning in ComponentState then
+    Result := FItems.Count
+  else
+  begin
+    InitializePopupForm;
+    if Assigned(FPopupForm) then
+      Result := FPopupForm.CheckListBox.Items.Count
+    else
+      Result := FItems.Count; // Fallback
+  end;
+end;
+
+function TCheckListButton.IndexOf(const AName: string; AItems: TStrings; ACaseSensitive: boolean = True): integer;
+var
+  i: integer;
+  s1, s2: string;
+  List: TStringList;
+begin
+  List := TStringList.Create;
+  try
+    List.Assign(AItems);
+    List.CaseSensitive := False;
+    List.Sorted := True;
+    List.Sort;
+    List.Sorted := False;
+    List.CaseSensitive := ACaseSensitive;
+    for i := 0 to List.Count - 1 do
+    begin
+      if ACaseSensitive then
+      begin
+        if List[i] = AName then
+          Exit(i);
+      end
+      else
+      begin
+        s1 := List[i];
+        s2 := AName;
+        if CompareText(s1, s2) = 0 then
+          Exit(i);
+      end;
+    end;
+    Result := -1;
+  finally
+    List.Free;
+  end;
 end;
 
 end.
