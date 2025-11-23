@@ -533,6 +533,7 @@ type
     FAdjustingScrollBars: boolean;
     FSReserved: TFileStream;
     FRepaint: boolean;
+    FDuplicateHighlight: boolean;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -836,6 +837,7 @@ begin
   FShowNote := False;
   FMemoNeedSelectAll := True;
   FRepaint := False;
+  FDuplicateHighlight := True;
   FShowColumnDone := True;
   FShowColumnTask := True;
   FShowColumnNote := True;
@@ -1747,7 +1749,7 @@ begin
 
     if Length(S) > 0 then
     begin
-      if not (gdSelected in aState) and (FLastText <> string.Empty) and (S = FLastText) and
+      if FDuplicateHighlight and not (gdSelected in aState) and (FLastText <> string.Empty) and (S = FLastText) and
         (taskGrid.Selection.Height = 0) and ((aCol <> FLastCol) or (aRow <> FLastRow)) then
       begin
         grid.canvas.Brush.Style := bsSolid;
@@ -7041,7 +7043,7 @@ begin
   if aRow < 0 then aRow := taskGrid.Row;
   if (aCol > 0) and (aRow > 0) then
   begin
-    if (FLastText <> string.Empty) or (Value <> string.Empty) then
+    if FDuplicateHighlight and ((FLastText <> string.Empty) or (Value <> string.Empty)) then
     begin
       FLastText := Value;
       if Tasks.HasDuplicateMatches(FLastText) and (taskGrid.Selection.Height = 0) then
@@ -7695,6 +7697,7 @@ begin
   if (FFindActive) or (taskGrid.RowCount = 0) then exit;
   FFindActive := True;
   aRowsChanged := 0;
+  FDuplicateHighlight := False;
   Enabled := False;
   try
     FindText := aText;
@@ -7917,6 +7920,7 @@ begin
 
     Result := True;
   finally
+    FDuplicateHighlight := True;
     FFindActive := False;
     Enabled := True;
   end;
@@ -8005,6 +8009,8 @@ begin
     // Replace all
     while (Find(aText, aMatchCase, aWrapAround, True, RowsChanged, True)) and (formReplaceText.Visible) do
     begin
+      FDuplicateHighlight := False;
+
       if self.ActiveControl = memoNote then
         Target := memoNote
       else
@@ -8039,6 +8045,7 @@ begin
     FBackup := True;
     FShowNote := sShowNote;
     Enabled := True;
+    FDuplicateHighlight := True;
   end;
 end;
 
