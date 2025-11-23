@@ -335,12 +335,13 @@ type
     procedure memoNoteExit(Sender: TObject);
     procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure memoNoteChange(Sender: TObject);
-    procedure editTagsKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure editTagsTagClick(Sender: TObject; const TagText: string);
-    procedure editTagsChange(Sender: TObject);
-    procedure editTagsTagAdd(Sender: TObject; const TagText: string);
-    procedure editTagsTagRemove(Sender: TObject; const TagText: string);
-    procedure editTagsTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
+    procedure tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure tagsEditTagClick(Sender: TObject; const TagText: string);
+    procedure tagsEditChange(Sender: TObject);
+    procedure tagsEditTagAdd(Sender: TObject; const TagText: string);
+    procedure tagsEditTagRemove(Sender: TObject; const TagText: string);
+    procedure tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
+    procedure tagsEditExit(Sender: TObject);
     procedure groupTabsChange(Sender: TObject);
     procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure groupTabsMouseLeave(Sender: TObject);
@@ -463,7 +464,7 @@ type
     Memo: TMemo;
     PanelMemo: TPanel;
     DatePicker: TDateTimePicker;
-    editTags: TTagEdit;
+    tagsEdit: TTagEdit;
     FChanged: boolean;
     FBackup: boolean;
     FReadOnly: boolean;
@@ -625,6 +626,8 @@ type
     procedure RestoreSelectedState(aRowMem: boolean = True; aRowMemPriority: boolean = True; aFocusMemo: boolean = False);
     procedure GridAdjustScrollBars;
     procedure GridInvalidate;
+    procedure TagsAdd(const Rect: TRect; const TagText: string);
+    procedure DelayedFinishTagEdit(Data: PtrInt);
     function FreeFile: boolean;
     function LastRowHeight(aRow: integer): integer;
     procedure ChangeLastText(const Value: string; aCol: integer = -1; aRow: integer = -1);
@@ -796,29 +799,30 @@ uses filemanager, settings, systemtool, crypto, forminput, formmemo, formfind, f
 procedure TformNotetask.FormCreate(Sender: TObject);
 begin
   // Init components
-  editTags := TTagEdit.Create(Self);
-  editTags.Parent := panelTags;
-  editTags.AutoSuggest := True;
-  editTags.Align := alTop;
-  editTags.AutoSizeHeight := True;
-  editTags.DragIndicatorColor := clRed;
-  editTags.SelectionRectColor := clSilver;
-  editTags.TagHoverColor := clNone;
-  editTags.TagSuffixColor := clGrayWhite;
-  editTags.RoundCorners := 25;
-  editTags.AutoColorSeed := 14;
-  editTags.EditMinWidth := 150;
-  editTags.AutoColorBrigtness := TagsColorBrigtness;
-  editTags.AutoColorSaturation := TagsColorSaturation;
-  editTags.BackSpaceEditTag := True;
-  editTags.ShowHint := True;
-  editTags.PopupMenu := PopupTags;
-  editTags.OnKeyDown := @editTagsKeyDown;
-  editTags.OnTagClick := @editTagsTagClick;
-  editTags.OnChange := @editTagsChange;
-  editTags.OnTagAdd := @editTagsTagAdd;
-  editTags.OnTagRemove := @editTagsTagRemove;
-  editTags.OnTagReorder := @editTagsTagReorder;
+  tagsEdit := TTagEdit.Create(Self);
+  tagsEdit.Parent := panelTags;
+  tagsEdit.AutoSuggest := True;
+  tagsEdit.Align := alTop;
+  tagsEdit.AutoSizeHeight := True;
+  tagsEdit.DragIndicatorColor := clRed;
+  tagsEdit.SelectionRectColor := clSilver;
+  tagsEdit.TagHoverColor := clNone;
+  tagsEdit.TagSuffixColor := clGrayWhite;
+  tagsEdit.RoundCorners := 25;
+  tagsEdit.AutoColorSeed := 14;
+  tagsEdit.EditMinWidth := 150;
+  tagsEdit.AutoColorBrigtness := TagsColorBrigtness;
+  tagsEdit.AutoColorSaturation := TagsColorSaturation;
+  tagsEdit.BackSpaceEditTag := True;
+  tagsEdit.ShowHint := True;
+  tagsEdit.PopupMenu := PopupTags;
+  tagsEdit.OnKeyDown := @tagsEditKeyDown;
+  tagsEdit.OnTagClick := @tagsEditTagClick;
+  tagsEdit.OnChange := @tagsEditChange;
+  tagsEdit.OnTagAdd := @tagsEditTagAdd;
+  tagsEdit.OnTagRemove := @tagsEditTagRemove;
+  tagsEdit.OnTagReorder := @tagsEditTagReorder;
+  tagsEdit.OnExit := @tagsEditExit;
 
   // Initialize variables
   FBackup := True;
@@ -927,7 +931,7 @@ begin
 
   FreeFile;
 
-  editTags.Free;
+  tagsEdit.Free;
 end;
 
 procedure TformNotetask.FormShow(Sender: TObject);
@@ -973,7 +977,7 @@ end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
-  if memoNote.Focused or filterBox.Focused or editTags.Focused then
+  if memoNote.Focused or filterBox.Focused or tagsEdit.Focused then
     exit;
 
   if Screen.ActiveForm <> Self then
@@ -1722,7 +1726,7 @@ begin
         task := Tasks.GetTask(ARow);
         if task.Tags.Count > 0 then
         begin
-          BitTags := editTags.GetTagsBitmap(task.Tags, Max(Font.Size div 2 + 2, 8), Min(ARect.Width, 500),
+          BitTags := tagsEdit.GetTagsBitmap(task.Tags, Max(Font.Size div 2 + 2, 8), Min(ARect.Width, 500),
             ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected, ifthen(bgFill <> clWhite, TagsDimnessColor, TagsDimness)),
             ColorToRGB(bgFill));
           try
@@ -1804,7 +1808,6 @@ begin
 
       DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
     end;
-
   end;
 end;
 
@@ -2000,7 +2003,7 @@ end;
 procedure TformNotetask.groupTabsChange(Sender: TObject);
 begin
   EditComplite;
-  editTags.FinishEdit;
+  tagsEdit.FinishEdit;
 
   if (Length(FLastRowMem) > Tasks.SelectedGroup) then
     FLastRowMem[Tasks.SelectedGroup] := taskGrid.Row;
@@ -2311,20 +2314,20 @@ end;
 
 procedure TformNotetask.contextCopyTagsClick(Sender: TObject);
 begin
-  if editTags.SelectedTags.Count > 0 then
-    Clipboard.AsText := editTags.SelectedTags.DelimitedText
+  if tagsEdit.SelectedTags.Count > 0 then
+    Clipboard.AsText := tagsEdit.SelectedTags.DelimitedText
   else
-  if editTags.HoveredTag <> string.Empty then
-    Clipboard.AsText := editTags.HoveredTag;
+  if tagsEdit.HoveredTag <> string.Empty then
+    Clipboard.AsText := tagsEdit.HoveredTag;
 end;
 
 procedure TformNotetask.contextDeleteTagsClick(Sender: TObject);
 begin
-  if editTags.SelectedTags.Count > 0 then
-    editTags.RemoveSelectedTags
+  if tagsEdit.SelectedTags.Count > 0 then
+    tagsEdit.RemoveSelectedTags
   else
-  if editTags.HoveredTag <> string.Empty then
-    editTags.RemoveTag(editTags.HoveredTag, True);
+  if tagsEdit.HoveredTag <> string.Empty then
+    tagsEdit.RemoveTag(tagsEdit.HoveredTag, True);
 end;
 
 procedure TformNotetask.contextWindowsCRLFClick(Sender: TObject);
@@ -2486,9 +2489,9 @@ begin
     exit;
   end
   else
-  if editTags.Focused and not editTags.ReadOnly and editTags.EditBox.CanUndo then
+  if tagsEdit.Focused and not tagsEdit.ReadOnly and tagsEdit.EditBox.CanUndo then
   begin
-    editTags.EditBox.Undo;
+    tagsEdit.EditBox.Undo;
     exit;
   end;
 
@@ -2563,9 +2566,9 @@ begin
     exit;
   end
   else
-  if editTags.Focused then
+  if tagsEdit.Focused then
   begin
-    editTags.EditBox.CutToClipboard;
+    tagsEdit.EditBox.CutToClipboard;
     exit;
   end;
 
@@ -2597,21 +2600,21 @@ begin
     exit;
   end
   else
-  if editTags.SelectedTags.Count > 0 then
+  if tagsEdit.SelectedTags.Count > 0 then
   begin
-    Clipboard.AsText := editTags.SelectedTags.DelimitedText;
+    Clipboard.AsText := tagsEdit.SelectedTags.DelimitedText;
     exit;
   end
   else
-  if editTags.HoveredTag <> string.Empty then
+  if tagsEdit.HoveredTag <> string.Empty then
   begin
-    Clipboard.AsText := editTags.HoveredTag;
+    Clipboard.AsText := tagsEdit.HoveredTag;
     exit;
   end
   else
-  if editTags.EditBox.Focused then
+  if tagsEdit.EditBox.Focused then
   begin
-    editTags.EditBox.CopyToClipboard;
+    tagsEdit.EditBox.CopyToClipboard;
     exit;
   end;
 
@@ -2640,10 +2643,10 @@ begin
     exit;
   end
   else
-  if editTags.Focused then
+  if tagsEdit.Focused then
   begin
-    if not editTags.ReadOnly then
-      editTags.EditBox.PasteFromClipboard;
+    if not tagsEdit.ReadOnly then
+      tagsEdit.EditBox.PasteFromClipboard;
     exit;
   end;
 
@@ -2686,7 +2689,7 @@ begin
     exit;
   end
   else
-  if editTags.Focused then
+  if tagsEdit.Focused then
   begin
     {$IFDEF UNIX}
     if not editTags.ReadOnly then
@@ -2736,9 +2739,9 @@ begin
     exit;
   end
   else
-  if editTags.Focused then
+  if tagsEdit.Focused then
   begin
-    editTags.EditBox.SelectAll;
+    tagsEdit.EditBox.SelectAll;
     exit;
   end;
 
@@ -3959,17 +3962,17 @@ begin
   SetChanged;
 end;
 
-procedure TformNotetask.editTagsKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+procedure TformNotetask.tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
-  if editTags.ReadOnly then exit
+  if tagsEdit.ReadOnly then exit
   else
   if Key = VK_DELETE then // Delete
   begin
     {$IFDEF UNIX}
     {$ELSE}
-    if (editTags.EditBox.SelLength = 0) then
-      editTags.EditBox.SelLength := CalcDeleteCount(editTags.EditBox.Text, editTags.EditBox.SelStart);
-    editTags.EditBox.ClearSelection;
+    if (tagsEdit.EditBox.SelLength = 0) then
+      tagsEdit.EditBox.SelLength := CalcDeleteCount(tagsEdit.EditBox.Text, tagsEdit.EditBox.SelStart);
+    tagsEdit.EditBox.ClearSelection;
     Key := 0;
     {$ENDIF}
   end
@@ -3980,7 +3983,7 @@ begin
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key = VK_Z) and (not editTags.EditBox.Focused) then // Ctrl + Z
+  if (ssCtrl in Shift) and (Key = VK_Z) and (not tagsEdit.EditBox.Focused) then // Ctrl + Z
   begin
     aUndo.Execute;
     Key := 0;
@@ -3991,42 +3994,31 @@ begin
       taskGrid.SetFocus;
 end;
 
-procedure TformNotetask.editTagsTagClick(Sender: TObject; const TagText: string);
+procedure TformNotetask.tagsEditTagClick(Sender: TObject; const TagText: string);
 begin
   filterBox.Text := TagText;
   filterBoxChange(Self);
 end;
 
-procedure TformNotetask.editTagsChange(Sender: TObject);
+procedure TformNotetask.tagsEditChange(Sender: TObject);
 begin
   if taskGrid.Selection.Height = 0 then
   begin
     Tasks.CreateBackup;
-    Tasks.GetTask(taskGrid.Row).Tags.Assign(editTags.Items);
+    Tasks.GetTask(taskGrid.Row).Tags.Assign(tagsEdit.Items);
     SetFilter;
     SetChanged;
     GridInvalidate;
   end;
 end;
 
-procedure TformNotetask.editTagsTagAdd(Sender: TObject; const TagText: string);
-var
-  i: integer;
+procedure TformNotetask.tagsEditTagAdd(Sender: TObject; const TagText: string);
 begin
   if taskGrid.Selection.Height > 0 then
-  begin
-    Tasks.CreateBackup;
-    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-      if Tasks.Map(i) > -1 then
-        Tasks.GetTask(i).Tags.Add(TagText);
-
-    SetFilter;
-    SetChanged;
-    GridInvalidate;
-  end;
+    TagsAdd(taskGrid.Selection, TagText);
 end;
 
-procedure TformNotetask.editTagsTagRemove(Sender: TObject; const TagText: string);
+procedure TformNotetask.tagsEditTagRemove(Sender: TObject; const TagText: string);
 var
   i: integer;
 begin
@@ -4043,7 +4035,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.editTagsTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
+procedure TformNotetask.tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
 var
   i: integer;
 begin
@@ -4052,11 +4044,17 @@ begin
     Tasks.CreateBackup;
     for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
       if Tasks.Map(i) > -1 then
-        Tasks.GetTask(i).Tags.Assign(editTags.Items);
+        Tasks.GetTask(i).Tags.Assign(tagsEdit.Items);
 
     SetChanged;
     GridInvalidate;
   end;
+end;
+
+procedure TformNotetask.tagsEditExit(Sender: TObject);
+begin
+  FLastGridSelection := taskGrid.Selection;
+  Application.QueueAsyncCall(@DelayedFinishTagEdit, 0);
 end;
 
 procedure TformNotetask.memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -4188,7 +4186,7 @@ begin
 
     taskGrid.Clean;
     taskGrid.RowCount := 2;
-    editTags.SuggestedItems.Clear;
+    tagsEdit.SuggestedItems.Clear;
 
     // Load saved settings for new file
     LoadGridSettings(Self, taskGrid, string.Empty);
@@ -4321,7 +4319,7 @@ begin
   else
     ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
 
-  editTags.SuggestedItems.Clear;
+  tagsEdit.SuggestedItems.Clear;
   if Assigned(Tasks) then
     Tasks.Free;
   Tasks := TTasks.Create(TextToStringList(Content));
@@ -6616,6 +6614,33 @@ begin
   Application.ProcessMessages;
 end;
 
+procedure TformNotetask.TagsAdd(const Rect: TRect; const TagText: string);
+var
+  i: integer;
+begin
+  Tasks.CreateBackup;
+  if Rect.Height > 0 then
+  begin
+    for i := Rect.Top to Rect.Bottom do
+      if Tasks.Map(i) > -1 then
+        Tasks.GetTask(i).Tags.Add(TagText);
+  end
+  else
+    Tasks.GetTask(Rect.Top).Tags.Add(TagText);
+  SetFilter;
+  SetChanged;
+  GridInvalidate;
+end;
+
+procedure TformNotetask.DelayedFinishTagEdit(Data: PtrInt);
+begin
+  if (Trim(tagsEdit.EditBox.Text) <> string.Empty) then
+  begin
+    TagsAdd(FLastGridSelection, tagsEdit.EditBox.Text);
+    tagsEdit.EditBox.Text := string.Empty;
+  end;
+end;
+
 function TformNotetask.FreeFile: boolean;
 begin
   // Release the reserved file stream if it exists
@@ -6649,7 +6674,7 @@ begin
     memoNote.Alignment := taRightJustify;
     memoNote.BorderSpacing.Left := 0;
     memoNote.BorderSpacing.Right := 10;
-    editTags.BiDiMode := bdRightToLeft;
+    tagsEdit.BiDiMode := bdRightToLeft;
     SetCursorTo(panelNote, 'RIGHTARROW');
   end
   else
@@ -6664,7 +6689,7 @@ begin
     memoNote.BorderSpacing.Left := 10;
     memoNote.BorderSpacing.Right := 0;
     memoNote.BiDiMode := bdLeftToRight;
-    editTags.BiDiMode := bdLeftToRight;
+    tagsEdit.BiDiMode := bdLeftToRight;
     SetCursorTo(panelNote, 'LEFTARROW');
   end;
 end;
@@ -7185,35 +7210,35 @@ begin
         if (tags.Count > 0) then
         begin
           if (not HasDiff) and (Tasks.Map(taskGrid.Selection.Top) > -1) then
-            editTags.Items.Assign(Tasks.GetTask(taskGrid.Selection.Top).Tags)
+            tagsEdit.Items.Assign(Tasks.GetTask(taskGrid.Selection.Top).Tags)
           else
-            editTags.Items.Assign(tags);
+            tagsEdit.Items.Assign(tags);
         end;
-        editTags.ReadOnly := FReadOnly;
-        editTags.AllowReorder := not HasDiff;
-        editTags.Color := clDefault;
+        tagsEdit.ReadOnly := FReadOnly;
+        tagsEdit.AllowReorder := not HasDiff;
+        tagsEdit.Color := clDefault;
       end
       else if Tasks.Map(taskGrid.Row) > -1 then
       begin
         // Single row selected — set editable tag
-        editTags.Items.Assign(Tasks.GetTask(taskGrid.Row).Tags);
-        editTags.ReadOnly := FReadOnly;
-        editTags.AllowReorder := True;
-        editTags.Color := clDefault;
+        tagsEdit.Items.Assign(Tasks.GetTask(taskGrid.Row).Tags);
+        tagsEdit.ReadOnly := FReadOnly;
+        tagsEdit.AllowReorder := True;
+        tagsEdit.Color := clDefault;
       end
       else
       begin
-        editTags.Items.Clear;
-        editTags.ReadOnly := True;
+        tagsEdit.Items.Clear;
+        tagsEdit.ReadOnly := True;
       end;
     end
     else
     begin
-      editTags.Items.Clear;
-      editTags.ReadOnly := True;
+      tagsEdit.Items.Clear;
+      tagsEdit.ReadOnly := True;
     end;
   finally
-    editTags.ClearSelection;
+    tagsEdit.ClearSelection;
     tags.Free;
   end;
 end;
@@ -7275,7 +7300,7 @@ begin
   SortedState := filterBox.Sorted;
   filterBox.Sorted := False;
   filterBox.Items.Assign(Tasks.Tags);
-  editTags.SuggestedItems := Tasks.Tags;
+  tagsEdit.SuggestedItems := Tasks.Tags;
 
   // Remove ` from each item directly
   for i := 0 to filterBox.Items.Count - 1 do
@@ -7432,12 +7457,12 @@ begin
 
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
-  if Assigned(editTags) then
+  if Assigned(tagsEdit) then
   begin
-    editTags.RemoveConfirmMessage := rremovetag;
-    editTags.RemoveConfirmTitle := rremovetagtitle;
-    editTags.TextHint := renternewtag;
-    editTags.EditBox.Hint := renternewtaghint;
+    tagsEdit.RemoveConfirmMessage := rremovetag;
+    tagsEdit.RemoveConfirmTitle := rremovetagtitle;
+    tagsEdit.TextHint := renternewtag;
+    tagsEdit.EditBox.Hint := renternewtaghint;
   end;
 
   if (Assigned(Tasks)) and (Tasks.GroupNames[0] = string.Empty) and (groupTabs.Tabs.Count > 0) then

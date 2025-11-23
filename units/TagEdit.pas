@@ -154,7 +154,6 @@ type
     procedure EditMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure EditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure EditExit(Sender: TObject);
     procedure SuggestedChanged(Sender: TObject);
     procedure CheckListItemChecked(Sender: TObject; Index: integer; Checked: boolean);
     procedure TagsChanged(Sender: TObject);
@@ -414,7 +413,6 @@ begin
     FEdit.ParentFont := True;
     FEdit.BorderStyle := bsNone;
     FEdit.OnKeyDown := @EditKeyDown;
-    FEdit.OnExit := @EditExit;
     FEdit.OnKeyUp := OnKeyUp;
     FEdit.OnKeyPress := OnKeyPress;
     FEdit.Color := Color;
@@ -1334,12 +1332,6 @@ begin
 
   // Call the MouseUp method for any cleanup
   MouseUp(Button, Shift, GlobalPos.X, GlobalPos.Y);
-end;
-
-procedure TCustomTagEdit.EditExit(Sender: TObject);
-begin
-  // When leaving the edit, add tag if not empty
-  FinishEdit;
 end;
 
 procedure TCustomTagEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer);
