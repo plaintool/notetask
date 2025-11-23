@@ -1,0 +1,31 @@
+## Development Issues
+- [x] 2024-01-15, ~~**Fix memory leak in authentication service**~~ `bug:critical` // Causing server crashes under high load, requires thorough testing
+- [x] 2024-02-10, ~~Implement dark theme for admin panel~~ `feature:ui` // Multiple user requests for reduced eye strain during night work
+- [x] 2024-03-22, ~~Refactor payment processing module~~ `enhancement`
+- [x] 2024-04-05, ~~**Security patch for SQL injection**~~ `security:critical` // Found during penetration testing, high priority fix
+- [x] 2024-05-18, ~~Add two-factor authentication~~ `feature:security` // Compliance requirement for new data protection regulations
+- [x] 2024-06-30, ~~Optimize database queries for reports~~ `performance` // Reports taking 3+ minutes to generate, affecting user productivity
+- [x] 2024-07-12, ~~Fix timezone issues in calendar widget~~ `bug:frontend`
+- [x] 2024-08-25, **API rate limiting implementation** `security` // Preventing API abuse and ensuring fair usage
+- [x] 2024-09-08, Mobile responsive design for dashboard `feature:ui` // 40% of users now access via mobile devices
+- [x] 2024-10-15, ~~Migrate to new cloud provider~~ `enhancement`
+- [x] 2024-11-10, Fix file upload progress indicator `bug` // Progress bar stuck at 99% even when upload completes
+- [x] 2024-12-28, Add real-time notifications `feature` // Users missing important updates because they don't refresh frequently
+- [x] 2025-01-15, **Patch security vulnerability in user session** `security:critical` // Urgent fix required
+- [x] 2025-02-22, Improve search functionality with filters `enhancement:ux` // Customer feedback indicates current search is too basic
+- [x] 2025-03-30, **Memory optimization in image processing** `performance:backend` // Using 2GB RAM for large batches, causing system slowdowns
+- [x] 2025-04-15, Implement bulk operations for user management `feature` // Admin team spending hours on repetitive tasks
+- [x] 2025-05-10, Fix cross-browser compatibility issues `bug:frontend` // Form validation broken in Safari, date picker issues in Firefox
+- [x] 2025-06-30, Add audit logging for compliance `security` `backend` // Required for upcoming ISO 27001 certification audit
+- [x] 2025-07-15, **Database connection pooling** `performance` // Current implementation hitting connection limits during peak hours
+- [ ] 2025-08-20, Refactor legacy code in billing module `refactor` // Original code written 5 years ago, becoming difficult to maintain
+- [ ] 2025-09-10, Fix SSL certificate renewal automation `devops` // Certificates expiring because renewal script fails silently
+- [ ] 2025-10-28, Add support for multiple languages `feature:i18n` `frontend` // Expanding to European markets requires localization
+- [ ] 2025-11-15, **Upgrade to React 18** `enhancement:frontend` // Current version reaching end of support, need security patches
+- [ ] 2025-12-01, Implement automated backup system `devops` // Manual backups causing gaps in disaster recovery preparedness
+- [ ] 2026-01-20, Fix race condition in inventory management `bug:backend` // Occasionally two users can reserve same item due to timing issue
+- [ ] 2026-02-10, Add unit tests for authentication service `testing` // Current test coverage only 30%, too risky to make changes
+- [ ] 2026-03-01, **Microservices migration planning** `architecture` // Monolithic application becoming too large to deploy and scale
+- [ ] 2026-04-15, Fix memory leaks in mobile app `performance:mobile` // App crashes after prolonged use due to memory buildup
+- [ ] 2026-05-30, Implement feature flags system `feature` // Need ability to roll out features gradually and toggle off if issues
+- [ ] 2026-06-20, **Performance monitoring dashboard** `monitoring` // Currently flying blind on system performance metrics

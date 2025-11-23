@@ -2665,6 +2665,7 @@ begin
     SetInfo;
     SetNote;
     SetTags;
+    SetFilter;
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
@@ -6638,6 +6639,7 @@ begin
   begin
     TagsAdd(FLastGridSelection, tagsEdit.EditBox.Text);
     tagsEdit.EditBox.Text := string.Empty;
+    SetTags;
   end;
 end;
 
