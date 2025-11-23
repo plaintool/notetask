@@ -7695,6 +7695,7 @@ begin
   if (FFindActive) or (taskGrid.RowCount = 0) then exit;
   FFindActive := True;
   aRowsChanged := 0;
+  Enabled := False;
   try
     FindText := aText;
     MatchCase := aMatchCase;
@@ -7909,7 +7910,7 @@ begin
       end;
 
     until ((not WrapAround) and (((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow = 0)))) or
-      (WrapAround and (Counter > taskGrid.RowCount));
+      (WrapAround and (Counter > taskGrid.RowCount)) or (not formFindText.Visible and not formReplaceText.Visible);
 
     if (WrapAround and (Counter > taskGrid.RowCount)) then
       exit(NotFound);
@@ -7917,6 +7918,7 @@ begin
     Result := True;
   finally
     FFindActive := False;
+    Enabled := True;
   end;
 end;
 
@@ -7979,6 +7981,7 @@ begin
     FShowNote := False;
   GridBackupSelection;
   Tasks.CreateBackup; // FBackup = false here
+  Enabled := False;
   try
     if self.ActiveControl = memoNote then
     begin
@@ -8000,7 +8003,7 @@ begin
       Target.SelText := aToText;
 
     // Replace all
-    while (Find(aText, aMatchCase, aWrapAround, True, RowsChanged, True)) do
+    while (Find(aText, aMatchCase, aWrapAround, True, RowsChanged, True)) and (formReplaceText.Visible) do
     begin
       if self.ActiveControl = memoNote then
         Target := memoNote
@@ -8035,6 +8038,7 @@ begin
   finally
     FBackup := True;
     FShowNote := sShowNote;
+    Enabled := True;
   end;
 end;
 
