@@ -98,10 +98,10 @@ type
     procedure Loaded; override;
     procedure ParentFontChanged; override;
     procedure FontChanged(Sender: TObject); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Click; override;
     procedure ShowPopupForm;
     procedure HidePopupForm;
     procedure ToggleSelectedChecks;
@@ -484,24 +484,28 @@ begin
   UpdatePopupStyles;
 end;
 
-procedure TCheckListButton.UpdatePopupStyles;
+procedure TCheckListButton.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  if Assigned(FPopupForm) then
-    FPopupForm.UpdateStylesFromButton;
-end;
+  inherited MouseUp(Button, Shift, X, Y);
 
-procedure TCheckListButton.Click;
-begin
+  // Only handle left mouse button
+  if Button <> mbLeft then Exit;
+
   // Initialize form if needed
   InitializePopupForm;
-
-  // Simple toggle - the form knows when to hide itself
   if not Assigned(FPopupForm) then Exit;
 
+  // Simple toggle - the form knows when to hide itself
   if FPopupForm.Visible then
     HidePopupForm
   else
     ShowPopupForm;
+end;
+
+procedure TCheckListButton.UpdatePopupStyles;
+begin
+  if Assigned(FPopupForm) then
+    FPopupForm.UpdateStylesFromButton;
 end;
 
 procedure TCheckListButton.ShowPopupForm;

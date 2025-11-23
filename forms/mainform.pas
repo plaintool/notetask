@@ -909,7 +909,7 @@ begin
   aRunPowershell.Enabled := False;
   aPageProperties.Visible := False;
   aPageProperties.Enabled := False;
-  filterClear.Flat:=False;
+  filterClear.Flat := False;
   {$ENDIF}
 end;
 
