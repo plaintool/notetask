@@ -2695,11 +2695,11 @@ begin
   if tagsEdit.Focused then
   begin
     {$IFDEF UNIX}
-    if not editTags.ReadOnly then
+    if not tagsEdit.ReadOnly then
     begin
-      if editTags.EditBox.SelLength = 0 then
-        editTags.EditBox.SelLength := CalcDeleteCount(editTags.EditBox.Text, editTags.EditBox.SelStart);
-      editTags.EditBox.ClearSelection;
+      if tagsEdit.EditBox.SelLength = 0 then
+        tagsEdit.EditBox.SelLength := CalcDeleteCount(tagsEdit.EditBox.Text, tagsEdit.EditBox.SelStart);
+      tagsEdit.EditBox.ClearSelection;
     end;
     {$ENDIF}
     exit;
