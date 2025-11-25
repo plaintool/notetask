@@ -620,7 +620,7 @@ type
     procedure MoveTabRight(Index: integer);
     procedure ChangeGroup(Index: integer);
     procedure CalcDefaultColWidth;
-    procedure CalcRowHeights(aRow: integer = 0; aForce: boolean = False);
+    procedure CalcRowHeight(aRow: integer = 0; aForce: boolean = False);
     procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     procedure BackupSelectedState(aRowMem: boolean = False);
@@ -954,6 +954,13 @@ begin
 
   if not FileOpened then NewFile(False);
 
+  // Before paint form
+  SetCaption;
+  RestoreSelectedState(True, True, True);
+  Tasks.CalcTagsWidths(-1, taskGrid.Columns[1].Width, tagsEdit, Font);
+  CalcRowHeight(0, True);
+
+  // Paint Form
   if (not Application.Terminated) then
   begin
     OnShow := nil;
@@ -967,13 +974,7 @@ begin
     {$ENDIF}
   end;
 
-  SetCaption;
-
-  RestoreSelectedState(True, True, True);
-
-  // The sequence is critical: configure the settings after the state has been loaded
-  CalcRowHeights(0, True);
-
+  // After paint form
   if (ReadOnly) then ShowMessage(rfilereadonly);
 end;
 
@@ -1447,7 +1448,7 @@ procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; 
 begin
   taskGridResize(Sender);
   if IsColumn then
-    CalcRowHeights(0, True);
+    CalcRowHeight(0, True);
   EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 2, -2, -2, 0);
 end;
@@ -1736,14 +1737,21 @@ begin
             BitTags.Transparent := True;
             TagsWidth := BitTags.Width;
             task.TagsWidth := TagsWidth;
-            if taskGrid.BiDiMode = bdLeftToRight then
-              grid.canvas.Draw(aRect.Right - TagsWidth - 5, aRect.Top, BitTags)
+            if TagsWidth < aRect.Width - 50 then
+            begin
+              if taskGrid.BiDiMode = bdLeftToRight then
+                grid.canvas.Draw(aRect.Right - TagsWidth - 5, aRect.Top, BitTags)
+              else
+                grid.canvas.Draw(aRect.Left + 5, aRect.Top, BitTags);
+            end
             else
-              grid.canvas.Draw(aRect.Left + 5, aRect.Top, BitTags);
+              TagsWidth := 0;
           finally
             BitTags.Free;
           end;
-        end;
+        end
+        else
+          TagsWidth := task.TagsWidth;
       end;
     end;
 
@@ -2024,7 +2032,8 @@ begin
   Tasks.CreateBackup;
   GridBackupSelection;
 
-  ResetRowHeight;
+  Tasks.CalcTagsWidths(-1, taskGrid.Columns[1].Width, tagsEdit, Font);
+  CalcRowHeight(0, True);
   SetNote;
   SetTags;
   SetInfo;
@@ -2782,7 +2791,7 @@ begin
     // Apply the selected font to the form
     Self.Font := fontDialog.Font;
 
-    CalcRowHeights(0, True);
+    CalcRowHeight(0, True);
   end;
 end;
 
@@ -3961,7 +3970,7 @@ procedure TformNotetask.memoNoteChange(Sender: TObject);
 begin
   taskGrid.Cells[3, taskGrid.Row] := memoNote.Text;
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
-  CalcRowHeights(taskGrid.Row);
+  CalcRowHeight(taskGrid.Row);
   SetChanged;
 end;
 
@@ -5260,7 +5269,7 @@ begin
   Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
   FMemoStartEdit := False;
   SetChanged;
-  CalcRowHeights(taskGrid.Row);
+  CalcRowHeight(taskGrid.Row);
   EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
   if (taskGrid.Col = 3) then
     SetNote;
@@ -5468,7 +5477,7 @@ begin
     taskGrid.Selection := Sel;
     FLastSelectionHeight := Sel.Height;
   end;
-  CalcRowHeights(0, True);
+  CalcRowHeight(0, True);
   SetInfo;
   SetNote;
   SetTags;
@@ -5681,7 +5690,7 @@ begin
   // Refresh grid and UI
   Sel := taskGrid.Selection;
   FillGrid;
-  CalcRowHeights(0, True);
+  CalcRowHeight(0, True);
   SetInfo;
   SetNote;
   SetTags;
@@ -6027,7 +6036,7 @@ begin
       if (not Outdent) then
       begin
         taskGrid.Cells[2, RowIndex] := IndentStr + taskGrid.Cells[2, RowIndex];
-        CalcRowHeights;
+        CalcRowHeight;
       end
       else
         taskGrid.Cells[2, RowIndex] := TrimLeadingSpaces(taskGrid.Cells[2, RowIndex], Length(unicodestring(IndentStr)));
@@ -6882,7 +6891,7 @@ procedure TformNotetask.FillGrid;
 begin
   DisableGridEvents;
   Tasks.FillGrid(taskGrid, FShowArchived, FShowDuration, FShowTime, SortOrder, SortColumn, FilterBox.Text);
-  CalcRowHeights;
+  CalcRowHeight;
   EnableGridEvents;
 end;
 
@@ -6894,7 +6903,7 @@ begin
     taskGrid.DefaultColWidth := Canvas.TextWidth('10000');
 end;
 
-procedure TformNotetask.CalcRowHeights(aRow: integer = 0; aForce: boolean = False);
+procedure TformNotetask.CalcRowHeight(aRow: integer = 0; aForce: boolean = False);
 var
   FromRow, ToRow: integer;
 
@@ -7023,7 +7032,7 @@ begin
       Memo.Height := h;
 
     if (aCalcRowHeight) then
-      CalcRowHeights(aRow);
+      CalcRowHeight(aRow);
   finally
     taskGrid.EndUpdate;
   end;

@@ -15,10 +15,12 @@ uses
   Classes,
   SysUtils,
   Math,
+  Graphics,
   Grids,
   Clipbrd,
   StrUtils,
   DateUtils,
+  TagEdit,
   formattool;
 
 type
@@ -146,6 +148,7 @@ type
     procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
     function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;
     procedure FillTags;
+    procedure CalcTagsWidths(Group: integer; ColWidth: integer; TagsEdit: TTagEdit; Font: TFont);
     procedure CreateBackup;
     procedure UndoBackup;
     procedure CreateBackupInit;
@@ -1290,7 +1293,7 @@ end;
 
 function TTasks.MoveTasksTop(Index1, Index2: integer; ShowArchived: boolean): integer;
 var
-  TempTasks: array of TTask;
+  TempTasks: array of TTask = ();
   i, IndStart, IndEnd, Len, TargetIndex: integer;
 begin
   Result := -1;
@@ -1351,7 +1354,7 @@ end;
 
 function TTasks.MoveTasksBottom(Index1, Index2: integer; ShowArchived: boolean): integer;
 var
-  TempTasks: array of TTask;
+  TempTasks: array of TTask = ();
   i, IndStart, IndEnd, Len, TargetIndex: integer;
 begin
   Result := -1;
@@ -1887,6 +1890,33 @@ begin
     Up.Free;
     Down.Free;
   end;
+end;
+
+procedure TTasks.CalcTagsWidths(Group: integer; ColWidth: integer; TagsEdit: TTagEdit; Font: TFont);
+var
+  i: integer;
+  BitTags: TBitmap;
+
+  procedure CalcTask(task: TTask);
+  begin
+    if task.Tags.Count > 0 then
+    begin
+      BitTags := TagsEdit.GetTagsBitmap(task.Tags, Max(Font.Size div 2 + 2, 8), Min(ColWidth, 500), 32, 2);
+      try
+        task.TagsWidth := BitTags.Width;
+      finally
+        BitTags.Free;
+      end;
+    end;
+  end;
+
+begin
+  if Group < 0 then
+    for i := 0 to High(FTaskList) do
+      CalcTask(FTaskList[i])
+  else
+    for i := 0 to High(FGroupList[Group]) do
+      CalcTask(FGroupList[Group][i]);
 end;
 
 procedure TTasks.CreateBackup;
