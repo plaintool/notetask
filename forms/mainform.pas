@@ -2870,9 +2870,9 @@ begin
   selCol := taskGrid.Col;
 
   if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTasksTop(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
+    newRow := Tasks.MoveTasksTop(taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowArchived)
   else
-    newRow := Tasks.MoveTasksBottom(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
+    newRow := Tasks.MoveTasksBottom(taskGrid.Selection.Bottom, taskGrid.Selection.Top, FShowArchived);
 
   FillGrid;
   if (newRow > -1) then
@@ -2902,9 +2902,9 @@ begin
   selCol := taskGrid.Col;
 
   if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTasksBottom(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
+    newRow := Tasks.MoveTasksBottom(taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowArchived)
   else
-    newRow := Tasks.MoveTasksTop(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
+    newRow := Tasks.MoveTasksTop(taskGrid.Selection.Bottom, taskGrid.Selection.Top, FShowArchived);
 
   FillGrid;
   if (newRow > -1) then

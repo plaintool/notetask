@@ -137,8 +137,8 @@ type
     function MoveGroupLeft(Index: integer; aShowArchived: boolean; aFilter: string; DisplayTime: boolean): integer;
     function MoveGroupRight(Index: integer; aShowArchived: boolean; aFilter: string; DisplayTime: boolean): integer;
     function MoveGroupTasks(Index1, Index2, NewGroup: integer): integer;
-    function MoveTasksTop(Index1, Index2: integer): integer;
-    function MoveTasksBottom(Index1, Index2: integer): integer;
+    function MoveTasksTop(Index1, Index2: integer; ShowArchived: boolean): integer;
+    function MoveTasksBottom(Index1, Index2: integer; ShowArchived: boolean): integer;
     function MoveTasksUp(Index1, Index2: integer): integer;
     function MoveTasksDown(Index1, Index2: integer): integer;
     procedure SwapTasks(OldIndex, NewIndex: integer);
@@ -1288,71 +1288,131 @@ begin
   Result := LastTask;
 end;
 
-function TTasks.MoveTasksTop(Index1, Index2: integer): integer;
+function TTasks.MoveTasksTop(Index1, Index2: integer; ShowArchived: boolean): integer;
 var
-  TempTasks: array of TTask; // Temporary array for selected tasks
-  i, IndStart, IndEnd, Len: integer;
+  TempTasks: array of TTask;
+  i, IndStart, IndEnd, Len, TargetIndex: integer;
 begin
   Result := -1;
   IndStart := Map(Index1);
   IndEnd := Map(Index2);
   Len := IndEnd - IndStart + 1;
 
-  // Check if the Index1 is valid and not already at the top
-  if (IndStart > 0) and (IndEnd <= Count) then
-  begin
-    CreateBackup;
-
-    // Save selected tasks to temporary array
-    TempTasks := [];
-    SetLength(TempTasks, Len);
-    for i := IndStart to IndEnd do
-      TempTasks[i - IndStart] := FTaskList[i];
-
-    // Shift tasks down to make room at the top
-    for i := IndEnd downto Len do
-      FTaskList[i] := FTaskList[i - Len];
-
-    // Place saved tasks at the top in the original order
-    for i := 0 to High(TempTasks) do
-      FTaskList[i] := TempTasks[i];
-
-    SetLength(TempTasks, 0);
-    TempTasks := nil;
-    Result := 1;
-  end;
-end;
-
-function TTasks.MoveTasksBottom(Index1, Index2: integer): integer;
-var
-  TempTasks: array of TTask; // Temporary array for selected tasks
-  i, IndStart, IndEnd, Len: integer;
-begin
-  Result := -1;
-  IndStart := Map(Index1);
-  IndEnd := Map(Index2);
-  Len := IndEnd - IndStart + 1;
-
-  // Check if the Index1 is valid and not already at the bottom
+  // Check if the Index1 is valid
   if (IndStart >= 0) and (IndEnd < Count) then
   begin
     CreateBackup;
 
+    // Determine target index based on ShowArchived
+    if ShowArchived then
+      TargetIndex := 0
+    else
+    begin
+      // Find the first non-archived task from the top
+      TargetIndex := 0;
+      while (TargetIndex < Count) and FTaskList[TargetIndex].FArchive do
+        Inc(TargetIndex);
+    end;
+
+    // Don't move if we're already at the correct position
+    if IndStart = TargetIndex then
+    begin
+      Result := 0;
+      Exit;
+    end;
+
     // Save selected tasks to temporary array
-    TempTasks := [];
     SetLength(TempTasks, Len);
     for i := IndStart to IndEnd do
       TempTasks[i - IndStart] := FTaskList[i];
 
-    // Shift all tasks down to fill the gap
-    for i := IndStart to Count - 1 - Len do
-      FTaskList[i] := FTaskList[i + Len];
+    if IndStart > TargetIndex then
+    begin
+      // Moving up - shift tasks between TargetIndex and IndStart-1 down
+      for i := IndStart - 1 downto TargetIndex do
+        FTaskList[i + Len] := FTaskList[i];
+    end
+    else
+    begin
+      // Moving down - shift tasks between IndEnd+1 and TargetIndex-1 up
+      for i := IndEnd + 1 to TargetIndex - 1 do
+        FTaskList[i - Len] := FTaskList[i];
+      TargetIndex := TargetIndex - Len;
+    end;
 
-    // Place the stored task at the end
+    // Place saved tasks at the target position
     for i := 0 to High(TempTasks) do
-      FTaskList[Count - len + i] := TempTasks[i];
+      FTaskList[TargetIndex + i] := TempTasks[i];
 
-    Result := Length(MapGrid) - 1; //ReverseMap(FCount);
+    SetLength(TempTasks, 0);
+    Result := 1;
+  end;
+end;
+
+function TTasks.MoveTasksBottom(Index1, Index2: integer; ShowArchived: boolean): integer;
+var
+  TempTasks: array of TTask;
+  i, IndStart, IndEnd, Len, TargetIndex: integer;
+begin
+  Result := -1;
+  IndStart := Map(Index1);
+  IndEnd := Map(Index2);
+  Len := IndEnd - IndStart + 1;
+
+  // Check if the Index1 is valid
+  if (IndStart >= 0) and (IndEnd < Count) then
+  begin
+    CreateBackup;
+
+    // Determine target index based on ShowArchived
+    if ShowArchived then
+      TargetIndex := Count - 1
+    else
+    begin
+      // Find the last non-archived task from the bottom
+      TargetIndex := Count - 1;
+      while (TargetIndex >= 0) and FTaskList[TargetIndex].FArchive do
+        Dec(TargetIndex);
+    end;
+
+    // Don't move if we're already at the correct position
+    if IndEnd = TargetIndex then
+    begin
+      Result := TargetIndex;
+      Exit;
+    end;
+
+    // Save selected tasks to temporary array
+    SetLength(TempTasks, Len);
+    for i := IndStart to IndEnd do
+      TempTasks[i - IndStart] := FTaskList[i];
+
+    if IndEnd < TargetIndex then
+    begin
+      // Moving down - shift tasks between IndEnd+1 and TargetIndex up
+      for i := IndEnd + 1 to TargetIndex do
+        FTaskList[i - Len] := FTaskList[i];
+
+      // Place saved tasks at the target position
+      for i := 0 to High(TempTasks) do
+        FTaskList[TargetIndex - Len + 1 + i] := TempTasks[i];
+
+      Result := TargetIndex - Len + 1;
+    end
+    else
+    begin
+      // Moving up - shift tasks between TargetIndex+1 and IndStart-1 down
+      for i := IndStart - 1 downto TargetIndex + 1 do
+        FTaskList[i + Len] := FTaskList[i];
+
+      // Place saved tasks at the target position
+      for i := 0 to High(TempTasks) do
+        FTaskList[TargetIndex + 1 + i] := TempTasks[i];
+
+      Result := TargetIndex + 1;
+    end;
+
+    SetLength(TempTasks, 0);
   end;
 end;
 
