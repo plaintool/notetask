@@ -328,13 +328,14 @@ type
     procedure ApplicationOnException(Sender: TObject; E: Exception);
     procedure ApplicationOnQueryEndSession(var CanEnd: boolean);
     procedure ApplicationOnShowHint(var HintStr: string; var CanShow: boolean; var HintInfo: THintInfo);
-
-    procedure memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure memoNoteDblClick(Sender: TObject);
     procedure memoNoteEnter(Sender: TObject);
     procedure memoNoteExit(Sender: TObject);
-    procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure memoNoteChange(Sender: TObject);
+    procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure memoNoteKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure memoNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure tagsEditTagClick(Sender: TObject; const TagText: string);
     procedure tagsEditChange(Sender: TObject);
@@ -519,10 +520,12 @@ type
     FLastTabMouseX: integer;
     FLastTabTarget: integer;
     FLastTabFilter: integer;
+    FNoteLastIndex, FNoteSelStart, FNoteSelLength: integer;
+    FNoteLastSelText: string;
+    FNoteLastSelStart, FNoteLastSelLength: integer;
     FGroupIndexMap: array of integer;
     FDragTab: integer;
     FNoteSelecting: boolean;
-    FNoteLastIndex, FNoteSelStart, FNoteSelLength: integer;
     FKeyPressed: TUTF8Char;
     FLoadedSelectedTab, FLoadedSelectedRow: integer;
     FLoadedSelection: TRect;
@@ -1879,8 +1882,10 @@ begin
     Memo.OnEnter := @MemoEnter; // Event Enter
     Memo.OnChange := @MemoChange; // Event Change
     Memo.OnKeyDown := @MemoKeyDown; // Event KeyDown
-    Memo.OnMouseDown := @memoNoteMouseDown; // Event MouseDown
-    Memo.OnDblClick := @memoNoteDblClick; // Event MouseDown
+    Memo.OnMouseDown := @MemoNoteMouseDown; // Event MouseDown
+    Memo.OnDblClick := @MemoNoteDblClick; // Event MouseDown
+    Memo.OnKeyUp := @MemoNoteKeyUp; // Event KeyUp
+    Memo.OnMouseUp := @MemoNoteMouseUp; // Event MouseUp
     if (aCol = 4) then
       Memo.OnKeyPress := @MemoKeyPress; // Event KeyPress for amount column only
     Memo.Text := taskGrid.Cells[aCol, aRow];
@@ -3981,12 +3986,132 @@ begin
       taskGrid.SetFocus;
 end;
 
+procedure TformNotetask.memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+var
+  Value: string;
+begin
+  if not (ssDouble in Shift) then
+  begin
+    if ssCtrl in Shift then
+    begin
+      Value := Trim(FNoteLastSelText);
+
+      if IsURL(Value) then
+        OpenURL(IfThen(HasScheme(Value), Value, http + Value))
+      else
+      if IsEmail(Value) then
+        OpenURL(IfThen(AnsiStartsText(mailto, Value), Value, mailto + Value));
+
+      (Sender as TMemo).SelStart := FNoteLastSelStart;
+      (Sender as TMemo).SelLength := FNoteLastSelLength;
+    end
+    else
+      FMemoSelStartClicked := (Sender as TMemo).SelStart;
+  end;
+end;
+
+procedure TformNotetask.memoNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  if not (ssCtrl in Shift) then
+  begin
+    FNoteLastSelText := (Sender as TMemo).SelText;
+    FNoteLastSelStart := (Sender as TMemo).SelStart;
+    FNoteLastSelLength := (Sender as TMemo).SelLength;
+  end;
+end;
+
+procedure TformNotetask.memoNoteKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
+begin
+  FNoteLastSelText := (Sender as TMemo).SelText;
+  FNoteLastSelStart := (Sender as TMemo).SelStart;
+  FNoteLastSelLength := (Sender as TMemo).SelLength;
+end;
+
 procedure TformNotetask.memoNoteChange(Sender: TObject);
 begin
   taskGrid.Cells[3, taskGrid.Row] := memoNote.Text;
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
   CalcRowHeight(taskGrid.Row);
   SetChanged;
+end;
+
+procedure TformNotetask.memoNoteDblClick(Sender: TObject);
+{$IFDEF WINDOWS}
+var
+  Value: unicodestring;
+  pos1, leftIdx, rightIdx, len: integer;
+  ch: widechar;
+
+  function CharType(ch: widechar): integer;
+  begin
+    // 1 = letter or digit
+    // 2 = space
+    // 3 = other symbol
+    if IsLetterOrDigit(ch) or (ch = '_') or (ch = '-') or (ch = '@') then
+      Result := 1
+    else if ch = ' ' then
+      Result := 2
+    else
+      Result := 3;
+  end;
+{$ENDIF}
+begin
+  {$IFDEF WINDOWS}
+  Value := unicodestring((Sender as TMemo).Text);
+  len := Length(Value);
+  if len = 0 then Exit;
+
+  if (FMemoSelStartClicked >= 0) then
+    pos1 := FMemoSelStartClicked + 1
+  else
+    pos1 := (Sender as TMemo).SelStart + 1;
+
+  if pos1 < 1 then pos1 := 1;
+  if pos1 > len then pos1 := len;
+
+  ch := Value[pos1];
+  leftIdx := pos1;
+  rightIdx := pos1 + 1;
+
+  case CharType(ch) of
+    1: // word (letters/digits/_/-)
+    begin
+      while (leftIdx > 1) and (CharType(Value[leftIdx - 1]) = 1) do Dec(leftIdx);
+      while (rightIdx <= len) and (CharType(Value[rightIdx]) = 1) do Inc(rightIdx);
+
+      // extend with dot-joined tokens (.exe, .tar.gz etc.)
+      while (leftIdx > 2) and (Value[leftIdx - 1] = '.') and (CharType(Value[leftIdx - 2]) = 1) do
+      begin
+        Dec(leftIdx); // include dot
+        while (leftIdx > 1) and (CharType(Value[leftIdx - 1]) = 1) do Dec(leftIdx);
+      end;
+      while (rightIdx < len) and (Value[rightIdx] = '.') and (CharType(Value[rightIdx + 1]) = 1) do
+      begin
+        Inc(rightIdx); // include dot
+        while (rightIdx <= len) and (CharType(Value[rightIdx]) = 1) do Inc(rightIdx);
+      end;
+    end;
+
+    2: // spaces
+    begin
+      while (leftIdx > 1) and (Value[leftIdx - 1] = ' ') do Dec(leftIdx);
+      while (rightIdx <= len) and (Value[rightIdx] = ' ') do Inc(rightIdx);
+    end;
+
+    3: // other symbols
+    begin
+      while (leftIdx > 1) and (Value[leftIdx - 1] = ch) do Dec(leftIdx);
+      while (rightIdx <= len) and (Value[rightIdx] = ch) do Inc(rightIdx);
+    end;
+    else
+      ; // NOP
+  end;
+
+  // Apply selection
+  (Sender as TMemo).SelStart := leftIdx - 1;
+  (Sender as TMemo).SelLength := rightIdx - leftIdx;
+  {$ENDIF}
+  FMemoSelStartClicked := -1;
 end;
 
 procedure TformNotetask.tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -4082,93 +4207,6 @@ procedure TformNotetask.tagsEditExit(Sender: TObject);
 begin
   FLastGridSelection := taskGrid.Selection;
   Application.QueueAsyncCall(@DelayedFinishTagEdit, 0);
-end;
-
-procedure TformNotetask.memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-begin
-  if not (ssDouble in Shift) then
-  begin
-    FMemoSelStartClicked := (Sender as TMemo).SelStart;
-  end;
-end;
-
-procedure TformNotetask.memoNoteDblClick(Sender: TObject);
-{$IFDEF WINDOWS}
-var
-  Value: unicodestring;
-  pos1, leftIdx, rightIdx, len: integer;
-  ch: widechar;
-
-  function CharType(ch: widechar): integer;
-  begin
-    // 1 = letter or digit
-    // 2 = space
-    // 3 = other symbol
-    if IsLetterOrDigit(ch) or (ch = '_') or (ch = '-') or (ch = '@') then
-      Result := 1
-    else if ch = ' ' then
-      Result := 2
-    else
-      Result := 3;
-  end;
-{$ENDIF}
-begin
-  {$IFDEF WINDOWS}
-  Value := unicodestring((Sender as TMemo).Text);
-  len := Length(Value);
-  if len = 0 then Exit;
-
-  if (FMemoSelStartClicked >= 0) then
-    pos1 := FMemoSelStartClicked + 1
-  else
-    pos1 := (Sender as TMemo).SelStart + 1;
-
-  if pos1 < 1 then pos1 := 1;
-  if pos1 > len then pos1 := len;
-
-  ch := Value[pos1];
-  leftIdx := pos1;
-  rightIdx := pos1 + 1;
-
-  case CharType(ch) of
-    1: // word (letters/digits/_/-)
-    begin
-      while (leftIdx > 1) and (CharType(Value[leftIdx - 1]) = 1) do Dec(leftIdx);
-      while (rightIdx <= len) and (CharType(Value[rightIdx]) = 1) do Inc(rightIdx);
-
-      // extend with dot-joined tokens (.exe, .tar.gz etc.)
-      while (leftIdx > 2) and (Value[leftIdx - 1] = '.') and (CharType(Value[leftIdx - 2]) = 1) do
-      begin
-        Dec(leftIdx); // include dot
-        while (leftIdx > 1) and (CharType(Value[leftIdx - 1]) = 1) do Dec(leftIdx);
-      end;
-      while (rightIdx < len) and (Value[rightIdx] = '.') and (CharType(Value[rightIdx + 1]) = 1) do
-      begin
-        Inc(rightIdx); // include dot
-        while (rightIdx <= len) and (CharType(Value[rightIdx]) = 1) do Inc(rightIdx);
-      end;
-    end;
-
-    2: // spaces
-    begin
-      while (leftIdx > 1) and (Value[leftIdx - 1] = ' ') do Dec(leftIdx);
-      while (rightIdx <= len) and (Value[rightIdx] = ' ') do Inc(rightIdx);
-    end;
-
-    3: // other symbols
-    begin
-      while (leftIdx > 1) and (Value[leftIdx - 1] = ch) do Dec(leftIdx);
-      while (rightIdx <= len) and (Value[rightIdx] = ch) do Inc(rightIdx);
-    end;
-    else
-      ; // NOP
-  end;
-
-  // Apply selection
-  (Sender as TMemo).SelStart := leftIdx - 1;
-  (Sender as TMemo).SelLength := rightIdx - leftIdx;
-  {$ENDIF}
-  FMemoSelStartClicked := -1;
 end;
 
 procedure TformNotetask.NewFile(SaveSetting: boolean = True);
@@ -5278,6 +5316,18 @@ begin
   end;
 end;
 
+procedure TformNotetask.MemoKeyPress(Sender: TObject; var Key: char);
+begin
+  // Event KeyPress for Amount column only
+  // Replace comma with dot for decimal input
+  if Key in ['.', ','] then
+    Key := DefaultFormatSettings.DecimalSeparator;
+
+  // Allow digits and one decimal point
+  if not (Key in ['0'..'9', DefaultFormatSettings.DecimalSeparator, '-', '+', '/', '*', '%', '^', '(', ')', ' ', #8, #13]) then
+    Key := #0; // Block other keys
+end;
+
 procedure TformNotetask.MemoChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
@@ -5340,18 +5390,6 @@ begin
     if Memo.SelLength > 0 then
       MemoBackup;
   end;
-end;
-
-procedure TformNotetask.MemoKeyPress(Sender: TObject; var Key: char);
-begin
-  // Event KeyPress for Amount column only
-  // Replace comma with dot for decimal input
-  if Key in ['.', ','] then
-    Key := DefaultFormatSettings.DecimalSeparator;
-
-  // Allow digits and one decimal point
-  if not (Key in ['0'..'9', DefaultFormatSettings.DecimalSeparator, '-', '+', '/', '*', '%', '^', '(', ')', ' ', #8, #13]) then
-    Key := #0; // Block other keys
 end;
 
 procedure TformNotetask.DatePickerEnter(Sender: TObject);

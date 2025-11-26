@@ -176,7 +176,9 @@ object formNotetask: TformNotetask
       OnEnter = memoNoteEnter
       OnExit = memoNoteExit
       OnKeyDown = memoNoteKeyDown
+      OnKeyUp = memoNoteKeyUp
       OnMouseDown = memoNoteMouseDown
+      OnMouseUp = memoNoteMouseUp
     end
   end
   object panelTabs: TPanel
