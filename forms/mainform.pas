@@ -2053,6 +2053,12 @@ procedure TformNotetask.groupTabsMouseMove(Sender: TObject; Shift: TShiftState; 
 var
   target: integer;
 begin
+  if not (ssLeft in Shift) then
+  begin
+    groupTabsMouseLeave(Self);
+    exit;
+  end;
+
   target := groupTabs.IndexOfTabAt(X, Y);
   if FDragTab >= 0 then
   begin
