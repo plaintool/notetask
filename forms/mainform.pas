@@ -2208,14 +2208,19 @@ end;
 procedure TformNotetask.filterBoxChange(Sender: TObject);
 var
   LastTask, LastTab: integer;
+  LastSelTop, LastSelBottom: integer;
+  LastRect, NewRect: TGridRect;
 begin
   LastTask := Tasks.Map(taskGrid.Row);
   LastTab := FindGroupRealIndex(groupTabs.TabIndex);
+  LastSelTop := Tasks.Map(taskGrid.Selection.Top);
+  LastSelBottom := Tasks.Map(taskGrid.Selection.Bottom);
+  LastRect := taskGrid.Selection;
+
   if (Trim(filterBox.Text) <> string.Empty) and (FLastTabFilter < 0) then
   begin
     FLastTabFilter := LastTab;
   end;
-
   SetTabs;
   FillGrid;
 
@@ -2225,8 +2230,12 @@ begin
   if Trim(filterBox.Text) = string.Empty then
     FLastTabFilter := -1;
 
-
-  taskGrid.ClearSelections;
+  NewRect := Rect(LastRect.Left, Tasks.ReverseMap(LastSelTop), LastRect.Right, Tasks.ReverseMap(LastSelBottom));
+  if (LastRect.Height = NewRect.Height) then
+    taskGrid.Selection := NewRect
+  else
+    taskGrid.ClearSelections;
+  CalcRowHeight(0, True);
   SetInfo;
   SetNote;
   SetTags;
