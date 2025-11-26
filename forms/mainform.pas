@@ -6066,6 +6066,7 @@ begin
   end;
 
   SetChanged;  // Mark that data has changed
+  GridInvalidate;
 end;
 
 procedure TformNotetask.IndentTasks(Outdent: boolean = False);

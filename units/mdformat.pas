@@ -36,6 +36,7 @@ function TaskFromString(const TaskString: string): TTask;
 var
   PartNote, PartDate, PartSpace: TStringArray; // Use TStringArray for compatibility
   CompletedStr, CleanedText: string;
+  i: integer;
 
   function TestParts(Part: TStringArray; var Result1: TTask; const Separator: string = ','): boolean;
   begin
@@ -105,7 +106,7 @@ var
 begin
   Result := TTask.Create;
 
-  // Format: - [x] 01.01.2000, 123, ~~**Task**~~ // Note
+  // Format: - [x] 01.01.2000, 123, ~~**Task**~~ `tag1` `tag2` // Note
   Result.FSpaceBeforeNote := True;
   Result.FSpaceAfterNote := True;
   Result.FNoteItalic := False;
@@ -113,32 +114,37 @@ begin
 
   // Split the task string into PartNote
   PartNote := TaskString.Split(['//']);
-  if (Length(PartNote) >= 2) and (not PartNote[0].EndsWith(':')) then // Url protection
-  begin
-    CompletedStr := PartNote[0];
-    if (Length(CompletedStr) > 0) and (CompletedStr.EndsWith(' ')) then
-    begin
-      Delete(CompletedStr, Length(CompletedStr), 1);
-      Result.FSpaceBeforeNote := True;
-    end
-    else
-      Result.FSpaceBeforeNote := False;
+  if (Length(PartNote) >= 2) then
+    for i := 0 to High(PartNote) do
+      if (not PartNote[i].EndsWith(':')) then // Url protection
+      begin
+        CompletedStr := JoinArrayText(PartNote, 0, '//', i).TrimRight('//');
+        if (Length(CompletedStr) > 0) and (CompletedStr.EndsWith(' ')) then
+        begin
+          Delete(CompletedStr, Length(CompletedStr), 1);
+          Result.FSpaceBeforeNote := True;
+        end
+        else
+          Result.FSpaceBeforeNote := False;
 
-    if (Length(PartNote[1]) > 0) and (PartNote[1].StartsWith(' ')) then
-    begin
-      Delete(PartNote[1], 0, 1);
-      Result.FSpaceAfterNote := True;
-    end
-    else
-      Result.FSpaceAfterNote := False;
+        if (Length(PartNote) > i + 1) and (Length(PartNote[i + 1]) > 0) and (PartNote[i + 1].StartsWith(' ')) then
+        begin
+          Delete(PartNote[i + 1], 0, 1);
+          Result.FSpaceAfterNote := True;
+        end
+        else
+          Result.FSpaceAfterNote := False;
 
-    Result.FNote := JoinArrayText(PartNote, 1, '//');
+        Result.FNote := JoinArrayText(PartNote, i + 1, '//');
 
-    // Test for empty Note symbols
-    if (Result.FNote.Trim = string.empty) then
-      Result.FEmptyNote := True;
-  end
-  else
+        // Test for empty Note symbols
+        if (Result.FNote.Trim = string.empty) then
+          Result.FEmptyNote := True;
+
+        Break;
+      end;
+
+  if (CompletedStr = string.Empty) then
     CompletedStr := JoinArrayText(PartNote, 0, '//');
 
   // Remove star in start and end of Note

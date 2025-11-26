@@ -85,7 +85,7 @@ function IsURL(const S: string): boolean;
 
 function HasScheme(const URL: string): boolean;
 
-function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
+function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','; EndIndex: integer = -1): string;
 
 function RemoveBacktickBlocks(const S: string): string;
 
@@ -764,7 +764,7 @@ begin
     (Pos('sms:', LowerCase(URL)) = 1);
 end;
 
-function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','): string;
+function JoinArrayText(const Parts: TStringArray; StartIndex: integer = 0; const Separator: string = ','; EndIndex: integer = -1): string;
 var
   i: integer;
 begin
@@ -774,7 +774,7 @@ begin
   if StartIndex < 0 then StartIndex := 0;
   if StartIndex > High(Parts) then Exit;
 
-  for i := StartIndex to High(Parts) do
+  for i := StartIndex to ifthen(EndIndex < 0, High(Parts), EndIndex) do
   begin
     Result += Parts[i];
     if i < High(Parts) then
