@@ -1062,8 +1062,8 @@ begin
   try
     List.Assign(AItems);
     List.CaseSensitive := False;
-    List.Sorted := True;
-    List.Sort;
+    List.Sorted := FSorted;
+    if FSorted then List.Sort;
     List.Sorted := False;
     List.CaseSensitive := ACaseSensitive;
     for i := 0 to List.Count - 1 do

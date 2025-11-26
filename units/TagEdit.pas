@@ -107,6 +107,7 @@ type
     function GetTagHeight(AFontSize: integer = -1): integer;
     function GetTagRect(Index: integer): TRect;
     function GetHoveredTag: string;
+    function GetSuggestedItemsSorted: boolean;
 
     procedure SetTags(Value: TStringList);
     procedure SetSuggestedTags(Value: TStringList);
@@ -116,6 +117,7 @@ type
     procedure SetTextHint(Value: TTranslateString);
     procedure SetSelectionColor(Value: TColor);
     procedure SetTagColors(Value: TTagColorItems);
+    procedure SetSuggestedItemsSorted(Value: boolean);
 
     function RemovalConfirmed(idx: integer = -1): boolean;
     function TagAtPos(const P: TPoint): integer;
@@ -197,6 +199,7 @@ type
     property Enabled: boolean read FEnabled write SetEnabled;
     property TagColors: TTagColorItems read FTagColors write SetTagColors;
     property HoveredTag: string read GetHoveredTag;
+    property SuggestedItemsSorted: boolean read GetSuggestedItemsSorted write SetSuggestedItemsSorted default False;
     property SelectionColor: TColor read FSelectionColor write SetSelectionColor default clHighlight;
     property SelectionRectColor: TColor read FSelectionRectColor write FSelectionRectColor default clHighlight;
     property SelectionRectPenStyle: TPenStyle read FSelectionRectPenStyle write FSelectionRectPenStyle default psDash;
@@ -298,6 +301,7 @@ type
     property SelectionRectPenStyle;
     property SelectionRectWidth;
     property SuggestedItems;
+    property SuggestedItemsSorted;
     property Items;
     // events
     property OnTagClick;
@@ -360,7 +364,7 @@ begin
 
   FSuggestedTags := TStringList.Create;
   FSuggestedTags.CaseSensitive := True;
-  FSuggestedTags.Sorted := True;
+  FSuggestedTags.Sorted := SuggestedItemsSorted;
   FSuggestedTags.Duplicates := dupIgnore;
   FSuggestedTags.Delimiter := ';';
   FSuggestedTags.OnChange := @SuggestedChanged;
@@ -421,7 +425,7 @@ begin
 
     FCheckListButton.Parent := Self;
     FCheckListButton.Flat := True;
-    FCheckListButton.Sorted := True;
+    FCheckListButton.Sorted := SuggestedItemsSorted;
     FCheckListButton.Visible := False;
     FCheckListButton.Caption := '...';
     FCheckListButton.MultiSelect := True;
@@ -457,6 +461,11 @@ begin
   inherited Destroy;
 end;
 
+function TCustomTagEdit.GetTags: TStringList;
+begin
+  Result := FTags;
+end;
+
 function TCustomTagEdit.GetTagHeight(AFontSize: integer = -1): integer;
 begin
   Result := Scale(ifthen(AFontSize > -1, AFontSize, CoalesceInt(Font.Size, Screen.SystemFont.Size, 8)) * 2 + 6);
@@ -478,9 +487,9 @@ begin
     Result := string.Empty;
 end;
 
-function TCustomTagEdit.GetTags: TStringList;
+function TCustomTagEdit.GetSuggestedItemsSorted: boolean;
 begin
-  Result := FTags;
+  Result := FSuggestedTags.Sorted;
 end;
 
 procedure TCustomTagEdit.SetTags(Value: TStringList);
@@ -607,6 +616,12 @@ begin
   end;
   Invalidate;
   UpdateAutoHeight;
+end;
+
+procedure TCustomTagEdit.SetSuggestedItemsSorted(Value: boolean);
+begin
+  FSuggestedTags.Sorted := Value;
+  FCheckListButton.Sorted := Value;
 end;
 
 procedure TCustomTagEdit.UpdateEditPosition;
