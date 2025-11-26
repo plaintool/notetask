@@ -92,6 +92,7 @@ type
     FRemoveConfirmMessage: TTranslateString;
     FRemoveConfirmTitle: TTranslateString;
     FTextHint: TTranslateString;
+    FSuggestionButtonCaption: TTranslateString;
 
     FFont: TFont;
     FParentFont: boolean;
@@ -108,6 +109,8 @@ type
     function GetTagRect(Index: integer): TRect;
     function GetHoveredTag: string;
     function GetSuggestedItemsSorted: boolean;
+    function GetSuggestedButtonGlyph: TBitmap;
+    function GetSuggestedButtonCaption: string;
 
     procedure SetTags(Value: TStringList);
     procedure SetSuggestedTags(Value: TStringList);
@@ -118,6 +121,8 @@ type
     procedure SetSelectionColor(Value: TColor);
     procedure SetTagColors(Value: TTagColorItems);
     procedure SetSuggestedItemsSorted(Value: boolean);
+    procedure SetSuggestedButtonGlyph(AValue: TBitmap);
+    procedure SetSuggestedButtonCaption(const AValue: string);
 
     function RemovalConfirmed(idx: integer = -1): boolean;
     function TagAtPos(const P: TPoint): integer;
@@ -200,6 +205,8 @@ type
     property TagColors: TTagColorItems read FTagColors write SetTagColors;
     property HoveredTag: string read GetHoveredTag;
     property SuggestedItemsSorted: boolean read GetSuggestedItemsSorted write SetSuggestedItemsSorted default False;
+    property SuggestedButtonGlyph: TBitmap read GetSuggestedButtonGlyph write SetSuggestedButtonGlyph;
+    property SuggestedButtonCaption: string read GetSuggestedButtonCaption write SetSuggestedButtonCaption;
     property SelectionColor: TColor read FSelectionColor write SetSelectionColor default clHighlight;
     property SelectionRectColor: TColor read FSelectionRectColor write FSelectionRectColor default clHighlight;
     property SelectionRectPenStyle: TPenStyle read FSelectionRectPenStyle write FSelectionRectPenStyle default psDash;
@@ -302,6 +309,8 @@ type
     property SelectionRectWidth;
     property SuggestedItems;
     property SuggestedItemsSorted;
+    property SuggestedButtonCaption;
+    property SuggestedButtonGlyph;
     property Items;
     // events
     property OnTagClick;
@@ -368,6 +377,7 @@ begin
   FSuggestedTags.Duplicates := dupIgnore;
   FSuggestedTags.Delimiter := ';';
   FSuggestedTags.OnChange := @SuggestedChanged;
+  FSuggestionButtonCaption := '...';
 
   Height := Scale(32);
   Width := Scale(300);
@@ -427,7 +437,6 @@ begin
     FCheckListButton.Flat := True;
     FCheckListButton.Sorted := SuggestedItemsSorted;
     FCheckListButton.Visible := False;
-    FCheckListButton.Caption := '...';
     FCheckListButton.MultiSelect := True;
     FCheckListButton.DropDownCount := 15;
     FCheckListButton.AttachedControl := FEdit;
@@ -490,6 +499,18 @@ end;
 function TCustomTagEdit.GetSuggestedItemsSorted: boolean;
 begin
   Result := FSuggestedTags.Sorted;
+end;
+
+function TCustomTagEdit.GetSuggestedButtonGlyph: TBitmap;
+begin
+  // return glyph of internal button
+  Result := FCheckListButton.Glyph;
+end;
+
+function TCustomTagEdit.GetSuggestedButtonCaption: string;
+begin
+  // return caption of internal button
+  Result := FSuggestionButtonCaption;
 end;
 
 procedure TCustomTagEdit.SetTags(Value: TStringList);
@@ -622,6 +643,22 @@ procedure TCustomTagEdit.SetSuggestedItemsSorted(Value: boolean);
 begin
   FSuggestedTags.Sorted := Value;
   FCheckListButton.Sorted := Value;
+end;
+
+procedure TCustomTagEdit.SetSuggestedButtonCaption(const AValue: string);
+begin
+  // assign caption to internal button
+  FSuggestionButtonCaption := AValue;
+  FCheckListButton.Caption := FSuggestionButtonCaption;
+end;
+
+procedure TCustomTagEdit.SetSuggestedButtonGlyph(AValue: TBitmap);
+begin
+  // assign glyph to internal button
+  if Assigned(AValue) then
+    FCheckListButton.Glyph.Assign(AValue)
+  else
+    FCheckListButton.Glyph.Clear;
 end;
 
 procedure TCustomTagEdit.UpdateEditPosition;

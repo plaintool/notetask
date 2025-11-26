@@ -104,6 +104,7 @@ type
     filterClear: TSpeedButton;
     fontDialog: TFontDialog;
     groupTabs: TTabControl;
+    MiscImages: TImageList;
     MainMenu: TMainMenu;
     memoNote: TMemo;
     menuFile: TMenuItem;
@@ -819,6 +820,8 @@ begin
   tagsEdit.AutoColorSaturation := TagsColorSaturation;
   tagsEdit.BackSpaceEditTag := True;
   tagsEdit.ShowHint := True;
+  tagsEdit.SuggestedButtonCaption := string.Empty;
+  MiscImages.GetBitmap(0, tagsEdit.SuggestedButtonGlyph);
   tagsEdit.PopupMenu := PopupTags;
   tagsEdit.OnKeyDown := @tagsEditKeyDown;
   tagsEdit.OnTagClick := @tagsEditTagClick;
