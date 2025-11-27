@@ -468,6 +468,7 @@ begin
   FTagColors.Free;
   FSelectedTags.Free;
   FCheckListButton.Free;
+  FSuggestedTags.Free;
   inherited Destroy;
 end;
 
