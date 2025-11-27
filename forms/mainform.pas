@@ -7370,7 +7370,7 @@ begin
   SetCaption;
   if (not ShowStatusBar) then exit;
 
-  statusBar.Panels[0].Text := IntToStr(Round(FZoom * 100)) + '%';
+  statusBar.Panels[0].Text := ' ' + IntToStr(Round(FZoom * 100)) + '%';
 
   if Assigned(FEncoding) then
   begin
