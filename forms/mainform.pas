@@ -7150,9 +7150,9 @@ end;
 procedure TformNotetask.CalcDefaultColWidth;
 begin
   if (FShowDuration) then
-    taskGrid.DefaultColWidth := Canvas.TextWidth('10.10sec') + 10
+    taskGrid.DefaultColWidth := Round((Canvas.TextWidth('10.10sec') + 10) * FZoom)
   else
-    taskGrid.DefaultColWidth := Canvas.TextWidth('10000');
+    taskGrid.DefaultColWidth := Round(Canvas.TextWidth('10000') * FZoom);
 end;
 
 procedure TformNotetask.CalcRowHeight(aRow: integer = 0; aForce: boolean = False);
