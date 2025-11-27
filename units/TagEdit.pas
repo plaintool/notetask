@@ -73,6 +73,7 @@ type
     FRoundCorners: integer;
     FTagBorderWidth: integer;
     FEditMinWidth: integer;
+    FCloseBtnWidth: integer;
 
     FSelecting: boolean;
     FSelectionRectPenStyle: TPenStyle;
@@ -1044,10 +1045,10 @@ end;
 
 function TCustomTagEdit.CoalesceInt(const A, B: integer; const C: integer = 0): integer;
 begin
-  if A > 0 then
+  if A <> 0 then
     Result := A
   else
-  if B > 0 then
+  if B <> 0 then
     Result := B
   else
     Result := C;
@@ -1407,7 +1408,7 @@ end;
 
 procedure TCustomTagEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  idx, M: integer;
+  idx: integer;
   R: TRect;
   IsEditArea: boolean;
 begin
@@ -1430,9 +1431,9 @@ begin
     begin
       // Existing close button logic
       R := GetTagRect(idx);
-      M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3) + 4);
+
       // Click near right edge removes the tag - do it immediately
-      if (X > R.Right - M) and RemovalConfirmed(idx) then
+      if (X > R.Right - FCloseBtnWidth - Scale(2)) and RemovalConfirmed(idx) then
       begin
         RemoveTag(FTags[idx]);
         FMouseDownIndex := -1; // Reset since we handled it
@@ -2023,7 +2024,7 @@ var
   i: integer;
   R: TRect;
   s, Part1, Part2: string;
-  X, Y, W, H, M: integer;
+  X, Y, W, H, CloseBtnWidth: integer;
   SepW: integer = 0;
   Color1: Tcolor = clNone;
   Color2: TColor = clNone;
@@ -2221,10 +2222,11 @@ begin
     end;
 
     // Calculate shift
+    FCloseBtnWidth := ACanvas.TextWidth('×') + Scale(5);
     if (FReadOnly) or (not AShowCloseButtons) or (FCloseButtonOnHover and not Hover) then
-      M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3) + 2)
+      CloseBtnWidth := 0
     else
-      M := 0;
+      CloseBtnWidth := ACanvas.TextWidth('×') + Scale(2);
 
     // Draw text
     ACanvas.Brush.Style := bsClear;
@@ -2232,20 +2234,22 @@ begin
     if HasColon then
     begin
       ACanvas.Font.Color := FontColor1;
-      ACanvas.TextOut(R.Left + Scale(Max(AIndent, 4)), R.Top + Scale(3), Part1);
+      ACanvas.TextOut(R.Left + SepW div 2 - ACanvas.TextWidth(Part1) div 2, R.Top + R.Height div 2 -
+        ACanvas.TextHeight(Part1) div 2 - Scale(1), Part1);
 
       ACanvas.Font.Color := FontColor2;
-      ACanvas.TextOut(R.Left + SepW + M div 4, R.Top + Scale(3), Part2);
+      ACanvas.TextOut(R.Left + SepW + (R.Width - SepW) div 2 - ACanvas.TextWidth(Part2) div 2 - CloseBtnWidth div
+        2, R.Top + R.Height div 2 - ACanvas.TextHeight(Part2) div 2 - Scale(1), Part2);
     end
     else
-      ACanvas.TextOut(R.Left + Scale(6) + M div 4, R.Top + Scale(3), s);
+      ACanvas.TextOut(R.Left + R.Width div 2 - ACanvas.TextWidth(s) div 2 - CloseBtnWidth div 2, R.Top +
+        R.Height div 2 - ACanvas.TextHeight(s) div 2 - Scale(1), s);
 
     // Draw '×' button if enabled
     if AShowCloseButtons and (not FReadOnly) and (FCloseButtons) and (not FCloseButtonOnHover or Hover) then
     begin
       ACanvas.Font.Underline := False;
-      M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3) + 2);
-      ACanvas.TextOut(R.Right - M, R.Top + Scale(AIndent), '×');
+      ACanvas.TextOut(R.Right - FCloseBtnWidth, R.Top + R.Height div 2 - ACanvas.TextHeight('×') div 2 - Scale(2), '×');
     end;
 
     Inc(X, W + Scale(AIndent));

@@ -759,6 +759,18 @@ msgstr "सभी परिवर्तन पूर्ववत करें"
 msgid "Word wrap"
 msgstr "शब्द लपेटना"
 
+#: tformnotetask.azoomdefault.caption
+msgid "Default zoom"
+msgstr "डिफ़ॉल्ट ज़ूम"
+
+#: tformnotetask.azoomin.caption
+msgid "Zoom in"
+msgstr "ज़ूम इन"
+
+#: tformnotetask.azoomout.caption
+msgid "Zoom out"
+msgstr "ज़ूम आउट"
+
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
@@ -886,6 +898,10 @@ msgstr "कार्य"
 #: tformnotetask.menuview.caption
 msgid "View"
 msgstr "दृश्य"
+
+#: tformnotetask.menuzoom.caption
+msgid "Zoom"
+msgstr "ज़ूम"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"

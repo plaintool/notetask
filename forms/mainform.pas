@@ -49,6 +49,9 @@ type
     aAbout: TAction;
     aCopy: TAction;
     aCheckforupdates: TAction;
+    aZoomDefault: TAction;
+    aZoomOut: TAction;
+    aZoomIn: TAction;
     aFilter: TAction;
     aEditGroupTooltip: TAction;
     aSplitTasks: TAction;
@@ -107,6 +110,10 @@ type
     groupTabs: TTabControl;
     contextColor: TMenuItem;
     contextResetColor: TMenuItem;
+    menuZoomIn: TMenuItem;
+    menuZoomOut: TMenuItem;
+    menuDefaultZoom: TMenuItem;
+    menuZoom: TMenuItem;
     MiscImages: TImageList;
     MainMenu: TMainMenu;
     memoNote: TMemo;
@@ -317,6 +324,9 @@ type
     procedure aFilterExecute(Sender: TObject);
     procedure aShowTagsExecute(Sender: TObject);
     procedure aSplitTasksExecute(Sender: TObject);
+    procedure aZoomDefaultExecute(Sender: TObject);
+    procedure aZoomInExecute(Sender: TObject);
+    procedure aZoomOutExecute(Sender: TObject);
     procedure contextCopyTagsClick(Sender: TObject);
     procedure contextDeleteTagsClick(Sender: TObject);
     procedure contextColorClick(Sender: TObject);
@@ -343,6 +353,7 @@ type
     procedure memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure memoNoteKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure memoNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure memoNoteMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
     procedure tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure tagsEditTagClick(Sender: TObject; const TagText: string);
     procedure tagsEditChange(Sender: TObject);
@@ -476,6 +487,7 @@ type
     FChanged: boolean;
     FBackup: boolean;
     FReadOnly: boolean;
+    FOriginalFontSize: integer;
     FMemoStartEdit: boolean;
     FMemoOldText: TCaption;
     FMemoNeedSelectAll: boolean;
@@ -566,12 +578,12 @@ type
     procedure DatePickerEnter(Sender: TObject);
     procedure DatePickerChange(Sender: TObject);
     procedure DatePickerKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure SetChanged(aChanged: boolean = True);
     procedure EditCell(aCol: integer = -1; aRow: integer = -1);
     procedure EditComplite(aEnter: boolean = False; aEscape: boolean = False);
     procedure DisableDrag;
     procedure DisableGridEvents;
     procedure EnableGridEvents;
+    procedure SetChanged(aChanged: boolean = True);
     procedure SetCaption;
     procedure SetInfo;
     procedure SetTags;
@@ -591,6 +603,7 @@ type
     procedure StarTasks(aRow: integer = 0);
     procedure IndentTasks(Outdent: boolean = False);
     procedure SetReadOnly(Value: boolean);
+    procedure SetZoom(Value: integer);
     procedure SetBiDiRightToLeft(Value: boolean);
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowTags(Value: boolean);
@@ -653,6 +666,7 @@ type
     function GetMemoNoteSelStart: integer;
     function GetMemoNoteSelLength: integer;
   public
+    FZoom: integer;
     FShowArchived: boolean;
     FShowDuration: boolean;
     FShowTime: boolean;
@@ -683,6 +697,7 @@ type
       overload;
     function Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
+    property Zoom: integer read FZoom write SetZoom;
     property ReadOnly: boolean read FReadOnly write SetReadOnly;
     property WordWrap: boolean read FWordWrap write FWordWrap;
     property EnterSubmit: boolean read FEnterSubmit write FEnterSubmit;
@@ -838,6 +853,7 @@ begin
   tagsEdit.OnExit := @tagsEditExit;
 
   // Initialize variables
+  FZoom := 0;
   FBackup := True;
   FReadOnly := False;
   FWordWrap := True;
@@ -914,6 +930,9 @@ begin
   ShowTime := FShowTime;
   HideNoteText := FHideNoteText;
 
+  // Zoom
+  FOriginalFontSize := Font.Size;
+
   // Apply loaded settings to columns
   ApplyColumnSetting;
   ApplySortingActions;
@@ -921,7 +940,7 @@ begin
   // Set language
   SetLanguage(Language);
 
-  // Menu access
+  // menuZoomIn access
   {$IFDEF UNIX}
   aRunPowershell.Visible := False;
   aRunPowershell.Enabled := False;
@@ -970,7 +989,7 @@ begin
   SetCaption;
   RestoreSelectedState(True, True, True);
   Tasks.CalcTagsWidths(-1, taskGrid.Columns[1].Width, tagsEdit, Font);
-  CalcRowHeight(0, True);
+  SetZoom(FZoom);
 
   // Paint Form
   if (not Application.Terminated) then
@@ -1049,13 +1068,10 @@ begin
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key in [VK_1, VK_2, VK_3, VK_4, VK_5, VK_6, VK_7, VK_8, VK_9, VK_0]) then // Ctrl + Number
+  if (ssCtrl in Shift) and (Key in [VK_1, VK_2, VK_3, VK_4, VK_5, VK_6, VK_7, VK_8, VK_9]) then // Ctrl + Number
   begin
     EditComplite;
-    if (Key = VK_0) then
-      ChangeGroup(9)
-    else
-      ChangeGroup(Key - VK_0 - 1);
+    ChangeGroup(Key - VK_0 - 1);
     Key := 0;
   end
   else
@@ -1242,7 +1258,7 @@ procedure TformNotetask.FormKeyUp(Sender: TObject; var Key: word; Shift: TShiftS
 begin
   if (Key = VK_MENU) and (ssShift in Shift) then
   begin
-    Key := 0; // block menu flicker when Alt+Shift
+    Key := 0; // block menuZoomIn flicker when Alt+Shift
     Exit;
   end;
 end;
@@ -1548,6 +1564,9 @@ end;
 procedure TformNotetask.taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   FIsSelecting := False;
+
+  if (Button = mbMiddle) and (ssCtrl in Shift) then // Middle button + Ctrl
+    aZoomDefault.Execute;
 end;
 
 procedure TformNotetask.taskGridMouseLeave(Sender: TObject);
@@ -1591,7 +1610,17 @@ end;
 procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint; var Handled: boolean);
 begin
-  EditComplite;
+  if IsEditing then
+    EditComplite;
+
+  if ssCtrl in Shift then
+  begin
+    if WheelDelta > 0 then
+      aZoomIn.Execute
+    else
+      aZoomOut.Execute;
+    Handled := True;
+  end;
 end;
 
 procedure TformNotetask.taskGridResize(Sender: TObject);
@@ -1741,9 +1770,9 @@ begin
         task := Tasks.GetTask(ARow);
         if task.Tags.Count > 0 then
         begin
-          BitTags := tagsEdit.GetTagsBitmap(task.Tags, Max(Font.Size div 2 + 2, 8), Min(ARect.Width, 500),
-            ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected, ifthen(bgFill <> clWhite, TagsDimnessColor, TagsDimness)),
-            ColorToRGB(bgFill));
+          BitTags := tagsEdit.GetTagsBitmap(task.Tags, Max(Font.Size div 2 + 3 + Round(FZoom / 1.5), 1),
+            Min(ARect.Width, 500), ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected,
+            ifthen(bgFill <> clWhite, TagsDimnessColor, TagsDimness)), ColorToRGB(bgFill));
           try
             BitTags.TransparentColor := clWhite;
             BitTags.Transparent := True;
@@ -2196,7 +2225,7 @@ procedure TformNotetask.statusBarContextPopup(Sender: TObject; MousePos: TPoint;
 var
   i, PosX: integer;
 begin
-  // If menu called by keyboard MousePos is invalid
+  // If menuZoomIn called by keyboard MousePos is invalid
   if (MousePos.X < 0) or (MousePos.Y < 0) then
   begin
     Handled := True;
@@ -2860,8 +2889,8 @@ begin
   begin
     // Apply the selected font to the form
     Self.Font := fontDialog.Font;
-
-    CalcRowHeight(0, True);
+    FOriginalFontSize := Self.Font.Size;
+    aZoomDefault.Execute;
   end;
 end;
 
@@ -2920,6 +2949,23 @@ begin
   if taskGrid.RowCount = 0 then exit;
 
   SplitTasks;
+end;
+
+procedure TformNotetask.aZoomDefaultExecute(Sender: TObject);
+begin
+  Zoom := 0;
+end;
+
+procedure TformNotetask.aZoomInExecute(Sender: TObject);
+begin
+  if FOriginalFontSize + Zoom < 200 then
+    Zoom := Zoom + 1;
+end;
+
+procedure TformNotetask.aZoomOutExecute(Sender: TObject);
+begin
+  if FOriginalFontSize + Zoom > 1 then
+    Zoom := Zoom - 1;
 end;
 
 procedure TformNotetask.aCheckforupdatesExecute(Sender: TObject);
@@ -4067,6 +4113,19 @@ begin
     FNoteLastSelText := (Sender as TMemo).SelText;
     FNoteLastSelStart := (Sender as TMemo).SelStart;
     FNoteLastSelLength := (Sender as TMemo).SelLength;
+  end;
+end;
+
+procedure TformNotetask.memoNoteMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
+  MousePos: TPoint; var Handled: boolean);
+begin
+  if ssCtrl in Shift then
+  begin
+    if WheelDelta > 0 then
+      aZoomIn.Execute
+    else
+      aZoomOut.Execute;
+    Handled := True;
   end;
 end;
 
@@ -7095,7 +7154,7 @@ begin
   if (ShowColumnNote) then CalcCol(3);
 
   // Header, tabs, first col
-  taskGrid.RowHeights[0] := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
+  taskGrid.RowHeights[0] := Max(Canvas.TextHeight('A') + 4, taskGrid.DefaultRowHeight) + FZoom;
   if (aForce) then
   begin
     {$IFDEF UNIX}
@@ -7181,6 +7240,18 @@ begin
     FLastText := string.Empty;
 end;
 
+procedure TformNotetask.SetChanged(aChanged: boolean = True);
+begin
+  if (aChanged = False) then
+    taskGrid.Modified := False;
+
+  FChanged := taskGrid.Modified or aChanged;
+  aSave.Enabled := FChanged and not FReadOnly;
+  aUndo.Enabled := FChanged;
+  aUndoAll.Enabled := FChanged;
+  SetCaption;
+end;
+
 procedure TformNotetask.SetCaption;
 var
   NewCaption: string;
@@ -7219,7 +7290,7 @@ begin
   begin
     statusBar.Panels[1].Text := UpperCase(GetEncodingName(FEncoding));
 
-    // Encoding menu check
+    // Encoding menuZoomIn check
     contextANSI.Checked := FEncoding = TEncoding.ANSI;
     contextASCII.Checked := FEncoding = TEncoding.ASCII;
     contextUTF8.Checked := FEncoding = TEncoding.UTF8;
@@ -7231,7 +7302,7 @@ begin
   begin
     statusBar.Panels[2].Text := FLineEnding.ToString;
 
-    // Line ending menu check
+    // Line ending menuZoomIn check
     contextWindowsCRLF.Checked := FLineEnding = TLineEnding.WindowsCRLF;
     contextUnixLF.Checked := FLineEnding = TLineEnding.UnixLF;
     contextMacintoshCR.Checked := FLineEnding = TLineEnding.MacintoshCR;
@@ -7466,6 +7537,18 @@ begin
   contextDeleteTags.Enabled := not Value;
 end;
 
+procedure TformNotetask.SetZoom(Value: integer);
+begin
+  FZoom := Value;
+  taskGrid.Font.Size := Max(1, FOriginalFontSize + FZoom);
+  memoNote.Font.Size := taskGrid.Font.Size;
+  if Assigned(Memo) then
+    Memo.Font.Size := taskGrid.Font.Size;
+  if Assigned(DatePicker) then
+    DatePicker.Font.Size := taskGrid.Font.Size;
+  CalcRowHeight(0, True);
+end;
+
 procedure TformNotetask.SetTabs(Change: boolean = True);
 var
   Clean: TStringList;
@@ -7608,18 +7691,6 @@ begin
     else
     // nolang
   end;
-end;
-
-procedure TformNotetask.SetChanged(aChanged: boolean = True);
-begin
-  if (aChanged = False) then
-    taskGrid.Modified := False;
-
-  FChanged := taskGrid.Modified or aChanged;
-  aSave.Enabled := FChanged and not FReadOnly;
-  aUndo.Enabled := FChanged;
-  aUndoAll.Enabled := FChanged;
-  SetCaption;
 end;
 
 procedure TformNotetask.DisableDrag;

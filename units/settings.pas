@@ -273,6 +273,7 @@ begin
     ItemSettings.Add('ShowColumnDate', Form.ShowColumnDate);
     ItemSettings.Add('ShowColumnAmount', Form.ShowColumnAmount);
     ItemSettings.Add('ShowColumnFavorite', Form.ShowColumnFavorite);
+    ItemSettings.Add('Scale', Form.Zoom);
 
     // Add column widths if the columns are visible
     if Grid.Columns[0].Visible then
@@ -422,6 +423,9 @@ begin
 
       if ItemSettings.FindPath('ShowColumnFavorite') <> nil then
         Form.FShowColumnFavorite := ItemSettings.FindPath('ShowColumnFavorite').AsBoolean;
+
+      if ItemSettings.FindPath('Scale') <> nil then
+        Form.FZoom := ItemSettings.FindPath('Scale').AsInteger;
 
       if ItemSettings.FindPath('ColumnDone') <> nil then
         Grid.Columns[0].Width := Form.Scale96ToForm(ItemSettings.FindPath('ColumnDone').AsInteger);

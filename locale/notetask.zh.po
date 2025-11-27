@@ -759,6 +759,18 @@ msgstr "撤销所有更改"
 msgid "Word wrap"
 msgstr "自动换行"
 
+#: tformnotetask.azoomdefault.caption
+msgid "Default zoom"
+msgstr "默认缩放"
+
+#: tformnotetask.azoomin.caption
+msgid "Zoom in"
+msgstr "放大"
+
+#: tformnotetask.azoomout.caption
+msgid "Zoom out"
+msgstr "缩小"
+
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
@@ -886,6 +898,10 @@ msgstr "任务"
 #: tformnotetask.menuview.caption
 msgid "View"
 msgstr "查看"
+
+#: tformnotetask.menuzoom.caption
+msgid "Zoom"
+msgstr "缩放"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"

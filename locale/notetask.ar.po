@@ -759,6 +759,18 @@ msgstr "تراجع عن جميع التغييرات"
 msgid "Word wrap"
 msgstr "تغليف الكلمات"
 
+#: tformnotetask.azoomdefault.caption
+msgid "Default zoom"
+msgstr "التكبير الافتراضي"
+
+#: tformnotetask.azoomin.caption
+msgid "Zoom in"
+msgstr "تكبير الصورة"
+
+#: tformnotetask.azoomout.caption
+msgid "Zoom out"
+msgstr "تصغير الصورة"
+
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
@@ -886,6 +898,10 @@ msgstr "مهمة"
 #: tformnotetask.menuview.caption
 msgid "View"
 msgstr "عرض"
+
+#: tformnotetask.menuzoom.caption
+msgid "Zoom"
+msgstr "تكبير"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"

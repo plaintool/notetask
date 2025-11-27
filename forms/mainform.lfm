@@ -178,6 +178,7 @@ object formNotetask: TformNotetask
       OnKeyUp = memoNoteKeyUp
       OnMouseDown = memoNoteMouseDown
       OnMouseUp = memoNoteMouseUp
+      OnMouseWheel = memoNoteMouseWheel
     end
   end
   object panelTabs: TPanel
@@ -525,6 +526,18 @@ object formNotetask: TformNotetask
       object menuShowStatusBar: TMenuItem
         Action = aShowStatusBar
         AutoCheck = True
+      end
+      object menuZoom: TMenuItem
+        Caption = 'Zoom'
+        object menuZoomIn: TMenuItem
+          Action = aZoomIn
+        end
+        object menuZoomOut: TMenuItem
+          Action = aZoomOut
+        end
+        object menuDefaultZoom: TMenuItem
+          Action = aZoomDefault
+        end
       end
       object Separator13: TMenuItem
         Caption = '-'
@@ -1110,6 +1123,24 @@ object formNotetask: TformNotetask
       Checked = True
       ShortCut = 32822
       OnExecute = aShowColumnFavoriteExecute
+    end
+    object aZoomIn: TAction
+      Category = 'View'
+      Caption = 'Zoom in'
+      ShortCut = 16571
+      OnExecute = aZoomInExecute
+    end
+    object aZoomOut: TAction
+      Category = 'View'
+      Caption = 'Zoom out'
+      ShortCut = 16573
+      OnExecute = aZoomOutExecute
+    end
+    object aZoomDefault: TAction
+      Category = 'View'
+      Caption = 'Default zoom'
+      ShortCut = 16432
+      OnExecute = aZoomDefaultExecute
     end
   end
   object openDialog: TOpenDialog

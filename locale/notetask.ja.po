@@ -759,6 +759,18 @@ msgstr "すべての変更を元に戻す"
 msgid "Word wrap"
 msgstr "行の折り返し"
 
+#: tformnotetask.azoomdefault.caption
+msgid "Default zoom"
+msgstr "デフォルトのズーム"
+
+#: tformnotetask.azoomin.caption
+msgid "Zoom in"
+msgstr "ズームイン"
+
+#: tformnotetask.azoomout.caption
+msgid "Zoom out"
+msgstr "ズームアウト"
+
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
@@ -886,6 +898,10 @@ msgstr "タスク"
 #: tformnotetask.menuview.caption
 msgid "View"
 msgstr "表示"
+
+#: tformnotetask.menuzoom.caption
+msgid "Zoom"
+msgstr "ズーム"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"

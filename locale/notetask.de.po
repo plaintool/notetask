@@ -759,6 +759,18 @@ msgstr "Alle Änderungen rückgängig machen"
 msgid "Word wrap"
 msgstr "Zeilenumbruch"
 
+#: tformnotetask.azoomdefault.caption
+msgid "Default zoom"
+msgstr "Standardzoom"
+
+#: tformnotetask.azoomin.caption
+msgid "Zoom in"
+msgstr "Vergrößern"
+
+#: tformnotetask.azoomout.caption
+msgid "Zoom out"
+msgstr "Verkleinern"
+
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
@@ -886,6 +898,10 @@ msgstr "Aufgabe"
 #: tformnotetask.menuview.caption
 msgid "View"
 msgstr "Ansicht"
+
+#: tformnotetask.menuzoom.caption
+msgid "Zoom"
+msgstr "Zoom"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"

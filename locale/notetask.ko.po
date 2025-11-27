@@ -759,6 +759,18 @@ msgstr "모든 변경 사항 실행 취소"
 msgid "Word wrap"
 msgstr "단어 줄 바꿈"
 
+#: tformnotetask.azoomdefault.caption
+msgid "Default zoom"
+msgstr "기본 확대/축소"
+
+#: tformnotetask.azoomin.caption
+msgid "Zoom in"
+msgstr "확대"
+
+#: tformnotetask.azoomout.caption
+msgid "Zoom out"
+msgstr "축소"
+
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
@@ -886,6 +898,10 @@ msgstr "작업"
 #: tformnotetask.menuview.caption
 msgid "View"
 msgstr "보기"
+
+#: tformnotetask.menuzoom.caption
+msgid "Zoom"
+msgstr "확대/축소"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"

@@ -759,6 +759,18 @@ msgstr "Deshacer todos los cambios"
 msgid "Word wrap"
 msgstr "Ajustar texto"
 
+#: tformnotetask.azoomdefault.caption
+msgid "Default zoom"
+msgstr "Zoom predeterminado"
+
+#: tformnotetask.azoomin.caption
+msgid "Zoom in"
+msgstr "Acercar"
+
+#: tformnotetask.azoomout.caption
+msgid "Zoom out"
+msgstr "Alejar"
+
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
@@ -886,6 +898,10 @@ msgstr "Tarea"
 #: tformnotetask.menuview.caption
 msgid "View"
 msgstr "Ver"
+
+#: tformnotetask.menuzoom.caption
+msgid "Zoom"
+msgstr "Zoom"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"
