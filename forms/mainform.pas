@@ -7626,12 +7626,20 @@ end;
 procedure TformNotetask.SetZoom(Value: float);
 begin
   FZoom := Value;
+  taskGrid.Font.Assign(Font);
   taskGrid.Font.Size := Round(Max(1, FOriginalFontSize * FZoom));
+  memoNote.Font.Assign(Font);
   memoNote.Font.Size := taskGrid.Font.Size;
   if Assigned(Memo) then
+  begin
+    Memo.Font.Assign(Font);
     Memo.Font.Size := taskGrid.Font.Size;
+  end;
   if Assigned(DatePicker) then
+  begin
+    DatePicker.Font.Assign(Font);
     DatePicker.Font.Size := taskGrid.Font.Size;
+  end;
 
   contextZoom50.Checked := SameFloat(FZoom, 0.5, 0.001);
   contextZoom60.Checked := SameFloat(FZoom, 0.6, 0.001);
