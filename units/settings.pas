@@ -425,7 +425,7 @@ begin
         Form.FShowColumnFavorite := ItemSettings.FindPath('ShowColumnFavorite').AsBoolean;
 
       if ItemSettings.FindPath('Scale') <> nil then
-        Form.FZoom := ItemSettings.FindPath('Scale').AsInteger;
+        Form.FZoom := ItemSettings.FindPath('Scale').AsFloat;
 
       if ItemSettings.FindPath('ColumnDone') <> nil then
         Grid.Columns[0].Width := Form.Scale96ToForm(ItemSettings.FindPath('ColumnDone').AsInteger);

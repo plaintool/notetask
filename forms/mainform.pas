@@ -603,7 +603,7 @@ type
     procedure StarTasks(aRow: integer = 0);
     procedure IndentTasks(Outdent: boolean = False);
     procedure SetReadOnly(Value: boolean);
-    procedure SetZoom(Value: integer);
+    procedure SetZoom(Value: float);
     procedure SetBiDiRightToLeft(Value: boolean);
     procedure SetShowStatusBar(Value: boolean);
     procedure SetShowTags(Value: boolean);
@@ -666,7 +666,7 @@ type
     function GetMemoNoteSelStart: integer;
     function GetMemoNoteSelLength: integer;
   public
-    FZoom: integer;
+    FZoom: float;
     FShowArchived: boolean;
     FShowDuration: boolean;
     FShowTime: boolean;
@@ -697,7 +697,7 @@ type
       overload;
     function Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
-    property Zoom: integer read FZoom write SetZoom;
+    property Zoom: float read FZoom write SetZoom;
     property ReadOnly: boolean read FReadOnly write SetReadOnly;
     property WordWrap: boolean read FWordWrap write FWordWrap;
     property EnterSubmit: boolean read FEnterSubmit write FEnterSubmit;
@@ -853,7 +853,7 @@ begin
   tagsEdit.OnExit := @tagsEditExit;
 
   // Initialize variables
-  FZoom := 0;
+  FZoom := 1;
   FBackup := True;
   FReadOnly := False;
   FWordWrap := True;
@@ -940,7 +940,7 @@ begin
   // Set language
   SetLanguage(Language);
 
-  // menuZoomIn access
+  // menu access
   {$IFDEF UNIX}
   aRunPowershell.Visible := False;
   aRunPowershell.Enabled := False;
@@ -1770,7 +1770,7 @@ begin
         task := Tasks.GetTask(ARow);
         if task.Tags.Count > 0 then
         begin
-          BitTags := tagsEdit.GetTagsBitmap(task.Tags, Max(Font.Size div 2 + 3 + Round(FZoom / 1.5), 1),
+          BitTags := tagsEdit.GetTagsBitmap(task.Tags, Round(Max(Max(Font.Size div 2, 8) * FZoom, 1)),
             Min(ARect.Width, 500), ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected,
             ifthen(bgFill <> clWhite, TagsDimnessColor, TagsDimness)), ColorToRGB(bgFill));
           try
@@ -2953,19 +2953,19 @@ end;
 
 procedure TformNotetask.aZoomDefaultExecute(Sender: TObject);
 begin
-  Zoom := 0;
+  Zoom := 1;
 end;
 
 procedure TformNotetask.aZoomInExecute(Sender: TObject);
 begin
-  if FOriginalFontSize + Zoom < 200 then
-    Zoom := Zoom + 1;
+  if Zoom < 4.9 then
+    Zoom := Zoom + 0.1;
 end;
 
 procedure TformNotetask.aZoomOutExecute(Sender: TObject);
 begin
-  if FOriginalFontSize + Zoom > 1 then
-    Zoom := Zoom - 1;
+  if Zoom > 0.2 then
+    Zoom := Zoom - 0.1;
 end;
 
 procedure TformNotetask.aCheckforupdatesExecute(Sender: TObject);
@@ -4086,6 +4086,9 @@ procedure TformNotetask.memoNoteMouseDown(Sender: TObject; Button: TMouseButton;
 var
   Value: string;
 begin
+  if (Button = mbMiddle) and (ssCtrl in Shift) then // Middle button + Ctrl
+    aZoomDefault.Execute
+  else
   if not (ssDouble in Shift) then
   begin
     if ssCtrl in Shift then
@@ -7154,7 +7157,7 @@ begin
   if (ShowColumnNote) then CalcCol(3);
 
   // Header, tabs, first col
-  taskGrid.RowHeights[0] := Max(Canvas.TextHeight('A') + 4, taskGrid.DefaultRowHeight) + FZoom;
+  taskGrid.RowHeights[0] := Round(Max(Canvas.TextHeight('A') + 4, taskGrid.DefaultRowHeight) * FZoom);
   if (aForce) then
   begin
     {$IFDEF UNIX}
@@ -7285,6 +7288,8 @@ var
 begin
   SetCaption;
   if (not ShowStatusBar) then exit;
+
+  statusBar.Panels[0].Text := IntToStr(Round(FZoom * 100)) + '%';
 
   if Assigned(FEncoding) then
   begin
@@ -7537,16 +7542,17 @@ begin
   contextDeleteTags.Enabled := not Value;
 end;
 
-procedure TformNotetask.SetZoom(Value: integer);
+procedure TformNotetask.SetZoom(Value: float);
 begin
   FZoom := Value;
-  taskGrid.Font.Size := Max(1, FOriginalFontSize + FZoom);
+  taskGrid.Font.Size := Round(Max(1, FOriginalFontSize * FZoom));
   memoNote.Font.Size := taskGrid.Font.Size;
   if Assigned(Memo) then
     Memo.Font.Size := taskGrid.Font.Size;
   if Assigned(DatePicker) then
     DatePicker.Font.Size := taskGrid.Font.Size;
   CalcRowHeight(0, True);
+  SetInfo;
 end;
 
 procedure TformNotetask.SetTabs(Change: boolean = True);

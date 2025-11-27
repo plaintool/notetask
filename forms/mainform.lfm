@@ -102,7 +102,7 @@ object formNotetask: TformNotetask
     Font.Height = -12
     Panels = <    
       item
-        Width = 30
+        Width = 50
       end    
       item
         Width = 100
