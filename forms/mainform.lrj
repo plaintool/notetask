@@ -118,5 +118,16 @@
 {"hash":304761,"name":"tformnotetask.contextcopytag.caption","sourcebytes":[67,111,112,121],"value":"Copy"},
 {"hash":78392485,"name":"tformnotetask.contextdeletetags.caption","sourcebytes":[68,101,108,101,116,101],"value":"Delete"},
 {"hash":104224174,"name":"tformnotetask.contextcolor.caption","sourcebytes":[67,111,108,111,114,46,46,46],"value":"Color..."},
-{"hash":103984290,"name":"tformnotetask.contextresetcolor.caption","sourcebytes":[82,101,115,101,116,32,99,111,108,111,114],"value":"Reset color"}
+{"hash":103984290,"name":"tformnotetask.contextresetcolor.caption","sourcebytes":[82,101,115,101,116,32,99,111,108,111,114],"value":"Reset color"},
+{"hash":215077,"name":"tformnotetask.contextzoom150.caption","sourcebytes":[49,53,48,37],"value":"150%"},
+{"hash":214821,"name":"tformnotetask.contextzoom140.caption","sourcebytes":[49,52,48,37],"value":"140%"},
+{"hash":214565,"name":"tformnotetask.contextzoom130.caption","sourcebytes":[49,51,48,37],"value":"130%"},
+{"hash":214309,"name":"tformnotetask.contextzoom120.caption","sourcebytes":[49,50,48,37],"value":"120%"},
+{"hash":214053,"name":"tformnotetask.contextzoom110.caption","sourcebytes":[49,49,48,37],"value":"110%"},
+{"hash":213797,"name":"tformnotetask.contextzoom100.caption","sourcebytes":[49,48,48,37],"value":"100%"},
+{"hash":15397,"name":"tformnotetask.contextzoom90.caption","sourcebytes":[57,48,37],"value":"90%"},
+{"hash":15141,"name":"tformnotetask.contextzoom80.caption","sourcebytes":[56,48,37],"value":"80%"},
+{"hash":14885,"name":"tformnotetask.contextzoom70.caption","sourcebytes":[55,48,37],"value":"70%"},
+{"hash":14629,"name":"tformnotetask.contextzoom60.caption","sourcebytes":[54,48,37],"value":"60%"},
+{"hash":14373,"name":"tformnotetask.contextzoom50.caption","sourcebytes":[53,48,37],"value":"50%"}
 ]}

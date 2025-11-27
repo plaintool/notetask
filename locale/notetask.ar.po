@@ -836,6 +836,50 @@ msgstr ""
 msgid "WindowsCRLF"
 msgstr ""
 
+#: tformnotetask.contextzoom100.caption
+msgid "100%"
+msgstr ""
+
+#: tformnotetask.contextzoom110.caption
+msgid "110%"
+msgstr ""
+
+#: tformnotetask.contextzoom120.caption
+msgid "120%"
+msgstr ""
+
+#: tformnotetask.contextzoom130.caption
+msgid "130%"
+msgstr ""
+
+#: tformnotetask.contextzoom140.caption
+msgid "140%"
+msgstr ""
+
+#: tformnotetask.contextzoom150.caption
+msgid "150%"
+msgstr ""
+
+#: tformnotetask.contextzoom50.caption
+msgid "50%"
+msgstr ""
+
+#: tformnotetask.contextzoom60.caption
+msgid "60%"
+msgstr ""
+
+#: tformnotetask.contextzoom70.caption
+msgid "70%"
+msgstr ""
+
+#: tformnotetask.contextzoom80.caption
+msgid "80%"
+msgstr ""
+
+#: tformnotetask.contextzoom90.caption
+msgid "90%"
+msgstr ""
+
 #: tformnotetask.filterbox.hint
 msgid ""
 "The filter searches text in any field.\n"
@@ -988,3 +1032,4 @@ msgstr "ابحث عن ماذا:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "استبدال بـ:"
+

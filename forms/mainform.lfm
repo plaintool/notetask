@@ -1455,4 +1455,55 @@ object formNotetask: TformNotetask
     Left = 600
     Top = 176
   end
+  object PopupZoom: TPopupMenu
+    Left = 472
+    Top = 392
+    object contextZoom150: TMenuItem
+      Caption = '150%'
+      GroupIndex = 1
+      OnClick = contextZoom150Click
+    end
+    object contextZoom140: TMenuItem
+      Caption = '140%'
+      OnClick = contextZoom140Click
+    end
+    object contextZoom130: TMenuItem
+      Caption = '130%'
+      OnClick = contextZoom130Click
+    end
+    object contextZoom120: TMenuItem
+      Caption = '120%'
+      OnClick = contextZoom120Click
+    end
+    object contextZoom110: TMenuItem
+      Caption = '110%'
+      OnClick = contextZoom110Click
+    end
+    object contextZoom100: TMenuItem
+      Caption = '100%'
+      Checked = True
+      Default = True
+      OnClick = contextZoom100Click
+    end
+    object contextZoom90: TMenuItem
+      Caption = '90%'
+      OnClick = contextZoom90Click
+    end
+    object contextZoom80: TMenuItem
+      Caption = '80%'
+      OnClick = contextZoom80Click
+    end
+    object contextZoom70: TMenuItem
+      Caption = '70%'
+      OnClick = contextZoom70Click
+    end
+    object contextZoom60: TMenuItem
+      Caption = '60%'
+      OnClick = contextZoom60Click
+    end
+    object contextZoom50: TMenuItem
+      Caption = '50%'
+      OnClick = contextZoom50Click
+    end
+  end
 end

@@ -94,6 +94,7 @@ type
     colorDialog: TColorDialog;
     contextAskChatGPT1: TMenuItem;
     contextCopy1: TMenuItem;
+    contextZoom100: TMenuItem;
     contextCopyTag: TMenuItem;
     contextWindowsCRLF: TMenuItem;
     contextANSI: TMenuItem;
@@ -110,6 +111,16 @@ type
     groupTabs: TTabControl;
     contextColor: TMenuItem;
     contextResetColor: TMenuItem;
+    contextZoom90: TMenuItem;
+    contextZoom80: TMenuItem;
+    contextZoom70: TMenuItem;
+    contextZoom60: TMenuItem;
+    contextZoom50: TMenuItem;
+    contextZoom110: TMenuItem;
+    contextZoom120: TMenuItem;
+    contextZoom130: TMenuItem;
+    contextZoom140: TMenuItem;
+    contextZoom150: TMenuItem;
     menuZoomIn: TMenuItem;
     menuZoomOut: TMenuItem;
     menuDefaultZoom: TMenuItem;
@@ -196,6 +207,7 @@ type
     PopupMemo: TPopupMenu;
     PopupStatusbar: TPopupMenu;
     PopupLineEnding: TPopupMenu;
+    PopupZoom: TPopupMenu;
     PopupTags: TPopupMenu;
     printDialog: TPrintDialog;
     saveDialog: TSaveDialog;
@@ -331,6 +343,17 @@ type
     procedure contextDeleteTagsClick(Sender: TObject);
     procedure contextColorClick(Sender: TObject);
     procedure contextResetColorClick(Sender: TObject);
+    procedure contextZoom100Click(Sender: TObject);
+    procedure contextZoom110Click(Sender: TObject);
+    procedure contextZoom120Click(Sender: TObject);
+    procedure contextZoom130Click(Sender: TObject);
+    procedure contextZoom140Click(Sender: TObject);
+    procedure contextZoom150Click(Sender: TObject);
+    procedure contextZoom50Click(Sender: TObject);
+    procedure contextZoom60Click(Sender: TObject);
+    procedure contextZoom70Click(Sender: TObject);
+    procedure contextZoom80Click(Sender: TObject);
+    procedure contextZoom90Click(Sender: TObject);
     procedure filterBoxChange(Sender: TObject);
     procedure filterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure filterClearClick(Sender: TObject);
@@ -2247,6 +2270,9 @@ begin
   if (FStatusPanelIndex > 2) and (FStatusPanelIndex < statusBar.Panels.Count) then
     PopupStatusbar.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
   else
+  if (FStatusPanelIndex = 0) then
+    PopupZoom.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
+  else
   if (FStatusPanelIndex = 1) then
     PopupEncoding.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
   else
@@ -2438,6 +2464,61 @@ begin
     tagsEdit.Invalidate;
     GridInvalidate;
   end;
+end;
+
+procedure TformNotetask.contextZoom50Click(Sender: TObject);
+begin
+  SetZoom(0.5);
+end;
+
+procedure TformNotetask.contextZoom60Click(Sender: TObject);
+begin
+  SetZoom(0.6);
+end;
+
+procedure TformNotetask.contextZoom70Click(Sender: TObject);
+begin
+  SetZoom(0.7);
+end;
+
+procedure TformNotetask.contextZoom80Click(Sender: TObject);
+begin
+  SetZoom(0.8);
+end;
+
+procedure TformNotetask.contextZoom90Click(Sender: TObject);
+begin
+  SetZoom(0.9);
+end;
+
+procedure TformNotetask.contextZoom100Click(Sender: TObject);
+begin
+  SetZoom(1.0);
+end;
+
+procedure TformNotetask.contextZoom110Click(Sender: TObject);
+begin
+  SetZoom(1.1);
+end;
+
+procedure TformNotetask.contextZoom120Click(Sender: TObject);
+begin
+  SetZoom(1.2);
+end;
+
+procedure TformNotetask.contextZoom130Click(Sender: TObject);
+begin
+  SetZoom(1.3);
+end;
+
+procedure TformNotetask.contextZoom140Click(Sender: TObject);
+begin
+  SetZoom(1.4);
+end;
+
+procedure TformNotetask.contextZoom150Click(Sender: TObject);
+begin
+  SetZoom(1.5);
 end;
 
 procedure TformNotetask.contextWindowsCRLFClick(Sender: TObject);
@@ -7551,6 +7632,19 @@ begin
     Memo.Font.Size := taskGrid.Font.Size;
   if Assigned(DatePicker) then
     DatePicker.Font.Size := taskGrid.Font.Size;
+
+  contextZoom50.Checked := SameFloat(FZoom, 0.5, 0.001);
+  contextZoom60.Checked := SameFloat(FZoom, 0.6, 0.001);
+  contextZoom70.Checked := SameFloat(FZoom, 0.7, 0.001);
+  contextZoom80.Checked := SameFloat(FZoom, 0.8, 0.001);
+  contextZoom90.Checked := SameFloat(FZoom, 0.9, 0.001);
+  contextZoom100.Checked := SameFloat(FZoom, 1.0, 0.001);
+  contextZoom110.Checked := SameFloat(FZoom, 1.1, 0.001);
+  contextZoom120.Checked := SameFloat(FZoom, 1.2, 0.001);
+  contextZoom130.Checked := SameFloat(FZoom, 1.3, 0.001);
+  contextZoom140.Checked := SameFloat(FZoom, 1.4, 0.001);
+  contextZoom150.Checked := SameFloat(FZoom, 1.5, 0.001);
+
   CalcRowHeight(0, True);
   SetInfo;
 end;

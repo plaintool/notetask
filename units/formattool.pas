@@ -121,6 +121,8 @@ function CloneArray(const Src: TIntegerArray): TIntegerArray;
 
 procedure CopyToArray(var Dest: TIntegerArray; const Src: TIntegerArray);
 
+function SameFloat(A, B: Double; Eps: Double): Boolean;
+
 const
   Brackets: array[0..17] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]',
     '[X]', '[ ]', '[]', 'x ', '-x ', '- x ', 'X ', '-X ', '- X ');
@@ -1185,6 +1187,12 @@ begin
   CopyCount := Min(Length(Dest), Length(Src));
   for i := 0 to CopyCount - 1 do
     Dest[i] := Src[i];
+end;
+
+function SameFloat(A, B: Double; Eps: Double): Boolean;
+begin
+  // Compare floats with epsilon
+  Result := Abs(A - B) < Eps;
 end;
 
 end.
