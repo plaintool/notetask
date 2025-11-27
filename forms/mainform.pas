@@ -4198,8 +4198,13 @@ end;
 
 procedure TformNotetask.tagsEditTagClick(Sender: TObject; const TagText: string);
 begin
-  filterBox.Text := TagText;
-  filterBoxChange(Self);
+  if (filterBox.Text <> TagText) then
+  begin
+    filterBox.Text := TagText;
+    filterBoxChange(Self);
+  end
+  else
+    filterClearClick(Sender);
 end;
 
 procedure TformNotetask.tagsEditChange(Sender: TObject);
