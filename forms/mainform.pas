@@ -7492,7 +7492,9 @@ begin
             tagsEdit.Items.Assign(Tasks.GetTask(taskGrid.Selection.Top).Tags)
           else
             tagsEdit.Items.Assign(tags);
-        end;
+        end
+        else
+          tagsEdit.Items.Clear;
         tagsEdit.ReadOnly := FReadOnly;
         tagsEdit.AllowReorder := not HasDiff;
         tagsEdit.Color := clDefault;

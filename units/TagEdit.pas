@@ -1169,7 +1169,8 @@ end;
 
 procedure TCustomTagEdit.SuggestedChanged(Sender: TObject);
 var
-  i: integer;
+  i, idx: integer;
+  NewValue: TStringList;
 begin
   if csDesigning in ComponentState then exit;
 
@@ -1181,11 +1182,28 @@ begin
     FCheckListButton.Items.Assign(FSuggestedTags)
   else
   begin
-    // Add if not exists in FCheckListButton.Items
-    for i := 0 to FSuggestedTags.Count - 1 do
-    begin
-      if IndexOf(FSuggestedTags[i], FCheckListButton.Items) < 0 then
-        FCheckListButton.Items.Add(FSuggestedTags[i]); // add only new items
+    NewValue := TStringList.Create;
+    try
+      NewValue.Sorted := True;
+      NewValue.Assign(FSuggestedTags);
+
+      // Insert items at the same positions if they don't exist
+      for i := 0 to NewValue.Count - 1 do
+      begin
+        // get index of the tag in target list
+        // comment: search tag in destination list
+        idx := IndexOf(NewValue[i], FCheckListButton.Items);
+        if idx < 0 then
+        begin
+          // comment: insert at the same position (or at the end if index is out of range)
+          if i <= FCheckListButton.Items.Count then
+            FCheckListButton.Items.Insert(i, NewValue[i])
+          else
+            FCheckListButton.Items.Add(NewValue[i]);
+        end;
+      end;
+    finally
+      NewValue.Free;
     end;
 
     // remove items not present in FSuggestedTags — iterate backwards to avoid index shift
@@ -2238,8 +2256,8 @@ begin
         ACanvas.TextHeight(Part1) div 2 - Scale(1), Part1);
 
       ACanvas.Font.Color := FontColor2;
-      ACanvas.TextOut(R.Left + SepW + (R.Width - SepW) div 2 - ACanvas.TextWidth(Part2) div 2 - CloseBtnWidth div
-        2, R.Top + R.Height div 2 - ACanvas.TextHeight(Part2) div 2 - Scale(1), Part2);
+      ACanvas.TextOut(R.Left + SepW - Scale(AIndent) + (R.Width - SepW) div 2 - ACanvas.TextWidth(Part2) div
+        2 - CloseBtnWidth div 2, R.Top + R.Height div 2 - ACanvas.TextHeight(Part2) div 2 - Scale(1), Part2);
     end
     else
       ACanvas.TextOut(R.Left + R.Width div 2 - ACanvas.TextWidth(s) div 2 - CloseBtnWidth div 2, R.Top +
