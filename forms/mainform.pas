@@ -317,9 +317,9 @@ type
     procedure aFilterExecute(Sender: TObject);
     procedure aShowTagsExecute(Sender: TObject);
     procedure aSplitTasksExecute(Sender: TObject);
-    procedure contextColorClick(Sender: TObject);
     procedure contextCopyTagsClick(Sender: TObject);
     procedure contextDeleteTagsClick(Sender: TObject);
+    procedure contextColorClick(Sender: TObject);
     procedure contextResetColorClick(Sender: TObject);
     procedure filterBoxChange(Sender: TObject);
     procedure filterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -2375,7 +2375,7 @@ var
   HoverTag: string;
   HoverIndex: integer;
 begin
-  HoverTag := GetBeforeColon(tagsEdit.HoveredTag);
+  HoverTag := GetBeforeColon(LowerCase(tagsEdit.HoveredTag));
   HoverIndex := tagsEdit.TagColors.IndexOf(HoverTag);
 
   if HoverIndex >= 0 then
@@ -2399,7 +2399,7 @@ var
   HoverTag: string;
   HoverIndex: integer;
 begin
-  HoverTag := GetBeforeColon(tagsEdit.HoveredTag);
+  HoverTag := GetBeforeColon(LowerCase(tagsEdit.HoveredTag));
   HoverIndex := tagsEdit.TagColors.IndexOf(HoverTag);
 
   if HoverIndex >= 0 then
