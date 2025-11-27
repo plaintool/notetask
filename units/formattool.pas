@@ -97,6 +97,8 @@ function StringListToBacktickString(List: TStringList; LeadingSpace: boolean = T
 
 procedure AddPrefixTags(List: TStringList);
 
+function GetBeforeColon(const S: string): string;
+
 procedure ParseGroupName(const Value: string; out NameText, HintText: string);
 
 function ReplaceLineBreaks(const S: string): string;
@@ -1016,6 +1018,19 @@ begin
     // Always free the temporary list to avoid memory leaks
     PrefixesToAdd.Free;
   end;
+end;
+
+function GetBeforeColon(const S: string): string;
+var
+  p: Integer;
+begin
+  // Find ":" position
+  p := Pos(':', S); // returns 0 if not found
+
+  if p > 0 then
+    Result := Copy(S, 1, p - 1)
+  else
+    Result := S; // no ":" → return whole string
 end;
 
 procedure ParseGroupName(const Value: string; out NameText, HintText: string);

@@ -230,6 +230,7 @@ type
     procedure RemoveTag(const ATag: string; AConfirm: boolean = False);
     function Focused: boolean; override;
     procedure CopyHoverText;
+    function GetAutoColor(const ATag: string): TColor;
     procedure RemoveSelectedTags;
     procedure FinishEdit;
     procedure SelectAll;
@@ -1098,6 +1099,11 @@ begin
     // Optional: Provide visual feedback
     // ShowMessage('Copied: ' + FTags[TagIndex]);
   end;
+end;
+
+function TCustomTagEdit.GetAutoColor(const ATag: string): TColor;
+begin
+  Result := RandTagColor(ATag, FAutoColorBrigtness, FAutoColorSaturation);
 end;
 
 procedure TCustomTagEdit.FinishEdit;

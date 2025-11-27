@@ -88,6 +88,7 @@ type
     aNewWindow: TAction;
     aOpen: TAction;
     ActionList: TActionList;
+    colorDialog: TColorDialog;
     contextAskChatGPT1: TMenuItem;
     contextCopy1: TMenuItem;
     contextCopyTag: TMenuItem;
@@ -104,6 +105,8 @@ type
     filterClear: TSpeedButton;
     fontDialog: TFontDialog;
     groupTabs: TTabControl;
+    contextColor: TMenuItem;
+    contextResetColor: TMenuItem;
     MiscImages: TImageList;
     MainMenu: TMainMenu;
     memoNote: TMemo;
@@ -196,6 +199,7 @@ type
     Separator10: TMenuItem;
     Separator17: TMenuItem;
     Separator18: TMenuItem;
+    Separator19: TMenuItem;
     Separator2: TMenuItem;
     Separator21: TMenuItem;
     Separator3: TMenuItem;
@@ -313,8 +317,10 @@ type
     procedure aFilterExecute(Sender: TObject);
     procedure aShowTagsExecute(Sender: TObject);
     procedure aSplitTasksExecute(Sender: TObject);
+    procedure contextColorClick(Sender: TObject);
     procedure contextCopyTagsClick(Sender: TObject);
     procedure contextDeleteTagsClick(Sender: TObject);
+    procedure contextResetColorClick(Sender: TObject);
     procedure filterBoxChange(Sender: TObject);
     procedure filterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure filterClearClick(Sender: TObject);
@@ -893,7 +899,7 @@ begin
   ResourceBitmapStarGray.Transparent := True;
   ResourceBitmapStarGray.TransparentColor := clFuchsia;
 
-  LoadFormSettings(Self);
+  LoadFormSettings(Self, tagsEdit);
   LoadGridSettings(Self, taskGrid, string.Empty);
 
   // After load settings
@@ -927,7 +933,7 @@ end;
 
 procedure TformNotetask.FormDestroy(Sender: TObject);
 begin
-  SaveFormSettings(Self);
+  SaveFormSettings(Self, tagsEdit);
   SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
   // Free allocated resources
@@ -2364,6 +2370,47 @@ begin
     tagsEdit.RemoveTag(tagsEdit.HoveredTag, True);
 end;
 
+procedure TformNotetask.contextColorClick(Sender: TObject);
+var
+  HoverTag: string;
+  HoverIndex: integer;
+begin
+  HoverTag := GetBeforeColon(tagsEdit.HoveredTag);
+  HoverIndex := tagsEdit.TagColors.IndexOf(HoverTag);
+
+  if HoverIndex >= 0 then
+    colorDialog.Color := tagsEdit.TagColors.Items[HoverIndex].Color
+  else
+    colorDialog.Color := tagsEdit.GetAutoColor(HoverTag);
+
+  if (colorDialog.Execute) then
+  begin
+    if HoverIndex >= 0 then
+      tagsEdit.TagColors.Items[HoverIndex].Color := colorDialog.Color
+    else
+      tagsEdit.TagColors.Add(HoverTag, colorDialog.Color);
+    tagsEdit.Invalidate;
+    GridInvalidate;
+  end;
+end;
+
+procedure TformNotetask.contextResetColorClick(Sender: TObject);
+var
+  HoverTag: string;
+  HoverIndex: integer;
+begin
+  HoverTag := GetBeforeColon(tagsEdit.HoveredTag);
+  HoverIndex := tagsEdit.TagColors.IndexOf(HoverTag);
+
+  if HoverIndex >= 0 then
+  begin
+    tagsEdit.TagColors.Delete(HoverIndex);
+
+    tagsEdit.Invalidate;
+    GridInvalidate;
+  end;
+end;
+
 procedure TformNotetask.contextWindowsCRLFClick(Sender: TObject);
 begin
   FLineEnding := TLineEnding.WindowsCRLF;
@@ -2474,7 +2521,7 @@ var
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  SaveFormSettings(self); // Save setting for new process
+  SaveFormSettings(self, tagsEdit); // Save setting for new process
 
   Process := TProcess.Create(nil); // Create a new process
   try

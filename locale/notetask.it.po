@@ -772,6 +772,11 @@ msgstr ""
 msgid "ASCII"
 msgstr ""
 
+#: tformnotetask.contextcolor.caption
+msgctxt "tformnotetask.contextcolor.caption"
+msgid "Color..."
+msgstr "Colore…"
+
 #: tformnotetask.contextcopystatusbar.caption
 msgctxt "tformnotetask.contextcopystatusbar.caption"
 msgid "Copy"
@@ -790,6 +795,10 @@ msgstr "Elimina"
 #: tformnotetask.contextmacintoshcr.caption
 msgid "MacintoshCR"
 msgstr ""
+
+#: tformnotetask.contextresetcolor.caption
+msgid "Reset color"
+msgstr "Reimposta colore"
 
 #: tformnotetask.contextunixlf.caption
 msgid "UnixLF"

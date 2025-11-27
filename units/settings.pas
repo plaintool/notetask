@@ -18,7 +18,8 @@ uses
   Grids,
   Graphics,
   fpjson,
-  mainform;
+  mainform,
+  TagEdit;
 
 type
   TGridSettings = record
@@ -26,9 +27,9 @@ type
     RowHeights: array of integer;
   end;
 
-procedure SaveFormSettings(Form: TformNotetask);
+procedure SaveFormSettings(Form: TformNotetask; TagEdit: TTagEdit);
 
-function LoadFormSettings(Form: TformNotetask): boolean;
+function LoadFormSettings(Form: TformNotetask; TagEdit: TTagEdit): boolean;
 
 procedure SaveGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string);
 
@@ -47,10 +48,13 @@ begin
   {$ENDIF}
 end;
 
-procedure SaveFormSettings(Form: TformNotetask);
+procedure SaveFormSettings(Form: TformNotetask; TagEdit: TTagEdit);
 var
-  JSONObj: TJSONObject;
   FileName: string;
+  JSONObj: TJSONObject;
+  TagArr: TJSONArray;
+  ItemObj: TJSONObject;
+  i: integer;
 begin
   FileName := GetSettingsDirectory('form_settings.json'); // Get settings file name
   ForceDirectories(GetSettingsDirectory); // Ensure the directory exists
@@ -82,6 +86,21 @@ begin
     JSONObj.Add('FontSize', Form.Font.Size);
     JSONObj.Add('FontStyle', integer(Form.Font.Style));  // Convert font style to number
 
+    // Save Tag Colors
+    TagArr := TJSONArray.Create; // JSON array for colors
+
+    // iterate TagItems
+    for i := 0 to TagEdit.TagColors.Count - 1 do
+    begin
+      ItemObj := TJSONObject.Create;
+      // store tag name
+      ItemObj.Add('Tag', TagEdit.TagColors[i].TagName);
+      // store color as integer
+      ItemObj.Add('Color', TagEdit.TagColors[i].Color);
+      TagArr.Add(ItemObj);
+    end;
+    JSONObj.Add('TagColors', TagArr);
+
     // Write to file
     with TStringList.Create do
     try
@@ -95,13 +114,19 @@ begin
   end;
 end;
 
-function LoadFormSettings(Form: TformNotetask): boolean;
+function LoadFormSettings(Form: TformNotetask; TagEdit: TTagEdit): boolean;
 var
   JSONData: TJSONData;
   JSONObj: TJSONObject;
   FileName: string;
   FileStream: TFileStream;
   FileContent: string;
+  TagData: TJSONData;
+  TagArr: TJSONArray;
+  ItemObj: TJSONObject;
+  TagStr: string;
+  ColVal: TColor;
+  i: integer;
 begin
   Result := False;
   FileContent := string.Empty;
@@ -161,6 +186,36 @@ begin
         Form.Font.Size := JSONObj.FindPath('FontSize').AsInteger;
       if JSONObj.FindPath('FontStyle') <> nil then
         Form.Font.Style := TFontStyles(JSONObj.FindPath('FontStyle').AsInteger); // Convert integer back to TFontStyles
+
+      // Load Tag Colors
+      TagData := JSONObj.FindPath('TagColors');  // safe lookup
+      if (TagData <> nil) and (TagData.JSONType = jtArray) then
+      begin
+        TagArr := TJSONArray(TagData);
+        TagEdit.TagColors.Clear;
+
+        for i := 0 to TagArr.Count - 1 do
+        begin
+          if TagArr.Items[i] is TJSONObject then
+          begin
+            ItemObj := TJSONObject(TagArr.Items[i]);
+
+            // read tag name
+            if ItemObj.Find('Tag') <> nil then
+              TagStr := ItemObj.Strings['Tag']
+            else
+              TagStr := '';
+
+            // read color
+            if ItemObj.Find('Color') <> nil then
+              ColVal := ItemObj.Integers['Color']
+            else
+              ColVal := clNone;
+
+            TagEdit.TagColors.Add(TagStr, ColVal);
+          end;
+        end;
+      end;
 
       Result := True;
     finally

@@ -1373,6 +1373,17 @@ object formNotetask: TformNotetask
       Caption = 'Delete'
       OnClick = contextDeleteTagsClick
     end
+    object Separator19: TMenuItem
+      Caption = '-'
+    end
+    object contextColor: TMenuItem
+      Caption = 'Color...'
+      OnClick = contextColorClick
+    end
+    object contextResetColor: TMenuItem
+      Caption = 'Reset color'
+      OnClick = contextResetColorClick
+    end
   end
   object MiscImages: TImageList
     Height = 12
@@ -1385,5 +1396,32 @@ object formNotetask: TformNotetask
       BF0B8A2D48D09F0B0D3B6520F685FA8114F7F342C38EDCF003016968182692A9
       1F043481F814340D92A39F011AEE24A55F00C26E30D3
     }
+  end
+  object colorDialog: TColorDialog
+    Color = clBlack
+    CustomColors.Strings = (
+      'ColorA=000000'
+      'ColorB=000080'
+      'ColorC=008000'
+      'ColorD=008080'
+      'ColorE=800000'
+      'ColorF=800080'
+      'ColorG=808000'
+      'ColorH=808080'
+      'ColorI=C0C0C0'
+      'ColorJ=0000FF'
+      'ColorK=00FF00'
+      'ColorL=00FFFF'
+      'ColorM=FF0000'
+      'ColorN=FF00FF'
+      'ColorO=FFFF00'
+      'ColorP=FFFFFF'
+      'ColorQ=C0DCC0'
+      'ColorR=F0CAA6'
+      'ColorS=F0FBFF'
+      'ColorT=A4A0A0'
+    )
+    Left = 600
+    Top = 176
   end
 end
