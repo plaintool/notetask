@@ -44,6 +44,7 @@ type
 
     FEdit: TEdit;
     FCheckListButton: TCheckListButton;
+
     FColor: TColor;
     FTagColor: TColor;
     FTagSuffixColor: TColor;
@@ -62,7 +63,6 @@ type
     FCloseButtons: boolean;
     FCloseButtonOnHover: boolean;
     FBackspaceEditTag: boolean;
-    FTagEditing: boolean;
     FReadOnly: boolean;
     FEnabled: boolean;
 
@@ -91,8 +91,10 @@ type
     FRemoveConfirm: boolean;
     FRemoveConfirmMessage: TTranslateString;
     FRemoveConfirmTitle: TTranslateString;
+
     FTextHint: TTranslateString;
     FSuggestionButtonCaption: TTranslateString;
+    FTagEditing: string;
 
     FFont: TFont;
     FParentFont: boolean;
@@ -384,7 +386,7 @@ begin
   Width := Scale(300);
   FColor := clWindow;
   ParentColor := False;
-  FTagEditing := False;
+  FTagEditing := string.Empty;
   FReadOnly := False;
   FEnabled := True;
   FAutoSizeHeight := False;
@@ -1111,7 +1113,7 @@ procedure TCustomTagEdit.FinishEdit;
 begin
   if FEdit.Text <> string.Empty then
     AddTag(Trim(FEdit.Text));
-  FTagEditing := False;
+  FTagEditing := string.Empty;
 end;
 
 procedure TCustomTagEdit.ClearSelection;
@@ -1218,8 +1220,12 @@ begin
   if Key = VK_RETURN then
   begin
     if FEdit.Text <> string.Empty then
-      AddTag(FEdit.Text);
-    FTagEditing := False;
+      AddTag(FEdit.Text)
+    else
+    if Assigned(FOnChange) and (FTagEditing <> string.Empty) then
+      FOnChange(Sender);
+
+    FTagEditing := string.Empty;
     Key := 0;
   end
   else
@@ -1231,16 +1237,19 @@ begin
     FTags.Delete(FTags.Count - 1);
     if FBackSpaceEditTag then
     begin
-      FEdit.Text := ATag;
+      FTagEditing := ATag;
+      FEdit.Text := FTagEditing;
       FEdit.SelStart := FEdit.GetTextLen;
-      FTagEditing := True;
       UpdateEditPosition;
       Repaint;
+    end
+    else
+    begin
+      if Assigned(FOnTagRemove) then
+        FOnTagRemove(Sender, ATag);
+      if Assigned(FOnChange) then
+        FOnChange(Sender);
     end;
-    if Assigned(FOnTagRemove) then
-      FOnTagRemove(Sender, ATag);
-    if Assigned(FOnChange) then
-      FOnChange(Sender);
     UpdateAutoHeight;
     Invalidate;
     Key := 0;
@@ -1259,12 +1268,15 @@ begin
       ClearSelection;
       Key := 0;
     end;
-    if (FEdit.Text <> string.Empty) then
+    if (FEdit.Text <> string.Empty) or (FTagEditing <> string.Empty) then
     begin
-      if not FTagEditing then
+      if FTagEditing = string.Empty then
         FEdit.Text := string.Empty
       else
+      begin
+        FEdit.Text := FTagEditing;
         FinishEdit;
+      end;
       Key := 0;
     end;
   end
