@@ -379,6 +379,7 @@ type
     procedure memoNoteMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
     procedure tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure tagsEditTagClick(Sender: TObject; const TagText: string);
+    procedure tagsEditBeforeChange(Sender: TObject);
     procedure tagsEditChange(Sender: TObject);
     procedure tagsEditTagAdd(Sender: TObject; const TagText: string);
     procedure tagsEditTagRemove(Sender: TObject; const TagText: string);
@@ -869,6 +870,7 @@ begin
   tagsEdit.PopupMenu := PopupTags;
   tagsEdit.OnKeyDown := @tagsEditKeyDown;
   tagsEdit.OnTagClick := @tagsEditTagClick;
+  tagsEdit.OnBeforeChange := @tagsEditBeforeChange;
   tagsEdit.OnChange := @tagsEditChange;
   tagsEdit.OnTagAdd := @tagsEditTagAdd;
   tagsEdit.OnTagRemove := @tagsEditTagRemove;
@@ -4350,61 +4352,72 @@ begin
     filterClearClick(Sender);
 end;
 
+procedure TformNotetask.tagsEditBeforeChange(Sender: TObject);
+begin
+  Tasks.CreateBackup;
+end;
+
 procedure TformNotetask.tagsEditChange(Sender: TObject);
 begin
-  if taskGrid.Selection.Height = 0 then
-  begin
-    Tasks.CreateBackup;
-    Tasks.GetTask(taskGrid.Row).Tags.Assign(tagsEdit.Items);
-    SetFilter;
-    SetChanged;
-    GridInvalidate;
-  end;
+  SetFilter;
+  SetChanged;
+  taskGrid.Invalidate;
 end;
 
 procedure TformNotetask.tagsEditTagAdd(Sender: TObject; const TagText: string);
 begin
-  if taskGrid.Selection.Height > 0 then
-    TagsAdd(taskGrid.Selection, TagText);
+  TagsAdd(taskGrid.Selection, TagText);
 end;
 
 procedure TformNotetask.tagsEditTagRemove(Sender: TObject; const TagText: string);
 var
   i: integer;
 begin
-  if taskGrid.Selection.Height > 0 then
-  begin
-    Tasks.CreateBackup;
-    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-      if Tasks.Map(i) > -1 then
-        StringListRemove(Tasks.GetTask(i).Tags, TagText);
-
-    SetFilter;
-    SetChanged;
-    GridInvalidate;
-  end;
+  //  Tasks.CreateBackup;
+  for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+    if Tasks.Map(i) > -1 then
+      StringListRemove(Tasks.GetTask(i).Tags, TagText);
 end;
 
 procedure TformNotetask.tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
 var
   i: integer;
 begin
-  if taskGrid.Selection.Height > 0 then
-  begin
-    Tasks.CreateBackup;
-    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-      if Tasks.Map(i) > -1 then
-        Tasks.GetTask(i).Tags.Assign(tagsEdit.Items);
+  Tasks.CreateBackup;
+  for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+    if Tasks.Map(i) > -1 then
+      Tasks.GetTask(i).Tags.Assign(tagsEdit.Items);
+end;
 
-    SetChanged;
-    GridInvalidate;
-  end;
+procedure TformNotetask.TagsAdd(const Rect: TRect; const TagText: string);
+var
+  i: integer;
+begin
+  //  Tasks.CreateBackup;
+  if Rect.Height > 0 then
+  begin
+    for i := Rect.Top to Rect.Bottom do
+      if Tasks.Map(i) > -1 then
+        Tasks.GetTask(i).Tags.Add(TagText);
+  end
+  else
+    Tasks.GetTask(Rect.Top).Tags.Add(TagText);
 end;
 
 procedure TformNotetask.tagsEditExit(Sender: TObject);
 begin
   FLastGridSelection := taskGrid.Selection;
   Application.QueueAsyncCall(@DelayedFinishTagEdit, 0);
+end;
+
+procedure TformNotetask.DelayedFinishTagEdit(Data: PtrInt);
+begin
+  if (Trim(tagsEdit.EditBox.Text) <> string.Empty) then
+  begin
+    TagsAdd(FLastGridSelection, tagsEdit.EditBox.Text);
+    tagsEdit.EditBox.Text := string.Empty;
+    SetTags;
+  end;
 end;
 
 procedure TformNotetask.NewFile(SaveSetting: boolean = True);
@@ -6878,34 +6891,6 @@ begin
   Application.ProcessMessages;
 end;
 
-procedure TformNotetask.TagsAdd(const Rect: TRect; const TagText: string);
-var
-  i: integer;
-begin
-  Tasks.CreateBackup;
-  if Rect.Height > 0 then
-  begin
-    for i := Rect.Top to Rect.Bottom do
-      if Tasks.Map(i) > -1 then
-        Tasks.GetTask(i).Tags.Add(TagText);
-  end
-  else
-    Tasks.GetTask(Rect.Top).Tags.Add(TagText);
-  SetFilter;
-  SetChanged;
-  GridInvalidate;
-end;
-
-procedure TformNotetask.DelayedFinishTagEdit(Data: PtrInt);
-begin
-  if (Trim(tagsEdit.EditBox.Text) <> string.Empty) then
-  begin
-    TagsAdd(FLastGridSelection, tagsEdit.EditBox.Text);
-    tagsEdit.EditBox.Text := string.Empty;
-    SetTags;
-  end;
-end;
-
 function TformNotetask.FreeFile: boolean;
 begin
   // Release the reserved file stream if it exists
@@ -7868,6 +7853,12 @@ end;
 
 function TformNotetask.GetSelectedRows: TIntegerArray;
 begin
+  try
+    if Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex) then
+      FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)] := GetSelectedRow;
+  except
+    // just insure
+  end;
   Result := FLastRowMem;
 end;
 

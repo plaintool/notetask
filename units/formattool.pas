@@ -97,6 +97,8 @@ function StringListToBacktickString(List: TStringList; LeadingSpace: boolean = T
 
 procedure AddPrefixTags(List: TStringList);
 
+function StringListsEqual(A, B: TStrings): Boolean;
+
 function GetBeforeColon(const S: string): string;
 
 procedure ParseGroupName(const Value: string; out NameText, HintText: string);
@@ -1020,6 +1022,25 @@ begin
     // Always free the temporary list to avoid memory leaks
     PrefixesToAdd.Free;
   end;
+end;
+
+function StringListsEqual(A, B: TStrings): Boolean;
+var
+  i: Integer;
+begin
+  // Compare count first
+  if A.Count <> B.Count then
+    Exit(False);
+
+  // Compare each line
+  for i := 0 to A.Count - 1 do
+  begin
+    // Compare text values
+    if A[i] <> B[i] then
+      Exit(False);
+  end;
+
+  Result := True;
 end;
 
 function GetBeforeColon(const S: string): string;

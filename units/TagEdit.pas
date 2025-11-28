@@ -74,6 +74,7 @@ type
     FTagBorderWidth: integer;
     FEditMinWidth: integer;
     FCloseBtnWidth: integer;
+    FCheckListInBulk: boolean;
 
     FSelecting: boolean;
     FSelectionRectPenStyle: TPenStyle;
@@ -96,6 +97,8 @@ type
     FTextHint: TTranslateString;
     FSuggestionButtonCaption: TTranslateString;
     FTagEditing: string;
+    FCheckListAdded: string;
+    FCheckListRemoved: string;
 
     FFont: TFont;
     FParentFont: boolean;
@@ -105,6 +108,7 @@ type
     FOnTagReorder: TTagReorderEvent;
     FOnTagClick: TTagEvent;
     FOnTagPopup: TTagPopupEvent;
+    FOnBeforeChange: TNotifyEvent;
     FOnChange: TNotifyEvent;
 
     function GetTags: TStringList;
@@ -166,6 +170,8 @@ type
     procedure EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure SuggestedChanged(Sender: TObject);
     procedure CheckListItemChecked(Sender: TObject; Index: integer; Checked: boolean);
+    procedure CheckListBeforeBulkChange(Sender: TObject);
+    procedure CheckListAfterBulkChange(Sender: TObject);
     procedure TagsChanged(Sender: TObject);
     procedure FontChanged(Sender: TObject); override;
     procedure ParentFontChange(Sender: TObject);
@@ -222,6 +228,7 @@ type
 
     property OnTagClick: TTagEvent read FOnTagClick write FOnTagClick;
     property OnTagPopup: TTagPopupEvent read FOnTagPopup write FOnTagPopup;
+    property OnBeforeChange: TNotifyEvent read FOnBeforeChange write FOnBeforeChange;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnTagAdd: TTagEvent read FOnTagAdd write FOnTagAdd;
     property OnTagRemove: TTagEvent read FOnTagRemove write FOnTagRemove;
@@ -229,7 +236,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure AddTag(const ATag: string);
+    procedure AddTag(const ATag: string; AEditing: boolean = False);
     procedure RemoveTag(const ATag: string; AConfirm: boolean = False);
     function Focused: boolean; override;
     procedure CopyHoverText;
@@ -319,6 +326,7 @@ type
     // events
     property OnTagClick;
     property OnTagPopup;
+    property OnBeforeChange;
     property OnChange;
     property OnTagAdd;
     property OnTagRemove;
@@ -445,6 +453,8 @@ begin
     FCheckListButton.DropDownCount := 15;
     FCheckListButton.AttachedControl := FEdit;
     FCheckListButton.OnItemChecked := @CheckListItemChecked;
+    FCheckListButton.OnBeforeBulkChange := @CheckListBeforeBulkChange;
+    FCheckListButton.OnAfterBulkChange := @CheckListAfterBulkChange;
 
     FEdit.OnMouseDown := @EditMouseDown;
     FEdit.OnMouseMove := @EditMouseMove;
@@ -750,23 +760,35 @@ end;
 
 procedure TCustomTagEdit.UpdateCheckList(AddSuggestions: boolean = True);
 var
-  i: integer;
+  i, idx: integer;
+  tagName: string;
 begin
-  if not Assigned(FCheckListButton) or (csDesigning in ComponentState) then exit;
+  if not Assigned(FCheckListButton) or (csDesigning in ComponentState) then Exit;
 
-  FCheckListButton.UncheckAll;
+  // optionally add missing suggestions
   if AddSuggestions and FAutoSuggest then
+  begin
     for i := 0 to FTags.Count - 1 do
     begin
-      if (IndexOf(FTags[i], FSuggestedTags) < 0) then
-        FSuggestedTags.Add(FTags[i]);
+      tagName := FTags[i];
 
-      if (IndexOf(FTags[i], FCheckListButton.Items) < 0) then
-        FCheckListButton.Items.Add(FTags[i]);
+      if (IndexOf(tagName, FSuggestedTags) < 0) then
+        FSuggestedTags.Add(tagName);
+
+      if (IndexOf(tagName, FCheckListButton.Items) < 0) then
+        FCheckListButton.Items.Add(tagName);
     end;
+  end;
 
-  for i := 0 to FTags.Count - 1 do
-    FCheckListButton.CheckedByName[FTags[i]] := True;
+  // iterate over all items and check/uncheck individually
+  for i := 0 to FCheckListButton.Items.Count - 1 do
+  begin
+    tagName := FCheckListButton.Items[i];
+    // check if tag is in FTags
+    idx := IndexOf(tagName, FTags);
+    if FCheckListButton.Checked[i] <> (idx >= 0) then
+      FCheckListButton.Checked[i] := (idx >= 0);
+  end;
 end;
 
 procedure TCustomTagEdit.UpdateHoverState(X, Y: integer);
@@ -871,7 +893,7 @@ begin
   Result := FEdit.Focused;
 end;
 
-procedure TCustomTagEdit.AddTag(const ATag: string);
+procedure TCustomTagEdit.AddTag(const ATag: string; AEditing: boolean = False);
 var
   SL: TStringList;
   i: integer;
@@ -893,16 +915,22 @@ begin
     else
       SL.Add(ATag);
 
-    for i := 0 to SL.Count - 1 do
+    if Sl.Count > 0 then
     begin
-      s := Trim(SL[i]);
-      // Skip empty or duplicate tags
-      if (s <> '') and (IndexOf(s, FTags) = -1) then
+      if Assigned(FOnBeforeChange) and not AEditing then
+        FOnBeforeChange(Self);
+
+      for i := 0 to SL.Count - 1 do
       begin
-        FTags.Add(s);
-        TagsAdded := True;
-        if Assigned(FOnTagAdd) then
-          FOnTagAdd(Self, s);
+        s := Trim(SL[i]);
+        // Skip empty or duplicate tags
+        if (s <> '') and (IndexOf(s, FTags) = -1) then
+        begin
+          FTags.Add(s);
+          TagsAdded := True;
+          if Assigned(FOnTagAdd) then
+            FOnTagAdd(Self, s);
+        end;
       end;
     end;
   finally
@@ -923,57 +951,98 @@ end;
 
 procedure TCustomTagEdit.RemoveTag(const ATag: string; AConfirm: boolean = False);
 var
-  i: integer;
+  SL: TStringList;
+  i, Index: integer;
+  s: string;
+  TagsToRemove: TStringList;
+  EditValue: string;
+  TagsRemoved: boolean;
 begin
-  i := IndexOf(ATag, FTags);
+  if ATag = string.Empty then
+    Exit;
 
-  if AConfirm and not RemovalConfirmed(i) then exit;
+  TagsRemoved := False;
+  EditValue := FEdit.Text;
+  FEdit.Clear;
+  SL := TStringList.Create;
+  TagsToRemove := TStringList.Create;
+  try
+    // Split by semicolon if present
+    if Pos(';', ATag) > 0 then
+      ExtractStrings([';'], [], PChar(ATag), SL)
+    else
+      SL.Add(ATag);
 
-  if i >= 0 then
+    // Collect unique tags that exist in FTags
+    for i := 0 to SL.Count - 1 do
+    begin
+      s := Trim(SL[i]);
+      if (s <> '') and (IndexOf(s, FTags) >= 0) and (TagsToRemove.IndexOf(s) = -1) then
+        TagsToRemove.Add(s);
+    end;
+
+    if TagsToRemove.Count > 0 then
+    begin
+      // Single confirmation for all tags (index = -1)
+      if AConfirm and not RemovalConfirmed(-1) then
+        Exit;
+
+      if Assigned(FOnBeforeChange) then
+        FOnBeforeChange(Self);
+
+      // Remove all collected tags
+      for i := 0 to TagsToRemove.Count - 1 do
+      begin
+        s := TagsToRemove[i];
+        Index := IndexOf(s, FTags);
+        if Index >= 0 then
+        begin
+          FTags.Delete(Index);
+          TagsRemoved := True;
+          if Assigned(FOnTagRemove) then
+            FOnTagRemove(Self, s);
+        end;
+      end;
+    end;
+  finally
+    SL.Free;
+    TagsToRemove.Free;
+  end;
+
+  // Update UI if tags were removed
+  if TagsRemoved then
   begin
-    FTags.Delete(i);
-    if Assigned(FOnTagRemove) then
-      FOnTagRemove(Self, ATag);
     if Assigned(FOnChange) then
       FOnChange(Self);
     Invalidate;
     UpdateAutoHeight;
-  end;
+  end
+  else
+    FEdit.Text := EditValue;
 end;
 
 procedure TCustomTagEdit.RemoveSelectedTags;
 var
   I: integer;
-  TagToRemove: string;
+  TagsString: string;
 begin
   if FSelectedTags.Count = 0 then
     Exit;
 
-  if not RemovalConfirmed then exit;
-
-  // Remove tags from the main list
-  for I := FSelectedTags.Count - 1 downto 0 do
+  // Build semicolon separated string of selected tags
+  TagsString := '';
+  for I := 0 to FSelectedTags.Count - 1 do
   begin
-    TagToRemove := FSelectedTags[I];
-
-    // Call OnTagRemove event if assigned
-    if Assigned(FOnTagRemove) then
-      FOnTagRemove(Self, TagToRemove);
-
-    // Remove from main tags list
-    FTags.Delete(IndexOf(TagToRemove, FTags));
+    if I > 0 then
+      TagsString := TagsString + ';';
+    TagsString := TagsString + FSelectedTags[I];
   end;
+
+  // Use bulk RemoveTag method
+  RemoveTag(TagsString, True);
 
   // Clear selection
   FSelectedTags.Clear;
-
-  // Call OnChange event if assigned
-  if Assigned(FOnChange) then
-    FOnChange(Self);
-
-  // Update visual
-  Invalidate;
-  UpdateAutoHeight;
 end;
 
 function TCustomTagEdit.RemovalConfirmed(idx: integer = -1): boolean;
@@ -1113,7 +1182,7 @@ end;
 procedure TCustomTagEdit.FinishEdit;
 begin
   if FEdit.Text <> string.Empty then
-    AddTag(Trim(FEdit.Text));
+    AddTag(Trim(FEdit.Text), True);
   FTagEditing := string.Empty;
 end;
 
@@ -1223,10 +1292,47 @@ procedure TCustomTagEdit.CheckListItemChecked(Sender: TObject; Index: integer; C
 begin
   if csDesigning in ComponentState then exit;
 
-  if Checked then
-    AddTag(FCheckListButton.Items[Index])
+  if not FCheckListInBulk then
+  begin
+    if Checked then
+      AddTag(FCheckListButton.Items[Index])
+    else
+      RemoveTag(FCheckListButton.Items[Index]);
+  end
   else
-    RemoveTag(FCheckListButton.Items[Index]);
+  begin
+    if Checked then
+      FCheckListAdded += ';' + FCheckListButton.Items[Index]
+    else
+      FCheckListRemoved += ';' + FCheckListButton.Items[Index];
+  end;
+end;
+
+procedure TCustomTagEdit.CheckListBeforeBulkChange(Sender: TObject);
+begin
+  if Assigned(FOnBeforeChange) then
+    FOnBeforeChange(Sender);
+
+  FCheckListInBulk := True;
+  FCheckListAdded := string.Empty;
+  FCheckListRemoved := string.Empty;
+end;
+
+procedure TCustomTagEdit.CheckListAfterBulkChange(Sender: TObject);
+begin
+  if FCheckListInBulk then
+  begin
+    try
+      if Length(FCheckListAdded) > 0 then
+        AddTag(FCheckListAdded);
+      if Length(FCheckListRemoved) > 0 then
+        RemoveTag(FCheckListRemoved);
+    finally
+      FCheckListInBulk := False;
+      FCheckListAdded := string.Empty;
+      FCheckListRemoved := string.Empty;
+    end;
+  end;
 end;
 
 procedure TCustomTagEdit.EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -1238,8 +1344,11 @@ begin
   // Enter adds a new tag (handles multiple tags separated by ';')
   if Key = VK_RETURN then
   begin
+    if Assigned(FOnBeforeChange) and (FTagEditing = string.Empty) then
+      FOnBeforeChange(Sender);
+
     if FEdit.Text <> string.Empty then
-      AddTag(FEdit.Text)
+      AddTag(FEdit.Text, FTagEditing <> string.Empty)
     else
     if Assigned(FOnChange) and (FTagEditing <> string.Empty) then
       FOnChange(Sender);
@@ -1252,8 +1361,12 @@ begin
   if (Key = VK_BACK) and (FEdit.Text = string.Empty) and (FTags.Count > 0) and (FBackspaceEditTag or
     RemovalConfirmed(FTags.Count - 1)) then
   begin
+    if Assigned(FOnBeforeChange) then
+      FOnBeforeChange(Sender);
+
     ATag := FTags[FTags.Count - 1];
     FTags.Delete(FTags.Count - 1);
+
     if FBackSpaceEditTag then
     begin
       FTagEditing := ATag;
@@ -1261,14 +1374,11 @@ begin
       FEdit.SelStart := FEdit.GetTextLen;
       UpdateEditPosition;
       Repaint;
-    end
-    else
-    begin
-      if Assigned(FOnTagRemove) then
-        FOnTagRemove(Sender, ATag);
-      if Assigned(FOnChange) then
-        FOnChange(Sender);
     end;
+    if Assigned(FOnTagRemove) then
+      FOnTagRemove(Sender, ATag);
+    if Assigned(FOnChange) then
+      FOnChange(Sender);
     UpdateAutoHeight;
     Invalidate;
     Key := 0;
@@ -1656,6 +1766,9 @@ begin
         // Adjust drop index if dragging forward
         if FDropIndex > FDragIndex then
           Dec(FDropIndex);
+
+        if Assigned(FOnBeforeChange) then
+          FOnBeforeChange(Self);
 
         TempTag := FTags[FDragIndex];
         FTags.Delete(FDragIndex);

@@ -24,8 +24,7 @@ const
   {$ENDIF}
 
 type
-  TCheckBoxListClickEvent = procedure(Sender: TObject; Index: integer; Checked: boolean) of object;
-  TCheckBoxListChangeEvent = procedure(Sender: TObject) of object;
+  TItemCheckedEvent = procedure(Sender: TObject; Index: integer; Checked: boolean) of object;
 
   { TCheckListForm }
 
@@ -58,8 +57,10 @@ type
     FPopupForm: TCheckListForm;
     FItems: TStrings;
     FAttachedControl: TControl;
-    FOnItemChecked: TCheckBoxListClickEvent;
-    FOnChange: TCheckBoxListChangeEvent;
+    FOnItemChecked: TItemCheckedEvent;
+    FOnBeforeBulkChange: TNotifyEvent;
+    FOnAfterBulkChange: TNotifyEvent;
+    FOnChange: TNotifyEvent;
     FOnDropDown: TNotifyEvent;
     FOnCloseUp: TNotifyEvent;
     FClosing: boolean;
@@ -98,7 +99,7 @@ type
     procedure Loaded; override;
     procedure ParentFontChanged; override;
     procedure FontChanged(Sender: TObject); override;
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -125,8 +126,10 @@ type
     property Sorted: boolean read FSorted write SetSorted default False;
     property ParentColor: boolean read FParentColor write SetParentColor default True;
     property ParentFont: boolean read FParentFont write SetParentFont default True;
-    property OnItemChecked: TCheckBoxListClickEvent read FOnItemChecked write FOnItemChecked;
-    property OnChange: TCheckBoxListChangeEvent read FOnChange write FOnChange;
+    property OnItemChecked: TItemCheckedEvent read FOnItemChecked write FOnItemChecked;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnBeforeBulkChange: TNotifyEvent read FOnBeforeBulkChange write FOnBeforeBulkChange;
+    property OnAfterBulkChange: TNotifyEvent read FOnAfterBulkChange write FOnAfterBulkChange;
     property OnDropDown: TNotifyEvent read FOnDropDown write FOnDropDown;
     property OnCloseUp: TNotifyEvent read FOnCloseUp write FOnCloseUp;
     property PopupEmpty: boolean read FPopupEmpty write FPopupEmpty default True;
@@ -213,6 +216,7 @@ begin
     begin
       if Assigned(FOnItemChecked) then
         FOnItemChecked(Self, FCheckListBox.ItemIndex, FCheckListBox.Checked[FCheckListBox.ItemIndex]);
+
       if Assigned(FOnChange) then
         FOnChange(Self);
     end;
@@ -484,7 +488,7 @@ begin
   UpdatePopupStyles;
 end;
 
-procedure TCheckListButton.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TCheckListButton.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   inherited MouseUp(Button, Shift, X, Y);
 
@@ -645,6 +649,13 @@ begin
     end;
   end;
 
+  // Event before change
+  if HasSelection or (FPopupForm.CheckListBox.ItemIndex >= 0) then
+  begin
+    if Assigned(FOnBeforeBulkChange) then
+      FOnBeforeBulkChange(Self);
+  end;
+
   // If no items selected, work with focused item only
   if not HasSelection and (FPopupForm.CheckListBox.ItemIndex >= 0) then
   begin
@@ -677,22 +688,29 @@ begin
     end;
   end;
 
+  // Event after change
   if HasSelection or (FPopupForm.CheckListBox.ItemIndex >= 0) then
   begin
     if Assigned(FOnChange) then
       FOnChange(Self);
+    if Assigned(FOnAfterBulkChange) then
+      FOnAfterBulkChange(Self);
   end;
 end;
 
 procedure TCheckListButton.CheckAll;
 var
   i: integer;
-  OldOnItemChecked: TCheckBoxListClickEvent;
-  OldOnChange: TCheckBoxListChangeEvent;
+  OldOnItemChecked: TItemCheckedEvent;
+  OldOnChange: TNotifyEvent;
 begin
   // Initialize form if needed
   InitializePopupForm;
   if not Assigned(FPopupForm) or (Count = 0) then Exit;
+
+  // Event before change
+  if Assigned(FOnBeforeBulkChange) then
+    FOnBeforeBulkChange(Self);
 
   // Save old event handlers
   OldOnItemChecked := FOnItemChecked;
@@ -718,20 +736,26 @@ begin
     FOnChange := OldOnChange;
   end;
 
-  // Trigger events once after all changes
+  // Event after change
   if Assigned(FOnChange) then
     FOnChange(Self);
+  if Assigned(FOnAfterBulkChange) then
+    FOnAfterBulkChange(Self);
 end;
 
 procedure TCheckListButton.UncheckAll;
 var
   i: integer;
-  OldOnItemChecked: TCheckBoxListClickEvent;
-  OldOnChange: TCheckBoxListChangeEvent;
+  OldOnItemChecked: TItemCheckedEvent;
+  OldOnChange: TNotifyEvent;
 begin
   // Initialize form if needed
   InitializePopupForm;
   if not Assigned(FPopupForm) or (Count = 0) then Exit;
+
+  // Event before change
+  if Assigned(FOnBeforeBulkChange) then
+    FOnBeforeBulkChange(Self);
 
   // Save old event handlers
   OldOnItemChecked := FOnItemChecked;
@@ -757,19 +781,25 @@ begin
     FOnChange := OldOnChange;
   end;
 
-  // Trigger events once after all changes
+  // Event after change
   if Assigned(FOnChange) then
     FOnChange(Self);
+  if Assigned(FOnAfterBulkChange) then
+    FOnAfterBulkChange(Self);
 end;
 
 procedure TCheckListButton.Clear;
 var
-  OldOnItemChecked: TCheckBoxListClickEvent;
-  OldOnChange: TCheckBoxListChangeEvent;
+  OldOnItemChecked: TItemCheckedEvent;
+  OldOnChange: TNotifyEvent;
 begin
   // Initialize form if needed
   InitializePopupForm;
   if not Assigned(FPopupForm) or (Count = 0) then Exit;
+
+  // Event before change
+  if Assigned(FOnBeforeBulkChange) then
+    FOnBeforeBulkChange(Self);
 
   // Save old event handlers
   OldOnItemChecked := FOnItemChecked;
@@ -790,14 +820,11 @@ begin
     FOnChange := OldOnChange;
   end;
 
-  // Trigger events once after clearing
+  // Event after change
   if Assigned(FOnChange) then
     FOnChange(Self);
-end;
-
-function TCheckListButton.Scale(const AValue: integer): integer;
-begin
-  Result := Scale96ToScreen(AValue);
+  if Assigned(FOnAfterBulkChange) then
+    FOnAfterBulkChange(Self);
 end;
 
 function TCheckListButton.GetCheckedByName(const AName: string): boolean;
@@ -834,9 +861,15 @@ begin
   if Index >= 0 then
   begin
     FPopupForm.CheckListBox.Checked[Index] := Value;
+
     if Assigned(FOnChange) then
       FOnChange(Self);
   end;
+end;
+
+function TCheckListButton.Scale(const AValue: integer): integer;
+begin
+  Result := Scale96ToScreen(AValue);
 end;
 
 procedure TCheckListButton.SetAttachedControl(Value: TControl);
@@ -968,6 +1001,7 @@ begin
   if (Index >= 0) and (Index < FPopupForm.CheckListBox.Items.Count) then
   begin
     FPopupForm.CheckListBox.Checked[Index] := Value;
+
     if Assigned(FOnChange) then
       FOnChange(Self);
   end;
@@ -1002,6 +1036,7 @@ begin
   if (Index >= 0) and (Index < FPopupForm.CheckListBox.Items.Count) then
   begin
     FPopupForm.CheckListBox.State[Index] := Value;
+
     if Assigned(FOnChange) then
       FOnChange(Self);
   end;
