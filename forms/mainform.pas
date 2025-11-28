@@ -4467,6 +4467,7 @@ begin
     // Load saved settings for new file
     LoadGridSettings(Self, taskGrid, string.Empty);
     ApplyGridSettings;
+    SetZoom(FZoom);
 
     taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Row, taskGrid.Selection.Right, taskGrid.Row);
     taskGrid.Row := 1;
@@ -4602,9 +4603,8 @@ begin
 
   // Load saved settings for file
   LoadGridSettings(Self, taskGrid, ExtractFileName(FFileName));
-
   ApplyGridSettings;
-
+  SetZoom(FZoom);
   SetFilter;
 
   FLineEndingOriginal := FLineEnding;
