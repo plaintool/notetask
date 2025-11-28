@@ -2973,7 +2973,7 @@ begin
     // Apply the selected font to the form
     Self.Font := fontDialog.Font;
     FOriginalFontSize := Self.Font.Size;
-    aZoomDefault.Execute;
+    SetZoom(FZoom);
   end;
 end;
 
