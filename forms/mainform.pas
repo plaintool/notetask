@@ -2275,10 +2275,10 @@ begin
   if (FStatusPanelIndex = 0) then
     PopupZoom.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
   else
-  if (FStatusPanelIndex = 1) then
+  if (FStatusPanelIndex = 1) and (not FReadOnly) then
     PopupEncoding.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
   else
-  if (FStatusPanelIndex = 2) then
+  if (FStatusPanelIndex = 2) and (not FReadOnly) then
     PopupLineEnding.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y);
 end;
 
