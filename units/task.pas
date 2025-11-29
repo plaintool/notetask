@@ -291,9 +291,9 @@ var
         Result := False;
     end
     else
-    if TryStrToDate(B, DateB) then
+    if TryStrToDateTime(B, DateB) then
     begin
-      if TryStrToDate(A, DateA) then
+      if TryStrToDateTime(A, DateA) then
       begin
         // Date comparison
         if Op = '=' then Result := DateA = DateB

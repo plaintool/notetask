@@ -689,6 +689,7 @@ type
     function GetMemoNoteScroll: integer;
     function GetMemoNoteSelStart: integer;
     function GetMemoNoteSelLength: integer;
+    procedure DrawHighlightedText(aCanvas: TCanvas; const aText, aFilterText: string; aRect: TRect; aColor: TColor);
   public
     FZoom: float;
     FShowArchived: boolean;
@@ -1666,13 +1667,13 @@ end;
 
 procedure TformNotetask.taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
 var
-  grid: TStringGrid;
-  S: string;
-  drawrect: TRect;
+  Grid: TStringGrid;
+  Value: string;
+  DrawRect: TRect;
   bgFill: TColor;
-  flags: cardinal;
-  task: TTask;
-  amount: double;
+  Flags: cardinal;
+  Task: TTask;
+  Amount: double;
   FS: TFormatSettings;
   ImgIndex: integer;
   ImgX, ImgY: integer;
@@ -1680,18 +1681,18 @@ var
   TagsWidth: integer = 0;
   OriginalLeft, OriginalRight: integer;
 begin
-  grid := Sender as TStringGrid;
+  Grid := Sender as TStringGrid;
   bgFill := clWhite;
 
   // Border for fixed cells
-  if (aRow < grid.FixedRows) or (aCol < grid.FixedCols) then
+  if (aRow < Grid.FixedRows) or (aCol < Grid.FixedCols) then
   begin
-    grid.Canvas.Pen.Color := clSilver;
-    grid.Canvas.Pen.Style := psSolid;
-    grid.Canvas.Pen.Width := 1;
-    grid.Canvas.Pen.Width := 0;
-    grid.Canvas.Brush.Style := bsClear;
-    grid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
+    Grid.Canvas.Pen.Color := clSilver;
+    Grid.Canvas.Pen.Style := psSolid;
+    Grid.Canvas.Pen.Width := 1;
+    Grid.Canvas.Pen.Width := 0;
+    Grid.Canvas.Brush.Style := bsClear;
+    Grid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
 
     if (aRow = 0) and (aCol = 0) and (SortColumn = 0) and Assigned(taskGrid.TitleImageList) then
     begin
@@ -1703,7 +1704,7 @@ begin
       ImgX := aRect.Right - taskGrid.TitleImageList.Width - 4;
       ImgY := aRect.Top + ((aRect.Bottom - aRect.Top - taskGrid.TitleImageList.Height) div 2);
 
-      taskGrid.TitleImageList.Draw(grid.Canvas, ImgX, ImgY, ImgIndex, True);
+      taskGrid.TitleImageList.Draw(Grid.Canvas, ImgX, ImgY, ImgIndex, True);
     end;
   end
   else
@@ -1714,101 +1715,101 @@ begin
       (not IsEditing)) then
     begin
       bgFill := clRowFocused;    // Focused
-      grid.Canvas.Font.Color := clBlack;
+      Grid.Canvas.Font.Color := clBlack;
     end
     else
     if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
     begin
       bgFill := clHighlight;    // Multiselect
-      grid.Canvas.Font.Color := clWhite;
+      Grid.Canvas.Font.Color := clWhite;
     end
     else
     if gdRowHighlight in aState then
     begin
       bgFill := clRowHighlight; // Highlight
-      grid.Canvas.Font.Color := clBlack;
+      Grid.Canvas.Font.Color := clBlack;
     end
     else
     begin
       if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
       begin
-        task := Tasks.GetTask(ARow);
-        if (ShowColumnDate) and (not task.Done) and (task.Date > 0) and (task.Date < Now) then // Color expired task
+        Task := Tasks.GetTask(ARow);
+        if (ShowColumnDate) and (not Task.Done) and (Task.Date > 0) and (Task.Date < Now) then // Color expired Task
         begin
           bgFill := clRowExpired; // Expired warning red
-          grid.Canvas.Font.Color := clBlack;
+          Grid.Canvas.Font.Color := clBlack;
         end
         else
-        if (not task.Done) and (task.Archive) then
+        if (not Task.Done) and (Task.Archive) then
         begin
           bgFill := clWhite; // Not done but arhive warning color
-          grid.Canvas.Font.Color := clMaroon;
+          Grid.Canvas.Font.Color := clMaroon;
         end
         else
         begin
           bgFill := clWhite; // All other white
-          grid.Canvas.Font.Color := clBlack;
+          Grid.Canvas.Font.Color := clBlack;
         end;
       end;
     end;
 
     if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
     begin
-      task := Tasks.GetTask(ARow);
-      if task.Star then
-        grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsBold];
+      Task := Tasks.GetTask(ARow);
+      if Task.Star then
+        Grid.Canvas.Font.Style := Grid.Canvas.Font.Style + [fsBold];
 
-      if (aCol = 2) and (task.Archive) then
-        grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsStrikeOut];
+      if (aCol = 2) and (Task.Archive) then
+        Grid.Canvas.Font.Style := Grid.Canvas.Font.Style + [fsStrikeOut];
 
-      if (aCol = 3) and (task.NoteItalic) then
-        grid.Canvas.Font.Style := grid.Canvas.Font.Style + [fsItalic];
+      if (aCol = 3) and (Task.NoteItalic) then
+        Grid.Canvas.Font.Style := Grid.Canvas.Font.Style + [fsItalic];
 
-      if (aCol = 5) and (task.Date > Now) and (not (gdSelected in aState)) then
-        grid.Canvas.Font.Color := clDarkBlue;
+      if (aCol = 5) and (Task.Date > Now) and (not (gdSelected in aState)) then
+        Grid.Canvas.Font.Color := clDarkBlue;
     end;
 
     // Fill the cell background
-    grid.Canvas.Brush.Color := bgFill;
-    grid.canvas.Brush.Style := bsSolid;
-    grid.canvas.FillRect(aRect);
+    Grid.Canvas.Brush.Color := bgFill;
+    Grid.canvas.Brush.Style := bsSolid;
+    Grid.canvas.FillRect(aRect);
 
     if (aCol in [1, 6]) then
     begin
-      grid.DefaultDrawCell(aCol, aRow, aRect, aState);
+      Grid.DefaultDrawCell(aCol, aRow, aRect, aState);
       exit;
     end;
 
-    if (aCol = 4) and (TryStrToFloat(grid.Cells[ACol, ARow], amount)) then
+    if (aCol = 4) and (TryStrToFloat(Grid.Cells[ACol, ARow], Amount)) then
     begin
       FS := DefaultFormatSettings;
       FS.ThousandSeparator := ' ';
-      S := FormatFloat('#,##0.##########', StrToFloat(grid.Cells[ACol, ARow]), FS);
+      Value := FormatFloat('#,##0.##########', StrToFloat(Grid.Cells[ACol, ARow]), FS);
     end
     else
-      S := grid.Cells[ACol, ARow];
+      Value := Grid.Cells[ACol, ARow];
 
     if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
     begin
       if (aCol = 2) then
       begin
-        task := Tasks.GetTask(ARow);
-        if task.Tags.Count > 0 then
+        Task := Tasks.GetTask(ARow);
+        if Task.Tags.Count > 0 then
         begin
-          BitTags := tagsEdit.GetTagsBitmap(task.Tags, Round(Max(Max(Font.Size div 2, 8) * FZoom, 1)),
+          BitTags := tagsEdit.GetTagsBitmap(Task.Tags, Round(Max(Max(Font.Size div 2, 8) * FZoom, 1)),
             Min(ARect.Width, 500), ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected,
             ifthen(bgFill <> clWhite, TagsDimnessColor, TagsDimness)), ColorToRGB(bgFill));
           try
             BitTags.TransparentColor := clWhite;
             BitTags.Transparent := True;
             TagsWidth := BitTags.Width;
-            task.TagsWidth := TagsWidth;
+            Task.TagsWidth := TagsWidth;
             if TagsWidth < aRect.Width - 50 then
             begin
               if taskGrid.BiDiMode = bdLeftToRight then
-                grid.canvas.Draw(aRect.Right - TagsWidth - 5, aRect.Top, BitTags)
+                Grid.canvas.Draw(aRect.Right - TagsWidth - 5, aRect.Top, BitTags)
               else
-                grid.canvas.Draw(aRect.Left + 5, aRect.Top, BitTags);
+                Grid.canvas.Draw(aRect.Left + 5, aRect.Top, BitTags);
             end
             else
               TagsWidth := 0;
@@ -1817,73 +1818,382 @@ begin
           end;
         end
         else
-          TagsWidth := task.TagsWidth;
+          TagsWidth := Task.TagsWidth;
       end;
     end;
 
-    if Length(S) > 0 then
+    if Length(Value) > 0 then
     begin
-      if FDuplicateHighlight and not (gdSelected in aState) and (FLastText <> string.Empty) and (S = FLastText) and
-        (taskGrid.Selection.Height = 0) and ((aCol <> FLastCol) or (aRow <> FLastRow)) then
+      if FDuplicateHighlight and not (gdSelected in aState) and (FLastText <> string.Empty) and
+        (Value = FLastText) and (taskGrid.Selection.Height = 0) and ((aCol <> FLastCol) or (aRow <> FLastRow)) then
       begin
-        grid.canvas.Brush.Style := bsSolid;
-        grid.canvas.Brush.Color := clDuplicateHighlight;
+        Grid.canvas.Brush.Style := bsSolid;
+        Grid.canvas.Brush.Color := clDuplicateHighlight;
       end
       else
-        grid.canvas.Brush.Style := bsClear;
-      drawrect := aRect;
-      drawrect.Inflate(-4, 0);
+        Grid.canvas.Brush.Style := bsClear;
+      DrawRect := aRect;
+      DrawRect.Inflate(-4, 0);
 
       // Save original boundaries
-      OriginalLeft := drawrect.Left;
-      OriginalRight := drawrect.Right;
+      OriginalLeft := DrawRect.Left;
+      OriginalRight := DrawRect.Right;
 
       // Reduce text area by TagsWidth for text measurement
-      if TagsWidth < drawrect.Width then
+      if TagsWidth < DrawRect.Width then
       begin
         if FBiDiRightToLeft then
-          drawrect.Left := OriginalLeft + TagsWidth  // For RTL: reserve space on the left
+          DrawRect.Left := OriginalLeft + TagsWidth  // For RTL: reserve space on the left
         else
-          drawrect.Right := OriginalRight - TagsWidth; // For LTR: reserve space on the right
+          DrawRect.Right := OriginalRight - TagsWidth; // For LTR: reserve space on the right
       end;
 
       // First pass: calculate text size
-      flags := DT_CALCRECT;
+      Flags := DT_CALCRECT;
       if FBiDiRightToLeft then
-        flags := flags or DT_RIGHT
+        Flags := Flags or DT_RIGHT
       else
-        flags := flags or DT_LEFT;
+        Flags := Flags or DT_LEFT;
       if FWordWrap then
-        flags := flags or DT_WORDBREAK;
+        Flags := Flags or DT_WORDBREAK;
 
-      DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
+      DrawText(Grid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
 
       // Second pass: actual text drawing
       // Restore the reduced area for drawing
-      drawrect.Left := OriginalLeft;
-      drawrect.Right := OriginalRight;
+      DrawRect.Left := OriginalLeft;
+      DrawRect.Right := OriginalRight;
 
-      if TagsWidth < drawrect.Width then
+      if TagsWidth < DrawRect.Width then
       begin
         if FBiDiRightToLeft then
-          drawrect.Left := OriginalLeft + TagsWidth
+          DrawRect.Left := OriginalLeft + TagsWidth
         else
-          drawrect.Right := OriginalRight - TagsWidth;
+          DrawRect.Right := OriginalRight - TagsWidth;
       end;
 
-      flags := DT_NOPREFIX;
+      Flags := DT_NOPREFIX;
       if FBiDiRightToLeft then
-        flags := flags or DT_RIGHT
+        Flags := Flags or DT_RIGHT
       else
-        flags := flags or DT_LEFT;
+        Flags := Flags or DT_LEFT;
       if FWordWrap then
-        flags := flags or DT_WORDBREAK;
+        Flags := Flags or DT_WORDBREAK;
 
       if (FHideNoteText) and (aCol = 3) then
-        S := MaskTextWithBullets(S, grid.Canvas, FLineEnding);
+        Value := MaskTextWithBullets(Value, Grid.Canvas, FLineEnding);
 
-      DrawText(grid.canvas.handle, PChar(S), Length(S), drawrect, flags);
+      if (Value = string.Empty) or (filterBox.Text = string.Empty) or (Pos(ULower(filterBox.Text),
+        ULower(ifthen(aCol = 4, ReplaceStr(Value, ' ', ''), Value))) = 0) or ((FHideNoteText) and (aCol = 3)) then
+        DrawText(Grid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags)
+      else
+      begin
+        if (aCol = 4) then Value := ReplaceStr(Value, ' ', '');
+
+        DrawHighlightedText(Grid.Canvas, Value, filterBox.Text, DrawRect, tagsEdit.BlendColors(clDuplicateHighlight, bgFill, 50));
+      end;
     end;
+  end;
+end;
+
+procedure TformNotetask.DrawHighlightedText(aCanvas: TCanvas; const aText, aFilterText: string; aRect: TRect; aColor: TColor);
+type
+  TTextRange = record
+    StartPos: integer;
+    EndPos: integer;
+    IsMatch: boolean;
+  end;
+  PTextRange = ^TTextRange;
+
+  TLineWord = record
+    word: string;
+    Width: integer;
+    IsMatch: boolean;
+  end;
+var
+  TextRanges: TList;
+  LineWords: array of TLineWord = ();
+  LineStartIndex: integer; // Index of first word in current line
+  LineWidth: integer;      // Current line width
+  Flags: cardinal;
+  CurrentY: integer;
+  LineHeight: integer;
+  SavedBrushStyle: TBrushStyle;
+  SavedBrushColor: TColor;
+  SavedTextColor: TColor;
+  Range: PTextRange;
+  Fragment: string;
+  CurrentWord: string;
+  WordStart, WordEnd: integer;
+  WordWidth: integer;
+  TotalGroupWidth: integer;
+  I, J: integer;
+
+// Build text ranges for highlighting matches
+  procedure BuildTextRanges;
+  var
+    LowerText, LowerFilter: string;
+    CurrentPos, MatchPos: integer;
+    Range: PTextRange;
+  begin
+    if (aFilterText = '') or (aText = '') then
+    begin
+      // No filter text - create single normal range
+      New(Range);
+      Range^.StartPos := 1;
+      Range^.EndPos := Length(aText);
+      Range^.IsMatch := False;
+      TextRanges.Add(Range);
+      Exit;
+    end;
+
+    LowerText := ULower(aText);
+    LowerFilter := ULower(aFilterText);
+    CurrentPos := 1;
+
+    while CurrentPos <= Length(aText) do
+    begin
+      MatchPos := Pos(LowerFilter, LowerText, CurrentPos);
+
+      if MatchPos = 0 then
+      begin
+        // No more matches - add remaining text as normal range
+        if CurrentPos <= Length(aText) then
+        begin
+          New(Range);
+          Range^.StartPos := CurrentPos;
+          Range^.EndPos := Length(aText);
+          Range^.IsMatch := False;
+          TextRanges.Add(Range);
+        end;
+        Break;
+      end
+      else
+      begin
+        // Add text before match as normal range
+        if MatchPos > CurrentPos then
+        begin
+          New(Range);
+          Range^.StartPos := CurrentPos;
+          Range^.EndPos := MatchPos - 1;
+          Range^.IsMatch := False;
+          TextRanges.Add(Range);
+        end;
+
+        // Add matching text as highlight range
+        New(Range);
+        Range^.StartPos := MatchPos;
+        Range^.EndPos := MatchPos + Length(aFilterText) - 1;
+        Range^.IsMatch := True;
+        TextRanges.Add(Range);
+
+        CurrentPos := MatchPos + Length(aFilterText);
+      end;
+    end;
+  end;
+
+  // Draw a complete line
+  procedure DrawLine(LineStart, LineEnd: integer; Y: integer);
+  var
+    J, X: integer;
+    DrawRect: TRect;
+    TotalLineWidth: integer;
+  begin
+    // Remove last space
+    LineWords[LineEnd].word := TrimRight(LineWords[LineEnd].word);
+    LineWords[LineEnd].Width := aCanvas.TextWidth(LineWords[LineEnd].word);
+    LineWords[LineStart].word := TrimLeft(LineWords[LineStart].word);
+    LineWords[LineStart].Width := aCanvas.TextWidth(LineWords[LineStart].word);
+
+    // Calculate total width of this line
+    TotalLineWidth := 0;
+    for J := LineStart to LineEnd do
+      TotalLineWidth := TotalLineWidth + LineWords[J].Width;
+
+    // Set starting X based on text direction
+    if FBiDiRightToLeft then
+      X := aRect.Right - TotalLineWidth  // Align line to right
+    else
+      X := aRect.Left;                   // Align line to left
+
+    // Ensure we don't draw outside the bounds
+    if X < aRect.Left then X := aRect.Left;
+    if X + TotalLineWidth > aRect.Right then
+    begin
+      // Adjust if line is too long (shouldn't happen with proper word wrapping)
+      TotalLineWidth := aRect.Right - X;
+      if FBiDiRightToLeft then
+        X := aRect.Right - TotalLineWidth;
+    end;
+
+    // Draw all words in the line
+    for J := LineStart to LineEnd do
+    begin
+      // Check if we're still within bounds
+      if (X + LineWords[J].Width > aRect.Right) then
+        Break;
+
+      DrawRect := Rect(X, Y, X + LineWords[J].Width, Y + LineHeight);
+      if LineWords[J].IsMatch then
+      begin
+        aCanvas.Brush.Style := bsSolid;
+        aCanvas.Brush.Color := aColor;
+        aCanvas.FillRect(DrawRect);
+      end
+      else
+        aCanvas.Brush.Style := bsClear;
+
+      Flags := DT_NOPREFIX;
+      if FBiDiRightToLeft then
+        Flags := Flags or DT_RIGHT
+      else
+        Flags := Flags or DT_LEFT;
+      if FWordWrap then
+        Flags := Flags or DT_WORDBREAK;
+
+      DrawText(aCanvas.handle, PChar(LineWords[J].word), Length(LineWords[J].word), DrawRect, Flags);
+      X := X + LineWords[J].Width;
+    end;
+  end;
+
+begin
+  TextRanges := TList.Create;
+  try
+    // Save canvas state
+    SavedBrushStyle := aCanvas.Brush.Style;
+    SavedBrushColor := aCanvas.Brush.Color;
+    SavedTextColor := aCanvas.Font.Color;
+
+    try
+      BuildTextRanges;
+      if TextRanges.Count = 0 then Exit;
+      LineHeight := aCanvas.TextHeight('Wg');
+
+      // First, extract all words from all text ranges
+      SetLength(LineWords, 0);
+
+      for I := 0 to TextRanges.Count - 1 do
+      begin
+        Range := PTextRange(TextRanges[I]);
+        Fragment := Copy(aText, Range^.StartPos, Range^.EndPos - Range^.StartPos + 1);
+
+        WordStart := 1;
+        while WordStart <= Length(Fragment) do
+        begin
+          // Find word boundaries (include spaces and line breaks as separate "words")
+          WordEnd := WordStart;
+
+          if Fragment[WordStart] = ' ' then
+          begin
+            // This is a space - treat it as a separate word
+            while (WordEnd < Length(Fragment)) and (Fragment[WordEnd + 1] = ' ') do
+              Inc(WordEnd);
+          end
+          else if (Fragment[WordStart] = #10) or (Fragment[WordStart] = #13) then
+          begin
+            // This is a line break - handle different line break types
+            if (Fragment[WordStart] = #13) and (WordEnd < Length(Fragment)) and (Fragment[WordEnd + 1] = #10) then
+            begin
+              // Windows line break (CR+LF) - treat as single word
+              Inc(WordEnd);
+            end;
+            // For Unix line breaks (LF only) or Mac classic (CR only), we don't need to do anything else
+            // as WordEnd is already at the current position
+          end
+          else
+          begin
+            // This is a non-space word - continue until space or line break
+            while (WordEnd < Length(Fragment)) and (Fragment[WordEnd + 1] <> ' ') and (Fragment[WordEnd + 1] <> #10) and
+              (Fragment[WordEnd + 1] <> #13) do
+              Inc(WordEnd);
+          end;
+
+          CurrentWord := Copy(Fragment, WordStart, WordEnd - WordStart + 1);
+
+          // For line breaks, use a special representation or calculate width differently
+          if (Fragment[WordStart] = #10) or (Fragment[WordStart] = #13) then
+          begin
+            // Line breaks have zero width for calculation purposes
+            // but we need to handle them specially during drawing
+            WordWidth := 0;
+
+            // Optionally, you could replace line break with a visible character for debugging
+            // CurrentWord := '¶'; // Uncomment for debugging
+            // WordWidth := aCanvas.TextWidth('¶'); // Uncomment for debugging
+          end
+          else
+          begin
+            WordWidth := aCanvas.TextWidth(CurrentWord);
+          end;
+
+          // Add word to array
+          SetLength(LineWords, Length(LineWords) + 1);
+          LineWords[High(LineWords)].word := CurrentWord;
+          LineWords[High(LineWords)].Width := WordWidth;
+          LineWords[High(LineWords)].IsMatch := Range^.IsMatch;
+
+          WordStart := WordEnd + 1;
+        end;
+      end;
+
+      if Length(LineWords) = 0 then Exit;
+
+      // Now break into lines and draw
+      LineStartIndex := 0;
+      LineWidth := 0;
+      CurrentY := aRect.Top;
+
+      for I := 0 to High(LineWords) do
+      begin
+        WordWidth := LineWords[I].Width;
+
+        // Calculate total width from current position to next break (space or line break)
+        TotalGroupWidth := WordWidth;
+
+        // Look ahead to find the next break and calculate total width
+        for J := I + 1 to High(LineWords) do
+        begin
+          // Stop at next break (space or line break)
+          if (LineWords[J].word = ' ') or (LineWords[J].word = #10) or (LineWords[J].word = #13) or
+            (LineWords[J].word = #13#10) then
+            Break;
+
+          TotalGroupWidth := TotalGroupWidth + LineWords[J].Width;
+        end;
+
+        // Check if the entire group fits or if it's a line break
+        if ((LineWidth > 0) and (LineWidth + TotalGroupWidth > aRect.Width)) or (LineWords[I].word = #10) or
+          (LineWords[I].word = #13) or (LineWords[I].word = #13#10) then
+        begin
+          DrawLine(LineStartIndex, I - 1, CurrentY);
+          CurrentY := CurrentY + LineHeight;
+          if CurrentY + LineHeight > aRect.Bottom then
+            Exit;
+          LineStartIndex := I;
+          LineWidth := WordWidth;
+        end
+        else
+        begin
+          LineWidth := LineWidth + WordWidth;
+        end;
+      end;
+
+      // Draw the last line
+      if LineStartIndex <= High(LineWords) then
+        DrawLine(LineStartIndex, High(LineWords), CurrentY);
+
+    finally
+      // Restore canvas state
+      aCanvas.Brush.Style := SavedBrushStyle;
+      aCanvas.Brush.Color := SavedBrushColor;
+      aCanvas.Font.Color := SavedTextColor;
+    end;
+
+  finally
+    // Clean up text ranges
+    for I := 0 to TextRanges.Count - 1 do
+      Dispose(PTextRange(TextRanges[I]));
+    TextRanges.Free;
   end;
 end;
 
@@ -7854,7 +8164,7 @@ end;
 function TformNotetask.GetSelectedRows: TIntegerArray;
 begin
   try
-    if Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex) then
+    if (groupTabs.Visible) and (groupTabs.TabIndex >= 0) and (Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex)) then
       FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)] := GetSelectedRow;
   except
     // just insure

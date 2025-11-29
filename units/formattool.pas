@@ -69,7 +69,7 @@ function GetConsoleEncoding: string;
 
 function IsUTF8Char(const S: string; CharIndex: integer; FindChar: string = ' '): boolean;
 
-function ULower(Value: string): unicodestring;
+function ULower(Value: string): string;
 
 function IsLetterOrDigit(ch: widechar): boolean;
 
@@ -97,7 +97,7 @@ function StringListToBacktickString(List: TStringList; LeadingSpace: boolean = T
 
 procedure AddPrefixTags(List: TStringList);
 
-function StringListsEqual(A, B: TStrings): Boolean;
+function StringListsEqual(A, B: TStrings): boolean;
 
 function GetBeforeColon(const S: string): string;
 
@@ -123,7 +123,7 @@ function CloneArray(const Src: TIntegerArray): TIntegerArray;
 
 procedure CopyToArray(var Dest: TIntegerArray; const Src: TIntegerArray);
 
-function SameFloat(A, B: Double; Eps: Double): Boolean;
+function SameFloat(A, B: double; Eps: double): boolean;
 
 const
   Brackets: array[0..17] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]',
@@ -594,9 +594,9 @@ begin
   Result := (ch = FindChar);
 end;
 
-function ULower(Value: string): unicodestring;
+function ULower(Value: string): string;
 begin
-  Result := UnicodeLowerCase(unicodestring(Value));
+  Result := UTF8LowerCase(Value);
 end;
 
 function IsLetterOrDigit(ch: widechar): boolean;
@@ -1024,9 +1024,9 @@ begin
   end;
 end;
 
-function StringListsEqual(A, B: TStrings): Boolean;
+function StringListsEqual(A, B: TStrings): boolean;
 var
-  i: Integer;
+  i: integer;
 begin
   // Compare count first
   if A.Count <> B.Count then
@@ -1045,7 +1045,7 @@ end;
 
 function GetBeforeColon(const S: string): string;
 var
-  p: Integer;
+  p: integer;
 begin
   // Find ":" position
   p := Pos(':', S); // returns 0 if not found
@@ -1210,7 +1210,7 @@ begin
     Dest[i] := Src[i];
 end;
 
-function SameFloat(A, B: Double; Eps: Double): Boolean;
+function SameFloat(A, B: double; Eps: double): boolean;
 begin
   // Compare floats with epsilon
   Result := Abs(A - B) < Eps;
