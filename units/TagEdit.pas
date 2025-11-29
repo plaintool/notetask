@@ -1554,12 +1554,20 @@ begin
       R := GetTagRect(idx);
 
       // Click near right edge removes the tag - do it immediately
-      if (X > R.Right - FCloseBtnWidth - Scale(2)) and RemovalConfirmed(idx) then
+      if (X > R.Right - FCloseBtnWidth - Scale(2)) then
       begin
-        RemoveTag(FTags[idx]);
-        FMouseDownIndex := -1; // Reset since we handled it
-        if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
-        exit;
+        if RemovalConfirmed(idx) then
+        begin
+          RemoveTag(FTags[idx]);
+          FMouseDownIndex := -1; // Reset since we handled it
+          if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+          exit;
+        end
+        else
+        begin
+          FHoverIndex := -1;
+          Invalidate;
+        end;
       end;
     end;
 
