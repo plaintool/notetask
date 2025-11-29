@@ -262,7 +262,6 @@ end;
 procedure TTask.FillTags;
 begin
   FillTagsFromString(FTags, FText, True);
-  FillTagsFromString(FTags, FNote, True);
 end;
 
 function TTask.MatchesFilter(const Filter: string; DisplayTime: boolean): boolean;

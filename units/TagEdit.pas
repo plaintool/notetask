@@ -95,7 +95,7 @@ type
     FRemoveConfirmTitle: TTranslateString;
 
     FTextHint: TTranslateString;
-    FSuggestionButtonCaption: TTranslateString;
+    FSuggestedButtonCaption: TTranslateString;
     FTagEditing: string;
     FCheckListAdded: string;
     FCheckListRemoved: string;
@@ -117,7 +117,6 @@ type
     function GetHoveredTag: string;
     function GetSuggestedItemsSorted: boolean;
     function GetSuggestedButtonGlyph: TBitmap;
-    function GetSuggestedButtonCaption: string;
 
     procedure SetTags(Value: TStringList);
     procedure SetSuggestedTags(Value: TStringList);
@@ -215,7 +214,7 @@ type
     property HoveredTag: string read GetHoveredTag;
     property SuggestedItemsSorted: boolean read GetSuggestedItemsSorted write SetSuggestedItemsSorted default False;
     property SuggestedButtonGlyph: TBitmap read GetSuggestedButtonGlyph write SetSuggestedButtonGlyph;
-    property SuggestedButtonCaption: string read GetSuggestedButtonCaption write SetSuggestedButtonCaption;
+    property SuggestedButtonCaption: string read FSuggestedButtonCaption write SetSuggestedButtonCaption;
     property SelectionColor: TColor read FSelectionColor write SetSelectionColor default clHighlight;
     property SelectionRectColor: TColor read FSelectionRectColor write FSelectionRectColor default clHighlight;
     property SelectionRectPenStyle: TPenStyle read FSelectionRectPenStyle write FSelectionRectPenStyle default psDash;
@@ -389,7 +388,7 @@ begin
   FSuggestedTags.Duplicates := dupIgnore;
   FSuggestedTags.Delimiter := ';';
   FSuggestedTags.OnChange := @SuggestedChanged;
-  FSuggestionButtonCaption := '...';
+  FSuggestedButtonCaption := '...';
 
   Height := Scale(32);
   Width := Scale(300);
@@ -520,12 +519,6 @@ function TCustomTagEdit.GetSuggestedButtonGlyph: TBitmap;
 begin
   // return glyph of internal button
   Result := FCheckListButton.Glyph;
-end;
-
-function TCustomTagEdit.GetSuggestedButtonCaption: string;
-begin
-  // return caption of internal button
-  Result := FSuggestionButtonCaption;
 end;
 
 procedure TCustomTagEdit.SetTags(Value: TStringList);
@@ -663,8 +656,8 @@ end;
 procedure TCustomTagEdit.SetSuggestedButtonCaption(const AValue: string);
 begin
   // assign caption to internal button
-  FSuggestionButtonCaption := AValue;
-  FCheckListButton.Caption := FSuggestionButtonCaption;
+  FSuggestedButtonCaption := AValue;
+  FCheckListButton.Caption := Trim(FSuggestedButtonCaption);
 end;
 
 procedure TCustomTagEdit.SetSuggestedButtonGlyph(AValue: TBitmap);
