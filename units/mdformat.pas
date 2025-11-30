@@ -106,7 +106,7 @@ var
 begin
   Result := TTask.Create;
 
-  // Format: - [x] 01.01.2000, 123, ~~**Task**~~ `tag1` `tag2` // Note
+  // Format: - [x] 01.01.2000, 123, ~~**Task `tag1` `tag2`**~~ // Note
   Result.FSpaceBeforeNote := True;
   Result.FSpaceAfterNote := True;
   Result.FNoteItalic := False;
@@ -251,6 +251,10 @@ begin
   TextString := ReplaceLineBreaks(Task.FText);
   NoteString := ReplaceLineBreaks(Task.FNote);
 
+  // Add Tags to TextString
+  if (Col = 0) and (Task.Tags.Count > 0) then
+    TextString := TextString + StringListToBacktickString(Task.Tags, TextString <> string.Empty);
+
   // Add '**' for starred tasks
   if Task.FStar then
     TextString := '**' + TextString + '**';
@@ -296,10 +300,6 @@ begin
       else
         Result := string.Empty; // If the completion date is missing, return an empty string
     else
-      // Add Tags to TextString
-      if (Task.Tags.Count > 0) then
-        TextString := TextString + StringListToBacktickString(Task.Tags, (TextString <> string.Empty) and not EndsWith(TextString));
-
       // Forming the task string considering the completion date and Note
       if (DoneString = string.Empty) then
       begin
