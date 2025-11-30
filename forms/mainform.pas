@@ -421,6 +421,7 @@ type
     procedure taskGridResize(Sender: TObject);
     procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
     procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
+    procedure taskGridTopLeftChanged(Sender: TObject);
     procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState;
       var ABitmap: TBitmap);
     procedure taskGridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
@@ -582,6 +583,8 @@ type
     FDuplicateHighlight: boolean;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
+    procedure UpdateComboRegion(Combo: TComboBox; AInsetLeft: integer = 1; AInsetTop: integer = 1;
+      AInsetRight: integer = 0; AInsetBottom: integer = 1);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
     function FindGroupTabIndex(Value: integer): integer;
@@ -589,10 +592,7 @@ type
     function GetLineAtEnd: integer;
     function GetLineAtPos(Y: integer): integer;
     procedure PasteWithLineEnding(AMemo: TMemo);
-    procedure UpdateComboRegion(Combo: TComboBox; AInsetLeft: integer = 1; AInsetTop: integer = 1;
-      AInsetRight: integer = 0; AInsetBottom: integer = 1);
     procedure SelectMemoLine(LineIndex: integer; Move: boolean = False);
-    procedure SetMemoFocusDelayed(Data: PtrInt);
     procedure PanelMemoEnter(Sender: TObject);
     procedure PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure MemoEnter(Sender: TObject);
@@ -675,7 +675,6 @@ type
     procedure GridAdjustScrollBars;
     procedure GridInvalidate;
     procedure TagsAdd(const Rect: TRect; const TagText: string);
-    procedure DelayedFinishTagEdit(Data: PtrInt);
     function FreeFile: boolean;
     function LastRowHeight(aRow: integer): integer;
     procedure ChangeLastText(const Value: string; aCol: integer = -1; aRow: integer = -1);
@@ -690,6 +689,9 @@ type
     function GetMemoNoteSelStart: integer;
     function GetMemoNoteSelLength: integer;
     procedure DrawHighlightedText(aCanvas: TCanvas; const aText, aFilterText: string; aRect: TRect; aColor: TColor);
+    procedure DelayedSetMemoFocus(Data: PtrInt);
+    procedure DelayedFinishTagEdit(Data: PtrInt);
+    procedure DelayedInvalidate(Data: PtrInt);
   public
     FZoom: float;
     FShowArchived: boolean;
@@ -859,7 +861,8 @@ begin
   tagsEdit.SelectionRectColor := clSilver;
   tagsEdit.TagHoverColor := clNone;
   tagsEdit.TagSuffixColor := clGrayWhite;
-  tagsEdit.RoundCorners := 25;
+  tagsEdit.RoundCorners := 20;
+  tagsEdit.TagHeightFactor := 2;
   tagsEdit.AutoColorSeed := 14;
   tagsEdit.EditMinWidth := 150;
   tagsEdit.AutoColorBrigtness := TagsColorBrigtness;
@@ -2331,6 +2334,22 @@ begin
       FIsEditing := True;
     end;
   end;
+end;
+
+procedure TformNotetask.taskGridTopLeftChanged(Sender: TObject);
+begin
+  EditComplite;
+
+  if taskGrid.TopRow = 1 then
+    Application.QueueAsyncCall(@DelayedInvalidate, 0);
+
+  if taskGrid.TopRow + taskGrid.VisibleRowCount >= taskGrid.RowCount then
+    Application.QueueAsyncCall(@DelayedInvalidate, 0);
+end;
+
+procedure TformNotetask.DelayedInvalidate(Data: PtrInt);
+begin
+  Repaint;
 end;
 
 procedure TformNotetask.taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer;
@@ -5774,7 +5793,7 @@ begin
   {$ENDIF}
 end;
 
-procedure TformNotetask.SetMemoFocusDelayed(Data: PtrInt);
+procedure TformNotetask.DelayedSetMemoFocus(Data: PtrInt);
 begin
   if Assigned(Memo) and (Memo.CanFocus) then
   begin
@@ -5786,7 +5805,7 @@ end;
 
 procedure TformNotetask.PanelMemoEnter(Sender: TObject);
 begin
-  Application.QueueAsyncCall(@SetMemoFocusDelayed, 0);
+  Application.QueueAsyncCall(@DelayedSetMemoFocus, 0);
 end;
 
 procedure TformNotetask.PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);

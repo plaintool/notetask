@@ -72,6 +72,7 @@ type
     FBorderWidth: integer;
     FRoundCorners: integer;
     FTagBorderWidth: integer;
+    FTagHeightFactor: integer;
     FEditMinWidth: integer;
     FCloseBtnWidth: integer;
     FCheckListInBulk: boolean;
@@ -191,17 +192,18 @@ type
     property AutoColorSeed: longword read FAutoColorSeed write FAutoColorSeed default 0;
     property CloseButtons: boolean read FCloseButtons write FCloseButtons default True;
     property CloseButtonOnHover: boolean read FCloseButtonOnHover write FCloseButtonOnHover default True;
-    property TagHoverUnderline: boolean read FTagHoverUnderline write FTagHoverUnderline default True;
     property BackSpaceEditTag: boolean read FBackspaceEditTag write FBackspaceEditTag default False;
+    property BorderColor: TColor read FBorderColor write FBorderColor default clWindowFrame;
+    property BorderWidth: integer read FBorderWidth write FBorderWidth default 0;
+    property RoundCorners: integer read FRoundCorners write FRoundCorners default 5;
+    property TagHoverUnderline: boolean read FTagHoverUnderline write FTagHoverUnderline default True;
     property TagColor: TColor read FTagColor write FTagColor default clNone;
     property TagSuffixColor: TColor read FTagSuffixColor write FTagSuffixColor default clWhite;
     property TagHoverColor: TColor read FTagHoverColor write FTagHoverColor default clHighlight;
     property TagBorderColor: TColor read FTagBorderColor write FTagBorderColor default clNone;
-    property DragIndicatorColor: TColor read FDragIndicatorColor write FDragIndicatorColor default clRed;
-    property BorderColor: TColor read FBorderColor write FBorderColor default clWindowFrame;
-    property BorderWidth: integer read FBorderWidth write FBorderWidth default 0;
-    property RoundCorners: integer read FRoundCorners write FRoundCorners default 5;
     property TagBorderWidth: integer read FTagBorderWidth write FTagBorderWidth default 2;
+    property TagHeightFactor: integer read FTagHeightFactor write FTagHeightFactor default 0;
+    property DragIndicatorColor: TColor read FDragIndicatorColor write FDragIndicatorColor default clRed;
     property EditMinWidth: integer read FEditMinWidth write FEditMinWidth default 50;
     property RemoveConfirm: boolean read FRemoveConfirm write FRemoveConfirm default True;
     property RemoveConfirmTitle: TTranslateString read FRemoveConfirmTitle write FRemoveConfirmTitle;
@@ -292,15 +294,16 @@ type
     property Width;
     property Tag;
     property Color;
-    property TagHoverUnderline;
     property CloseButtons;
     property CloseButtonOnHover;
     property BackSpaceEditTag;
+    property TagHoverUnderline;
     property TagColor;
     property TagSuffixColor;
     property TagHoverColor;
     property TagBorderColor;
     property TagBorderWidth;
+    property TagHeightFactor;
     property DragIndicatorColor;
     property AutoColorBrigtness;
     property AutoColorSaturation;
@@ -418,6 +421,7 @@ begin
   FTagHoverColor := clHighlight;
   FTagBorderColor := clNone;
   FTagBorderWidth := 2;
+  FTagHeightFactor := 0;
   FDragIndicatorColor := clRed;
   FBorderColor := clWindowFrame;
   FEditMinWidth := Scale(50);
@@ -491,7 +495,7 @@ end;
 
 function TCustomTagEdit.GetTagHeight(AFontSize: integer = -1): integer;
 begin
-  Result := Scale(ifthen(AFontSize > -1, AFontSize, CoalesceInt(Font.Size, Screen.SystemFont.Size, 8)) * 2 + 6);
+  Result := Scale(ifthen(AFontSize > -1, AFontSize, CoalesceInt(Font.Size, Screen.SystemFont.Size, 8)) * 2) + FTagHeightFactor;
 end;
 
 function TCustomTagEdit.GetTagRect(Index: integer): TRect;
@@ -2371,17 +2375,17 @@ begin
 
       ACanvas.Font.Color := FontColor2;
       ACanvas.TextOut(R.Left + SepW - Scale(AIndent) + (R.Width - SepW) div 2 - ACanvas.TextWidth(Part2) div
-        2 - CloseBtnWidth div 2, R.Top + R.Height div 2 - ACanvas.TextHeight(Part2) div 2 - Scale(1), Part2);
+        2 - CloseBtnWidth div 3, R.Top + R.Height div 2 - ACanvas.TextHeight(Part2) div 2 - Scale(1), Part2);
     end
     else
-      ACanvas.TextOut(R.Left + R.Width div 2 - ACanvas.TextWidth(s) div 2 - CloseBtnWidth div 2, R.Top +
+      ACanvas.TextOut(R.Left + R.Width div 2 - ACanvas.TextWidth(s) div 2 - CloseBtnWidth div 3, R.Top +
         R.Height div 2 - ACanvas.TextHeight(s) div 2 - Scale(1), s);
 
     // Draw '×' button if enabled
     if AShowCloseButtons and (not FReadOnly) and (FCloseButtons) and (not FCloseButtonOnHover or Hover) then
     begin
       ACanvas.Font.Underline := False;
-      ACanvas.TextOut(R.Right - FCloseBtnWidth, R.Top + R.Height div 2 - ACanvas.TextHeight('×') div 2 - Scale(2), '×');
+      ACanvas.TextOut(R.Right - FCloseBtnWidth, R.Top + R.Height div 2 - ACanvas.TextHeight('×') div 2 - Scale(1), '×');
     end;
 
     Inc(X, W + Scale(AIndent));

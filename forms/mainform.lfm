@@ -88,6 +88,7 @@ object formNotetask: TformNotetask
     OnSelection = taskGridSelection
     OnSelectCell = taskGridSelectCell
     OnSetCheckboxState = taskGridSetCheckboxState
+    OnTopLeftChanged = taskGridTopLeftChanged
     OnUserCheckboxBitmap = taskGridUserCheckboxBitmap
     OnUTF8KeyPress = taskGridUTF8KeyPress
     RowHeights = (
@@ -274,7 +275,6 @@ object formNotetask: TformNotetask
     Align = alBottom
     AutoSnap = False
     Color = clBtnFace
-    MinSize = 34
     ParentColor = False
     ResizeAnchor = akBottom
     Visible = False
