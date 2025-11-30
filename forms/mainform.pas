@@ -960,7 +960,8 @@ begin
   HideNoteText := FHideNoteText;
 
   // Zoom
-  FOriginalFontSize := Font.Size;
+  FOriginalFontSize := ifthen(Font.Size > 0, Font.Size, Screen.SystemFont.Size);
+  FOriginalFontSize := ifthen(FOriginalFontSize = 0, 8, FOriginalFontSize);
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
@@ -3304,7 +3305,8 @@ begin
   begin
     // Apply the selected font to the form
     Self.Font := fontDialog.Font;
-    FOriginalFontSize := Self.Font.Size;
+    FOriginalFontSize := ifthen(Font.Size > 0, Font.Size, Screen.SystemFont.Size);
+    FOriginalFontSize := ifthen(FOriginalFontSize = 0, 8, FOriginalFontSize);
     SetZoom(FZoom);
   end;
 end;
