@@ -78,6 +78,7 @@ type
     FCheckListInBulk: boolean;
 
     FSelecting: boolean;
+    FSelectingReady: boolean;
     FSelectionRectPenStyle: TPenStyle;
     FSelectionRectWidth: integer;
     FSelectionStart: TPoint;
@@ -1571,6 +1572,7 @@ begin
         begin
           FHoverIndex := -1;
           Invalidate;
+          exit;
         end;
       end;
     end;
@@ -1578,19 +1580,12 @@ begin
     // Start selection if clicking in empty space or edit area
     if (FAllowSelect) and (not FAllowReorder or (idx = -1) or IsEditArea) then
     begin
-      FSelecting := True;
-      FEdit.Visible := False;
-
-      FSelectionStart := Point(X, Y);
-      FSelectionRect := Rect(X, Y, X, Y);
+      FSelectingReady := True;
 
       // RemoveSelectedTags previous selection unless Ctrl is pressed
       if not (ssCtrl in Shift) then
         ClearSelection;
-
-      if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
     end;
-
   end;
 end;
 
@@ -1608,6 +1603,16 @@ var
 begin
   inherited MouseMove(Shift, X, Y);
   if csDesigning in ComponentState then exit;
+
+  if FSelectingReady then
+  begin
+    FSelectingReady := False;
+    FSelecting := True;
+
+    FEdit.Visible := False;
+    FSelectionStart := Point(X, Y);
+    FSelectionRect := Rect(X, Y, X, Y);
+  end;
 
   // Update hover state
   if not FDragging and not FSelecting then
@@ -1733,7 +1738,7 @@ begin
         if FReadOnly or not FCloseButtons then
           M := 0
         else
-          M := Scale(Round(CoalesceInt(Font.Size, Screen.SystemFont.Size, 8) * 1.3) + 2);
+          M := -FCloseBtnWidth - Scale(2);
         // Don't trigger click for remove button area (already handled in MouseDown)
         if not (X > R.Right - M) then
         begin
@@ -1755,6 +1760,8 @@ begin
             // Generate OnTagClick event
             if Assigned(FOnTagClick) and (not FSelecting) then
               FOnTagClick(Self, FTags[idx]);
+
+            FHoverIndex := idx;
           end;
 
           Invalidate;

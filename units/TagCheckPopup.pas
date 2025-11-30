@@ -805,10 +805,6 @@ begin
   InitializePopupForm;
   if not Assigned(FPopupForm) or (Count = 0) then Exit;
 
-  // Event before change
-  if Assigned(FOnBeforeBulkChange) then
-    FOnBeforeBulkChange(Self);
-
   // Save old event handlers
   OldOnItemChecked := FOnItemChecked;
   OldOnChange := FOnChange;
