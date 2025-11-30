@@ -34,6 +34,10 @@ It is designed to help you quickly organize a large number of small routine task
 ## Features:
 - **Numbering** — Tasks are numbered automatically based on their order of appearance in the file
 - **Multiline** — Tasks and notes with an option to submit or insert a line break when pressing Enter
+- **Tags** — task tag support with bulk tag editing, tag choice from existing items, auto or custom tag color, sorting, and optional tag suffixes
+- **Filtering** — filtering tasks across all fields and groups using an expression, with highlighting of matched items
+- **Find & Replace** — search and replace text within tasks and notes using a dialogs, with options for case sensitivity and scope selection
+- **Zoom** — zooming of tasks and notes with adjustable zoom via mouse, keyboard, menu, or status bar
 - **Move tasks** — single or multiple, within or between groups; task priority is set simply by its position in the list
 - **Archive tasks** — cross out archived items, which can be hidden or shown as needed
 - **Grouping** — each group on its own page, with full group management
@@ -60,7 +64,7 @@ Suitable for note-taking with an optional general note field at the bottom of th
 ![sample3](samples/sample3.png)
 
 ### Personal Information
-Suitable for storing personal information in encrypted files, with secure access and optional grouping for better organization.
+Suitable for storing personal information in encrypted files, with secure access and optional grouping for better organization. Highlights duplicate data.
 
 ![sample5](samples/sample4.png)
 
@@ -85,7 +89,8 @@ View menu settings are saved individually based on filename.
 
 ### Summary
 
-The status bar provides a concise, real-time overview of the current task list. These values are dynamically calculated based on either the full list of the current group or the currently selected tasks. It displays:
+The status bar provides a concise, real-time overview of the current task list. These values are dynamically calculated based on either the full list of the current group or the currently selected tasks. Settings are configured through the context menu on the status bar. It displays:
+- **Zoom Precentage** allowing you to enlarge or reduce the view
 - **Text encoding** (e.g., UTF-8) and **line ending** style (e.g., CRLF)  
 - **Completed tasks / Total tasks**  
 - **Total amount spent / Total amount for all tasks** — useful for shopping lists or financial tracking  

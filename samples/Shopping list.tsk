@@ -1,15 +1,14 @@
-- [x] 2024-08-01T00:00:00, 25, ~~Kitchen sponges and dish soap~~ // For daily cleaning tasks.
-- [x] 2024-08-10T00:00:00, 50, ~~Cleaning sprays and microfiber cloths~~ // Bought in bulk for the month.
-- [x] 2024-08-20T00:00:00, 15, ~~Lightbulbs~~ // Needed to replace burned-out ones.
-- [x] 2024-09-01T00:00:00, 30, Storage containers // For better pantry organization.
-- [x] 2024-09-15T00:00:00, 10, Batteries // Stocked up on AA and AAA sizes for household devices.
-- [x] 2024-09-25T00:00:00, 35, Trash bags and paper towels // Missed this item; need to reorder.
-- [x] 2024-10-05T00:00:00, 20, Kitchen towels // Replaced worn-out ones.
-- [x] 2024-10-15T00:00:00, 100, Laundry detergent and fabric softener // Enough for several months.
-- [ ] 2024-10-25T00:00:00, 60, Curtains // Selected style but waiting for a discount.
-- [x] 2024-11-05T00:00:00, 15, Hand soap and sanitizer // Refilled for all rooms.
-- [ ] 2024-11-15T00:00:00, 50, Floor mats // Need measurements for hallway and kitchen.
-- [x] 2024-11-25T00:00:00, 40, Holiday decorations and lights // Prepped for the holiday season.
-- [ ] 2024-12-05T00:00:00, 70, **Shelving** // For organizing tools and items in the garage.
-- [ ] 2024-12-15T00:00:00, 30, Air fresheners and candles // To refresh rooms before guests arrive.
-- [ ] 2025-01-01T00:00:00, 200, Vacuum cleaner // Plan to replace the old, worn-out model.
+- [x] 2024-08-01, 25, ~~Kitchen sponges and dish soap `kitchen`~~ // For daily cleaning tasks.
+- [x] 2024-08-10, 50, ~~Cleaning sprays and microfiber cloths `cleaning`~~ // Bought in bulk for the month.
+- [x] 2024-08-20, 15, ~~Lightbulbs `lighting`~~ // Needed to replace burned-out ones.
+- [x] 2025-08-01, 30, Storage containers `storage` // For better pantry organization.
+- [x] 2025-08-15, 10, Batteries `electronics` // Stocked up on AA and AAA sizes for household devices.
+- [x] 2025-08-25, 35, Trash bags and paper towels `trash` // Missed this item; need to reorder.
+- [x] 2025-09-05, 20, Kitchen towels `kitchen` // Replaced worn-out ones.
+- [x] 2025-09-15, 100, Laundry detergent and fabric softener `laundry` // Enough for several months.
+- [ ] 2025-09-25, 60, **Curtains `home`** // Selected style but waiting for a discount.
+- [x] 2025-10-05, 15, Hand soap and sanitizer `hygiene` // Refilled for all rooms.
+- [ ] 2025-12-15, 50, Holiday decorations and lights `holiday` // Need measurements for hallway and kitchen.
+- [x] 2025-12-25, 40, Shelving `furniture` // Prepped for the holiday season.
+- [ ] 2025-12-15, 30, Air fresheners and candles `home` // To refresh rooms before guests arrive.
+- [ ] 2026-01-01, 200, Vacuum cleaner `cleaning` // Plan to replace the old, worn-out model.
