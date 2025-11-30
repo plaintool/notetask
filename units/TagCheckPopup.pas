@@ -12,7 +12,7 @@ unit TagCheckPopup;
 interface
 
 uses
-  Classes, SysUtils, LResources, Forms, Controls, Clipbrd, Graphics, Dialogs, StdCtrls,
+  Classes, SysUtils, LResources, Forms, Controls, Clipbrd, Math, Graphics, Dialogs, StdCtrls,
   Buttons, CheckLst, ExtCtrls, Types, LCLType;
 
 const
@@ -69,6 +69,8 @@ type
     FItemHeight: integer;
     FAllowGrayed: boolean;
     FMultiSelect: boolean;
+    FPopupOpenTopDelta: integer;
+    FPopupOpenBottomDelta: integer;
     FPopupWidthDelta: integer;
     FSorted: boolean;
     FParentColor: boolean;
@@ -122,6 +124,8 @@ type
     property ItemHeight: integer read FItemHeight write SetItemHeight default 0;
     property AllowGrayed: boolean read FAllowGrayed write SetAllowGrayed default False;
     property MultiSelect: boolean read FMultiSelect write SetMultiSelect default False;
+    property PopupOpenTopDelta: integer read FPopupOpenTopDelta write FPopupOpenTopDelta default 0;
+    property PopupOpenBottomDelta: integer read FPopupOpenBottomDelta write FPopupOpenBottomDelta default 0;
     property PopupWidthDelta: integer read FPopupWidthDelta write FPopupWidthDelta default 2;
     property Sorted: boolean read FSorted write SetSorted default False;
     property ParentColor: boolean read FParentColor write SetParentColor default True;
@@ -420,6 +424,8 @@ begin
   FAllowGrayed := False;
   FMultiSelect := False;
   FPopupWidthDelta := 2;
+  FPopupOpenTopDelta := 0;
+  FPopupOpenBottomDelta := 0;
   FSorted := False;
   FParentColor := True;
   FParentFont := True;
@@ -583,10 +589,12 @@ begin
   if P.Y + FormHeight > ScreenHeight then
   begin
     P := Control.ClientToScreen(Point(0, -FormHeight));
-    BorderDelta := -2;
+    BorderDelta := ifthen(FPopupOpenTopDelta <> 0, FPopupOpenTopDelta, -2);
   end
   else
-    BorderDelta := 1;
+  begin
+    BorderDelta := ifthen(FPopupOpenBottomDelta <> 0, -FPopupOpenBottomDelta, 1);
+  end;
 
   // Set form position and size
   FPopupForm.Top := P.Y + BorderDelta;
