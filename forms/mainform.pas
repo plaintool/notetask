@@ -1883,9 +1883,12 @@ begin
       if (FHideNoteText) and (aCol = 3) then
         Value := MaskTextWithBullets(Value, Grid.Canvas, FLineEnding);
 
-      if (Value = string.Empty) or (filterBox.Text = string.Empty) or (Pos(ULower(filterBox.Text),
-        ULower(ifthen(aCol = 4, ReplaceStr(Value, ' ', ''), Value))) = 0) or ((FHideNoteText) and (aCol = 3)) then
-        DrawText(Grid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags)
+      if (Value = string.Empty) or (filterBox.Text = string.Empty) or (Grid.canvas.Brush.Color = clDuplicateHighlight) or
+        (Pos(ULower(filterBox.Text), ULower(ifthen(aCol = 4, ReplaceStr(Value, ' ', ''), Value))) = 0) or
+        ((FHideNoteText) and (aCol = 3)) then
+      begin
+        DrawText(Grid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
+      end
       else
       begin
         if (aCol = 4) then Value := ReplaceStr(Value, ' ', '');

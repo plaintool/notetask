@@ -59,7 +59,9 @@ function CleanNumeric(Value: string): string;
 
 function CleanAmount(const Value: string): string;
 
-function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 2): string;
+function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 1): string;
+
+function TrimTrailingSpaces(const Input: string; MaxSpaces: integer = 1): string;
 
 function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;
 
@@ -440,7 +442,7 @@ begin
   Result := Value.Replace(' ', string.empty).Trim;
 end;
 
-function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 2): string;
+function TrimLeadingSpaces(const Input: string; MaxSpaces: integer = 1): string;
 var
   i, SpaceCount: integer;
 begin
@@ -457,6 +459,26 @@ begin
 
   // Remove the leading spaces
   Result := Copy(Input, SpaceCount + 1, Length(Input) - SpaceCount);
+end;
+
+function TrimTrailingSpaces(const Input: string; MaxSpaces: integer = 1): string;
+var
+  i, SpaceCount, L: integer;
+begin
+  SpaceCount := 0;
+  L := Length(Input);
+
+  // Count trailing spaces, up to MaxSpaces
+  for i := L downto 1 do
+  begin
+    if (Input[i] = ' ') and (SpaceCount < MaxSpaces) then
+      Inc(SpaceCount)
+    else
+      Break;
+  end;
+
+  // Remove the trailing spaces
+  Result := Copy(Input, 1, L - SpaceCount);
 end;
 
 function PosExReverse(const SubStr, S: unicodestring; Offset: SizeUint): SizeInt;
