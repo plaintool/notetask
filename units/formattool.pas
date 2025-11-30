@@ -776,11 +776,7 @@ begin
   try
     RE.Expression :=
       '^(?i)' + // case-insensitive
-      '(' + '(https?|ftp)://[^\s/$.?#].[^\s]*' +  // with scheme
-      '|' + '([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,}(:\d+)?(/[^\s?]*)?(\?[^\s?#]*([#][^\s]*)?)?' +
-      // domain with optional port, path and params
-      '|' + '[A-Za-z0-9_-]+(/[^\s?]*)?(\?[^\s?#]*([#][^\s]*)?)?' + // simple hostname without domain
-      ')$';
+      '(' + '(https?|ftp)://[^\s/$.?#].[^\s]*' + '|' + '.*/.*' + ')$';
     Result := RE.Exec(S);
   finally
     RE.Free;

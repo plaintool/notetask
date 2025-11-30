@@ -4500,8 +4500,6 @@ begin
 end;
 
 procedure TformNotetask.memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-var
-  Value: string;
 begin
   if (Button = mbMiddle) and (ssCtrl in Shift) then // Middle button + Ctrl
     aZoomDefault.Execute
@@ -4510,13 +4508,7 @@ begin
   begin
     if ssCtrl in Shift then
     begin
-      Value := Trim(FNoteLastSelText);
-
-      if IsURL(Value) then
-        OpenURL(IfThen(HasScheme(Value), Value, http + Value))
-      else
-      if IsEmail(Value) then
-        OpenURL(IfThen(AnsiStartsText(mailto, Value), Value, mailto + Value));
+      TryOpenAsUrl(Trim(FNoteLastSelText));
 
       (Sender as TMemo).SelStart := FNoteLastSelStart;
       (Sender as TMemo).SelLength := FNoteLastSelLength;
