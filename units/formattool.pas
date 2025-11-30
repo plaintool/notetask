@@ -117,6 +117,10 @@ procedure StringListRemove(AList: TStringList; const AName: string);
 
 function RemoveFirstSubstring(const S, SubStr: string; Reverse: boolean = False): string;
 
+function SameFloat(A, B: double; Eps: double): boolean;
+
+{TIntegerArray}
+
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
 
 procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
@@ -124,8 +128,6 @@ procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
 function CloneArray(const Src: TIntegerArray): TIntegerArray;
 
 procedure CopyToArray(var Dest: TIntegerArray; const Src: TIntegerArray);
-
-function SameFloat(A, B: double; Eps: double): boolean;
 
 const
   Brackets: array[0..17] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]',
@@ -1178,6 +1180,12 @@ begin
   end;
 end;
 
+function SameFloat(A, B: double; Eps: double): boolean;
+begin
+  // Compare floats with epsilon
+  Result := Abs(A - B) < Eps;
+end;
+
 procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
 var
   i, Len: integer;
@@ -1230,12 +1238,6 @@ begin
   CopyCount := Min(Length(Dest), Length(Src));
   for i := 0 to CopyCount - 1 do
     Dest[i] := Src[i];
-end;
-
-function SameFloat(A, B: double; Eps: double): boolean;
-begin
-  // Compare floats with epsilon
-  Result := Abs(A - B) < Eps;
 end;
 
 end.

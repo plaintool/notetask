@@ -1562,6 +1562,7 @@ var
   Rect: TGridRect;
   pDone, pText, pNote, pAmount, pDate: string;
   Row1, Row2, RowText: string;
+  Str, Arh: boolean;
   i, j: integer;
 begin
   SelectedText := TStringList.Create;
@@ -1586,8 +1587,23 @@ begin
           if (j = 2) and (Grid.Columns[j - 1].Visible) then
           begin
             pText := GetTask(i).ToString(j);
-            if Rect.Width > 1 then pText := pText + StringListToBacktickString(GetTask(i).Tags,
-                (pText <> string.Empty) and not EndsWith(pText));
+            Arh := False;
+            if pText.StartsWith('~~') and pText.EndsWith('~~') then
+            begin
+              pText := RemoveFirstSubstring(pText, '~~');
+              pText := RemoveFirstSubstring(pText, '~~', True);
+              Arh := True;
+            end;
+            Str := False;
+            if pText.StartsWith('**') and pText.EndsWith('**') then
+            begin
+              pText := RemoveFirstSubstring(pText, '**');
+              pText := RemoveFirstSubstring(pText, '**', True);
+              Str := True;
+            end;
+            if Rect.Width > 0 then pText := pText + StringListToBacktickString(GetTask(i).Tags, (pText <> string.Empty));
+            if Str then pText := '**' + pText + '**';
+            if Arh then pText := '~~' + pText + '~~';
           end;
           if (j = 3) and ((Grid.Columns[j - 1].Visible) or NoteVisible) then pNote := GetTask(i).ToString(j);
           if (j = 4) and (Grid.Columns[j - 1].Visible) then pAmount := GetTask(i).ToString(j).Trim;
@@ -1673,6 +1689,9 @@ var
       end
       else
         GetTask(row).Text := string.Empty;
+
+      if TempTask.Tags.Count > 0 then
+        GetTask(row).Tags.Assign(TempTask.Tags); // Tags
     end
     else
     if col = 3 then // Note
