@@ -30,20 +30,28 @@ jobs:
             echo "Processing commit: $COMMIT_ID by $COMMIT_AUTHOR"
             
             upper_msg=$(echo "$COMMIT_MSG" | tr '[:lower:]' '[:upper:]')
-            if [[ "$upper_msg" == *"FIX:"* ]]; then
-              type="Bug"
-            elif [[ "$upper_msg" == *"FEATURE:"* ]]; then
-              type="Feature"
-            elif [[ "$upper_msg" == *"ENHANCEMENT:"* ]]; then
-              type="Enhancement"
-            else
-              type="None"
-            fi
-            
+            case "$upper_msg" in
+                *"FIX:"*|*"FIXED:"*)
+                    type="Bug"
+                    ;;
+                *"FEATURE:"*|*"FEAT:"*)
+                    type="Feature"
+                    ;;
+                *"ENHANCEMENT:"*|*"ENHANCE:"*)
+                    type="Enhancement"
+                    ;;
+                *"DOC:"*|*"DOCUMENTATION:"*)
+                    type="Documentation"
+                    ;;
+                *)
+                    type="None"
+                    ;;
+            esac
+
             if [ "$type" != "None" ]; then
               echo "Creating $type issue for commit: $COMMIT_ID"
               
-              TITLE=$(echo "$COMMIT_MSG" | sed -E 's/^(FIX|FEATURE|ENHANCEMENT):\s*//i')
+              TITLE=$(echo "$COMMIT_MSG" | sed -E 's/^(FIX|FIXED|FEATURE|FEAT|ENHANCEMENT|ENHANCE|DOC|DOCUMENTATION):\s*//i')
               BODY="**Commit:** https://github.com/$GITHUB_REPOSITORY/commit/$COMMIT_ID\n**Author:** $COMMIT_AUTHOR\n\nThis issue was automatically created from commit $COMMIT_ID"
               
               JSON="{\"title\":\"$TITLE\",\"body\":\"$BODY\",\"labels\":[\"$type\",\"Auto\"]}"
