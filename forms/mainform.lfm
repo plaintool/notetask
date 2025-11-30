@@ -504,20 +504,20 @@ object formNotetask: TformNotetask
         Action = aShowArchived
         AutoCheck = True
       end
-      object menuShowDuration: TMenuItem
-        Action = aShowDuration
-        AutoCheck = True
-      end
-      object MenuShowTime: TMenuItem
-        Action = aShowTime
-        AutoCheck = True
-      end
       object menuShowTags: TMenuItem
         Action = aShowTags
         AutoCheck = True
       end
       object menuShowNote: TMenuItem
         Action = aShowNote
+        AutoCheck = True
+      end
+      object menuShowDuration: TMenuItem
+        Action = aShowDuration
+        AutoCheck = True
+      end
+      object MenuShowTime: TMenuItem
+        Action = aShowTime
         AutoCheck = True
       end
       object menuHideNoteText: TMenuItem
@@ -1060,14 +1060,14 @@ object formNotetask: TformNotetask
       Category = 'View'
       AutoCheck = True
       Caption = 'Show note'
-      ShortCut = 32824
+      ShortCut = 32957
       OnExecute = aShowNoteExecute
     end
     object aHideNoteText: TAction
       Category = 'View'
       AutoCheck = True
       Caption = 'Hide note text'
-      ShortCut = 32957
+      ShortCut = 32824
       OnExecute = aHideNoteTextExecute
     end
     object aShowStatusBar: TAction
