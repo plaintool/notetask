@@ -6611,6 +6611,7 @@ begin
   end;
 
   SetChanged;  // Mark that data has changed
+  CalcRowHeight(0, True);
   GridInvalidate;
 end;
 
@@ -7486,7 +7487,9 @@ var
     task: TTask;
     flags: cardinal;
     h: integer;
+    OldBold: boolean;
   begin
+    OldBold := taskGrid.Canvas.Font.Bold;
     for row := FromRow to ToRow do
     begin
       drawrect := taskGrid.CellRect(col, row);
@@ -7495,15 +7498,21 @@ var
       Text := taskGrid.Cells[col, row];
 
       // Reduce text area by TagsWidth for text measurement
-      if (col = 2) then
+      if (col in [2, 3]) then
       begin
         task := Tasks.GetTask(row);
-        if task.TagsWidth < drawrect.Width then
+        if task.Star then
+          taskGrid.Canvas.Font.Bold := True;
+
+        if (col = 2) then
         begin
-          if FBiDiRightToLeft then
-            drawrect.Left := drawrect.Left + task.TagsWidth  // For RTL: reserve space on the left
-          else
-            drawrect.Right := drawrect.Right - task.TagsWidth; // For LTR: reserve space on the right
+          if task.TagsWidth < drawrect.Width then
+          begin
+            if FBiDiRightToLeft then
+              drawrect.Left := drawrect.Left + task.TagsWidth  // For RTL: reserve space on the left
+            else
+              drawrect.Right := drawrect.Right - task.TagsWidth; // For LTR: reserve space on the right
+          end;
         end;
       end;
 
@@ -7520,7 +7529,7 @@ var
       {$ENDIF}
 
       DrawText(taskGrid.canvas.handle, PChar(Text), Length(Text), drawrect, flags);
-
+      taskGrid.Canvas.Font.Bold := OldBold;
       if (force) or ((drawrect.bottom - drawrect.top) > taskGrid.RowHeights[row]) then
       begin
         h := drawrect.bottom - drawrect.top + 2;
