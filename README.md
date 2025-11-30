@@ -108,7 +108,7 @@ The status bar provides a concise, real-time overview of the current task list. 
 
 ```md
 ## Group // Tooltip
-- [x] Date, Amount, ~~**Text**~~ // Note <br>
+- [x] Date, Amount, ~~**Text `tag`**~~ // Note #texttag <br>
 ```
 ### Legend
 *All fields are optional. A task line may include any combination of them.*
@@ -118,29 +118,32 @@ The status bar provides a concise, real-time overview of the current task list. 
 - `Date` — task date and optional timestamp in ISO 8601 format `yyyy-MM-ddTHH:mm:ss`
 - `Amount` — numeric value related to the task (e.g., cost, quantity), using a dot `.` as the decimal separator
 - `~~**Text**~~` — task description, bold if marked as favorite with a star, and crossed out if archived (inactive regardless of completion)
+- ``` `tag` ``` — tags are collected from any position in the task text when enclosed in backticks, and after saving the task they are stored immediately after the task text, separated by a space
 - `// Note` — comment or additional information about the task
+- `#texttag` — text tags can appear in the note or in the task, will be collected as suggestions for the filter, and may start with the characters # @ % + $
 - `<br>` — line break in a note or task
 
 ### Example
 
 >## Planning
->- [x] 2024-08-10, ~~**Organize attic storage**~~ // Completed in late summer cleanup.
->- [x] 2024-08-14, ~~**Sort garage tools**~~ // Organized into labeled bins.
->- [ ] ~~Declutter old paperwork and create a filing system for important documents while recycling unnecessary ones~~ // Not completed, delayed due to lack of time.
->- [x] 2024-08-25, ~~Deep clean the kitchen~~ // Completed before hosting a dinner.
->- [x] 2024-09-01, **Rearrange home office and add a standing desk for more comfortable work during long hours** // Improved lighting and ergonomics.
->- [x] 2024-09-07, **Plan and organize pantry** // Added new shelving.
->- [ ] ~~Donate unused clothes~~ // Postponed due to bad weather on donation day.
->- [x] 2024-09-21, **Set up new filing system** // All important documents categorized.
->- [x] 2024-09-30, Clean living room windows // Sparkling clean before guests arrived.
->- [x] 2024-10-05, Organize bookshelves // Sorted by category and frequency of use.
->- [x] 2024-10-12, Sort holiday decorations // Separated outdated items for donation.
+>- [x] 2024-08-10, ~~**Organize attic storage**~~ `storage` // Completed in late summer cleanup.
+>- [x] 2024-08-14, ~~**Sort garage tools**~~ `storage` // Organized into labeled bins.
+>- [ ] ~~Declutter old paperwork and create a filing system for important documents while recycling unnecessary ones~~ `storage` `delayed` // Not completed, delayed due to lack of time.
+>- [x] 2024-08-25, ~~Deep clean the kitchen~~ `cleaning` // Completed before hosting a dinner.
+>- [x] 2024-09-01, **Rearrange home office and add a standing desk for more comfortable work during long hours** `organization` // Improved lighting and ergonomics.
+>- [x] 2024-09-07, **Plan and organize pantry** `storage` // Added new shelving.
+>- [ ] ~~Donate unused clothes~~ `storage` `delayed` // Postponed due to bad weather on donation day.
+>- [x] 2024-09-21, **Set up new filing system** `organization` // All important documents categorized.
+>- [x] 2024-09-30, Clean living room windows `cleaning` // Sparkling clean before guests arrived.
+>- [x] 2024-10-05, Organize bookshelves `storage` // Sorted by category and frequency of use.
+>- [x] 2024-10-12, Sort holiday decorations `storage` // Separated outdated items for donation.
 >## Repair
->- [x] 2024-07-15, ~~Replace leaking kitchen faucet~~ // Scheduled plumber visit.
->- [x] 2024-07-20, Fix broken garage door opener // Order replacement parts.
->- [ ] 2024-07-25, Repair cracked bathroom tiles // Awaiting tile delivery.
->- [x] 2024-07-30, Service heating system before winter // Book technician.
->- [ ] 2024-08-05, Paint front door and touch up exterior walls // Prepare paint and materials.
+>- [x] 2024-07-15, ~~Replace leaking kitchen faucet~~ `repair` // Scheduled plumber visit.
+>- [x] 2024-07-20, Fix broken garage door opener `repair` `urgent` // Order replacement parts.
+>- [ ] 2024-07-25, Repair cracked bathroom tiles `repair` `delayed` // Awaiting tile delivery.
+>- [x] 2024-07-30, Service heating system before winter `maintenance` // Book technician.
+>- [ ] 2024-08-05, Paint front door and touch up exterior walls `painting` `delayed` // Prepare paint and materials.
+
 
 ## Installation
 
