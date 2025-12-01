@@ -38,19 +38,19 @@ It is designed to help you quickly organize a large number of small routine task
 - **Filtering** — filtering tasks across all fields and groups using an expression, with highlighting of matched items
 - **Find & Replace** — search and replace text within tasks and notes using a dialogs, with options for case sensitivity and scope selection
 - **Zoom** — zooming of tasks and notes with adjustable zoom via mouse, keyboard, menu, or status bar
+- **Encrypt files** — password-based encryption and decryption of task files for secure storage and sharing
 - **Move tasks** — single or multiple, within or between groups; task priority is set simply by its position in the list
 - **Archive tasks** — cross out archived items, which can be hidden or shown as needed
 - **Grouping** — each group on its own page, with full group management
-- **Track duration** — per-task (on/off) and **total duration** for all or selected tasks
-- **Track amount** — per-task quantities or prices and **total amount** for all or selected tasks
 - **Merge tasks** — combine multiple tasks into one
 - **Split tasks** — split a single task into multiple tasks based on the selected column; each line break in the column becomes a new task, while all other columns are copied to each new task
 - **Indent tasks** — create subtasks and task hierarchies
 - **Highlight** — automatic background highlighting of overdue tasks, text highlighting of archived but incomplete tasks and blue text for tasks with a future due date
 - **Copy tasks** — copy selected tasks or fields in Markdown format
 - **Paste tasks** — insert individual fields or entire tasks from clipboard
-- **Encrypt files** — password-based encryption and decryption of task files for secure storage and sharing
 - **Customize columns** — toggle visibility of columns and interface elements (e.g., duration, note field, status bar)
+- **Track duration** — per-task (on/off) and **total duration** for all or selected tasks
+- **Track amount** — per-task quantities or prices and **total amount** for all or selected tasks
 - **Status bar summary** — shows totals of dates and amounts separately for **completed** and **incomplete** tasks
 
 ### Shopping list
