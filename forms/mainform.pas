@@ -1013,11 +1013,13 @@ begin
       FileOpened := OpenFile(FilePath, False, True); // Function to load a task from the file
   end;
 
-  if not FileOpened then NewFile(False);
+  if not FileOpened then
+    NewFile(False)
+  else
+    RestoreSelectedState(True, True, True);
 
   // Before paint form
   SetCaption;
-  RestoreSelectedState(True, True, True);
   Tasks.CalcTagsWidths(-1, taskGrid.Columns[1].Width, tagsEdit, Font);
   SetZoom(FZoom);
 
@@ -4795,10 +4797,10 @@ begin
     ApplyGridSettings;
     SetZoom(FZoom);
 
-    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Row, taskGrid.Selection.Right, taskGrid.Row);
-    taskGrid.Row := 1;
-
     SetFilter;
+
+    taskGrid.Row := 1;
+    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Row, taskGrid.Selection.Right, taskGrid.Row);
 
     FLineEndingOriginal := FLineEnding;
     FEncodingOriginal := FEncoding;
