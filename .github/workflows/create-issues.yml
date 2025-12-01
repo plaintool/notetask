@@ -2,7 +2,7 @@ name: Create Issue from Commit
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   create_issues:
     runs-on: ubuntu-latest
