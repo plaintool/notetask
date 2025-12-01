@@ -377,6 +377,7 @@ begin
   // Initialize selection
   FSelectedTags := TStringList.Create;
   FSelectedTags.CaseSensitive := True;
+  FSelectedTags.QuoteChar := #0;
   FSelectedTags.Delimiter := ';';
   FSelectionColor := clHighlight;
   FSelectionRectColor := clHighlight;

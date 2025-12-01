@@ -264,8 +264,8 @@ begin
       if SelectedItems.Count > 0 then
       begin
         // Join items with semicolon separator
-        CopyText := SelectedItems.DelimitedText;
         SelectedItems.Delimiter := ';';
+        SelectedItems.QuoteChar := #0;
         CopyText := SelectedItems.DelimitedText;
 
         // Copy to clipboard
