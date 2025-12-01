@@ -8192,23 +8192,18 @@ begin
 end;
 
 procedure TformNotetask.CorrectGridSelection;
-var
-  test: TRect;
 begin
   // Check and fix Row if it's out of bounds
   if taskGrid.Row >= taskGrid.RowCount then
     taskGrid.Row := taskGrid.RowCount - 1;
 
-  test := taskGrid.Selection;
   // Only fix Selection.Bottom if it's out of bounds
   if taskGrid.Selection.Bottom >= taskGrid.RowCount then
-    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Selection.Top,
-      taskGrid.Selection.Right, taskGrid.RowCount - 1);
+    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Selection.Top, taskGrid.Selection.Right, taskGrid.RowCount - 1);
 
   // Only fix Selection.Top if it's out of bounds
   if taskGrid.Selection.Top >= taskGrid.RowCount then
-    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.RowCount -
-      1, taskGrid.Selection.Right, taskGrid.Selection.Bottom);
+    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.RowCount - 1, taskGrid.Selection.Right, taskGrid.Selection.Bottom);
 end;
 
 function TformNotetask.GetSelectedTab: integer;
