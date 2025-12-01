@@ -7784,7 +7784,7 @@ end;
 procedure TformNotetask.SetTags;
 var
   i: integer;
-  tags, curtags: TStringList;
+  tags, curtags, firstTags: TStringList;
   HasDiff: boolean = False;
 begin
   if (not ShowTags) then exit;
@@ -7795,6 +7795,10 @@ begin
   curtags := TStringList.Create;
   curtags.Sorted := True;
   curtags.Duplicates := dupIgnore;
+  firstTags := TStringList.Create;
+  firstTags.Sorted := True;
+  firstTags.Duplicates := dupIgnore;
+
   try
     if Assigned(Tasks) and (taskGrid.RowCount > 1) then
     begin
@@ -7806,7 +7810,10 @@ begin
           begin
             curtags.Assign(Tasks.GetTask(i).Tags);
             tags.AddStrings(curtags);
-            if (i > taskGrid.Selection.Top) and (not StringListsEqual(tags, curtags)) then
+
+            if i = taskGrid.Selection.Top then
+              firstTags.Assign(curtags)
+            else if not StringListsEqual(firstTags, curtags) then
               HasDiff := True;
           end;
         if (tags.Count > 0) then
@@ -7844,6 +7851,8 @@ begin
   finally
     tagsEdit.ClearSelection;
     tags.Free;
+    curtags.Free;
+    firstTags.Free;
   end;
 end;
 
