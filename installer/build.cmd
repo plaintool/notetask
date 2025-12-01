@@ -5,20 +5,36 @@ setlocal
 SET "SOURCE_DIR=E:\notetask\installer"
 SET "VERSION=1.1.0"
 
+:: Check if platform parameter is provided
+IF "%1"=="" (
+    SET "PLATFORM=x64"
+) ELSE (
+    SET "PLATFORM=%1"
+)
+
+:: Validate platform parameter
+IF NOT "%PLATFORM%"=="x64" IF NOT "%PLATFORM%"=="x86" (
+    echo Error: Invalid platform parameter. Use x64 or x86.
+    echo Example: %0 x64
+    echo Example: %0 x86
+    pause
+    exit /b 1
+)
+
 :: --- Build peruser ---
-echo Compiling msisetup_peruser.wxs with candle...
-candle -nologo "%SOURCE_DIR%\msisetup_peruser.wxs" -out "%SOURCE_DIR%\peruser.wixobj" -ext WixUIExtension >nul
-echo Linking peruser.wixobj into notetask-%VERSION%.msi with light...
-light -nologo "%SOURCE_DIR%\peruser.wixobj" -out "%SOURCE_DIR%\notetask-%VERSION%.msi" -ext WixUIExtension >nul
-echo File created: notetask-%VERSION%.msi
+echo Compiling msisetup_peruser.wxs with candle for %PLATFORM%...
+candle -nologo "%SOURCE_DIR%\msisetup_peruser.wxs" -out "%SOURCE_DIR%\peruser.wixobj" -ext WixUIExtension -dPlatform=%PLATFORM% >nul
+echo Linking peruser.wixobj into notetask-%VERSION%-%PLATFORM%.msi with light...
+light -nologo "%SOURCE_DIR%\peruser.wixobj" -out "%SOURCE_DIR%\notetask-%VERSION%-%PLATFORM%.msi" -ext WixUIExtension >nul
+echo File created: notetask-%VERSION%-%PLATFORM%.msi
 echo.
 
 :: --- Build permachine ---
-echo Compiling msisetup_permachine.wxs with candle...
-candle -nologo "%SOURCE_DIR%\msisetup_permachine.wxs" -out "%SOURCE_DIR%\permachine.wixobj" -ext WixUIExtension >nul
-echo Linking permachine.wixobj into notetask-%VERSION%-allusers.msi with light...
-light -nologo "%SOURCE_DIR%\permachine.wixobj" -out "%SOURCE_DIR%\notetask-%VERSION%-allusers.msi" -ext WixUIExtension >nul
-echo File created: notetask-%VERSION%-allusers.msi
+echo Compiling msisetup_permachine.wxs with candle for %PLATFORM%...
+candle -nologo "%SOURCE_DIR%\msisetup_permachine.wxs" -out "%SOURCE_DIR%\permachine.wixobj" -ext WixUIExtension -dPlatform=%PLATFORM% >nul
+echo Linking permachine.wixobj into notetask-%VERSION%-%PLATFORM%-allusers.msi with light...
+light -nologo "%SOURCE_DIR%\permachine.wixobj" -out "%SOURCE_DIR%\notetask-%VERSION%-%PLATFORM%-allusers.msi" -ext WixUIExtension >nul
+echo File created: notetask-%VERSION%-%PLATFORM%-allusers.msi
 echo.
 
 :: --- Clean temporary files ---
@@ -35,22 +51,22 @@ SET CERTPASS=1234
 SET TIMESTAMP_URL=http://timestamp.digicert.com
 
 echo Signing MSI files...
-%SIGNTOOL% sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-%VERSION%.msi"
+%SIGNTOOL% sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-%VERSION%-%PLATFORM%.msi"
 IF %ERRORLEVEL% EQU 0 (
-    echo Signing of notetask-%VERSION%.msi completed successfully
+    echo Signing of notetask-%VERSION%-%PLATFORM%.msi completed successfully
 ) else (
-    echo Signing failed for notetask-%VERSION%.msi
+    echo Signing failed for notetask-%VERSION%-%PLATFORM%.msi
 )
 
-%SIGNTOOL% sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-%VERSION%-allusers.msi"
+%SIGNTOOL% sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-%VERSION%-%PLATFORM%-allusers.msi"
 IF %ERRORLEVEL% EQU 0 (
-    echo Signing of notetask-%VERSION%-allusers.msi completed successfully
+    echo Signing of notetask-%VERSION%-%PLATFORM%-allusers.msi completed successfully
 ) else (
-    echo Signing failed for notetask-%VERSION%-allusers.msi
+    echo Signing failed for notetask-%VERSION%-%PLATFORM%-allusers.msi
 )
 
 :: --- Portable ---
-tar -czf notetask-1.1.0.tar.gz -C .. notetask.exe -C "%CD%\debsetup\DATA\usr\bin" notetask
+tar -czf notetask-%VERSION%.tar.gz -C .. notetask.exe notetask32.exe -C "%CD%\debsetup\DATA\usr\bin" notetask
 
 echo Build and signing completed successfully!
 pause
