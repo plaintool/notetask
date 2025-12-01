@@ -681,6 +681,7 @@ type
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
     function IsCanClose: boolean;
+    procedure CorrectGridSelection;
     function GetSelectedTab: integer;
     function GetSelectedRow: integer;
     function GetSelection: TRect;
@@ -1013,15 +1014,14 @@ begin
       FileOpened := OpenFile(FilePath, False, True); // Function to load a task from the file
   end;
 
-  if not FileOpened then
-    NewFile(False)
-  else
-    RestoreSelectedState(True, True, True);
+  if not FileOpened then NewFile(False);
 
   // Before paint form
   SetCaption;
+  RestoreSelectedState(True, True, True);
   Tasks.CalcTagsWidths(-1, taskGrid.Columns[1].Width, tagsEdit, Font);
   SetZoom(FZoom);
+  CorrectGridSelection;
 
   // Paint Form
   if (not Application.Terminated) then
@@ -3331,6 +3331,7 @@ begin
       TaskText += ' `' + Value + '`';
   end;
   Ind := Tasks.InsertTask(TaskText, taskGrid.Row);
+  FLastText := string.Empty;
   FillGrid;
   ResetRowHeight;
   if (Ind > 0) then
@@ -8188,6 +8189,26 @@ begin
   end
   else
     Result := True; // No changes, just close the form
+end;
+
+procedure TformNotetask.CorrectGridSelection;
+var
+  test: TRect;
+begin
+  // Check and fix Row if it's out of bounds
+  if taskGrid.Row >= taskGrid.RowCount then
+    taskGrid.Row := taskGrid.RowCount - 1;
+
+  test := taskGrid.Selection;
+  // Only fix Selection.Bottom if it's out of bounds
+  if taskGrid.Selection.Bottom >= taskGrid.RowCount then
+    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Selection.Top,
+      taskGrid.Selection.Right, taskGrid.RowCount - 1);
+
+  // Only fix Selection.Top if it's out of bounds
+  if taskGrid.Selection.Top >= taskGrid.RowCount then
+    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.RowCount -
+      1, taskGrid.Selection.Right, taskGrid.Selection.Bottom);
 end;
 
 function TformNotetask.GetSelectedTab: integer;
