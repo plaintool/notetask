@@ -243,6 +243,8 @@ type
     function Focused: boolean; override;
     procedure CopyHoverText;
     function GetAutoColor(const ATag: string): TColor;
+    function GetFirstSelectedTag: string;
+    function GetLastUnselectedTag: string;
     procedure RemoveSelectedTags;
     procedure FinishEdit;
     procedure SelectAll;
@@ -1185,6 +1187,34 @@ begin
   FTagEditing := string.Empty;
 end;
 
+function TCustomTagEdit.GetFirstSelectedTag: string;
+var
+  i: integer;
+begin
+  Result := '';
+  for i := 0 to FTags.Count - 1 do
+    if FSelectedTags.IndexOf(FTags[i]) >= 0 then
+    begin
+      Result := FTags[i];
+      Break;
+    end;
+end;
+
+function TCustomTagEdit.GetLastUnselectedTag: string;
+var
+  i: integer;
+begin
+  Result := string.Empty;
+  for i := FTags.Count - 1 downto 0 do
+  begin
+    if FSelectedTags.IndexOf(FTags[i]) = -1 then
+    begin
+      Result := FTags[i];
+      Break;
+    end;
+  end;
+end;
+
 procedure TCustomTagEdit.ClearSelection;
 begin
   if FSelectedTags.Count > 0 then
@@ -1337,6 +1367,7 @@ end;
 procedure TCustomTagEdit.EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   ATag: string;
+  Idx: integer;
 begin
   if csDesigning in ComponentState then exit;
 
@@ -1408,10 +1439,40 @@ begin
       Key := 0;
     end;
   end
-  else if (FAllowSelect) and (ssCtrl in Shift) and (Key = VK_A) and (FEdit.Text = string.Empty) then
+  else if (FAllowSelect) and (FEdit.Text = string.Empty) then
   begin
-    SelectAll;
-    Key := 0;
+    if (ssShift in Shift) and (Key = VK_LEFT) then
+    begin
+      ATag := GetLastUnselectedTag;
+      if Length(ATag) > 0 then
+      begin
+        FSelectedTags.Add(GetLastUnselectedTag);
+        Invalidate;
+      end;
+    end
+    else
+    if (SelectedTags.Count > 0) and (ssShift in Shift) and (Key = VK_RIGHT) then
+    begin
+      idx := FSelectedTags.IndexOf(GetFirstSelectedTag);
+      if idx >= 0 then
+      begin
+        FSelectedTags.Delete(idx);
+        Invalidate;
+      end;
+    end
+    else
+    if ((ssCtrl in Shift) and (Key = VK_A)) or ((ssShift in Shift) and (Key = VK_HOME)) then
+    begin
+      SelectAll;
+      Key := 0;
+    end
+    else
+    if (SelectedTags.Count > 0) and (ssShift in Shift) and (Key = VK_END) then
+    begin
+      ClearSelection;
+      Key := 0;
+    end;
+
   end;
 
   if Assigned(OnKeyDown) then
