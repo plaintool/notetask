@@ -579,8 +579,20 @@ object formNotetask: TformNotetask
         object menuChinese: TMenuItem
           Action = aLangChinese
         end
+        object MenuItem3: TMenuItem
+          Action = aLangCzech
+        end
+        object MenuItem4: TMenuItem
+          Action = aLangDanish
+        end
+        object MenuItem5: TMenuItem
+          Action = aLangDutch
+        end
         object menuEnglish: TMenuItem
           Action = aLangEnglish
+        end
+        object MenuItem6: TMenuItem
+          Action = aLangFinnish
         end
         object menuFrench: TMenuItem
           Action = aLangFrench
@@ -588,8 +600,17 @@ object formNotetask: TformNotetask
         object menuGerman: TMenuItem
           Action = aLangGerman
         end
+        object MenuItem7: TMenuItem
+          Action = aLangGreek
+        end
+        object MenuItem8: TMenuItem
+          Action = aLangHebrew
+        end
         object menuHindi: TMenuItem
           Action = aLangHindi
+        end
+        object MenuItem9: TMenuItem
+          Action = aLangIndonesian
         end
         object menuItalian: TMenuItem
           Action = aLangItalian
@@ -600,14 +621,26 @@ object formNotetask: TformNotetask
         object menuKorean: TMenuItem
           Action = aLangKorean
         end
+        object MenuItem10: TMenuItem
+          Action = aLangPolish
+        end
         object menuPortuguese: TMenuItem
           Action = aLangPortuguese
+        end
+        object MenuItem11: TMenuItem
+          Action = aLangRomanian
         end
         object menuRussian: TMenuItem
           Action = aLangRussian
         end
         object menuSpanish: TMenuItem
           Action = aLangSpanish
+        end
+        object MenuItem12: TMenuItem
+          Action = aLangSwedish
+        end
+        object MenuItem13: TMenuItem
+          Action = aLangTurkish
         end
         object menuUkrainian: TMenuItem
           Action = aLangUkrainian
@@ -785,61 +818,6 @@ object formNotetask: TformNotetask
       Category = 'Language'
       Caption = 'Chinese'
       OnExecute = aLangChineseExecute
-    end
-    object aLangEnglish: TAction
-      Category = 'Language'
-      Caption = 'English'
-      OnExecute = aLangEnglishExecute
-    end
-    object aLangFrench: TAction
-      Category = 'Language'
-      Caption = 'French'
-      OnExecute = aLangFrenchExecute
-    end
-    object aLangGerman: TAction
-      Category = 'Language'
-      Caption = 'German'
-      OnExecute = aLangGermanExecute
-    end
-    object aLangHindi: TAction
-      Category = 'Language'
-      Caption = 'Hindi'
-      OnExecute = aLangHindiExecute
-    end
-    object aLangItalian: TAction
-      Category = 'Language'
-      Caption = 'Italian'
-      OnExecute = aLangItalianExecute
-    end
-    object aLangJapanese: TAction
-      Category = 'Language'
-      Caption = 'Japanese'
-      OnExecute = aLangJapaneseExecute
-    end
-    object aLangKorean: TAction
-      Category = 'Language'
-      Caption = 'Korean'
-      OnExecute = aLangKoreanExecute
-    end
-    object aLangPortuguese: TAction
-      Category = 'Language'
-      Caption = 'Portuguese'
-      OnExecute = aLangPortugueseExecute
-    end
-    object aLangRussian: TAction
-      Category = 'Language'
-      Caption = 'Russian'
-      OnExecute = aLangRussianExecute
-    end
-    object aLangSpanish: TAction
-      Category = 'Language'
-      Caption = 'Spanish'
-      OnExecute = aLangSpanishExecute
-    end
-    object aLangUkrainian: TAction
-      Category = 'Language'
-      Caption = 'Ukrainian'
-      OnExecute = aLangUkrainianExecute
     end
     object aInsertGroup: TAction
       Category = 'Group'
@@ -1140,6 +1118,116 @@ object formNotetask: TformNotetask
       Caption = 'Default zoom'
       ShortCut = 16432
       OnExecute = aZoomDefaultExecute
+    end
+    object aLangCzech: TAction
+      Category = 'Language'
+      Caption = 'Czech'
+      OnExecute = aLangCzechExecute
+    end
+    object aLangDanish: TAction
+      Category = 'Language'
+      Caption = 'Danish'
+      OnExecute = aLangDanishExecute
+    end
+    object aLangDutch: TAction
+      Category = 'Language'
+      Caption = 'Dutch'
+      OnExecute = aLangDutchExecute
+    end
+    object aLangEnglish: TAction
+      Category = 'Language'
+      Caption = 'English'
+      OnExecute = aLangEnglishExecute
+    end
+    object aLangFinnish: TAction
+      Category = 'Language'
+      Caption = 'Finnish'
+      OnExecute = aLangFinnishExecute
+    end
+    object aLangFrench: TAction
+      Category = 'Language'
+      Caption = 'French'
+      OnExecute = aLangFrenchExecute
+    end
+    object aLangGerman: TAction
+      Category = 'Language'
+      Caption = 'German'
+      OnExecute = aLangGermanExecute
+    end
+    object aLangGreek: TAction
+      Category = 'Language'
+      Caption = 'Greek'
+      OnExecute = aLangGreekExecute
+    end
+    object aLangHebrew: TAction
+      Category = 'Language'
+      Caption = 'Hebrew'
+      OnExecute = aLangHebrewExecute
+    end
+    object aLangHindi: TAction
+      Category = 'Language'
+      Caption = 'Hindi'
+      OnExecute = aLangHindiExecute
+    end
+    object aLangIndonesian: TAction
+      Category = 'Language'
+      Caption = 'Indonesian'
+      OnExecute = aLangIndonesianExecute
+    end
+    object aLangItalian: TAction
+      Category = 'Language'
+      Caption = 'Italian'
+      OnExecute = aLangItalianExecute
+    end
+    object aLangJapanese: TAction
+      Category = 'Language'
+      Caption = 'Japanese'
+      OnExecute = aLangJapaneseExecute
+    end
+    object aLangKorean: TAction
+      Category = 'Language'
+      Caption = 'Korean'
+      OnExecute = aLangKoreanExecute
+    end
+    object aLangPolish: TAction
+      Category = 'Language'
+      Caption = 'Polish'
+      OnExecute = aLangPolishExecute
+    end
+    object aLangPortuguese: TAction
+      Category = 'Language'
+      Caption = 'Portuguese'
+      OnExecute = aLangPortugueseExecute
+    end
+    object aLangRomanian: TAction
+      Category = 'Language'
+      Caption = 'Romanian'
+      OnExecute = aLangRomanianExecute
+    end
+    object aLangRussian: TAction
+      Category = 'Language'
+      Caption = 'Russian'
+      OnExecute = aLangRussianExecute
+    end
+    object aLangSpanish: TAction
+      Category = 'Language'
+      Caption = 'Spanish'
+      OnExecute = aLangSpanishExecute
+    end
+    object aLangSwedish: TAction
+      Category = 'Language'
+      Caption = 'Swedish'
+      OnExecute = aLangSwedishExecute
+    end
+    object aLangTurkish: TAction
+      Category = 'Language'
+      Caption = 'Turkish'
+      OnExecute = aLangTurkishExecute
+    end
+    object aLangUkrainian: TAction
+      Category = 'Language'
+      Caption = 'Ukrainian'
+      OnExecute = aLangUkrainianExecute
     end
   end
   object openDialog: TOpenDialog

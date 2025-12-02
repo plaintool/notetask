@@ -5,7 +5,7 @@ msgstr ""
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: ko\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,16 +13,16 @@ msgstr ""
 
 #: formfind.rdirectiondown
 msgid "Down"
-msgstr "아래로"
+msgstr "Bawah"
 
 #: formfind.rdirectionup
 msgid "Up"
-msgstr "위로"
+msgstr "Atas"
 
 #: forminput.rpasswordsnotequal
 msgctxt "forminput.rpasswordsnotequal"
 msgid "Passwords are not equal!"
-msgstr "비밀번호가 일치하지 않습니다!"
+msgstr "Kata sandi tidak cocok!"
 
 #: mainform.rapp
 msgctxt "mainform.rapp"
@@ -32,56 +32,56 @@ msgstr "Notetask"
 #: mainform.rarchiveconfirm
 msgctxt "mainform.rarchiveconfirm"
 msgid "Are you sure you want to archive / unarchive this task?"
-msgstr "이 작업을 아카이브/아카이브 해제 하시겠습니까?"
+msgstr "Anda yakin ingin mengarsipkan / membuka arsip tugas ini?"
 
 #: mainform.rarchivesconfirm
 msgctxt "mainform.rarchivesconfirm"
 msgid "Are you sure you want to archive / unarchive selected tasks?"
-msgstr "선택한 작업을 아카이브/아카이브 해제 하시겠습니까?"
+msgstr "Anda yakin ingin mengarsipkan / membuka arsip tugas yang dipilih?"
 
 #: mainform.rcantfind
 msgid "Can't find"
-msgstr "찾을 수 없음"
+msgstr "Tidak dapat menemukan"
 
 #: mainform.rchatgpt
 msgid "https://chatgpt.com?q="
-msgstr "https://chatgpt.com?q="
+msgstr ""
 
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
-msgstr "선택한 영역의 데이터를 지우시겠습니까?"
+msgstr "Anda yakin ingin menghapus data di area yang dipilih?"
 
 #: mainform.rconfirmation
 msgid "Confirmation"
-msgstr "확인"
+msgstr "Konfirmasi"
 
 #: mainform.rconfirmpassword
 msgid "Confirm Password:"
-msgstr "비밀번호 확인:"
+msgstr "Konfirmasi Kata Sandi:"
 
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
-msgstr "이 작업을 삭제하시겠습니까?"
+msgstr "Anda yakin ingin menghapus tugas ini?"
 
 #: mainform.rdeletegroupconfirm
 msgid "Are you sure you want to delete this group? This will also delete all tasks within this group."
-msgstr "이 그룹을 삭제하시겠습니까? 이 그룹 내의 모든 작업도 삭제됩니다."
+msgstr "Anda yakin ingin menghapus grup ini? Ini juga akan menghapus semua tugas dalam grup ini."
 
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
-msgstr "선택한 작업을 삭제하시겠습니까?"
+msgstr "Anda yakin ingin menghapus tugas yang dipilih?"
 
 #: mainform.rencrypted
 msgid "Encrypted"
-msgstr "암호화됨"
+msgstr "Terenkripsi"
 
 #: mainform.rentergroupname
 msgid "Enter the group name:"
-msgstr "그룹 이름을 입력하세요:"
+msgstr "Masukkan nama grup:"
 
 #: mainform.renternewtag
 msgid "Enter new tag..."
-msgstr "새 태그를 입력하십시오..."
+msgstr "Masukkan tag baru..."
 
 #: mainform.renternewtaghint
 msgid ""
@@ -89,166 +89,166 @@ msgid ""
 "Colon separates the tag from the suffix.\n"
 "Semicolon allows adding multiple tags."
 msgstr ""
-"태그는 선택된 모든 작업에 추가되거나 제거됩니다.\n"
-"콜론은 태그와 접미사를 구분합니다.\n"
-"세미콜론을 사용하면 여러 태그를 추가할 수 있습니다."
+"Tag ditambahkan ke atau dihapus dari semua tugas yang dipilih.\n"
+"Titik dua memisahkan tag dari akhiran.\n"
+"Titik koma memungkinkan penambahan beberapa tag."
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
-msgstr "요청한 파일을 디스크에서 찾을 수 없습니다."
+msgstr "File yang diminta tidak ditemukan di disk."
 
 #: mainform.rfilereadonly
 msgid "The file is read-only or is in use by another user."
-msgstr "파일이 읽기 전용이거나 다른 사용자가 사용 중입니다."
+msgstr "File hanya-baca atau sedang digunakan oleh pengguna lain."
 
 #: mainform.rgoto
 msgctxt "mainform.rgoto"
 msgid "Go to"
-msgstr "이동하기"
+msgstr "Pergi ke"
 
 #: mainform.rgototask
 msgctxt "mainform.rgototask"
 msgid "Go to task"
-msgstr "작업으로 이동"
+msgstr "Pergi ke tugas"
 
 #: mainform.rgroup
 msgctxt "mainform.rgroup"
 msgid "Group"
-msgstr "그룹"
+msgstr "Grup"
 
 #: mainform.rgroupuntitled
 msgctxt "mainform.rgroupuntitled"
 msgid "Ungrouped"
-msgstr "그룹화되지 않음"
+msgstr "Tidak tergrup"
 
 #: mainform.rincorrectpassword
 msgid "Incorrect password!"
-msgstr "잘못된 비밀번호입니다!"
+msgstr "Kata sandi salah!"
 
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
-msgstr "선택한 작업을 병합하시겠습니까?"
+msgstr "Anda yakin ingin menggabungkan tugas yang dipilih?"
 
 #: mainform.rno
 msgid "&No"
-msgstr "아니요"
+msgstr "&Tidak"
 
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
-msgstr "라인 번호가 허용된 범위를 초과했습니다."
+msgstr "Nomor baris berada di luar rentang yang diizinkan."
 
 #: mainform.rok
 msgctxt "mainform.rok"
 msgid "OK"
-msgstr "확인"
+msgstr "OK"
 
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "작업 파일 (*.tsk)|*.tsk|텍스트 파일 (*.txt)|*.txt|마크다운 파일 (*.md)|*.md|모든 파일 (*.*)|*.*"
+msgstr "File tugas (*.tsk)|*.tsk|File teks (*.txt)|*.txt|File Markdown (*.md)|*.md|Semua file (*.*)|*.*"
 
 #: mainform.rpassword
 msgid "Password:"
-msgstr "비밀번호:"
+msgstr "Kata Sandi:"
 
 #: mainform.rreadonly
 msgid "Read-only"
-msgstr "읽기 전용"
+msgstr "Hanya-baca"
 
 #: mainform.rremovetag
 msgid "Are you sure you want to remove tag(s)"
-msgstr "태그를 제거하시겠습니까"
+msgstr "Anda yakin ingin menghapus tag"
 
 #: mainform.rremovetagtitle
 msgid "Remove tag(s)"
-msgstr "태그 제거"
+msgstr "Hapus tag"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
-msgstr " 작업"
+msgstr " tugas"
 
 #: mainform.rsavechanges
 msgid "Do you want to save the changes?"
-msgstr "변경 사항을 저장하시겠습니까?"
+msgstr "Apakah Anda ingin menyimpan perubahan?"
 
 #: mainform.rsavedialogfilter
 msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "작업 파일 (*.tsk)|*.tsk|암호화된 작업 파일 (*.tsk)|*.tsk|텍스트 파일 (*.txt)|*.txt|Markdown 파일 (*.md)|*.md|모든 파일 (*.*)|*.*"
+msgstr "File tugas (*.tsk)|*.tsk|File Tugas Terenkripsi (*.tsk)|*.tsk|File teks (*.txt)|*.txt|File Markdown (*.md)|*.md|Semua file (*.*)|*.*"
 
 #: mainform.rsplitconfirm
 msgid "Are you sure you want to split the selected tasks based on the current column?"
-msgstr "현재 열을 기준으로 선택한 작업을 나누시겠습니까?"
+msgstr "Anda yakin ingin memisahkan tugas yang dipilih berdasarkan kolom saat ini?"
 
 #: mainform.rsplitwarning
 msgid "Please select the column with line breaks to split the tasks."
-msgstr "작업을 나누려면 줄 바꿈이 있는 열을 선택하세요."
+msgstr "Silakan pilih kolom dengan jeda baris untuk memisahkan tugas."
 
 #: mainform.rtasknumber
 msgctxt "mainform.rtasknumber"
 msgid "Task number:"
-msgstr "작업 번호:"
+msgstr "Nomor tugas:"
 
 #: mainform.rundoconfirm
 msgid "Are you sure you want to discard all changes? This action cannot be undone."
-msgstr "모든 변경 사항을 버리시겠습니까? 이 작업은 취소할 수 없습니다."
+msgstr "Anda yakin ingin membatalkan semua perubahan? Tindakan ini tidak dapat dibatalkan."
 
 #: mainform.runtitled
 msgid "Untitled"
-msgstr "제목 없음"
+msgstr "Tanpa judul"
 
 #: mainform.ryes
 msgid "&Yes"
-msgstr "예"
+msgstr "&Ya"
 
 #: systemtool.newversion
 #, object-pascal-format
 msgid "New version available: %s. Open GitHub page to download?"
-msgstr "새 버전 사용 가능: %s. 다운로드하려면 GitHub 페이지를 열겠습니까?"
+msgstr "Versi baru tersedia: %s. Buka halaman GitHub untuk mengunduh?"
 
 #: systemtool.newversioncheckerror
 msgid "Error checking version:"
-msgstr "버전 확인 오류:"
+msgstr "Kesalahan memeriksa versi:"
 
 #: systemtool.newversionuptodate
 msgid "Your version is up to date."
-msgstr "사용 중인 버전은 최신입니다."
+msgstr "Versi Anda sudah terbaru."
 
 #: task.rdays
 msgid "d"
-msgstr "일"
+msgstr "h\"  # har"
 
 #: task.rhours
 msgid "h"
-msgstr "시"
+msgstr "j\"  # ja"
 
 #: task.rminutes
 msgctxt "task.rminutes"
 msgid "min"
-msgstr "분"
+msgstr "mnt"
 
 #: task.rmonths
 msgctxt "task.rmonths"
 msgid "m"
-msgstr "월"
+msgstr "b\"  # bula"
 
 #: task.rseconds
 msgid "sec"
-msgstr "초"
+msgstr "dtk"
 
 #: task.ryears
 msgid "y"
-msgstr "년"
+msgstr "th\"  # tahu"
 
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
-msgstr "확인"
+msgstr "OK"
 
 #: tformaboutnotetask.caption
 msgid "About"
-msgstr "정보"
+msgstr "Tentang"
 
 #: tformaboutnotetask.labelby.caption
 msgid "by Alexander Tverskoy is licensed under"
@@ -277,7 +277,7 @@ msgstr "OK"
 
 #: tformdonatenotetask.caption
 msgid "Buy me a coffee"
-msgstr "커피 한 잔 주세요"
+msgstr "Beri saya kopi"
 
 #: tformdonatenotetask.editwallet1.text
 msgid "bc1qqzarmz7yzv34mgpxdp5v58ejre7twy8upalfa9"
@@ -300,12 +300,12 @@ msgstr ""
 #: tformdonatenotetask.label1.caption
 msgctxt "tformdonatenotetask.label1.caption"
 msgid "Hey there! Fuel this passion project with a little caffeine boost! Every donation helps keep the code rolling and the coffee brewing. Thanks for supporting the work and the developer behind it!"
-msgstr "안녕하세요! 이 열정 가득한 프로젝트에 약간의 카페인 부스트를 주세요! 후원 덕분에 코드가 계속 이어지고 커피가 준비됩니다. 이 프로젝트와 개발자를 지원해 주셔서 감사합니다!"
+msgstr "Hai! Bantu proyek penuh semangat ini dengan sedikit suntikan kafein! Setiap donasi membantu kode tetap berjalan dan kopi tetap diseduh. Terima kasih telah mendukung karya dan pengembang di baliknya!"
 
 #: tformdonatenotetask.label10.caption
 msgctxt "tformdonatenotetask.label10.caption"
 msgid "Feel free to make a donation through any exchange, for example:"
-msgstr "어떤 거래소를 통해서도 기부하셔도 됩니다. 예를 들어:"
+msgstr "Jangan ragu untuk melakukan donasi melalui bursa apa pun, misalnya:"
 
 #: tformdonatenotetask.label2.caption
 msgid "BTC"
@@ -350,77 +350,77 @@ msgstr ""
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "취소"
+msgstr "Batal"
 
 #: tformfindtext.buttonfind.caption
 msgctxt "tformfindtext.buttonfind.caption"
 msgid "Find Next"
-msgstr "다음 찾기"
+msgstr "Cari Selanjutnya"
 
 #: tformfindtext.caption
 msgctxt "tformfindtext.caption"
 msgid "Find"
-msgstr "찾기"
+msgstr "Cari"
 
 #: tformfindtext.checkmatchcase.caption
 msgctxt "tformfindtext.checkmatchcase.caption"
 msgid "Match case"
-msgstr "대소문자 구분"
+msgstr "Sesuaikan huruf besar/kecil"
 
 #: tformfindtext.checkwraparound.caption
 msgctxt "tformfindtext.checkwraparound.caption"
 msgid "Wrap around"
-msgstr "끝까지 감싸기"
+msgstr "Lanjut dari atas"
 
 #: tformfindtext.labelwhat.caption
 msgctxt "tformfindtext.labelwhat.caption"
 msgid "Find what:"
-msgstr "찾을 내용:"
+msgstr "Cari:"
 
 #: tformfindtext.radiodirection.caption
 msgctxt "tformfindtext.radiodirection.caption"
 msgid "Direction"
-msgstr "방향"
+msgstr "Arah"
 
 #: tforminputtext.buttoncancel.caption
 msgctxt "tforminputtext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "취소"
+msgstr "Batal"
 
 #: tforminputtext.buttonok.caption
 msgctxt "tforminputtext.buttonok.caption"
 msgid "Go to"
-msgstr "이동하기"
+msgstr "Pergi ke"
 
 #: tforminputtext.caption
 msgctxt "tforminputtext.caption"
 msgid "Go to task"
-msgstr "작업으로 이동"
+msgstr "Pergi ke tugas"
 
 #: tforminputtext.checkshowpassword.caption
 msgctxt "tforminputtext.checkshowpassword.caption"
 msgid "Show Password"
-msgstr "비밀번호 표시"
+msgstr "Tampilkan Kata Sandi"
 
 #: tforminputtext.labelcaption.caption
 msgctxt "tforminputtext.labelcaption.caption"
 msgid "Task number:"
-msgstr "작업 번호:"
+msgstr "Nomor tugas:"
 
 #: tforminputtext.labelcaption2.caption
 msgctxt "tforminputtext.labelcaption2.caption"
 msgid "Confirm password:"
-msgstr "비밀번호 확인:"
+msgstr "Konfirmasi kata sandi:"
 
 #: tformmemotext.buttoncancel.caption
 msgctxt "tformmemotext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "취소"
+msgstr "Batal"
 
 #: tformmemotext.buttonok.caption
 msgctxt "tformmemotext.buttonok.caption"
 msgid "Go to"
-msgstr "이동하기"
+msgstr "Pergi ke"
 
 #: tformmemotext.caption
 msgctxt "tformmemotext.caption"
@@ -430,118 +430,118 @@ msgstr "Notetask"
 #: tformmemotext.labelcaption.caption
 msgctxt "tformmemotext.labelcaption.caption"
 msgid "Enter Value:"
-msgstr "값을 입력하세요:"
+msgstr "Masukkan Nilai:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."
-msgstr "정보..."
+msgstr "Tentang..."
 
 #: tformnotetask.aarchivetasks.caption
 msgid "Archive tasks ↔"
-msgstr "작업 아카이브 ↔"
+msgstr "Arsipkan tugas ↔"
 
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
-msgstr "읽기 순서: 오른쪽에서 왼쪽으로"
+msgstr "Urutan baca: kanan ke kiri"
 
 #: tformnotetask.achatgpt.caption
 msgid "Ask ChatGPT..."
-msgstr "ChatGPT에게 질문하기..."
+msgstr "Tanya ChatGPT..."
 
 #: tformnotetask.acheckforupdates.caption
 msgid "Check for updates"
-msgstr "업데이트 확인"
+msgstr "Periksa pembaruan"
 
 #: tformnotetask.acopy.caption
 msgctxt "tformnotetask.acopy.caption"
 msgid "Copy"
-msgstr "복사"
+msgstr "Salin"
 
 #: tformnotetask.acut.caption
 msgid "Cut"
-msgstr "잘라내기"
+msgstr "Potong"
 
 #: tformnotetask.adatetime.caption
 msgid "Date time"
-msgstr "날짜 시간"
+msgstr "Tanggal waktu"
 
 #: tformnotetask.adelete.caption
 msgctxt "tformnotetask.adelete.caption"
 msgid "Delete"
-msgstr "삭제"
+msgstr "Hapus"
 
 #: tformnotetask.adeletegroup.caption
 msgid "Delete group"
-msgstr "그룹 삭제"
+msgstr "Hapus grup"
 
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
-msgstr "작업 삭제"
+msgstr "Hapus tugas"
 
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
-msgstr "커피 한 잔 주세요..."
+msgstr "Beri saya kopi..."
 
 #: tformnotetask.aduplicategroup.caption
 msgid "Duplicate group"
-msgstr "그룹을 복제하다"
+msgstr "Duplikat grup"
 
 #: tformnotetask.aduplicatetasks.caption
 msgid "Duplicate tasks"
-msgstr "작업 복제"
+msgstr "Duplikat tugas"
 
 #: tformnotetask.aeditgrouptooltip.caption
 msgid "Edit Group Tooltip"
-msgstr "그룹 툴팁 편집"
+msgstr "Edit Tooltip Grup"
 
 #: tformnotetask.aentersubmit.caption
 msgid "Enter submit"
-msgstr "Enter 제출"
+msgstr "Enter untuk kirim"
 
 #: tformnotetask.aexit.caption
 msgid "Exit"
-msgstr "종료"
+msgstr "Keluar"
 
 #: tformnotetask.afilter.caption
 msgid "Filter..."
-msgstr "필터..."
+msgstr "Filter..."
 
 #: tformnotetask.afind.caption
 msgid "Find..."
-msgstr "찾기..."
+msgstr "Cari..."
 
 #: tformnotetask.afindnext.caption
 msgid "Find next"
-msgstr "다음 찾기"
+msgstr "Cari selanjutnya"
 
 #: tformnotetask.afindprev.caption
 msgid "Find previous"
-msgstr "이전 찾기"
+msgstr "Cari sebelumnya"
 
 #: tformnotetask.afont.caption
 msgid "Font..."
-msgstr "글꼴..."
+msgstr "Fonta..."
 
 #: tformnotetask.agoto.caption
 msgid "Go to..."
-msgstr "이동하기..."
+msgstr "Pergi ke..."
 
 #: tformnotetask.ahidenotetext.caption
 msgid "Hide note text"
-msgstr "메모 텍스트 숨기기"
+msgstr "Sembunyikan teks catatan"
 
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
-msgstr "작업 들여쓰기 늘리기"
+msgstr "Indentasi tugas"
 
 #: tformnotetask.ainsertgroup.caption
 msgid "Insert group"
-msgstr "그룹 삽입"
+msgstr "Sisipkan grup"
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
-msgstr "작업 삽입"
+msgstr "Sisipkan tugas"
 
 #: tformnotetask.alangarabic.caption
 msgid "Arabic"
@@ -645,180 +645,180 @@ msgstr "Ukrainian"
 
 #: tformnotetask.amergetasks.caption
 msgid "Merge tasks"
-msgstr "작업 병합"
+msgstr "Gabungkan tugas"
 
 #: tformnotetask.amovegroupleft.caption
 msgid "Move group left"
-msgstr "그룹을 왼쪽으로 이동"
+msgstr "Geser grup ke kiri"
 
 #: tformnotetask.amovegroupright.caption
 msgid "Move group right"
-msgstr "그룹을 오른쪽으로 이동"
+msgstr "Geser grup ke kanan"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
-msgstr "작업을 맨 아래로 이동"
+msgstr "Pindahkan tugas ke bawah"
 
 #: tformnotetask.amovetaskdown.caption
 msgid "Move tasks down"
-msgstr "작업을 아래로 이동"
+msgstr "Geser tugas ke bawah"
 
 #: tformnotetask.amovetaskleft.caption
 msgid "Move tasks to left group"
-msgstr "작업을 왼쪽 그룹으로 이동"
+msgstr "Pindahkan tugas ke grup kiri"
 
 #: tformnotetask.amovetaskright.caption
 msgid "Move tasks to right group"
-msgstr "작업을 오른쪽 그룹으로 이동"
+msgstr "Pindahkan tugas ke grup kanan"
 
 #: tformnotetask.amovetasktop.caption
 msgid "Move tasks to top"
-msgstr "작업을 맨 위로 이동"
+msgstr "Pindahkan tugas ke atas"
 
 #: tformnotetask.amovetaskup.caption
 msgid "Move tasks up"
-msgstr "작업을 위로 이동"
+msgstr "Geser tugas ke atas"
 
 #: tformnotetask.anew.caption
 msgid "New"
-msgstr "새로운"
+msgstr "Baru"
 
 #: tformnotetask.anewwindow.caption
 msgid "New window"
-msgstr "새 창"
+msgstr "Jendela baru"
 
 #: tformnotetask.aopen.caption
 msgid "Open..."
-msgstr "열기..."
+msgstr "Buka..."
 
 #: tformnotetask.aoutdenttasks.caption
 msgid "Outdent tasks"
-msgstr "작업 들여쓰기 줄이기"
+msgstr "Kurangi indentasi tugas"
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."
-msgstr "페이지 속성..."
+msgstr "Properti halaman..."
 
 #: tformnotetask.apaste.caption
 msgid "Paste"
-msgstr "붙여넣기"
+msgstr "Tempel"
 
 #: tformnotetask.aprint.caption
 msgid "Print..."
-msgstr "인쇄..."
+msgstr "Cetak..."
 
 #: tformnotetask.arenamegroup.caption
 msgid "Rename group"
-msgstr "그룹 이름 변경"
+msgstr "Ubah nama grup"
 
 #: tformnotetask.areplace.caption
 msgid "Replace..."
-msgstr "바꾸기..."
+msgstr "Ganti..."
 
 #: tformnotetask.arunpowershell.caption
 msgid "Run in PowerShell..."
-msgstr "PowerShell에서 실행..."
+msgstr "Jalankan di PowerShell..."
 
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
-msgstr "터미널에서 실행..."
+msgstr "Jalankan di terminal..."
 
 #: tformnotetask.asave.caption
 msgid "Save"
-msgstr "저장"
+msgstr "Simpan"
 
 #: tformnotetask.asaveas.caption
 msgid "Save as..."
-msgstr "다른 이름으로 저장..."
+msgstr "Simpan sebagai..."
 
 #: tformnotetask.asavenotesas.caption
 msgid "Save notes as..."
-msgstr "메모 다른 이름으로 저장..."
+msgstr "Simpan catatan sebagai..."
 
 #: tformnotetask.aselectall.caption
 msgid "Select all"
-msgstr "모두 선택"
+msgstr "Pilih semua"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "보관된 작업"
+msgstr "Tampilkan tugas terarsip"
 
 #: tformnotetask.ashowcolumnamount.caption
 msgid "Column amount"
-msgstr "열 금액"
+msgstr "Kolom jumlah"
 
 #: tformnotetask.ashowcolumndate.caption
 msgid "Column date"
-msgstr "열 날짜"
+msgstr "Kolom tanggal"
 
 #: tformnotetask.ashowcolumndone.caption
 msgid "Column done"
-msgstr "열 완료"
+msgstr "Kolom selesai"
 
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
-msgstr "열 즐겨찾기"
+msgstr "Kolom favorit"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr "열 메모"
+msgstr "Kolom catatan"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
-msgstr "열 작업"
+msgstr "Kolom tugas"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
-msgstr "지속 시간"
+msgstr "Durasi"
 
 #: tformnotetask.ashownote.caption
 msgid "Show note"
-msgstr "메모"
+msgstr "Catatan"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "상태 표시줄"
+msgstr "Bilah status"
 
 #: tformnotetask.ashowtags.caption
 msgid "Show tags"
-msgstr "태그"
+msgstr "Tag"
 
 #: tformnotetask.ashowtime.caption
 msgid "Show time"
-msgstr "시간 표시"
+msgstr "Tampilkan waktu"
 
 #: tformnotetask.asplittasks.caption
 msgid "Split tasks"
-msgstr "작업 나누기"
+msgstr "Pisahkan tugas"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"
-msgstr "실행 취소"
+msgstr "Batalkan"
 
 #: tformnotetask.aundoall.caption
 msgid "Undo all changes"
-msgstr "모든 변경 사항 실행 취소"
+msgstr "Batalkan semua perubahan"
 
 #: tformnotetask.awordwrap.caption
 msgid "Word wrap"
-msgstr "단어 줄 바꿈"
+msgstr "Pembungkusan kata"
 
 #: tformnotetask.azoomdefault.caption
 msgid "Default zoom"
-msgstr "기본 확대/축소"
+msgstr "Zoom default"
 
 #: tformnotetask.azoomin.caption
 msgid "Zoom in"
-msgstr "확대"
+msgstr "Perbesar"
 
 #: tformnotetask.azoomout.caption
 msgid "Zoom out"
-msgstr "축소"
+msgstr "Perkecil"
 
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
-msgstr "노트 작업"
+msgstr "Notetask"
 
 #: tformnotetask.contextansi.caption
 msgid "ANSI"
@@ -831,22 +831,22 @@ msgstr ""
 #: tformnotetask.contextcolor.caption
 msgctxt "tformnotetask.contextcolor.caption"
 msgid "Color..."
-msgstr "색…"
+msgstr "Warna..."
 
 #: tformnotetask.contextcopystatusbar.caption
 msgctxt "tformnotetask.contextcopystatusbar.caption"
 msgid "Copy"
-msgstr "복사"
+msgstr "Salin"
 
 #: tformnotetask.contextcopytag.caption
 msgctxt "tformnotetask.contextcopytag.caption"
 msgid "Copy"
-msgstr "복사"
+msgstr "Salin"
 
 #: tformnotetask.contextdeletetags.caption
 msgctxt "tformnotetask.contextdeletetags.caption"
 msgid "Delete"
-msgstr "삭제"
+msgstr "Hapus"
 
 #: tformnotetask.contextmacintoshcr.caption
 msgid "MacintoshCR"
@@ -854,7 +854,7 @@ msgstr ""
 
 #: tformnotetask.contextresetcolor.caption
 msgid "Reset color"
-msgstr "색 초기화"
+msgstr "Atur ulang warna"
 
 #: tformnotetask.contextunixlf.caption
 msgid "UnixLF"
@@ -935,44 +935,44 @@ msgid ""
 "- 1 / 0 filter by task completion.\n"
 "- * / !* filter by task favorite."
 msgstr ""
-"필터는 모든 필드에서 텍스트를 검색합니다. \n"
-"- 태그는 드롭다운 목록에서 선택할 수 있습니다. \n"
-"- 태그에서만 검색하려면 시작 부분에 #을 사용하십시오. \n"
-"- 목록에는 @, #, %, +, $로 시작하는 텍스트 태그도 포함됩니다. \n"
-"- 부정을 위해 시작 부분에 !을 사용하십시오 (포함하지 않음). \n"
-"- =, !=, >, <, >=, <= 연산자는 금액과 날짜를 지원합니다. \n"
-"- 1 / 0은 작업 완료 상태로 필터링합니다. \n"
-"- * / !*은 즐겨찾기 상태로 필터링합니다."
+"Filter mencari teks di bidang apa pun.\n"
+"- Tag dapat dipilih dari daftar dropdown.\n"
+"- Gunakan # di awal untuk mencari hanya di tag.\n"
+"- Daftar juga menyertakan tag teks yang dimulai dengan @, #, %, +, atau $.\n"
+"- Gunakan ! di awal untuk negasi (tidak mengandung).\n"
+"- Mendukung =, !=, >, <, >=, <= untuk jumlah dan tanggal.\n"
+"- 1 / 0 filter berdasarkan penyelesaian tugas.\n"
+"- * / !* filter berdasarkan favorit tugas."
 
 #: tformnotetask.filterbox.texthint
 msgctxt "tformnotetask.filterbox.texthint"
 msgid "Type to filter..."
-msgstr "필터하려면 입력하세요..."
+msgstr "Ketik untuk memfilter..."
 
 #: tformnotetask.fontdialog.title
 msgid "Font select"
-msgstr "글꼴 선택"
+msgstr "Pemilihan fonta"
 
 #: tformnotetask.menuedit.caption
 msgid "Edit"
-msgstr "편집"
+msgstr "Edit"
 
 #: tformnotetask.menufile.caption
 msgid "File"
-msgstr "파일"
+msgstr "File"
 
 #: tformnotetask.menuformat.caption
 msgid "Format"
-msgstr "형식"
+msgstr "Format"
 
 #: tformnotetask.menugroup.caption
 msgctxt "tformnotetask.menugroup.caption"
 msgid "Group"
-msgstr "그룹"
+msgstr "Grup"
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
-msgstr "도움말"
+msgstr "Bantuan"
 
 #: tformnotetask.menulanguage.caption
 msgid "Language"
@@ -981,98 +981,98 @@ msgstr "Language"
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"
 msgid "Task"
-msgstr "작업"
+msgstr "Tugas"
 
 #: tformnotetask.menuview.caption
 msgid "View"
-msgstr "보기"
+msgstr "Tampilan"
 
 #: tformnotetask.menuzoom.caption
 msgid "Zoom"
-msgstr "확대/축소"
+msgstr "Zoom"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"
-msgstr "열기"
+msgstr "Membuka"
 
 #: tformnotetask.savedialog.title
 msgctxt "tformnotetask.savedialog.title"
 msgid "Saving"
-msgstr "저장"
+msgstr "Menyimpan"
 
 #: tformnotetask.savenotesdialog.title
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
-msgstr "저장"
+msgstr "Menyimpan"
 
 #: tformnotetask.taskgrid.columns[0].title.caption
 msgid "Done"
-msgstr "완료"
+msgstr "Selesai"
 
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
 msgid "Task"
-msgstr "작업"
+msgstr "Tugas"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
 msgid "Note"
-msgstr "메모"
+msgstr "Catatan"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgctxt "tformnotetask.taskgrid.columns[3].title.caption"
 msgid "Amount"
-msgstr "금액"
+msgstr "Jumlah"
 
 #: tformnotetask.taskgrid.columns[4].title.caption
 msgctxt "tformnotetask.taskgrid.columns[4].title.caption"
 msgid "Date"
-msgstr "날짜"
+msgstr "Tanggal"
 
 #: tformnotetask.taskgrid.columns[5].title.caption
 msgctxt "tformnotetask.taskgrid.columns[5].title.caption"
 msgid "Star"
-msgstr "별"
+msgstr "Bintang"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "취소"
+msgstr "Batal"
 
 #: tformreplacetext.buttonfind.caption
 msgctxt "tformreplacetext.buttonfind.caption"
 msgid "Find Next"
-msgstr "다음 찾기"
+msgstr "Cari Selanjutnya"
 
 #: tformreplacetext.buttonreplace.caption
 msgctxt "tformreplacetext.buttonreplace.caption"
 msgid "Replace"
-msgstr "바꾸기"
+msgstr "Ganti"
 
 #: tformreplacetext.buttonreplaceall.caption
 msgid "Replace All"
-msgstr "모두 바꾸기"
+msgstr "Ganti Semua"
 
 #: tformreplacetext.caption
 msgctxt "tformreplacetext.caption"
 msgid "Replace"
-msgstr "바꾸기"
+msgstr "Ganti"
 
 #: tformreplacetext.checkmatchcase.caption
 msgctxt "tformreplacetext.checkmatchcase.caption"
 msgid "Match case"
-msgstr "대소문자 구분"
+msgstr "Sesuaikan huruf besar/kecil"
 
 #: tformreplacetext.checkwraparound.caption
 msgctxt "tformreplacetext.checkwraparound.caption"
 msgid "Wrap around"
-msgstr "끝에서 다시 시작"
+msgstr "Lanjut dari atas"
 
 #: tformreplacetext.labelwhat.caption
 msgctxt "tformreplacetext.labelwhat.caption"
 msgid "Find what:"
-msgstr "찾을 내용:"
+msgstr "Cari:"
 
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
-msgstr "다음으로 바꾸기:"
+msgstr "Ganti dengan:"

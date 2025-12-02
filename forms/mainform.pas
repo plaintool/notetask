@@ -49,6 +49,17 @@ type
     aAbout: TAction;
     aCopy: TAction;
     aCheckforupdates: TAction;
+    aLangTurkish: TAction;
+    aLangGreek: TAction;
+    aLangHebrew: TAction;
+    aLangIndonesian: TAction;
+    aLangPolish: TAction;
+    aLangRomanian: TAction;
+    aLangSwedish: TAction;
+    aLangCzech: TAction;
+    aLangDanish: TAction;
+    aLangDutch: TAction;
+    aLangFinnish: TAction;
     aZoomDefault: TAction;
     aZoomOut: TAction;
     aZoomIn: TAction;
@@ -121,6 +132,17 @@ type
     contextZoom130: TMenuItem;
     contextZoom140: TMenuItem;
     contextZoom150: TMenuItem;
+    MenuItem10: TMenuItem;
+    MenuItem11: TMenuItem;
+    MenuItem12: TMenuItem;
+    MenuItem13: TMenuItem;
+    MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
+    MenuItem5: TMenuItem;
+    MenuItem6: TMenuItem;
+    MenuItem7: TMenuItem;
+    MenuItem8: TMenuItem;
+    MenuItem9: TMenuItem;
     menuZoomIn: TMenuItem;
     menuZoomOut: TMenuItem;
     menuDefaultZoom: TMenuItem;
@@ -334,6 +356,17 @@ type
     procedure aCheckforupdatesExecute(Sender: TObject);
     procedure aEditGroupTooltipExecute(Sender: TObject);
     procedure aFilterExecute(Sender: TObject);
+    procedure aLangCzechExecute(Sender: TObject);
+    procedure aLangDanishExecute(Sender: TObject);
+    procedure aLangDutchExecute(Sender: TObject);
+    procedure aLangFinnishExecute(Sender: TObject);
+    procedure aLangGreekExecute(Sender: TObject);
+    procedure aLangHebrewExecute(Sender: TObject);
+    procedure aLangIndonesianExecute(Sender: TObject);
+    procedure aLangPolishExecute(Sender: TObject);
+    procedure aLangRomanianExecute(Sender: TObject);
+    procedure aLangSwedishExecute(Sender: TObject);
+    procedure aLangTurkishExecute(Sender: TObject);
     procedure aShowTagsExecute(Sender: TObject);
     procedure aSplitTasksExecute(Sender: TObject);
     procedure aZoomDefaultExecute(Sender: TObject);
@@ -4181,6 +4214,48 @@ begin
   end;
 end;
 
+procedure TformNotetask.aLangArabicExecute(Sender: TObject);
+begin
+  SetLanguage('ar');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangBelarusianExecute(Sender: TObject);
+begin
+  SetLanguage('be');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangChineseExecute(Sender: TObject);
+begin
+  SetLanguage('zh');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangCzechExecute(Sender: TObject);
+begin
+  SetLanguage('cs');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangDanishExecute(Sender: TObject);
+begin
+  SetLanguage('da');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangDutchExecute(Sender: TObject);
+begin
+  SetLanguage('nl');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
 procedure TformNotetask.aLangEnglishExecute(Sender: TObject);
 begin
   SetLanguage('en');
@@ -4188,9 +4263,9 @@ begin
   SetInfo;
 end;
 
-procedure TformNotetask.aLangSpanishExecute(Sender: TObject);
+procedure TformNotetask.aLangFinnishExecute(Sender: TObject);
 begin
-  SetLanguage('es');
+  SetLanguage('fi');
   if ShowDuration then FillGrid;
   SetInfo;
 end;
@@ -4209,23 +4284,37 @@ begin
   SetInfo;
 end;
 
+procedure TformNotetask.aLangGreekExecute(Sender: TObject);
+begin
+  SetLanguage('el');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangHebrewExecute(Sender: TObject);
+begin
+  SetLanguage('he');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangHindiExecute(Sender: TObject);
+begin
+  SetLanguage('hi');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangIndonesianExecute(Sender: TObject);
+begin
+  SetLanguage('id');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
 procedure TformNotetask.aLangItalianExecute(Sender: TObject);
 begin
   SetLanguage('it');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangPortugueseExecute(Sender: TObject);
-begin
-  SetLanguage('pt');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangRussianExecute(Sender: TObject);
-begin
-  SetLanguage('ru');
   if ShowDuration then FillGrid;
   SetInfo;
 end;
@@ -4244,9 +4333,51 @@ begin
   SetInfo;
 end;
 
-procedure TformNotetask.aLangChineseExecute(Sender: TObject);
+procedure TformNotetask.aLangPolishExecute(Sender: TObject);
 begin
-  SetLanguage('zh');
+  SetLanguage('pl');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangPortugueseExecute(Sender: TObject);
+begin
+  SetLanguage('pt');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangRomanianExecute(Sender: TObject);
+begin
+  SetLanguage('ro');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangRussianExecute(Sender: TObject);
+begin
+  SetLanguage('ru');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangSpanishExecute(Sender: TObject);
+begin
+  SetLanguage('es');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangSwedishExecute(Sender: TObject);
+begin
+  SetLanguage('sv');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangTurkishExecute(Sender: TObject);
+begin
+  SetLanguage('tr');
   if ShowDuration then FillGrid;
   SetInfo;
 end;
@@ -4254,27 +4385,6 @@ end;
 procedure TformNotetask.aLangUkrainianExecute(Sender: TObject);
 begin
   SetLanguage('uk');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangBelarusianExecute(Sender: TObject);
-begin
-  SetLanguage('be');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangHindiExecute(Sender: TObject);
-begin
-  SetLanguage('hi');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangArabicExecute(Sender: TObject);
-begin
-  SetLanguage('ar');
   if ShowDuration then FillGrid;
   SetInfo;
 end;
@@ -8083,20 +8193,31 @@ end;
 
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);
 begin
-  aLangEnglish.Checked := False;
-  aLangGerman.Checked := False;
-  aLangSpanish.Checked := False;
-  aLangFrench.Checked := False;
-  aLangItalian.Checked := False;
-  aLangPortuguese.Checked := False;
-  aLangRussian.Checked := False;
-  aLangUkrainian.Checked := False;
-  aLangBelarusian.Checked := False;
-  aLangHindi.Checked := False;
   aLangArabic.Checked := False;
+  aLangBelarusian.Checked := False;
   aLangChinese.Checked := False;
+  aLangCzech.Checked := False;
+  aLangDanish.Checked := False;
+  aLangDutch.Checked := False;
+  aLangEnglish.Checked := False;
+  aLangFinnish.Checked := False;
+  aLangFrench.Checked := False;
+  aLangGerman.Checked := False;
+  aLangGreek.Checked := False;
+  aLangHebrew.Checked := False;
+  aLangHindi.Checked := False;
+  aLangIndonesian.Checked := False;
+  aLangItalian.Checked := False;
   aLangJapanese.Checked := False;
   aLangKorean.Checked := False;
+  aLangPolish.Checked := False;
+  aLangPortuguese.Checked := False;
+  aLangRomanian.Checked := False;
+  aLangRussian.Checked := False;
+  aLangSpanish.Checked := False;
+  aLangSwedish.Checked := False;
+  aLangTurkish.Checked := False;
+  aLangUkrainian.Checked := False;
 
   if (aLanguage <> string.Empty) then
   begin
@@ -8119,20 +8240,31 @@ begin
     groupTabs.Tabs[0] := rgroupuntitled;
 
   case Language of
-    'en': aLangEnglish.Checked := True;
-    'de': aLangGerman.Checked := True;
-    'es': aLangSpanish.Checked := True;
-    'fr': aLangFrench.Checked := True;
-    'it': aLangItalian.Checked := True;
-    'pt': aLangPortuguese.Checked := True;
-    'ru': aLangRussian.Checked := True;
-    'uk': aLangUkrainian.Checked := True;
-    'be': aLangBelarusian.Checked := True;
-    'hi': aLangHindi.Checked := True;
     'ar': aLangArabic.Checked := True;
+    'be': aLangBelarusian.Checked := True;
     'zh': aLangChinese.Checked := True;
+    'cs': aLangCzech.Checked := True;
+    'da': aLangDanish.Checked := True;
+    'nl': aLangDutch.Checked := True;
+    'en': aLangEnglish.Checked := True;
+    'fi': aLangFinnish.Checked := True;
+    'fr': aLangFrench.Checked := True;
+    'de': aLangGerman.Checked := True;
+    'el': aLangGreek.Checked := True;
+    'he': aLangHebrew.Checked := True;
+    'hi': aLangHindi.Checked := True;
+    'id': aLangIndonesian.Checked := True;
+    'it': aLangItalian.Checked := True;
     'ja': aLangJapanese.Checked := True;
     'ko': aLangKorean.Checked := True;
+    'pl': aLangPolish.Checked := True;
+    'pt': aLangPortuguese.Checked := True;
+    'ro': aLangRomanian.Checked := True;
+    'ru': aLangRussian.Checked := True;
+    'es': aLangSpanish.Checked := True;
+    'sv': aLangSwedish.Checked := True;
+    'tr': aLangTurkish.Checked := True;
+    'uk': aLangUkrainian.Checked := True;
     else
     // nolang
   end;

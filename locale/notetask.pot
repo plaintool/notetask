@@ -542,8 +542,24 @@ msgstr ""
 msgid "Chinese"
 msgstr ""
 
+#: tformnotetask.alangczech.caption
+msgid "Czech"
+msgstr ""
+
+#: tformnotetask.alangdanish.caption
+msgid "Danish"
+msgstr ""
+
+#: tformnotetask.alangdutch.caption
+msgid "Dutch"
+msgstr ""
+
 #: tformnotetask.alangenglish.caption
 msgid "English"
+msgstr ""
+
+#: tformnotetask.alangfinnish.caption
+msgid "Finnish"
 msgstr ""
 
 #: tformnotetask.alangfrench.caption
@@ -554,8 +570,20 @@ msgstr ""
 msgid "German"
 msgstr ""
 
+#: tformnotetask.alanggreek.caption
+msgid "Greek"
+msgstr ""
+
+#: tformnotetask.alanghebrew.caption
+msgid "Hebrew"
+msgstr ""
+
 #: tformnotetask.alanghindi.caption
 msgid "Hindi"
+msgstr ""
+
+#: tformnotetask.alangindonesian.caption
+msgid "Indonesian"
 msgstr ""
 
 #: tformnotetask.alangitalian.caption
@@ -570,8 +598,16 @@ msgstr ""
 msgid "Korean"
 msgstr ""
 
+#: tformnotetask.alangpolish.caption
+msgid "Polish"
+msgstr ""
+
 #: tformnotetask.alangportuguese.caption
 msgid "Portuguese"
+msgstr ""
+
+#: tformnotetask.alangromanian.caption
+msgid "Romanian"
 msgstr ""
 
 #: tformnotetask.alangrussian.caption
@@ -580,6 +616,14 @@ msgstr ""
 
 #: tformnotetask.alangspanish.caption
 msgid "Spanish"
+msgstr ""
+
+#: tformnotetask.alangswedish.caption
+msgid "Swedish"
+msgstr ""
+
+#: tformnotetask.alangturkish.caption
+msgid "Turkish"
 msgstr ""
 
 #: tformnotetask.alangukrainian.caption

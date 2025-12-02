@@ -5,7 +5,7 @@ msgstr ""
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: ko\n"
+"Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,16 +13,16 @@ msgstr ""
 
 #: formfind.rdirectiondown
 msgid "Down"
-msgstr "아래로"
+msgstr "Jos"
 
 #: formfind.rdirectionup
 msgid "Up"
-msgstr "위로"
+msgstr "Sus"
 
 #: forminput.rpasswordsnotequal
 msgctxt "forminput.rpasswordsnotequal"
 msgid "Passwords are not equal!"
-msgstr "비밀번호가 일치하지 않습니다!"
+msgstr "Parolele nu coincid!"
 
 #: mainform.rapp
 msgctxt "mainform.rapp"
@@ -32,56 +32,56 @@ msgstr "Notetask"
 #: mainform.rarchiveconfirm
 msgctxt "mainform.rarchiveconfirm"
 msgid "Are you sure you want to archive / unarchive this task?"
-msgstr "이 작업을 아카이브/아카이브 해제 하시겠습니까?"
+msgstr "Sunteți sigur că doriți să arhivați / dezarhivați această sarcină?"
 
 #: mainform.rarchivesconfirm
 msgctxt "mainform.rarchivesconfirm"
 msgid "Are you sure you want to archive / unarchive selected tasks?"
-msgstr "선택한 작업을 아카이브/아카이브 해제 하시겠습니까?"
+msgstr "Sunteți sigur că doriți să arhivați / dezarhivați sarcinile selectate?"
 
 #: mainform.rcantfind
 msgid "Can't find"
-msgstr "찾을 수 없음"
+msgstr "Nu se poate găsi"
 
 #: mainform.rchatgpt
 msgid "https://chatgpt.com?q="
-msgstr "https://chatgpt.com?q="
+msgstr ""
 
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
-msgstr "선택한 영역의 데이터를 지우시겠습니까?"
+msgstr "Sunteți sigur că doriți să ștergeți datele din zona selectată?"
 
 #: mainform.rconfirmation
 msgid "Confirmation"
-msgstr "확인"
+msgstr "Confirmare"
 
 #: mainform.rconfirmpassword
 msgid "Confirm Password:"
-msgstr "비밀번호 확인:"
+msgstr "Confirmați parola:"
 
 #: mainform.rdeleteconfirm
 msgid "Are you sure you want to delete this task?"
-msgstr "이 작업을 삭제하시겠습니까?"
+msgstr "Sunteți sigur că doriți să ștergeți această sarcină?"
 
 #: mainform.rdeletegroupconfirm
 msgid "Are you sure you want to delete this group? This will also delete all tasks within this group."
-msgstr "이 그룹을 삭제하시겠습니까? 이 그룹 내의 모든 작업도 삭제됩니다."
+msgstr "Sunteți sigur că doriți să ștergeți acest grup? Aceasta va șterge și toate sarcinile din acest grup."
 
 #: mainform.rdeletesconfirm
 msgid "Are you sure you want to delete selected tasks?"
-msgstr "선택한 작업을 삭제하시겠습니까?"
+msgstr "Sunteți sigur că doriți să ștergeți sarcinile selectate?"
 
 #: mainform.rencrypted
 msgid "Encrypted"
-msgstr "암호화됨"
+msgstr "Criptat"
 
 #: mainform.rentergroupname
 msgid "Enter the group name:"
-msgstr "그룹 이름을 입력하세요:"
+msgstr "Introduceți numele grupului:"
 
 #: mainform.renternewtag
 msgid "Enter new tag..."
-msgstr "새 태그를 입력하십시오..."
+msgstr "Introduceți o etichetă nouă..."
 
 #: mainform.renternewtaghint
 msgid ""
@@ -89,166 +89,166 @@ msgid ""
 "Colon separates the tag from the suffix.\n"
 "Semicolon allows adding multiple tags."
 msgstr ""
-"태그는 선택된 모든 작업에 추가되거나 제거됩니다.\n"
-"콜론은 태그와 접미사를 구분합니다.\n"
-"세미콜론을 사용하면 여러 태그를 추가할 수 있습니다."
+"Eticheta este adăugată sau eliminată din toate sarcinile selectate.\n"
+"Două puncte separă eticheta de sufix.\n"
+"Punct și virgulă permit adăugarea mai multor etichete."
 
 #: mainform.rfilenotfound
 msgid "The requested file was not found on the disk."
-msgstr "요청한 파일을 디스크에서 찾을 수 없습니다."
+msgstr "Fișierul solicitat nu a fost găsit pe disc."
 
 #: mainform.rfilereadonly
 msgid "The file is read-only or is in use by another user."
-msgstr "파일이 읽기 전용이거나 다른 사용자가 사용 중입니다."
+msgstr "Fișierul este doar pentru citire sau este folosit de alt utilizator."
 
 #: mainform.rgoto
 msgctxt "mainform.rgoto"
 msgid "Go to"
-msgstr "이동하기"
+msgstr "Mergi la"
 
 #: mainform.rgototask
 msgctxt "mainform.rgototask"
 msgid "Go to task"
-msgstr "작업으로 이동"
+msgstr "Mergi la sarcină"
 
 #: mainform.rgroup
 msgctxt "mainform.rgroup"
 msgid "Group"
-msgstr "그룹"
+msgstr "Grup"
 
 #: mainform.rgroupuntitled
 msgctxt "mainform.rgroupuntitled"
 msgid "Ungrouped"
-msgstr "그룹화되지 않음"
+msgstr "Negrupate"
 
 #: mainform.rincorrectpassword
 msgid "Incorrect password!"
-msgstr "잘못된 비밀번호입니다!"
+msgstr "Parolă incorectă!"
 
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
-msgstr "선택한 작업을 병합하시겠습니까?"
+msgstr "Sunteți sigur că doriți să îmbinăți sarcinile selectate?"
 
 #: mainform.rno
 msgid "&No"
-msgstr "아니요"
+msgstr "&Nu"
 
 #: mainform.rnumstringtoolarge
 msgid "The line number is out of the allowed range."
-msgstr "라인 번호가 허용된 범위를 초과했습니다."
+msgstr "Numărul liniei este în afara intervalului permis."
 
 #: mainform.rok
 msgctxt "mainform.rok"
 msgid "OK"
-msgstr "확인"
+msgstr "OK"
 
 #: mainform.ropendialogfilter
 msgctxt "mainform.ropendialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "작업 파일 (*.tsk)|*.tsk|텍스트 파일 (*.txt)|*.txt|마크다운 파일 (*.md)|*.md|모든 파일 (*.*)|*.*"
+msgstr "Fișiere sarcini (*.tsk)|*.tsk|Fișiere text (*.txt)|*.txt|Fișiere Markdown (*.md)|*.md|Toate fișierele (*.*)|*.*"
 
 #: mainform.rpassword
 msgid "Password:"
-msgstr "비밀번호:"
+msgstr "Parolă:"
 
 #: mainform.rreadonly
 msgid "Read-only"
-msgstr "읽기 전용"
+msgstr "Doar citire"
 
 #: mainform.rremovetag
 msgid "Are you sure you want to remove tag(s)"
-msgstr "태그를 제거하시겠습니까"
+msgstr "Sunteți sigur că doriți să eliminați eticheta/etichetele"
 
 #: mainform.rremovetagtitle
 msgid "Remove tag(s)"
-msgstr "태그 제거"
+msgstr "Eliminați eticheta/etichetele"
 
 #: mainform.rrows
 msgctxt "mainform.rrows"
 msgid " tasks"
-msgstr " 작업"
+msgstr " sarcini"
 
 #: mainform.rsavechanges
 msgid "Do you want to save the changes?"
-msgstr "변경 사항을 저장하시겠습니까?"
+msgstr "Doriți să salvați modificările?"
 
 #: mainform.rsavedialogfilter
 msgctxt "mainform.rsavedialogfilter"
 msgid "Task files (*.tsk)|*.tsk|Encrypted Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*"
-msgstr "작업 파일 (*.tsk)|*.tsk|암호화된 작업 파일 (*.tsk)|*.tsk|텍스트 파일 (*.txt)|*.txt|Markdown 파일 (*.md)|*.md|모든 파일 (*.*)|*.*"
+msgstr "Fișiere sarcini (*.tsk)|*.tsk|Fișiere sarcini criptate (*.tsk)|*.tsk|Fișiere text (*.txt)|*.txt|Fișiere Markdown (*.md)|*.md|Toate fișierele (*.*)|*.*"
 
 #: mainform.rsplitconfirm
 msgid "Are you sure you want to split the selected tasks based on the current column?"
-msgstr "현재 열을 기준으로 선택한 작업을 나누시겠습니까?"
+msgstr "Sunteți sigur că doriți să împărțiți sarcinile selectate pe baza coloanei curente?"
 
 #: mainform.rsplitwarning
 msgid "Please select the column with line breaks to split the tasks."
-msgstr "작업을 나누려면 줄 바꿈이 있는 열을 선택하세요."
+msgstr "Vă rugăm să selectați coloana cu întreruperi de linie pentru a împărți sarcinile."
 
 #: mainform.rtasknumber
 msgctxt "mainform.rtasknumber"
 msgid "Task number:"
-msgstr "작업 번호:"
+msgstr "Număr sarcină:"
 
 #: mainform.rundoconfirm
 msgid "Are you sure you want to discard all changes? This action cannot be undone."
-msgstr "모든 변경 사항을 버리시겠습니까? 이 작업은 취소할 수 없습니다."
+msgstr "Sunteți sigur că doriți să renunțați la toate modificările? Această acțiune nu poate fi anulată."
 
 #: mainform.runtitled
 msgid "Untitled"
-msgstr "제목 없음"
+msgstr "Fără titlu"
 
 #: mainform.ryes
 msgid "&Yes"
-msgstr "예"
+msgstr "&Da"
 
 #: systemtool.newversion
 #, object-pascal-format
 msgid "New version available: %s. Open GitHub page to download?"
-msgstr "새 버전 사용 가능: %s. 다운로드하려면 GitHub 페이지를 열겠습니까?"
+msgstr "Este disponibilă o nouă versiune: %s. Deschideți pagina GitHub pentru descărcare?"
 
 #: systemtool.newversioncheckerror
 msgid "Error checking version:"
-msgstr "버전 확인 오류:"
+msgstr "Eroare la verificarea versiunii:"
 
 #: systemtool.newversionuptodate
 msgid "Your version is up to date."
-msgstr "사용 중인 버전은 최신입니다."
+msgstr "Versiunea dvs. este la zi."
 
 #: task.rdays
 msgid "d"
-msgstr "일"
+msgstr "z"
 
 #: task.rhours
 msgid "h"
-msgstr "시"
+msgstr "o"
 
 #: task.rminutes
 msgctxt "task.rminutes"
 msgid "min"
-msgstr "분"
+msgstr "min"
 
 #: task.rmonths
 msgctxt "task.rmonths"
 msgid "m"
-msgstr "월"
+msgstr "l"
 
 #: task.rseconds
 msgid "sec"
-msgstr "초"
+msgstr "s"
 
 #: task.ryears
 msgid "y"
-msgstr "년"
+msgstr "a"
 
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
 msgid "OK"
-msgstr "확인"
+msgstr "OK"
 
 #: tformaboutnotetask.caption
 msgid "About"
-msgstr "정보"
+msgstr "Despre"
 
 #: tformaboutnotetask.labelby.caption
 msgid "by Alexander Tverskoy is licensed under"
@@ -277,7 +277,7 @@ msgstr "OK"
 
 #: tformdonatenotetask.caption
 msgid "Buy me a coffee"
-msgstr "커피 한 잔 주세요"
+msgstr "Cumpără-mi o cafea"
 
 #: tformdonatenotetask.editwallet1.text
 msgid "bc1qqzarmz7yzv34mgpxdp5v58ejre7twy8upalfa9"
@@ -300,12 +300,12 @@ msgstr ""
 #: tformdonatenotetask.label1.caption
 msgctxt "tformdonatenotetask.label1.caption"
 msgid "Hey there! Fuel this passion project with a little caffeine boost! Every donation helps keep the code rolling and the coffee brewing. Thanks for supporting the work and the developer behind it!"
-msgstr "안녕하세요! 이 열정 가득한 프로젝트에 약간의 카페인 부스트를 주세요! 후원 덕분에 코드가 계속 이어지고 커피가 준비됩니다. 이 프로젝트와 개발자를 지원해 주셔서 감사합니다!"
+msgstr "Salut! Alimentează acest proiect pasional cu un pic de cafeină! Fiecare donație ajută la menținerea codului și la prepararea cafelei. Mulțumesc pentru sprijinul acordat muncii și dezvoltatorului din spatele ei!"
 
 #: tformdonatenotetask.label10.caption
 msgctxt "tformdonatenotetask.label10.caption"
 msgid "Feel free to make a donation through any exchange, for example:"
-msgstr "어떤 거래소를 통해서도 기부하셔도 됩니다. 예를 들어:"
+msgstr "Nu ezitați să faceți o donație prin orice exchange, de exemplu:"
 
 #: tformdonatenotetask.label2.caption
 msgid "BTC"
@@ -350,77 +350,77 @@ msgstr ""
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "취소"
+msgstr "Anulează"
 
 #: tformfindtext.buttonfind.caption
 msgctxt "tformfindtext.buttonfind.caption"
 msgid "Find Next"
-msgstr "다음 찾기"
+msgstr "Găsește următorul"
 
 #: tformfindtext.caption
 msgctxt "tformfindtext.caption"
 msgid "Find"
-msgstr "찾기"
+msgstr "Caută"
 
 #: tformfindtext.checkmatchcase.caption
 msgctxt "tformfindtext.checkmatchcase.caption"
 msgid "Match case"
-msgstr "대소문자 구분"
+msgstr "Fără majuscule"
 
 #: tformfindtext.checkwraparound.caption
 msgctxt "tformfindtext.checkwraparound.caption"
 msgid "Wrap around"
-msgstr "끝까지 감싸기"
+msgstr "Continuă căutarea"
 
 #: tformfindtext.labelwhat.caption
 msgctxt "tformfindtext.labelwhat.caption"
 msgid "Find what:"
-msgstr "찾을 내용:"
+msgstr "Caută:"
 
 #: tformfindtext.radiodirection.caption
 msgctxt "tformfindtext.radiodirection.caption"
 msgid "Direction"
-msgstr "방향"
+msgstr "Direcție"
 
 #: tforminputtext.buttoncancel.caption
 msgctxt "tforminputtext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "취소"
+msgstr "Anulează"
 
 #: tforminputtext.buttonok.caption
 msgctxt "tforminputtext.buttonok.caption"
 msgid "Go to"
-msgstr "이동하기"
+msgstr "Mergi la"
 
 #: tforminputtext.caption
 msgctxt "tforminputtext.caption"
 msgid "Go to task"
-msgstr "작업으로 이동"
+msgstr "Mergi la sarcină"
 
 #: tforminputtext.checkshowpassword.caption
 msgctxt "tforminputtext.checkshowpassword.caption"
 msgid "Show Password"
-msgstr "비밀번호 표시"
+msgstr "Afișează parola"
 
 #: tforminputtext.labelcaption.caption
 msgctxt "tforminputtext.labelcaption.caption"
 msgid "Task number:"
-msgstr "작업 번호:"
+msgstr "Număr sarcină:"
 
 #: tforminputtext.labelcaption2.caption
 msgctxt "tforminputtext.labelcaption2.caption"
 msgid "Confirm password:"
-msgstr "비밀번호 확인:"
+msgstr "Confirmați parola:"
 
 #: tformmemotext.buttoncancel.caption
 msgctxt "tformmemotext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "취소"
+msgstr "Anulează"
 
 #: tformmemotext.buttonok.caption
 msgctxt "tformmemotext.buttonok.caption"
 msgid "Go to"
-msgstr "이동하기"
+msgstr "Mergi la"
 
 #: tformmemotext.caption
 msgctxt "tformmemotext.caption"
@@ -430,118 +430,118 @@ msgstr "Notetask"
 #: tformmemotext.labelcaption.caption
 msgctxt "tformmemotext.labelcaption.caption"
 msgid "Enter Value:"
-msgstr "값을 입력하세요:"
+msgstr "Introduceți valoarea:"
 
 #: tformnotetask.aabout.caption
 msgid "About..."
-msgstr "정보..."
+msgstr "Despre..."
 
 #: tformnotetask.aarchivetasks.caption
 msgid "Archive tasks ↔"
-msgstr "작업 아카이브 ↔"
+msgstr "Arhivează sarcini ↔"
 
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
-msgstr "읽기 순서: 오른쪽에서 왼쪽으로"
+msgstr "Ordine de citire: de la dreapta la stânga"
 
 #: tformnotetask.achatgpt.caption
 msgid "Ask ChatGPT..."
-msgstr "ChatGPT에게 질문하기..."
+msgstr "Întreabă ChatGPT..."
 
 #: tformnotetask.acheckforupdates.caption
 msgid "Check for updates"
-msgstr "업데이트 확인"
+msgstr "Verifică actualizări"
 
 #: tformnotetask.acopy.caption
 msgctxt "tformnotetask.acopy.caption"
 msgid "Copy"
-msgstr "복사"
+msgstr "Copiază"
 
 #: tformnotetask.acut.caption
 msgid "Cut"
-msgstr "잘라내기"
+msgstr "Taie"
 
 #: tformnotetask.adatetime.caption
 msgid "Date time"
-msgstr "날짜 시간"
+msgstr "Dată și oră"
 
 #: tformnotetask.adelete.caption
 msgctxt "tformnotetask.adelete.caption"
 msgid "Delete"
-msgstr "삭제"
+msgstr "Șterge"
 
 #: tformnotetask.adeletegroup.caption
 msgid "Delete group"
-msgstr "그룹 삭제"
+msgstr "Șterge grupul"
 
 #: tformnotetask.adeletetasks.caption
 msgctxt "tformnotetask.adeletetasks.caption"
 msgid "Delete tasks"
-msgstr "작업 삭제"
+msgstr "Șterge sarcini"
 
 #: tformnotetask.adonate.caption
 msgid "Buy me a coffee..."
-msgstr "커피 한 잔 주세요..."
+msgstr "Cumpără-mi o cafea..."
 
 #: tformnotetask.aduplicategroup.caption
 msgid "Duplicate group"
-msgstr "그룹을 복제하다"
+msgstr "Duplică grupul"
 
 #: tformnotetask.aduplicatetasks.caption
 msgid "Duplicate tasks"
-msgstr "작업 복제"
+msgstr "Duplică sarcini"
 
 #: tformnotetask.aeditgrouptooltip.caption
 msgid "Edit Group Tooltip"
-msgstr "그룹 툴팁 편집"
+msgstr "Editează indiciul grupului"
 
 #: tformnotetask.aentersubmit.caption
 msgid "Enter submit"
-msgstr "Enter 제출"
+msgstr "Enter confirmă"
 
 #: tformnotetask.aexit.caption
 msgid "Exit"
-msgstr "종료"
+msgstr "Ieșire"
 
 #: tformnotetask.afilter.caption
 msgid "Filter..."
-msgstr "필터..."
+msgstr "Filtru..."
 
 #: tformnotetask.afind.caption
 msgid "Find..."
-msgstr "찾기..."
+msgstr "Caută..."
 
 #: tformnotetask.afindnext.caption
 msgid "Find next"
-msgstr "다음 찾기"
+msgstr "Găsește următorul"
 
 #: tformnotetask.afindprev.caption
 msgid "Find previous"
-msgstr "이전 찾기"
+msgstr "Găsește anteriorul"
 
 #: tformnotetask.afont.caption
 msgid "Font..."
-msgstr "글꼴..."
+msgstr "Font..."
 
 #: tformnotetask.agoto.caption
 msgid "Go to..."
-msgstr "이동하기..."
+msgstr "Mergi la..."
 
 #: tformnotetask.ahidenotetext.caption
 msgid "Hide note text"
-msgstr "메모 텍스트 숨기기"
+msgstr "Ascunde textul notei"
 
 #: tformnotetask.aindenttasks.caption
 msgid "Indent tasks"
-msgstr "작업 들여쓰기 늘리기"
+msgstr "Indentează sarcini"
 
 #: tformnotetask.ainsertgroup.caption
 msgid "Insert group"
-msgstr "그룹 삽입"
+msgstr "Inserează grup"
 
 #: tformnotetask.ainserttask.caption
 msgid "Insert task"
-msgstr "작업 삽입"
+msgstr "Inserează sarcină"
 
 #: tformnotetask.alangarabic.caption
 msgid "Arabic"
@@ -645,180 +645,180 @@ msgstr "Ukrainian"
 
 #: tformnotetask.amergetasks.caption
 msgid "Merge tasks"
-msgstr "작업 병합"
+msgstr "Îmbină sarcini"
 
 #: tformnotetask.amovegroupleft.caption
 msgid "Move group left"
-msgstr "그룹을 왼쪽으로 이동"
+msgstr "Mută grupul la stânga"
 
 #: tformnotetask.amovegroupright.caption
 msgid "Move group right"
-msgstr "그룹을 오른쪽으로 이동"
+msgstr "Mută grupul la dreapta"
 
 #: tformnotetask.amovetaskbottom.caption
 msgid "Move tasks to bottom"
-msgstr "작업을 맨 아래로 이동"
+msgstr "Mută sarcinile în jos"
 
 #: tformnotetask.amovetaskdown.caption
 msgid "Move tasks down"
-msgstr "작업을 아래로 이동"
+msgstr "Mută sarcinile în jos"
 
 #: tformnotetask.amovetaskleft.caption
 msgid "Move tasks to left group"
-msgstr "작업을 왼쪽 그룹으로 이동"
+msgstr "Mută sarcinile în grupul din stânga"
 
 #: tformnotetask.amovetaskright.caption
 msgid "Move tasks to right group"
-msgstr "작업을 오른쪽 그룹으로 이동"
+msgstr "Mută sarcinile în grupul din dreapta"
 
 #: tformnotetask.amovetasktop.caption
 msgid "Move tasks to top"
-msgstr "작업을 맨 위로 이동"
+msgstr "Mută sarcinile în sus"
 
 #: tformnotetask.amovetaskup.caption
 msgid "Move tasks up"
-msgstr "작업을 위로 이동"
+msgstr "Mută sarcinile în sus"
 
 #: tformnotetask.anew.caption
 msgid "New"
-msgstr "새로운"
+msgstr "Nou"
 
 #: tformnotetask.anewwindow.caption
 msgid "New window"
-msgstr "새 창"
+msgstr "Fereastră nouă"
 
 #: tformnotetask.aopen.caption
 msgid "Open..."
-msgstr "열기..."
+msgstr "Deschide..."
 
 #: tformnotetask.aoutdenttasks.caption
 msgid "Outdent tasks"
-msgstr "작업 들여쓰기 줄이기"
+msgstr "De-indentează sarcini"
 
 #: tformnotetask.apageproperties.caption
 msgid "Page properties..."
-msgstr "페이지 속성..."
+msgstr "Proprietăți pagină..."
 
 #: tformnotetask.apaste.caption
 msgid "Paste"
-msgstr "붙여넣기"
+msgstr "Lipește"
 
 #: tformnotetask.aprint.caption
 msgid "Print..."
-msgstr "인쇄..."
+msgstr "Tipărește..."
 
 #: tformnotetask.arenamegroup.caption
 msgid "Rename group"
-msgstr "그룹 이름 변경"
+msgstr "Redenumește grupul"
 
 #: tformnotetask.areplace.caption
 msgid "Replace..."
-msgstr "바꾸기..."
+msgstr "Înlocuiește..."
 
 #: tformnotetask.arunpowershell.caption
 msgid "Run in PowerShell..."
-msgstr "PowerShell에서 실행..."
+msgstr "Rulează în PowerShell..."
 
 #: tformnotetask.arunterminal.caption
 msgid "Run in terminal..."
-msgstr "터미널에서 실행..."
+msgstr "Rulează în terminal..."
 
 #: tformnotetask.asave.caption
 msgid "Save"
-msgstr "저장"
+msgstr "Salvează"
 
 #: tformnotetask.asaveas.caption
 msgid "Save as..."
-msgstr "다른 이름으로 저장..."
+msgstr "Salvează ca..."
 
 #: tformnotetask.asavenotesas.caption
 msgid "Save notes as..."
-msgstr "메모 다른 이름으로 저장..."
+msgstr "Salvează notele ca..."
 
 #: tformnotetask.aselectall.caption
 msgid "Select all"
-msgstr "모두 선택"
+msgstr "Selectează tot"
 
 #: tformnotetask.ashowarchived.caption
 msgid "Show archived tasks"
-msgstr "보관된 작업"
+msgstr "Arată sarcinile arhivate"
 
 #: tformnotetask.ashowcolumnamount.caption
 msgid "Column amount"
-msgstr "열 금액"
+msgstr "Coloană sumă"
 
 #: tformnotetask.ashowcolumndate.caption
 msgid "Column date"
-msgstr "열 날짜"
+msgstr "Coloană dată"
 
 #: tformnotetask.ashowcolumndone.caption
 msgid "Column done"
-msgstr "열 완료"
+msgstr "Coloană terminat"
 
 #: tformnotetask.ashowcolumnfavorite.caption
 msgid "Column fovorite"
-msgstr "열 즐겨찾기"
+msgstr "Coloană favorite"
 
 #: tformnotetask.ashowcolumnnote.caption
 msgid "Column note"
-msgstr "열 메모"
+msgstr "Coloană notă"
 
 #: tformnotetask.ashowcolumntask.caption
 msgid "Column task"
-msgstr "열 작업"
+msgstr "Coloană sarcină"
 
 #: tformnotetask.ashowduration.caption
 msgid "Show duration"
-msgstr "지속 시간"
+msgstr "Durată"
 
 #: tformnotetask.ashownote.caption
 msgid "Show note"
-msgstr "메모"
+msgstr "Notă"
 
 #: tformnotetask.ashowstatusbar.caption
 msgid "Show status bar"
-msgstr "상태 표시줄"
+msgstr "Bară de stare"
 
 #: tformnotetask.ashowtags.caption
 msgid "Show tags"
-msgstr "태그"
+msgstr "Etichete"
 
 #: tformnotetask.ashowtime.caption
 msgid "Show time"
-msgstr "시간 표시"
+msgstr "Arată timpul"
 
 #: tformnotetask.asplittasks.caption
 msgid "Split tasks"
-msgstr "작업 나누기"
+msgstr "Împarte sarcini"
 
 #: tformnotetask.aundo.caption
 msgid "Undo"
-msgstr "실행 취소"
+msgstr "Anulează"
 
 #: tformnotetask.aundoall.caption
 msgid "Undo all changes"
-msgstr "모든 변경 사항 실행 취소"
+msgstr "Anulează toate modificările"
 
 #: tformnotetask.awordwrap.caption
 msgid "Word wrap"
-msgstr "단어 줄 바꿈"
+msgstr "Împărțire cuvinte"
 
 #: tformnotetask.azoomdefault.caption
 msgid "Default zoom"
-msgstr "기본 확대/축소"
+msgstr "Zoom implicit"
 
 #: tformnotetask.azoomin.caption
 msgid "Zoom in"
-msgstr "확대"
+msgstr "Mărește"
 
 #: tformnotetask.azoomout.caption
 msgid "Zoom out"
-msgstr "축소"
+msgstr "Micșorează"
 
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
-msgstr "노트 작업"
+msgstr "Notetask"
 
 #: tformnotetask.contextansi.caption
 msgid "ANSI"
@@ -831,22 +831,22 @@ msgstr ""
 #: tformnotetask.contextcolor.caption
 msgctxt "tformnotetask.contextcolor.caption"
 msgid "Color..."
-msgstr "색…"
+msgstr "Culoare…"
 
 #: tformnotetask.contextcopystatusbar.caption
 msgctxt "tformnotetask.contextcopystatusbar.caption"
 msgid "Copy"
-msgstr "복사"
+msgstr "Copiază"
 
 #: tformnotetask.contextcopytag.caption
 msgctxt "tformnotetask.contextcopytag.caption"
 msgid "Copy"
-msgstr "복사"
+msgstr "Copiază"
 
 #: tformnotetask.contextdeletetags.caption
 msgctxt "tformnotetask.contextdeletetags.caption"
 msgid "Delete"
-msgstr "삭제"
+msgstr "Șterge"
 
 #: tformnotetask.contextmacintoshcr.caption
 msgid "MacintoshCR"
@@ -854,7 +854,7 @@ msgstr ""
 
 #: tformnotetask.contextresetcolor.caption
 msgid "Reset color"
-msgstr "색 초기화"
+msgstr "Resetează culoarea"
 
 #: tformnotetask.contextunixlf.caption
 msgid "UnixLF"
@@ -935,144 +935,144 @@ msgid ""
 "- 1 / 0 filter by task completion.\n"
 "- * / !* filter by task favorite."
 msgstr ""
-"필터는 모든 필드에서 텍스트를 검색합니다. \n"
-"- 태그는 드롭다운 목록에서 선택할 수 있습니다. \n"
-"- 태그에서만 검색하려면 시작 부분에 #을 사용하십시오. \n"
-"- 목록에는 @, #, %, +, $로 시작하는 텍스트 태그도 포함됩니다. \n"
-"- 부정을 위해 시작 부분에 !을 사용하십시오 (포함하지 않음). \n"
-"- =, !=, >, <, >=, <= 연산자는 금액과 날짜를 지원합니다. \n"
-"- 1 / 0은 작업 완료 상태로 필터링합니다. \n"
-"- * / !*은 즐겨찾기 상태로 필터링합니다."
+"Filtrul caută text în orice câmp.\n"
+"- Etichetele pot fi alese dintr-o listă derulantă.\n"
+"- Folosiți # la început pentru a căuta doar în etichete.\n"
+"- Lista include și etichete text care încep cu @, #, %, + sau $.\n"
+"- Folosiți ! la început pentru negație (nu conține).\n"
+"- Suportă =, !=, >, <, >=, <= pentru sume și date.\n"
+"- 1 / 0 filtrează după finalizarea sarcinii.\n"
+"- * / !* filtrează după sarcina favorită."
 
 #: tformnotetask.filterbox.texthint
 msgctxt "tformnotetask.filterbox.texthint"
 msgid "Type to filter..."
-msgstr "필터하려면 입력하세요..."
+msgstr "Tastați pentru a filtra..."
 
 #: tformnotetask.fontdialog.title
 msgid "Font select"
-msgstr "글꼴 선택"
+msgstr "Selectare font"
 
 #: tformnotetask.menuedit.caption
 msgid "Edit"
-msgstr "편집"
+msgstr "Editare"
 
 #: tformnotetask.menufile.caption
 msgid "File"
-msgstr "파일"
+msgstr "Fișier"
 
 #: tformnotetask.menuformat.caption
 msgid "Format"
-msgstr "형식"
+msgstr "Format"
 
 #: tformnotetask.menugroup.caption
 msgctxt "tformnotetask.menugroup.caption"
 msgid "Group"
-msgstr "그룹"
+msgstr "Grup"
 
 #: tformnotetask.menuhelp.caption
 msgid "Help"
-msgstr "도움말"
+msgstr "Ajutor"
 
 #: tformnotetask.menulanguage.caption
 msgid "Language"
-msgstr "Language"
+msgstr "Limba"
 
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"
 msgid "Task"
-msgstr "작업"
+msgstr "Sarcină"
 
 #: tformnotetask.menuview.caption
 msgid "View"
-msgstr "보기"
+msgstr "Vizualizare"
 
 #: tformnotetask.menuzoom.caption
 msgid "Zoom"
-msgstr "확대/축소"
+msgstr "Zoom"
 
 #: tformnotetask.opendialog.title
 msgid "Opening"
-msgstr "열기"
+msgstr "Deschidere"
 
 #: tformnotetask.savedialog.title
 msgctxt "tformnotetask.savedialog.title"
 msgid "Saving"
-msgstr "저장"
+msgstr "Salvare"
 
 #: tformnotetask.savenotesdialog.title
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
-msgstr "저장"
+msgstr "Salvare"
 
 #: tformnotetask.taskgrid.columns[0].title.caption
 msgid "Done"
-msgstr "완료"
+msgstr "Terminat"
 
 #: tformnotetask.taskgrid.columns[1].title.caption
 msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
 msgid "Task"
-msgstr "작업"
+msgstr "Sarcină"
 
 #: tformnotetask.taskgrid.columns[2].title.caption
 msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
 msgid "Note"
-msgstr "메모"
+msgstr "Notă"
 
 #: tformnotetask.taskgrid.columns[3].title.caption
 msgctxt "tformnotetask.taskgrid.columns[3].title.caption"
 msgid "Amount"
-msgstr "금액"
+msgstr "Sumă"
 
 #: tformnotetask.taskgrid.columns[4].title.caption
 msgctxt "tformnotetask.taskgrid.columns[4].title.caption"
 msgid "Date"
-msgstr "날짜"
+msgstr "Dată"
 
 #: tformnotetask.taskgrid.columns[5].title.caption
 msgctxt "tformnotetask.taskgrid.columns[5].title.caption"
 msgid "Star"
-msgstr "별"
+msgstr "Stea"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"
 msgid "Cancel"
-msgstr "취소"
+msgstr "Anulează"
 
 #: tformreplacetext.buttonfind.caption
 msgctxt "tformreplacetext.buttonfind.caption"
 msgid "Find Next"
-msgstr "다음 찾기"
+msgstr "Găsește următorul"
 
 #: tformreplacetext.buttonreplace.caption
 msgctxt "tformreplacetext.buttonreplace.caption"
 msgid "Replace"
-msgstr "바꾸기"
+msgstr "Înlocuiește"
 
 #: tformreplacetext.buttonreplaceall.caption
 msgid "Replace All"
-msgstr "모두 바꾸기"
+msgstr "Înlocuiește tot"
 
 #: tformreplacetext.caption
 msgctxt "tformreplacetext.caption"
 msgid "Replace"
-msgstr "바꾸기"
+msgstr "Înlocuiește"
 
 #: tformreplacetext.checkmatchcase.caption
 msgctxt "tformreplacetext.checkmatchcase.caption"
 msgid "Match case"
-msgstr "대소문자 구분"
+msgstr "Fără majuscule"
 
 #: tformreplacetext.checkwraparound.caption
 msgctxt "tformreplacetext.checkwraparound.caption"
 msgid "Wrap around"
-msgstr "끝에서 다시 시작"
+msgstr "Continuă căutarea"
 
 #: tformreplacetext.labelwhat.caption
 msgctxt "tformreplacetext.labelwhat.caption"
 msgid "Find what:"
-msgstr "찾을 내용:"
+msgstr "Caută:"
 
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
-msgstr "다음으로 바꾸기:"
+msgstr "Înlocuiește cu:"

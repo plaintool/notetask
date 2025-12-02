@@ -16,7 +16,7 @@
         <TextDesc Value=""/>
       </XPManifest>
       <Icon Value="0"/>
-      <Resources Count="21">
+      <Resources Count="32">
         <Resource_0 FileName="img\check.bmp" Type="BITMAP" ResourceName="CHECK"/>
         <Resource_1 FileName="img\uncheck.bmp" Type="BITMAP" ResourceName="UNCHECK"/>
         <Resource_2 FileName="img\taskdoc.ico" Type="ICON" ResourceName="TASKDOC"/>
@@ -38,6 +38,17 @@
         <Resource_18 FileName="img\stargold.bmp" Type="BITMAP" ResourceName="STARGOLD"/>
         <Resource_19 FileName="img\leftarrow.cur" Type="RCDATA" ResourceName="LEFTARROW"/>
         <Resource_20 FileName="img\rightarrow.cur" Type="RCDATA" ResourceName="RIGHTARROW"/>
+        <Resource_21 FileName="locale\notetask.cs.po" Type="RCDATA" ResourceName="NOTETASK.CS"/>
+        <Resource_22 FileName="locale\notetask.da.po" Type="RCDATA" ResourceName="NOTETASK.DA"/>
+        <Resource_23 FileName="locale\notetask.el.po" Type="RCDATA" ResourceName="NOTETASK.EL"/>
+        <Resource_24 FileName="locale\notetask.fi.po" Type="RCDATA" ResourceName="NOTETASK.FI"/>
+        <Resource_25 FileName="locale\notetask.he.po" Type="RCDATA" ResourceName="NOTETASK.HE"/>
+        <Resource_26 FileName="locale\notetask.id.po" Type="RCDATA" ResourceName="NOTETASK.ID"/>
+        <Resource_27 FileName="locale\notetask.nl.po" Type="RCDATA" ResourceName="NOTETASK.NL"/>
+        <Resource_28 FileName="locale\notetask.pl.po" Type="RCDATA" ResourceName="NOTETASK.PL"/>
+        <Resource_29 FileName="locale\notetask.ro.po" Type="RCDATA" ResourceName="NOTETASK.RO"/>
+        <Resource_30 FileName="locale\notetask.sv.po" Type="RCDATA" ResourceName="NOTETASK.SV"/>
+        <Resource_31 FileName="locale\notetask.tr.po" Type="RCDATA" ResourceName="NOTETASK.TR"/>
       </Resources>
     </General>
     <i18n>

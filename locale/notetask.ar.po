@@ -555,9 +555,25 @@ msgstr "Belarusian"
 msgid "Chinese"
 msgstr "Chinese"
 
+#: tformnotetask.alangczech.caption
+msgid "Czech"
+msgstr "Czech"
+
+#: tformnotetask.alangdanish.caption
+msgid "Danish"
+msgstr "Danish"
+
+#: tformnotetask.alangdutch.caption
+msgid "Dutch"
+msgstr "Dutch"
+
 #: tformnotetask.alangenglish.caption
 msgid "English"
 msgstr "English"
+
+#: tformnotetask.alangfinnish.caption
+msgid "Finnish"
+msgstr "Finnish"
 
 #: tformnotetask.alangfrench.caption
 msgid "French"
@@ -567,9 +583,21 @@ msgstr "French"
 msgid "German"
 msgstr "German"
 
+#: tformnotetask.alanggreek.caption
+msgid "Greek"
+msgstr "Greek"
+
+#: tformnotetask.alanghebrew.caption
+msgid "Hebrew"
+msgstr "Hebrew"
+
 #: tformnotetask.alanghindi.caption
 msgid "Hindi"
 msgstr "Hindi"
+
+#: tformnotetask.alangindonesian.caption
+msgid "Indonesian"
+msgstr "Indonesian"
 
 #: tformnotetask.alangitalian.caption
 msgid "Italian"
@@ -583,9 +611,17 @@ msgstr "Japanese"
 msgid "Korean"
 msgstr "Korean"
 
+#: tformnotetask.alangpolish.caption
+msgid "Polish"
+msgstr "Polish"
+
 #: tformnotetask.alangportuguese.caption
 msgid "Portuguese"
 msgstr "Portuguese"
+
+#: tformnotetask.alangromanian.caption
+msgid "Romanian"
+msgstr "Romanian"
 
 #: tformnotetask.alangrussian.caption
 msgid "Russian"
@@ -594,6 +630,14 @@ msgstr "Russian"
 #: tformnotetask.alangspanish.caption
 msgid "Spanish"
 msgstr "Spanish"
+
+#: tformnotetask.alangswedish.caption
+msgid "Swedish"
+msgstr "Swedish"
+
+#: tformnotetask.alangturkish.caption
+msgid "Turkish"
+msgstr "Turkish"
 
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
@@ -1032,4 +1076,3 @@ msgstr "ابحث عن ماذا:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "استبدال بـ:"
-
