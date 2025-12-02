@@ -597,6 +597,7 @@ type
     FLastTabMouseX: integer;
     FLastTabTarget: integer;
     FLastTabFilter: integer;
+    FLastTabIndex: integer;
     FNoteLastIndex, FNoteSelStart, FNoteSelLength: integer;
     FNoteLastSelText: string;
     FNoteLastSelStart, FNoteLastSelLength: integer;
@@ -2465,8 +2466,13 @@ begin
     taskGrid.Row := 1;
   taskGrid.ClearSelections;
 
-  Tasks.CreateBackup;
-  GridBackupSelection;
+  if (groupTabs.TabIndex <> FLastTabIndex) then
+  begin
+    Tasks.CreateBackup;
+    GridBackupSelection;
+  end;
+
+  FLastTabIndex := groupTabs.TabIndex;
 
   Tasks.CalcTagsWidths(-1, taskGrid.Columns[1].Width, tagsEdit, Font);
   CalcRowHeight(0, True);
