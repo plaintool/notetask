@@ -88,14 +88,118 @@ const
   MAX_ALLOWED_UNCOMPRESSED = 512 * 1024 * 1024;
 
 {$IFDEF MSWINDOWS}
-const
-  BCRYPT_USE_SYSTEM_PREFERRED_RNG = $00000002;
-
 type
   NTSTATUS = longint;
+  PUCHAR = pbyte;
 
-function BCryptGenRandom(hAlgorithm: Pointer; pbBuffer: Pointer; cbBuffer: ULONG; dwFlags: ULONG): NTSTATUS;
-  stdcall; external 'bcrypt.dll';
+  // CryptoAPI types definition
+  HCRYPTPROV = ULONG;
+
+const
+  // Flags for BCryptGenRandom
+  BCRYPT_USE_SYSTEM_PREFERRED_RNG = $00000002;
+  STATUS_SUCCESS = $00000000;
+
+  // Flags for CryptGenRandom (legacy CryptoAPI)
+  PROV_RSA_FULL = 1;
+  CRYPT_VERIFYCONTEXT = $F0000000;
+
+  // Define function pointer types
+type
+  TBCryptGenRandom = function(hAlgorithm: Pointer; pbBuffer: PUCHAR; cbBuffer: ULONG; dwFlags: ULONG): NTSTATUS; stdcall;
+  TCryptAcquireContext = function(var phProv: HCRYPTPROV; pszContainer: pchar; pszProvider: pchar;
+    dwProvType: DWORD; dwFlags: DWORD): BOOL; stdcall;
+  TCryptReleaseContext = function(hProv: HCRYPTPROV; dwFlags: DWORD): BOOL; stdcall;
+  TCryptGenRandom = function(hProv: HCRYPTPROV; dwLen: DWORD; pbBuffer: pbyte): BOOL; stdcall;
+
+var
+  // Function pointers for dynamic loading
+  BCryptGenRandomPtr: TBCryptGenRandom = nil;
+  CryptAcquireContextPtr: TCryptAcquireContext = nil;
+  CryptReleaseContextPtr: TCryptReleaseContext = nil;
+  CryptGenRandomPtr: TCryptGenRandom = nil;
+
+  // Flag to track if libraries have been initialized
+  LibrariesInitialized: boolean = False;
+  BCryptLibHandle: THandle = 0;
+  AdvApiLibHandle: THandle = 0;
+
+// Initialize crypto libraries on first call
+// Dynamically loads bcrypt.dll (Vista+) and gets pointers to legacy CryptoAPI functions
+procedure InitializeCryptoFunctions;
+begin
+  if LibrariesInitialized then Exit;
+
+  // Try to load bcrypt.dll (available on Windows Vista and later)
+  BCryptLibHandle := LoadLibrary('bcrypt.dll');
+  if BCryptLibHandle <> 0 then
+  begin
+    // Get pointer to BCryptGenRandom function
+    Pointer(BCryptGenRandomPtr) := GetProcAddress(BCryptLibHandle, 'BCryptGenRandom');
+  end;
+
+  // advapi32.dll is available on all Windows versions including XP
+  // Try to get handle to already loaded module first
+  AdvApiLibHandle := GetModuleHandle('advapi32.dll');
+  if AdvApiLibHandle = 0 then
+    AdvApiLibHandle := LoadLibrary('advapi32.dll');
+
+  if AdvApiLibHandle <> 0 then
+  begin
+    // Get pointers to CryptoAPI functions
+    Pointer(CryptAcquireContextPtr) :=
+      GetProcAddress(AdvApiLibHandle, 'CryptAcquireContextA');
+    Pointer(CryptReleaseContextPtr) :=
+      GetProcAddress(AdvApiLibHandle, 'CryptReleaseContext');
+    Pointer(CryptGenRandomPtr) := GetProcAddress(AdvApiLibHandle, 'CryptGenRandom');
+  end;
+
+  LibrariesInitialized := True;
+end;
+
+// Wrapper function to generate cryptographically secure random bytes
+// Works on Windows XP (using CryptGenRandom) and newer Windows versions (using BCryptGenRandom)
+function GenerateRandomBytes(len: integer): TBytes;
+var
+  hProv: HCRYPTPROV;
+begin
+  Result := [];
+  SetLength(Result, len);
+
+  // Initialize libraries on first call
+  InitializeCryptoFunctions;
+
+  // First try: Use BCryptGenRandom (available on Windows Vista and later)
+  if Assigned(BCryptGenRandomPtr) then
+  begin
+    // Note: BCRYPT_USE_SYSTEM_PREFERRED_RNG flag requires Vista SP2 or later
+    // For maximum compatibility with clean Vista, consider using BCryptOpenAlgorithmProvider
+    if BCryptGenRandomPtr(nil, @Result[0], len, BCRYPT_USE_SYSTEM_PREFERRED_RNG) = STATUS_SUCCESS then
+      Exit;
+  end;
+
+  // Fallback: Use CryptGenRandom (available on Windows XP and later)
+  if Assigned(CryptAcquireContextPtr) and Assigned(CryptGenRandomPtr) and Assigned(CryptReleaseContextPtr) then
+  begin
+    // Initialize hProv
+    hProv := 0;
+    // Acquire crypto context
+    if CryptAcquireContextPtr(hProv, nil, nil, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT) then
+    try
+      // Generate random bytes using legacy CryptoAPI
+      if CryptGenRandomPtr(hProv, len, @Result[0]) then
+        Exit;
+    finally
+      // Always release the crypto context
+      CryptReleaseContextPtr(hProv, 0);
+    end;
+  end;
+
+  // Both methods failed - clean up and raise exception
+  SetLength(Result, 0); // Free the allocated array
+  raise Exception.Create('Operation failed');
+end;
+
 {$ENDIF}
 
 function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
@@ -245,7 +349,8 @@ begin
     Move(Salt[0], DataToAuth[0], Length(Salt));
     Move(IV[0], DataToAuth[Length(Salt)], Length(IV));
     if OutputStream.Size > 0 then
-      Move(OutputStream.Memory^, DataToAuth[Length(Salt) + Length(IV)], OutputStream.Size);
+      Move(OutputStream.Memory^, DataToAuth[Length(Salt) + Length(IV)],
+        OutputStream.Size);
 
     // compute HMAC
     BytesToArray(HMAC_SHA256(KeyAuth, DataToAuth), HMAC);
@@ -265,7 +370,8 @@ begin
     Move(IV[0], Container[Length(FILE_MAGIC) + Length(Salt)], Length(IV));
 
     // write HMAC after IV
-    Move(HMAC[0], Container[Length(FILE_MAGIC) + Length(Salt) + Length(IV)], Length(HMAC));
+    Move(HMAC[0], Container[Length(FILE_MAGIC) + Length(Salt) + Length(IV)],
+      Length(HMAC));
 
     // write ciphertext after HMAC
     if OutputStream.Size > 0 then
@@ -358,7 +464,8 @@ begin
       Move(Salt[0], DataToVerify[0], Length(Salt));
       Move(IV[0], DataToVerify[Length(Salt)], SizeOf(IV));
       if EncryptedStream.Size > 0 then
-        Move(EncryptedStream.Memory^, DataToVerify[Length(Salt) + SizeOf(IV)], EncryptedStream.Size);
+        Move(EncryptedStream.Memory^, DataToVerify[Length(Salt) + SizeOf(IV)],
+          EncryptedStream.Size);
       // compute expected HMAC
       BytesToArray(HMAC_SHA256(KeyAuth, DataToVerify), ExpectedHMAC);
       FillChar(DataToVerify[0], Length(DataToVerify), 0);
@@ -443,8 +550,9 @@ begin
   end;
   {$ELSE}
   // On Windows, use BCryptGenRandom (CNG)
-  if (BCryptGenRandom(nil, @Result[0], len, BCRYPT_USE_SYSTEM_PREFERRED_RNG) <> 0) then
-  begin
+  try
+    Result := GenerateRandomBytes(len);
+  except
     FreeBytesSecure(Result);
     raise Exception.Create('Operation failed');
   end;
@@ -619,8 +727,8 @@ end;
 function HMAC_SHA256(const Key, Data: TBytes): TBytes;
 var
   Sha: TDCP_sha256;
-  BlockKey: array[0..63] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  BlockKey: array[0..63] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   // block size for SHA-256 is 64
   IKeyPad: array[0..63] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -748,7 +856,8 @@ begin
         Move(Salt[0], TmpKey[0], Length(Salt));
       Move(IntBlock[0], TmpKey[Length(Salt)], 4);
 
-      Accumulator := HMAC_SHA256(Password, TmpKey);  // U1 = HMAC(Password, Salt || INT(i))
+      Accumulator := HMAC_SHA256(Password, TmpKey);
+      // U1 = HMAC(Password, Salt || INT(i))
       U := Accumulator;
 
       // iterate U2..Uc

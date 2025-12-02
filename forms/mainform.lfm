@@ -10,7 +10,6 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
-  LCLVersion = '4.0.0.4'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -300,7 +299,6 @@ object formNotetask: TformNotetask
     Top = 112
     object menuFile: TMenuItem
       Caption = 'File'
-      ShortCut = 16454
       object menuNew: TMenuItem
         Action = aNew
       end
