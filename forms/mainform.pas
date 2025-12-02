@@ -996,7 +996,7 @@ begin
 
   // Zoom
   FOriginalFontSize := ifthen(Font.Size > 0, Font.Size, Screen.SystemFont.Size);
-  FOriginalFontSize := ifthen(FOriginalFontSize = 0, 8, FOriginalFontSize);
+  FOriginalFontSize := ifthen(FOriginalFontSize = 0, 10, FOriginalFontSize);
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
@@ -3347,7 +3347,7 @@ begin
     // Apply the selected font to the form
     Self.Font := fontDialog.Font;
     FOriginalFontSize := ifthen(Font.Size > 0, Font.Size, Screen.SystemFont.Size);
-    FOriginalFontSize := ifthen(FOriginalFontSize = 0, 8, FOriginalFontSize);
+    FOriginalFontSize := ifthen(FOriginalFontSize = 0, 10, FOriginalFontSize);
     SetZoom(FZoom);
   end;
 end;
