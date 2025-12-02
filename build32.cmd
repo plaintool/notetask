@@ -28,6 +28,7 @@ IF %ERRORLEVEL% NEQ 0 (
 ::Rename output to notetask32.exe to distinguish from 64-bit
 if exist "notetask.exe" (
     echo Renaming 32-bit executable...
+    if exist "notetask32.exe" del /F /Q "notetask32.exe"
     ren "notetask.exe" "notetask32.exe"
 )
 
