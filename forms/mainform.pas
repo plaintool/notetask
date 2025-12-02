@@ -7607,6 +7607,7 @@ var
       drawrect.Inflate(-4, 0);
 
       Text := taskGrid.Cells[col, row];
+      if Text = string.Empty then Text := 'Wg';
 
       // Reduce text area by TagsWidth for text measurement
       if (col in [2, 3]) then

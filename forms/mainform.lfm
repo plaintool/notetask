@@ -57,6 +57,7 @@ object formNotetask: TformNotetask
         Width = 65
       end>
     DefaultColWidth = 50
+    DefaultRowHeight = 22
     FixedColor = clWindow
     Flat = True
     GridLineColor = 13290186
@@ -90,10 +91,6 @@ object formNotetask: TformNotetask
     OnTopLeftChanged = taskGridTopLeftChanged
     OnUserCheckboxBitmap = taskGridUserCheckboxBitmap
     OnUTF8KeyPress = taskGridUTF8KeyPress
-    RowHeights = (
-      22
-      27
-    )
   end
   object statusBar: TStatusBar
     Left = 0
