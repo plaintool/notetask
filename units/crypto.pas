@@ -7,6 +7,7 @@
 unit crypto;
 
 {$mode ObjFPC}{$H+}
+{$codepage utf8}
 
 interface
 
@@ -345,7 +346,7 @@ begin
     end;
 
     // compute data to authenticate
-    SetLength(DataToAuth, Length(Salt) + Length(IV) + OutputStream.Size);
+    SetLength(DataToAuth, int64(Length(Salt)) + int64(Length(IV)) + OutputStream.Size);
     Move(Salt[0], DataToAuth[0], Length(Salt));
     Move(IV[0], DataToAuth[Length(Salt)], Length(IV));
     if OutputStream.Size > 0 then
@@ -356,7 +357,7 @@ begin
     BytesToArray(HMAC_SHA256(KeyAuth, DataToAuth), HMAC);
 
     // allocate container: MAGIC + SALT + IV + HMAC + CipherText
-    SetLength(Container, Length(FILE_MAGIC) + Length(Salt) + Length(IV) + Length(HMAC) + OutputStream.Size);
+    SetLength(Container, int64(Length(FILE_MAGIC)) + int64(Length(Salt)) + int64(Length(IV)) + int64(Length(HMAC)) + OutputStream.Size);
 
     // copy parts into container
     if Length(FILE_MAGIC) > 0 then
@@ -440,7 +441,7 @@ begin
       InputStream.ReadBuffer(HMAC[0], SizeOf(HMAC));
 
       // remaining is encrypted data
-      EncryptedSize := InputStream.Size - (SizeOf(Magic) + Length(Salt) + SizeOf(IV) + SizeOf(HMAC));
+      EncryptedSize := InputStream.Size - (int64(SizeOf(Magic)) + int64(Length(Salt)) + int64(SizeOf(IV)) + int64(SizeOf(HMAC)));
       if EncryptedSize < 0 then
       begin
         FreeBytesSecure(Salt);
@@ -460,7 +461,7 @@ begin
       Move(Hash[32], KeyAuth[0], 32);
 
       // compute data to verify
-      SetLength(DataToVerify, Length(Salt) + SizeOf(IV) + EncryptedStream.Size);
+      SetLength(DataToVerify, int64(Length(Salt)) + int64(SizeOf(IV)) + EncryptedStream.Size);
       Move(Salt[0], DataToVerify[0], Length(Salt));
       Move(IV[0], DataToVerify[Length(Salt)], SizeOf(IV));
       if EncryptedStream.Size > 0 then
