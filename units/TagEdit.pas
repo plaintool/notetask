@@ -243,7 +243,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AddTag(const ATag: string; AEditing: boolean = False);
-    procedure RemoveTag(const ATag: string; AConfirm: boolean = False);
+    function RemoveTag(const ATag: string; AConfirm: boolean = False): boolean;
     function Focused: boolean; override;
     procedure CopyHoverText;
     function GetAutoColor(const ATag: string): TColor;
@@ -977,7 +977,7 @@ begin
     FEdit.Text := EditValue; // Restore original text if no tags added
 end;
 
-procedure TCustomTagEdit.RemoveTag(const ATag: string; AConfirm: boolean = False);
+function TCustomTagEdit.RemoveTag(const ATag: string; AConfirm: boolean = False): boolean;
 var
   SL: TStringList;
   TagsToRemove: TStringList;
@@ -987,6 +987,8 @@ var
   TagsRemoved: boolean;
   AllowChange: boolean;
 begin
+  Result := False;
+
   // Exit if the input tag is empty
   if ATag = string.Empty then
     Exit;
@@ -1054,6 +1056,7 @@ begin
   // Update UI and trigger change event if tags were removed
   if TagsRemoved then
   begin
+    Result := True;
     if Assigned(FOnChange) then
       FOnChange(Self);
     Invalidate;
@@ -1081,10 +1084,11 @@ begin
   end;
 
   // Use bulk RemoveTag method
-  RemoveTag(TagsString, True);
-
-  // Clear selection
-  FSelectedTags.Clear;
+  if RemoveTag(TagsString, True) then
+  begin
+    FSelectedTags.Clear; // Clear selection
+    Invalidate;
+  end;
 end;
 
 function TCustomTagEdit.RemovalConfirmed(idx: integer = -1): boolean;
@@ -1532,12 +1536,8 @@ begin
       Key := 0;
     end
     else
-    if (SelectedTags.Count > 0) and (ssShift in Shift) and (Key = VK_END) then
-    begin
+    if (not (ssShift in Shift) or ((ssShift in Shift) and (Key = VK_END))) and (SelectedTags.Count > 0) then
       ClearSelection;
-      Key := 0;
-    end;
-
   end;
 
   if Assigned(OnKeyDown) then
