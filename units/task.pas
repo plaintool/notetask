@@ -43,7 +43,8 @@ type
     FDateStart: TDateTime; // Calculated start time interval
     FDateEnd: TDateTime; // Calculated end time interval
     FTags: TStringList; // List of detected tags
-    FTagsWidth: integer;
+    FTagsWidth: integer; // Tag area width in the table
+    FRowHeight: integer; // Currect row height in table
     constructor Create;
     constructor Create(const TaskString: string); // Constructor that takes a task string
     destructor Destroy; override; // Destructor
@@ -208,6 +209,7 @@ begin
   FTags := TStringList.Create;
   FTags.Duplicates := dupIgnore;
   FTagsWidth := 0;
+  FRowHeight := 0;
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -257,6 +259,7 @@ begin
   else
     FTags.Clear;
   FTagsWidth := Original.FTagsWidth;
+  FRowHeight := Original.FRowHeight;
 end;
 
 procedure TTask.FillTags;

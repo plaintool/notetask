@@ -701,8 +701,8 @@ type
     procedure MoveTabRight(Index: integer);
     procedure ChangeGroup(Index: integer);
     procedure CalcDefaultColWidth;
-    procedure CalcRowHeight(aRow: integer = 0; aForce: boolean = False);
-    procedure ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
+    procedure ResetRowHeight(aCalcRowHeight: boolean = True; aRow: integer = 0);
+    procedure CalcRowHeight(aForce: boolean = False; aRow: integer = 0);
     procedure SwapRowHeights(RowIndex1, RowIndex2: integer);
     procedure BackupSelectedState(aRowMem: boolean = False);
     procedure RestoreSelectedState(aRowMem: boolean = True; aRowMemPriority: boolean = True; aFocusMemo: boolean = False);
@@ -1542,7 +1542,7 @@ procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; 
 begin
   taskGridResize(Sender);
   if IsColumn then
-    CalcRowHeight(0, True);
+    CalcRowHeight(True);
   EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 2, -2, -2, 0);
 end;
@@ -2475,7 +2475,7 @@ begin
   FLastTabIndex := groupTabs.TabIndex;
 
   Tasks.CalcTagsWidths(-1, taskGrid.Columns[1].Width, tagsEdit, Font);
-  CalcRowHeight(0, True);
+  CalcRowHeight(True);
   SetNote;
   SetTags;
   SetInfo;
@@ -2686,7 +2686,7 @@ begin
     taskGrid.Selection := NewRect
   else
     taskGrid.ClearSelections;
-  CalcRowHeight(0, True);
+  CalcRowHeight;
   SetInfo;
   SetNote;
   SetTags;
@@ -3525,11 +3525,11 @@ begin
   FillGrid;
   if (newRow > -1) then
   begin
-    ResetRowHeight(-1);
+    ResetRowHeight(True, -1);
     taskGrid.Row := newRow;
     taskGrid.Col := selCol;
     taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
-    ResetRowHeight(-1);
+    ResetRowHeight(True, -1);
   end;
   SetChanged;
   SetNote;
@@ -3558,11 +3558,11 @@ begin
   FillGrid;
   if (newRow > -1) then
   begin
-    ResetRowHeight(-1);
+    ResetRowHeight(True, -1);
     taskGrid.Row := newRow;
     taskGrid.Col := selCol;
     taskGrid.Selection := TGridRect.Create(selLeft, newRow - selLen + 1, selRight, newRow);
-    ResetRowHeight(-1);
+    ResetRowHeight(True, -1);
   end;
   SetChanged;
   SetNote;
@@ -4079,7 +4079,7 @@ begin
   memoNote.WordWrap := FWordWrap;
   if sel = 0 then
     memoNote.SelLength := 0;
-  ResetRowHeight;
+  CalcRowHeight(True);
   Invalidate;
 end;
 
@@ -4671,7 +4671,7 @@ procedure TformNotetask.memoNoteChange(Sender: TObject);
 begin
   taskGrid.Cells[3, taskGrid.Row] := memoNote.Text;
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
-  CalcRowHeight(taskGrid.Row);
+  CalcRowHeight(True, taskGrid.Row);
   SetChanged;
 end;
 
@@ -5990,7 +5990,7 @@ begin
   Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
   FMemoStartEdit := False;
   SetChanged;
-  CalcRowHeight(taskGrid.Row);
+  CalcRowHeight(True, taskGrid.Row);
   EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
   if (taskGrid.Col = 3) then
     SetNote;
@@ -6186,7 +6186,7 @@ begin
     taskGrid.Selection := Sel;
     FLastSelectionHeight := Sel.Height;
   end;
-  CalcRowHeight(0, True);
+  CalcRowHeight(True);
   SetInfo;
   SetNote;
   SetTags;
@@ -6399,7 +6399,7 @@ begin
   // Refresh grid and UI
   Sel := taskGrid.Selection;
   FillGrid;
-  CalcRowHeight(0, True);
+  CalcRowHeight(True);
   SetInfo;
   SetNote;
   SetTags;
@@ -6722,7 +6722,7 @@ begin
   end;
 
   SetChanged;  // Mark that data has changed
-  CalcRowHeight(0, True);
+  CalcRowHeight(True);
   GridInvalidate;
 end;
 
@@ -7474,14 +7474,14 @@ procedure TformNotetask.SetShowColumnTask(Value: boolean);
 begin
   FShowColumnTask := Value;
   taskGrid.Columns.Items[1].Visible := FShowColumnTask;
-  ResetRowHeight;
+  CalcRowHeight(True);
 end;
 
 procedure TformNotetask.SetShowColumnNote(Value: boolean);
 begin
   FShowColumnNote := Value;
   taskGrid.Columns.Items[2].Visible := FShowColumnNote;
-  ResetRowHeight;
+  CalcRowHeight(True);
 end;
 
 procedure TformNotetask.SetShowColumnAmount(Value: boolean);
@@ -7586,118 +7586,7 @@ begin
     taskGrid.DefaultColWidth := Round(Canvas.TextWidth('10000') * FZoom);
 end;
 
-procedure TformNotetask.CalcRowHeight(aRow: integer = 0; aForce: boolean = False);
-var
-  FromRow, ToRow: integer;
-
-  procedure CalcCol(col: integer; force: boolean = False);
-  var
-    row: integer;
-    drawrect: TRect;
-    Text: string;
-    task: TTask;
-    flags: cardinal;
-    h: integer;
-    OldBold: boolean;
-  begin
-    OldBold := taskGrid.Canvas.Font.Bold;
-    for row := FromRow to ToRow do
-    begin
-      drawrect := taskGrid.CellRect(col, row);
-      drawrect.Inflate(-4, 0);
-
-      Text := taskGrid.Cells[col, row];
-      if Text = string.Empty then Text := 'Wg';
-
-      // Reduce text area by TagsWidth for text measurement
-      if (col in [2, 3]) then
-      begin
-        task := Tasks.GetTask(row);
-        if task.Star then
-          taskGrid.Canvas.Font.Bold := True;
-
-        if (col = 2) then
-        begin
-          if task.TagsWidth < drawrect.Width then
-          begin
-            if FBiDiRightToLeft then
-              drawrect.Left := drawrect.Left + task.TagsWidth  // For RTL: reserve space on the left
-            else
-              drawrect.Right := drawrect.Right - task.TagsWidth; // For LTR: reserve space on the right
-          end;
-        end;
-      end;
-
-      flags := DT_CALCRECT;
-      if FBiDiRightToLeft then
-        flags := flags + DT_RIGHT
-      else
-        flags := flags + DT_LEFT;
-      if FWordWrap then
-        flags := flags or DT_WORDBREAK;
-
-      {$IFDEF UNIX}
-      Text := StringReplace(Text, #$0A, #$0A+ '+', [rfReplaceAll]);
-      {$ENDIF}
-
-      DrawText(taskGrid.canvas.handle, PChar(Text), Length(Text), drawrect, flags);
-      taskGrid.Canvas.Font.Bold := OldBold;
-      if (force) or ((drawrect.bottom - drawrect.top) > taskGrid.RowHeights[row]) then
-      begin
-        h := drawrect.bottom - drawrect.top + 2;
-        if (force) and (h < taskGrid.DefaultRowHeight) then
-          h := Max(taskGrid.Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
-        FLastRowHeights[row] := h;
-        taskGrid.RowHeights[row] := h;
-      end
-      else
-        FLastRowHeights[row] := taskGrid.RowHeights[row];
-    end;
-  end;
-
-begin
-  taskGrid.BeginUpdate;
-  try
-    SetLength(FLastRowHeights, taskGrid.RowCount);
-
-    if aRow = -1 then
-    begin
-      FromRow := taskGrid.Selection.Top;
-      ToRow := taskGrid.Selection.Bottom;
-    end
-    else
-    if aRow = 0 then
-    begin
-      FromRow := 1;
-      ToRow := taskGrid.RowCount - 1;
-    end
-    else
-    begin
-      FromRow := aRow;
-      ToRow := aRow;
-    end;
-    if (ShowColumnTask) then CalcCol(2, aForce);
-    if (ShowColumnNote) then CalcCol(3);
-
-    // Header, tabs, first col
-    taskGrid.RowHeights[0] := Round(Max(Canvas.TextHeight('A') + 4, taskGrid.DefaultRowHeight) * FZoom);
-    if (aForce) then
-    begin
-      {$IFDEF UNIX}
-    panelTabs.Height := Canvas.TextHeight('A') + 11;
-      {$ELSE}
-      panelTabs.Height := Canvas.TextHeight('A') + 8;
-      {$ENDIF}
-      CalcDefaultColWidth;
-    end;
-
-    EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
-  finally
-    taskGrid.EndUpdate;
-  end;
-end;
-
-procedure TformNotetask.ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
+procedure TformNotetask.ResetRowHeight(aCalcRowHeight: boolean = True; aRow: integer = 0);
 var
   i: integer;
   h: integer;
@@ -7729,7 +7618,133 @@ begin
       Memo.Height := h;
 
     if (aCalcRowHeight) then
-      CalcRowHeight(aRow);
+      CalcRowHeight(False, aRow);
+  finally
+    taskGrid.EndUpdate;
+  end;
+end;
+
+procedure TformNotetask.CalcRowHeight(aForce: boolean = False; aRow: integer = 0);
+var
+  FromRow, ToRow: integer;
+
+  procedure CalcCol(col: integer; force: boolean = False);
+  var
+    row: integer;
+    drawrect: TRect;
+    Text: string;
+    task: TTask;
+    flags: cardinal;
+    h: integer;
+    OldBold: boolean;
+  begin
+    OldBold := taskGrid.Canvas.Font.Bold;
+    for row := FromRow to ToRow do
+    begin
+      task := Tasks.GetTask(row);
+      if aForce or (task.FRowHeight = 0) then
+      begin
+        drawrect := taskGrid.CellRect(col, row);
+        drawrect.Inflate(-4, 0);
+
+        Text := taskGrid.Cells[col, row];
+        if Text = string.Empty then Text := 'Wg';
+
+        // Reduce text area by TagsWidth for text measurement
+        if (col in [2, 3]) then
+        begin
+          if task.Star then
+            taskGrid.Canvas.Font.Bold := True;
+
+          if (col = 2) then
+          begin
+            if task.TagsWidth < drawrect.Width then
+            begin
+              if FBiDiRightToLeft then
+                drawrect.Left := drawrect.Left + task.TagsWidth  // For RTL: reserve space on the left
+              else
+                drawrect.Right := drawrect.Right - task.TagsWidth; // For LTR: reserve space on the right
+            end;
+          end;
+        end;
+
+        flags := DT_CALCRECT;
+        if FBiDiRightToLeft then
+          flags := flags + DT_RIGHT
+        else
+          flags := flags + DT_LEFT;
+        if FWordWrap then
+          flags := flags or DT_WORDBREAK;
+
+        {$IFDEF UNIX}
+        Text := StringReplace(Text, #$0A, #$0A+ '+', [rfReplaceAll]);
+        {$ENDIF}
+
+        DrawText(taskGrid.canvas.handle, PChar(Text), Length(Text), drawrect, flags);
+        taskGrid.Canvas.Font.Bold := OldBold;
+
+        // The greater than sign is important because values may differ across fields, need max
+        if force or (abs(drawrect.bottom - drawrect.top) > taskGrid.RowHeights[row]) then
+        begin
+          h := drawrect.bottom - drawrect.top + 2;
+          if (force) and (h < taskGrid.DefaultRowHeight) then
+            h := Max(taskGrid.Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
+          FLastRowHeights[row] := h;
+          taskGrid.RowHeights[row] := h;
+          task.FRowHeight := h;
+        end
+        else
+          FLastRowHeights[row] := taskGrid.RowHeights[row];
+      end
+      else
+      begin
+        FLastRowHeights[row] := task.FRowHeight;
+        taskGrid.RowHeights[row] := task.FRowHeight;
+      end;
+    end;
+  end;
+
+begin
+  taskGrid.BeginUpdate;
+  try
+    SetLength(FLastRowHeights, taskGrid.RowCount);
+
+    // if -1 only selection
+    if aRow = -1 then
+    begin
+      FromRow := taskGrid.Selection.Top;
+      ToRow := taskGrid.Selection.Bottom;
+    end
+    else
+    // if 0 for all rows
+    if aRow = 0 then
+    begin
+      FromRow := 1;
+      ToRow := taskGrid.RowCount - 1;
+    end
+    else // if valid row just that row
+    begin
+      FromRow := aRow;
+      ToRow := aRow;
+    end;
+
+    // Force applies only to the priority column
+    if (ShowColumnTask) then CalcCol(2, aForce);
+    if (ShowColumnNote) then CalcCol(3);
+
+    // Header, tabs, first col
+    taskGrid.RowHeights[0] := Round(Max(Canvas.TextHeight('A') + 4, taskGrid.DefaultRowHeight) * FZoom);
+    if (aForce) then
+    begin
+      {$IFDEF UNIX}
+    panelTabs.Height := Canvas.TextHeight('A') + 11;
+      {$ELSE}
+      panelTabs.Height := Canvas.TextHeight('A') + 8;
+      {$ENDIF}
+      CalcDefaultColWidth;
+    end;
+
+    EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
   finally
     taskGrid.EndUpdate;
   end;
@@ -8112,7 +8127,7 @@ begin
   contextZoom140.Checked := SameFloat(FZoom, 1.4, 0.001);
   contextZoom150.Checked := SameFloat(FZoom, 1.5, 0.001);
 
-  CalcRowHeight(0, True);
+  CalcRowHeight(True);
   SetInfo;
 end;
 
