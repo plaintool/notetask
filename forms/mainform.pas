@@ -3110,7 +3110,7 @@ begin
       Tasks.UndoBackupInit;
       FillGrid;
       ResetRowHeight;
-      SetFilter(False);
+      SetFilter;
       SetInfo;
       SetNote;
       SetTags;
