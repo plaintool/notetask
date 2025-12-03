@@ -1772,6 +1772,8 @@ begin
 
   if Button = mbLeft then
   begin
+    FSelectingReady := False;
+
     // Handle selection completion
     if FSelecting then
     begin

@@ -830,7 +830,7 @@ const
   clGrayWhite = TColor($FEFEFE); // RGB(254,254,254)
   clGrayDark = TColor($E9E9E9); // RGB(233,233,233)
   clGrayHighlight = TColor($E3E3E3); // RGB(227,227,227)
-  clDuplicateHighlight = TColor($BBFFFF); // RGB(204, 255, 255)
+  clDuplicateHighlight = TColor($AAFFFF); // RGB(255, 255, 170)
 
 resourcestring
   rapp = 'Notetask';
@@ -7656,40 +7656,45 @@ var
   end;
 
 begin
-  SetLength(FLastRowHeights, taskGrid.RowCount);
+  taskGrid.BeginUpdate;
+  try
+    SetLength(FLastRowHeights, taskGrid.RowCount);
 
-  if aRow = -1 then
-  begin
-    FromRow := taskGrid.Selection.Top;
-    ToRow := taskGrid.Selection.Bottom;
-  end
-  else
-  if aRow = 0 then
-  begin
-    FromRow := 1;
-    ToRow := taskGrid.RowCount - 1;
-  end
-  else
-  begin
-    FromRow := aRow;
-    ToRow := aRow;
-  end;
-  if (ShowColumnTask) then CalcCol(2, aForce);
-  if (ShowColumnNote) then CalcCol(3);
+    if aRow = -1 then
+    begin
+      FromRow := taskGrid.Selection.Top;
+      ToRow := taskGrid.Selection.Bottom;
+    end
+    else
+    if aRow = 0 then
+    begin
+      FromRow := 1;
+      ToRow := taskGrid.RowCount - 1;
+    end
+    else
+    begin
+      FromRow := aRow;
+      ToRow := aRow;
+    end;
+    if (ShowColumnTask) then CalcCol(2, aForce);
+    if (ShowColumnNote) then CalcCol(3);
 
-  // Header, tabs, first col
-  taskGrid.RowHeights[0] := Round(Max(Canvas.TextHeight('A') + 4, taskGrid.DefaultRowHeight) * FZoom);
-  if (aForce) then
-  begin
-    {$IFDEF UNIX}
+    // Header, tabs, first col
+    taskGrid.RowHeights[0] := Round(Max(Canvas.TextHeight('A') + 4, taskGrid.DefaultRowHeight) * FZoom);
+    if (aForce) then
+    begin
+      {$IFDEF UNIX}
     panelTabs.Height := Canvas.TextHeight('A') + 11;
-    {$ELSE}
-    panelTabs.Height := Canvas.TextHeight('A') + 8;
-    {$ENDIF}
-    CalcDefaultColWidth;
-  end;
+      {$ELSE}
+      panelTabs.Height := Canvas.TextHeight('A') + 8;
+      {$ENDIF}
+      CalcDefaultColWidth;
+    end;
 
-  EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
+    EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
+  finally
+    taskGrid.EndUpdate;
+  end;
 end;
 
 procedure TformNotetask.ResetRowHeight(aRow: integer = 0; aCalcRowHeight: boolean = True);
