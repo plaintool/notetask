@@ -412,7 +412,7 @@ type
     procedure memoNoteMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
     procedure tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure tagsEditTagClick(Sender: TObject; const TagText: string);
-    procedure tagsEditBeforeChange(Sender: TObject);
+    procedure tagsEditBeforeChange(Sender: TObject; Tags: string; Operation: TTagEditOperation; var AllowChange: boolean);
     procedure tagsEditChange(Sender: TObject);
     procedure tagsEditTagAdd(Sender: TObject; const TagText: string);
     procedure tagsEditTagRemove(Sender: TObject; const TagText: string);
@@ -4797,7 +4797,7 @@ begin
     filterClearClick(Sender);
 end;
 
-procedure TformNotetask.tagsEditBeforeChange(Sender: TObject);
+procedure TformNotetask.tagsEditBeforeChange(Sender: TObject; Tags: string; Operation: TTagEditOperation; var AllowChange: boolean);
 begin
   Tasks.CreateBackup;
 end;
