@@ -69,6 +69,7 @@ type
     FBackspaceEditTag: boolean;
     FReadOnly: boolean;
     FEnabled: boolean;
+    FUpdatePopup: boolean;
 
     FAutoColorBrigtness: integer;
     FAutoColorSaturation: integer;
@@ -138,6 +139,7 @@ type
 
     function RemovalConfirmed(idx: integer = -1): boolean;
     function TagAtPos(const P: TPoint): integer;
+    procedure SetFocusOnEdit;
     procedure UpdateEditPosition;
     procedure UpdateCheckList(AddSuggestions: boolean = True);
     procedure UpdateHoverState(X, Y: integer);
@@ -174,6 +176,7 @@ type
     procedure EditMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure EditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure SuggestedChanged(Sender: TObject);
+    procedure CheckListClick(Sender: TObject);
     procedure CheckListBeforeBulkChange(Sender: TObject);
     procedure CheckListItemChecked(Sender: TObject; Index: integer; Checked: boolean);
     procedure CheckListAfterBulkChange(Sender: TObject);
@@ -463,6 +466,7 @@ begin
     FCheckListButton.MultiSelect := True;
     FCheckListButton.DropDownCount := 15;
     FCheckListButton.AttachedControl := FEdit;
+    FCheckListButton.OnClick := @CheckListClick;
     FCheckListButton.OnItemChecked := @CheckListItemChecked;
     FCheckListButton.OnBeforeBulkChange := @CheckListBeforeBulkChange;
     FCheckListButton.OnAfterBulkChange := @CheckListAfterBulkChange;
@@ -503,7 +507,7 @@ end;
 
 function TCustomTagEdit.GetTagHeight(AFontSize: integer = -1): integer;
 begin
-  Result := Scale(ifthen(AFontSize > -1, AFontSize, CoalesceInt(Font.Size, Screen.SystemFont.Size, 8)) * 2) + FTagHeightFactor;
+  Result := Scale(ifthen(AFontSize > -1, AFontSize, CoalesceInt(Font.Size, Screen.SystemFont.Size, 10)) * 2) + FTagHeightFactor;
 end;
 
 function TCustomTagEdit.GetTagRect(Index: integer): TRect;
@@ -681,10 +685,15 @@ begin
     FCheckListButton.Glyph.Clear;
 end;
 
+procedure TCustomTagEdit.SetFocusOnEdit;
+begin
+  if Self.Visible and FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+end;
+
 procedure TCustomTagEdit.UpdateEditPosition;
 var
   LastRect: TRect;
-  NewLeft, NewTop: integer;
+  NewLeft, NewTop, NewTopScaled, OldTop: integer;
   AvailWidth: integer;
 begin
   if FUpdatingEdit or (csDesigning in ComponentState) then Exit;
@@ -720,15 +729,21 @@ begin
       NewTop := Scale(4);
     end;
 
+    {$IFDEF UNIX}
+    NewTopScaled := NewTop +Scale(1);
+    {$ELSE}
+    NewTopScaled := NewTop + Scale(3);
+    {$ENDIF}
+
     // Set position only when changed
-    if (FEdit.Left <> NewLeft) or (FEdit.Top <> NewTop) then
+    if (FEdit.Left <> NewLeft) or (FEdit.Top <> NewTopScaled) then
     begin
+      OldTop := FEdit.Top;
       FEdit.Left := NewLeft;
-      {$IFDEF UNIX}
-      FEdit.Top := NewTop +Scale(1);
-      {$ELSE}
-      FEdit.Top := NewTop + Scale(3);
-      {$ENDIF}
+      FEdit.Top := NewTopScaled;
+
+      if (not FAutoSizeHeight) and (FEdit.Top <> OldTop) then
+        FUpdatePopup := True;
     end;
 
     if (not FEdit.Visible) or (FSuggestedTags.Count = 0) then
@@ -845,10 +860,9 @@ begin
   begin
     OldHeight := Height;
     Height := CalculateAutoHeight;
-    if (Height <> OldHeight) and (FCheckListButton.PopupVisible) then
+    if (Height <> OldHeight) then
     begin
-      Application.ProcessMessages;
-      FCheckListButton.ShowPopupForm;
+      FUpdatePopup := True;
     end;
   end;
 end;
@@ -885,7 +899,7 @@ procedure TCustomTagEdit.ScaleFontsPPI(const AToPPI: integer; const AProportion:
 begin
   inherited ScaleFontsPPI(AToPPI, AProportion);
   if ((not FParentFont) and (FFont.Size <= 0)) or ((FParentFont) and (Assigned(Parent)) and (Parent.Font.Size <= 0)) then
-    FFont.Size := CoalesceInt(Screen.SystemFont.Size, 8);
+    FFont.Size := CoalesceInt(Screen.SystemFont.Size, 10);
   DoScaleFontPPI(FFont, AToPPI, AProportion);
   if (Assigned(Parent)) and (FParentFont) then
     DoScaleFontPPI(Parent.Font, AToPPI, AProportion);
@@ -895,7 +909,7 @@ procedure TCustomTagEdit.FixDesignFontsPPI(const ADesignTimePPI: integer);
 begin
   inherited FixDesignFontsPPI(ADesignTimePPI);
   if ((not FParentFont) and (FFont.Size <= 0)) or ((FParentFont) and (Assigned(Parent)) and (Parent.Font.Size <= 0)) then
-    FFont.Size := CoalesceInt(Screen.SystemFont.Size, 8);
+    FFont.Size := CoalesceInt(Screen.SystemFont.Size, 10);
   DoFixDesignFontPPI(FFont, ADesignTimePPI);
   if (Assigned(Parent)) and (FParentFont) then
     DoFixDesignFontPPI(Parent.Font, ADesignTimePPI);
@@ -927,6 +941,7 @@ begin
   SL := TStringList.Create;
   TagsToAdd := TStringList.Create;
   FTags.OnChange := nil;
+  FEdit.Visible := False;
   try
     // Split by semicolon if present, otherwise add as single tag
     if Pos(';', ATag) > 0 then
@@ -970,6 +985,7 @@ begin
       end;
     end;
   finally
+    FEdit.Visible := True;
     FTags.OnChange := @TagsChanged;
     SL.Free;
     TagsToAdd.Free;
@@ -1010,6 +1026,7 @@ begin
   SL := TStringList.Create;
   TagsToRemove := TStringList.Create;
   FTags.OnChange := nil;
+  FEdit.Visible := False;
   try
     // Split by semicolon if present, otherwise treat as single tag
     if Pos(';', ATag) > 0 then
@@ -1060,6 +1077,7 @@ begin
       end;
     end;
   finally
+    FEdit.Visible := True;
     FTags.OnChange := @TagsChanged;
     SL.Free;
     TagsToRemove.Free;
@@ -1100,6 +1118,7 @@ begin
   begin
     FSelectedTags.Clear; // Clear selection
     Invalidate;
+    SetFocusOnEdit;
   end;
 end;
 
@@ -1374,6 +1393,11 @@ begin
   Invalidate;
 end;
 
+procedure TCustomTagEdit.CheckListClick(Sender: TObject);
+begin
+  FUpdatePopup := False;
+end;
+
 procedure TCustomTagEdit.CheckListBeforeBulkChange(Sender: TObject);
 var
   AllowChange: boolean;
@@ -1391,20 +1415,29 @@ procedure TCustomTagEdit.CheckListItemChecked(Sender: TObject; Index: integer; C
 begin
   if csDesigning in ComponentState then exit;
 
-  if not FCheckListInBulk then
+  if not FCheckListInBulk then // Single element
   begin
     if Checked then
       AddTag(FCheckListButton.Items[Index])
     else
       RemoveTag(FCheckListButton.Items[Index]);
+
+    try
+      Application.ProcessMessages;
+      if FUpdatePopup and FCheckListButton.PopupVisible then
+        FCheckListButton.UpdatePopupForm;
+    finally
+      FUpdatePopup := False;
+    end;
   end
-  else
+  else // Bulk check
   begin
     if Checked then
       FCheckListAdded += ';' + FCheckListButton.Items[Index]
     else
       FCheckListRemoved += ';' + FCheckListButton.Items[Index];
   end;
+
 end;
 
 procedure TCustomTagEdit.CheckListAfterBulkChange(Sender: TObject);
@@ -1416,7 +1449,12 @@ begin
         AddTag(FCheckListAdded);
       if Length(FCheckListRemoved) > 0 then
         RemoveTag(FCheckListRemoved);
+
+      Application.ProcessMessages;
+      if FUpdatePopup and FCheckListButton.PopupVisible then
+        FCheckListButton.UpdatePopupForm;
     finally
+      FUpdatePopup := False;
       FCheckListInBulk := False;
       FCheckListAdded := string.Empty;
       FCheckListRemoved := string.Empty;
@@ -1453,6 +1491,7 @@ begin
       FOnChange(Sender);
 
     FTagEditing := string.Empty;
+    SetFocusOnEdit;
     Key := 0;
   end
   else
@@ -1519,10 +1558,11 @@ begin
       end;
       Key := 0;
     end;
+    SetFocusOnEdit;
   end
   else if (FAllowSelect) and (FEdit.Text = string.Empty) then
   begin
-    if (ssShift in Shift) and (Key = VK_LEFT) then
+    if (ssShift in Shift) and (Key in [VK_LEFT, VK_UP]) then
     begin
       ATag := GetLastUnselectedTag;
       if Length(ATag) > 0 then
@@ -1532,7 +1572,7 @@ begin
       end;
     end
     else
-    if (SelectedTags.Count > 0) and (ssShift in Shift) and (Key = VK_RIGHT) then
+    if (SelectedTags.Count > 0) and (ssShift in Shift) and (Key in [VK_RIGHT, VK_DOWN]) then
     begin
       idx := FSelectedTags.IndexOf(GetFirstSelectedTag);
       if idx >= 0 then
@@ -1542,13 +1582,14 @@ begin
       end;
     end
     else
-    if ((ssCtrl in Shift) and (Key = VK_A)) or ((ssShift in Shift) and (Key = VK_HOME)) then
+    if ((ssCtrl in Shift) and (Key = VK_A)) or ((ssShift in Shift) and (Key in [VK_HOME, VK_PRIOR])) then
     begin
       SelectAll;
       Key := 0;
     end
     else
-    if ((not (ssShift in Shift) and not (ssCtrl in Shift)) or ((ssShift in Shift) and (Key = VK_END))) and (SelectedTags.Count > 0) then
+    if ((not (ssShift in Shift) and not (ssCtrl in Shift)) or ((ssShift in Shift) and (Key in [VK_END, VK_NEXT]))) and
+      (SelectedTags.Count > 0) then
       ClearSelection;
   end;
 
@@ -1569,8 +1610,7 @@ begin
   if FEdit.Text <> string.Empty then
   begin
     // Just ensure Edit has focus for text editing
-    if FEdit.CanFocus then
-      FEdit.SetFocus;
+    SetFocusOnEdit;
     Exit;
   end;
 
@@ -1647,10 +1687,7 @@ begin
   begin
     // Check if it was a simple click (minimal movement)
     if (Abs(GlobalPos.X - FMouseDownPos.X) <= Scale(2)) and (Abs(GlobalPos.Y - FMouseDownPos.Y) <= Scale(2)) then
-    begin
-      if FEdit.CanFocus then
-        FEdit.SetFocus;
-    end;
+      SetFocusOnEdit;
   end;
 
   // End selection if we were selecting
@@ -1658,7 +1695,7 @@ begin
   begin
     FSelecting := False;
     FEdit.Visible := Enabled and not ReadOnly;
-    if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+    SetFocusOnEdit;
 
     FSelectionRect := Rect(0, 0, 0, 0);
     Invalidate;
@@ -1704,7 +1741,7 @@ begin
         begin
           RemoveTag(FTags[idx]);
           FMouseDownIndex := -1; // Reset since we handled it
-          if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+          SetFocusOnEdit;
           exit;
         end
         else
@@ -1857,7 +1894,7 @@ begin
     begin
       FSelecting := False;
       FEdit.Visible := FEnabled and not FReadOnly;
-      if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+      SetFocusOnEdit;
 
       // If selection rectangle is very small, treat as click
       DragThreshold := Scale(2);
@@ -1978,7 +2015,7 @@ begin
   begin
     FSelecting := False;
     FEdit.Visible := FEnabled and not FReadOnly;
-    if FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+    SetFocusOnEdit;
     FSelectionRect := Rect(0, 0, 0, 0);
     Invalidate;
   end
