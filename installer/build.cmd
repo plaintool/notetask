@@ -69,4 +69,3 @@ IF %ERRORLEVEL% EQU 0 (
 tar -czf notetask-%VERSION%.tar.gz -C .. notetask.exe notetask32.exe -C "%CD%\debsetup\DATA\usr\bin" notetask
 
 echo Build and signing completed successfully!
-pause

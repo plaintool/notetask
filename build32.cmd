@@ -62,5 +62,3 @@ if exist "notetask32.exe" (
 ) else (
     echo Executable not found: notetask32.exe
 )
-
-pause

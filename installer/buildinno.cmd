@@ -28,4 +28,3 @@ IF %ERRORLEVEL% EQU 0 (
 )
 
 echo Build and signing notetask-any-x86-x64.exe completed successfully!
-pause
