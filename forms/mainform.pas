@@ -3370,8 +3370,15 @@ begin
   begin
     StartsWithOperator(filterBox.Text, Oper, Value);
     if (Length(Oper) = 0) or (Oper = '#') or (Oper = '=') then
-      TaskText += ' `' + Value + '`';
+    begin
+      if Trim(Value) <> string.Empty then
+        TaskText += ' `' + Trim(Value) + '`'
+      else
+      if Value <> string.Empty then
+        TaskText += ' ' + Value;
+    end;
   end;
+
   Ind := Tasks.InsertTask(TaskText, taskGrid.Row);
   FLastText := string.Empty;
   FillGrid;

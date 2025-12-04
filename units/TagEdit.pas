@@ -949,7 +949,7 @@ begin
         s := TagsToAdd[i]; // Already trimmed
 
         // Skip empty or duplicate tags
-        if (s <> '') and (IndexOf(s, FTags) = -1) then
+        if (Trim(s) <> '') and (IndexOf(s, FTags) = -1) then
         begin
           FTags.Add(s);
           TagsAdded := True;
