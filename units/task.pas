@@ -369,7 +369,8 @@ var
 
 begin
   TrimFilter := Trim(Filter);
-  if TrimFilter = string.Empty then
+  if TrimFilter = string.Empty then TrimFilter := Filter; // Original filter if only spaces
+  if (TrimFilter = string.Empty) then
     Exit(True); // Empty filter matches everything
 
   if StartsWithOperator(TrimFilter, Oper, ValuePart) then
@@ -1022,7 +1023,7 @@ begin
   // Increment the selected group index and set the name of the new group
   Inc(FSelectedGroup);
   SetLength(FGroupList[FSelectedGroup], 0);
-  FGroupNameList[FSelectedGroup] := IfThen(aName = string.Empty, aName, '## ' + aName);
+  FGroupNameList[FSelectedGroup] := IfThen(aName = string.Empty, aName, mdformat.gp + ' ' + aName);
   FGroupHintList[FSelectedGroup] := string.Empty;
 
   // Change group to new one
@@ -1036,7 +1037,7 @@ function TTasks.RenameGroup(aIndex: integer; aName: string): boolean;
 begin
   Result := False;
   if (aIndex < 0) or (aIndex >= CountGroup) then exit;
-  FGroupNameList[aIndex] := IfThen(aName = string.Empty, aName, '## ' + aName);
+  FGroupNameList[aIndex] := IfThen(aName = string.Empty, aName, mdformat.gp + ' ' + aName);
   Result := True;
 end;
 
@@ -1079,7 +1080,7 @@ begin
   end;
 
   // Name new group
-  FGroupNameList[aIndex + 1] := IfThen(aName = string.Empty, aName, '## ' + aName);
+  FGroupNameList[aIndex + 1] := IfThen(aName = string.Empty, aName, mdformat.gp + ' ' + aName);
   FGroupHintList[aIndex + 1] := FGroupHintList[aIndex];
 
   Result := True;
@@ -1560,92 +1561,8 @@ begin
 end;
 
 procedure TTasks.CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
-var
-  SelectedText: TStringList;
-  Rect: TGridRect;
-  pDone, pText, pNote, pAmount, pDate: string;
-  Row1, Row2, RowText: string;
-  Str, Arh: boolean;
-  i, j: integer;
 begin
-  SelectedText := TStringList.Create;
-  SelectedText.Options := SelectedText.Options - [soTrailingLineBreak];
-
-  try
-    Rect := Grid.Selection; // Get grid selection rect
-
-    if (Rect.Width = 0) and (Rect.Left > 1) then
-    begin
-      for i := Rect.Top to Rect.Bottom do
-      begin
-        SelectedText.Add(Grid.Cells[Rect.Left, i]);
-      end;
-    end
-    else
-      for i := Rect.Top to Rect.Bottom do
-      begin
-        for j := Rect.Left to Rect.Right do
-        begin
-          if (j = 1) and (Grid.Columns[j - 1].Visible) then pDone := GetTask(i).ToString(j).Trim;
-          if (j = 2) and (Grid.Columns[j - 1].Visible) then
-          begin
-            pText := GetTask(i).ToString(j);
-            Arh := False;
-            if pText.StartsWith('~~') and pText.EndsWith('~~') then
-            begin
-              pText := RemoveFirstSubstring(pText, '~~');
-              pText := RemoveFirstSubstring(pText, '~~', True);
-              Arh := True;
-            end;
-            Str := False;
-            if pText.StartsWith('**') and pText.EndsWith('**') then
-            begin
-              pText := RemoveFirstSubstring(pText, '**');
-              pText := RemoveFirstSubstring(pText, '**', True);
-              Str := True;
-            end;
-            if Rect.Width > 0 then pText := pText + StringListToBacktickString(GetTask(i).Tags, (pText <> string.Empty));
-            if Str then pText := '**' + pText + '**';
-            if Arh then pText := '~~' + pText + '~~';
-          end;
-          if (j = 3) and ((Grid.Columns[j - 1].Visible) or NoteVisible) then pNote := GetTask(i).ToString(j);
-          if (j = 4) and (Grid.Columns[j - 1].Visible) then pAmount := GetTask(i).ToString(j).Trim;
-          if (j = 5) and (Grid.Columns[j - 1].Visible) then pDate := GetTask(i).ToString(j).Trim;
-        end;
-        Row1 := (pDone + ' ' + pDate).Trim;
-        Row2 := (pText + ifthen(StartsWith(pNote), '', ' ') + pNote);
-
-        if (pDate <> string.Empty) and ((Row2 <> string.Empty) or (pAmount <> string.Empty)) then
-          Row1 += ', '
-        else
-        if (Row1 <> string.Empty) and (Row2 <> string.Empty) then
-          Row1 += ' ';
-
-        if (pAmount <> string.Empty) then
-        begin
-          Row1 += pAmount;
-          if (Row2 <> string.Empty) then Row1 += ', ';
-        end;
-
-        RowText := Row1 + Row2;
-
-        if (Grid.Selection.Width = 0) and (Grid.Selection.Height = 0) then
-          RowText := StringReplace(RowText, '<br>', sLineBreak, [rfReplaceAll]);
-
-        SelectedText.Add(RowText);
-      end;
-
-    // Copy to clipboard
-    if SelectedText.Count > 0 then
-    begin
-      if Assigned(Value) then
-        Value^ := SelectedText.Text
-      else
-        Clipboard.AsText := SelectedText.Text;
-    end;
-  finally
-    SelectedText.Free;
-  end;
+  mdformat.TasksToClipboard(Grid, NoteVisible, Value, @GetTask);
 end;
 
 function TTasks.PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;
@@ -1760,7 +1677,7 @@ var
         GetTask(row).Date := 0;
     end
     else
-    if col = 6 then // Star
+    if col = 6 then // st
     begin
       GetTask(row).Star := TempTask.Star;
     end;
