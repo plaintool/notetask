@@ -1536,7 +1536,7 @@ begin
       Key := 0;
     end
     else
-    if (not (ssShift in Shift) or ((ssShift in Shift) and (Key = VK_END))) and (SelectedTags.Count > 0) then
+    if ((not (ssShift in Shift) and not (ssCtrl in Shift)) or ((ssShift in Shift) and (Key = VK_END))) and (SelectedTags.Count > 0) then
       ClearSelection;
   end;
 
