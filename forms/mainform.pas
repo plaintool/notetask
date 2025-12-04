@@ -5711,7 +5711,7 @@ begin
         mTagBorderWidth := tagsEdit.TagBorderWidth;
         tagsEdit.RoundCorners := TGridPrinter(Sender).ScaleY(tagsEdit.RoundCorners);
         tagsEdit.TagBorderWidth := TGridPrinter(Sender).ScaleY(tagsEdit.TagBorderWidth);
-        BitTags := tagsEdit.GetTagsBitmap(Task.Tags, Round(TGridPrinter(Sender).ScaleY(Max(ACanvas.Font.Size, 8))),
+        BitTags := tagsEdit.GetTagsBitmap(Task.Tags, Round(TGridPrinter(Sender).ScaleY(Max(ACanvas.Font.Size, 10))),
           Min(ARect.Width, TGridPrinter(Sender).ScaleY(500)), ARect.Height, 2, TagsDimnessPrint);
         try
           BitTags.TransparentColor := clWhite;
