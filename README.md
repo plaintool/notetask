@@ -4,7 +4,7 @@ A simple application for creating and organizing task lists, offering essential 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Build with: Lazarus](https://img.shields.io/badge/Build_with-Lazarus-blueviolet)](https://www.lazarus-ide.org/)
 [![Platform: Windows Linux](https://img.shields.io/badge/Platform-Windows_Linux-yellow)](#)
-[![Languages: ar be zh en fr de hi it ja ko pt ru es uk](https://img.shields.io/badge/Lang-ar_be_zh_en_fr_de_hi_it_ja_ko_pt_ru_es_uk-green)](https://www.ethnologue.com)
+[![Languages: ar be zh cs da nl en fi fr de el he hi id it ja ko pl pt ro ru es sv tr uk](https://img.shields.io/badge/Lang-ar_be_zh_cs_da_nl_en_fi_fr_de_el_he_hi_id_it_ja_ko_pl_pt_ro_ru_es_sv_tr_uk-green)](https://www.ethnologue.com)
 
 >- [Notetask](#notetask)
 >   - [What is it?](#what-is-it)
