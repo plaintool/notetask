@@ -112,6 +112,7 @@ type
     procedure UncheckAll;
     procedure Clear;
     function Scale(const AValue: integer): integer;
+    function PopupVisible: boolean;
     property Checked[Index: integer]: boolean read GetChecked write SetChecked;
     property CheckedByName[AName: string]: boolean read GetCheckedByName write SetCheckedByName;
     property ItemEnabled[Index: integer]: boolean read GetItemEnabled write SetItemEnabled;
@@ -874,6 +875,13 @@ end;
 function TCheckListButton.Scale(const AValue: integer): integer;
 begin
   Result := Scale96ToScreen(AValue);
+end;
+
+function TCheckListButton.PopupVisible: boolean;
+begin
+  InitializePopupForm;
+  if Assigned(FPopupForm) then
+    Result := FPopupForm.Showing;
 end;
 
 procedure TCheckListButton.SetAttachedControl(Value: TControl);

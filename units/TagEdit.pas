@@ -838,10 +838,18 @@ begin
 end;
 
 procedure TCustomTagEdit.UpdateAutoHeight;
+var
+  OldHeight: integer;
 begin
   if FAutoSizeHeight and (not (Align in [alClient, alRight, alLeft])) then
   begin
+    OldHeight := Height;
     Height := CalculateAutoHeight;
+    if (Height <> OldHeight) and (FCheckListButton.PopupVisible) then
+    begin
+      Application.ProcessMessages;
+      FCheckListButton.ShowPopupForm;
+    end;
   end;
 end;
 
@@ -918,6 +926,7 @@ begin
 
   SL := TStringList.Create;
   TagsToAdd := TStringList.Create;
+  FTags.OnChange := nil;
   try
     // Split by semicolon if present, otherwise add as single tag
     if Pos(';', ATag) > 0 then
@@ -961,6 +970,7 @@ begin
       end;
     end;
   finally
+    FTags.OnChange := @TagsChanged;
     SL.Free;
     TagsToAdd.Free;
   end;
@@ -999,6 +1009,7 @@ begin
 
   SL := TStringList.Create;
   TagsToRemove := TStringList.Create;
+  FTags.OnChange := nil;
   try
     // Split by semicolon if present, otherwise treat as single tag
     if Pos(';', ATag) > 0 then
@@ -1049,6 +1060,7 @@ begin
       end;
     end;
   finally
+    FTags.OnChange := @TagsChanged;
     SL.Free;
     TagsToRemove.Free;
   end;
@@ -1306,8 +1318,8 @@ procedure TCustomTagEdit.TagsChanged(Sender: TObject);
 begin
   FHoverIndex := -1; // Reset hover state when Items change
   Invalidate;
-  UpdateAutoHeight;
   UpdateCheckList;
+  UpdateAutoHeight;
 end;
 
 procedure TCustomTagEdit.SuggestedChanged(Sender: TObject);
@@ -1478,8 +1490,8 @@ begin
       FOnTagRemove(Sender, ATag);
     if Assigned(FOnChange) then
       FOnChange(Sender);
-    UpdateAutoHeight;
     Invalidate;
+    UpdateAutoHeight;
     Key := 0;
   end
   else
