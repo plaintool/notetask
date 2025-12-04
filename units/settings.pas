@@ -17,6 +17,7 @@ uses
   SysUtils,
   Grids,
   Graphics,
+  Printers,
   fpjson,
   mainform,
   TagEdit;
@@ -85,6 +86,17 @@ begin
     JSONObj.Add('FontName', Form.Font.Name);
     JSONObj.Add('FontSize', Form.Font.Size);
     JSONObj.Add('FontStyle', integer(Form.Font.Style));  // Convert font style to number
+
+    // Printer
+    JSONObj.Add('PrinterPaperName', Printer.PaperSize.PaperName);
+    if Printer.Orientation = poLandscape then
+      JSONObj.Add('PrinterOrientation', 'Landscape')
+    else
+      JSONObj.Add('PrinterOrientation', 'Portrait');
+    JSONObj.Add('PrinterMarginLeft', Form.pageSetupDialog.MarginLeft);
+    JSONObj.Add('PrinterMarginRight', Form.pageSetupDialog.MarginRight);
+    JSONObj.Add('PrinterMarginTop', Form.pageSetupDialog.MarginTop);
+    JSONObj.Add('PrinterMarginBottom', Form.pageSetupDialog.MarginBottom);
 
     // Save Tag Colors
     TagArr := TJSONArray.Create; // JSON array for colors
@@ -178,6 +190,25 @@ begin
         if (JSONObj.FindPath('Language').AsString <> string.Empty) and (Language <> JSONObj.FindPath('Language').AsString) then
           Language := JSONObj.FindPath('Language').AsString;
       end;
+
+      // Printer
+      if JSONObj.FindPath('PrinterPaperName') <> nil then
+        Printer.PaperSize.PaperName := JSONObj.FindPath('PrinterPaperName').AsString;
+      if JSONObj.FindPath('PrinterOrientation') <> nil then
+      begin
+        if JSONObj.FindPath('PrinterOrientation').AsString = 'Landscape' then
+          Printer.Orientation := poLandscape
+        else
+          Printer.Orientation := poPortrait;
+      end;
+      if JSONObj.FindPath('PrinterMarginLeft') <> nil then
+        Form.pageSetupDialog.MarginLeft := JSONObj.FindPath('PrinterMarginLeft').AsInteger;
+      if JSONObj.FindPath('PrinterMarginRight') <> nil then
+        Form.pageSetupDialog.MarginRight := JSONObj.FindPath('PrinterMarginRight').AsInteger;
+      if JSONObj.FindPath('PrinterMarginTop') <> nil then
+        Form.pageSetupDialog.MarginTop := JSONObj.FindPath('PrinterMarginTop').AsInteger;
+      if JSONObj.FindPath('PrinterMarginBottom') <> nil then
+        Form.pageSetupDialog.MarginBottom := JSONObj.FindPath('PrinterMarginBottom').AsInteger;
 
       // Check and load font properties
       if JSONObj.FindPath('FontName') <> nil then

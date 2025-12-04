@@ -620,6 +620,7 @@ type
     procedure UpdateComboRegion(Combo: TComboBox; AInsetLeft: integer = 1; AInsetTop: integer = 1;
       AInsetRight: integer = 0; AInsetBottom: integer = 1);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
+    procedure PrinterBeforePrintCell(Sender: TObject; AGrid: TCustomGrid; ACanvas: TCanvas; ACol, ARow: integer; ARect: TRect);
     procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
     function FindGroupTabIndex(Value: integer): integer;
     function FindGroupRealIndex(Value: integer): integer;
@@ -806,6 +807,7 @@ const
   TagsColorBrigtness = 80;
   TagsColorSaturation = 80;
   TagsDimnessSelected = 55;
+  TagsDimnessPrint = 60;
   TagsDimnessColor = 45;
   TagsDimness = 35;
 
@@ -1837,7 +1839,7 @@ begin
         if Task.Tags.Count > 0 then
         begin
           BitTags := tagsEdit.GetTagsBitmap(Task.Tags, Round(Max(Max(Font.Size div 2, 8) * FZoom, 1)),
-            Min(ARect.Width, 500), ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected,
+            Min(ARect.Width, Round(500 * FZoom)), ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected,
             ifthen(bgFill <> clWhite, TagsDimnessColor, TagsDimness)), ColorToRGB(bgFill));
           try
             BitTags.TransparentColor := clWhite;
@@ -3952,6 +3954,7 @@ begin
       gridPrinter.Grid := taskGrid;
       gridPrinter.OnGetCellText := @PrinterGetCellText;
       gridPrinter.OnPrepareCanvas := @PrinterPrepareCanvas;
+      gridPrinter.OnBeforePrintCell := @PrinterBeforePrintCell;
       gridPrinter.Orientation := Printer.Orientation;
       gridPrinter.Margins.Left := pageSetupDialog.MarginLeft / 100;
       gridPrinter.Margins.Right := pageSetupDialog.MarginRight / 100;
@@ -5651,42 +5654,81 @@ end;
 
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
 var
-  prncanvas: TCanvas;
   task: TTask;
+  ACanvas: TCanvas;
 begin
   if not Tasks.HasTask(aRow) then exit;
 
-  prncanvas := TGridPrinter(Sender).Canvas;
+  ACanvas := TGridPrinter(Sender).Canvas;
   task := Tasks.GetTask(aRow);
 
   // Default text color
-  prncanvas.Font.Color := clBlack;
-  prncanvas.Font.Style := [];
+  ACanvas.Font.Color := clBlack;
+  ACanvas.Font.Style := [];
 
   // Color and style
   if (ShowColumnDate) and (not task.Done) and (task.Date > 0) and (task.Date < Now) then
-    prncanvas.Font.Color := clRed
+    ACanvas.Font.Color := clRed
   else if (not task.Done) and task.Archive then
-    prncanvas.Font.Color := clMaroon;
+    ACanvas.Font.Color := clMaroon;
 
   if task.Star then
-    prncanvas.Font.Style := prncanvas.Font.Style + [fsBold];
+    ACanvas.Font.Style := ACanvas.Font.Style + [fsBold];
 
   if (aCol = 2) and task.Archive then
-    prncanvas.Font.Style := prncanvas.Font.Style + [fsStrikeOut];
+    ACanvas.Font.Style := ACanvas.Font.Style + [fsStrikeOut];
 
   if (aCol = 3) and task.NoteItalic then
-    prncanvas.Font.Style := prncanvas.Font.Style + [fsItalic];
+    ACanvas.Font.Style := ACanvas.Font.Style + [fsItalic];
 
   if (aCol = 5) and (task.Date > Now) then
-    prncanvas.Font.Color := clDarkBlue;
+    ACanvas.Font.Color := clDarkBlue;
 
   // Text styles
-  with prncanvas.TextStyle do
+  with ACanvas.TextStyle do
   begin
     SingleLine := not FWordWrap;
     WordBreak := FWordWrap;
     RightToLeft := FBiDiRightToLeft;
+  end;
+end;
+
+procedure TformNotetask.PrinterBeforePrintCell(Sender: TObject; AGrid: TCustomGrid; ACanvas: TCanvas; ACol, ARow: integer; ARect: TRect);
+var
+  task: TTask;
+  BitTags: TBitmap;
+  mRoundCorners, mTagBorderWidth: integer;
+begin
+  if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
+  begin
+    if (aCol = 2) then
+    begin
+      Task := Tasks.GetTask(ARow);
+      if Task.Tags.Count > 0 then
+      begin
+        mRoundCorners := tagsEdit.RoundCorners;
+        mTagBorderWidth := tagsEdit.TagBorderWidth;
+        tagsEdit.RoundCorners := TGridPrinter(Sender).ScaleY(tagsEdit.RoundCorners);
+        tagsEdit.TagBorderWidth := TGridPrinter(Sender).ScaleY(tagsEdit.TagBorderWidth);
+        BitTags := tagsEdit.GetTagsBitmap(Task.Tags, Round(TGridPrinter(Sender).ScaleY(Max(ACanvas.Font.Size, 8))),
+          Min(ARect.Width, TGridPrinter(Sender).ScaleY(500)), ARect.Height, 2, TagsDimnessPrint);
+        try
+          BitTags.TransparentColor := clWhite;
+          BitTags.Transparent := True;
+          if BitTags.Width < aRect.Width - 50 then
+          begin
+            if taskGrid.BiDiMode = bdLeftToRight then
+              ACanvas.Draw(aRect.Right - BitTags.Width - 5, aRect.Top + tagsEdit.TagBorderWidth, BitTags)
+            else
+              ACanvas.Draw(aRect.Left + 5, aRect.Top + tagsEdit.TagBorderWidth, BitTags);
+          end;
+        finally
+          tagsEdit.RoundCorners := mRoundCorners;
+          tagsEdit.TagBorderWidth := mTagBorderWidth;
+          BitTags.Free;
+        end;
+      end;
+    end;
   end;
 end;
 

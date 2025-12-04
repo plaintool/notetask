@@ -3,7 +3,7 @@
 //  License: Modified LGPL-2 (with linking exception, like Lazarus LCL).
 //  https://wiki.freepascal.org/GridPrinter
 //  Modified for use in Notetask © 2024 by Alexander Tverskoy
-//  This version includes minor compatibility fixes for modern FPC/Lazarus
+//    - Enhanced tag printing support for Notetask application
 //-----------------------------------------------------------------------------------
 
 unit GridPrn;
@@ -35,6 +35,11 @@ type
 
   TGridPrnNewPageEvent = procedure(Sender: TObject; AGrid: TCustomGrid; APageNo: integer;
     AStartCol, AStartRow, AEndCol, AEndRow: integer) of object;
+
+  TGridPrnBeforePrintCellEvent = procedure(Sender: TObject; AGrid: TCustomGrid; ACanvas: TCanvas;
+    ACol, ARow: integer; ARect: TRect) of object;
+
+  TGridPrnCalcRowHeightEvent = procedure(Sender: TObject; AGrid: TCustomGrid; ARow: integer; var AHeight: integer) of object;
 
   TGridPrnHeaderFooterSection = (hfsLeft, hfsCenter, hfsRight);
 
@@ -166,7 +171,9 @@ type
     FOnNewPage: TGridPrnNewPageEvent;
     FOnPrepareCanvas: TOnPrepareCanvasEvent;
     FOnPrintCell: TGridPrnPrintCellEvent;
+    FOnBeforePrintCell: TGridPrnBeforePrintCellEvent;
     FOnUpdatePreview: TNotifyEvent;
+    FOnCalcRowHeight: TGridPrnCalcRowHeightEvent;
     function GetBorderLineWidthHor: integer;
     function GetBorderLineWidthVert: integer;
     function GetCanvas: TCanvas;
@@ -224,6 +231,7 @@ type
     FPrinting: boolean;
     procedure CalcFixedColPos(AStartCol, AEndCol: integer; var ALeft, ARight: integer);
     procedure CalcFixedRowPos(AStartRow, AEndRow: integer; var ATop, ABottom: integer);
+    procedure DoCalcRowHeight(ARow: integer; var AHeight: integer); virtual;
     procedure DoLinePrinted(ARow, ALastCol: integer); virtual;
     procedure DoNewLine(ARow: integer); virtual;
     procedure DoNewPage(AStartCol, AStartRow, AEndCol, AEndRow: integer); virtual;
@@ -314,7 +322,9 @@ type
     property OnNewPage: TGridPrnNewPageEvent read FOnNewPage write FOnNewPage;  // Started printing a new page
     property OnPrepareCanvas: TOnPrepareCanvasEvent read FOnPrepareCanvas write FOnPrepareCanvas;
     property OnPrintCell: TGridPrnPrintCellEvent read FOnPrintCell write FOnPrintCell;
+    property OnBeforePrintCell: TGridPrnBeforePrintCellEvent read FOnBeforePrintCell write FOnBeforePrintCell;
     property OnUpdatePreview: TNotifyEvent read FOnUpdatePreview write FOnUpdatePreview;
+    property OnCalcRowHeight: TGridPrnCalcRowHeightEvent read FOnCalcRowHeight write FOnCalcRowHeight;
   end;
 
 function mm2px(mm: double; dpi: integer): integer;
@@ -639,7 +649,6 @@ begin
   Writer.WriteInteger(FFontSize);
 end;
 
-
 { TGridPrinter }
 
 constructor TGridPrinter.Create(AOwner: TComponent);
@@ -725,7 +734,6 @@ begin
   end;
 end;
 
-
 function TGridPrinter.CreatePreviewBitmap(APageNo, APercentage: integer): TBitmap;
 begin
   if FGrid = nil then
@@ -749,6 +757,12 @@ begin
   Execute(FPreviewBitmap.Canvas);
 
   Result := FPreviewBitmap;
+end;
+
+procedure TGridPrinter.DoCalcRowHeight(ARow: integer; var AHeight: integer);
+begin
+  if Assigned(FOnCalcRowHeight) then
+    FOnCalcRowHeight(Self, FGrid, ARow, AHeight);
 end;
 
 procedure TGridPrinter.DoLinePrinted(ARow, ALastCol: integer);
@@ -1393,6 +1407,10 @@ begin
   s := GetCellText(ACol, ARow);
   InflateRect(ARect, -FPadding, 0);
 
+  // Before print do additional draw actions
+  if Assigned(FOnBeforePrintCell) then
+    FOnBeforePrintCell(Self, FGrid, ACanvas, ACol, ARow, ARect);
+
   // Handle checkbox columns
   if lGrid.Columns.Enabled and (ACol >= FFixedCols) and (ARow >= FFixedRows) then
   begin
@@ -1867,16 +1885,27 @@ var
   i: integer;
   h: double;
   fixed: double;
+  NewHeight: integer;
 begin
   fixed := FTopMargin;
   SetLength(FRowHeights, FRowCount);
+
   for i := 0 to FRowCount - 1 do
   begin
     h := AFactor * TGridAccess(FGrid).RowHeights[i];
+
+    if Assigned(FOnCalcRowHeight) then
+    begin
+      NewHeight := Round(h);
+      DoCalcRowHeight(i, NewHeight);
+      h := NewHeight;
+    end;
+
     FRowHeights[i] := h;
     if i < FFixedRows then
       fixed := fixed + h;
   end;
+
   FFixedRowPos := round(fixed);
 end;
 
