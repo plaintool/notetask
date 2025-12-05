@@ -6492,12 +6492,12 @@ begin
 
       // RemoveTask from collection
       taskGrid.DeleteRow(RowIndex);
-
       FillGrid;
       SetInfo;
       SetNote;
       SetTags;
       SetChanged; // Mark that data has changed
+      FLastText := taskGrid.Cells[taskGrid.Col, taskGrid.Row];
     end;
   end;
 end;
@@ -6547,6 +6547,7 @@ begin
       SetNote;
       SetTags;
       SetChanged; // Mark that data has changed
+      FLastText := taskGrid.Cells[taskGrid.Col, taskGrid.Row];
     end;
   end
   else
