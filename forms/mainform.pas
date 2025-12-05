@@ -1867,7 +1867,7 @@ begin
     if Length(Value) > 0 then
     begin
       if FDuplicateHighlight and not (gdSelected in aState) and (FLastText <> string.Empty) and
-        (Value = FLastText) and (taskGrid.Selection.Height = 0) and ((aCol <> FLastCol) or (aRow <> FLastRow)) then
+        (Trim(Value) = Trim(FLastText)) and (taskGrid.Selection.Height = 0) and ((aCol <> FLastCol) or (aRow <> FLastRow)) then
       begin
         Grid.canvas.Brush.Style := bsSolid;
         Grid.canvas.Brush.Color := clDuplicateHighlight;
