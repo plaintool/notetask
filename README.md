@@ -151,7 +151,15 @@ The status bar provides a concise, real-time overview of the current task list. 
 
 ### Windows
 
-Download the installer executable from the [releases page](https://github.com/plaintool/Notetask/releases). Run the installer and follow the on-screen instructions to complete the installation. After installation, you can launch Notetask from the Start menu or desktop shortcut.
+Several installer options are available on the releases page:
+
+- **notetask-any-x86-x64.exe** — a universal EXE installer that works on **both x86 and x64** systems and supports installation **for a single user or for all users**, depending on the selected options.
+- **notetask-x64.msi / notetask-x86.msi** — installs the application **for the current user**.  
+- **notetask-x64-allusers.msi / notetask-x86-allusers.msi** — installs the application **for all users on the system**.  
+
+> **Note:** Windows XP supports installation **only via MSI installers**. The EXE installer is **not compatible** with Windows XP.
+
+Download the installer from the [releases page](https://github.com/plaintool/Notetask/releases), run it, and follow the on-screen instructions. After installation, you can launch Notetask from the Start menu or from the desktop shortcut.
 
 ---
 
