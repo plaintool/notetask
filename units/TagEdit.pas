@@ -1423,9 +1423,11 @@ begin
       RemoveTag(FCheckListButton.Items[Index]);
 
     try
-      Application.ProcessMessages;
       if FUpdatePopup and FCheckListButton.PopupVisible then
+      begin
+        Application.ProcessMessages;
         FCheckListButton.UpdatePopupForm;
+      end;
     finally
       FUpdatePopup := False;
     end;
@@ -1450,9 +1452,11 @@ begin
       if Length(FCheckListRemoved) > 0 then
         RemoveTag(FCheckListRemoved);
 
-      Application.ProcessMessages;
       if FUpdatePopup and FCheckListButton.PopupVisible then
+      begin
+        Application.ProcessMessages;
         FCheckListButton.UpdatePopupForm;
+      end;
     finally
       FUpdatePopup := False;
       FCheckListInBulk := False;
