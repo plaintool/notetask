@@ -245,6 +245,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure SetFocus; override;
     procedure AddTag(const ATag: string; AEditing: boolean = False);
     function RemoveTag(const ATag: string; AConfirm: boolean = False): boolean;
     function Focused: boolean; override;
@@ -500,6 +501,12 @@ begin
   inherited Destroy;
 end;
 
+procedure TCustomTagEdit.SetFocus;
+begin
+  inherited;
+  SetFocusOnEdit;
+end;
+
 function TCustomTagEdit.GetTags: TStringList;
 begin
   Result := FTags;
@@ -687,7 +694,8 @@ end;
 
 procedure TCustomTagEdit.SetFocusOnEdit;
 begin
-  if Self.Visible and FEdit.Visible and FEdit.CanFocus then FEdit.SetFocus;
+  if Visible and FEdit.Visible and FEdit.CanFocus then
+    FEdit.SetFocus;
 end;
 
 procedure TCustomTagEdit.UpdateEditPosition;

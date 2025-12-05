@@ -638,7 +638,7 @@ type
     procedure DatePickerChange(Sender: TObject);
     procedure DatePickerKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure EditCell(aCol: integer = -1; aRow: integer = -1);
-    procedure EditComplite(aEnter: boolean = False; aEscape: boolean = False);
+    procedure EditComplete(aEnter: boolean = False; aEscape: boolean = False);
     procedure DisableDrag;
     procedure DisableGridEvents;
     procedure EnableGridEvents;
@@ -1138,8 +1138,21 @@ begin
   else
   if (ssCtrl in Shift) and (Key in [VK_1, VK_2, VK_3, VK_4, VK_5, VK_6, VK_7, VK_8, VK_9]) then // Ctrl + Number
   begin
-    EditComplite;
+    EditComplete;
     ChangeGroup(Key - VK_0 - 1);
+    Key := 0;
+  end
+  else
+  if (Key = VK_ADD) and (groupTabs.Tabs.Count > 1) and (not IsEditing) then // NUMPAD+
+  begin
+    EditComplete;
+    ChangeGroup(groupTabs.TabIndex + 1);
+    Key := 0;
+  end
+  else if (Key = VK_SUBTRACT) and (groupTabs.Tabs.Count > 1) and (not IsEditing) then // NUMPAD-
+  begin
+    EditComplete;
+    ChangeGroup(groupTabs.TabIndex - 1);
     Key := 0;
   end
   else
@@ -1252,7 +1265,7 @@ begin
   begin
     if IsEditing then
     begin
-      EditComplite;
+      EditComplete;
       if taskGrid.Row > 0 then
         taskGrid.Row := taskGrid.Row - 1;
       Key := 0;
@@ -1263,7 +1276,7 @@ begin
   begin
     if IsEditing then
     begin
-      EditComplite;
+      EditComplete;
       if (taskGrid.Row < taskGrid.RowCount - 1) then
         taskGrid.Row := taskGrid.Row + 1;
       Key := 0;
@@ -1285,7 +1298,7 @@ begin
   if (Key = VK_ESCAPE) then // Escape
   begin
     if IsEditing then
-      EditComplite(False, True)
+      EditComplete(False, True)
     else
       taskGrid.ClearSelections;
     Key := 0;
@@ -1298,7 +1311,7 @@ begin
       if (taskGrid.Col in [4, 5]) or ((taskGrid.Col in [2, 3]) and ((FEnterSubmit and (Shift = [])) or
         (not FEnterSubmit and ((Shift = [ssCtrl]) or (Shift = [ssShift]))))) then
       begin
-        EditComplite(True);
+        EditComplete(True);
         Key := 0;
       end
       else
@@ -1400,7 +1413,7 @@ procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; 
 var
   LastTask: integer;
 begin
-  EditComplite;
+  EditComplete;
   if IsColumn then
   begin
     LastTask := Tasks.Map(FLastRow);
@@ -1679,7 +1692,7 @@ procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; 
   MousePos: TPoint; var Handled: boolean);
 begin
   if IsEditing then
-    EditComplite;
+    EditComplete;
 
   if ssCtrl in Shift then
   begin
@@ -2377,7 +2390,7 @@ end;
 
 procedure TformNotetask.taskGridTopLeftChanged(Sender: TObject);
 begin
-  EditComplite;
+  EditComplete;
 
   if taskGrid.TopRow = 1 then
     Application.QueueAsyncCall(@DelayedInvalidate, 0);
@@ -2451,7 +2464,7 @@ end;
 
 procedure TformNotetask.groupTabsChange(Sender: TObject);
 begin
-  EditComplite;
+  EditComplete;
   tagsEdit.FinishEdit;
 
   if (Length(FLastRowMem) > Tasks.SelectedGroup) then
@@ -3362,7 +3375,7 @@ var
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  EditComplite;
+  EditComplete;
   GridBackupSelection;
 
   TaskText := '[ ]';
@@ -3654,7 +3667,7 @@ procedure TformNotetask.aIndentTasksExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
-  EditComplite;
+  EditComplete;
   IndentTasks;
 end;
 
@@ -3662,7 +3675,7 @@ procedure TformNotetask.aOutdentTasksExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
   if taskGrid.RowCount < 2 then exit;
-  EditComplite;
+  EditComplete;
   IndentTasks(True);
 end;
 
@@ -3999,7 +4012,7 @@ procedure TformNotetask.aShowTimeExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  EditComplite;
+  EditComplete;
   ShowTime := aShowTime.Checked;
   FillGrid;
   SetInfo;
@@ -4023,7 +4036,7 @@ procedure TformNotetask.aHideNoteTextExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  EditComplite;
+  EditComplete;
   HideNoteText := aHideNoteText.Checked;
   FillGrid;
 end;
@@ -4084,7 +4097,7 @@ var
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  EditComplite;
+  EditComplete;
   FWordWrap := aWordWrap.Checked;
   sel := memoNote.SelLength;
   memoNote.WordWrap := FWordWrap;
@@ -4105,7 +4118,7 @@ procedure TformNotetask.aBidiRightToLeftExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  EditComplite;
+  EditComplete;
   BiDiRightToLeft := aBidiRightToLeft.Checked;
   ResetRowHeight;
   Invalidate;
@@ -4882,7 +4895,7 @@ var
 begin
   if IsCanClose then
   begin
-    EditComplite;
+    EditComplete;
 
     // Save settings for current file
     if SaveSetting then
@@ -4967,7 +4980,7 @@ begin
   FreeBytesSecure(FSalt);
   FileNameOld := FFileName;
   FFileName := fileName;
-  EditComplite;
+  EditComplete;
 
   FreeFile;
   ReadOnly := not TryLockFile(FFileName, FSReserved);
@@ -5128,7 +5141,7 @@ begin
       begin
         try
           try
-            EditComplite;
+            EditComplete;
             FreeFile;
             SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, Token, FSalt, FKeyEnc, FKeyAuth);
             SetChanged(False);
@@ -5838,7 +5851,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.EditComplite(aEnter: boolean = False; aEscape: boolean = False);
+procedure TformNotetask.EditComplete(aEnter: boolean = False; aEscape: boolean = False);
 begin
   if IsEditing then
   begin
@@ -6067,7 +6080,7 @@ begin
   if (Key = VK_TAB) then
   begin
     Key := 0;
-    EditComplite(True);
+    EditComplete(True);
 
     with taskGrid do
     begin
@@ -6134,7 +6147,7 @@ begin
   if (Key = VK_TAB) then
   begin
     Key := 0;
-    EditComplite(FDatePickerDateSet, not FDatePickerDateSet);
+    EditComplete(FDatePickerDateSet, not FDatePickerDateSet);
 
     with taskGrid do
     begin
@@ -6573,7 +6586,7 @@ begin
 
     if Confirm = mrYes then
     begin
-      EditComplite;
+      EditComplete;
       if (FBackup) then
       begin
         GridBackupSelection;
@@ -6607,7 +6620,7 @@ begin
 
     if Confirm = mrYes then
     begin
-      EditComplite;
+      EditComplete;
       if (FBackup) then
       begin
         GridBackupSelection;
@@ -7493,6 +7506,9 @@ begin
 
   AlignBottomControls;
 
+  if Visible and panelTags.Visible and tagsEdit.CanFocus then
+    tagsEdit.SetFocus;
+
   SetTags;
 end;
 
@@ -7505,6 +7521,9 @@ begin
   Splitter.Visible := FShowNote;
 
   AlignBottomControls;
+
+  if Visible and panelNote.Visible and memoNote.CanFocus then
+    memoNote.SetFocus;
 
   SetNote;
 end;
