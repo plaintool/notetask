@@ -20,11 +20,11 @@ SET CERTPASS=1234
 SET TIMESTAMP_URL=http://timestamp.digicert.com
 
 echo Signing file...
-%SIGNTOOL% sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-any-x86-x64.exe"
+%SIGNTOOL% sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-%VERSION%-any-x86-x64.exe"
 IF %ERRORLEVEL% EQU 0 (
-    echo Signing of notetask-any-x86-x64.exe completed successfully
+    echo Signing of notetask-%VERSION%-any-x86-x64.exe completed successfully
 ) else (
-    echo Signing failed for notetask-any-x86-x64.exe
+    echo Signing failed for notetask-%VERSION%-any-x86-x64.exe
 )
 
-echo Build and signing notetask-any-x86-x64.exe completed successfully!
+echo Build and signing notetask-%VERSION%-any-x86-x64.exe completed successfully!
