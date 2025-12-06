@@ -20,16 +20,28 @@ jobs:
 
       - name: Generate changelog from issues
         id: changelog
-        uses: heinrichreimer/action-github-changelog-generator@v2.3
+        uses: heinrichreimer/action-github-changelog-generator@v2.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issues: true
-          pull-requests: false
-          only-last-tag: true
-          exclude-labels: 'duplicate,question,invalid,wontfix'
-          bug-labels: 'bug, auto bug'
-          enhancement-labels: 'enhancement, auto enhancement' 
-          feature-labels: 'feature, auto feature'
+          pullRequests: false
+          onlyLastTag: true
+          excludeLabels: 'duplicate,question,invalid,wontfix'
+          configureSections: |
+              {
+                "features": {
+                  "prefix": "### 🚀 New Features",
+                  "labels": ["feature", "feature auto"]
+                },
+                "enhancements": {
+                  "prefix": "### ✨ Enhancements",
+                  "labels": ["enhancement", "enhancement auto"]
+                },
+                "bugfixes": {
+                  "prefix": "### 🐛 Fixed Bugs",
+                  "labels": ["bug", "bug auto"]
+                }
+              }
           output: CHANGELOG.md
 
       - name: Show generated changelog

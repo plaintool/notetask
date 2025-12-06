@@ -15,20 +15,57 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Process all commits
+      - name: Process commits safely
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BEFORE_SHA="${{ github.event.before }}"
           CURRENT_SHA="${{ github.event.after }}"
           
-          echo "Processing commits from $BEFORE_SHA to $CURRENT_SHA"
+          # Check if BEFORE_SHA exists in the repository
+          if ! git rev-parse --verify "$BEFORE_SHA" > /dev/null 2>&1; then
+            echo "Warning: BEFORE_SHA ($BEFORE_SHA) not found in repository. This can happen with force push after squash/rebasing."
+            echo "Processing only the current commit $CURRENT_SHA"
+            
+            # Get information about the current commit only
+            COMMIT_MSG=$(git log --format="%s" -n 1 $CURRENT_SHA)
+            COMMIT_AUTHOR=$(git log --format="%an" -n 1 $CURRENT_SHA)
+            
+            # Create array with just the current commit
+            COMMITS="$CURRENT_SHA|$COMMIT_MSG|$COMMIT_AUTHOR"
+          else
+            echo "Processing commits from $BEFORE_SHA to $CURRENT_SHA"
+            
+            # Check if there are commits in the range
+            if ! git log --oneline $BEFORE_SHA..$CURRENT_SHA --quiet > /dev/null 2>&1; then
+              echo "No commits found in range $BEFORE_SHA..$CURRENT_SHA"
+              echo "This can happen with force push after squash/rebasing."
+              echo "Skipping issue creation."
+              exit 0
+            fi
+            
+            COMMITS=$(git log --pretty=format:"%H|%s|%an" $BEFORE_SHA..$CURRENT_SHA)
+          fi
           
-          COMMITS=$(git log --pretty=format:"%H|%s|%an" $BEFORE_SHA..$CURRENT_SHA)
+          # Exit if no commits to process
+          if [ -z "$COMMITS" ]; then
+            echo "No commits to process"
+            exit 0
+          fi
+          
+          echo "Found commits to process:"
+          echo "$COMMITS"
           
           while IFS='|' read -r COMMIT_ID COMMIT_MSG COMMIT_AUTHOR; do
             echo "Processing commit: $COMMIT_ID by $COMMIT_AUTHOR"
             
+            # Additional safety check: verify commit exists
+            if ! git rev-parse --verify "$COMMIT_ID" > /dev/null 2>&1; then
+              echo "Warning: Commit $COMMIT_ID not found, skipping..."
+              continue
+            fi
+            
+            # Convert commit message to uppercase for case-insensitive matching
             upper_msg=$(echo "$COMMIT_MSG" | tr '[:lower:]' '[:upper:]')
             case "$upper_msg" in
                 *"FIX:"*|*"FIXED:"*)
@@ -51,11 +88,13 @@ jobs:
             if [ "$type" != "None" ]; then
               echo "Creating $type issue for commit: $COMMIT_ID"
               
+              # Remove commit type prefix from title for cleaner issue titles
               TITLE=$(echo "$COMMIT_MSG" | sed -E 's/^(FIX|FIXED|FEATURE|FEAT|ENHANCEMENT|ENHANCE|DOC|DOCUMENTATION):\s*//i')
               BODY="**Commit:** https://github.com/$GITHUB_REPOSITORY/commit/$COMMIT_ID\n**Author:** $COMMIT_AUTHOR\n\nThis issue was automatically created from commit $COMMIT_ID"
               
               JSON="{\"title\":\"$TITLE\",\"body\":\"$BODY\",\"labels\":[\"$type\",\"Auto\"]}"
               
+              # Create GitHub issue via API
               RESPONSE=$(curl -s -X POST \
                 -H "Authorization: token $GITHUB_TOKEN" \
                 -H "Accept: application/vnd.github+json" \
@@ -63,15 +102,18 @@ jobs:
                 https://api.github.com/repos/${GITHUB_REPOSITORY}/issues \
                 -d "$JSON")
               
+              # Extract issue number from API response
               ISSUE_NUMBER=$(echo "$RESPONSE" | grep -o '"number":[[:space:]]*[0-9]*' | grep -o '[0-9]*')
               if [ -z "$ISSUE_NUMBER" ]; then
                 ISSUE_NUMBER=$(echo "$RESPONSE" | sed -n 's/.*"number":\([0-9]*\).*/\1/p')
               fi
               
+              # If issue was created successfully, close it after a delay
               if [ -n "$ISSUE_NUMBER" ] && [ "$ISSUE_NUMBER" != "null" ]; then
                 echo "Waiting 5 seconds before closing issue..."
                 sleep 5
                 
+                # Close the issue
                 curl -s -X PATCH \
                   -H "Authorization: token $GITHUB_TOKEN" \
                   -H "Accept: application/vnd.github+json" \
