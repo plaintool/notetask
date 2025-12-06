@@ -17,6 +17,7 @@ A simple application for creating and organizing task lists, offering essential 
 >   - [Windows](#windows)
 >   - [Linux](#linux)
 >- [Featured on](#featured-on)
+>- [Donate](#donate-💖)
 >- [Licensing](#licensing)
 
 ## What is it?
@@ -210,6 +211,19 @@ Notetask has been reviewed and listed on reputable software directories:
 - [MajorGeeks](https://www.majorgeeks.com/files/details/notetask.html)
 - [Softpedia](https://www.softpedia.com/get/Office-tools/Diary-Organizers-Calendar/Notetask.shtml)
 - [AlternativeTo](https://alternativeto.net/software/notetask/about/)
+
+## Donate 💖
+
+If you like Notetask and want to support its development, you can send a donation:
+
+| Currency | Network | Wallet Address |
+|----------|-----------------|----------------|
+| USDT     | Tron (TRC20)    | `TJvoYPRWw35SFxP5wh4c97Egm5TaS8uBVE` |
+| USDT     | Ethereum (ERC20), Binance Smart Chain (BEP20) | `0x404d7f200A318979EC9eB940F022045e6d38e43D` |
+| BTC      | Bitcoin (BTC)   | `bc1qqzarmz7yzv34mgpxdp5v58ejre7twy8upalfa9` |
+| ETH      | Ethereum (ERC20)| `0x404d7f200A318979EC9eB940F022045e6d38e43D` |
+
+Every little help is appreciated! 🙏
 
 ## Licensing
 
