@@ -17,7 +17,7 @@ A simple application for creating and organizing task lists, offering essential 
 >   - [Windows](#windows)
 >   - [Linux](#linux)
 >- [Featured on](#featured-on)
->- [Donate](#donate-💖)
+>- [Donate](#donate-)
 >- [Licensing](#licensing)
 
 ## What is it?
