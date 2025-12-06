@@ -57,12 +57,6 @@ type
     FPopupForm: TCheckListForm;
     FItems: TStrings;
     FAttachedControl: TControl;
-    FOnItemChecked: TItemCheckedEvent;
-    FOnBeforeBulkChange: TNotifyEvent;
-    FOnAfterBulkChange: TNotifyEvent;
-    FOnChange: TNotifyEvent;
-    FOnDropDown: TNotifyEvent;
-    FOnCloseUp: TNotifyEvent;
     FClosing: boolean;
     FPopupEmpty: boolean;
     FDropDownCount: integer;
@@ -72,9 +66,16 @@ type
     FPopupOpenTopDelta: integer;
     FPopupOpenBottomDelta: integer;
     FPopupWidthDelta: integer;
+    FPopupWidthIncludeSelf: boolean;
     FSorted: boolean;
     FParentColor: boolean;
     FParentFont: boolean;
+    FOnItemChecked: TItemCheckedEvent;
+    FOnBeforeBulkChange: TNotifyEvent;
+    FOnAfterBulkChange: TNotifyEvent;
+    FOnChange: TNotifyEvent;
+    FOnDropDown: TNotifyEvent;
+    FOnCloseUp: TNotifyEvent;
     procedure SetAttachedControl(Value: TControl);
     procedure SetDropDownCount(Value: integer);
     procedure SetItemHeight(Value: integer);
@@ -139,6 +140,7 @@ type
     property OnDropDown: TNotifyEvent read FOnDropDown write FOnDropDown;
     property OnCloseUp: TNotifyEvent read FOnCloseUp write FOnCloseUp;
     property PopupEmpty: boolean read FPopupEmpty write FPopupEmpty default True;
+    property PopupWidthIncludeSelf: boolean read FPopupWidthIncludeSelf write FPopupWidthIncludeSelf default True;
     property ParentBackground default False;
     property Color;
     property Font;
@@ -432,6 +434,7 @@ begin
   FParentColor := True;
   FParentFont := True;
   FPopupEmpty := True;
+  FPopupWidthIncludeSelf := True;
   GroupIndex := 1;
   AllowAllUp := True;
 end;
@@ -571,6 +574,8 @@ var
   MaxVisibleItems: integer;
   BorderDelta: integer;
 begin
+  if not Assigned(FPopupForm) then Exit;
+
   FPopupForm.CheckListBox.Enabled := False;
   try
     Control := FAttachedControl;
@@ -635,8 +640,8 @@ begin
     end
     else
     begin
-      FPopupForm.Left := P.X - 2;
-      FPopupForm.Width := Control.Width + Self.Width + Scale(FPopupWidthDelta);
+      FPopupForm.Left := P.X;
+      FPopupForm.Width := Control.Width + ifthen(FPopupWidthIncludeSelf, Self.Width, 0) + Scale(FPopupWidthDelta) - 1;
     end;
     FPopupForm.Height := FormHeight;
   finally

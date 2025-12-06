@@ -70,6 +70,7 @@ type
     FReadOnly: boolean;
     FEnabled: boolean;
     FUpdatePopup: boolean;
+    FSuggestedUnderEdit: boolean;
 
     FAutoColorBrigtness: integer;
     FAutoColorSaturation: integer;
@@ -136,6 +137,7 @@ type
     procedure SetSuggestedItemsSorted(Value: boolean);
     procedure SetSuggestedButtonGlyph(AValue: TBitmap);
     procedure SetSuggestedButtonCaption(const AValue: string);
+    procedure SetSuggestedUnderEdit(Value: boolean);
 
     function RemovalConfirmed(idx: integer = -1): boolean;
     function TagAtPos(const P: TPoint): integer;
@@ -225,6 +227,7 @@ type
     property SuggestedItemsSorted: boolean read GetSuggestedItemsSorted write SetSuggestedItemsSorted default False;
     property SuggestedButtonGlyph: TBitmap read GetSuggestedButtonGlyph write SetSuggestedButtonGlyph;
     property SuggestedButtonCaption: string read FSuggestedButtonCaption write SetSuggestedButtonCaption;
+    property SuggestedUnderEdit: boolean read FSuggestedUnderEdit write SetSuggestedUnderEdit default True;
     property SelectionColor: TColor read FSelectionColor write SetSelectionColor default clHighlight;
     property SelectionRectColor: TColor read FSelectionRectColor write FSelectionRectColor default clHighlight;
     property SelectionRectPenStyle: TPenStyle read FSelectionRectPenStyle write FSelectionRectPenStyle default psDash;
@@ -248,12 +251,12 @@ type
     procedure SetFocus; override;
     procedure AddTag(const ATag: string; AEditing: boolean = False);
     function RemoveTag(const ATag: string; AConfirm: boolean = False): boolean;
+    procedure RemoveSelectedTags;
     function Focused: boolean; override;
-    procedure CopyHoverText;
     function GetAutoColor(const ATag: string): TColor;
     function GetFirstSelectedTag: string;
     function GetLastUnselectedTag: string;
-    procedure RemoveSelectedTags;
+    procedure CopyHoverText;
     procedure FinishEdit;
     procedure SelectAll;
     procedure ClearSelection;
@@ -335,6 +338,7 @@ type
     property SuggestedItemsSorted;
     property SuggestedButtonCaption;
     property SuggestedButtonGlyph;
+    property SuggestedUnderEdit;
     property Items;
     // events
     property OnTagClick;
@@ -404,6 +408,7 @@ begin
   FSuggestedTags.Delimiter := ';';
   FSuggestedTags.OnChange := @SuggestedChanged;
   FSuggestedButtonCaption := '...';
+  FSuggestedUnderEdit := True;
 
   Height := Scale(32);
   Width := Scale(300);
@@ -466,7 +471,10 @@ begin
     FCheckListButton.Visible := False;
     FCheckListButton.MultiSelect := True;
     FCheckListButton.DropDownCount := 15;
-    FCheckListButton.AttachedControl := FEdit;
+    if FSuggestedUnderEdit then
+      FCheckListButton.AttachedControl := FEdit
+    else
+      FCheckListButton.AttachedControl := Self;
     FCheckListButton.OnClick := @CheckListClick;
     FCheckListButton.OnItemChecked := @CheckListItemChecked;
     FCheckListButton.OnBeforeBulkChange := @CheckListBeforeBulkChange;
@@ -681,6 +689,22 @@ begin
   // assign caption to internal button
   FSuggestedButtonCaption := AValue;
   FCheckListButton.Caption := Trim(FSuggestedButtonCaption);
+end;
+
+procedure TCustomTagEdit.SetSuggestedUnderEdit(Value: boolean);
+begin
+  FSuggestedUnderEdit := Value;
+  if FSuggestedUnderEdit then
+  begin
+    FCheckListButton.AttachedControl := FEdit;
+    FCheckListButton.PopupWidthIncludeSelf := True;
+  end
+  else
+  begin
+    FCheckListButton.AttachedControl := Self;
+    FCheckListButton.PopupWidthIncludeSelf := False;
+  end;
+  FCheckListButton.UpdatePopupForm;
 end;
 
 procedure TCustomTagEdit.SetSuggestedButtonGlyph(AValue: TBitmap);
@@ -1004,6 +1028,7 @@ begin
   begin
     if Assigned(FOnChange) then
       FOnChange(Self);
+    TagsChanged(Self);
     Invalidate;
     UpdateAutoHeight;
   end
@@ -1097,6 +1122,7 @@ begin
     Result := True;
     if Assigned(FOnChange) then
       FOnChange(Self);
+    TagsChanged(Self);
     Invalidate;
     UpdateAutoHeight;
   end
