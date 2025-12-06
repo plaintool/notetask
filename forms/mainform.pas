@@ -8070,6 +8070,7 @@ procedure TformNotetask.SetNote;
 var
   i: integer;
   notes: TStringList;
+  note: string;
 begin
   if (not ShowNote) then exit;
 
@@ -8083,7 +8084,11 @@ begin
         // Multiple rows selected — concatenate notes and set read-only
         for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
           if Tasks.Map(i) > -1 then
-            notes.Add(Tasks.GetTask(i).Note);
+          begin
+            note := Tasks.GetTask(i).Note;
+            if note <> string.Empty then
+              notes.Add(note);
+          end;
         memoNote.Lines.Text := notes.Text;
         memoNote.ReadOnly := True;
         memoNote.Color := clGray;
