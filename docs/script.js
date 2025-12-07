@@ -118,6 +118,33 @@ animate();
 window.addEventListener('resize', () => {
   width = canvas.width = window.innerWidth;
   height = canvas.height = window.innerHeight;
+
+  // recreate stars
+  dimStars.length = 0;
+  brightStars.length = 0;
+
+  for (let i = 0; i < dimStarsCount; i++) {
+    dimStars.push({
+      x: Math.random() * width - width/2,
+      y: Math.random() * height - height/2,
+      z: Math.random() * width,
+      speed: Math.random() * 0.5 + 0.2,
+      radius: Math.random() * 1.5 + 0.5
+    });
+  }
+
+  for (let i = 0; i < brightStarsCount; i++) {
+    brightStars.push({
+      x: Math.random() * width - width/2,
+      y: Math.random() * height - height/2,
+      z: Math.random() * width,
+      speed: Math.random() * 3 + 2,
+      radius: Math.random() * 3 + 1.5
+    });
+  }
+
+  // reset comet too
+  comet.active = false;
 });
 
 // scroll to top by default

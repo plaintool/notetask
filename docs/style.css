@@ -1,6 +1,6 @@
   body, html {
     margin: 0;
-    padding: 0;
+    padding: 10px;
     overflow: auto; /* allow scrolling */
     min-height: 100vh;
     background: black;
@@ -57,3 +57,77 @@
   #slogan {
     margin-top: 0;
   }
+  
+  /* Table styling */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 800px;
+  margin: 20px 0;
+}
+
+th, td {
+  border: 1px solid #888;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background: #111;
+}
+
+/* Responsive: turn table into cards */
+@media (max-width: 600px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  thead tr {
+    display: none;
+  }
+  tr {
+    margin-bottom: 15px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 10px;
+  }
+  td {
+    position: relative;
+    padding-left: 39%;
+    border: none;
+    border-bottom: 1px solid #444;
+  }
+  td::before {
+    position: absolute;
+    left: 10px;
+    width: 45%;
+    white-space: nowrap;
+    font-weight: bold;
+    content: attr(data-label);
+  }
+}
+
+footer#footer {
+  width: 100%;
+  text-align: center;
+  padding: 10px 0;
+  /* dark footer background with transparency gradient */
+  background: linear-gradient(to top, rgba(17,17,17,1), rgba(17,17,17,0.3));
+  color: #ccc;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  font-size: 14px;
+}
+
+
+/* Optional: add small shadow on top */
+footer#footer {
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
+}
