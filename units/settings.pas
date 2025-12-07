@@ -41,9 +41,16 @@ implementation
 uses systemtool;
 
 function GetSettingsDirectory(fileName: string = ''): string;
+var
+  baseDir: string;
 begin
   {$IFDEF Windows}
-  Result := IncludeTrailingPathDelimiter(GetEnvironmentVariable('LOCALAPPDATA')) + 'notetask\'+fileName;
+  // LOCALAPPDATA does not exist on Windows XP, fallback to APPDATA
+  baseDir := GetEnvironmentVariable('LOCALAPPDATA');
+  if baseDir = '' then
+    baseDir := GetEnvironmentVariable('APPDATA');
+
+  Result := IncludeTrailingPathDelimiter(baseDir) + 'notetask\' + fileName;
   {$ELSE}
   Result := IncludeTrailingPathDelimiter(GetUserDir) + '.config/notetask/' + filename;
   {$ENDIF}
