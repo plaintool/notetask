@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notetask</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<div id="placeholder">
+  <h1 id="header">Notetask 1.1.0</h1>
+  <p id="slogan">Organize, focus, and shine among your own universe of tasks</p>
+  <img src="https://github.com/plaintool/notetask/raw/main/samples/sample1.png" alt="Notetask sample">
+  <p>
+    <a href="https://github.com/plaintool/notetask">Github</a>
+    <a href="https://github.com/plaintool/notetask/releases/latest">Download</a>
+    <a href="donate.htm">Buy me a cofe...</a>
+  </p>
+  <div id="description">
+    <h2>What is it?</h2>
+    <p>
+      Do you often save important ideas, to-do lists, phone numbers, or command-line snippets in random text files, hoping to find them later… only to forget where exactly you put them? No more wasted time searching — <strong>Notetask</strong> helps bring order to the chaos!<br>
+      All your notes can be stored locally on your device — no clouds, no third parties.<br>
+      This handy desktop app helps you organize your tasks, capture ideas, and manage your lists — with no more confusion!
+    </p>
+    <p>
+      <strong>Notetask</strong> is a cross-platform application for managing task lists that include <em>completion status</em>, <em>task description</em>, and <em>notes</em>. Each task can have a due <em>date</em> and be marked as a favorite with a <em>star</em>. It uses its own storage text format based on Markdown.
+    </p>
+   
+    <p>
+      It is designed to help you quickly organize a large number of small routine tasks. You can enter tasks directly in the app or paste raw text from the clipboard — such as a list of requirements or ideas — then sort them into groups, set durations or amounts, and start working right away. Perfect for managing project to-dos, bug lists, feature requests, and other ongoing tasks.
+    </p>
+
+    <h3>Features:</h3>
+    <ul>
+      <li><strong>Numbering</strong> — Tasks are numbered automatically based on their order of appearance in the file</li>
+      <li><strong>Multiline</strong> — Tasks and notes with an option to submit or insert a line break when pressing Enter</li>
+      <li><strong>Tags</strong> — task tag support with bulk tag editing, tag choice from existing items, auto or custom tag color, sorting, and optional tag suffixes</li>
+      <li><strong>Filtering</strong> — filtering tasks across all fields and groups using an expression, with highlighting of matched items</li>
+      <li><strong>Find & Replace</strong> — search and replace text within tasks and notes using dialogs, with options for case sensitivity and scope selection</li>
+      <li><strong>Zoom</strong> — zooming of tasks and notes with adjustable zoom via mouse, keyboard, menu, or status bar</li>
+      <li><strong>Encrypt files</strong> — password-based encryption and decryption of task files for secure storage and sharing</li>
+      <li><strong>Move tasks</strong> — single or multiple, within or between groups; task priority is set simply by its position in the list</li>
+      <li><strong>Archive tasks</strong> — cross out archived items, which can be hidden or shown as needed</li>
+      <li><strong>Grouping</strong> — each group on its own page, with full group management</li>
+      <li><strong>Merge tasks</strong> — combine multiple tasks into one</li>
+      <li><strong>Split tasks</strong> — split a single task into multiple tasks based on the selected column; each line break in the column becomes a new task, while all other columns are copied to each new task</li>
+      <li><strong>Indent tasks</strong> — create subtasks and task hierarchies</li>
+      <li><strong>Highlight</strong> — automatic background highlighting of overdue tasks, text highlighting of archived but incomplete tasks and blue text for tasks with a future due date</li>
+      <li><strong>Copy tasks</strong> — copy selected tasks or fields in Markdown format</li>
+      <li><strong>Paste tasks</strong> — insert individual fields or entire tasks from clipboard</li>
+      <li><strong>Customize columns</strong> — toggle visibility of columns and interface elements (e.g., duration, note field, status bar)</li>
+      <li><strong>Track duration</strong> — per-task (on/off) and <strong>total duration</strong> for all or selected tasks</li>
+      <li><strong>Track amount</strong> — per-task quantities or prices and <strong>total amount</strong> for all or selected tasks</li>
+      <li><strong>Status bar summary</strong> — shows totals of dates and amounts separately for <strong>completed</strong> and <strong>incomplete</strong> tasks</li>
+    </ul>
+
+    <h4>Shopping list</h4>
+    <p>
+      <strong>Notetask</strong> allows you to keep a shopping list with item prices and see the total cost in the status bar, including the cost of purchased items.
+    </p>
+    <img src="https://github.com/plaintool/notetask/raw/main/samples/sample2.png" alt="sample2">
+
+    <h4>Notes</h4>
+    <p>Suitable for note-taking with an optional general note field at the bottom of the application window, as well as support for paged grouping and all task management features.</p>
+    <img src="https://github.com/plaintool/notetask/raw/main/samples/sample3.png" alt="sample3">
+
+    <h4>Personal Information</h4>
+    <p>Suitable for storing personal information in encrypted files, with secure access and optional grouping for better organization. Highlights duplicate data.</p>
+    <img src="https://github.com/plaintool/notetask/raw/main/samples/sample4.png" alt="sample4">
+
+    <h4>Encryption</h4>
+    <p>
+      Notetask can encrypt files using AES-256 in CBC mode with a key derived via PBKDF2-HMAC-SHA256. Files are compressed using zlib before encryption, and a SHA-256 HMAC over the salt, IV, and ciphertext ensures integrity and authenticity.
+    </p>
+    <p>
+      The user can save an encrypted binary file with password protection. If the password is left empty, the file is still encrypted but without password protection, storing only the compressed data in the encrypted format.
+    </p>
+    <p>
+      To save an encrypted file, the corresponding format must be selected in the file save dialog.
+    </p>
+    <img src="https://github.com/plaintool/notetask/raw/main/samples/encrypt.png" alt="encrypt">
+
+    <h4>Shortcuts</h4>
+    <p>Nearly all major features can be accessed through convenient keyboard shortcuts. View menu settings are saved individually based on filename.</p>
+    <img src="https://github.com/plaintool/notetask/raw/main/samples/menu.png" alt="menu">
+
+    <h4>Summary</h4>
+    <p>
+      The status bar provides a concise, real-time overview of the current task list. These values are dynamically calculated based on either the full list of the current group or the currently selected tasks. Settings are configured through the context menu on the status bar. It displays:
+    </p>
+    <ul>
+      <li><strong>Zoom Percentage</strong> allowing you to enlarge or reduce the view</li>
+      <li><strong>Text encoding</strong> (e.g., UTF-8) and <strong>line ending</strong> style (e.g., CRLF)</li>
+      <li><strong>Completed tasks / Total tasks</strong></li>
+      <li><strong>Total amount spent / Total amount for all tasks</strong> — useful for shopping lists or financial tracking</li>
+      <li><strong>Elapsed time / Estimated total time</strong> — helps monitor progress on timed tasks</li>
+    </ul>
+    <img src="https://github.com/plaintool/notetask/raw/main/samples/statusbar.png" alt="statusbar">
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

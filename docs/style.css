@@ -1,0 +1,59 @@
+  body, html {
+    margin: 0;
+    padding: 0;
+    overflow: auto; /* allow scrolling */
+    min-height: 100vh;
+    background: black;
+    font-family: Arial, sans-serif;
+    color: white;
+    scroll-behavior: smooth;
+  }
+  
+  #placeholder {
+    position: relative; /* changed from absolute */
+    max-width: 800px;
+    margin: 50px auto;
+    text-align: center;
+    z-index: 1;
+  }
+
+  #placeholder img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    opacity: 0.9; /* make image semi-transparent */
+  }
+
+  #placeholder a {
+    color: #00ffff;
+    text-decoration: none;
+    margin: 0 10px;
+  }
+
+  #placeholder a:hover {
+    text-decoration: underline;
+  }
+
+  #description p, ul {
+    text-align: left;
+  }
+
+  canvas {
+    display: block;
+    position: fixed; /* fixed so stars stay while scrolling */
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+  
+  #donate {
+    vertical-align: middle;
+  }
+
+  #header {
+    margin-bottom: 5px;
+  }
+
+  #slogan {
+    margin-top: 0;
+  }
