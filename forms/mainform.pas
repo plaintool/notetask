@@ -1904,6 +1904,7 @@ begin
       end
       else
         Grid.canvas.Brush.Style := bsClear;
+      Grid.canvas.Font.Color := Font.Color;
       DrawRect := aRect;
       DrawRect.Inflate(-4, 0);
 
