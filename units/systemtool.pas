@@ -742,7 +742,7 @@ begin
     end;
     {$ENDIF}
 
-    if ResponseContent <> '' then
+    if ResponseContent <> string.Empty then
     begin
       JsonData := GetJSON(ResponseContent);
       try
@@ -764,11 +764,11 @@ begin
       end;
     end
     else
-      ShowMessage(newversioncheckerror);
+      ShowMessage(newversioncheckerror + LineEnding + Url);
 
   except
     on E: Exception do
-      ShowMessage(newversioncheckerror + ' ' + E.Message);
+      ShowMessage(newversioncheckerror + LineEnding + Url + LineEnding + E.Message);
   end;
 end;
 
