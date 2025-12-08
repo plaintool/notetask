@@ -10,6 +10,7 @@ object formNotetask: TformNotetask
   Color = clWindow
   KeyPreview = True
   Menu = MainMenu
+  LCLVersion = '4.4.0.0'
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -20,7 +21,7 @@ object formNotetask: TformNotetask
   OnShow = FormShow
   object taskGrid: TStringGrid
     Left = 0
-    Height = 294
+    Height = 296
     Top = 24
     Width = 851
     Align = alClient
@@ -126,7 +127,7 @@ object formNotetask: TformNotetask
     Cursor = crVSplit
     Left = 0
     Height = 5
-    Top = 318
+    Top = 320
     Width = 851
     Align = alBottom
     AutoSnap = False
@@ -139,7 +140,7 @@ object formNotetask: TformNotetask
   object panelNote: TPanel
     Left = 0
     Height = 128
-    Top = 323
+    Top = 325
     Width = 851
     Align = alBottom
     BevelOuter = bvNone
@@ -266,19 +267,20 @@ object formNotetask: TformNotetask
     Cursor = crVSplit
     Left = 0
     Height = 5
-    Top = 451
+    Top = 453
     Width = 851
     Align = alBottom
     AutoSnap = False
     Color = clBtnFace
+    MinSize = 32
     ParentColor = False
     ResizeAnchor = akBottom
     Visible = False
   end
   object panelTags: TScrollBox
     Left = 0
-    Height = 34
-    Top = 456
+    Height = 32
+    Top = 458
     Width = 851
     HorzScrollBar.Page = 1
     HorzScrollBar.Visible = False
