@@ -41,8 +41,10 @@ implementation
 uses systemtool;
 
 function GetSettingsDirectory(fileName: string = ''): string;
+  {$IFDEF Windows}
 var
   baseDir: string;
+  {$ENDIF}
 begin
   {$IFDEF Windows}
   // LOCALAPPDATA does not exist on Windows XP, fallback to APPDATA
