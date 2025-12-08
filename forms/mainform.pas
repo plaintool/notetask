@@ -1038,6 +1038,7 @@ procedure TformNotetask.FormShow(Sender: TObject);
 var
   FilePath: string;
   FileOpened: boolean;
+  TagsHeight: integer;
 begin
   Visible := False;
 
@@ -1054,7 +1055,12 @@ begin
 
   // Before paint form
   SetCaption;
+
+  // Save panel height as it gets cleared during restore on Linux
+  TagsHeight := panelTags.Height;
   RestoreSelectedState(True, True, True);
+  panelTags.Height := TagsHeight;
+
   Tasks.CalcTagsWidths(-1, taskGrid.Columns[1].Width, tagsEdit, Font);
   SetZoom(FZoom);
   CorrectGridSelection;
