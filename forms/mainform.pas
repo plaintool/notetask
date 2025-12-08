@@ -803,6 +803,11 @@ var
 
 const
   DefRowHeight = 22;
+  {$IFDEF UNIX}
+  DefFontSize = 11;
+  {$ELSE}
+  DefFontSize = 9;
+  {$ENDIF}
 
   TagsColorBrigtness = 80;
   TagsColorSaturation = 80;
@@ -998,7 +1003,13 @@ begin
 
   // Zoom
   FOriginalFontSize := ifthen(Font.Size > 0, Font.Size, Screen.SystemFont.Size);
-  FOriginalFontSize := ifthen(FOriginalFontSize = 0, 10, FOriginalFontSize);
+  if FOriginalFontSize = 0 then
+  begin
+    FOriginalFontSize := DefFontSize;
+    {$IFDEF UNIX}
+    Self.Font.Size := DefFontSize;
+    {$ENDIF}
+  end;
 
   // Apply loaded settings to columns
   ApplyColumnSetting;
@@ -3369,7 +3380,13 @@ begin
     // Apply the selected font to the form
     Self.Font := fontDialog.Font;
     FOriginalFontSize := ifthen(Font.Size > 0, Font.Size, Screen.SystemFont.Size);
-    FOriginalFontSize := ifthen(FOriginalFontSize = 0, 10, FOriginalFontSize);
+    if FOriginalFontSize = 0 then
+    begin
+      FOriginalFontSize := DefFontSize;
+      {$IFDEF UNIX}
+      Self.Font.Size := DefFontSize;
+      {$ENDIF}
+    end;
     SetZoom(FZoom);
   end;
 end;
