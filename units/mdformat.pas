@@ -488,7 +488,7 @@ begin
           if (j = 5) and (Grid.Columns[j - 1].Visible) then pDate := GetTask(i).ToString(j).Trim;
         end;
         Row1 := (pDone + sp + pDate).Trim;
-        Row2 := (pText + ifthen(StartsWith(pNote), string.Empty, sp) + pNote);
+        Row2 := (pText + ifthen((pNote = string.Empty) or StartsWith(pNote), string.Empty, sp) + pNote);
 
         if (pDate <> string.Empty) and ((Row2 <> string.Empty) or (pAmount <> string.Empty)) then
           Row1 += ', '
