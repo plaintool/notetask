@@ -1,5 +1,5 @@
 Buildroot: ~/rpmbuild/BUILDROOT
-Name: Notetask
+Name: notetask
 Version: 1.1.0
 Release: 2
 Summary: A simple application for creating and organizing task lists
@@ -8,7 +8,7 @@ Distribution: Fedora
 Group: Converted/base
 Requires: gtk2
 
-%define _rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm
+%define _build_name_fmt %%{name}-%%{version}.rpm
 %define _unpackaged_files_terminate_build 0
 
 %description
