@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=notetask
+Exec=/usr/bin/notetask %f
+Type=Application
+MimeType=application/x-notetask
+Terminal=false
+Icon=x-notetask
+Categories=TextEditor;Office;Development;
+StartupWMClass=Notetask

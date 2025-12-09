@@ -1,3 +1,6 @@
 installer/debsetup/** text eol=lf
 installer/debsetup/**/*.exe -text
 installer/debsetup/**/*.png -text
+installer/rpmsetup/** text eol=lf
+installer/rpmsetup/**/*.exe -text
+installer/rpmsetup/**/*.png -text
