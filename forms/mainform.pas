@@ -2306,8 +2306,7 @@ begin
     end
     else
     begin
-      Memo.Color := clRowHighlight;
-      Memo.Font.Color := clBlack;
+      Memo.Color := clRowFocused;
     end;
     Memo.Font.Name := taskGrid.Font.Name;
     Memo.Font.Size := taskGrid.Font.Size;
@@ -6084,7 +6083,6 @@ begin
   else
   begin
     Memo.Color := clRowFocused;
-    Memo.Font.Color := clBlack;
   end;
 end;
 
