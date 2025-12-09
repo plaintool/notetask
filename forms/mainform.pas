@@ -4855,6 +4855,8 @@ begin
   SetFilter;
   SetChanged;
   taskGrid.Invalidate;
+  Application.ProcessMessages;
+  CalcRowHeight(True);
 end;
 
 procedure TformNotetask.tagsEditTagAdd(Sender: TObject; const TagText: string);
@@ -4865,11 +4867,17 @@ end;
 procedure TformNotetask.tagsEditTagRemove(Sender: TObject; const TagText: string);
 var
   i: integer;
+  task: TTask;
 begin
   //  Tasks.CreateBackup;
   for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
     if Tasks.Map(i) > -1 then
-      StringListRemove(Tasks.GetTask(i).Tags, TagText);
+    begin
+      task := Tasks.GetTask(i);
+      StringListRemove(task.Tags, TagText);
+      if task.Tags.Count = 0 then
+        task.TagsWidth := 0;
+    end;
 end;
 
 procedure TformNotetask.tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
