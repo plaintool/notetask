@@ -804,7 +804,7 @@ var
 const
   DefRowHeight = 22;
   {$IFDEF UNIX}
-  DefFontSize = 11;
+  DefFontSize = 10;
   {$ELSE}
   DefFontSize = 9;
   {$ENDIF}
