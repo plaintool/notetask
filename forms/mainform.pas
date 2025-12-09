@@ -583,6 +583,7 @@ type
     FWrapAround: boolean;
     FBiDiRightToLeft: boolean;
     FFindActive: boolean;
+    FFindF3: boolean;
     FFindText: string;
     FFoundText: string;
     FLastGridSelection: TRect;
@@ -4242,7 +4243,10 @@ begin
   end;
 
   if (FindText <> string.Empty) then
-    Find(FindText, MatchCase, WrapAround, True)
+  begin
+    FFindF3 := True;
+    Find(FindText, MatchCase, WrapAround, True);
+  end
   else
     aFind.Execute;
 end;
@@ -4252,7 +4256,10 @@ begin
   if taskGrid.RowCount < 2 then exit;
 
   if (FindText <> string.Empty) then
-    Find(FindText, MatchCase, WrapAround, False)
+  begin
+    FFindF3 := True;
+    Find(FindText, MatchCase, WrapAround, False);
+  end
   else
     aFind.Execute;
 end;
@@ -8835,7 +8842,7 @@ begin
       end;
 
     until ((not WrapAround) and (((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow = 0)))) or
-      (WrapAround and (Counter > taskGrid.RowCount)) or (not formFindText.Visible and not formReplaceText.Visible);
+      (WrapAround and (Counter > taskGrid.RowCount)) or (not FFindF3 and not formFindText.Visible and not formReplaceText.Visible);
 
     if (WrapAround and (Counter > taskGrid.RowCount)) then
       exit(NotFound);
@@ -8843,7 +8850,9 @@ begin
     Result := True;
   finally
     FDuplicateHighlight := True;
+    FLastText := string.Empty;
     FFindActive := False;
+    FFindF3 := False;
     Enabled := True;
   end;
 end;
@@ -8878,7 +8887,10 @@ begin
     if self.ActiveControl = memoNote then
       Target := memoNote
     else
+    begin
+      FMemoOldText := Memo.Text;
       Target := Memo;
+    end;
 
     GridBackupSelection;
     Tasks.CreateBackup;
@@ -8936,7 +8948,10 @@ begin
       if self.ActiveControl = memoNote then
         Target := memoNote
       else
+      begin
+        FMemoOldText := Memo.Text;
         Target := Memo;
+      end;
       Target.SelText := aToText;
       FLastFoundSelLength := Length(unicodestring(aToText));
       Target.SelStart := Max(Target.SelStart - FLastFoundSelLength, 0);
