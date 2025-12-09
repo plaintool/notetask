@@ -3803,6 +3803,7 @@ begin
     // Show the form as a modal dialog
     if ShowModal = mrOk then
     begin
+      EditComplete;
       newName := editText.Text;
       if (newName = rgroupuntitled) then newName := string.Empty;
 
@@ -8464,11 +8465,11 @@ begin
     taskGrid.Row := taskGrid.RowCount - 1;
 
   // Only fix Selection.Bottom if it's out of bounds
-  if taskGrid.Selection.Bottom >= taskGrid.RowCount then
+  if (taskGrid.Selection.Bottom < 1) or (taskGrid.Selection.Bottom >= taskGrid.RowCount) then
     taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Selection.Top, taskGrid.Selection.Right, taskGrid.RowCount - 1);
 
   // Only fix Selection.Top if it's out of bounds
-  if taskGrid.Selection.Top >= taskGrid.RowCount then
+  if (taskGrid.Selection.Top < 1) or (taskGrid.Selection.Top >= taskGrid.RowCount) then
     taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.RowCount - 1, taskGrid.Selection.Right, taskGrid.Selection.Bottom);
 end;
 
