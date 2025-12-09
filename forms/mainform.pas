@@ -589,6 +589,7 @@ type
     FLastGridSelection: TRect;
     FLastGridRow, FLastGridCol: integer;
     FLastSelectionHeight: integer;
+    FLastSelection: TGridRect;
     FLastFoundRow, FLastFoundCol, FLastFoundSelStart, FLastFoundSelLength: integer;
     FLastRowHeights: array of integer;
     FLastRow, FLastCol: integer;
@@ -2457,28 +2458,34 @@ begin
 end;
 
 procedure TformNotetask.taskGridSelection(Sender: TObject; aCol, aRow: integer);
+var
+  Modified: boolean = False;
 begin
   if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
     SetInfo;
 
-  if (aCol <> FLastCol) or (aRow <> FLastRow) or (taskGrid.Selection.Height <> FLastSelectionHeight) then
+  if (aRow <> FLastRow) or (taskGrid.Selection.Top <> FLastSelection.Top) or (taskGrid.Selection.Bottom <> FLastSelection.Bottom) then
   begin
-    if (aRow <> FLastRow) or (taskGrid.Selection.Height <> FLastSelectionHeight) then
-    begin
-      SetNote;
-      SetTags;
-    end;
-
-    FLastCol := aCol;
     FLastRow := aRow;
-    ChangeLastText(taskGrid.Cells[aCol, aRow], aCol, aRow);
+    Modified := True;
+    SetNote;
+    SetTags;
   end;
+
+  if (aCol <> FLastCol) or (taskGrid.Selection.Left <> FLastSelection.Left) or (taskGrid.Selection.Right <> FLastSelection.Right) then
+  begin
+    FLastCol := aCol;
+    Modified := True;
+  end;
+  if Modified then
+    ChangeLastText(taskGrid.Cells[aCol, aRow], aCol, aRow);
 
   // Save row to mem
   if Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex) then
     FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)] := aRow;
 
   FLastSelectionHeight := taskGrid.Selection.Height;
+  FLastSelection := taskGrid.Selection;
 end;
 
 procedure TformNotetask.groupTabsChange(Sender: TObject);
@@ -4242,6 +4249,9 @@ begin
     WrapAround := formFindText.checkWrapAround.Checked;
   end;
 
+  if (FindText = string.Empty) and (Clipboard.AsText <> string.Empty) then
+    FindText := Clipboard.AsText;
+
   if (FindText <> string.Empty) then
   begin
     FFindF3 := True;
@@ -4254,6 +4264,9 @@ end;
 procedure TformNotetask.aFindPrevExecute(Sender: TObject);
 begin
   if taskGrid.RowCount < 2 then exit;
+
+  if (FindText = string.Empty) and (Clipboard.AsText <> string.Empty) then
+    FindText := Clipboard.AsText;
 
   if (FindText <> string.Empty) then
   begin
@@ -7888,10 +7901,10 @@ begin
           GridInvalidate;
         FLastTextMatch := False;
       end;
+      exit;
     end;
-  end
-  else
-    FLastText := string.Empty;
+  end;
+  FLastText := string.Empty;
 end;
 
 procedure TformNotetask.SetChanged(aChanged: boolean = True);
@@ -8606,8 +8619,13 @@ var
         taskGrid.Row := FLastFoundRow;
         taskGrid.Col := FLastFoundCol;
         taskGrid.EditorMode := True;
+        FMemoOldText := Memo.Text;
         Memo.SelStart := FLastFoundSelStart;
         Memo.SelLength := FLastFoundSelLength;
+        {$IFDEF UNIX}
+          if Memo.Visible and Memo.CanSetFocus then
+            Memo.SetFocus;
+        {$ENDIF}
       end
       else
       begin
@@ -8627,7 +8645,10 @@ begin
   FFindActive := True;
   aRowsChanged := 0;
   FDuplicateHighlight := False;
-  Enabled := False;
+  {$IFDEF WINDOWS}
+  if not Silent then
+    Enabled := False;
+  {$ENDIF}
   try
     FindText := aText;
     MatchCase := aMatchCase;
@@ -8726,11 +8747,16 @@ begin
         begin
           FMemoNeedSelectAll := False;
           taskGrid.EditorMode := True;
+          FMemoOldText := Memo.Text;
           FLastFoundRow := taskGrid.Row;
           FLastFoundCol := taskGrid.Col;
           FLastFoundSelStart := Memo.SelStart;
           FLastFoundSelLength := Memo.SelLength;
           FFoundText := aText;
+          {$IFDEF UNIX}
+          if Memo.Visible and Memo.CanSetFocus then
+            Memo.SetFocus;
+          {$ENDIF}
           Counter := 0;
           Break;
         end;
@@ -8740,8 +8766,8 @@ begin
       begin
         sValue := unicodestring(DateTimeToString(DatePicker.DateTime));
         sText := unicodestring(aText);
-        if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (taskGrid.Cells[taskGrid.Col, taskGrid.Row] <>
-          string.Empty) and (not LastDate) then
+        if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and
+          (taskGrid.Cells[taskGrid.Col, taskGrid.Row] <> string.Empty) and (not LastDate) then
         begin
           FMemoNeedSelectAll := False;
           taskGrid.EditorMode := True;
@@ -8750,6 +8776,10 @@ begin
           FLastFoundSelStart := 0;
           FLastFoundSelLength := Length(sValue);
           FFoundText := aText;
+          {$IFDEF UNIX}
+          if Memo.Visible and Memo.CanSetFocus then
+            Memo.SetFocus;
+          {$ENDIF}
           Counter := 0;
           Break;
         end;
@@ -8841,8 +8871,9 @@ begin
         if (CurCol = 2) and (not ShowColumnTask) then DecCurCol;
       end;
 
-    until ((not WrapAround) and (((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow = 0)))) or
-      (WrapAround and (Counter > taskGrid.RowCount)) or (not FFindF3 and not formFindText.Visible and not formReplaceText.Visible);
+    until ((not WrapAround) and (((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or
+        ((not aDirectionDown) and (CurRow = 0)))) or (WrapAround and (Counter > taskGrid.RowCount)) or
+      (not FFindF3 and not formFindText.Visible and not formReplaceText.Visible);
 
     if (WrapAround and (Counter > taskGrid.RowCount)) then
       exit(NotFound);
@@ -8850,10 +8881,12 @@ begin
     Result := True;
   finally
     FDuplicateHighlight := True;
-    FLastText := string.Empty;
     FFindActive := False;
     FFindF3 := False;
-    Enabled := True;
+    {$IFDEF WINDOWS}
+    if not Silent then
+      Enabled := True;
+    {$ENDIF}
   end;
 end;
 
@@ -8981,8 +9014,8 @@ begin
   finally
     FBackup := True;
     FShowNote := sShowNote;
-    Enabled := True;
     FDuplicateHighlight := True;
+    Enabled := True;
   end;
 end;
 
