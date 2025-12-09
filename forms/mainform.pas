@@ -1377,8 +1377,14 @@ end;
 
 procedure TformNotetask.FormDropFiles(Sender: TObject; const FileNames: array of string);
 begin
+  // Ignore drops from the memo itself
+  if (Screen.ActiveControl = Memo) then
+    Exit;
+
   if Length(FileNames) > 0 then
   begin
+    if not FileExists(FileNames[0]) then Exit;
+
     if IsCanClose then
       OpenFile(FileNames[0]);
   end;
