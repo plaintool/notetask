@@ -1822,7 +1822,7 @@ begin
         else
         begin
           bgFill := clWhite; // All other white
-          Grid.Canvas.Font.Color := clBlack;
+          Grid.Canvas.Font.Color := Font.Color;
         end;
       end;
     end;
@@ -1906,7 +1906,7 @@ begin
       end
       else
         Grid.canvas.Brush.Style := bsClear;
-      Grid.canvas.Font.Color := Font.Color;
+
       DrawRect := aRect;
       DrawRect.Inflate(-4, 0);
 
