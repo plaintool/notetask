@@ -1,0 +1,128 @@
+<?xml version="1.0" ?>
+<XML_DIZ_INFO>
+	<MASTER_PAD_VERSION_INFO>
+		<MASTER_PAD_VERSION>3.11</MASTER_PAD_VERSION>
+		<MASTER_PAD_EDITOR>PADGen 3.1.1.50 http://www.padgen.org</MASTER_PAD_EDITOR>
+		<MASTER_PAD_INFO>Portable Application Description, or PAD for short, is a data set that is used by shareware authors to disseminate information to anyone interested in their software products. To find out more go to http://pad.asp-software.org</MASTER_PAD_INFO>
+	</MASTER_PAD_VERSION_INFO>
+	<Company_Info>
+		<Company_Name>plaintool</Company_Name>
+		<Address_1 />
+		<Address_2 />
+		<City_Town />
+		<State_Province />
+		<Zip_Postal_Code />
+		<Country />
+		<Company_WebSite_URL>https://github.com/plaintool</Company_WebSite_URL>
+		<Contact_Info>
+			<Author_First_Name>Alexander</Author_First_Name>
+			<Author_Last_Name>T</Author_Last_Name>
+			<Author_Email>astverskoy@gmail.com</Author_Email>
+			<Contact_First_Name />
+			<Contact_Last_Name />
+			<Contact_Email />
+		</Contact_Info>
+		<Support_Info>
+			<Sales_Email />
+			<Support_Email />
+			<General_Email />
+			<Sales_Phone />
+			<Support_Phone />
+			<General_Phone />
+			<Fax_Phone />
+		</Support_Info>
+	</Company_Info>
+	<Program_Info>
+		<Program_Name>Notetask</Program_Name>
+		<Program_Version>1.1.0</Program_Version>
+		<Program_Release_Month>12</Program_Release_Month>
+		<Program_Release_Day>09</Program_Release_Day>
+		<Program_Release_Year>2025</Program_Release_Year>
+		<Program_Cost_Dollars />
+		<Program_Cost_Other_Code />
+		<Program_Cost_Other />
+		<Program_Type>Freeware</Program_Type>
+		<Program_Release_Status>New Release</Program_Release_Status>
+		<Program_Install_Support>Install and Uninstall</Program_Install_Support>
+		<Program_OS_Support>Linux,Win7 x32,Win7 x64,WinOther,Other</Program_OS_Support>
+		<Program_Language>English,Arabic,Byelorussian,Chinese,Czech,Danish,Dutch,Finnish,French,German,Greek,Hebrew,Hindi,Italian,Japanese,Korean,Polish,Portuguese,Romanian,Russian,Spanish,Swedish,Turkish,Ukrainian</Program_Language>
+		<Program_Change_Info />
+		<Program_Specific_Category>Business</Program_Specific_Category>
+		<Program_Category_Class>Business::Office Suites &amp; Tools</Program_Category_Class>
+		<Program_System_Requirements />
+		<File_Info>
+			<File_Size_Bytes>4179032</File_Size_Bytes>
+			<File_Size_K>4081</File_Size_K>
+			<File_Size_MB>3.99</File_Size_MB>
+		</File_Info>
+		<Expire_Info>
+			<Has_Expire_Info>N</Has_Expire_Info>
+			<Expire_Count />
+			<Expire_Based_On />
+			<Expire_Other_Info />
+			<Expire_Month />
+			<Expire_Day />
+			<Expire_Year />
+		</Expire_Info>
+	</Program_Info>
+	<Program_Descriptions>
+		<English>
+			<Keywords>todo, task manager, notes, encryption, plaintext, tags, filtering</Keywords>
+			<Char_Desc_45 />
+			<Char_Desc_80 />
+			<Char_Desc_250>A simple application for creating and organizing task lists, offering essential features for efficient task management, similar to Notepad in its simplicity and functionality.</Char_Desc_250>
+			<Char_Desc_450 />
+			<Char_Desc_2000>Notetask is a free and open-source cross-platform task manager and note-taking application for Windows and Linux, written in Lazarus (Free Pascal). The core idea of Notetask is simple: it stores tasks and notes in plain text files, where each line represents a separate task or note. Users can also choose to save their files in an encrypted format for personal information, while all data remains local to their device.
+
+Notetask provides a customizable interface and a range of features to manage tasks effectively, including automatic numbering, paged task groups with duration and amount tracking, task merging, splitting, archiving, indentation, highlighting for overdue or upcoming tasks, copy/paste in Markdown, and an optional encrypted file format. It is fully Unicode-enabled and localized in 25 languages.
+
+Changelog (v1.1.0)
+
+New Features
+- Implement real-time task filtering for all visible groups and tasks
+- Highlight text fragments found by filter in the grid
+- Implement full tag support in task file
+- Dropdown check-list in tag input allows selecting existing tags or removing them
+- Add Zoom functionality for the grid with control via View menu, mouse wheel, hotkeys, or status bar
+- Add tooltips for groups, stored in the file after comment marker
+- Search and highlight cell text matching current cell
+- Build a single InnoSetup installer for all architectures
+- Add 32-bit build
+- Add translations for cs, da, nl, fi, el, he, id, pl, ro, sv, tr
+- Open a link from notes or grid with Ctrl + Click
+
+Enhancements
+- Switch groups using NUMPAD+ and NUMPAD-
+- Save print settings, print tags behind task text
+- Change MD format, place tags closer to task text
+- Allow writing links in task text
+- Move task to top/bottom before first/last visible non-archived task if archive hidden
+- Check for updates via wget on Linux
+- Render sorting arrow in fixed column</Char_Desc_2000>
+		</English>
+	</Program_Descriptions>
+	<Web_Info>
+		<Application_URLs>
+			<Application_Info_URL>https://github.com/plaintool/notetask</Application_Info_URL>
+			<Application_Order_URL>https://github.com/plaintool/notetask/releases/latest</Application_Order_URL>
+			<Application_Screenshot_URL>https://github.com/plaintool/notetask/raw/main/samples/sample1.png</Application_Screenshot_URL>
+			<Application_Icon_URL>https://github.com/plaintool/notetask/raw/main/samples/notetask.png</Application_Icon_URL>
+			<Application_XML_File_URL>https://github.com/plaintool/notetask/raw/main/installer/notetask.xml</Application_XML_File_URL>
+		</Application_URLs>
+		<Download_URLs>
+			<Primary_Download_URL>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-any-x86-x64.exe</Primary_Download_URL>
+			<Secondary_Download_URL>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0.deb</Secondary_Download_URL>
+			<Additional_Download_URL_1>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-x64.msi</Additional_Download_URL_1>
+			<Additional_Download_URL_2>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-x86.msi</Additional_Download_URL_2>
+		</Download_URLs>
+	</Web_Info>
+	<Permissions>
+		<Distribution_Permissions />
+		<EULA />
+	</Permissions>
+	<ASP>
+		<ASP_FORM>Y</ASP_FORM>
+		<ASP_Member>N</ASP_Member>
+		<ASP_Member_Number />
+	</ASP>
+</XML_DIZ_INFO>
