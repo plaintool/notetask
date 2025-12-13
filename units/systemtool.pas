@@ -527,6 +527,7 @@ var
   Url: string;
   CurrentVersion: string;
   ResponseContent: string;
+  ErrorMsg: string;
 
 {$IFDEF WINDOWS}
   function HttpGetWinInet(const AUrl: string): string;
@@ -746,6 +747,20 @@ begin
     begin
       JsonData := GetJSON(ResponseContent);
       try
+        if JsonData.FindPath('tag_name') = nil then
+        begin
+          try
+            ErrorMsg := JsonData.GetPath('message').AsString;
+            if ErrorMsg <> '' then
+              ShowMessage(newversioncheckerror + LineEnding + Url + LineEnding + 'GitHub API: ' + ErrorMsg)
+            else
+              ShowMessage(newversioncheckerror + LineEnding + Url);
+          except
+            ShowMessage(newversioncheckerror + LineEnding + Url);
+          end;
+          Exit;
+        end;
+
         LatestVersion := JsonData.GetPath('tag_name').AsString;
 
         if AnsiLowerCase(StringReplace(LatestVersion, 'v', '', [rfReplaceAll])) <> AnsiLowerCase(
