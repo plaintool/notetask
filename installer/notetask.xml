@@ -2,7 +2,7 @@
 <XML_DIZ_INFO>
 	<MASTER_PAD_VERSION_INFO>
 		<MASTER_PAD_VERSION>3.11</MASTER_PAD_VERSION>
-		<MASTER_PAD_EDITOR>PADGen 3.1.1.50 http://www.padgen.org</MASTER_PAD_EDITOR>
+		<MASTER_PAD_EDITOR>PadXml 1.0.0</MASTER_PAD_EDITOR>
 		<MASTER_PAD_INFO>Portable Application Description, or PAD for short, is a data set that is used by shareware authors to disseminate information to anyone interested in their software products. To find out more go to http://pad.asp-software.org</MASTER_PAD_INFO>
 	</MASTER_PAD_VERSION_INFO>
 	<Company_Info>
@@ -24,7 +24,7 @@
 		</Contact_Info>
 		<Support_Info>
 			<Sales_Email />
-			<Support_Email />
+			<Support_Email>astverskoy@gmail.com</Support_Email>
 			<General_Email />
 			<Sales_Phone />
 			<Support_Phone />
@@ -44,8 +44,8 @@
 		<Program_Type>Freeware</Program_Type>
 		<Program_Release_Status>New Release</Program_Release_Status>
 		<Program_Install_Support>Install and Uninstall</Program_Install_Support>
-		<Program_OS_Support>Linux,Win7 x32,Win7 x64,WinOther,Other</Program_OS_Support>
-		<Program_Language>English,Arabic,Byelorussian,Chinese,Czech,Danish,Dutch,Finnish,French,German,Greek,Hebrew,Hindi,Italian,Japanese,Korean,Polish,Portuguese,Romanian,Russian,Spanish,Swedish,Turkish,Ukrainian</Program_Language>
+		<Program_OS_Support>Linux,Win7 x32,Win7 x64,WinOther,WinXP,Other</Program_OS_Support>
+		<Program_Language>English,Arabic,Byelorussian,Chinese,Czech,Danish,Dutch,Finnish,French,German,Greek,Hebrew,Hindi,Indonesian,Italian,Japanese,Korean,Polish,Portuguese,Romanian,Russian,Spanish,Swedish,Turkish,Ukrainian</Program_Language>
 		<Program_Change_Info />
 		<Program_Specific_Category>Business</Program_Specific_Category>
 		<Program_Category_Class>Business::Office Suites &amp; Tools</Program_Category_Class>
@@ -67,11 +67,11 @@
 	</Program_Info>
 	<Program_Descriptions>
 		<English>
-			<Keywords>todo, task manager, notes, encryption, plaintext, tags, filtering</Keywords>
-			<Char_Desc_45 />
-			<Char_Desc_80 />
+			<Keywords>editor, plaintext, todo, task manager, notes, encryption, tags, filtering</Keywords>
+			<Char_Desc_45>Free cross-platform task &amp; notes in plaintext</Char_Desc_45>
+			<Char_Desc_80>Free cross-platform task &amp; notes in plain-text on your disk!</Char_Desc_80>
 			<Char_Desc_250>A simple application for creating and organizing task lists, offering essential features for efficient task management, similar to Notepad in its simplicity and functionality.</Char_Desc_250>
-			<Char_Desc_450 />
+			<Char_Desc_450>Notetask is a free and open-source cross-platform task manager and note-taking application for Windows and Linux, written in Lazarus (Free Pascal). The core idea of Notetask is simple: it stores tasks and notes in plain text files, where each line represents a separate task or note. Users can also choose to save their files in an encrypted format for personal information, while all data remains local to their device.</Char_Desc_450>
 			<Char_Desc_2000>Notetask is a free and open-source cross-platform task manager and note-taking application for Windows and Linux, written in Lazarus (Free Pascal). The core idea of Notetask is simple: it stores tasks and notes in plain text files, where each line represents a separate task or note. Users can also choose to save their files in an encrypted format for personal information, while all data remains local to their device.
 
 Notetask provides a customizable interface and a range of features to manage tasks effectively, including automatic numbering, paged task groups with duration and amount tracking, task merging, splitting, archiving, indentation, highlighting for overdue or upcoming tasks, copy/paste in Markdown, and an optional encrypted file format. It is fully Unicode-enabled and localized in 25 languages.
@@ -111,14 +111,24 @@ Enhancements
 		</Application_URLs>
 		<Download_URLs>
 			<Primary_Download_URL>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-any-x86-x64.exe</Primary_Download_URL>
-			<Secondary_Download_URL>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0.deb</Secondary_Download_URL>
+			<Secondary_Download_URL />
 			<Additional_Download_URL_1>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-x64.msi</Additional_Download_URL_1>
 			<Additional_Download_URL_2>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-x86.msi</Additional_Download_URL_2>
 		</Download_URLs>
 	</Web_Info>
 	<Permissions>
-		<Distribution_Permissions />
-		<EULA />
+		<Distribution_Permissions>This software is distributed under the terms of the GNU General Public License v3.0.
+You are allowed to copy, distribute, and modify the program, provided that any
+redistribution or derivative work is licensed under GPLv3 and the source code
+is made available.</Distribution_Permissions>
+		<EULA>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 3 of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.</EULA>
 	</Permissions>
 	<ASP>
 		<ASP_FORM>Y</ASP_FORM>
