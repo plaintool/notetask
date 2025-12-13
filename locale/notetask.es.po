@@ -344,7 +344,21 @@ msgid "USDT"
 msgstr ""
 
 #: tformdonatenotetask.labelurl.caption
+msgctxt "tformdonatenotetask.labelurl.caption"
+msgid "Changelly.com"
+msgstr ""
+
+#: tformdonatenotetask.labelurl.hint
+msgctxt "tformdonatenotetask.labelurl.hint"
 msgid "https://changelly.com/buy-crypto?amount=15&from=usd"
+msgstr ""
+
+#: tformdonatenotetask.labelurl1.caption
+msgid "How to do it easily"
+msgstr ""
+
+#: tformdonatenotetask.labelurl1.hint
+msgid "https://plaintool.github.io/notetask/donate.htm"
 msgstr ""
 
 #: tformfindtext.buttoncancel.caption
@@ -1076,3 +1090,4 @@ msgstr "Buscar qué:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Reemplazar con:"
+

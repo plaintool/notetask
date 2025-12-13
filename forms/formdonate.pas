@@ -42,6 +42,7 @@ type
     Label9: TLabel;
     labelUrl: TLabel;
     Label10: TLabel;
+    labelUrl1: TLabel;
     procedure buttonCopy1Click(Sender: TObject);
     procedure buttonCopy2Click(Sender: TObject);
     procedure buttonCopy3Click(Sender: TObject);
@@ -104,7 +105,7 @@ end;
 
 procedure TformDonateNotetask.labelUrlClick(Sender: TObject);
 begin
-  OpenUrl(labelUrl.Caption);
+  OpenUrl((Sender as TLabel).Hint);
 end;
 
 procedure TformDonateNotetask.editWallet4Click(Sender: TObject);

@@ -344,8 +344,24 @@ msgid "USDT"
 msgstr ""
 
 #: tformdonatenotetask.labelurl.caption
-msgid "https://changelly.com/buy-crypto?amount=15&from=usd"
+#, fuzzy
+#| msgid "https://changelly.com/buy-crypto?amount=15&from=usd"
+msgctxt "tformdonatenotetask.labelurl.caption"
+msgid "Changelly.com"
 msgstr "https://changelly.com/buy-crypto?amount=15&from=usd"
+
+#: tformdonatenotetask.labelurl.hint
+msgctxt "tformdonatenotetask.labelurl.hint"
+msgid "https://changelly.com/buy-crypto?amount=15&from=usd"
+msgstr ""
+
+#: tformdonatenotetask.labelurl1.caption
+msgid "How to do it easily"
+msgstr ""
+
+#: tformdonatenotetask.labelurl1.hint
+msgid "https://plaintool.github.io/notetask/donate.htm"
+msgstr ""
 
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"
@@ -1076,3 +1092,4 @@ msgstr "Εύρεση:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Αντικατάσταση με:"
+

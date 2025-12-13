@@ -9,6 +9,7 @@ object formDonateNotetask: TformDonateNotetask
   ClientHeight = 442
   ClientWidth = 441
   Color = clWindow
+  LCLVersion = '4.4.0.0'
   OnCreate = FormCreate
   object buttonOk: TButton
     Left = 356
@@ -297,13 +298,16 @@ object formDonateNotetask: TformDonateNotetask
     Cursor = crHandPoint
     Left = 16
     Height = 15
+    Hint = 'https://changelly.com/buy-crypto?amount=15&from=usd'
     Top = 132
-    Width = 312
-    Caption = 'https://changelly.com/buy-crypto?amount=15&from=usd'
+    Width = 80
+    Caption = 'Changelly.com'
     Font.Color = clBlue
     Font.Style = [fsUnderline]
     ParentFont = False
+    ParentShowHint = False
     ShowAccelChar = False
+    ShowHint = True
     WordWrap = True
     OnClick = labelUrlClick
   end
@@ -315,5 +319,22 @@ object formDonateNotetask: TformDonateNotetask
     AutoSize = False
     Caption = 'Feel free to make a donation through any exchange, for example:'
     WordWrap = True
+  end
+  object labelUrl1: TLabel
+    Cursor = crHandPoint
+    Left = 136
+    Height = 15
+    Hint = 'https://plaintool.github.io/notetask/donate.htm'
+    Top = 132
+    Width = 98
+    Caption = 'How to do it easily'
+    Font.Color = clBlue
+    Font.Style = [fsUnderline]
+    ParentFont = False
+    ParentShowHint = False
+    ShowAccelChar = False
+    ShowHint = True
+    WordWrap = True
+    OnClick = labelUrlClick
   end
 end
