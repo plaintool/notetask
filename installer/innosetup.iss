@@ -33,6 +33,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
+UninstallDisplayIcon={app}\notetask.exe
 DefaultDirName={autopf}\{#MyAppName}
 ArchitecturesAllowed=x64compatible x86 arm64
 ArchitecturesInstallIn64BitMode=x64compatible arm64

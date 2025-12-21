@@ -28,6 +28,7 @@
         <Package Description="$(var.ProductName)" Comments="Notetask" Platform="$(var.Platform)" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
         <!-- <Property Id="ALLUSERS" Value="1"/> -->
         <Property Id="MSIFASTINSTALL" Value="1" />
+        <Property Id="ARPPRODUCTICON" Value="AppIcon" />
         <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Upgrade Id="45C75BC5-3DDC-453B-A7AB-7E2AE0D88699">
@@ -102,6 +103,7 @@
         <UI>
             <UIRef Id="WixUI_Minimal" />
         </UI>
+        <Icon Id="AppIcon" SourceFile="..\$(var.ExeName)" />
         <Icon Id="DesktopIcon.exe" SourceFile="..\$(var.ExeName)" />
         <Icon Id="StartMenuIcon.exe" SourceFile="..\$(var.ExeName)" />
     </Product>
