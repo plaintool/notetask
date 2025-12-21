@@ -1,6 +1,6 @@
 Buildroot: ~/rpmbuild/BUILDROOT
 Name: notetask
-Version: 1.1.0
+Version: 1.1.1
 Release: 2
 Summary: A simple application for creating and organizing task lists
 License: see /usr/share/doc/notetask/copyright
@@ -25,14 +25,14 @@ mkdir -p %{buildroot}/usr/share/icons/hicolor/64x64/apps
 mkdir -p %{buildroot}/usr/share/icons/hicolor/128x128/mimetypes
 mkdir -p %{buildroot}/usr/share/icons/hicolor/128x128/apps
 
-cp -p ~/notetask-1.1.0/usr/bin/notetask %{buildroot}/usr/bin/
-cp -p ~/notetask-1.1.0/usr/share/applications/x-notetask.desktop %{buildroot}/usr/share/applications/
-cp -p ~/notetask-1.1.0/usr/share/pixmaps/notetask.png %{buildroot}/usr/share/pixmaps/
-cp -p ~/notetask-1.1.0/usr/share/mime/packages/x-notetask.xml %{buildroot}/usr/share/mime/packages/
-cp -p ~/notetask-1.1.0/usr/share/icons/hicolor/64x64/mimetypes/taskdoc.png %{buildroot}/usr/share/icons/hicolor/64x64/mimetypes/
-cp -p ~/notetask-1.1.0/usr/share/icons/hicolor/64x64/apps/x-notetask.png %{buildroot}/usr/share/icons/hicolor/64x64/apps/
-cp -p ~/notetask-1.1.0/usr/share/icons/hicolor/128x128/mimetypes/taskdoc.png %{buildroot}/usr/share/icons/hicolor/128x128/mimetypes/
-cp -p ~/notetask-1.1.0/usr/share/icons/hicolor/128x128/apps/x-notetask.png %{buildroot}/usr/share/icons/hicolor/128x128/apps/
+cp -p ~/notetask-1.1.1/usr/bin/notetask %{buildroot}/usr/bin/
+cp -p ~/notetask-1.1.1/usr/share/applications/x-notetask.desktop %{buildroot}/usr/share/applications/
+cp -p ~/notetask-1.1.1/usr/share/pixmaps/notetask.png %{buildroot}/usr/share/pixmaps/
+cp -p ~/notetask-1.1.1/usr/share/mime/packages/x-notetask.xml %{buildroot}/usr/share/mime/packages/
+cp -p ~/notetask-1.1.1/usr/share/icons/hicolor/64x64/mimetypes/taskdoc.png %{buildroot}/usr/share/icons/hicolor/64x64/mimetypes/
+cp -p ~/notetask-1.1.1/usr/share/icons/hicolor/64x64/apps/x-notetask.png %{buildroot}/usr/share/icons/hicolor/64x64/apps/
+cp -p ~/notetask-1.1.1/usr/share/icons/hicolor/128x128/mimetypes/taskdoc.png %{buildroot}/usr/share/icons/hicolor/128x128/mimetypes/
+cp -p ~/notetask-1.1.1/usr/share/icons/hicolor/128x128/apps/x-notetask.png %{buildroot}/usr/share/icons/hicolor/128x128/apps/
 
 chmod +x %{buildroot}/usr/bin/notetask
 

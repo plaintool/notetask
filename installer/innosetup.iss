@@ -20,7 +20,7 @@ Root: HKA; Subkey: "Software\Classes\Applications\notetask.exe\shell\open\comman
 ;End of registry data from file notetask.reg
 
 #define MyAppName "Notetask"
-#define MyAppVersion "1.1.0"
+#define MyAppVersion "1.1.1"
 #define MyAppPublisher "Alexander Tverskoy"
 #define MyAppURL "https://github.com/plaintool/notetask"
 #define MyAppExeName "notetask.exe"

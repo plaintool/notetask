@@ -3,7 +3,7 @@ setlocal
 
 :: Define paths
 SET "SOURCE_DIR=E:\notetask\installer"
-SET "VERSION=1.1.0"
+SET "VERSION=1.1.1"
 
 :: Check if platform parameter is provided
 IF "%1"=="" (

@@ -3,7 +3,7 @@ setlocal
 
 :: Define paths
 SET "SOURCE_DIR=E:\notetask\installer"
-SET "VERSION=1.1.0"
+SET "VERSION=1.1.1"
 
 :: --- Build inno setup ---
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "%SOURCE_DIR%\innosetup.iss"
