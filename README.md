@@ -208,9 +208,10 @@ sudo dnf install -y xterm
 ## Featured on
 Notetask has been reviewed and listed on reputable software directories:
 
-- [MajorGeeks](https://www.majorgeeks.com/files/details/notetask.html)
-- [Softpedia](https://www.softpedia.com/get/Office-tools/Diary-Organizers-Calendar/Notetask.shtml)
-- [AlternativeTo](https://alternativeto.net/software/notetask/about/)
+[![MajorGeeks](https://img.shields.io/badge/MajorGeeks-Visit-darkolivegreen?style=for-the-badge)](https://www.majorgeeks.com/files/details/notetask.html)
+[![Softpedia](https://img.shields.io/badge/Softpedia-Visit-navy?style=for-the-badge)](https://www.softpedia.com/get/Office-tools/Diary-Organizers-Calendar/Notetask.shtml)
+[![AlternativeTo](https://img.shields.io/badge/AlternativeTo-Visit-dodgerblue?style=for-the-badge)](https://alternativeto.net/software/notetask/about/)
+[![Join our Discord](https://img.shields.io/badge/Discord-Join%20Server-7289DA?logo=discord&style=for-the-badge)](https://discord.gg/72JrFpUUZZ)
 
 ## Donate 💖
 
