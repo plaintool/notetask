@@ -13,14 +13,14 @@
 		<State_Province />
 		<Zip_Postal_Code />
 		<Country />
-		<Company_WebSite_URL>https://github.com/plaintool</Company_WebSite_URL>
+		<Company_WebSite_URL>http://github.com/plaintool</Company_WebSite_URL>
 		<Contact_Info>
 			<Author_First_Name>Alexander</Author_First_Name>
 			<Author_Last_Name>T</Author_Last_Name>
 			<Author_Email>astverskoy@gmail.com</Author_Email>
-			<Contact_First_Name />
-			<Contact_Last_Name />
-			<Contact_Email />
+			<Contact_First_Name>Alexander</Contact_First_Name>
+			<Contact_Last_Name>T</Contact_Last_Name>
+			<Contact_Email>astverskoy@gmail.com</Contact_Email>
 		</Contact_Info>
 		<Support_Info>
 			<Sales_Email />
@@ -103,17 +103,17 @@ Enhancements
 	</Program_Descriptions>
 	<Web_Info>
 		<Application_URLs>
-			<Application_Info_URL>https://github.com/plaintool/notetask</Application_Info_URL>
-			<Application_Order_URL>https://github.com/plaintool/notetask/releases/latest</Application_Order_URL>
-			<Application_Screenshot_URL>https://github.com/plaintool/notetask/raw/main/samples/sample1.png</Application_Screenshot_URL>
-			<Application_Icon_URL>https://github.com/plaintool/notetask/raw/main/samples/notetask.png</Application_Icon_URL>
-			<Application_XML_File_URL>https://github.com/plaintool/notetask/raw/main/installer/notetask.xml</Application_XML_File_URL>
+			<Application_Info_URL>http://github.com/plaintool/notetask</Application_Info_URL>
+			<Application_Order_URL>http://github.com/plaintool/notetask/releases/latest</Application_Order_URL>
+			<Application_Screenshot_URL>http://raw.githubusercontent.com/plaintool/notetask/main/samples/sample1.png</Application_Screenshot_URL>
+			<Application_Icon_URL>http://raw.githubusercontent.com/plaintool/notetask/main/samples/notetask32.png</Application_Icon_URL>
+			<Application_XML_File_URL>http://raw.githubusercontent.com/plaintool/notetask/refs/heads/main/installer/notetask.xml</Application_XML_File_URL>
 		</Application_URLs>
 		<Download_URLs>
-			<Primary_Download_URL>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-any-x86-x64.exe</Primary_Download_URL>
+			<Primary_Download_URL>http://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-any-x86-x64.exe</Primary_Download_URL>
 			<Secondary_Download_URL />
-			<Additional_Download_URL_1>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-x64.msi</Additional_Download_URL_1>
-			<Additional_Download_URL_2>https://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-x86.msi</Additional_Download_URL_2>
+			<Additional_Download_URL_1>http://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-x64.msi</Additional_Download_URL_1>
+			<Additional_Download_URL_2>http://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-x86.msi</Additional_Download_URL_2>
 		</Download_URLs>
 	</Web_Info>
 	<Permissions>
