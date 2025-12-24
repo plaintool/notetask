@@ -44,17 +44,29 @@ function GetSettingsDirectory(fileName: string = ''): string;
   {$IFDEF Windows}
 var
   baseDir: string;
+  exeDir: string;
   {$ENDIF}
 begin
   {$IFDEF Windows}
-  // LOCALAPPDATA does not exist on Windows XP, fallback to APPDATA
+  // Get directory where exe is located
+  exeDir := ExtractFilePath(ParamStr(0));
+
+  // Portable mode: settings file exists near exe
+  if FileExists(exeDir + 'form_settings.json') then
+  begin
+    Result := IncludeTrailingPathDelimiter(exeDir) + fileName;
+    Exit;
+  end;
+
+  // Default mode: use LOCALAPPDATA or APPDATA
   baseDir := GetEnvironmentVariable('LOCALAPPDATA');
   if baseDir = '' then
     baseDir := GetEnvironmentVariable('APPDATA');
 
   Result := IncludeTrailingPathDelimiter(baseDir) + 'notetask\' + fileName;
   {$ELSE}
-  Result := IncludeTrailingPathDelimiter(GetUserDir) + '.config/notetask/' + filename;
+  // Unix-like systems: use ~/.config/notetask
+  Result := IncludeTrailingPathDelimiter(GetUserDir) + '.config/notetask/' + fileName;
   {$ENDIF}
 end;
 

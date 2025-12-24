@@ -66,6 +66,10 @@ IF %ERRORLEVEL% EQU 0 (
 )
 
 :: --- Portable ---
-tar -czf notetask-%VERSION%.tar.gz -C .. notetask.exe notetask32.exe -C "%CD%\debsetup\DATA\usr\bin" notetask
+powershell -Command ^
+"Compress-Archive ^
+ -Force ^
+ -Path ..\notetask.exe,..\notetask32.exe, .\form_settings.json ^
+ -DestinationPath notetask-%VERSION%-x86-x64-portable.zip"
 
 echo Build and signing completed successfully!
