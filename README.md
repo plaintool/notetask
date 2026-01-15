@@ -157,6 +157,7 @@ Several installer options are available on the releases page:
 - **notetask-any-x86-x64.exe** — a universal EXE installer that works on **both x86 and x64** systems and supports installation **for a single user or for all users**, depending on the selected options.
 - **notetask-x64.msi / notetask-x86.msi** — installs the application **for the current user**.  
 - **notetask-x64-allusers.msi / notetask-x86-allusers.msi** — installs the application **for all users on the system**.  
+- **notetask-x86-x64-portable.zip** — portable version, saves its settings to `form_settings.json` if it is near the executable; otherwise, in the user directory
 
 > **Note:** Windows XP supports installation **only via MSI installers**. The EXE installer is **not compatible** with Windows XP.
 
@@ -211,7 +212,6 @@ Notetask has been reviewed and listed on reputable software directories:
 [![MajorGeeks](https://img.shields.io/badge/MajorGeeks-Visit-darkolivegreen?style=for-the-badge)](https://www.majorgeeks.com/files/details/notetask.html)
 [![Softpedia](https://img.shields.io/badge/Softpedia-Visit-navy?style=for-the-badge)](https://www.softpedia.com/get/Office-tools/Diary-Organizers-Calendar/Notetask.shtml)
 [![AlternativeTo](https://img.shields.io/badge/AlternativeTo-Visit-dodgerblue?style=for-the-badge)](https://alternativeto.net/software/notetask/about/)
-[![Join our Discord](https://img.shields.io/badge/Discord-Join%20Server-7289DA?logo=discord&style=for-the-badge)](https://discord.gg/72JrFpUUZZ)
 
 ## Donate 💖
 
