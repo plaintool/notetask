@@ -280,21 +280,21 @@ msgid "Buy me a coffee"
 msgstr "मुझे एक कॉफी खरीदें"
 
 #: tformdonatenotetask.editwallet1.text
-msgid "bc1qqzarmz7yzv34mgpxdp5v58ejre7twy8upalfa9"
+msgid "bc1qp8m5j75yd58zhf9hl0a753shay093j2548f84e"
 msgstr ""
 
 #: tformdonatenotetask.editwallet2.text
 msgctxt "tformdonatenotetask.editwallet2.text"
-msgid "0x404d7f200A318979EC9eB940F022045e6d38e43D"
+msgid "0x328e689E961c3Abb143835f8677947Fa9eaF9f6F"
 msgstr ""
 
 #: tformdonatenotetask.editwallet3.text
 msgctxt "tformdonatenotetask.editwallet3.text"
-msgid "0x404d7f200A318979EC9eB940F022045e6d38e43D"
+msgid "0x328e689E961c3Abb143835f8677947Fa9eaF9f6F"
 msgstr ""
 
 #: tformdonatenotetask.editwallet4.text
-msgid "TJvoYPRWw35SFxP5wh4c97Egm5TaS8uBVE"
+msgid "TYSJJHjpu6aqr8UsGaCTLxDyh6HKWoNQ8k"
 msgstr ""
 
 #: tformdonatenotetask.label1.caption

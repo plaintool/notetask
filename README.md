@@ -219,10 +219,10 @@ If you like Notetask and want to support its development, you can send a donatio
 
 | Currency | Network | Wallet Address |
 |----------|-----------------|----------------|
-| USDT     | Tron (TRC20)    | `TJvoYPRWw35SFxP5wh4c97Egm5TaS8uBVE` |
-| USDT     | Ethereum (ERC20), Binance Smart Chain (BEP20) | `0x404d7f200A318979EC9eB940F022045e6d38e43D` |
-| BTC      | Bitcoin (BTC)   | `bc1qqzarmz7yzv34mgpxdp5v58ejre7twy8upalfa9` |
-| ETH      | Ethereum (ERC20)| `0x404d7f200A318979EC9eB940F022045e6d38e43D` |
+| USDT     | Tron (TRC20)    | `TYSJJHjpu6aqr8UsGaCTLxDyh6HKWoNQ8k` |
+| USDT     | Ethereum (ERC20), Binance Smart Chain (BEP20) | `0x328e689E961c3Abb143835f8677947Fa9eaF9f6F` |
+| BTC      | Bitcoin (BTC)   | `bc1qp8m5j75yd58zhf9hl0a753shay093j2548f84e` |
+| ETH      | Ethereum (ERC20)| `0x328e689E961c3Abb143835f8677947Fa9eaF9f6F` |
 
 Every little help is appreciated! 🙏
 
