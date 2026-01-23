@@ -1974,7 +1974,8 @@ begin
       begin
         if (aCol = 4) then Value := ReplaceStr(Value, ' ', '');
 
-        DrawHighlightedText(Grid.Canvas, Value, filterBox.Text, DrawRect, tagsEdit.BlendColors(clDuplicateHighlight, bgFill, 50));
+        DrawHighlightedText(Grid.Canvas, Value, filterBox.Text, DrawRect,
+          ifthen(bgFill <> clWhite, tagsEdit.BlendColors(clDuplicateHighlight, bgFill, 50), clDuplicateHighlight));
       end;
     end;
   end;
