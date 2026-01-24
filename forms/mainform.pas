@@ -618,7 +618,7 @@ type
     FRepaint: boolean;
     FDuplicateHighlight: boolean;
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
-      OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = 0);
+      OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = -1);
     procedure UpdateComboRegion(Combo: TComboBox; AInsetLeft: integer = 1; AInsetTop: integer = 1;
       AInsetRight: integer = 0; AInsetBottom: integer = 1);
     procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
