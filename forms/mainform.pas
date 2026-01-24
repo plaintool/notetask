@@ -3351,7 +3351,8 @@ begin
   if filterBox.Focused then exit;
   if memoNote.Focused then
   begin
-    memoNote.SelectAll;
+    memoNote.SelStart := 0;
+    memoNote.SelLength := Length(memoNote.Text);
     exit;
   end
   else
@@ -3374,7 +3375,10 @@ begin
   end
   else
   if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
-    Memo.SelectAll;
+  begin
+    Memo.SelStart := 0;
+    Memo.SelLength := Length(Memo.Text);
+  end;
 end;
 
 procedure TformNotetask.aExitExecute(Sender: TObject);
@@ -4554,7 +4558,8 @@ begin
   else
   if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
   begin
-    memoNote.SelectAll;
+    memoNote.SelStart := 0;
+    memoNote.SelLength := Length(memoNote.Text);
     Key := 0;
   end
   else
@@ -5900,7 +5905,8 @@ begin
     Value := Tasks.GetTaskValue(aCol, aRow);
     if (aCol <> 4) or (Value <> '0') then
       Memo.Text := Value;
-    Memo.SelectAll;
+    Memo.SelStart := 0;
+    Memo.SelLength := Length(Memo.Text);
     Memo.SetFocus;
     FMemoStartEdit := True;
   end;
@@ -6070,7 +6076,10 @@ begin
 
   // If amount column selected then clean when edit
   if (FMemoNeedSelectAll) and (taskGrid.Col in [2, 3, 4]) then
-    Memo.SelectAll;
+  begin
+    Memo.SelStart := 0;
+    Memo.SelLength := Length(Memo.Text);
+  end;
   FMemoNeedSelectAll := True;
 
   if (FKeyPressed <> string.Empty) and (FKeyPressed <> #13) then
