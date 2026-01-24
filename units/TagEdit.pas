@@ -1405,7 +1405,7 @@ begin
   begin
     NewValue := TStringList.Create;
     try
-      NewValue.Sorted := True;
+      NewValue.Sorted := FSuggestedTags.Sorted;
       NewValue.Assign(FSuggestedTags);
 
       // Insert items at the same positions if they don't exist
@@ -1417,7 +1417,7 @@ begin
         if idx < 0 then
         begin
           // comment: insert at the same position (or at the end if index is out of range)
-          if i <= FCheckListButton.Items.Count then
+          if (not FCheckListButton.Sorted) and (i <= FCheckListButton.Items.Count) then
             FCheckListButton.Items.Insert(i, NewValue[i])
           else
             FCheckListButton.Items.Add(NewValue[i]);

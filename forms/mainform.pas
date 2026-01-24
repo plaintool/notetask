@@ -8186,6 +8186,7 @@ begin
   SortedState := filterBox.Sorted;
   filterBox.Sorted := False;
   filterBox.Items.Assign(Tasks.Tags);
+  tagsEdit.SuggestedItemsSorted := False;
   tagsEdit.SuggestedItems := Tasks.Tags;
 
   // Remove ` from each item directly
