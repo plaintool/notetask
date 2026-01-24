@@ -183,6 +183,15 @@ resourcestring
   rmonths = 'm';
   ryears = 'y';
 
+const
+  COL_NUM = 0;
+  COL_DONE = 1;
+  COL_TASK = 2;
+  COL_NOTE = 3;
+  COL_AMOUNT = 4;
+  COL_DATE = 5;
+  COL_STAR = 6;
+
 implementation
 
 uses mdformat;
@@ -792,20 +801,20 @@ end;
 function TTasks.GetTaskValue(ACol, aRow: integer): string;
 begin
   Result := string.Empty;
-  if ACol = 1 then
+  if ACol = COL_DONE then
     if GetTask(aRow).FDone then Result := '1'
     else
       Result := '0'
   else
-  if ACol = 2 then Result := GetTask(aRow).Text
+  if ACol = COL_TASK then Result := GetTask(aRow).Text
   else
-  if ACol = 3 then Result := GetTask(aRow).Note
+  if ACol = COL_NOTE then Result := GetTask(aRow).Note
   else
-  if ACol = 4 then Result := GetTask(aRow).AmountStr
+  if ACol = COL_AMOUNT then Result := GetTask(aRow).AmountStr
   else
-  if ACol = 5 then Result := GetTask(aRow).DateTimeStrISO
+  if ACol = COL_DATE then Result := GetTask(aRow).DateTimeStrISO
   else
-  if ACol = 6 then
+  if ACol = COL_STAR then
     if GetTask(aRow).FStar then Result := '1'
     else
       Result := '0';
@@ -834,30 +843,30 @@ begin
     // Get the task by the row index (minus one, as rows start from 1)
 
     // Reading data from the grid
-    Task.Done := StrToBoolDef(Grid.Cells[1, Row], False); // Convert to boolean
-    Task.Text := Grid.Cells[2, Row].Replace(sLineBreak, '<br>').Replace(#10, string.Empty).Replace(
+    Task.Done := StrToBoolDef(Grid.Cells[COL_DONE, Row], False); // Convert to boolean
+    Task.Text := Grid.Cells[COL_TASK, Row].Replace(sLineBreak, '<br>').Replace(#10, string.Empty).Replace(
       #13, string.Empty).Replace('<br>', sLineBreak);
-    Task.Note := Grid.Cells[3, Row].Replace(sLineBreak, '<br>').Replace(#10, string.Empty).Replace(
+    Task.Note := Grid.Cells[COL_NOTE, Row].Replace(sLineBreak, '<br>').Replace(#10, string.Empty).Replace(
       #13, string.Empty).Replace('<br>', sLineBreak);
 
-    if not TryStrToFloat(CleanNumeric(Grid.Cells[4, Row]), pAmount) then
+    if not TryStrToFloat(CleanNumeric(Grid.Cells[COL_AMOUNT, Row]), pAmount) then
     begin
       pAmount := 0; // If parsing the amount failed, set to 0
-      Grid.Cells[4, Row] := string.Empty;
+      Grid.Cells[COL_AMOUNT, Row] := string.Empty;
     end
     else
     if (pAmount = 0) then
-      Grid.Cells[4, Row] := string.Empty
+      Grid.Cells[COL_AMOUNT, Row] := string.Empty
     else
-      Grid.Cells[4, Row] := FloatToString(pAmount);
+      Grid.Cells[COL_AMOUNT, Row] := FloatToString(pAmount);
     Task.Amount := pAmount;
-    if not TryStrToDateTime(Grid.Cells[5, Row], pDate) then
+    if not TryStrToDateTime(Grid.Cells[COL_DATE, Row], pDate) then
     begin
       pDate := 0; // If parsing the date failed, set to 0
-      Grid.Cells[5, Row] := string.Empty;
+      Grid.Cells[COL_DATE, Row] := string.Empty;
     end
     else
-      Grid.Cells[5, Row] := DateTimeToString(pDate, DisplayTime);
+      Grid.Cells[COL_DATE, Row] := DateTimeToString(pDate, DisplayTime);
     Task.Date := pDate;
   end
   else
@@ -975,21 +984,21 @@ begin
     for j := Rect.Left to Rect.Right do
     begin
       // Clearing task fields based on the column
-      if (j = 1) then
+      if (j = COL_DONE) then
         GetTask(i).Done := False; // Reset completion status
-      if (j = 2) then
+      if (j = COL_TASK) then
         GetTask(i).Text := ''; // Clear task description
-      if (j = 3) then
+      if (j = COL_NOTE) then
         GetTask(i).Note := ''; // Clear note
-      if (j = 4) then
+      if (j = COL_AMOUNT) then
         GetTask(i).Amount := 0; // Reset amount
-      if (j = 5) then
+      if (j = COL_DATE) then
         GetTask(i).Date := 0; // Reset completion date
-      if (j = 6) then
+      if (j = COL_STAR) then
         GetTask(i).Star := False; // Reset starred
 
       // For grid column
-      if (j = 1) then
+      if (j = COL_DONE) then
         Grid.Cells[j, i] := '0'
       else
         Grid.Cells[j, i] := string.Empty;
@@ -1579,10 +1588,10 @@ var
 
   procedure PasteSelecting;
   begin
-    if col = 1 then // Done
+    if col = COL_DONE then
       GetTask(row).Done := TempTask.Done
     else
-    if col = 2 then // Task
+    if col = COL_TASK then
     begin
       if (TempTask.Text <> string.Empty) then
       begin
@@ -1614,7 +1623,7 @@ var
         GetTask(row).Tags.Assign(TempTask.Tags); // Tags
     end
     else
-    if col = 3 then // Note
+    if col = COL_NOTE then
     begin
       if (TempTask.Note <> string.Empty) then
       begin
@@ -1639,7 +1648,7 @@ var
         GetTask(row).Note := string.Empty;
     end
     else
-    if col = 4 then // Amount
+    if col = COL_AMOUNT then
     begin
       if (TempTask.Amount <> 0) then
         GetTask(row).Amount := TempTask.Amount
@@ -1658,7 +1667,7 @@ var
         GetTask(row).Amount := 0;
     end
     else
-    if col = 5 then // Date
+    if col = COL_DATE then
     begin
       if (TempTask.Date <> 0) then
         GetTask(row).Date := TempTask.Date
@@ -1677,7 +1686,7 @@ var
         GetTask(row).Date := 0;
     end
     else
-    if col = 6 then // st
+    if col = COL_STAR then
     begin
       GetTask(row).Star := TempTask.Star;
     end;
@@ -2363,22 +2372,22 @@ var
     Task2 := FTaskList[FMapGrid[Index2]];
 
     case SortColumn of
-      1: begin
+      COL_DONE: begin
         // Completed status
         Value1 := IntToStr(Ord(Task1.Done));
         Value2 := IntToStr(Ord(Task2.Done));
       end;
-      2: begin
+      COL_TASK: begin
         // Task description
         Value1 := Task1.Text;
         Value2 := Task2.Text;
       end;
-      3: begin
+      COL_NOTE: begin
         // Note
         Value1 := Task1.Note;
         Value2 := Task2.Note;
       end;
-      4: begin
+      COL_AMOUNT: begin
         // Completion amount (compare as double)
         Amount1 := Task1.Amount;
         Amount2 := Task2.Amount;
@@ -2401,7 +2410,7 @@ var
         end;
         Exit;
       end;
-      5: begin
+      COL_DATE: begin
         // Completion date (compare as DateTime)
         DateTime1 := Task1.Date;
         DateTime2 := Task2.Date;
@@ -2424,7 +2433,7 @@ var
         end;
         Exit;
       end;
-      6: begin
+      COL_STAR: begin
         // Completed status
         Value1 := IntToStr(Ord(Task1.Star));
         Value2 := IntToStr(Ord(Task2.Star));
@@ -2597,26 +2606,26 @@ begin
         end;
 
         // Fill task in grid for archive or not
-        Grid.Cells[1, RowIndex] := IntToStr(Ord(FTaskList[I].Done));
-        Grid.Cells[2, RowIndex] := FTaskList[I].Text;
-        Grid.Cells[3, RowIndex] := FTaskList[I].Note;
+        Grid.Cells[COL_DONE, RowIndex] := IntToStr(Ord(FTaskList[I].Done));
+        Grid.Cells[COL_TASK, RowIndex] := FTaskList[I].Text;
+        Grid.Cells[COL_NOTE, RowIndex] := FTaskList[I].Note;
         if FTaskList[I].Amount <> 0 then
         begin
-          Grid.Cells[4, RowIndex] := FTaskList[I].AmountStr;
+          Grid.Cells[COL_AMOUNT, RowIndex] := FTaskList[I].AmountStr;
         end
         else
-          Grid.Cells[4, RowIndex] := string.Empty;
+          Grid.Cells[COL_AMOUNT, RowIndex] := string.Empty;
 
         if FTaskList[I].Date > 0 then
         begin
           if (DisplayTime) then
-            Grid.Cells[5, RowIndex] := FTaskList[I].DateTimeStr
+            Grid.Cells[COL_DATE, RowIndex] := FTaskList[I].DateTimeStr
           else
-            Grid.Cells[5, RowIndex] := FTaskList[I].DateStr;
+            Grid.Cells[COL_DATE, RowIndex] := FTaskList[I].DateStr;
         end
         else
-          Grid.Cells[5, RowIndex] := string.Empty;
-        Grid.Cells[6, RowIndex] := IntToStr(Ord(FTaskList[I].Star));
+          Grid.Cells[COL_DATE, RowIndex] := string.Empty;
+        Grid.Cells[COL_STAR, RowIndex] := IntToStr(Ord(FTaskList[I].Star));
 
         FMapGrid[RowIndex] := I;
 
@@ -2636,8 +2645,8 @@ begin
         Grid.Cells[0, 0] := DateDiff;
     end;
 
-    // Perform sorting if SortColumn is between 1 and 4
-    if (SortColumn >= 1) and (SortColumn <= 6) then
+    // Perform sorting if SortColumn is between COL_DONE and COL_STAR
+    if (SortColumn >= COL_DONE) and (SortColumn <= COL_STAR) then
     begin
       // Bubble Sort logic to sort rows based on CompareTasks function
       for I := 1 to Grid.RowCount - 2 do

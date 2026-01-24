@@ -947,7 +947,7 @@ begin
   FShowColumnFavorite := True;
   FBiDiRightToLeft := self.BiDiMode = bdRightToLeft;
   FDragTab := -1;
-  FSortColumn := 0;
+  FSortColumn := COL_NUM;
   FMemoSelStartClicked := -1;
   FLastTabFilter := -1;
   FLastTextMatch := False;
@@ -1074,7 +1074,7 @@ begin
   RestoreSelectedState(True, True, True);
   panelTags.Height := TagsHeight;
 
-  Tasks.CalcTagsWidths(-1, taskGrid.Columns[1].Width, tagsEdit, Font);
+  Tasks.CalcTagsWidths(-1, taskGrid.Columns[COL_TASK - 1].Width, tagsEdit, Font);
   SetZoom(FZoom);
   CorrectGridSelection;
 
@@ -1309,7 +1309,7 @@ begin
   begin
     if (not IsEditing) and (taskGrid.Focused) then
     begin
-      if (not taskGrid.Columns[0].Visible) or (taskGrid.Col = 6) then
+      if (not taskGrid.Columns[COL_DONE - 1].Visible) or (taskGrid.Col = COL_STAR) then
         StarTasks
       else
         CompleteTasks;
@@ -1330,28 +1330,28 @@ begin
   begin
     if IsEditing then
     begin
-      if (taskGrid.Col in [4, 5]) or ((taskGrid.Col in [2, 3]) and ((FEnterSubmit and (Shift = [])) or
-        (not FEnterSubmit and ((Shift = [ssCtrl]) or (Shift = [ssShift]))))) then
+      if (taskGrid.Col in [COL_AMOUNT, COL_DATE]) or ((taskGrid.Col in [COL_TASK, COL_NOTE]) and
+        ((FEnterSubmit and (Shift = [])) or (not FEnterSubmit and ((Shift = [ssCtrl]) or (Shift = [ssShift]))))) then
       begin
         EditComplete(True);
         Key := 0;
       end
       else
-      if (taskGrid.Col in [2, 3]) and (FEnterSubmit) and (Shift = [ssCtrl]) then
+      if (taskGrid.Col in [COL_TASK, COL_NOTE]) and (FEnterSubmit) and (Shift = [ssCtrl]) then
       begin
         Memo.SelText := sLineBreak;
-        key := 0;
+        Key := 0;
       end;
     end
     else
     begin
-      if (taskGrid.Col in [2, 3, 4]) then
+      if (taskGrid.Col in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
         FMemoNeedSelectAll := False
       else
-      if (taskGrid.Col = 1) then
+      if (taskGrid.Col = COL_DONE) then
         CompleteTasks
       else
-      if (taskGrid.Col = 6) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
+      if (taskGrid.Col = COL_STAR) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
         StarTasks;
     end;
   end;
@@ -1466,12 +1466,12 @@ begin
   begin
     if (ssShift in GetKeyShiftState) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Top <> index) then
     begin
-      taskGrid.Selection := TGridRect.Create(1, taskGrid.Selection.Top, 6, index);
+      taskGrid.Selection := TGridRect.Create(COL_DONE, taskGrid.Selection.Top, COL_STAR, index);
     end
     else
     begin
       taskGrid.Row := index;
-      taskGrid.Selection := TGridRect.Create(1, index, 6, index);
+      taskGrid.Selection := TGridRect.Create(COL_DONE, index, COL_STAR, index);
     end;
     // Trigger event
     taskGrid.OnSelection(taskGrid, taskGrid.Col, taskGrid.Row);
@@ -1484,7 +1484,7 @@ var
   CheckBoxRect: TRect;
   CheckBoxSize: integer;
 begin
-  if (aCol = 1) then
+  if (aCol = COL_DONE) then
   begin
     // Define checkbox area size (16x16)
     CheckBoxSize := 14;
@@ -1514,7 +1514,7 @@ begin
     FDisableCheckToggle := False;
     exit;
   end;
-  if (aCol = 6) then
+  if (aCol = COL_STAR) then
   begin
     // Get mouse position in screen coordinates
     MousePosScreen := Mouse.CursorPos;
@@ -1536,14 +1536,14 @@ end;
 
 procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
 begin
-  if (aCol = 1) then
+  if (aCol = COL_DONE) then
   begin
     if (FDisableCheckToggle) then exit;
 
     CompleteTasks(aRow);
   end
   else
-  if (aCol = 6) then
+  if (aCol = COL_STAR) then
   begin
     if (FDisableStarToggle) then exit;
 
@@ -1561,7 +1561,7 @@ begin
       Tasks.CreateBackup;
     end;
     Tasks.AddMap(Tasks.AddTask('[ ]'));
-    taskGrid.Cells[1, tIndex] := '0';
+    taskGrid.Cells[COL_DONE, tIndex] := '0';
     SetInfo;
     SetChanged;
     SetNote;
@@ -1706,7 +1706,7 @@ begin
     Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
   end;
 
-  if (Button = mbLeft) and (ssCtrl in Shift) and (taskGrid.Col in [2, 3]) then
+  if (Button = mbLeft) and (ssCtrl in Shift) and (taskGrid.Col in [COL_TASK, COL_NOTE]) then
     TryOpenAsUrl(Trim(taskGrid.Cells[taskGrid.Col, taskGrid.Row]));
 
   if (not FRepaint) then
@@ -1777,7 +1777,7 @@ begin
     Grid.Canvas.Brush.Style := bsClear;
     Grid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
 
-    if (aRow = 0) and (aCol = 0) and (SortColumn = 0) and Assigned(taskGrid.TitleImageList) then
+    if (aRow = 0) and (aCol = COL_NUM) and (SortColumn = COL_NUM) and Assigned(taskGrid.TitleImageList) then
     begin
       if SortOrder = soAscending then
         ImgIndex := 0
@@ -1842,13 +1842,13 @@ begin
       if Task.Star then
         Grid.Canvas.Font.Style := Grid.Canvas.Font.Style + [fsBold];
 
-      if (aCol = 2) and (Task.Archive) then
+      if (aCol = COL_TASK) and (Task.Archive) then
         Grid.Canvas.Font.Style := Grid.Canvas.Font.Style + [fsStrikeOut];
 
-      if (aCol = 3) and (Task.NoteItalic) then
+      if (aCol = COL_NOTE) and (Task.NoteItalic) then
         Grid.Canvas.Font.Style := Grid.Canvas.Font.Style + [fsItalic];
 
-      if (aCol = 5) and (Task.Date > Now) and (not (gdSelected in aState)) then
+      if (aCol = COL_DATE) and (Task.Date > Now) and (not (gdSelected in aState)) then
         Grid.Canvas.Font.Color := clDarkBlue;
     end;
 
@@ -1857,13 +1857,13 @@ begin
     Grid.canvas.Brush.Style := bsSolid;
     Grid.canvas.FillRect(aRect);
 
-    if (aCol in [1, 6]) then
+    if (aCol in [COL_DONE, COL_STAR]) then
     begin
       Grid.DefaultDrawCell(aCol, aRow, aRect, aState);
       exit;
     end;
 
-    if (aCol = 4) and (TryStrToFloat(Grid.Cells[ACol, ARow], Amount)) then
+    if (aCol = COL_AMOUNT) and (TryStrToFloat(Grid.Cells[ACol, ARow], Amount)) then
     begin
       FS := DefaultFormatSettings;
       FS.ThousandSeparator := ' ';
@@ -1874,7 +1874,7 @@ begin
 
     if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
     begin
-      if (aCol = 2) then
+      if (aCol = COL_TASK) then
       begin
         Task := Tasks.GetTask(ARow);
         if Task.Tags.Count > 0 then
@@ -1964,18 +1964,18 @@ begin
       if FWordWrap then
         Flags := Flags or DT_WORDBREAK;
 
-      if (FHideNoteText) and (aCol = 3) then
+      if (FHideNoteText) and (aCol = COL_NOTE) then
         Value := MaskTextWithBullets(Value, Grid.Canvas, FLineEnding);
 
       if (Value = string.Empty) or (filterBox.Text = string.Empty) or (Grid.canvas.Brush.Color = clDuplicateHighlight) or
-        (Pos(ULower(filterBox.Text), ULower(ifthen(aCol = 4, ReplaceStr(Value, ' ', ''), Value))) = 0) or
-        ((FHideNoteText) and (aCol = 3)) then
+        (Pos(ULower(filterBox.Text), ULower(ifthen(aCol = COL_AMOUNT, ReplaceStr(Value, ' ', ''), Value))) = 0) or
+        ((FHideNoteText) and (aCol = COL_NOTE)) then
       begin
         DrawText(Grid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
       end
       else
       begin
-        if (aCol = 4) then Value := ReplaceStr(Value, ' ', '');
+        if (aCol = COL_AMOUNT) then Value := ReplaceStr(Value, ' ', '');
 
         DrawHighlightedText(Grid.Canvas, Value, filterBox.Text, DrawRect,
           ifthen(bgFill <> clWhite, tagsEdit.BlendColors(clDuplicateHighlight, bgFill, 50), clDuplicateHighlight));
@@ -2295,7 +2295,7 @@ begin
     exit;
   end;
 
-  if (aCol in [2, 3, 4]) then
+  if (aCol in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
   begin
     PanelMemo := TPanel.Create(Self);
     PanelMemo.Parent := taskGrid;
@@ -2325,8 +2325,8 @@ begin
     Memo.ScrollBars := ssNone;
     Memo.TabStop := False;
     Memo.WantTabs := True;
-    Memo.WordWrap := (FWordWrap) and (aCol <> 4);
-    Memo.WantReturns := aCol in [2, 3];
+    Memo.WordWrap := (FWordWrap) and (aCol <> COL_AMOUNT);
+    Memo.WantReturns := aCol in [COL_TASK, COL_NOTE];
     if (FBiDiRightToLeft) then
     begin
       Memo.BiDiMode := bdRightToLeft;
@@ -2346,7 +2346,7 @@ begin
     Memo.OnDblClick := @MemoNoteDblClick; // Event MouseDown
     Memo.OnKeyUp := @MemoNoteKeyUp; // Event KeyUp
     Memo.OnMouseUp := @MemoNoteMouseUp; // Event MouseUp
-    if (aCol = 4) then
+    if (aCol = COL_AMOUNT) then
       Memo.OnKeyPress := @MemoKeyPress; // Event KeyPress for amount column only
     Memo.Text := taskGrid.Cells[aCol, aRow];
     Memo.SelStart := Length(Memo.Text);
@@ -2369,7 +2369,7 @@ begin
     end;
   end
   else
-  if (aCol = 5) then
+  if (aCol = COL_DATE) then
   begin
     DatePicker := TDateTimePicker.Create(Self);
     DatePicker.Visible := False;
@@ -2437,7 +2437,7 @@ procedure TformNotetask.taskGridUserCheckboxBitmap(Sender: TObject; const aCol, 
   const CheckedState: TCheckboxState; var ABitmap: TBitmap);
 begin
   // Check if we're in the correct column
-  if aCol = 1 then
+  if aCol = COL_DONE then
   begin
     // Assign the appropriate bitmap based on the CheckedState
     if CheckedState = cbChecked then
@@ -2446,7 +2446,7 @@ begin
       ABitmap := ResourceBitmapUncheck; // Use uncheck bitmap
   end
   else
-  if aCol = 6 then
+  if aCol = COL_STAR then
   begin
     // Assign the appropriate bitmap based on the CheckedState
     if CheckedState = cbChecked then
@@ -2524,7 +2524,7 @@ begin
 
   FLastTabIndex := groupTabs.TabIndex;
 
-  Tasks.CalcTagsWidths(-1, taskGrid.Columns[1].Width, tagsEdit, Font);
+  Tasks.CalcTagsWidths(-1, taskGrid.Columns[COL_TASK - 1].Width, tagsEdit, Font);
   CalcRowHeight(True);
   SetNote;
   SetTags;
@@ -3277,7 +3277,7 @@ begin
     ResetRowHeight;
     if (Assigned(DatePicker)) then
       DatePicker.DateTime := Tasks.GetTask(taskGrid.Row).Date;
-    if (SortColumn = 0) then
+    if (SortColumn = COL_NUM) then
       taskGrid.Selection := Sel;
     SetChanged;
     SetInfo;
@@ -3370,7 +3370,7 @@ begin
 
   if not IsEditing then
   begin
-    taskGrid.Selection := TGridRect.Create(0, 0, 6, taskGrid.RowCount);
+    taskGrid.Selection := TGridRect.Create(COL_NUM, 0, COL_STAR, taskGrid.RowCount);
     FLastSelectionHeight := taskGrid.Selection.Height;
     SetInfo;
     SetNote;
@@ -3742,14 +3742,14 @@ var
   begin
     if (taskGrid.RowCount > 1) then
     begin
-      if (taskGrid.Cells[ACol, ARow].Trim = string.Empty) or (ACol = 5) then
+      if (taskGrid.Cells[ACol, ARow].Trim = string.Empty) or (ACol = COL_DATE) then
         taskGrid.Cells[ACol, ARow] := CurrentDateTime
       else
         taskGrid.Cells[ACol, ARow] := taskGrid.Cells[ACol, ARow].Trim + ' ' + CurrentDateTime;
       Tasks.SetTask(taskGrid, ARow, False, FShowTime);
       if Assigned(DatePicker) then
         DatePicker.DateTime := Now;
-      if (FShowDuration) and (ACol = 5) then
+      if (FShowDuration) and (ACol = COL_DATE) then
         FillGrid;
     end
     else
@@ -3780,13 +3780,13 @@ begin
   else
   if IsEditing then
   begin
-    if (taskGrid.Col = 5) then
+    if (taskGrid.Col = COL_DATE) then
     begin
-      taskGrid.Cells[5, taskGrid.Row] := CurrentDateTime;
+      taskGrid.Cells[COL_DATE, taskGrid.Row] := CurrentDateTime;
       DatePicker.DateTime := Now;
     end
     else
-    if (taskGrid.Col in [2, 3]) then
+    if (taskGrid.Col in [COL_TASK, COL_NOTE]) then
     begin
       PosStart := Memo.SelStart;
       Memo.SelText := CurrentDateTime;
@@ -4550,7 +4550,7 @@ begin
       memoNote.CaretPos := Point(0, NewPos);
     MemoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
     memoNote.Invalidate;
-    key := 0;
+    Key := 0;
   end
   else
   if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
@@ -4752,7 +4752,7 @@ end;
 
 procedure TformNotetask.memoNoteChange(Sender: TObject);
 begin
-  taskGrid.Cells[3, taskGrid.Row] := memoNote.Text;
+  taskGrid.Cells[COL_NOTE, taskGrid.Row] := memoNote.Text;
   Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
   CalcRowHeight(True, taskGrid.Row);
   SetChanged;
@@ -5276,7 +5276,7 @@ begin
   FillGrid;
 
   taskGrid.Row := 1;
-  taskGrid.Col := 2;
+  taskGrid.Col := COL_TASK;
   groupTabs.TabIndex := 0;
   ResetRowHeight;
   SetInfo;
@@ -5330,15 +5330,16 @@ end;
 
 function TformNotetask.IsExecuteValueNote(memoPriority: boolean = False): boolean;
 begin
-  Result := (((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or ((panelNote.Visible) and
-    ((memoPriority) or (memoNote.SelLength > 0) or (memoNote.Focused)))) and (panelNote.Visible) and (memoNote.SelLength > 0);
+  Result := (((taskGrid.Selection.Left = COL_NOTE) and (taskGrid.Selection.Right >= COL_NOTE)) or
+    ((panelNote.Visible) and ((memoPriority) or (memoNote.SelLength > 0) or (memoNote.Focused)))) and
+    (panelNote.Visible) and (memoNote.SelLength > 0);
 end;
 
 function TformNotetask.GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
 begin
   // If note column is selected or note panel visible
-  if (((taskGrid.Selection.Left = 3) and (taskGrid.Selection.Right >= 3)) or ((panelNote.Visible) and
-    ((memoPriority) or (memoNote.SelLength > 0) or (memoNote.Focused)))) then
+  if (((taskGrid.Selection.Left = COL_NOTE) and (taskGrid.Selection.Right >= COL_NOTE)) or
+    ((panelNote.Visible) and ((memoPriority) or (memoNote.SelLength > 0) or (memoNote.Focused)))) then
   begin
     if (panelNote.Visible) and (memoNote.SelLength > 0) then
       Result := memoNote.SelText
@@ -5763,13 +5764,13 @@ begin
   if task.Star then
     ACanvas.Font.Style := ACanvas.Font.Style + [fsBold];
 
-  if (aCol = 2) and task.Archive then
+  if (aCol = COL_TASK) and task.Archive then
     ACanvas.Font.Style := ACanvas.Font.Style + [fsStrikeOut];
 
-  if (aCol = 3) and task.NoteItalic then
+  if (aCol = COL_NOTE) and task.NoteItalic then
     ACanvas.Font.Style := ACanvas.Font.Style + [fsItalic];
 
-  if (aCol = 5) and (task.Date > Now) then
+  if (aCol = COL_DATE) and (task.Date > Now) then
     ACanvas.Font.Color := clDarkBlue;
 
   // Text styles
@@ -5789,7 +5790,7 @@ var
 begin
   if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
   begin
-    if (aCol = 2) then
+    if (aCol = COL_TASK) then
     begin
       Task := Tasks.GetTask(ARow);
       if Task.Tags.Count > 0 then
@@ -5906,7 +5907,7 @@ begin
   begin
     EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
     Value := Tasks.GetTaskValue(aCol, aRow);
-    if (aCol <> 4) or (Value <> '0') then
+    if (aCol <> COL_AMOUNT) or (Value <> '0') then
       Memo.Text := Value;
     Memo.SelStart := 0;
     Memo.SelLength := Length(Memo.Text);
@@ -5923,7 +5924,7 @@ procedure TformNotetask.EditComplete(aEnter: boolean = False; aEscape: boolean =
 begin
   if IsEditing then
   begin
-    if (taskGrid.Col = 5) and (Assigned(DatePicker)) then
+    if (taskGrid.Col = COL_DATE) and (Assigned(DatePicker)) then
     begin
       if (aEnter) then
       begin
@@ -5942,13 +5943,13 @@ begin
       end;
     end;
 
-    if (taskGrid.Col in [2, 3, 4]) and (Assigned(Memo)) then
+    if (taskGrid.Col in [COL_TASK, COL_NOTE, COL_AMOUNT]) and (Assigned(Memo)) then
     begin
       // Pressing the Escape key cancels editing
       if (aEscape) then
         Memo.Text := FMemoOldText
       else
-      if taskGrid.Col in [2, 3] then
+      if taskGrid.Col in [COL_TASK, COL_NOTE] then
         SetFilter;
     end;
 
@@ -6057,7 +6058,7 @@ begin
   if UTF8Key = #8 then  // backspace
     Memo.SelText := string.Empty
   else
-  if (taskGrid.Col <> 4) then
+  if (taskGrid.Col <> COL_AMOUNT) then
     Memo.SelText := UTF8Key
   else
     Memo.SelText := CleanNumericExpression(UTF8Key);
@@ -6078,7 +6079,7 @@ begin
   FMemoOldText := taskGrid.Cells[TaskGrid.Col, TaskGrid.Row];
 
   // If amount column selected then clean when edit
-  if (FMemoNeedSelectAll) and (taskGrid.Col in [2, 3, 4]) then
+  if (FMemoNeedSelectAll) and (taskGrid.Col in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
   begin
     Memo.SelStart := 0;
     Memo.SelLength := Length(Memo.Text);
@@ -6087,7 +6088,7 @@ begin
 
   if (FKeyPressed <> string.Empty) and (FKeyPressed <> #13) then
   begin
-    if (taskGrid.Col = 4) then
+    if (taskGrid.Col = COL_AMOUNT) then
       Memo.SelText := CleanNumericExpression(FKeyPressed)
     else
       Memo.SelText := FKeyPressed;
@@ -6125,9 +6126,9 @@ begin
   SetChanged;
   CalcRowHeight(True, taskGrid.Row);
   EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
-  if (taskGrid.Col = 3) then
+  if (taskGrid.Col = COL_NOTE) then
     SetNote;
-  if (taskGrid.Col = 4) then
+  if (taskGrid.Col = COL_AMOUNT) then
     SetInfo;
 end;
 
@@ -6164,7 +6165,7 @@ begin
       if Row < RowCount - 1 then
       begin
         Row := Row + 1;
-        nextCol := 2;
+        nextCol := COL_TASK;
         while (nextCol < ColCount) and (not Columns[nextCol - 1].Visible) do
           Inc(nextCol);
         if nextCol < ColCount then
@@ -6224,7 +6225,7 @@ begin
       if Row < RowCount - 1 then
       begin
         Row := Row + 1;
-        nextCol := 2;
+        nextCol := COL_TASK;
         while (nextCol < ColCount) and (not Columns[nextCol - 1].Visible) do
           Inc(nextCol);
         if nextCol < ColCount then
@@ -6310,7 +6311,7 @@ begin
     EnableGridEvents;
   end;
   FillGrid;
-  if (SortColumn = 0) then
+  if (SortColumn = COL_NUM) then
   begin
     if (SortOrder = soAscending) then
       taskGrid.Row := Sel.Top
@@ -6414,10 +6415,10 @@ begin
   colToSplit := -1;
   for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
   begin
-    if (taskGrid.Col = 2) and (Pos(FLineEnding.Value, Tasks.GetTask(i).Text) > 0) then
-      colToSplit := 2
-    else if (taskGrid.Col = 3) and (Pos(FLineEnding.Value, Tasks.GetTask(i).Note) > 0) then
-      colToSplit := 3;
+    if (taskGrid.Col = COL_TASK) and (Pos(FLineEnding.Value, Tasks.GetTask(i).Text) > 0) then
+      colToSplit := COL_TASK
+    else if (taskGrid.Col = COL_NOTE) and (Pos(FLineEnding.Value, Tasks.GetTask(i).Note) > 0) then
+      colToSplit := COL_NOTE;
   end;
 
   if (colToSplit = -1) then
@@ -6455,7 +6456,7 @@ begin
       Task := TasksToSplit[i];
 
       // Get fields for splitting
-      if (colToSplit = 2) then
+      if (colToSplit = COL_TASK) then
       begin
         Source := Task.Text;
         Source2 := Task.Note;
@@ -6473,14 +6474,14 @@ begin
       Lines2.Text := Source2;
 
       // Update original task
-      if (colToSplit = 2) then
+      if (colToSplit = COL_TASK) then
         Task.Text := Trim(Lines[0])
       else
         Task.Note := Trim(Lines[0]);
 
       if Lines.Count = Lines2.Count then
       begin
-        if (colToSplit = 2) then
+        if (colToSplit = COL_TASK) then
           Task.Note := Trim(Lines2[0])
         else
           Task.Text := Trim(Lines2[0]);
@@ -6493,14 +6494,14 @@ begin
         try
           NewTask.Copy(Task); // Copy all properties
 
-          if (colToSplit = 2) then
+          if (colToSplit = COL_TASK) then
             NewTask.Text := Trim(Lines[j])
           else
             NewTask.Note := Trim(Lines[j]);
 
           if Lines.Count = Lines2.Count then
           begin
-            if (colToSplit = 2) then
+            if (colToSplit = COL_TASK) then
               NewTask.Note := Trim(Lines2[j])
             else
               NewTask.Text := Trim(Lines2[j]);
@@ -6539,7 +6540,7 @@ begin
   SetChanged;
 
   // Restore selection
-  if (SortColumn = 0) then
+  if (SortColumn = COL_NUM) then
     taskGrid.Selection := TGridRect.Create(sel.Left, sel.Top, Sel.Right, index + (Sel.Bottom - Sel.Top))
   else
     taskGrid.Selection := Sel;
@@ -6755,12 +6756,12 @@ begin
 
           if Tasks.GetTask(RowIndex).Done then
           begin
-            taskGrid.Cells[1, RowIndex] := '1';
-            if (taskGrid.Columns.Items[4].Visible) and (taskGrid.Cells[5, RowIndex] = string.Empty) then
-              taskGrid.Cells[5, RowIndex] := DateTimeToString(Now, FShowTime);
+            taskGrid.Cells[COL_DONE, RowIndex] := '1';
+            if (taskGrid.Columns.Items[COL_DATE - 1].Visible) and (taskGrid.Cells[COL_DATE, RowIndex] = string.Empty) then
+              taskGrid.Cells[COL_DATE, RowIndex] := DateTimeToString(Now, FShowTime);
           end
           else
-            taskGrid.Cells[1, RowIndex] := '0';
+            taskGrid.Cells[COL_DONE, RowIndex] := '0';
 
           Tasks.SetTask(taskGrid, RowIndex, False, FShowTime); // Backup created on start
         end;
@@ -6794,12 +6795,12 @@ begin
       if Tasks.GetTask(RowIndex).Done then
       begin
         Check := True;
-        taskGrid.Cells[1, RowIndex] := '1';
-        if (taskGrid.Columns.Items[4].Visible) and (taskGrid.Cells[5, RowIndex] = string.Empty) then
-          taskGrid.Cells[5, RowIndex] := DateTimeToString(Now, FShowTime);
+        taskGrid.Cells[COL_DONE, RowIndex] := '1';
+        if (taskGrid.Columns.Items[COL_DATE - 1].Visible) and (taskGrid.Cells[COL_DATE, RowIndex] = string.Empty) then
+          taskGrid.Cells[COL_DATE, RowIndex] := DateTimeToString(Now, FShowTime);
       end
       else
-        taskGrid.Cells[1, RowIndex] := '0';
+        taskGrid.Cells[COL_DONE, RowIndex] := '0';
 
       Tasks.SetTask(taskGrid, RowIndex, False, FShowTime);
       if (ShowDuration) and (Check) then FillGrid;
@@ -6847,9 +6848,9 @@ begin
       Tasks.StarTask(RowIndex, False);
 
       if Tasks.GetTask(RowIndex).Star then
-        taskGrid.Cells[6, RowIndex] := '1'
+        taskGrid.Cells[COL_STAR, RowIndex] := '1'
       else
-        taskGrid.Cells[6, RowIndex] := '0';
+        taskGrid.Cells[COL_STAR, RowIndex] := '0';
 
       Tasks.SetTask(taskGrid, RowIndex, False, FShowTime);
     end;
@@ -6880,11 +6881,11 @@ begin
     begin
       if (not Outdent) then
       begin
-        taskGrid.Cells[2, RowIndex] := IndentStr + taskGrid.Cells[2, RowIndex];
+        taskGrid.Cells[COL_TASK, RowIndex] := IndentStr + taskGrid.Cells[COL_TASK, RowIndex];
         CalcRowHeight;
       end
       else
-        taskGrid.Cells[2, RowIndex] := TrimLeadingSpaces(taskGrid.Cells[2, RowIndex], Length(unicodestring(IndentStr)));
+        taskGrid.Cells[COL_TASK, RowIndex] := TrimLeadingSpaces(taskGrid.Cells[COL_TASK, RowIndex], Length(unicodestring(IndentStr)));
 
       Tasks.SetTask(taskGrid, RowIndex, False, FShowTime); // Backup created on start
     end;
@@ -6905,10 +6906,10 @@ begin
 
   FLastGridSelection := TRect.Empty;
   FLastGridRow := 1;
-  FLastGridCol := 2;
+  FLastGridCol := COL_TASK;
   taskGrid.ClearSelections;
   taskGrid.Row := 1;
-  taskGrid.Col := 2;
+  taskGrid.Col := COL_TASK;
 end;
 
 procedure TformNotetask.MemoNoteSetScrollPosition(Value: integer);
@@ -7607,40 +7608,40 @@ end;
 procedure TformNotetask.SetShowColumnDone(Value: boolean);
 begin
   FShowColumnDone := Value;
-  taskGrid.Columns.Items[0].Visible := FShowColumnDone;
+  taskGrid.Columns.Items[COL_DONE - 1].Visible := FShowColumnDone;
 end;
 
 procedure TformNotetask.SetShowColumnTask(Value: boolean);
 begin
   FShowColumnTask := Value;
-  taskGrid.Columns.Items[1].Visible := FShowColumnTask;
+  taskGrid.Columns.Items[COL_TASK - 1].Visible := FShowColumnTask;
   CalcRowHeight(True);
 end;
 
 procedure TformNotetask.SetShowColumnNote(Value: boolean);
 begin
   FShowColumnNote := Value;
-  taskGrid.Columns.Items[2].Visible := FShowColumnNote;
+  taskGrid.Columns.Items[COL_NOTE - 1].Visible := FShowColumnNote;
   CalcRowHeight(True);
 end;
 
 procedure TformNotetask.SetShowColumnAmount(Value: boolean);
 begin
   FShowColumnAmount := Value;
-  taskGrid.Columns.Items[3].Visible := FShowColumnAmount;
+  taskGrid.Columns.Items[COL_AMOUNT - 1].Visible := FShowColumnAmount;
   SetInfo;
 end;
 
 procedure TformNotetask.SetShowColumnDate(Value: boolean);
 begin
   FShowColumnDate := Value;
-  taskGrid.Columns.Items[4].Visible := FShowColumnDate;
+  taskGrid.Columns.Items[COL_DATE - 1].Visible := FShowColumnDate;
 end;
 
 procedure TformNotetask.SetShowColumnFavorite(Value: boolean);
 begin
   FShowColumnFavorite := Value;
-  taskGrid.Columns.Items[5].Visible := FShowColumnFavorite;
+  taskGrid.Columns.Items[COL_STAR - 1].Visible := FShowColumnFavorite;
 end;
 
 procedure TformNotetask.ApplyColumnSetting;
@@ -7653,12 +7654,12 @@ begin
   aShowColumnDate.Checked := FShowColumnDate;
   aShowColumnAmount.Checked := FShowColumnAmount;
   aShowColumnFavorite.Checked := FShowColumnFavorite;
-  taskGrid.Columns.Items[0].Visible := FShowColumnDone;
-  taskGrid.Columns.Items[1].Visible := FShowColumnTask;
-  taskGrid.Columns.Items[2].Visible := FShowColumnNote;
-  taskGrid.Columns.Items[3].Visible := FShowColumnAmount;
-  taskGrid.Columns.Items[4].Visible := FShowColumnDate;
-  taskGrid.Columns.Items[5].Visible := FShowColumnFavorite;
+  taskGrid.Columns.Items[COL_DONE - 1].Visible := FShowColumnDone;
+  taskGrid.Columns.Items[COL_TASK - 1].Visible := FShowColumnTask;
+  taskGrid.Columns.Items[COL_NOTE - 1].Visible := FShowColumnNote;
+  taskGrid.Columns.Items[COL_AMOUNT - 1].Visible := FShowColumnAmount;
+  taskGrid.Columns.Items[COL_DATE - 1].Visible := FShowColumnDate;
+  taskGrid.Columns.Items[COL_STAR - 1].Visible := FShowColumnFavorite;
 
   ApplySortArrow;
 end;
@@ -7669,7 +7670,7 @@ var
 begin
   for i := 0 to taskGrid.Columns.Count - 1 do
     taskGrid.Columns[i].Title.ImageIndex := -1;
-  if (SortColumn > 0) then
+  if (SortColumn > COL_NUM) then
   begin
     if SortOrder = soAscending then
       taskGrid.Columns[SortColumn - 1].Title.ImageIndex := 0
@@ -7697,14 +7698,14 @@ end;
 
 procedure TformNotetask.ApplySortingActions;
 begin
-  aMoveTaskTop.Enabled := (not ReadOnly) and (SortColumn = 0);
-  aMoveTaskBottom.Enabled := (not ReadOnly) and (SortColumn = 0);
-  aMoveTaskUp.Enabled := (not ReadOnly) and (SortColumn = 0);
-  aMoveTaskDown.Enabled := (not ReadOnly) and (SortColumn = 0);
-  aMoveTaskLeft.Enabled := (not ReadOnly) and (SortColumn = 0);
-  aMoveTaskRight.Enabled := (not ReadOnly) and (SortColumn = 0);
+  aMoveTaskTop.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
+  aMoveTaskBottom.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
+  aMoveTaskUp.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
+  aMoveTaskDown.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
+  aMoveTaskLeft.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
+  aMoveTaskRight.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
 
-  if (SortColumn = 0) then
+  if (SortColumn = COL_NUM) then
     taskGrid.Options := taskGrid.Options + [goRowMoving]
   else
     taskGrid.Options := taskGrid.Options - [goRowMoving];
@@ -7791,12 +7792,12 @@ var
         if Text = string.Empty then Text := 'Wg';
 
         // Reduce text area by TagsWidth for text measurement
-        if (col in [2, 3]) then
+        if (col in [COL_TASK, COL_NOTE]) then
         begin
           if task.Star then
             taskGrid.Canvas.Font.Bold := True;
 
-          if (col = 2) then
+          if (col = COL_TASK) then
           begin
             if task.TagsWidth < drawrect.Width then
             begin
@@ -7869,8 +7870,8 @@ begin
     end;
 
     // Force applies only to the priority column
-    if (ShowColumnTask) then CalcCol(2, aForce);
-    if (ShowColumnNote) then CalcCol(3);
+    if (ShowColumnTask) then CalcCol(COL_TASK, aForce);
+    if (ShowColumnNote) then CalcCol(COL_NOTE);
 
     // Header, tabs, first col
     taskGrid.RowHeights[0] := Round(Max(Canvas.TextHeight('A') + 4, taskGrid.DefaultRowHeight) * FZoom);
@@ -8712,7 +8713,7 @@ begin
     StartRow := taskGrid.Row;
     StartCol := taskGrid.Col;
     LastDate := False;
-    if taskGrid.Col = 1 then taskGrid.Col := 2;
+    if taskGrid.Col = COL_DONE then taskGrid.Col := COL_TASK;
     FMemoNeedSelectAll := False;
     taskGrid.EditorMode := True;
     if (Memo.SelStart > Length(unicodestring(Memo.Text)) - 1) then
@@ -8728,25 +8729,25 @@ begin
     Memo.SelLength := 0;
 
     // For the date, we move to the next or prev line if on the found one
-    if (aDirectionDown) and (FLastFoundCol = 5) and (taskGrid.Col = 5) then
+    if (aDirectionDown) and (FLastFoundCol = COL_DATE) and (taskGrid.Col = COL_DATE) then
     begin
       if (taskGrid.Row < taskGrid.RowCount - 1) then
       begin
         taskGrid.Row := taskGrid.Row + 1;
         Inc(aRowsChanged);
-        taskGrid.Col := 1;
+        taskGrid.Col := COL_DONE;
       end
       else
         LastDate := True;
     end
     else
-    if (not aDirectionDown) and (FLastFoundCol = 5) and (taskGrid.Col = 5) then
+    if (not aDirectionDown) and (FLastFoundCol = COL_DATE) and (taskGrid.Col = COL_DATE) then
     begin
       if (taskGrid.Row > 1) then
       begin
         taskGrid.Row := taskGrid.Row - 1;
         Inc(aRowsChanged);
-        taskGrid.Col := 5;
+        taskGrid.Col := COL_DATE;
       end
       else
         LastDate := True;
@@ -8757,7 +8758,7 @@ begin
     Counter := 0;
 
     repeat
-      if (CurCol < 5) and (CurCol > 1) and (Assigned(Memo)) then
+      if (CurCol < COL_DATE) and (CurCol > COL_DONE) and (Assigned(Memo)) then
       begin
         sValue := unicodestring(Memo.Text);
         sText := unicodestring(aText);
@@ -8780,7 +8781,7 @@ begin
         end;
       end
       else
-      if (CurCol = 5) and (Assigned(DatePicker)) then
+      if (CurCol = COL_DATE) and (Assigned(DatePicker)) then
       begin
         sValue := unicodestring(DateTimeToString(DatePicker.DateTime));
         sText := unicodestring(aText);
@@ -8804,7 +8805,7 @@ begin
       end;
 
       // Move to col
-      if ((aDirectionDown) and (CurCol < 5)) or ((not aDirectionDown) and (CurCol > 2)) then
+      if ((aDirectionDown) and (CurCol < COL_DATE)) or ((not aDirectionDown) and (CurCol > COL_TASK)) then
       begin
         // Move to next col
         if (aDirectionDown) then
@@ -8821,10 +8822,10 @@ begin
           if (aDirectionDown) then
           begin
             Inc(CurRow);
-            CurCol := 1;
+            CurCol := COL_DONE;
             taskGrid.Row := taskGrid.Row + 1;
             Inc(aRowsChanged);
-            taskGrid.Col := 2;
+            taskGrid.Col := COL_TASK;
             Memo.SelStart := 0;
             Memo.SelLength := 0;
           end
@@ -8832,10 +8833,10 @@ begin
             // Move to prev row
           begin
             Dec(CurRow);
-            CurCol := 5;
+            CurCol := COL_DATE;
             taskGrid.Row := taskGrid.Row - 1;
             Inc(aRowsChanged);
-            taskGrid.Col := 5;
+            taskGrid.Col := COL_DATE;
             Memo.SelStart := Length(unicodestring(Memo.Text)) - 1;
             Memo.SelLength := 0;
           end;
@@ -8854,8 +8855,8 @@ begin
             CurRow := 1;
             taskGrid.Row := 1;
             Inc(aRowsChanged);
-            CurCol := 2;
-            taskGrid.Col := 2;
+            CurCol := COL_TASK;
+            taskGrid.Col := COL_TASK;
             Memo.SelStart := 0;
           end
           else
@@ -8864,8 +8865,8 @@ begin
             CurRow := taskGrid.RowCount - 1;
             taskGrid.Row := taskGrid.RowCount - 1;
             Inc(aRowsChanged);
-            CurCol := 5;
-            taskGrid.Col := 5;
+            CurCol := COL_DATE;
+            taskGrid.Col := COL_DATE;
           end;
           Inc(Counter);
         end
@@ -8876,17 +8877,17 @@ begin
       // Skip hidden columns
       if (aDirectionDown) then
       begin
-        if (CurCol = 2) and (not ShowColumnTask) then IncCurCol;
-        if (CurCol = 3) and (not ShowColumnNote) then IncCurCol;
-        if (CurCol = 4) and (not ShowColumnAmount) then IncCurCol;
-        if (CurCol = 5) and (not ShowColumnDate) then IncCurCol;
+        if (CurCol = COL_TASK) and (not ShowColumnTask) then IncCurCol;
+        if (CurCol = COL_NOTE) and (not ShowColumnNote) then IncCurCol;
+        if (CurCol = COL_AMOUNT) and (not ShowColumnAmount) then IncCurCol;
+        if (CurCol = COL_DATE) and (not ShowColumnDate) then IncCurCol;
       end
       else
       begin
-        if (CurCol = 5) and (not ShowColumnDate) then DecCurCol;
-        if (CurCol = 4) and (not ShowColumnAmount) then DecCurCol;
-        if (CurCol = 3) and (not ShowColumnNote) then DecCurCol;
-        if (CurCol = 2) and (not ShowColumnTask) then DecCurCol;
+        if (CurCol = COL_DATE) and (not ShowColumnDate) then DecCurCol;
+        if (CurCol = COL_AMOUNT) and (not ShowColumnAmount) then DecCurCol;
+        if (CurCol = COL_NOTE) and (not ShowColumnNote) then DecCurCol;
+        if (CurCol = COL_TASK) and (not ShowColumnTask) then DecCurCol;
       end;
 
     until ((not WrapAround) and (((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or
