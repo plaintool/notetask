@@ -1162,13 +1162,14 @@ begin
     Key := 0;
   end
   else
-  if (Key = VK_ADD) and (groupTabs.Tabs.Count > 1) and (not IsEditing) then // NUMPAD+
+  if not (ssCtrl in Shift) and not (ssShift in Shift) and (Key = VK_ADD) and (groupTabs.Tabs.Count > 1) and (not IsEditing) then // NUMPAD+
   begin
     EditComplete;
     ChangeGroup(groupTabs.TabIndex + 1);
     Key := 0;
   end
-  else if (Key = VK_SUBTRACT) and (groupTabs.Tabs.Count > 1) and (not IsEditing) then // NUMPAD-
+  else if not (ssCtrl in Shift) and not (ssShift in Shift) and (Key = VK_SUBTRACT) and (groupTabs.Tabs.Count > 1) and (not IsEditing) then
+    // NUMPAD-
   begin
     EditComplete;
     ChangeGroup(groupTabs.TabIndex - 1);
@@ -1268,13 +1269,15 @@ begin
     Key := 0;
   end
   else
-  if (Shift = [ssCtrl, ssShift]) and (Key = VK_LEFT) then // Ctrl + Shift + Left
+  if ((Shift = [ssCtrl, ssShift]) and (Key = VK_LEFT)) or (((Shift = [ssCtrl]) or (Shift = [ssShift])) and (Key = VK_SUBTRACT)) then
+    // Ctrl + Shift + Left, Ctrl | Shift + NUMPAD-
   begin
     aMoveGroupLeft.Execute;
     Key := 0;
   end
   else
-  if (Shift = [ssCtrl, ssShift]) and (Key = VK_RIGHT) then // Ctrl + Shift + Right
+  if ((Shift = [ssCtrl, ssShift]) and (Key = VK_RIGHT)) or (((Shift = [ssCtrl]) or (Shift = [ssShift])) and (Key = VK_ADD)) then
+    // Ctrl + Shift + Right, Ctrl | Shift + NUMPAD+
   begin
     aMoveGroupRight.Execute;
     Key := 0;
