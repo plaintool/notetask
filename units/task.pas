@@ -108,6 +108,7 @@ type
     procedure UpdateGroup;
     procedure ChangeGroup(GroupIndex: integer; UpdateCurrent: boolean = False);
     function GetGroupName(Index: integer): string;
+    function GetGroupNameForTab(aIndex: integer): string;
     function GetGroupHint(Index: integer): string;
     function GetGroupFiltered(Index: integer; ShowArchive: boolean; Filter: string; DisplayTime: boolean): boolean;
     function HasDuplicateMatches(const Value: string): boolean;
@@ -658,6 +659,17 @@ end;
 function TTasks.GetGroupName(Index: integer): string;
 begin
   Result := FGroupNameList[Index];
+end;
+
+function TTasks.GetGroupNameForTab(aIndex: integer): string;
+begin
+  Result := string.Empty;
+  if (aIndex < 0) or (aIndex >= CountGroup) then exit;
+
+  Result := GroupNames[aIndex].TrimLeft([' ', '#']).Trim;
+
+  if (GetGroupFiltered(aIndex, False, string.Empty, False)) then
+    Result := ApplyCombiningChar(Result);
 end;
 
 function TTasks.GetGroupHint(Index: integer): string;

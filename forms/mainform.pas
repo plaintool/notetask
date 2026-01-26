@@ -8301,7 +8301,7 @@ begin
       begin
         if not Tasks.GetGroupFiltered(i, ShowArchived, filterBox.Text, FShowTime) then
         begin
-          Clean.Add(Tasks.GroupNames[i].TrimLeft([' ', '#']).Trim);
+          Clean.Add(Tasks.GetGroupNameForTab(i));
           SetLength(FGroupIndexMap, Length(FGroupIndexMap) + 1);
           FGroupIndexMap[High(FGroupIndexMap)] := i;
         end;

@@ -117,6 +117,8 @@ procedure StringListRemove(AList: TStringList; const AName: string);
 
 function RemoveFirstSubstring(const S, SubStr: string; Reverse: boolean = False): string;
 
+function ApplyCombiningChar(const AText: string; const ACombiningChar: string = #$0335): string;
+
 function SameFloat(A, B: double; Eps: double): boolean;
 
 {TIntegerArray}
@@ -1173,6 +1175,24 @@ begin
 
     if Position > 0 then
       Result := Copy(S, 1, Position - 1) + Copy(S, Position + Length(SubStr), MaxInt);
+  end;
+end;
+
+function ApplyCombiningChar(const AText: string; const ACombiningChar: string = #$0335): string;
+var
+  I, Len: integer;
+  Ch: string;
+begin
+  Result := '';
+  Len := UTF8Length(AText);
+
+  for I := 1 to Len do
+  begin
+    Ch := UTF8Copy(AText, I, 1);
+    Result := Result + Ch;
+
+    if (Ch <> #10) and (Ch <> #13) then
+      Result := Result + ACombiningChar;
   end;
 end;
 
