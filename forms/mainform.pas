@@ -698,7 +698,7 @@ type
     function IsExecuteValueNote(memoPriority: boolean = False): boolean;
     function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
-    procedure TryOpenAsUrl(Value: string);
+    function TryOpenAsUrl(Value: string): boolean;
     procedure ExecuteTerminal(usePowershell: boolean = True);
     procedure MoveTabLeft(Index: integer);
     procedure MoveTabRight(Index: integer);
@@ -4710,10 +4710,20 @@ begin
   begin
     if ssCtrl in Shift then
     begin
-      TryOpenAsUrl(Trim(FNoteLastSelText));
-
-      (Sender as TMemo).SelStart := FNoteLastSelStart;
-      (Sender as TMemo).SelLength := FNoteLastSelLength;
+      // if no selection try select full url
+      if (FNoteLastSelLength < 1) or (((Sender as TMemo).SelStart < FNoteLastSelStart) or
+        ((Sender as TMemo).SelStart > FNoteLastSelStart + FNoteLastSelLength)) or (not TryOpenAsUrl(Trim(FNoteLastSelText))) then
+      begin
+        MemoTokenAtPos(Sender as TMemo, (Sender as TMemo).SelStart, ':/?#[]@!$&''()*+,;=-_.~%');
+        FNoteLastSelText := (Sender as TMemo).SelText;
+        FNoteLastSelStart := (Sender as TMemo).SelStart;
+        FNoteLastSelLength := (Sender as TMemo).SelLength;
+      end
+      else
+      begin
+        (Sender as TMemo).SelStart := FNoteLastSelStart;
+        (Sender as TMemo).SelLength := FNoteLastSelLength;
+      end;
     end
     else
       FMemoSelStartClicked := (Sender as TMemo).SelStart;
@@ -4759,81 +4769,15 @@ begin
 end;
 
 procedure TformNotetask.memoNoteDblClick(Sender: TObject);
-{$IFDEF WINDOWS}
 var
-  Value: unicodestring;
-  pos1, leftIdx, rightIdx, len: integer;
-  ch: widechar;
-
-  function CharType(ch: widechar): integer;
-  begin
-    // 1 = letter or digit
-    // 2 = space
-    // 3 = other symbol
-    if IsLetterOrDigit(ch) or (ch = '_') or (ch = '-') or (ch = '@') then
-      Result := 1
-    else if ch = ' ' then
-      Result := 2
-    else
-      Result := 3;
-  end;
-{$ENDIF}
+  Pos: integer;
 begin
-  {$IFDEF WINDOWS}
-  Value := unicodestring((Sender as TMemo).Text);
-  len := Length(Value);
-  if len = 0 then Exit;
-
-  if (FMemoSelStartClicked >= 0) then
-    pos1 := FMemoSelStartClicked + 1
+  if FMemoSelStartClicked >= 0 then
+    Pos := FMemoSelStartClicked
   else
-    pos1 := (Sender as TMemo).SelStart + 1;
+    Pos := (Sender as TMemo).SelStart;
 
-  if pos1 < 1 then pos1 := 1;
-  if pos1 > len then pos1 := len;
-
-  ch := Value[pos1];
-  leftIdx := pos1;
-  rightIdx := pos1 + 1;
-
-  case CharType(ch) of
-    1: // word (letters/digits/_/-)
-    begin
-      while (leftIdx > 1) and (CharType(Value[leftIdx - 1]) = 1) do Dec(leftIdx);
-      while (rightIdx <= len) and (CharType(Value[rightIdx]) = 1) do Inc(rightIdx);
-
-      // extend with dot-joined tokens (.exe, .tar.gz etc.)
-      while (leftIdx > 2) and (Value[leftIdx - 1] = '.') and (CharType(Value[leftIdx - 2]) = 1) do
-      begin
-        Dec(leftIdx); // include dot
-        while (leftIdx > 1) and (CharType(Value[leftIdx - 1]) = 1) do Dec(leftIdx);
-      end;
-      while (rightIdx < len) and (Value[rightIdx] = '.') and (CharType(Value[rightIdx + 1]) = 1) do
-      begin
-        Inc(rightIdx); // include dot
-        while (rightIdx <= len) and (CharType(Value[rightIdx]) = 1) do Inc(rightIdx);
-      end;
-    end;
-
-    2: // spaces
-    begin
-      while (leftIdx > 1) and (Value[leftIdx - 1] = ' ') do Dec(leftIdx);
-      while (rightIdx <= len) and (Value[rightIdx] = ' ') do Inc(rightIdx);
-    end;
-
-    3: // other symbols
-    begin
-      while (leftIdx > 1) and (Value[leftIdx - 1] = ch) do Dec(leftIdx);
-      while (rightIdx <= len) and (Value[rightIdx] = ch) do Inc(rightIdx);
-    end;
-    else
-      ; // NOP
-  end;
-
-  // Apply selection
-  (Sender as TMemo).SelStart := leftIdx - 1;
-  (Sender as TMemo).SelLength := rightIdx - leftIdx;
-  {$ENDIF}
+  MemoTokenAtPos(Sender as TMemo, Pos, '_-@');
   FMemoSelStartClicked := -1;
 end;
 
@@ -5388,13 +5332,20 @@ begin
   end;
 end;
 
-procedure TformNotetask.TryOpenAsUrl(Value: string);
+function TformNotetask.TryOpenAsUrl(Value: string): boolean;
 begin
+  Result := False;
   if IsURL(Value) then
-    OpenURL(IfThen(HasScheme(Value), Value, http + Value))
+  begin
+    OpenURL(IfThen(HasScheme(Value), Value, http + Value));
+    Result := True;
+  end
   else
   if IsEmail(Value) then
+  begin
     OpenURL(IfThen(AnsiStartsText(mailto, Value), Value, mailto + Value));
+    Result := True;
+  end;
 end;
 
 procedure TformNotetask.ExecuteTerminal(usePowershell: boolean = True);

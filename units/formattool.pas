@@ -14,6 +14,7 @@ interface
 uses
   Classes,
   SysUtils,
+  StdCtrls,
   Graphics,
   Process,
   RegExpr,
@@ -24,6 +25,8 @@ uses
 
 type
   TIntegerArray = array of integer;
+
+procedure MemoTokenAtPos(AMemo: TMemo; APos: integer; const AExtraChars: unicodestring);
 
 function TextToStringList(const Content: string; TrimEnd: boolean = False): TStringList;
 
@@ -142,6 +145,79 @@ const
 implementation
 
 uses mathparser;
+
+procedure MemoTokenAtPos(AMemo: TMemo; APos: integer; const AExtraChars: unicodestring);
+var
+  Value: unicodestring;
+  Pos1, LeftIdx, RightIdx, LenText: integer;
+  Ch: widechar;
+
+  function IsExtraChar(ACh: widechar): boolean;
+  begin
+    Result := Pos(ACh, AExtraChars) > 0;
+  end;
+
+  function CharType(ACh: widechar): integer;
+  begin
+    // 1 = letter or digit
+    // 2 = space
+    // 3 = other symbol
+    if IsLetterOrDigit(ACh) or IsExtraChar(ACh) then
+      Result := 1
+    else if ACh = ' ' then
+      Result := 2
+    else
+      Result := 3;
+  end;
+
+begin
+  Value := unicodestring(AMemo.Text);
+  LenText := Length(Value);
+  if LenText = 0 then Exit;
+
+  Pos1 := APos + 1;
+  if Pos1 < 1 then Pos1 := 1;
+  if Pos1 > LenText then Pos1 := LenText;
+
+  Ch := Value[Pos1];
+  LeftIdx := Pos1;
+  RightIdx := Pos1 + 1;
+
+  case CharType(Ch) of
+    1:
+    begin
+      while (LeftIdx > 1) and (CharType(Value[LeftIdx - 1]) = 1) do Dec(LeftIdx);
+      while (RightIdx <= LenText) and (CharType(Value[RightIdx]) = 1) do Inc(RightIdx);
+
+      while (LeftIdx > 2) and (Value[LeftIdx - 1] = '.') and (CharType(Value[LeftIdx - 2]) = 1) do
+      begin
+        Dec(LeftIdx);
+        while (LeftIdx > 1) and (CharType(Value[LeftIdx - 1]) = 1) do Dec(LeftIdx);
+      end;
+
+      while (RightIdx < LenText) and (Value[RightIdx] = '.') and (CharType(Value[RightIdx + 1]) = 1) do
+      begin
+        Inc(RightIdx);
+        while (RightIdx <= LenText) and (CharType(Value[RightIdx]) = 1) do Inc(RightIdx);
+      end;
+    end;
+
+    2:
+    begin
+      while (LeftIdx > 1) and (Value[LeftIdx - 1] = ' ') do Dec(LeftIdx);
+      while (RightIdx <= LenText) and (Value[RightIdx] = ' ') do Inc(RightIdx);
+    end;
+
+    3:
+    begin
+      while (LeftIdx > 1) and (Value[LeftIdx - 1] = Ch) do Dec(LeftIdx);
+      while (RightIdx <= LenText) and (Value[RightIdx] = Ch) do Inc(RightIdx);
+    end;
+  end;
+
+  AMemo.SelStart := LeftIdx - 1;
+  AMemo.SelLength := RightIdx - LeftIdx;
+end;
 
 function TextToStringList(const Content: string; TrimEnd: boolean = False): TStringList;
 var
