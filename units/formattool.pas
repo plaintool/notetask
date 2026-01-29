@@ -16,6 +16,7 @@ uses
   SysUtils,
   StdCtrls,
   Graphics,
+  Grids,
   Process,
   RegExpr,
   Math,
@@ -133,6 +134,8 @@ procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
 function CloneArray(const Src: TIntegerArray): TIntegerArray;
 
 procedure CopyToArray(var Dest: TIntegerArray; const Src: TIntegerArray);
+
+function GetActualScrollBarVisibility(Grid: TStringGrid; ScrollBarStyle: TScrollStyle): Boolean;
 
 const
   Brackets: array[0..17] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]',
@@ -1330,6 +1333,78 @@ begin
   CopyCount := Min(Length(Dest), Length(Src));
   for i := 0 to CopyCount - 1 do
     Dest[i] := Src[i];
+end;
+
+function GetActualScrollBarVisibility(Grid: TStringGrid; ScrollBarStyle: TScrollStyle): Boolean;
+var
+  ContentWidth, ContentHeight: Integer;
+  ViewportWidth, ViewportHeight: Integer;
+  i: Integer;
+begin
+  Result := False;
+
+  if not (ScrollBarStyle in [ssHorizontal, ssVertical]) then
+    Exit(False);
+
+  // Calculate content dimensions
+  ContentWidth := 0;
+  ContentHeight := 0;
+
+  for i := Grid.FixedCols to Grid.ColCount - 1 do
+    Inc(ContentWidth, Grid.ColWidths[i]);
+
+  for i := Grid.FixedRows to Grid.RowCount - 1 do
+    Inc(ContentHeight, Grid.RowHeights[i]);
+
+  // Calculate viewport dimensions
+  ViewportWidth := Grid.ClientWidth;
+  ViewportHeight := Grid.ClientHeight;
+
+  for i := 0 to Grid.FixedCols - 1 do
+    Dec(ViewportWidth, Grid.ColWidths[i]);
+
+  for i := 0 to Grid.FixedRows - 1 do
+    Dec(ViewportHeight, Grid.RowHeights[i]);
+
+  // Account for grid lines
+  if Grid.GridLineWidth > 0 then
+  begin
+    // Subtract only lines between scrollable cells
+    // Fixed lines don't affect scrolling area
+    Dec(ViewportWidth, (Grid.ColCount - Grid.FixedCols - 1) * Grid.GridLineWidth);
+    Dec(ViewportHeight, (Grid.RowCount - Grid.FixedRows - 1) * Grid.GridLineWidth);
+  end;
+
+  ViewportWidth := Max(ViewportWidth, 0);
+  ViewportHeight := Max(ViewportHeight, 0);
+  Inc(ViewportWidth, 5);
+  Inc(ViewportHeight, 14);
+
+  case ScrollBarStyle of
+    ssHorizontal:
+    begin
+      if not (Grid.ScrollBars in [ssHorizontal, ssBoth, ssAutoHorizontal, ssAutoBoth]) then
+        Exit(False);
+
+      // For auto styles: show only if content exceeds viewport
+      // For non-auto styles: always show if enabled
+      if Grid.ScrollBars in [ssAutoHorizontal, ssAutoBoth] then
+        Result := (ContentWidth > ViewportWidth)
+      else
+        Result := (Grid.ScrollBars in [ssHorizontal, ssBoth]);
+    end;
+
+    ssVertical:
+    begin
+      if not (Grid.ScrollBars in [ssVertical, ssBoth, ssAutoVertical, ssAutoBoth]) then
+        Exit(False);
+
+      if Grid.ScrollBars in [ssAutoVertical, ssAutoBoth] then
+        Result := (ContentHeight > ViewportHeight)
+      else
+        Result := (Grid.ScrollBars in [ssVertical, ssBoth]);
+    end;
+  end;
 end;
 
 end.

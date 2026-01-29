@@ -132,6 +132,7 @@ type
     contextZoom130: TMenuItem;
     contextZoom140: TMenuItem;
     contextZoom150: TMenuItem;
+    ImagesBtn: TImageList;
     MenuItem10: TMenuItem;
     MenuItem11: TMenuItem;
     MenuItem12: TMenuItem;
@@ -147,7 +148,7 @@ type
     menuZoomOut: TMenuItem;
     menuDefaultZoom: TMenuItem;
     menuZoom: TMenuItem;
-    MiscImages: TImageList;
+    ImagesMisc: TImageList;
     MainMenu: TMainMenu;
     memoNote: TMemo;
     menuFile: TMenuItem;
@@ -222,6 +223,7 @@ type
     menuNew: TMenuItem;
     openDialog: TOpenDialog;
     pageSetupDialog: TPageSetupDialog;
+    panelFunc: TPanel;
     panelTabs: TPanel;
     panelNote: TPanel;
     Popup: TPopupMenu;
@@ -250,6 +252,7 @@ type
     Separator6: TMenuItem;
     Separator7: TMenuItem;
     Separator8: TMenuItem;
+    btnMulti: TSpeedButton;
     SplitFilter: TSplitter;
     SplitTags: TSplitter;
     statusBar: TStatusBar;
@@ -316,7 +319,7 @@ type
     menuOutdentTasks: TMenuItem;
     aShowColumnTask: TAction;
     menuColumnTask: TMenuItem;
-    TitleImages: TImageList;
+    ImagesTitle: TImageList;
     aRunTerminal: TAction;
     menuRunTerminal: TMenuItem;
     contextRunTerminal: TMenuItem;
@@ -372,6 +375,7 @@ type
     procedure aZoomDefaultExecute(Sender: TObject);
     procedure aZoomInExecute(Sender: TObject);
     procedure aZoomOutExecute(Sender: TObject);
+    procedure btnMultiClick(Sender: TObject);
     procedure contextCopyTagsClick(Sender: TObject);
     procedure contextDeleteTagsClick(Sender: TObject);
     procedure contextColorClick(Sender: TObject);
@@ -711,6 +715,7 @@ type
     procedure RestoreSelectedState(aRowMem: boolean = True; aRowMemPriority: boolean = True; aFocusMemo: boolean = False);
     procedure GridAdjustScrollBars;
     procedure GridInvalidate;
+    procedure AjustMultiButton;
     procedure TagsAdd(const Rect: TRect; const TagText: string);
     function FreeFile: boolean;
     function LastRowHeight(aRow: integer): integer;
@@ -914,7 +919,7 @@ begin
   tagsEdit.BackSpaceEditTag := True;
   tagsEdit.ShowHint := True;
   tagsEdit.SuggestedButtonCaption := string.Empty;
-  MiscImages.GetBitmap(0, tagsEdit.SuggestedButtonGlyph);
+  ImagesMisc.GetBitmap(0, tagsEdit.SuggestedButtonGlyph);
   tagsEdit.PopupMenu := PopupTags;
   tagsEdit.OnKeyDown := @tagsEditKeyDown;
   tagsEdit.OnTagClick := @tagsEditTagClick;
@@ -1593,6 +1598,7 @@ end;
 procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
 begin
   FIsSelecting := True;
+  AjustMultiButton;
 end;
 
 procedure TformNotetask.taskGridKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -1746,6 +1752,17 @@ begin
   // Update the size and position of the Memo
   if Assigned(taskGrid.Editor) and (taskGrid.Editor is TPanel) then
     TPanel(taskGrid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
+
+  // Align panelFunc to bottom-right of taskGrid
+  if GetActualScrollBarVisibility(taskGrid, ssVertical) then
+    panelFunc.Left := taskGrid.Left + taskGrid.Width - panelFunc.Width - GetSystemMetrics(SM_CXVSCROLL) - 5
+  else
+    panelFunc.Left := taskGrid.Left + taskGrid.Width - panelFunc.Width - 5;
+
+  if GetActualScrollBarVisibility(taskGrid, ssHorizontal) then
+    panelFunc.Top := taskGrid.Top + taskGrid.Height - panelFunc.Height - GetSystemMetrics(SM_CYHSCROLL) - 5
+  else
+    panelFunc.Top := taskGrid.Top + taskGrid.Height - panelFunc.Height - 5;
 end;
 
 procedure TformNotetask.taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
@@ -2473,6 +2490,8 @@ begin
   if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
     SetInfo;
 
+  AjustMultiButton;
+
   if (aRow <> FLastRow) or (taskGrid.Selection.Top <> FLastSelection.Top) or (taskGrid.Selection.Bottom <> FLastSelection.Bottom) then
   begin
     FLastRow := aRow;
@@ -3044,6 +3063,13 @@ begin
     SetInfo;
     SetChanged;
   end;
+end;
+
+procedure TformNotetask.btnMultiClick(Sender: TObject);
+begin
+  if btnMulti.ImageIndex = 0 then aInsertTask.Execute
+  else
+  if btnMulti.ImageIndex = 2 then aDuplicateTasks.Execute;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
@@ -7421,6 +7447,22 @@ begin
   Application.ProcessMessages;
   taskGrid.Invalidate;
   Application.ProcessMessages;
+end;
+
+procedure TformNotetask.AjustMultiButton;
+begin
+  if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) or (taskGrid.Selection.Width > 0) then
+  begin
+    btnMulti.Hint := aDuplicateTasks.Caption + ' (Ctrl+D)';
+    btnMulti.ImageIndex := 2;
+    btnMulti.HotImageIndex := 3;
+  end
+  else
+  begin
+    btnMulti.Hint := aInsertTask.Caption + ' (Ins)';
+    btnMulti.ImageIndex := 0;
+    btnMulti.HotImageIndex := 1;
+  end;
 end;
 
 function TformNotetask.FreeFile: boolean;

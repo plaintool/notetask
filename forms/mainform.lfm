@@ -70,7 +70,7 @@ object formNotetask: TformNotetask
     Options2 = [goEditorParentFont]
     RowCount = 2
     TabOrder = 0
-    TitleImageList = TitleImages
+    TitleImageList = ImagesTitle
     UseXORFeatures = True
     OnCheckboxToggled = taskGridCheckboxToggled
     OnColRowDeleted = taskGridColRowDeleted
@@ -292,6 +292,35 @@ object formNotetask: TformNotetask
     BorderStyle = bsNone
     ParentBackground = False
     TabOrder = 4
+  end
+  object panelFunc: TPanel
+    Left = 800
+    Height = 24
+    Top = 260
+    Width = 24
+    Anchors = [akRight, akBottom]
+    BevelOuter = bvNone
+    ClientHeight = 24
+    ClientWidth = 24
+    Color = clNone
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 7
+    object btnMulti: TSpeedButton
+      Left = 0
+      Height = 24
+      Top = 0
+      Width = 24
+      Align = alClient
+      Color = clNone
+      Flat = True
+      HotImageIndex = 1
+      Images = ImagesBtn
+      ImageIndex = 0
+      ShowHint = True
+      ParentShowHint = False
+      OnClick = btnMultiClick
+    end
   end
   object MainMenu: TMainMenu
     Left = 160
@@ -1336,7 +1365,7 @@ object formNotetask: TformNotetask
       Action = aSaveNotesAs
     end
   end
-  object TitleImages: TImageList
+  object ImagesTitle: TImageList
     Left = 240
     Top = 176
     Bitmap = {
@@ -1502,7 +1531,7 @@ object formNotetask: TformNotetask
       OnClick = contextResetColorClick
     end
   end
-  object MiscImages: TImageList
+  object ImagesMisc: TImageList
     Height = 12
     Left = 240
     Top = 240
@@ -1591,5 +1620,19 @@ object formNotetask: TformNotetask
       Caption = '50%'
       OnClick = contextZoom50Click
     end
+  end
+  object ImagesBtn: TImageList
+    Height = 24
+    Width = 24
+    Left = 320
+    Top = 240
+    Bitmap = {
+      4C7A0400000018000000180000008C0000000000000078DAED984B0AC0200C05
+      0FDA5BF52EBD476F64B7150445F2309F09CCC6C52C1E1A4CDAFBB406F02FFCB1
+      FD3B55C9CFFDA9E70718715F007DFFC11FDBBF5395FCDC9F7A7E8011FC01D9F7
+      A8E769A57FF5DCBBDF3AAF537EABBCB2F867397BF5677D6F51FB1DB0FF01CDBC
+      A59EA795FED573EF7EEBBC4EF9ADF2CAE29FE5ECD59FF5BD45ED7720E10366D8
+      F7E2
+    }
   end
 end
