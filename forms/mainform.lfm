@@ -44,6 +44,7 @@ object formNotetask: TformNotetask
         Width = 200
       end    
       item
+        Alignment = taRightJustify
         Title.Caption = 'Amount'
         Width = 100
       end    

@@ -731,7 +731,7 @@ type
     function GetMemoNoteScroll: integer;
     function GetMemoNoteSelStart: integer;
     function GetMemoNoteSelLength: integer;
-    procedure DrawHighlightedText(aCanvas: TCanvas; const aText, aFilterText: string; aRect: TRect; aColor: TColor);
+    procedure DrawHighlightedText(aCanvas: TCanvas; const aText, aFilterText: string; aRect: TRect; aColor: TColor; aCol: integer);
     procedure DelayedSetMemoFocus(Data: PtrInt);
     procedure DelayedFinishTagEdit(Data: PtrInt);
     procedure DelayedInvalidate(Data: PtrInt);
@@ -1754,11 +1754,20 @@ begin
     TPanel(taskGrid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
 
   // Align panelFunc to bottom-right of taskGrid
-  if GetActualScrollBarVisibility(taskGrid, ssVertical) then
-    panelFunc.Left := taskGrid.Left + taskGrid.Width - panelFunc.Width - GetSystemMetrics(SM_CXVSCROLL) - 5
+  if FBiDiRightToLeft then
+  begin
+    if GetActualScrollBarVisibility(taskGrid, ssVertical) then
+      panelFunc.Left := taskGrid.Left + GetSystemMetrics(SM_CXVSCROLL) + 5
+    else
+      panelFunc.Left := taskGrid.Left + 5;
+  end
   else
-    panelFunc.Left := taskGrid.Left + taskGrid.Width - panelFunc.Width - 5;
-
+  begin
+    if GetActualScrollBarVisibility(taskGrid, ssVertical) then
+      panelFunc.Left := taskGrid.Left + taskGrid.Width - panelFunc.Width - GetSystemMetrics(SM_CXVSCROLL) - 5
+    else
+      panelFunc.Left := taskGrid.Left + taskGrid.Width - panelFunc.Width - 5;
+  end;
   if GetActualScrollBarVisibility(taskGrid, ssHorizontal) then
     panelFunc.Top := taskGrid.Top + taskGrid.Height - panelFunc.Height - GetSystemMetrics(SM_CYHSCROLL) - 5
   else
@@ -1952,9 +1961,9 @@ begin
       // First pass: calculate text size
       Flags := DT_CALCRECT;
       if FBiDiRightToLeft then
-        Flags := Flags or DT_RIGHT
+        Flags := Flags or ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT)
       else
-        Flags := Flags or DT_LEFT;
+        Flags := Flags or ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT);
       if FWordWrap then
         Flags := Flags or DT_WORDBREAK;
 
@@ -1975,9 +1984,9 @@ begin
 
       Flags := DT_NOPREFIX;
       if FBiDiRightToLeft then
-        Flags := Flags or DT_RIGHT
+        Flags := Flags or ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT)
       else
-        Flags := Flags or DT_LEFT;
+        Flags := Flags or ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT);
       if FWordWrap then
         Flags := Flags or DT_WORDBREAK;
 
@@ -1995,13 +2004,14 @@ begin
         if (aCol = COL_AMOUNT) then Value := ReplaceStr(Value, ' ', '');
 
         DrawHighlightedText(Grid.Canvas, Value, filterBox.Text, DrawRect,
-          ifthen(bgFill <> clWhite, tagsEdit.BlendColors(clDuplicateHighlight, bgFill, 50), clDuplicateHighlight));
+          ifthen(bgFill <> clWhite, tagsEdit.BlendColors(clDuplicateHighlight, bgFill, 50), clDuplicateHighlight), aCol);
       end;
     end;
   end;
 end;
 
-procedure TformNotetask.DrawHighlightedText(aCanvas: TCanvas; const aText, aFilterText: string; aRect: TRect; aColor: TColor);
+procedure TformNotetask.DrawHighlightedText(aCanvas: TCanvas; const aText, aFilterText: string; aRect: TRect;
+  aColor: TColor; aCol: integer);
 type
   TTextRange = record
     StartPos: integer;
@@ -2117,9 +2127,9 @@ var
 
     // Set starting X based on text direction
     if FBiDiRightToLeft then
-      X := aRect.Right - TotalLineWidth  // Align line to right
+      X := ifthen(aCol in [COL_DATE], aRect.Left, aRect.Right - TotalLineWidth) // Align line to right
     else
-      X := aRect.Left;                   // Align line to left
+      X := ifthen(aCol in [COL_AMOUNT], aRect.Right - TotalLineWidth, aRect.Left); // Align line to left
 
     // Ensure we don't draw outside the bounds
     if X < aRect.Left then X := aRect.Left;
@@ -2128,7 +2138,7 @@ var
       // Adjust if line is too long (shouldn't happen with proper word wrapping)
       TotalLineWidth := aRect.Right - X;
       if FBiDiRightToLeft then
-        X := aRect.Right - TotalLineWidth;
+        X := ifthen(aCol in [COL_DATE], aRect.Left, aRect.Right - TotalLineWidth);
     end;
 
     // Draw all words in the line
@@ -2150,9 +2160,9 @@ var
 
       Flags := DT_NOPREFIX;
       if FBiDiRightToLeft then
-        Flags := Flags or DT_RIGHT
+        Flags := Flags or ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT)
       else
-        Flags := Flags or DT_LEFT;
+        Flags := Flags or ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT);
       if FWordWrap then
         Flags := Flags or DT_WORDBREAK;
 
@@ -2346,13 +2356,25 @@ begin
     Memo.WantReturns := aCol in [COL_TASK, COL_NOTE];
     if (FBiDiRightToLeft) then
     begin
-      Memo.BiDiMode := bdRightToLeft;
-      Memo.Alignment := taRightJustify;
+      if aCol = COL_AMOUNT then
+      begin
+        Memo.ParentBiDiMode := False;
+        Memo.BiDiMode := bdLeftToRight;
+        Memo.Alignment := taRightJustify;
+      end
+      else
+        Memo.BiDiMode := bdRightToLeft;
     end
     else
     begin
-      Memo.BiDiMode := bdLeftToRight;
-      Memo.Alignment := taLeftJustify;
+      if aCol = COL_AMOUNT then
+      begin
+        Memo.ParentBiDiMode := False;
+        Memo.BiDiMode := bdLeftToRight;
+        Memo.Alignment := taRightJustify;
+      end
+      else
+        Memo.BiDiMode := bdLeftToRight;
     end;
     EditControlSetBounds(PanelMemo, aCol, aRow);
     Memo.PopupMenu := PopupMemo;
@@ -2400,10 +2422,8 @@ begin
     else
       DatePicker.Kind := dtkDate;
     DatePicker.TimeDisplay := tdHMS;
-    if (FBiDiRightToLeft) then
-      DatePicker.BiDiMode := bdRightToLeft
-    else
-      DatePicker.BiDiMode := bdLeftToRight;
+    DatePicker.ParentBiDiMode := False;
+    DatePicker.BiDiMode := bdLeftToRight;
 
     EditControlSetBounds(DatePicker, aCol, aRow, 2, -2, -2, 0);
 
@@ -7491,8 +7511,13 @@ begin
   begin
     taskGrid.BiDiMode := bdRightToLeft;
     groupTabs.BiDiMode := bdRightToLeft;
-    for i := 1 to taskGrid.Columns.Count - 1 do
-      taskGrid.Columns[i].Alignment := taRightJustify;
+    for i := 1 to taskGrid.Columns.Count - 2 do
+    begin
+      if (i in [COL_AMOUNT - 1]) then
+        taskGrid.Columns[i].Alignment := taLeftJustify
+      else
+        taskGrid.Columns[i].Alignment := taRightJustify;
+    end;
     filterBox.BiDiMode := bdRightToLeft;
     memoNote.BiDiMode := bdRightToLeft;
     memoNote.Alignment := taRightJustify;
@@ -7505,8 +7530,6 @@ begin
   begin
     taskGrid.BiDiMode := bdLeftToRight;
     groupTabs.BiDiMode := bdLeftToRight;
-    for i := 1 to taskGrid.Columns.Count - 1 do
-      taskGrid.Columns[i].Alignment := taLeftJustify;
     filterBox.BiDiMode := bdLeftToRight;
     memoNote.BiDiMode := bdLeftToRight;
     memoNote.Alignment := taLeftJustify;
@@ -7515,7 +7538,15 @@ begin
     memoNote.BiDiMode := bdLeftToRight;
     tagsEdit.BiDiMode := bdLeftToRight;
     SetCursorTo(panelNote, 'LEFTARROW');
+    for i := 1 to taskGrid.Columns.Count - 2 do
+    begin
+      if (i = COL_AMOUNT - 1) then
+        taskGrid.Columns[i].Alignment := taRightJustify
+      else
+        taskGrid.Columns[i].Alignment := taLeftJustify;
+    end;
   end;
+  taskGridResize(Self);
 end;
 
 procedure TformNotetask.SetShowStatusBar(Value: boolean);
@@ -7768,7 +7799,7 @@ var
     drawrect: TRect;
     Text: string;
     task: TTask;
-    flags: cardinal;
+    Flags: cardinal;
     h: integer;
     OldBold: boolean;
   begin
@@ -7802,19 +7833,19 @@ var
           end;
         end;
 
-        flags := DT_CALCRECT;
+        Flags := DT_CALCRECT;
         if FBiDiRightToLeft then
-          flags := flags + DT_RIGHT
+          Flags := Flags or ifthen(col in [COL_DATE], DT_LEFT, DT_RIGHT)
         else
-          flags := flags + DT_LEFT;
+          Flags := Flags or ifthen(col in [COL_AMOUNT], DT_RIGHT, DT_LEFT);
         if FWordWrap then
-          flags := flags or DT_WORDBREAK;
+          Flags := Flags or DT_WORDBREAK;
 
         {$IFDEF UNIX}
         Text := StringReplace(Text, #$0A, #$0A+ '+', [rfReplaceAll]);
         {$ENDIF}
 
-        DrawText(taskGrid.canvas.handle, PChar(Text), Length(Text), drawrect, flags);
+        DrawText(taskGrid.canvas.handle, PChar(Text), Length(Text), drawrect, Flags);
         taskGrid.Canvas.Font.Bold := OldBold;
 
         // The greater than sign is important because values may differ across fields, need max
