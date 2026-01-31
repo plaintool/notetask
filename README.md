@@ -4,7 +4,9 @@ A simple application for creating and organizing task lists, offering essential 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Build with: Lazarus](https://img.shields.io/badge/Build_with-Lazarus-blueviolet)](https://www.lazarus-ide.org/)
 [![Platform: Windows Linux](https://img.shields.io/badge/Platform-Windows_Linux-yellow)](#)
-[![Languages: ar be zh cs da nl en fi fr de el he hi id it ja ko pl pt ro ru es sv tr uk](https://img.shields.io/badge/Lang-ar_be_zh_cs_da_nl_en_fi_fr_de_el_he_hi_id_it_ja_ko_pl_pt_ro_ru_es_sv_tr_uk-green)](https://www.ethnologue.com)
+[![Latest Release](https://img.shields.io/github/v/release/plaintool/notetask?label=Release)](https://github.com/plaintool/notetask/releases/latest)
+[![GitHub Downloads](https://img.shields.io/github/downloads/plaintool/notetask/total?label=Downloads)](https://github.com/plaintool/notetask/releases)
+<!-- [![Languages: ar be zh cs da nl en fi fr de el he hi id it ja ko pl pt ro ru es sv tr uk](https://img.shields.io/badge/Lang-ar_be_zh_cs_da_nl_en_fi_fr_de_el_he_hi_id_it_ja_ko_pl_pt_ro_ru_es_sv_tr_uk-green)](https://www.ethnologue.com) -->
 
 >- [Notetask](#notetask)
 >   - [What is it?](#what-is-it)
@@ -212,6 +214,7 @@ Notetask has been reviewed and listed on reputable software directories:
 [![MajorGeeks](https://img.shields.io/badge/MajorGeeks-Visit-darkolivegreen?style=for-the-badge)](https://www.majorgeeks.com/files/details/notetask.html)
 [![Softpedia](https://img.shields.io/badge/Softpedia-Visit-navy?style=for-the-badge)](https://www.softpedia.com/get/Office-tools/Diary-Organizers-Calendar/Notetask.shtml)
 [![AlternativeTo](https://img.shields.io/badge/AlternativeTo-Visit-dodgerblue?style=for-the-badge)](https://alternativeto.net/software/notetask/about/)
+
 
 ## Donate 💖
 
