@@ -715,7 +715,7 @@ type
     procedure RestoreSelectedState(aRowMem: boolean = True; aRowMemPriority: boolean = True; aFocusMemo: boolean = False);
     procedure GridAdjustScrollBars;
     procedure GridInvalidate;
-    procedure AjustMultiButton;
+    procedure AdjustMultiButton;
     procedure TagsAdd(const Rect: TRect; const TagText: string);
     function FreeFile: boolean;
     function LastRowHeight(aRow: integer): integer;
@@ -1098,6 +1098,8 @@ begin
   end;
 
   // After paint form
+  AdjustMultiButton;
+
   if (ReadOnly) then ShowMessage(rfilereadonly);
 end;
 
@@ -1598,7 +1600,7 @@ end;
 procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
 begin
   FIsSelecting := True;
-  AjustMultiButton;
+  AdjustMultiButton;
 end;
 
 procedure TformNotetask.taskGridKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -2510,7 +2512,7 @@ begin
   if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
     SetInfo;
 
-  AjustMultiButton;
+  AdjustMultiButton;
 
   if (aRow <> FLastRow) or (taskGrid.Selection.Top <> FLastSelection.Top) or (taskGrid.Selection.Bottom <> FLastSelection.Bottom) then
   begin
@@ -3175,7 +3177,7 @@ begin
     taskGrid.Col := TempLastCol;
     if (TempLastRow > 1) then
       taskGrid.Row := TempLastRow;
-    if (TempRect.Width > 0) and (TempRect.Height > 0) then
+    if (TempRect.Width > 0) or (TempRect.Height > 0) then
       taskGrid.Selection := TRect.Create(TempRect.Left, TempRect.Top, TempRect.Right, TempRect.Bottom);
     taskGrid.TopRow := TempTopRow;
     SetFilter;
@@ -3494,6 +3496,7 @@ begin
 
   if Visible and taskGrid.Visible and taskGrid.CanFocus then
     taskGrid.SetFocus;
+  AdjustMultiButton;
   SetInfo;
   SetChanged;
   SetNote;
@@ -6318,6 +6321,7 @@ begin
     FLastSelectionHeight := Sel.Height;
   end;
   CalcRowHeight(True);
+  AdjustMultiButton;
   SetInfo;
   SetNote;
   SetTags;
@@ -7469,7 +7473,7 @@ begin
   Application.ProcessMessages;
 end;
 
-procedure TformNotetask.AjustMultiButton;
+procedure TformNotetask.AdjustMultiButton;
 begin
   if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) or (taskGrid.Selection.Width > 0) then
   begin
