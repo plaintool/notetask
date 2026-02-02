@@ -168,10 +168,14 @@ Download the installer from the [releases page](https://github.com/plaintool/Not
 ---
 
 ### Linux
-*Debian-like systems*
+### *Debian-like systems*
 
-Download the appropriate `.deb` package for your system from the [releases page](https://github.com/plaintool/Notetask/releases). To install the package, open a terminal and run:
-
+Download the appropriate `.deb` package for your system from the [releases page](https://github.com/plaintool/Notetask/releases), or use `wget` directly:
+```bash
+wget https://github.com/plaintool/notetask/releases/download/v1.1.1/notetask-1.1.1.deb
+sudo apt install ./notetask-1.1.1.deb
+```
+If you downloaded the package manually, you can also install it via:
 ```bash
 sudo dpkg -i /path/to/notetask.deb
 ```
@@ -179,15 +183,15 @@ If there are missing dependencies, fix them by running:
 ```bash
 sudo apt-get install -f
 ```
-To remove Notetask from your system, use:
 
+### *Fedora-like systems*
+
+Download the appropriate `.rpm` package for your system, or use `wget` directly:
 ```bash
-sudo dpkg -r notetask
+wget https://github.com/plaintool/notetask/releases/download/v1.1.1/notetask-1.1.1.rpm
+sudo rpm -i ./notetask-1.1.1.rpm
 ```
-
-*Fedora-like systems*
-
-Download the appropriate .rpm package for your system. To install the package, open a terminal and run:
+If you downloaded the package manually, you can also install it via:
 ```bash
 sudo dnf install /path/to/notetask.rpm
 ```
@@ -195,15 +199,8 @@ If there are missing dependencies, fix them by running:
 ```bash
 sudo dnf install -y gtk2
 ```
-To remove Notetask from your system, use:
-
-```bash
-sudo dnf remove notetask
-```
-
 Some Notetask functions can run scripts in a terminal.
 If no terminal emulator is installed, you can add one, for example:
-
 ```bash
 sudo dnf install -y xterm
 ```
