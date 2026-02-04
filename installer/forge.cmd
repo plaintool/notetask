@@ -3,19 +3,11 @@ REM Main script to run all builds
 
 echo Starting all builds...
 
-call build.cmd
-echo Wait 2 seconds to ensure file is free
-timeout /t 2 /nobreak >nul
-call build32.cmd
-echo Wait 2 seconds to ensure file is free
-timeout /t 2 /nobreak >nul
-
-pushd installer
-call build.cmd
+call build.cmd x64
 echo Wait 2 seconds to ensure file is free
 timeout /t 2 /nobreak >nul
 SET "BUILD_PORTABLE=1"
-call build32.cmd
+call build.cmd x86
 echo Wait 2 seconds to ensure file is free
 timeout /t 2 /nobreak >nul
 call buildinno.cmd

@@ -2,8 +2,14 @@
 setlocal
 
 :: Define paths
-SET "SOURCE_DIR=E:\notetask\installer"
-SET "VERSION=1.1.1"
+SET "SOURCE_DIR=%~dp0"
+SET "VERSION=%VERSION%"
+IF "%~2" NEQ "" (
+    SET "VERSION=%~2"
+)
+IF "%VERSION%"=="" (
+    SET "VERSION=1.1.1"
+)
 
 :: --- Build inno setup ---
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "%SOURCE_DIR%\innosetup.iss"
@@ -14,17 +20,42 @@ echo.
 timeout /t 2 /nobreak >nul
 
 :: --- Sign installers ---
-SET SIGNTOOL="C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
-SET CERTFILE=AlexanderT.pfx
-SET CERTPASS=1234
-SET TIMESTAMP_URL=http://timestamp.digicert.com
+IF "%SIGNTOOL%"=="" (
+    SET "SIGNTOOL=C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
+)
+IF "%CERTFILE%"=="" (
+    IF EXIST "%SOURCE_DIR%AlexanderT.pfx" (
+        SET "CERTFILE=%SOURCE_DIR%AlexanderT.pfx"
+    ) ELSE (
+        IF NOT "%CERT_PFX%"=="" (
+            SET "CERTFILE=%TEMP%\notetask-cert.pfx"
+            powershell -NoProfile -Command "[IO.File]::WriteAllBytes('%TEMP%\\notetask-cert.pfx',[Convert]::FromBase64String($env:CERT_PFX))"
+        ) ELSE (
+            SET "CERTFILE="
+        )
+    )
+)
+SET "CERTPASS=1234"
+SET "TIMESTAMP_URL=http://timestamp.digicert.com"
 
-echo Signing file...
-%SIGNTOOL% sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-%VERSION%-any-x86-x64.exe"
-IF %ERRORLEVEL% EQU 0 (
-    echo Signing of notetask-%VERSION%-any-x86-x64.exe completed successfully
+if not "%CERTFILE%"=="" (
+    if exist "%CERTFILE%" (
+        if exist "%SIGNTOOL%" (
+            echo Signing file...
+            "%SIGNTOOL%" sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-%VERSION%-any-x86-x64.exe"
+            IF %ERRORLEVEL% EQU 0 (
+                echo Signing of notetask-%VERSION%-any-x86-x64.exe completed successfully
+            ) else (
+                echo Signing failed for notetask-%VERSION%-any-x86-x64.exe
+            )
+        ) else (
+            echo Skipping signing: signtool not found.
+        )
+    ) else (
+        echo Skipping signing: cert file not found.
+    )
 ) else (
-    echo Signing failed for notetask-%VERSION%-any-x86-x64.exe
+    echo Skipping signing: CERTFILE not set.
 )
 
 echo Build and signing notetask-%VERSION%-any-x86-x64.exe completed successfully!
