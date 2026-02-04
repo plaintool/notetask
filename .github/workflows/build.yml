@@ -1,0 +1,162 @@
+name: Build
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      CERT_PFX: ${{ secrets.CERT_PFX }}
+    outputs:
+      version: ${{ steps.set_version.outputs.version }}
+      tag_name: ${{ steps.set_version.outputs.tag_name }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set build version
+        id: set_version
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $lastTag = git tag --list "v*" --sort=-v:refname | Select-Object -First 1
+            if (-not $lastTag) {
+              $version = "0.0.1"
+            } else {
+              $raw = $lastTag -replace '^v', ''
+              $parts = $raw.Split('.')
+              if ($parts.Count -ge 3) {
+                $major = [int]$parts[0]
+                $minor = [int]$parts[1]
+                $patch = [int]$parts[2] + 1
+                $version = "$major.$minor.$patch"
+              } else {
+                $version = "$raw.1"
+              }
+            }
+          } else {
+            $version = "${{ github.ref_name }}" -replace '^v', ''
+          }
+          $tagName = "v$version"
+          "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "tag_name=$tagName" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Create tag for manual run
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        shell: pwsh
+        run: |
+          $tag = "v$env:VERSION"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          if (-not (git rev-parse -q --verify "refs/tags/$tag")) {
+            git tag $tag
+            git push origin $tag
+          } else {
+            Write-Host "Tag $tag already exists."
+          }
+
+      - name: Install build dependencies
+        shell: pwsh
+        run: |
+          choco install lazarus -y
+          choco install wixtoolset -y
+          choco install innosetup --version=6.6.1 -y
+          $fpcDir = "C:\\Lazarus\\fpc\\3.2.2"
+          $zipPath = "$env:RUNNER_TEMP\\fpc-i386.exe"
+          curl.exe -L "https://sourceforge.net/projects/freepascal/files/Win32/3.2.2/fpc-3.2.2.i386-win32.exe/download" -o $zipPath
+          Start-Process -FilePath $zipPath -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART","/DIR=$fpcDir" -Wait
+          $env:Path = "C:\\Lazarus\\fpc\\3.2.2\\bin\\i386-win32;$env:Path"
+          "PATH=$env:Path" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Copy Inno Setup language files
+        shell: pwsh
+        run: |
+          $src = "$env:GITHUB_WORKSPACE\installer\innolanguages\*"
+          $dst = "C:\Program Files (x86)\Inno Setup 6\Languages"
+          Copy-Item -Path $src -Destination $dst -Recurse -Force
+
+      - name: Locate 32-bit FPC
+        shell: pwsh
+        run: |
+          $candidates = @(
+            'C:\lazarus\fpc\3.2.2\bin\i386-win32\fpc.exe',
+            'C:\Lazarus\fpc\3.2.2\bin\i386-win32\fpc.exe'
+          )
+          $found = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if ($found) {
+            "FPC32_PATH=$found" | Out-File -FilePath $env:GITHUB_ENV -Append
+          } else {
+            Write-Error '32-bit FPC not found under Lazarus. Check Lazarus install.'
+          }
+
+      - name: Locate FPC config
+        shell: pwsh
+        run: |
+          $cfgCandidates = @(
+            'C:\lazarus\fpc\3.2.2\bin\i386-win32\fpc.cfg',
+            'C:\Lazarus\fpc\3.2.2\bin\i386-win32\fpc.cfg',
+            'C:\lazarus\fpc\3.2.2\bin\i386-win32\..\fpc.cfg',
+            'C:\Lazarus\fpc\3.2.2\bin\i386-win32\..\fpc.cfg'
+          )
+          $cfg = $cfgCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if ($cfg) {
+            "FPCCFG=$cfg" | Out-File -FilePath $env:GITHUB_ENV -Append
+          } else {
+            Write-Error "fpc.cfg not found under Lazarus install."
+          }
+
+      - name: Build 64-bit binary
+        shell: cmd
+        run: build.cmd
+
+      - name: Build 32-bit binary
+        shell: cmd
+        env:
+          PATH: C:\Lazarus\fpc\3.2.2\bin\i386-win32;%PATH%
+          FPCCFG: ${{ env.FPCCFG }}
+          FPCDIR: ${{ env.FPCDIR }}
+          FPC: ${{ env.FPC32_PATH }}
+        run: build32.cmd
+
+      - name: Build installers (x64)
+        shell: cmd
+        env:
+          BUILD_PORTABLE: 0
+        run: installer\build.cmd x64 %VERSION%
+
+      - name: Build installers (x86 + portable)
+        shell: cmd
+        env:
+          BUILD_PORTABLE: 1
+        run: installer\build.cmd x86 %VERSION%
+
+      - name: Build installer Inno Setup (x86 + x64)
+        shell: cmd
+        run: installer\buildinno.cmd %VERSION%
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            installer/*.exe
+            installer/*.msi
+            installer/*.zip
+
+  release:
+    needs: build
+    uses: ./.github/workflows/create-release.yml
+    with:
+      tag_name: ${{ needs.build.outputs.tag_name }}
+      artifact_name: build-artifacts

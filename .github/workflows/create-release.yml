@@ -1,8 +1,24 @@
 name: Create Release
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_call:
+    inputs:
+      tag_name:
+        required: true
+        type: string
+      artifact_name:
+        required: false
+        type: string
+        default: build-artifacts
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: Release tag to create
+        required: true
+        type: string
+      artifact_name:
+        description: Artifact name to attach
+        required: false
+        default: build-artifacts
 
 permissions:
   contents: write
@@ -47,9 +63,20 @@ jobs:
       - name: Show generated changelog
         run: cat CHANGELOG.md
 
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name || github.event.inputs.artifact_name }}
+          path: dist
+
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ inputs.tag_name || github.event.inputs.tag_name }}
           body_path: CHANGELOG.md
           draft: true
           prerelease: false
+          files: |
+            dist/**/*.exe
+            dist/**/*.msi
+            dist/**/*.zip
