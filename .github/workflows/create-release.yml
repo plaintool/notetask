@@ -66,8 +66,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.artifact_name || github.event.inputs.artifact_name }}
+          pattern: ${{ inputs.artifact_name || github.event.inputs.artifact_name }}
           path: dist
+          merge-multiple: true
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
@@ -80,3 +81,6 @@ jobs:
             dist/**/*.exe
             dist/**/*.msi
             dist/**/*.zip
+            dist/**/*.deb
+            dist/**/*.rpm
+            dist/**/*.tar.gz
