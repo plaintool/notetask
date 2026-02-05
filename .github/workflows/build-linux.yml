@@ -1,0 +1,102 @@
+name: Build Linux
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lazarus fpc dpkg-dev rpm binutils
+
+      - name: Build binary
+        run: make
+
+      - name: Package deb
+        run: |
+          template_root="installer/linux"
+          work_root="dist/debwork"
+          pkg_name="notetask-${VERSION}.deb"
+
+          if [ ! -d "$template_root" ]; then
+            echo "Debian template not found at $template_root"
+            exit 1
+          fi
+
+          rm -rf "$work_root"
+          mkdir -p "$work_root/control" "$work_root/data" dist
+
+          if [ -d "$template_root/CONTROL" ]; then
+            rsync -a "$template_root/CONTROL/" "$work_root/control/"
+          fi
+
+          if [ -d "$template_root/DATA" ]; then
+            rsync -a "$template_root/DATA/" "$work_root/data/"
+          fi
+
+          install -d "$work_root/data/usr/bin"
+          install -m 0755 notetask "$work_root/data/usr/bin/notetask"
+
+          sed -i "s/^Version:.*/Version: ${VERSION}/" "$work_root/control/control"
+
+          tar -C "$work_root/control" -czf "$work_root/control.tar.gz" .
+          tar -C "$work_root/data" -czf "$work_root/data.tar.gz" .
+          printf '2.0\n' > "$work_root/debian-binary"
+
+          ar r "dist/$pkg_name" \
+            "$work_root/debian-binary" \
+            "$work_root/control.tar.gz" \
+            "$work_root/data.tar.gz"
+
+      - name: Package rpm
+        run: |
+          template_root="installer/linux"
+          rpm_root="dist/rpm"
+          staging_root="$rpm_root/staging"
+          sources_root="$rpm_root/SOURCES"
+
+          if [ ! -d "$template_root" ]; then
+            echo "RPM template not found at $template_root"
+            exit 1
+          fi
+
+          rm -rf "$rpm_root"
+          mkdir -p "$staging_root" "$sources_root"
+
+          if [ -d "$template_root/DATA" ]; then
+            rsync -a "$template_root/DATA/" "$staging_root/"
+          fi
+          install -d "$staging_root/usr/bin"
+          install -m 0755 notetask "$staging_root/usr/bin/notetask"
+
+          find "$staging_root" -type f -o -type l | sed "s|^$staging_root||" | sed 's|^|/|' > "$sources_root/notetask.files"
+
+          rpmbuild -bb "installer/linux/notetask.spec" \
+            --define "_topdir $PWD/$rpm_root" \
+            --define "version $VERSION" \
+            --define "staging_dir $PWD/$staging_root"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-linux-artifacts
+          path: |
+            dist/*.deb
+            dist/rpm/RPMS/**/*.rpm
