@@ -18,6 +18,7 @@ uses
   Graphics,
   Grids,
   Clipbrd,
+  StdCtrls,
   StrUtils,
   DateUtils,
   TagEdit,
@@ -45,6 +46,7 @@ type
     FTags: TStringList; // List of detected tags
     FTagsWidth: integer; // Tag area width in the table
     FRowHeight: integer; // Currect row height in table
+    FIndentLevel: integer; // Nesting level calculated from spaces
     constructor Create;
     constructor Create(const TaskString: string); // Constructor that takes a task string
     destructor Destroy; override; // Destructor
@@ -124,7 +126,7 @@ type
     function GetTask(Index: integer): TTask; // Method to get a task by row index
     function GetTaskValue(ACol, ARow: integer): string; // Method to get a task value by row col
     function HasTask(Index: integer): boolean;
-    procedure SetTask(Grid: TStringGrid; Row: integer; Backup: boolean = True; DisplayTime: boolean = True);
+    procedure SetTask(Grid: TStringGrid; Memo: TMemo; Row: integer; Backup: boolean = True; DisplayTime: boolean = True);
     function InsertTask(const TaskString: string; Index: integer; Backup: boolean = True): integer;
     procedure DeleteTask(Index: integer);
     procedure ArchiveTask(Index: integer);
@@ -220,6 +222,7 @@ begin
   FTags.Duplicates := dupIgnore;
   FTagsWidth := 0;
   FRowHeight := 0;
+  FIndentLevel := 0;
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -270,6 +273,7 @@ begin
     FTags.Clear;
   FTagsWidth := Original.FTagsWidth;
   FRowHeight := Original.FRowHeight;
+  FIndentLevel := Original.FIndentLevel;
 end;
 
 procedure TTask.FillTags;
@@ -840,11 +844,12 @@ begin
   Result := (Ind >= 0) and (Ind < Count);
 end;
 
-procedure TTasks.SetTask(Grid: TStringGrid; Row: integer; Backup: boolean = True; DisplayTime: boolean = True);
+procedure TTasks.SetTask(Grid: TStringGrid; Memo: TMemo; Row: integer; Backup: boolean = True; DisplayTime: boolean = True);
 var
   Task: TTask;
   pDate: TDateTime;
   pAmount: double;
+  Indent: integer = 0;
 begin
   if (Row > 0) and (Row <= Count) then
   begin
@@ -860,6 +865,16 @@ begin
       #13, string.Empty).Replace('<br>', sLineBreak);
     Task.Note := Grid.Cells[COL_NOTE, Row].Replace(sLineBreak, '<br>').Replace(#10, string.Empty).Replace(
       #13, string.Empty).Replace('<br>', sLineBreak);
+
+    // Calculate indent level: 2 spaces = 1 level, odd space kept as text
+    Task.Text := ExtractIndent(Task.Text, Indent);
+    if Indent > 0 then
+    begin
+      Task.FIndentLevel := Task.FIndentLevel + Indent;
+      Grid.Cells[COL_TASK, Row] := TrimLeadingSpaces(Grid.Cells[COL_TASK, Row], Indent * 2);
+      if Assigned(Memo) then
+        Memo.Text := Grid.Cells[COL_TASK, Row];
+    end;
 
     if not TryStrToFloat(CleanNumeric(Grid.Cells[COL_AMOUNT, Row]), pAmount) then
     begin
@@ -1607,7 +1622,8 @@ var
     begin
       if (TempTask.Text <> string.Empty) then
       begin
-        GetTask(row).Text := CleanString(TempTask.Text);
+        GetTask(row).Text := ExtractIndent(CleanString(TempTask.Text), GetTask(row).FIndentLevel);
+
         if (Rect.Width > 0) then
         begin
           GetTask(row).Archive := TempTask.Archive;

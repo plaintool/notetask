@@ -123,7 +123,13 @@ function RemoveFirstSubstring(const S, SubStr: string; Reverse: boolean = False)
 
 function ApplyCombiningChar(const AText: string; const ACombiningChar: string = #$0335): string;
 
+procedure AddIndent(var TextString: string; IndentLevel: integer; Factor: integer = 2);
+
+function ExtractIndent(const AText: string; out AIndentLevel: integer): string;
+
 function SameFloat(A, B: double; Eps: double): boolean;
+
+function GetActualScrollBarVisibility(Grid: TStringGrid; ScrollBarStyle: TScrollStyle): boolean;
 
 {TIntegerArray}
 
@@ -134,8 +140,6 @@ procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
 function CloneArray(const Src: TIntegerArray): TIntegerArray;
 
 procedure CopyToArray(var Dest: TIntegerArray; const Src: TIntegerArray);
-
-function GetActualScrollBarVisibility(Grid: TStringGrid; ScrollBarStyle: TScrollStyle): Boolean;
 
 const
   Brackets: array[0..17] of string = ('- [x]', '- [X]', '- [ ]', '- []', '-[x]', '-[X]', '-[ ]', '-[]', '[x]',
@@ -1275,71 +1279,43 @@ begin
   end;
 end;
 
+procedure AddIndent(var TextString: string; IndentLevel: integer; Factor: integer = 2);
+var
+  SpaceCount: integer;
+begin
+  SpaceCount := IndentLevel * Factor;
+  TextString := StringOfChar(' ', SpaceCount) + TextString;
+end;
+
+function ExtractIndent(const AText: string; out AIndentLevel: integer): string;
+var
+  i: integer;
+begin
+  AIndentLevel := 0;
+  i := 1;
+
+  // Count only pairs of leading spaces (2 spaces = 1 level)
+  while (i + 1 <= Length(AText)) and (AText[i] = ' ') and (AText[i + 1] = ' ') do
+  begin
+    Inc(AIndentLevel);
+    Inc(i, 2);
+  end;
+
+  // Remove only indent spaces, keep single leading space if exists
+  Result := Copy(AText, i, Length(AText) - i + 1);
+end;
+
 function SameFloat(A, B: double; Eps: double): boolean;
 begin
   // Compare floats with epsilon
   Result := Abs(A - B) < Eps;
 end;
 
-procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
+function GetActualScrollBarVisibility(Grid: TStringGrid; ScrollBarStyle: TScrollStyle): boolean;
 var
-  i, Len: integer;
-begin
-  Len := Length(A);
-  if (Pos < 0) or (Pos > Len) then
-    Exit; // Out of bounds
-
-  // Increase array size
-  SetLength(A, Len + 1);
-
-  // Shift elements to the right
-  for i := Len - 1 downto Pos do
-    A[i + 1] := A[i];
-
-  // Insert new value
-  A[Pos] := Value;
-
-  // Increase all following elements by Delta
-  for i := Pos + 1 to High(A) do
-    A[i] := A[i] + Delta;
-end;
-
-procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
-var
-  i, Len: integer;
-begin
-  Len := Length(A);
-  if (Pos < 0) or (Pos >= Len) then
-    Exit; // Out of bounds
-
-  // Shift left
-  for i := Pos to Len - 2 do
-    A[i] := A[i + 1];
-
-  // Decrease array size
-  SetLength(A, Len - 1);
-end;
-
-function CloneArray(const Src: TIntegerArray): TIntegerArray;
-begin
-  Result := Copy(Src, 0, Length(Src));
-end;
-
-procedure CopyToArray(var Dest: TIntegerArray; const Src: TIntegerArray);
-var
-  CopyCount, i: integer;
-begin
-  // Determine how many elements to copy: take the smaller of Dest length and Src length
-  CopyCount := Min(Length(Dest), Length(Src));
-  for i := 0 to CopyCount - 1 do
-    Dest[i] := Src[i];
-end;
-
-function GetActualScrollBarVisibility(Grid: TStringGrid; ScrollBarStyle: TScrollStyle): Boolean;
-var
-  ContentWidth, ContentHeight: Integer;
-  ViewportWidth, ViewportHeight: Integer;
-  i: Integer;
+  ContentWidth, ContentHeight: integer;
+  ViewportWidth, ViewportHeight: integer;
+  i: integer;
 begin
   Result := False;
 
@@ -1405,6 +1381,62 @@ begin
         Result := (Grid.ScrollBars in [ssVertical, ssBoth]);
     end;
   end;
+end;
+
+{TIntegerArray}
+
+procedure InsertAtPos(var A: TIntegerArray; Pos, Value: integer; Delta: integer = 0);
+var
+  i, Len: integer;
+begin
+  Len := Length(A);
+  if (Pos < 0) or (Pos > Len) then
+    Exit; // Out of bounds
+
+  // Increase array size
+  SetLength(A, Len + 1);
+
+  // Shift elements to the right
+  for i := Len - 1 downto Pos do
+    A[i + 1] := A[i];
+
+  // Insert new value
+  A[Pos] := Value;
+
+  // Increase all following elements by Delta
+  for i := Pos + 1 to High(A) do
+    A[i] := A[i] + Delta;
+end;
+
+procedure DeleteAtPos(var A: TIntegerArray; Pos: integer);
+var
+  i, Len: integer;
+begin
+  Len := Length(A);
+  if (Pos < 0) or (Pos >= Len) then
+    Exit; // Out of bounds
+
+  // Shift left
+  for i := Pos to Len - 2 do
+    A[i] := A[i + 1];
+
+  // Decrease array size
+  SetLength(A, Len - 1);
+end;
+
+function CloneArray(const Src: TIntegerArray): TIntegerArray;
+begin
+  Result := Copy(Src, 0, Length(Src));
+end;
+
+procedure CopyToArray(var Dest: TIntegerArray; const Src: TIntegerArray);
+var
+  CopyCount, i: integer;
+begin
+  // Determine how many elements to copy: take the smaller of Dest length and Src length
+  CopyCount := Min(Length(Dest), Length(Src));
+  for i := 0 to CopyCount - 1 do
+    Dest[i] := Src[i];
 end;
 
 end.

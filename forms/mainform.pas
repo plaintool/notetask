@@ -1791,6 +1791,7 @@ var
   BitTags: TBitmap;
   TagsWidth: integer = 0;
   OriginalLeft, OriginalRight: integer;
+  Indent: integer = 0;
 begin
   Grid := Sender as TStringGrid;
   bgFill := clWhite;
@@ -1905,6 +1906,7 @@ begin
       if (aCol = COL_TASK) then
       begin
         Task := Tasks.GetTask(ARow);
+        Indent := Task.FIndentLevel * Canvas.TextWidth(' ') * 2;
         if Task.Tags.Count > 0 then
         begin
           BitTags := tagsEdit.GetTagsBitmap(Task.Tags, Round(Max(Max(Font.Size div 2, 8) * FZoom, 1)),
@@ -1946,6 +1948,8 @@ begin
 
       DrawRect := aRect;
       DrawRect.Inflate(-4, 0);
+      if (aCol = COL_TASK) then
+        DrawRect.Inflate(-Indent, 0, 0, 0);
 
       // Save original boundaries
       OriginalLeft := DrawRect.Left;
@@ -3795,7 +3799,7 @@ var
         taskGrid.Cells[ACol, ARow] := CurrentDateTime
       else
         taskGrid.Cells[ACol, ARow] := taskGrid.Cells[ACol, ARow].Trim + ' ' + CurrentDateTime;
-      Tasks.SetTask(taskGrid, ARow, False, FShowTime);
+      Tasks.SetTask(taskGrid, Memo, ARow, False, FShowTime);
       if Assigned(DatePicker) then
         DatePicker.DateTime := Now;
       if (FShowDuration) and (ACol = COL_DATE) then
@@ -3842,7 +3846,7 @@ begin
       Memo.SelStart := PosStart;
       Memo.SelLength := Length(CurrentDateTime);
     end;
-    Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
+    Tasks.SetTask(taskGrid, Memo, taskGrid.Row, FBackup, FShowTime);
     SetChanged;
     SetInfo;
   end
@@ -4812,7 +4816,7 @@ end;
 procedure TformNotetask.memoNoteChange(Sender: TObject);
 begin
   taskGrid.Cells[COL_NOTE, taskGrid.Row] := memoNote.Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, FBackup, FShowTime);
+  Tasks.SetTask(taskGrid, Memo, taskGrid.Row, FBackup, FShowTime);
   CalcRowHeight(True, taskGrid.Row);
   SetChanged;
 end;
@@ -6121,7 +6125,7 @@ end;
 procedure TformNotetask.MemoChange(Sender: TObject);
 begin
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-  Tasks.SetTask(taskGrid, taskGrid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
+  Tasks.SetTask(taskGrid, Memo, taskGrid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
   FMemoStartEdit := False;
   SetChanged;
   CalcRowHeight(True, taskGrid.Row);
@@ -6204,7 +6208,7 @@ procedure TformNotetask.DatePickerChange(Sender: TObject);
 begin
   FDatePickerDateSet := True;
   taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime, FShowTime);
-  Tasks.SetTask(taskGrid, taskGrid.Row, False, FShowTime);
+  Tasks.SetTask(taskGrid, Memo, taskGrid.Row, False, FShowTime);
   SetChanged;
   EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 2, -2, -2, 0);
   if (FShowDuration) then FillGrid;
@@ -6240,11 +6244,16 @@ procedure TformNotetask.EditControlSetBounds(Sender: TWinControl; aCol, aRow: in
   OffsetTop: integer; OffsetRight: integer; OffsetBottom: integer);
 var
   Rect: TRect;
+  Indent: integer = 0;
 begin
   if Assigned(Sender) then
   begin
+    if (Sender is TPanel) then
+      Indent := Tasks.GetTask(aRow).FIndentLevel * Canvas.TextWidth(' ') * 2;
+
     Rect := taskGrid.CellRect(aCol, aRow);
-    Sender.SetBounds(Rect.Left + OffsetLeft, Max(Rect.Top, taskGrid.RowHeights[0]) + OffsetTop, Rect.Right - Rect.Left + OffsetRight,
+    Sender.SetBounds(Rect.Left + OffsetLeft + Indent, Max(Rect.Top, taskGrid.RowHeights[0]) + OffsetTop,
+      Rect.Right - Rect.Left + OffsetRight,
       Rect.Bottom - Rect.Top + OffsetBottom);
   end;
 end;
@@ -6764,7 +6773,7 @@ begin
           else
             taskGrid.Cells[COL_DONE, RowIndex] := '0';
 
-          Tasks.SetTask(taskGrid, RowIndex, False, FShowTime); // Backup created on start
+          Tasks.SetTask(taskGrid, Memo, RowIndex, False, FShowTime); // Backup created on start
         end;
       end;
     finally
@@ -6803,7 +6812,7 @@ begin
       else
         taskGrid.Cells[COL_DONE, RowIndex] := '0';
 
-      Tasks.SetTask(taskGrid, RowIndex, False, FShowTime);
+      Tasks.SetTask(taskGrid, Memo, RowIndex, False, FShowTime);
       if (ShowDuration) and (Check) then FillGrid;
       SetChanged; // Mark that data has changed
       SetInfo;
@@ -6853,7 +6862,7 @@ begin
       else
         taskGrid.Cells[COL_STAR, RowIndex] := '0';
 
-      Tasks.SetTask(taskGrid, RowIndex, False, FShowTime);
+      Tasks.SetTask(taskGrid, Memo, RowIndex, False, FShowTime);
     end;
   end;
 
@@ -6880,15 +6889,13 @@ begin
     RowIndex := i;
     if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
     begin
-      if (not Outdent) then
-      begin
-        taskGrid.Cells[COL_TASK, RowIndex] := IndentStr + taskGrid.Cells[COL_TASK, RowIndex];
-        CalcRowHeight;
-      end
-      else
-        taskGrid.Cells[COL_TASK, RowIndex] := TrimLeadingSpaces(taskGrid.Cells[COL_TASK, RowIndex], Length(unicodestring(IndentStr)));
+      with Tasks.GetTask(RowIndex) do
+        if not Outdent then
+          Inc(FIndentLevel)
+        else if FIndentLevel > 0 then
+          Dec(FIndentLevel);
 
-      Tasks.SetTask(taskGrid, RowIndex, False, FShowTime); // Backup created on start
+      CalcRowHeight;
     end;
   end;
   SetChanged; // Mark that data has changed

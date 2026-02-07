@@ -250,6 +250,9 @@ begin
   else
     Result.FStar := False;
 
+  // Calculate indent level: 2 spaces = 1 level, odd space kept as text
+  Result.FText := ExtractIndent(Result.FText, Result.FIndentLevel);
+
   Result.FillTags;
 end;
 
@@ -265,6 +268,10 @@ begin
   // Replace line breaks from task description and Note
   TextString := ReplaceLineBreaks(Task.FText);
   NoteString := ReplaceLineBreaks(Task.FNote);
+
+  // Restore indent inside task text (2 spaces per level)
+  if Task.FIndentLevel > 0 then
+    AddIndent(TextString, Task.FIndentLevel);
 
   // Add Tags to TextString
   if (Col = 0) and (Task.Tags.Count > 0) then
@@ -440,7 +447,7 @@ var
   Rect: TGridRect;
   pDone, pText, pNote, pAmount, pDate: string;
   Row1, Row2, RowText: string;
-  Star, Arhive: boolean;
+  Star, Archive: boolean;
   i, j: integer;
 begin
   SelectedText := TStringList.Create;
@@ -453,7 +460,10 @@ begin
     begin
       for i := Rect.Top to Rect.Bottom do
       begin
-        SelectedText.Add(Grid.Cells[Rect.Left, i]);
+        RowText := Grid.Cells[Rect.Left, i];
+        if (Rect.Left = COL_TASK) and (GetTask(i).FIndentLevel > 0) then
+          AddIndent(RowText, GetTask(i).FIndentLevel);
+        SelectedText.Add(RowText);
       end;
     end
     else
@@ -465,12 +475,12 @@ begin
           if (j = 2) and (Grid.Columns[j - 1].Visible) then
           begin
             pText := GetTask(i).ToString(j);
-            Arhive := False;
+            Archive := False;
             if pText.StartsWith(ar) and pText.EndsWith(ar) then
             begin
               pText := RemoveFirstSubstring(pText, ar);
               pText := RemoveFirstSubstring(pText, ar, True);
-              Arhive := True;
+              Archive := True;
             end;
             Star := False;
             if pText.StartsWith(st) and pText.EndsWith(st) then
@@ -481,7 +491,7 @@ begin
             end;
             if Rect.Width > 0 then pText := pText + StringListToBacktickString(GetTask(i).Tags, (pText <> string.Empty));
             if Star then pText := st + pText + st;
-            if Arhive then pText := ar + pText + ar;
+            if Archive then pText := ar + pText + ar;
           end;
           if (j = 3) and ((Grid.Columns[j - 1].Visible) or NoteVisible) then pNote := GetTask(i).ToString(j);
           if (j = 4) and (Grid.Columns[j - 1].Visible) then pAmount := GetTask(i).ToString(j).Trim;
