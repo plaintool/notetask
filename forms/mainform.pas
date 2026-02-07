@@ -598,6 +598,7 @@ type
     FLastRowHeights: array of integer;
     FLastRow, FLastCol: integer;
     FLastText: string;
+    FLastFilter: string;
     FLastTextMatch: boolean;
     FLastRowMem: array of integer;
     FLastTabMouseX: integer;
@@ -719,7 +720,7 @@ type
     procedure TagsAdd(const Rect: TRect; const TagText: string);
     function FreeFile: boolean;
     function LastRowHeight(aRow: integer): integer;
-    procedure ChangeLastText(const Value: string; aCol: integer = -1; aRow: integer = -1);
+    procedure ChangeLastText(Value: string = string.Empty; aCol: integer = -1; aRow: integer = -1);
     function GetScrollPosition: integer;
     function GetIsEditing: boolean;
     function IsCanClose: boolean;
@@ -2000,7 +2001,7 @@ begin
         Value := MaskTextWithBullets(Value, Grid.Canvas, FLineEnding);
 
       if (Value = string.Empty) or (filterBox.Text = string.Empty) or (Grid.canvas.Brush.Color = clDuplicateHighlight) or
-        (Pos(ULower(filterBox.Text), ULower(ifthen(aCol = COL_AMOUNT, ReplaceStr(Value, ' ', ''), Value))) = 0) or
+        (Pos(ULower(Trim(filterBox.Text)), ULower(ifthen(aCol = COL_AMOUNT, ReplaceStr(Value, ' ', ''), Value))) = 0) or
         ((FHideNoteText) and (aCol = COL_NOTE)) then
       begin
         DrawText(Grid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
@@ -2009,7 +2010,7 @@ begin
       begin
         if (aCol = COL_AMOUNT) then Value := ReplaceStr(Value, ' ', '');
 
-        DrawHighlightedText(Grid.Canvas, Value, filterBox.Text, DrawRect,
+        DrawHighlightedText(Grid.Canvas, Value, Trim(filterBox.Text), DrawRect,
           ifthen(bgFill <> clWhite, tagsEdit.BlendColors(clDuplicateHighlight, bgFill, 50), clDuplicateHighlight), aCol);
       end;
     end;
@@ -2757,6 +2758,9 @@ var
   LastSelTop, LastSelBottom: integer;
   LastRect, NewRect: TGridRect;
 begin
+  if FLastFilter = filterBox.Text then Exit;
+  FLastFilter := filterBox.Text;
+
   LastTask := Tasks.Map(taskGrid.Row);
   LastTab := FindGroupRealIndex(groupTabs.TabIndex);
   LastSelTop := Tasks.Map(taskGrid.Selection.Top);
@@ -2782,6 +2786,7 @@ begin
   else
     taskGrid.ClearSelections;
   CalcRowHeight;
+  ChangeLastText;
   SetInfo;
   SetNote;
   SetTags;
@@ -2845,6 +2850,12 @@ begin
         Key := 0;
       end;
 
+    VK_UP, VK_DOWN:
+      if ((filterBox.GetTextLen > 0) and (filterBox.SelLength = 0)) and (Visible and taskGrid.Visible and taskGrid.CanFocus) then
+      begin
+        taskGrid.SetFocus;
+        Key := 0;
+      end;
     VK_ESCAPE:
       if Visible and taskGrid.Visible and taskGrid.CanFocus then
         taskGrid.SetFocus;
@@ -3961,7 +3972,8 @@ begin
     begin
       if Visible and taskGrid.Visible and taskGrid.CanFocus then
       begin
-        filterBox.Clear;
+        filterBox.Text := string.Empty;
+        FLastFilter := '-1';
         filterBoxChange(Self);
         taskGrid.SetFocus;
       end;
@@ -3973,12 +3985,14 @@ begin
         if Assigned(Memo) and (Memo.SelText <> string.Empty) then
         begin
           filterBox.Text := Memo.SelText;
+          FLastFilter := '-1';
           filterBoxChange(Self);
         end
         else
         if memoNote.Visible and memoNote.Focused and (memoNote.SelText <> string.Empty) then
         begin
           filterBox.Text := memoNote.SelText;
+          FLastFilter := '-1';
           filterBoxChange(Self);
         end;
       end;
@@ -3989,7 +4003,8 @@ begin
   end
   else
   begin
-    filterBox.Clear;
+    filterBox.Text := string.Empty;
+    FLastFilter := '-1';
     filterBoxChange(Self);
   end;
 end;
@@ -4871,6 +4886,7 @@ begin
   if (filterBox.Text <> TagText) then
   begin
     filterBox.Text := TagText;
+    FLastFilter := '-1';
     filterBoxChange(Self);
   end
   else
@@ -4966,6 +4982,7 @@ begin
       SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
     FilterBox.Clear;
+    FLastFilter := '-1';
     if Assigned(Tasks) then
       Tasks.Free;
 
@@ -5959,7 +5976,7 @@ begin
 
     taskGrid.EditorMode := False;
     FIsEditing := False;
-    ChangeLastText(taskGrid.Cells[taskGrid.Col, taskGrid.Row]);
+    ChangeLastText;
     ResetRowHeight;
     if Visible and taskGrid.Visible and taskGrid.CanFocus then
       taskGrid.SetFocus;
@@ -6248,7 +6265,7 @@ var
 begin
   if Assigned(Sender) then
   begin
-    if (Sender is TPanel) then
+    if (Sender is TPanel) and (aRow > 0) then
       Indent := Tasks.GetTask(aRow).FIndentLevel * Canvas.TextWidth(' ') * 2;
 
     Rect := taskGrid.CellRect(aCol, aRow);
@@ -7934,10 +7951,11 @@ begin
     Result := taskGrid.DefaultRowHeight;
 end;
 
-procedure TformNotetask.ChangeLastText(const Value: string; aCol: integer = -1; aRow: integer = -1);
+procedure TformNotetask.ChangeLastText(Value: string = string.Empty; aCol: integer = -1; aRow: integer = -1);
 begin
   if aCol < 0 then aCol := taskGrid.Col;
   if aRow < 0 then aRow := taskGrid.Row;
+  if Value = string.Empty then Value := taskGrid.Cells[aCol, aRow];
   if (aCol > 0) and (aRow > 0) then
   begin
     if FDuplicateHighlight and ((FLastText <> string.Empty) or (Value <> string.Empty)) then
