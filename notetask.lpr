@@ -21,7 +21,16 @@ uses
   forminput,
   formmemo,
   formfind,
-  formreplace;
+  formreplace
+  {$IFDEF WINDOWS}
+  {$HINTS OFF}
+  {$WARNINGS OFF}
+  ,uDarkStyle
+  ,uWin32WidgetSetDark
+  {$HINTS ON}
+  {$WARNINGS ON}
+  {$ENDIF}
+  ;
 
   {$R *.res}
 
@@ -31,6 +40,9 @@ begin
   Application.Title := 'Notetask';
   Application.Scaled := True;
   Application.Initialize;
+  {$IFDEF WINDOWS}
+  ApplyDarkStyle;
+  {$ENDIF}
   Application.CreateForm(TformNotetask, formNotetask);
   Application.CreateForm(TformFindText, formFindText);
   Application.CreateForm(TformReplaceText, formReplaceText);

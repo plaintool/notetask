@@ -73,7 +73,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="forms;units"/>
+            <OtherUnitFiles Value="forms;units;common"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -117,7 +117,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="forms;units"/>
+            <OtherUnitFiles Value="forms;units;common"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -261,36 +261,36 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="units\DCPrijndael.inc"/>
+        <Filename Value="common\DCPrijndael.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="units\dcprijndael.pas"/>
+        <Filename Value="common\dcprijndael.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DCPrijndael"/>
       </Unit>
       <Unit>
-        <Filename Value="units\dcpsha256.pas"/>
+        <Filename Value="common\dcpsha256.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DCPsha256"/>
       </Unit>
       <Unit>
-        <Filename Value="units\dcpblockciphers.pas"/>
+        <Filename Value="common\dcpblockciphers.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DCPblockciphers"/>
       </Unit>
       <Unit>
-        <Filename Value="units\dcpconst.pas"/>
+        <Filename Value="common\dcpconst.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DCPconst"/>
       </Unit>
       <Unit>
-        <Filename Value="units\dcpcrypt2.pas"/>
+        <Filename Value="common\dcpcrypt2.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DCPcrypt2"/>
       </Unit>
       <Unit>
-        <Filename Value="units\dcpbase64.pas"/>
+        <Filename Value="common\dcpbase64.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DCPbase64"/>
       </Unit>
@@ -302,16 +302,31 @@
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="units\TagColorItems.pas"/>
+        <Filename Value="common\TagColorItems.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="units\TagEdit.pas"/>
+        <Filename Value="common\TagEdit.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="units\TagCheckPopup.pas"/>
+        <Filename Value="common\TagCheckPopup.pas"/>
         <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="common\udarkstyle.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uDarkStyle"/>
+      </Unit>
+      <Unit>
+        <Filename Value="common\uimport.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uImport"/>
+      </Unit>
+      <Unit>
+        <Filename Value="common\uwin32widgetsetdark.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uWin32WidgetSetDark"/>
       </Unit>
     </Units>
   </ProjectOptions>

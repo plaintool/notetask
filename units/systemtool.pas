@@ -29,6 +29,7 @@ uses
   Windows,
   Registry,
   wininet,
+  uDarkStyle,
   {$ENDIF}
   {$IFDEF Linux}
   Unix,
@@ -49,11 +50,9 @@ function GetOSLanguage: string;
 
 function ApplicationTranslate(const Language: string; AForm: TCustomForm = nil): boolean;
 
-{$IFDEF Windows}
+function ThemeColor(LightColor, DarkColor: TColor): TColor;
 
-function IsWindowsDarkThemeEnabled: Boolean;
-
-{$ENDIF}
+function ThemeValue(LightValue, DarkValue: integer): integer;
 
 function SetCursorTo(Control: TControl; const ResName: string; CursorIndex: integer = 1001): boolean;
 
@@ -206,28 +205,29 @@ begin
   end;
 end;
 
-{$IFDEF Windows}
-
-function IsWindowsDarkThemeEnabled: Boolean;
-var
-  Key: HKEY;
-  Value: DWORD;
-  ValueSize: DWORD;
+function ThemeColor(LightColor, DarkColor: TColor): TColor;
 begin
-  Result := False;
-  Key:=HKEY_CURRENT_USER;
-  if RegOpenKeyEx(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Themes\Personalize', 0, KEY_READ, Key) = ERROR_SUCCESS then
-  begin
-    ValueSize := SizeOf(Value);
-    if RegQueryValueEx(Key, 'AppsUseLightTheme', nil, nil, @Value, @ValueSize) = ERROR_SUCCESS then
-    begin
-      Result := Value = 0; // 0 - Dark theme, 1 - Light theme
-    end;
-    RegCloseKey(Key);
-  end;
+  {$IFDEF WINDOWS}
+  if g_darkModeEnabled then
+    Result := DarkColor
+  else
+    Result := LightColor;
+  {$ELSE}
+  Result := LightColor;
+  {$ENDIF}
 end;
 
-{$ENDIF}
+function ThemeValue(LightValue, DarkValue: integer): integer;
+begin
+  {$IFDEF WINDOWS}
+  if g_darkModeEnabled then
+    Result := DarkValue
+  else
+    Result := LightValue;
+  {$ELSE}
+  Result := LightValue;
+  {$ENDIF}
+end;
 
 function SetCursorTo(Control: TControl; const ResName: string; CursorIndex: integer = 1001): boolean;
 var

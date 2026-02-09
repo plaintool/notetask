@@ -11,8 +11,13 @@ Modules used: dcprijndael, dcpsha256, dcpbase64, dcpcrypt2, dcpconst, dcpblockci
 License: MIT License
 https://cityinthesky.co.uk/opensource/dcpcrypt
 
-3. Main icon designed by Freepik
+3. Dark theme support modules from Double Commander
+Modules used: udarkstyle.pas, uimport.pas, uwin32widgetsetdark.pas
+License: GNU General Public License v2.0 (GPL-2.0)
+https://github.com/doublecmd/doublecmd
+
+4. Main icon designed by Freepik
 https://www.freepik.com/icon/tasks_906334
 
-4. Document icon designed by Zerode
+5. Document icon designed by Zerode
 https://www.iconarchive.com/show/plump-icons-by-zerode/Document-scheduled-tasks-icon.html
