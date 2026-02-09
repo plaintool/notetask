@@ -51,8 +51,8 @@ uses
   WSStdCtrls, Win32WSControls, StdCtrls, WSControls, Graphics, Themes, LazUTF8,
   UxTheme, Win32Themes, ExtCtrls, WSMenus, JwaWinGDI, FPImage, Math, uDarkStyle,
   WSComCtrls, CommCtrl, uImport, WSForms, Win32WSButtons, Buttons, Win32Extra,
-  Win32WSForms, Win32WSSpin, Spin, Win32WSMenus, Dialogs, GraphUtil,
-  Generics.Collections, TmSchema, InterfaceBase;
+  Win32WSForms, Win32WSSpin, Spin, Win32WSMenus, CheckLst, WSCheckLst, Win32WSCheckLst,
+  Dialogs, GraphUtil, Generics.Collections, TmSchema, InterfaceBase;
 
 type
   TWinControlDark = class(TWinControl);
@@ -97,6 +97,14 @@ type
     { TWin32WSCustomListBoxDark }
 
     TWin32WSCustomListBoxDark = class(TWin32WSCustomListBox)
+    published
+      class function CreateHandle(const AWinControl: TWinControl;
+            const AParams: TCreateParams): HWND; override;
+    end;
+
+    { TWin32WSCustomCheckListBoxDark }
+
+    TWin32WSCustomCheckListBoxDark = class(TWin32WSCustomCheckListBox)
     published
       class function CreateHandle(const AWinControl: TWinControl;
             const AParams: TCreateParams): HWND; override;
@@ -704,6 +712,42 @@ begin
   EnableDarkStyle(Result);
   SetWindowSubclass(Result, @ListBoxWindowProc2, ID_SUB_LISTBOX, 0);
   TCustomListBox(AWinControl).Color:= SysColor[COLOR_WINDOW];
+  AWinControl.Font.Color:= SysColor[COLOR_WINDOWTEXT];
+end;
+
+{ TWin32WSCustomCheckListBoxDark }
+
+function CheckListBoxWindowProc2(Window: HWND; Msg: UINT; wParam: Windows.WPARAM; lParam: Windows.LPARAM; uISubClass: UINT_PTR; dwRefData: DWORD_PTR): LRESULT; stdcall;
+var
+  PS: TPaintStruct;
+begin
+  if Msg = WM_PAINT then
+  begin
+    if SendMessage(Window, LB_GETCOUNT, 0, 0) = 0 then
+    begin
+      BeginPaint(Window, @ps);
+      // ListBox:= TCustomListBox(GetWin32WindowInfo(Window)^.WinControl);
+      // Windows.FillRect(DC, ps.rcPaint, ListBox.Brush.Reference.Handle);
+      EndPaint(Window, @ps);
+    end;
+  end;
+  Result:= DefSubclassProc(Window, Msg, WParam, LParam);
+end;
+
+class function TWin32WSCustomCheckListBoxDark.CreateHandle(
+  const AWinControl: TWinControl; const AParams: TCreateParams): HWND;
+var
+  P: TCreateParams;
+begin
+  P:= AParams;
+  P.ExStyle:= P.ExStyle and not WS_EX_CLIENTEDGE;
+  P.Style:= P.Style or WS_BORDER;
+  TCustomCheckListBox(AWinControl).BorderStyle:= bsNone;
+
+  Result:= inherited CreateHandle(AWinControl, P);
+  EnableDarkStyle(Result);
+  SetWindowSubclass(Result, @CheckListBoxWindowProc2, ID_SUB_LISTBOX, 0);
+  TCustomCheckListBox(AWinControl).Color:= SysColor[COLOR_WINDOW];
   AWinControl.Font.Color:= SysColor[COLOR_WINDOWTEXT];
 end;
 
@@ -1339,6 +1383,9 @@ begin
 
   WSStdCtrls.RegisterCustomListBox;
   RegisterWSComponent(TCustomListBox, TWin32WSCustomListBoxDark);
+
+  WSCheckLst.RegisterCustomCheckListBox;
+  RegisterWSComponent(TCustomCheckListBox, TWin32WSCustomCheckListBoxDark);
 
   WSForms.RegisterScrollingWinControl;
 
