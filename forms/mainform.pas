@@ -837,28 +837,30 @@ const
   http = 'http://';
 
   // Light theme colors
-  clRowHighlight_Light = TColor($FFF0DC); // RGB(220,240,255)
-  clRowFocused_Light = TColor($FFDCC8); // RGB(200,220,255)
-  clRowExpired_Light = TColor($DCDCFF); // RGB(255,220,220)
-  clDarkBlue_Light = TColor($B40000); // RGB(0,0,180)
-  clGray_Light = TColor($F0F0F0); // RGB(240,240,240)
-  clGrayLight_Light = TColor($FAFAFA); // RGB(250,250,250)
-  clGrayWhite_Light = TColor($FEFEFE); // RGB(254,254,254)
-  clGrayDark_Light = TColor($E9E9E9); // RGB(233,233,233)
-  clGrayHighlight_Light = TColor($D2D2D2); // RGB(210,210,210)
-  clDuplicateHighlight_Light = TColor($AAFFFF); // RGB(255, 255, 170)
+  clRowHighlight_Light = TColor($FFF0DC);       // RGB(220,240,255)
+  clRowFocused_Light = TColor($FFDCC8);         // RGB(200,220,255)
+  clRowExpired_Light = TColor($DCDCFF);         // RGB(255,220,220)
+  clPlanned_Light = TColor($B40000);            // RGB(0,0,180)
+  clReadOnly_Light = TColor($F0F0F0);           // RGB(240,240,240)
+  clSplitFilter_Light = TColor($FAFAFA);        // RGB(250,250,250)
+  clSpit_Light = TColor($E9E9E9);               // RGB(233,233,233)
+  clSplitHighlight_Light = TColor($D2D2D2);     // RGB(210,210,210)
+  clTagSuffix_Light = TColor($FEFEFE);          // RGB(254,254,254)
+  clDuplicateHighlight_Light = TColor($AAFFFF); // RGB(255,255,170)
+  clGridLineColor_Light = TColor($CACACA);      // RGB(202,202,202)
 
   // Dark theme colors
-  clRowHighlight_Dark = TColor($494540);       // RGB(64, 69, 73)
-  clRowFocused_Dark = TColor($6B5C54);         // RGB(84, 92, 107)
-  clRowExpired_Dark = TColor($2D2D46);         // RGB(70, 45, 45)
-  clDarkBlue_Dark = TColor($FF8C00);           // RGB(0, 140, 255)
-  clGray_Dark = TColor($404040);               // RGB(64, 64, 64)
-  clGrayLight_Dark = TColor($282828);          // RGB(40, 40, 40)
-  clGrayWhite_Dark = TColor($303030);          // RGB(48, 48, 48)
-  clGrayDark_Dark = TColor($404040);             // RGB(64, 64, 64)
-  clGrayHighlight_Dark = TColor($505050);        // RGB(80, 80, 80)
-  clDuplicateHighlight_Dark = TColor($00B4B4); // RGB(180, 180, 0)
+  clRowHighlight_Dark = TColor($463027);        // RGB(39, 48, 70)
+  clRowFocused_Dark = TColor($6C4C38);          // RGB(56, 76, 108)
+  clRowExpired_Dark = TColor($2D2D46);          // RGB(70, 45, 45)
+  clPlanned_Dark = TColor($FF8C00);             // RGB(0, 140, 255)
+  clReadOnly_Dark = TColor($404040);            // RGB(64, 64, 64)
+  clSplitFilter_Dark = TColor($505050);         // RGB(80, 80, 80)
+  clSplit_Dark = TColor($404040);               // RGB(64, 64, 64)
+  clSplitHighlight_Dark = TColor($505050);      // RGB(80, 80, 80)
+  clTagSuffix_Dark = TColor($303030);           // RGB(48, 48, 48)
+  clDuplicateHighlight_Dark = TColor($008C8C);  // RGB(140, 140, 0)
+  clGridLineColor_Dark = TColor($8C8C8C);       // RGB(140, 140, 140)
 
 resourcestring
   rapp = 'Notetask';
@@ -923,7 +925,7 @@ begin
   tagsEdit.DragIndicatorColor := clRed;
   tagsEdit.SelectionRectColor := clSilver;
   tagsEdit.TagHoverColor := clNone;
-  tagsEdit.TagSuffixColor := ThemeColor(clGrayWhite_Light, clGrayWhite_Dark);
+  tagsEdit.TagSuffixColor := ThemeColor(clTagSuffix_Light, clTagSuffix_Dark);
   tagsEdit.RoundCorners := 20;
   tagsEdit.TagHeightFactor := 2;
   tagsEdit.AutoColorSeed := 14;
@@ -981,10 +983,12 @@ begin
 
   // Set colors
   Self.Color := clWindow;
-  panelNote.Color := ThemeColor(clGrayDark_Light, clGrayDark_Dark);
-  Splitter.Color := ThemeColor(clGrayDark_Light, clGrayDark_Dark);
-  SplitTags.Color := ThemeColor(clGrayDark_Light, clGrayDark_Dark);
-  SplitFilter.Color := ThemeColor(clGrayLight_Light, clGrayLight_Dark);
+  taskGrid.GridLineColor := ThemeColor(clGridLineColor_Light, clGridLineColor_Dark);
+  taskGrid.FixedHotColor := ThemeColor(clSplitHighlight_Light, clSplitHighlight_Dark);
+  panelNote.Color := ThemeColor(clSpit_Light, clSplit_Dark);
+  Splitter.Color := ThemeColor(clSpit_Light, clSplit_Dark);
+  SplitTags.Color := ThemeColor(clSpit_Light, clSplit_Dark);
+  SplitFilter.Color := ThemeColor(clSplitFilter_Light, clSplitFilter_Dark);
 
   // Remove standart border
   UpdateComboRegion(filterBox);
@@ -1900,7 +1904,7 @@ begin
         Grid.Canvas.Font.Style := Grid.Canvas.Font.Style + [fsItalic];
 
       if (aCol = COL_DATE) and (Task.Date > Now) and (not (gdSelected in aState)) then
-        Grid.Canvas.Font.Color := ThemeColor(clDarkBlue_Light, clDarkBlue_Dark);
+        Grid.Canvas.Font.Color := ThemeColor(clPlanned_Light, clPlanned_Dark);
     end;
 
     // Fill the cell background
@@ -2369,7 +2373,7 @@ begin
     if (taskGrid.IsCellSelected[aCol, aRow]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
     begin
       Memo.Color := clHighlight;
-      Memo.Font.Color := ThemeColor(clWhite, clBlack);
+      Memo.Font.Color := clWhite;
     end
     else
     begin
@@ -2725,13 +2729,13 @@ end;
 
 procedure TformNotetask.panelNoteMouseEnter(Sender: TObject);
 begin
-  panelNote.Color := ThemeColor(clGrayHighlight_Light, clGrayHighlight_Dark);
+  panelNote.Color := ThemeColor(clSplitHighlight_Light, clSplitHighlight_Dark);
 end;
 
 procedure TformNotetask.panelNoteMouseLeave(Sender: TObject);
 begin
   FNoteSelecting := False;
-  panelNote.Color := ThemeColor(clGrayDark_Light, clGrayDark_Dark);
+  panelNote.Color := ThemeColor(clSpit_Light, clSplit_Dark);
 end;
 
 procedure TformNotetask.panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -5815,7 +5819,7 @@ begin
     ACanvas.Font.Style := ACanvas.Font.Style + [fsItalic];
 
   if (aCol = COL_DATE) and (task.Date > Now) then
-    ACanvas.Font.Color := ThemeColor(clDarkBlue_Light, clDarkBlue_Dark);
+    ACanvas.Font.Color := ThemeColor(clPlanned_Light, clPlanned_Dark);
 
   // Text styles
   with ACanvas.TextStyle do
@@ -6142,7 +6146,7 @@ begin
   if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
   begin
     Memo.Color := clHighlight;
-    Memo.Font.Color := ThemeColor(clWhite, clBlack);
+    Memo.Font.Color := clWhite;
   end
   else
   begin
@@ -8238,7 +8242,7 @@ begin
           end;
         memoNote.Lines.Text := notes.Text;
         memoNote.ReadOnly := True;
-        memoNote.Color := ThemeColor(clGray_Light, clGray_Dark);
+        memoNote.Color := ThemeColor(clReadOnly_Light, clReadOnly_Dark);
       end
       else if Tasks.Map(taskGrid.Row) > -1 then
       begin
