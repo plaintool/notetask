@@ -32,8 +32,10 @@
 
   -------------------------------------------------------------------------
   Modified for use in Notetask © 2024 by Alexander Tverskoy
-    - Added dark style for CheckBoxList
-    - Added dark style for Hint
+      - Added Dark style for CheckBox List
+      - Added Dark style for hints
+      - Added Dark style for the calendar
+      - Changed button color to COLOR_WINDOW
 }
 
 unit uWin32WidgetSetDark;
@@ -57,7 +59,8 @@ uses
   UxTheme, Win32Themes, ExtCtrls, WSMenus, JwaWinGDI, FPImage, Math, uDarkStyle,
   WSComCtrls, CommCtrl, uImport, WSForms, Win32WSButtons, Buttons, Win32Extra,
   Win32WSForms, Win32WSSpin, Spin, Win32WSMenus, CheckLst, WSCheckLst, Win32WSCheckLst,
-  Dialogs, GraphUtil, Generics.Collections, TmSchema, InterfaceBase;
+  Dialogs, GraphUtil, Generics.Collections, TmSchema, InterfaceBase,
+  Calendar, WSCalendar, Win32WSCalendar;
 
 type
   TWinControlDark = class(TWinControl);
@@ -110,6 +113,14 @@ type
     { TWin32WSCustomCheckListBoxDark }
 
     TWin32WSCustomCheckListBoxDark = class(TWin32WSCustomCheckListBox)
+    published
+      class function CreateHandle(const AWinControl: TWinControl;
+            const AParams: TCreateParams): HWND; override;
+    end;
+
+    { TWin32WSCustomCalendarDark }
+
+    TWin32WSCustomCalendarDark = class(TWin32WSCustomCalendar)
     published
       class function CreateHandle(const AWinControl: TWinControl;
             const AParams: TCreateParams): HWND; override;
@@ -756,6 +767,69 @@ begin
   AWinControl.Font.Color:= SysColor[COLOR_WINDOWTEXT];
 end;
 
+{ TWin32WSCustomCalendarDark }
+
+function CalendarWindowProc2(Window: HWND; Msg: UINT; wParam: Windows.WPARAM; lParam: Windows.LPARAM; uISubClass: UINT_PTR; dwRefData: DWORD_PTR): LRESULT; stdcall;
+begin
+  case Msg of
+    WM_ERASEBKGND:
+      begin
+        // Paint background with theme color to prevent white flickering
+        Windows.FillRect(HDC(wParam), TRect.Create(0, 0, 32767, 32767), SysColorBrush[COLOR_WINDOW]);
+        Exit(1);
+      end;
+    WM_DESTROY:
+      begin
+        // Unregister subclassing before window is destroyed
+        RemoveWindowSubclass(Window, SUBCLASSPROC(@CalendarWindowProc2), uISubClass);
+      end;
+  end;
+  Result := DefSubclassProc(Window, Msg, wParam, lParam);
+end;
+
+class function TWin32WSCustomCalendarDark.CreateHandle(
+  const AWinControl: TWinControl; const AParams: TCreateParams): HWND;
+var
+  P: TCreateParams;
+  R: TRect;
+begin
+  P := AParams;
+  // Remove thin white border
+  P.ExStyle := P.ExStyle and not WS_EX_CLIENTEDGE;
+  Result := inherited CreateHandle(AWinControl, P);
+
+  if Result <> 0 then
+  begin
+    // Disable themes to allow manual color management via MCM_SETCOLOR
+    SetWindowTheme(Result, '', '');
+
+    // Enable dark scrollbars if the control uses them
+    AllowDarkModeForWindow(Result, True);
+
+    // Register subclassing with correct type casting for FPC
+    SetWindowSubclass(Result, SUBCLASSPROC(@CalendarWindowProc2), ID_SUB_LISTBOX, 0);
+
+    // Apply dark theme colors from the SysColor array
+    SendMessage(Result, MCM_SETCOLOR, MCSC_BACKGROUND, SysColor[COLOR_WINDOW]);
+    SendMessage(Result, MCM_SETCOLOR, MCSC_MONTHBK, SysColor[COLOR_WINDOW]);
+    SendMessage(Result, MCM_SETCOLOR, MCSC_TEXT, SysColor[COLOR_WINDOWTEXT]);
+    SendMessage(Result, MCM_SETCOLOR, MCSC_TITLEBK, SysColor[COLOR_BTNFACE]);
+    SendMessage(Result, MCM_SETCOLOR, MCSC_TITLETEXT, SysColor[COLOR_BTNTEXT]);
+    SendMessage(Result, MCM_SETCOLOR, MCSC_TRAILINGTEXT, SysColor[COLOR_GRAYTEXT]);
+
+    // Calculate ideal size to remove extra padding caused by disabled themes
+    R := Default(TRect);
+    if SendMessage(Result, MCM_GETMINREQRECT, 0, LPARAM(@R)) <> 0 then
+    begin
+      // Update window size to fit content (including "Today" button)
+      SetWindowPos(Result, 0, 0, 0, R.Width, R.Height,
+        SWP_NOMOVE or SWP_NOZORDER or SWP_FRAMECHANGED);
+    end;
+
+    InvalidateRect(Result, nil, True);
+  end;
+end;
+
 { TWin32WSCustomMemoDark }
 
 class function TWin32WSCustomMemoDark.CreateHandle(
@@ -1394,6 +1468,9 @@ begin
 
   WSCheckLst.RegisterCustomCheckListBox;
   RegisterWSComponent(TCustomCheckListBox, TWin32WSCustomCheckListBoxDark);
+
+  WSCalendar.RegisterCustomCalendar;
+  RegisterWSComponent(TCustomCalendar, TWin32WSCustomCalendarDark);
 
   WSForms.RegisterScrollingWinControl;
 
