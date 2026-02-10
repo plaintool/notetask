@@ -80,6 +80,7 @@ type
     property DateTimeStrISO: string read GetDateTimeISO;
     property Tags: TStringList read FTags write FTags;
     property TagsWidth: integer read FTagsWidth write FTagsWidth;
+    property IndentLevel: integer read FIndentLevel write FIndentLevel;
   end;
 
   // Class representing a collection of tasks
@@ -904,6 +905,7 @@ function TTasks.InsertTask(const TaskString: string; Index: integer; Backup: boo
 var
   Task: TTask;
   i, Ind: integer;
+  Indent: integer = 0;
 begin
   if (Index = 0) then
     Ind := Count - 1
@@ -916,8 +918,11 @@ begin
   if (Backup) then
     CreateBackup;
 
-  Ind := Ind + 1;
+  Inc(Ind);
+  if Ind < Count then
+    Indent := FTaskList[Ind].IndentLevel;
   Task := TTask.Create(TaskString); // Create a new task
+  Task.IndentLevel := Indent;
   SetLength(FTaskList, Count + 1); // Resize the array
 
   // Shift tasks down to make space for the new task
