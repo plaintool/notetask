@@ -762,7 +762,10 @@ begin
 
   Result:= inherited CreateHandle(AWinControl, P);
   EnableDarkStyle(Result);
-  SetWindowSubclass(Result, @CheckListBoxWindowProc2, ID_SUB_LISTBOX, 0);
+
+  // Mark this window as CheckListBox for drawing functions
+  SetProp(Result, 'IsCheckListBox', 1);
+
   TCustomCheckListBox(AWinControl).Color:= SysColor[COLOR_WINDOW];
   AWinControl.Font.Color:= SysColor[COLOR_WINDOWTEXT];
 end;
@@ -1531,7 +1534,22 @@ procedure DrawCheckBox(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer; con
 var
   LCanvas: TCanvas;
   AStyle: TTextStyle;
+  OffsetX: Integer;
+  Window: HWND;
 begin
+  // Try to get the window handle from DC
+  Window := WindowFromDC(hdc);
+  if Window <> 0 then
+  begin
+    // Check if this is a CheckListBox window
+    if GetProp(Window, 'IsCheckListBox') = 1 then
+      OffsetX := 3
+    else
+      OffsetX := 0;
+  end
+  else
+    OffsetX := 0;
+
   LCanvas:= TCanvas.Create;
   try
     LCanvas.Handle:= HDC;
@@ -1546,7 +1564,7 @@ begin
     // Fill checkbox rect
     LCanvas.Font.Name:= 'Segoe MDL2 Assets';
     LCanvas.Font.Color:= SysColor[COLOR_WINDOW];
-    LCanvas.TextRect(pRect, 0, 0, MDL_CHECKBOX_FILLED, AStyle);
+    LCanvas.TextRect(pRect, OffsetX, 0, MDL_CHECKBOX_FILLED, AStyle);
 
     // Draw checkbox border
     if iStateId in [CBS_UNCHECKEDHOT, CBS_MIXEDHOT, CBS_CHECKEDHOT] then
@@ -1554,20 +1572,20 @@ begin
     else begin
       LCanvas.Font.Color:= RGBToColor(192, 192, 192);
     end;
-    LCanvas.TextRect(pRect, 0, 0, MDL_CHECKBOX_OUTLINE, AStyle);
+    LCanvas.TextRect(pRect, OffsetX, 0, MDL_CHECKBOX_OUTLINE, AStyle);
 
     // Draw checkbox state
     if iStateId in [CBS_MIXEDNORMAL, CBS_MIXEDHOT,
                     CBS_MIXEDPRESSED, CBS_MIXEDDISABLED] then
     begin
       LCanvas.Font.Color:= RGBToColor(120, 120, 120);
-      LCanvas.TextRect(pRect, 0, 0, MDL_CHECKBOX_GRAYED, AStyle);
+      LCanvas.TextRect(pRect, OffsetX, 0, MDL_CHECKBOX_GRAYED, AStyle);
     end
     else if iStateId in [CBS_CHECKEDNORMAL, CBS_CHECKEDHOT,
                          CBS_CHECKEDPRESSED, CBS_CHECKEDDISABLED] then
     begin
       LCanvas.Font.Color:= RGBToColor(192, 192, 192);
-      LCanvas.TextRect(pRect, 0, 0, MDL_CHECKBOX_CHECKED, AStyle);
+      LCanvas.TextRect(pRect, OffsetX, 0, MDL_CHECKBOX_CHECKED, AStyle);
     end;
   finally
     LCanvas.Handle:= 0;
