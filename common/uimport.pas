@@ -1,5 +1,9 @@
 unit uImport;
 
+{$NOTES OFF}
+{$HINTS OFF}
+{$WARNINGS OFF}
+
 {$mode objfpc}{$H+}
 
 interface

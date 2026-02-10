@@ -27,6 +27,10 @@
 
 unit uDarkStyle;
 
+{$NOTES OFF}
+{$HINTS OFF}
+{$WARNINGS OFF}
+
 {$mode delphi}
 
 interface

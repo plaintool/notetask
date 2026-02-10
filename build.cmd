@@ -29,6 +29,9 @@ IF %ERRORLEVEL% NEQ 0 (
 
 echo Build completed successfully
 
+echo Wait 2 seconds to ensure file is free
+timeout /t 2 /nobreak >nul
+
 ::Certificate settings (optional)
 IF "%SIGNTOOL%"=="" (
     SET "SIGNTOOL=C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"

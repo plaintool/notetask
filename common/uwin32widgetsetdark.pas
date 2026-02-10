@@ -40,6 +40,10 @@
 
 unit uWin32WidgetSetDark;
 
+{$NOTES OFF}
+{$HINTS OFF}
+{$WARNINGS OFF}
+
 {$mode objfpc}{$H+}
 {$modeswitch advancedrecords}
 
@@ -57,14 +61,15 @@ uses
   Controls, LCLType, Win32WSComCtrls, ComCtrls, LMessages, Win32WSStdCtrls,
   WSStdCtrls, Win32WSControls, StdCtrls, WSControls, Graphics, Themes, LazUTF8,
   UxTheme, Win32Themes, ExtCtrls, WSMenus, JwaWinGDI, FPImage, Math, uDarkStyle,
-  WSComCtrls, CommCtrl, uImport, WSForms, Win32WSButtons, Buttons, Win32Extra,
-  Win32WSForms, Win32WSSpin, Spin, Win32WSMenus, CheckLst, WSCheckLst, Win32WSCheckLst,
+  WSComCtrls, CommCtrl, uImport, WSForms, Buttons, Win32Extra,
+  Win32WSForms, Win32WSMenus, CheckLst, WSCheckLst, Win32WSCheckLst,
   Dialogs, GraphUtil, Generics.Collections, TmSchema, InterfaceBase,
+  // Win32WSButtons, Win32WSSpin, Spin,
   Calendar, WSCalendar, Win32WSCalendar;
 
 type
   TWinControlDark = class(TWinControl);
-  TCustomGroupBoxDark = class(TCustomGroupBox);
+  // TCustomGroupBoxDark = class(TCustomGroupBox);
 
 type
 
@@ -445,6 +450,11 @@ var
   LCanvas : TCanvas;
   LButton, RButton: TUDAlignButton;
 begin
+  rcDst.Left := 0;
+  rcDst.Right := 0;
+  rcDst.Top := 0;
+  rcDst.Bottom := 0;
+
   case Msg of
     WM_PAINT:
     begin
@@ -982,7 +992,7 @@ function DrawThemeTextDark(hTheme: HTHEME; hdc: HDC; iPartId, iStateId: Integer;
 var
   OldColor: COLORREF;
 begin
-  if (hTheme = Win32Theme.Theme[teToolTip]) then
+  if (hTheme = Win32Theme.ThemeForPPI[teToolTip, Screen.PixelsPerInch]) then
     OldColor:= SysColor[COLOR_INFOTEXT]
   else begin
     OldColor:= SysColor[COLOR_BTNTEXT];
@@ -1008,7 +1018,7 @@ var
   LCanvas: TCanvas;
   AStyle: TTextStyle;
 begin
-  if (hTheme = Win32Theme.Theme[teHeader]) then
+  if (hTheme = Win32Theme.ThemeForPPI[teHeader, Screen.PixelsPerInch]) then
   begin
     if iPartId in [HP_HEADERITEM, HP_HEADERITEMRIGHT] then
     begin
@@ -1040,7 +1050,7 @@ begin
     end;
   end
 
-  else if (hTheme = Win32Theme.Theme[teMenu]) then
+  else if (hTheme = Win32Theme.ThemeForPPI[teMenu, Screen.PixelsPerInch]) then
   begin
     if iPartId in [MENU_BARBACKGROUND, MENU_POPUPITEM, MENU_POPUPGUTTER,
                    MENU_POPUPSUBMENU, MENU_POPUPSEPARATOR, MENU_POPUPCHECK,
@@ -1104,7 +1114,7 @@ begin
     end;
   end
 
-  else if (hTheme = Win32Theme.Theme[teToolBar]) then
+  else if (hTheme = Win32Theme.ThemeForPPI[teToolBar, Screen.PixelsPerInch]) then
   begin
     if iPartId in [TP_BUTTON] then
     begin
@@ -1183,7 +1193,7 @@ begin
     end;
   end
 
-  else if (hTheme = Win32Theme.Theme[teButton]) then
+  else if (hTheme = Win32Theme.ThemeForPPI[teButton, Screen.PixelsPerInch]) then
   begin
     DrawButton(hTheme, hdc, iPartId, iStateId, pRect, pClipRect);
   end;
