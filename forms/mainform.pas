@@ -3127,9 +3127,9 @@ end;
 
 procedure TformNotetask.btnMultiClick(Sender: TObject);
 begin
-  if btnMulti.ImageIndex = 0 then aInsertTask.Execute
+  if btnMulti.ImageIndex in [0, 1] then aInsertTask.Execute
   else
-  if btnMulti.ImageIndex = 2 then aDuplicateTasks.Execute;
+  if btnMulti.ImageIndex in [2, 3] then aDuplicateTasks.Execute;
 end;
 
 procedure TformNotetask.aNewExecute(Sender: TObject);
