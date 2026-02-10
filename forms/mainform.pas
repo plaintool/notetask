@@ -1000,13 +1000,17 @@ begin
 
   // Load bitmaps from resources
   ResourceBitmapCheck.LoadFromResourceName(HInstance, 'CHECK');
+  ResourceBitmapCheck.TransparentColor := clFuchsia;
+  ResourceBitmapCheck.Transparent := True;
   ResourceBitmapUncheck.LoadFromResourceName(HInstance, 'UNCHECK');
+  ResourceBitmapUncheck.TransparentColor := clFuchsia;
+  ResourceBitmapUncheck.Transparent := True;
   ResourceBitmapStarGold.LoadFromResourceName(HInstance, 'STARGOLD');
-  ResourceBitmapStarGold.Transparent := True;
   ResourceBitmapStarGold.TransparentColor := clFuchsia;
+  ResourceBitmapStarGold.Transparent := True;
   ResourceBitmapStarGray.LoadFromResourceName(HInstance, 'STARGRAY');
-  ResourceBitmapStarGray.Transparent := True;
   ResourceBitmapStarGray.TransparentColor := clFuchsia;
+  ResourceBitmapStarGray.Transparent := True;
 
   LoadFormSettings(Self, tagsEdit);
   LoadGridSettings(Self, taskGrid, string.Empty);
