@@ -978,6 +978,9 @@ begin
   FreeBytesSecure(FSalt);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
+
+  // Set colors
+  Self.Color := clWindow;
   panelNote.Color := ThemeColor(clGrayDark_Light, clGrayDark_Dark);
   Splitter.Color := ThemeColor(clGrayDark_Light, clGrayDark_Dark);
   SplitTags.Color := ThemeColor(clGrayDark_Light, clGrayDark_Dark);

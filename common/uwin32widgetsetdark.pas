@@ -1034,7 +1034,7 @@ begin
       LCanvas:= TCanvas.Create;
       try
         LCanvas.Handle:= hdc;
-        AColor:= SysColor[COLOR_BTNFACE];
+        AColor:= SysColor[COLOR_WINDOW];
 
         if iStateId = TS_HOT then
           LCanvas.Brush.Color:= Lighter(AColor, 116)
