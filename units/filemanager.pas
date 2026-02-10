@@ -263,7 +263,7 @@ begin
       end;
 
       // Add 6 bits to the code point
-      codePoint := (codePoint shl 6) or (Buffer[i] and $3F);
+      codePoint := (codePoint shl 6) or (LongWord(Buffer[i] and $3F));
       Dec(remaining);
 
       // If sequence is complete, validate the code point

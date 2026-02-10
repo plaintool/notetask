@@ -1993,9 +1993,9 @@ begin
       // First pass: calculate text size
       Flags := DT_CALCRECT;
       if FBiDiRightToLeft then
-        Flags := Flags or ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT)
+        Flags := Flags or longword(ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT))
       else
-        Flags := Flags or ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT);
+        Flags := Flags or longword(ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT));
       if FWordWrap then
         Flags := Flags or DT_WORDBREAK;
 
@@ -2016,9 +2016,9 @@ begin
 
       Flags := DT_NOPREFIX;
       if FBiDiRightToLeft then
-        Flags := Flags or ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT)
+        Flags := Flags or longword(ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT))
       else
-        Flags := Flags or ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT);
+        Flags := Flags or longword(ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT));
       if FWordWrap then
         Flags := Flags or DT_WORDBREAK;
 
@@ -2194,9 +2194,9 @@ var
 
       Flags := DT_NOPREFIX;
       if FBiDiRightToLeft then
-        Flags := Flags or ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT)
+        Flags := Flags or longword(ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT))
       else
-        Flags := Flags or ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT);
+        Flags := Flags or longword(ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT));
       if FWordWrap then
         Flags := Flags or DT_WORDBREAK;
 
@@ -7890,9 +7890,9 @@ var
 
         Flags := DT_CALCRECT;
         if FBiDiRightToLeft then
-          Flags := Flags or ifthen(col in [COL_DATE], DT_LEFT, DT_RIGHT)
+          Flags := Flags or longword(ifthen(col in [COL_DATE], DT_LEFT, DT_RIGHT))
         else
-          Flags := Flags or ifthen(col in [COL_AMOUNT], DT_RIGHT, DT_LEFT);
+          Flags := Flags or longword(ifthen(col in [COL_AMOUNT], DT_RIGHT, DT_LEFT));
         if FWordWrap then
           Flags := Flags or DT_WORDBREAK;
 
