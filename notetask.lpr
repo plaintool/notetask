@@ -23,12 +23,8 @@ uses
   formfind,
   formreplace
   {$IFDEF WINDOWS}
-  {$HINTS OFF}
-  {$WARNINGS OFF}
   ,uDarkStyle
   ,uWin32WidgetSetDark
-  {$HINTS ON}
-  {$WARNINGS ON}
   {$ENDIF}
   ;
 

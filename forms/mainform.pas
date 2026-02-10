@@ -32,7 +32,7 @@ uses
   Menus,
   Buttons,
   LCLIntf,
-  LCLType, CheckLst,
+  LCLType,
   LConvEncoding,
   PrintersDlgs,
   DateTimePicker,

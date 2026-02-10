@@ -29,6 +29,11 @@
 
   You should have received a copy of the GNU Lesser General Public
   License along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+  -------------------------------------------------------------------------
+  Modified for use in Notetask © 2024 by Alexander Tverskoy
+    - Added dark style for CheckBoxList
+    - Added dark style for Hint
 }
 
 unit uWin32WidgetSetDark;
@@ -1352,7 +1357,7 @@ end;
 procedure ApplyDarkStyle;
 var
   Handler: TMethod;
-  Index: TThemedElement;
+  //Index: TThemedElement;
 begin
   if not g_darkModeEnabled then
     Exit;
@@ -1360,6 +1365,9 @@ begin
   SubClassUpDown;
 
   OpenThemeData:= @InterceptOpenThemeData;
+
+  SysColor[COLOR_INFOTEXT] := SysColor[COLOR_BTNTEXT];
+  SysColor[COLOR_INFOBK] := SysColor[COLOR_BTNFACE];
 
   DefBtnColors[dctFont]:= SysColor[COLOR_BTNTEXT];
   DefBtnColors[dctBrush]:= SysColor[COLOR_BTNFACE];
