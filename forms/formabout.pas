@@ -14,6 +14,7 @@ uses
   Forms,
   StdCtrls,
   ExtCtrls,
+  Graphics,
   LCLIntf;
 
 type
@@ -48,14 +49,15 @@ uses systemtool;
 
   { TformAboutNotetask }
 
-procedure TformAboutNotetask.LabelLicUrlClick(Sender: TObject);
-begin
-  OpenUrl(labelLicUrl.Caption);
-end;
-
 procedure TformAboutNotetask.FormCreate(Sender: TObject);
 begin
   labelName.Caption := 'Notetask © ' + GetAppVersion;
+  LabelLicUrl.Font.Color := ThemeColor(clBlue, clSkyBlue);
+end;
+
+procedure TformAboutNotetask.LabelLicUrlClick(Sender: TObject);
+begin
+  OpenUrl(labelLicUrl.Caption);
 end;
 
 end.

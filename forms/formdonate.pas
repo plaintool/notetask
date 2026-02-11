@@ -13,6 +13,7 @@ interface
 uses
   Forms,
   StdCtrls,
+  Graphics,
   Buttons,
   Clipbrd,
   LCLIntf, Classes;
@@ -73,6 +74,8 @@ uses systemtool;
 procedure TformDonateNotetask.FormCreate(Sender: TObject);
 begin
   ApplicationTranslate(language, self);
+  LabelUrl.Font.Color := ThemeColor(clBlue, clSkyBlue);
+  LabelUrl1.Font.Color := ThemeColor(clBlue, clSkyBlue);
 end;
 
 procedure TformDonateNotetask.buttonCopy1Click(Sender: TObject);
