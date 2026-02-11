@@ -5,7 +5,7 @@ A simple application for creating and organizing task lists, offering essential 
 [![Build with: Lazarus](https://img.shields.io/badge/Build_with-Lazarus-blueviolet)](https://www.lazarus-ide.org/)
 [![Platform: Windows Linux](https://img.shields.io/badge/Platform-Windows_Linux-yellow)](#)
 [![Latest Release](https://img.shields.io/github/v/release/plaintool/notetask?label=Release)](https://github.com/plaintool/notetask/releases/latest)
-[![GitHub Downloads](https://img.shields.io/github/downloads/plaintool/notetask/total?label=Downloads)](https://github.com/plaintool/notetask/releases)
+[![GitHub Downloads](https://img.shields.io/github/downloads/plaintool/notetask/total?label=Downloads&cacheSeconds=3600)](https://github.com/plaintool/notetask/releases)
 <!-- [![Languages: ar be zh cs da nl en fi fr de el he hi id it ja ko pl pt ro ru es sv tr uk](https://img.shields.io/badge/Lang-ar_be_zh_cs_da_nl_en_fi_fr_de_el_he_hi_id_it_ja_ko_pl_pt_ro_ru_es_sv_tr_uk-green)](https://www.ethnologue.com) -->
 
 >- [Notetask](#notetask)
