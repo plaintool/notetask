@@ -671,7 +671,7 @@ begin
   Result := string.Empty;
   if (aIndex < 0) or (aIndex >= CountGroup) then exit;
 
-  Result := GroupNames[aIndex].TrimLeft([' ', '#']).Trim;
+  Result := FGroupNameList[aIndex].TrimLeft([' ', '#']).Trim;
 
   if (Striket) and (GetGroupFiltered(aIndex, False, string.Empty, False)) then
     Result := ApplyCombiningChar(Result);

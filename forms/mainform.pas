@@ -3944,7 +3944,7 @@ begin
   try
     Left := self.Left + 14;
     Top := self.top + 52;
-    SetMode(aRenameGroup.Caption, rentergroupname, rOK, Tasks.GetGroupNameForTab(groupTabs.TabIndex, False));
+    SetMode(aRenameGroup.Caption, rentergroupname, rOK, Tasks.GetGroupNameForTab(FindGroupRealIndex(groupTabs.TabIndex), False));
 
     // Show the form as a modal dialog
     if (ShowModal = mrOk) {and (editText.Text <> groupTabs.Tabs[groupTabs.TabIndex])} then
