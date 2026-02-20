@@ -4,10 +4,10 @@
     # arguments for the WiX Toolset are stored here.
 
     candleArgs: 
-    lightArgs: "<projectname>.wixobj" -out "notetask-1.1.1.msi" <extensions>
+    lightArgs: "<projectname>.wixobj" -out "notetask.msi" <extensions>
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<?define ProductVersion = "1.1.1" ?>
+	<?define ProductVersion = "$(var.Version)" ?>
 	<?if $(var.Platform) = x64 ?>
         <?define ProductName = "Notetask $(var.ProductVersion)" ?>
         <?define Win64Value = "yes" ?>

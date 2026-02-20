@@ -8,8 +8,13 @@ IF "%~2" NEQ "" (
     SET "VERSION=%~2"
 )
 IF "%VERSION%"=="" (
-    SET "VERSION=1.1.1"
+    FOR /F "usebackq delims=" %%i IN ("%SOURCE_DIR%..\VERSION") DO SET "VERSION=%%i"
 )
+
+:: --- Copying languages ---
+set "source=%~dp0innolanguages"
+set "destination=C:\Program Files (x86)\Inno Setup 6\Languages"
+xcopy "%source%\*" "%destination%\" /y /i /s
 
 :: --- Build inno setup ---
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "%SOURCE_DIR%\innosetup.iss"
@@ -59,3 +64,4 @@ if not "%CERTFILE%"=="" (
 )
 
 echo Build and signing notetask-%VERSION%-any-x86-x64.exe completed successfully!
+pause

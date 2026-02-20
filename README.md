@@ -172,8 +172,8 @@ Download the installer from the [releases page](https://github.com/plaintool/Not
 
 Download the appropriate `.deb` package for your system from the [releases page](https://github.com/plaintool/Notetask/releases), or use `wget` directly:
 ```bash
-wget https://github.com/plaintool/notetask/releases/download/v1.1.1/notetask-1.1.1.deb
-sudo apt install ./notetask-1.1.1.deb
+wget https://github.com/plaintool/notetask/releases/download/v1.1.2/notetask-1.1.2.deb
+sudo apt install ./notetask-1.1.2.deb
 ```
 If you downloaded the package manually, you can also install it via:
 ```bash
@@ -188,8 +188,8 @@ sudo apt-get install -f
 
 Download the appropriate `.rpm` package for your system, or use `wget` directly:
 ```bash
-wget https://github.com/plaintool/notetask/releases/download/v1.1.1/notetask-1.1.1.rpm
-sudo rpm -i ./notetask-1.1.1.rpm
+wget https://github.com/plaintool/notetask/releases/download/v1.1.2/notetask-1.1.2.rpm
+sudo rpm -i ./notetask-1.1.2.rpm
 ```
 If you downloaded the package manually, you can also install it via:
 ```bash
