@@ -6292,7 +6292,7 @@ var
 begin
   if Assigned(Sender) then
   begin
-    if (Sender is TPanel) and (aRow > 0) then
+    if (Sender is TPanel) and (aRow > 0) and (aRow < taskGrid.RowCount) then
       Indent := Tasks.GetTask(aRow).FIndentLevel * Canvas.TextWidth(' ') * 2;
 
     Rect := taskGrid.CellRect(aCol, aRow);
