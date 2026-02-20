@@ -63,6 +63,46 @@ jobs:
       - name: Show generated changelog
         run: cat CHANGELOG.md
 
+      - name: Append installation section
+        run: |
+          TAG="${{ inputs.tag_name != '' && inputs.tag_name || github.event.inputs.tag_name }}"
+          VERSION="${TAG#v}"
+
+          cp CHANGELOG.md RELEASE.md
+          cat <<EOF >> RELEASE.md
+          
+          ---
+
+          # Installation
+
+          ## Windows
+
+          Several installer options are available on the releases page:
+
+          - [**notetask-${VERSION}-any-x86-x64.exe**](https://github.com/plaintool/notetask/releases/download/${TAG}/notetask-${VERSION}-any-x86-x64.exe) — a universal EXE installer that works on **both x86 and x64** systems and supports installation **for a single user or for all users**, depending on the selected options.
+          - [**notetask-${VERSION}-x64.msi**](https://github.com/plaintool/notetask/releases/download/${TAG}/notetask-${VERSION}-x64.msi) / [**notetask-${VERSION}-x86.msi**](https://github.com/plaintool/notetask/releases/download/${TAG}/notetask-${VERSION}-x86.msi) — installs the application **for the current user**.
+          - [**notetask-${VERSION}-x64-allusers.msi**](https://github.com/plaintool/notetask/releases/download/${TAG}/notetask-${VERSION}-x64-allusers.msi) / [**notetask-${VERSION}-x86-allusers.msi**](https://github.com/plaintool/notetask/releases/download/${TAG}/notetask-${VERSION}-x86-allusers.msi) — installs the application **for all users on the system**.
+          - [**notetask-${VERSION}-x86-x64-portable.zip**](https://github.com/plaintool/notetask/releases/download/${TAG}/notetask-${VERSION}-x86-x64-portable.zip) — portable version, saves its settings to \`form_settings.json\` if it is near the executable; otherwise, in the user directory
+
+          > **Note:** Windows XP supports installation **only via MSI installers**. The EXE installer is **not compatible** with Windows XP.
+
+          ## Linux
+          
+          ### *Debian-like systems (Debian, Ubuntu, etc.)*
+
+          \`\`\`bash
+          wget https://github.com/plaintool/notetask/releases/download/${TAG}/notetask-${VERSION}.deb
+          sudo apt install ./notetask-${VERSION}.deb
+          \`\`\`
+
+          ### *RPM-based systems (Fedora, RHEL, CentOS, openSUSE, etc.)*
+
+          \`\`\`bash
+          wget https://github.com/plaintool/notetask/releases/download/${TAG}/notetask-${VERSION}.rpm
+          sudo rpm -i ./notetask-${VERSION}.rpm
+          \`\`\`
+          EOF
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -74,7 +114,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ inputs.tag_name || github.event.inputs.tag_name }}
-          body_path: CHANGELOG.md
+          body_path: RELEASE.md
           draft: true
           prerelease: false
           files: |
