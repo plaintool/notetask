@@ -2,7 +2,7 @@
 <XML_DIZ_INFO>
 	<MASTER_PAD_VERSION_INFO>
 		<MASTER_PAD_VERSION>3.11</MASTER_PAD_VERSION>
-		<MASTER_PAD_EDITOR>PadXml 1.0.0</MASTER_PAD_EDITOR>
+		<MASTER_PAD_EDITOR>PadXml 1.0.1</MASTER_PAD_EDITOR>
 		<MASTER_PAD_INFO>Portable Application Description, or PAD for short, is a data set that is used by shareware authors to disseminate information to anyone interested in their software products. To find out more go to http://pad.asp-software.org</MASTER_PAD_INFO>
 	</MASTER_PAD_VERSION_INFO>
 	<Company_Info>
@@ -34,7 +34,7 @@
 	</Company_Info>
 	<Program_Info>
 		<Program_Name>Notetask</Program_Name>
-		<Program_Version>1.1.0</Program_Version>
+		<Program_Version>1.1.1</Program_Version>
 		<Program_Release_Month>12</Program_Release_Month>
 		<Program_Release_Day>09</Program_Release_Day>
 		<Program_Release_Year>2025</Program_Release_Year>
@@ -76,29 +76,28 @@
 
 Notetask provides a customizable interface and a range of features to manage tasks effectively, including automatic numbering, paged task groups with duration and amount tracking, task merging, splitting, archiving, indentation, highlighting for overdue or upcoming tasks, copy/paste in Markdown, and an optional encrypted file format. It is fully Unicode-enabled and localized in 25 languages.
 
-Changelog (v1.1.0)
+Changelog
+v1.1.1 (2026-02-11)
 
+Full Changelog
 New Features
-- Implement real-time task filtering for all visible groups and tasks
-- Highlight text fragments found by filter in the grid
-- Implement full tag support in task file
-- Dropdown check-list in tag input allows selecting existing tags or removing them
-- Add Zoom functionality for the grid with control via View menu, mouse wheel, hotkeys, or status bar
-- Add tooltips for groups, stored in the file after comment marker
-- Search and highlight cell text matching current cell
-- Build a single InnoSetup installer for all architectures
-- Add 32-bit build
-- Add translations for cs, da, nl, fi, el, he, id, pl, ro, sv, tr
-- Open a link from notes or grid with Ctrl + Click
+- Implement dark mode support in Windows dependent on OS setting #71
+- Add CI/CD pipeline (GitHub Actions + local support) #83
+- Add multi-function floating button for inserting or duplicating tasks #81
+- Provide a portable (ZIP) version #72
 
 Enhancements
-- Switch groups using NUMPAD+ and NUMPAD-
-- Save print settings, print tags behind task text
-- Change MD format, place tags closer to task text
-- Allow writing links in task text
-- Move task to top/bottom before first/last visible non-archived task if archive hidden
-- Check for updates via wget on Linux
-- Render sorting arrow in fixed column</Char_Desc_2000>
+- Apply Ctrl+Tab indentation to the entire task text, not just the first line #85
+- Ctrl+Click on memo first highlights entire link, second click follows it #80
+- Show Unicode strikethrough in group name when all tasks are archived #79
+- Add Ctrl+Num+/Num- shortcuts for tab moving (same as Ctrl+Shift+Left/Right) #78
+
+Fixed Bugs
+- Fix filter behavior; cursor keys in filter jump to table if text is unselected #84
+- Memo.SelectAll works incorrectly with Unicode; switched to manual selection #77
+- When selecting and editing a row, the memo overlaps the bottom cell border dotted line #76
+- Tag sorting broken in checklist; tags appear after textual tags #75
+- Duplicate highlight color differs from search match highlight #74</Char_Desc_2000>
 		</English>
 	</Program_Descriptions>
 	<Web_Info>
@@ -110,10 +109,10 @@ Enhancements
 			<Application_XML_File_URL>http://raw.githubusercontent.com/plaintool/notetask/refs/heads/main/installer/notetask.xml</Application_XML_File_URL>
 		</Application_URLs>
 		<Download_URLs>
-			<Primary_Download_URL>http://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-any-x86-x64.exe</Primary_Download_URL>
+			<Primary_Download_URL>http://github.com/plaintool/notetask/releases/download/v1.1.1/notetask-1.1.1-any-x86-x64.exe</Primary_Download_URL>
 			<Secondary_Download_URL />
-			<Additional_Download_URL_1>http://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-x64.msi</Additional_Download_URL_1>
-			<Additional_Download_URL_2>http://github.com/plaintool/notetask/releases/download/v1.1.0/notetask-1.1.0-x86.msi</Additional_Download_URL_2>
+			<Additional_Download_URL_1>http://github.com/plaintool/notetask/releases/download/v1.1.1/notetask-1.1.1-x64.msi</Additional_Download_URL_1>
+			<Additional_Download_URL_2>http://github.com/plaintool/notetask/releases/download/v1.1.1/notetask-1.1.1-x86.msi</Additional_Download_URL_2>
 		</Download_URLs>
 	</Web_Info>
 	<Permissions>
