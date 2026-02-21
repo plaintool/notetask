@@ -934,8 +934,8 @@ begin
         WordStr := Copy(S, Start, i - Start + 1); // Extract the block content
 
         // Validate block: length requirements and no line breaks
-        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and (Pos(#13, WordStr) = 0) and
-          (Pos(#10, WordStr) = 0) then
+        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and
+           (Pos(#13, WordStr) = 0) and (Pos(#10, WordStr) = 0) then
         begin
           // Remove single preceding space from NewS if present
           if (Length(NewS) > 0) and (NewS[Length(NewS)] = ' ') then
@@ -945,12 +945,20 @@ begin
           Inc(i); // Move past the closing backtick
           Continue; // Skip to next iteration without processing current position
         end;
+      end
+      else if i > Length(S) then
+      begin
+        // End of string reached without closing backtick: add remaining characters and exit
+        NewS := NewS + Copy(S, Start, Length(S) - Start + 1);
+        Break; // Exit the while loop
       end;
-      // If no valid backtick block found, fall through to normal character processing
+      // If we encountered a line break or invalid block, fall through to add current character
     end;
 
     // Add current character to result string (not part of valid backtick block)
-    NewS := NewS + S[i];
+    // Ensure i is within bounds (it will be, except after the Break above)
+    if i <= Length(S) then
+      NewS := NewS + S[i];
     Inc(i);
   end;
 
@@ -994,30 +1002,51 @@ begin
         Inc(i);
       end;
 
-      // Check if we found a valid closing backtick
+      // Analyze scan result
       if (i <= Length(S)) and (S[i] = '`') then
       begin
+        // Found a closing backtick
         WordStr := Copy(S, Start, i - Start + 1);
-        // Add the tag if it meets length requirements and has no line breaks
-        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and (Pos(#13, WordStr) = 0) and
-          (Pos(#10, WordStr) = 0) then
+        // Check if it's a valid tag (length, no line breaks)
+        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and
+           (Pos(#13, WordStr) = 0) and (Pos(#10, WordStr) = 0) then
         begin
+          // Valid tag: add to list and remove from output
           List.Add(StringReplace(WordStr, '`', '', [rfReplaceAll]));
 
           // Remove single preceding space from NewS if present
           if (Length(NewS) > 0) and (NewS[Length(NewS)] = ' ') then
             SetLength(NewS, Length(NewS) - 1);
 
-          // Skip adding this content to NewS (effectively removing it)
-          Inc(i); // Move past the closing backtick
-          Continue; // Skip to next iteration without adding to NewS
+          Inc(i); // Skip closing backtick
+          Continue; // Skip adding this block to NewS
+        end
+        else
+        begin
+          // Invalid backtick block: add it to NewS as plain text
+          NewS := NewS + Copy(S, Start, i - Start + 1);
+          Inc(i); // Move past closing backtick
+          Continue;
         end;
+      end
+      else if (i <= Length(S)) and (S[i] in [#13, #10]) then
+      begin
+        // Encountered a line break before closing backtick: add everything up to the line break
+        NewS := NewS + Copy(S, Start, i - Start + 1);
+        Inc(i); // Move past the line break
+        Continue;
+      end
+      else
+      begin
+        // End of string reached without a closing backtick: add the rest from Start
+        NewS := NewS + Copy(S, Start, Length(S) - Start + 1);
+        i := Length(S) + 1; // Exit the loop
+        Continue;
       end;
-      // If no valid backtick tag found, fall through to normal processing
     end;
 
     // Process regular prefix tags when Backtick is False, or when in Backtick mode but no valid backtick tag was found
-    if (not Backtick) and (S[i] in ['@', '#', '%', '+', '$']) and ((i = 1) or (S[i - 1] in [#32, #13, #10])) then
+    if (not Backtick) and (S[i] in ['@', '#', '%', '+', '$']) and ((i = 1) or (S[i-1] in [#32, #13, #10])) then
     begin
       Start := i;
       Inc(i);
