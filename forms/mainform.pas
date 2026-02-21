@@ -3509,6 +3509,7 @@ var
   TaskText, Oper, Value: string;
 begin
   if Screen.ActiveForm <> Self then exit;
+  if groupTabs.Tabs.Count = 0 then exit;
 
   EditComplete;
   GridBackupSelection;
@@ -3564,7 +3565,7 @@ end;
 procedure TformNotetask.aSplitTasksExecute(Sender: TObject);
 begin
   if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount = 0 then exit;
+  if taskGrid.RowCount < 2 then exit;
 
   SplitTasks;
 end;
@@ -3898,95 +3899,6 @@ begin
   end;
 end;
 
-procedure TformNotetask.aInsertGroupExecute(Sender: TObject);
-var
-  Result: integer;
-  newName: string;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  // Create an instance of the form
-  with formInputText do
-  try
-    Left := self.Left + 14;
-    Top := self.top + 52;
-    SetMode(aInsertGroup.Caption, rentergroupname, rOK);
-
-    // Show the form as a modal dialog
-    if ShowModal = mrOk then
-    begin
-      EditComplete;
-      newName := editText.Text;
-      if (newName = rgroupuntitled) then newName := string.Empty;
-
-      Result := Tasks.InsertGroup(newName);
-      if (Result <> FindGroupRealIndex(groupTabs.TabIndex)) then
-      begin
-        InsertAtPos(FLastRowMem, Result, 0);
-        SetTabs;
-        ChangeGroup(FindGroupTabIndex(Result));
-        SetChanged;
-      end;
-    end;
-  finally
-    Hide;
-  end;
-end;
-
-procedure TformNotetask.aRenameGroupExecute(Sender: TObject);
-var
-  newName: string;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  // Create an instance of the form
-  with formInputText do
-  try
-    Left := self.Left + 14;
-    Top := self.top + 52;
-    SetMode(aRenameGroup.Caption, rentergroupname, rOK, Tasks.GetGroupNameForTab(FindGroupRealIndex(groupTabs.TabIndex), False));
-
-    // Show the form as a modal dialog
-    if (ShowModal = mrOk) {and (editText.Text <> groupTabs.Tabs[groupTabs.TabIndex])} then
-    begin
-      newName := editText.Text;
-      if (newName = rgroupuntitled) and (groupTabs.TabIndex = 0) then newName := string.Empty;
-
-      if (Tasks.RenameGroup(FindGroupRealIndex(groupTabs.TabIndex), newName)) then
-      begin
-        SetTabs;
-        SetChanged;
-      end;
-    end;
-  finally
-    Hide;
-  end;
-end;
-
-procedure TformNotetask.aEditGroupTooltipExecute(Sender: TObject);
-begin
-  if (groupTabs.TabIndex = 0) and (Tasks.GroupNames[0] = string.Empty) then
-    exit;
-  with formMemoText do
-  try
-    if not formMemoText.Showed then
-    begin
-      Left := self.Left + 14;
-      Top := self.top + 52;
-    end;
-    SetMode(rapp, aEditGroupTooltip.Caption, rOK, Tasks.GetGroupHint(FindGroupRealIndex(groupTabs.TabIndex)), 400, 180, FWordWrap, True);
-
-    // Show the form as a modal dialog
-    if ShowModal = mrOk then
-    begin
-      Tasks.RehintGroup(FindGroupRealIndex(groupTabs.TabIndex), formMemoText.memoText.Text);
-      SetChanged;
-    end;
-  finally
-    Hide;
-  end;
-end;
-
 procedure TformNotetask.aFilterExecute(Sender: TObject);
 begin
   panelTabs.Visible := (not panelTabs.Visible and not filterBox.Focused) or
@@ -4036,7 +3948,10 @@ begin
   end;
 end;
 
-procedure TformNotetask.aDuplicateGroupExecute(Sender: TObject);
+procedure TformNotetask.aInsertGroupExecute(Sender: TObject);
+var
+  Result: integer;
+  newName: string;
 begin
   if Screen.ActiveForm <> Self then exit;
 
@@ -4045,7 +3960,97 @@ begin
   try
     Left := self.Left + 14;
     Top := self.top + 52;
-    SetMode(aDuplicateGroup.Caption, rentergroupname, rOK, groupTabs.Tabs[groupTabs.TabIndex]);
+    SetMode(aInsertGroup.Caption, rentergroupname, rOK);
+
+    // Show the form as a modal dialog
+    if ShowModal = mrOk then
+    begin
+      EditComplete;
+      newName := editText.Text;
+      if (newName = rgroupuntitled) then newName := string.Empty;
+
+      Result := Tasks.InsertGroup(newName);
+      if (Result <> FindGroupRealIndex(groupTabs.TabIndex)) then
+      begin
+        InsertAtPos(FLastRowMem, Result, 0);
+        SetTabs;
+        ChangeGroup(FindGroupTabIndex(Result));
+        SetChanged;
+      end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aRenameGroupExecute(Sender: TObject);
+var
+  newName: string;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if groupTabs.Tabs.Count < 1 then exit;
+
+  // Create an instance of the form
+  with formInputText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    SetMode(aRenameGroup.Caption, rentergroupname, rOK, Tasks.GetGroupNameForTab(FindGroupRealIndex(groupTabs.TabIndex), False));
+
+    // Show the form as a modal dialog
+    if (ShowModal = mrOk) {and (editText.Text <> groupTabs.Tabs[groupTabs.TabIndex])} then
+    begin
+      newName := editText.Text;
+      if (newName = rgroupuntitled) and (groupTabs.TabIndex = 0) then newName := string.Empty;
+
+      if (Tasks.RenameGroup(FindGroupRealIndex(groupTabs.TabIndex), newName)) then
+      begin
+        SetTabs;
+        SetChanged;
+      end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aEditGroupTooltipExecute(Sender: TObject);
+begin
+  if (groupTabs.TabIndex = 0) and (Tasks.GroupNames[0] = string.Empty) then
+    exit;
+  if groupTabs.Tabs.Count < 1 then exit;
+
+  with formMemoText do
+  try
+    if not formMemoText.Showed then
+    begin
+      Left := self.Left + 14;
+      Top := self.top + 52;
+    end;
+    SetMode(rapp, aEditGroupTooltip.Caption, rOK, Tasks.GetGroupHint(FindGroupRealIndex(groupTabs.TabIndex)), 400, 180, FWordWrap, True);
+
+    // Show the form as a modal dialog
+    if ShowModal = mrOk then
+    begin
+      Tasks.RehintGroup(FindGroupRealIndex(groupTabs.TabIndex), formMemoText.memoText.Text);
+      SetChanged;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aDuplicateGroupExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if groupTabs.Tabs.Count < 1 then exit;
+
+  // Create an instance of the form
+  with formInputText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    SetMode(aDuplicateGroup.Caption, rentergroupname, rOK, Tasks.GetGroupNameForTab(FindGroupRealIndex(groupTabs.TabIndex), False));
 
     // Show the form as a modal dialog
     if (ShowModal = mrOk) then
@@ -4068,6 +4073,8 @@ var
   Confirm: integer;
   Mem: TIntegerArray;
 begin
+  if groupTabs.Tabs.Count < 1 then exit;
+
   Confirm := MessageDlg(rdeletegroupconfirm, mtConfirmation, [mbYes, mbNo], 0);
 
   if (Confirm = mrYes) then
@@ -5730,6 +5737,7 @@ var
   RowMem: integer = -1;
 begin
   if (Index = 1) and (Tasks.GroupNames[0] = string.Empty) then exit;
+  if groupTabs.Tabs.Count < 1 then exit;
 
   Result := Tasks.MoveGroupLeft(FindGroupRealIndex(Index), ShowArchived, filterBox.Text, FShowTime);
   if (Length(FLastRowMem) > Result) then
@@ -5758,6 +5766,7 @@ var
   RowMem: integer = -1;
 begin
   if (Index = 0) and (Tasks.GroupNames[0] = string.Empty) then exit;
+  if groupTabs.Tabs.Count < 1 then exit;
 
   Result := Tasks.MoveGroupRight(FindGroupRealIndex(Index), ShowArchived, filterBox.Text, FShowTime);
   if (Length(FLastRowMem) > Result) then
@@ -8430,7 +8439,10 @@ begin
     begin
       groupTabs.TabIndex := 0;
       groupTabsChange(groupTabs);
-    end;
+    end
+    else
+    if LastRealIndex < 0 then
+      groupTabsChange(groupTabs);
 
     // Set selected row memory for tabs
     SetLength(FLastRowMem, Tasks.CountGroup);
