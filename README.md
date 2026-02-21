@@ -15,7 +15,8 @@ A simple application for creating and organizing task lists, offering essential 
 >- [File Format](#file-format)
 >   - [Legend](#legend)
 >   - [Example](#example)
-> - [Installation](#installation)
+>- [Grid Formatting](#grid-formatting)
+>- [Installation](#installation)
 >   - [Windows](#windows)
 >   - [Linux](#linux)
 >- [Featured on](#featured-on)
@@ -147,6 +148,17 @@ The status bar provides a concise, real-time overview of the current task list. 
 >- [x] 2024-07-30, Service heating system before winter `maintenance` // Book technician.
 >- [ ] 2024-08-05, Paint front door and touch up exterior walls `painting` `delayed` // Prepare paint and materials.
 
+## Grid Formatting
+
+*Note: The following text styles are used only inside the application.*
+> |Legend|Description|
+> |:-------------------------------:|:-----------------------------------------------|
+> | ![legend1](samples/legend1.png) | The date is scheduled but has not yet been reached |
+> | ![legend2](samples/legend2.png) | The task is past its due date and remains incomplete |
+> | ![legend3](samples/legend3.png) | The task has been archived but remains incomplete |
+> | ![legend4](samples/legend4.png) | The task has been moved to the archive |
+> | ![legend5](samples/legend5.png) | The task has been marked as favorite |
+> | ![legend6](samples/legend6.png) | Highlight cell text duplicates relative to the active cell, and highlight text fragments found through filter |
 
 ## Installation
 
