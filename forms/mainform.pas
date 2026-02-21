@@ -840,6 +840,7 @@ const
   clRowHighlight_Light = TColor($FFF0DC);       // RGB(220,240,255)
   clRowFocused_Light = TColor($FFDCC8);         // RGB(200,220,255)
   clRowExpired_Light = TColor($DCDCFF);         // RGB(255,220,220)
+  clRowNotDone_Light = TColor($000096);         // RGB(150,0,0)
   clPlanned_Light = TColor($B40000);            // RGB(0,0,180)
   clReadOnly_Light = TColor($F0F0F0);           // RGB(240,240,240)
   clSplitFilter_Light = TColor($FAFAFA);        // RGB(250,250,250)
@@ -852,7 +853,8 @@ const
   // Dark theme colors
   clRowHighlight_Dark = TColor($463027);        // RGB(39, 48, 70)
   clRowFocused_Dark = TColor($6C4C38);          // RGB(56, 76, 108)
-  clRowExpired_Dark = TColor($2D2D46);          // RGB(70, 45, 45)
+  clRowExpired_Dark = TColor($2D2D50);          // RGB(80, 45, 45)
+  clRowNotDone_Dark = TColor($9696FF);          // RGB(255,150,150)
   clPlanned_Dark = TColor($FF8C00);             // RGB(0, 140, 255)
   clReadOnly_Dark = TColor($404040);            // RGB(64, 64, 64)
   clSplitFilter_Dark = TColor($505050);         // RGB(80, 80, 80)
@@ -1881,7 +1883,8 @@ begin
         if (not Task.Done) and (Task.Archive) then
         begin
           bgFill := ThemeColor(clWhite, clBlack); // Not done but arhive warning color
-          Grid.Canvas.Font.Color := clMaroon;
+          Grid.Canvas.Font.Color := ThemeColor(clRowNotDone_Light, clRowNotDone_Dark);
+          ;
         end
         else
         begin
@@ -2598,6 +2601,7 @@ begin
   FLastTabIndex := groupTabs.TabIndex;
 
   Tasks.CalcTagsWidths(-1, taskGrid.Columns[COL_TASK - 1].Width, tagsEdit, Font);
+  ChangeLastText;
   CalcRowHeight(True);
   SetNote;
   SetTags;
@@ -2878,7 +2882,8 @@ begin
       end;
 
     VK_UP, VK_DOWN:
-      if ((filterBox.GetTextLen > 0) and (filterBox.SelLength = 0)) and (Visible and taskGrid.Visible and taskGrid.CanFocus) then
+      if (((filterBox.GetTextLen > 0) and (filterBox.SelLength = 0)) or (filterBox.Items.Count = 0)) and
+        (Visible and taskGrid.Visible and taskGrid.CanFocus) then
       begin
         taskGrid.SetFocus;
         Key := 0;
