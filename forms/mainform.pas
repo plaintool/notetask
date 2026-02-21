@@ -3540,6 +3540,8 @@ begin
   if Visible and taskGrid.Visible and taskGrid.CanFocus then
     taskGrid.SetFocus;
   AdjustMultiButton;
+  ResetRowHeight;
+  SetTabs;
   SetInfo;
   SetChanged;
   SetNote;
@@ -3759,6 +3761,8 @@ begin
     taskGrid.Col := selCol;
     taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
   end;
+  ResetRowHeight;
+  SetTabs;
   SetChanged;
   SetNote;
   SetTags;
@@ -3794,6 +3798,8 @@ begin
     taskGrid.Col := selCol;
     taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
   end;
+  ResetRowHeight;
+  SetTabs;
   SetChanged;
   SetNote;
   SetTags;
@@ -6640,6 +6646,8 @@ begin
       // RemoveTask from collection
       taskGrid.DeleteRow(RowIndex);
       FillGrid;
+      ResetRowHeight;
+      SetTabs;
       SetInfo;
       SetNote;
       SetTags;
@@ -6690,6 +6698,8 @@ begin
 
       taskGrid.ClearSelections;
       FillGrid;
+      ResetRowHeight;
+      SetTabs;
       SetInfo;
       SetNote;
       SetTags;
