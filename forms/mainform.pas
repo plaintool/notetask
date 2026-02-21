@@ -5015,14 +5015,17 @@ begin
     if SaveSetting then
       SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
+    taskGrid.Clean;
+    taskGrid.RowCount := 2;
+    tagsEdit.SuggestedItems.Clear;
     FilterBox.Clear;
     FLastFilter := '-1';
-    if Assigned(Tasks) then
-      Tasks.Free;
 
     new := TStringList.Create;
     new.Add('[ ]');
+    if Assigned(Tasks) then Tasks.Free;
     Tasks := TTasks.Create(new);
+
     FFileName := string.Empty;
     panelTabs.Visible := False;
 
@@ -5044,12 +5047,9 @@ begin
     FreeFile;
     ReadOnly := False;
 
-    taskGrid.Clean;
-    taskGrid.RowCount := 2;
-    tagsEdit.SuggestedItems.Clear;
-
     // Load saved settings for new file
     LoadGridSettings(Self, taskGrid, string.Empty);
+
     ApplyGridSettings;
     SetZoom(FZoom);
 
