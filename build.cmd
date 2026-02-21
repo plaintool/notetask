@@ -30,7 +30,7 @@ IF %ERRORLEVEL% NEQ 0 (
 echo Build completed successfully
 
 echo Wait 2 seconds to ensure file is free
-timeout /t 2 /nobreak >nul
+ping 127.0.0.1 -n 3 >nul
 
 ::Certificate settings (optional)
 IF "%SIGNTOOL%"=="" (

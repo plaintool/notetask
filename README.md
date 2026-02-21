@@ -156,10 +156,12 @@ The status bar provides a concise, real-time overview of the current task list. 
 
 Several installer options are available on the releases page:
 
-- **notetask-any-x86-x64.exe** — a universal EXE installer that works on **both x86 and x64** systems and supports installation **for a single user or for all users**, depending on the selected options.
-- **notetask-x64.msi / notetask-x86.msi** — installs the application **for the current user**.  
-- **notetask-x64-allusers.msi / notetask-x86-allusers.msi** — installs the application **for all users on the system**.  
-- **notetask-x86-x64-portable.zip** — portable version, saves its settings to `form_settings.json` if it is near the executable; otherwise, in the user directory
+| Description | Files |
+|-------------|-------|
+| **Universal installer (EXE)** — universal installer for **x86 and x64**, supports installation **for the current user or for all users** | `notetask‑any‑x86‑x64.exe` |
+| **User installer (MSI)** — installs the application **for the current user** | `notetask‑x64.msi`<br>`notetask‑x86.msi` |
+| **System installer (MSI)** — installs the application **for all users on the system** | `notetask‑x64‑allusers.msi`<br>`notetask‑x86‑allusers.msi` |
+| **Portable version** — saves its settings to `form_settings.json` if it is near the executable; otherwise, in the user directory | `notetask‑x86‑x64‑portable.zip` |
 
 > **Note:** Windows XP supports installation **only via MSI installers**. The EXE installer is **not compatible** with Windows XP.
 
@@ -168,13 +170,10 @@ Download the installer from the [releases page](https://github.com/plaintool/Not
 ---
 
 ### Linux
-### *Debian-like systems*
+### *Debian-like systems (Debian, Ubuntu, etc.)*
 
-Download the appropriate `.deb` package for your system from the [releases page](https://github.com/plaintool/Notetask/releases), or use `wget` directly:
-```bash
-wget https://github.com/plaintool/notetask/releases/download/v1.1.2/notetask-1.1.2.deb
-sudo apt install ./notetask-1.1.2.deb
-```
+Download the appropriate `.deb` package for your system from the [releases page](https://github.com/plaintool/Notetask/releases), or use `wget` directly. An example of using `wget` is provided on the release page.
+
 If you downloaded the package manually, you can also install it via:
 ```bash
 sudo dpkg -i /path/to/notetask.deb
@@ -184,13 +183,10 @@ If there are missing dependencies, fix them by running:
 sudo apt-get install -f
 ```
 
-### *Fedora-like systems*
+### *RPM-based systems (Fedora, RHEL, CentOS, openSUSE, etc.)*
 
-Download the appropriate `.rpm` package for your system, or use `wget` directly:
-```bash
-wget https://github.com/plaintool/notetask/releases/download/v1.1.2/notetask-1.1.2.rpm
-sudo rpm -i ./notetask-1.1.2.rpm
-```
+Download the appropriate `.rpm` package for your system, or use `wget` directly. An example of using `wget` is provided on the release page.
+
 If you downloaded the package manually, you can also install it via:
 ```bash
 sudo dnf install /path/to/notetask.rpm
