@@ -64,4 +64,3 @@ if not "%CERTFILE%"=="" (
 )
 
 echo Build and signing notetask-%VERSION%-any-x86-x64.exe completed successfully!
-pause
