@@ -832,7 +832,7 @@ msgstr "축소"
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
-msgstr "노트 작업"
+msgstr "Notetask"
 
 #: tformnotetask.contextansi.caption
 msgid "ANSI"
@@ -1090,4 +1090,3 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
-

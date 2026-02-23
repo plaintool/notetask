@@ -832,7 +832,7 @@ msgstr "Зменшити"
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
-msgstr "Завдання нотатки"
+msgstr "Notetask"
 
 #: tformnotetask.contextansi.caption
 msgid "ANSI"
@@ -1090,4 +1090,3 @@ msgstr "Знайти що:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Замінити на:"
-

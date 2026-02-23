@@ -832,7 +832,7 @@ msgstr "Verkleinern"
 #: tformnotetask.caption
 msgctxt "tformnotetask.caption"
 msgid "Notetask"
-msgstr "Notizaufgabe"
+msgstr "Notetask"
 
 #: tformnotetask.contextansi.caption
 msgid "ANSI"
@@ -1090,4 +1090,3 @@ msgstr "Was suchen:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Ersetzen durch:"
-
