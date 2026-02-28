@@ -140,7 +140,7 @@ begin
     // Write to file
     with TStringList.Create do
     try
-      Add(JSONObj.AsJSON);
+      Text := JSONObj.FormatJSON;
       SaveToFile(FileName);
     finally
       Free;
@@ -395,7 +395,7 @@ begin
     // Write the JSON object back to the file
     FileStream := TFileStream.Create(FileName, fmCreate);
     try
-      FileStream.Write(Pointer(JSONFile.AsJSON)^, Length(JSONFile.AsJSON));
+      FileStream.Write(Pointer(JSONFile.FormatJSON)^, Length(JSONFile.FormatJSON));
     finally
       FileStream.Free;
     end;
