@@ -77,7 +77,9 @@ var
   TagArr: TJSONArray;
   ItemObj: TJSONObject;
   i: integer;
+  DPI: integer;
 begin
+  DPI := Screen.PixelsPerInch;
   FileName := GetSettingsDirectory('form_settings.json'); // Get settings file name
   ForceDirectories(GetSettingsDirectory); // Ensure the directory exists
   JSONObj := TJSONObject.Create;
@@ -85,15 +87,15 @@ begin
     // Save form position and size
     if (Form.WindowState in [wsMaximized, wsMinimized]) then
     begin
-      JSONObj.Add('Left', Form.ScaleFormTo96(Form.RestoredLeft));
-      JSONObj.Add('Top', Form.ScaleFormTo96(Form.RestoredTop));
+      JSONObj.Add('Left', Round(Form.RestoredLeft * 96 / DPI));
+      JSONObj.Add('Top', Round(Form.RestoredTop * 96 / DPI));
       JSONObj.Add('Width', Form.ScaleFormTo96(Form.RestoredWidth));
       JSONObj.Add('Height', Form.ScaleFormTo96(Form.RestoredHeight));
     end
     else
     begin
-      JSONObj.Add('Left', Form.ScaleFormTo96(Form.Left));
-      JSONObj.Add('Top', Form.ScaleFormTo96(Form.Top));
+      JSONObj.Add('Left', Round(Form.Left * 96 / DPI));
+      JSONObj.Add('Top', Round(Form.Top * 96 / DPI));
       JSONObj.Add('Width', Form.ScaleFormTo96(Form.Width));
       JSONObj.Add('Height', Form.ScaleFormTo96(Form.Height));
     end;
@@ -163,8 +165,10 @@ var
   TagStr: string;
   ColVal: TColor;
   i: integer;
+  DPI: integer;
 begin
   Result := False;
+  DPI := Screen.PixelsPerInch;
   FileContent := string.Empty;
   FileName := GetSettingsDirectory('form_settings.json'); // Get the settings file name
   if not FileExists(FileName) then Exit; // Exit if the file does not exist
@@ -180,10 +184,10 @@ begin
 
       // Check and load form's position and size
       if JSONObj.FindPath('Left') <> nil then
-        Form.Left := Form.Scale96ToForm(JSONObj.FindPath('Left').AsInteger);
+        Form.Left := Round(JSONObj.FindPath('Left').AsInteger * DPI / 96);
 
       if JSONObj.FindPath('Top') <> nil then
-        Form.Top := Form.Scale96ToForm(JSONObj.FindPath('Top').AsInteger);
+        Form.Top := Round(JSONObj.FindPath('Top').AsInteger * DPI / 96);
 
       if JSONObj.FindPath('Width') <> nil then
         Form.Width := Form.Scale96ToForm(JSONObj.FindPath('Width').AsInteger);
