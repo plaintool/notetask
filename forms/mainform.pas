@@ -4405,7 +4405,7 @@ end;
 
 procedure TformNotetask.aAboutExecute(Sender: TObject);
 begin
-  formAboutNotetask := TformAboutNotetask.Create(nil);
+  formAboutNotetask := TformAboutNotetask.Create(Application);
   try
     formAboutNotetask.Left := Self.Left + 100;
     formAboutNotetask.Top := Self.Top + 100;
@@ -4592,7 +4592,7 @@ end;
 
 procedure TformNotetask.aDonateExecute(Sender: TObject);
 begin
-  formDonateNotetask := TformDonateNotetask.Create(nil);
+  formDonateNotetask := TformDonateNotetask.Create(Application);
   try
     formDonateNotetask.Left := Self.Left + 100;
     formDonateNotetask.Top := Self.Top + 100;
