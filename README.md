@@ -1,4 +1,5 @@
 # Notetask
+
 A simple application for creating and organizing task lists, offering essential features for efficient task management, similar to Notepad in its simplicity and functionality.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -35,7 +36,8 @@ This handy desktop app helps you organize your tasks, capture ideas, and manage 
 
 It is designed to help you quickly organize a large number of small routine tasks. You can enter tasks directly in the app or paste raw text from the clipboard — such as a list of requirements or ideas — then sort them into groups, set durations or amounts, and start working right away. Perfect for managing project to-dos, bug lists, feature requests, and other ongoing tasks.
 
-## Features:
+## Features
+
 - **Numbering** — Tasks are numbered automatically based on their order of appearance in the file
 - **Multiline** — Tasks and notes with an option to submit or insert a line break when pressing Enter
 - **Tags** — task tag support with bulk tag editing, tag choice from existing items, auto or custom tag color, sorting, and optional tag suffixes
@@ -58,34 +60,39 @@ It is designed to help you quickly organize a large number of small routine task
 - **Status bar summary** — shows totals of dates and amounts separately for **completed** and **incomplete** tasks
 
 ### Shopping list
+
 **Notetask** allows you to keep a shopping list with item prices and see the total cost in the status bar, including the cost of purchased items.
 
 ![sample2](samples/sample2.png)
 
 ### Notes
+
 Suitable for note-taking with an optional general note field at the bottom of the application window, as well as support for paged grouping and all task management features.
 
 ![sample3](samples/sample3.png)
 
 ### Personal Information
+
 Suitable for storing personal information in encrypted files, with secure access and optional grouping for better organization. Highlights duplicate data.
 
-![sample5](samples/sample4.png)
+![sample4](samples/sample4.png)
 
 Supports advanced features such as executing selected comments, tasks, or the entire script from notes as console commands.
 
-![sample4](samples/powershell.png)
+![powershell](samples/powershell.png)
 
 ### Encryption
+
 Notetask can encrypts files using AES-256 in CBC mode with a key derived via PBKDF2-HMAC-SHA256. The derived 64-byte key is split into a 32-byte encryption key and a 32-byte HMAC key. Files are compressed using zlib before encryption, and a SHA-256 HMAC over the salt, IV, and ciphertext ensures integrity and authenticity.
 
 The user can save an encrypted binary file with password protection. If the password is left empty, the file is still encrypted but without password protection, storing only the compressed data in the encrypted format.
 
 To save an encrypted file, the corresponding format must be selected in the file save dialog.
 
-![statusbar](samples/encrypt.png)
+![encrypt](samples/encrypt.png)
 
 ### Shortcuts
+
 Nearly all major features can be accessed through convenient keyboard shortcuts.  
 View menu settings are saved individually based on filename.
  
@@ -104,7 +111,7 @@ The status bar provides a concise, real-time overview of the current task list. 
 
 ## Demo
 
-![statusbar](samples/demo.gif)
+![demo](samples/demo.gif)
 
 ## File Format
 
@@ -115,6 +122,7 @@ The status bar provides a concise, real-time overview of the current task list. 
 - [x] Date, Amount, ~~**Text `tag`**~~ // Note #texttag <br>
 ```
 ### Legend
+
 *All fields are optional. A task line may include any combination of them.*
 - `## Group` — the group title, marking the start of a set of related tasks  
 - `// Tooltip` — tooltip with the group description
@@ -214,6 +222,7 @@ sudo dnf install -y xterm
 ```
 
 ## Featured on
+
 Notetask has been reviewed and listed on reputable software directories:
 
 [![MajorGeeks](https://img.shields.io/badge/MajorGeeks-Visit-darkolivegreen?style=for-the-badge)](https://www.majorgeeks.com/files/details/notetask.html)
