@@ -34,7 +34,7 @@
 	</Company_Info>
 	<Program_Info>
 		<Program_Name>Notetask</Program_Name>
-		<Program_Version>1.1.1</Program_Version>
+		<Program_Version>1.1.2</Program_Version>
 		<Program_Release_Month>12</Program_Release_Month>
 		<Program_Release_Day>09</Program_Release_Day>
 		<Program_Release_Year>2025</Program_Release_Year>
@@ -109,10 +109,10 @@ Fixed Bugs
 			<Application_XML_File_URL>http://raw.githubusercontent.com/plaintool/notetask/refs/heads/main/installer/notetask.xml</Application_XML_File_URL>
 		</Application_URLs>
 		<Download_URLs>
-			<Primary_Download_URL>http://github.com/plaintool/notetask/releases/download/v1.1.1/notetask-1.1.1-any-x86-x64.exe</Primary_Download_URL>
+			<Primary_Download_URL>http://github.com/plaintool/notetask/releases/download/v1.1.2/notetask-1.1.2-any-x86-x64.exe</Primary_Download_URL>
 			<Secondary_Download_URL />
-			<Additional_Download_URL_1>http://github.com/plaintool/notetask/releases/download/v1.1.1/notetask-1.1.1-x64.msi</Additional_Download_URL_1>
-			<Additional_Download_URL_2>http://github.com/plaintool/notetask/releases/download/v1.1.1/notetask-1.1.1-x86.msi</Additional_Download_URL_2>
+			<Additional_Download_URL_1>http://github.com/plaintool/notetask/releases/download/v1.1.2/notetask-1.1.2-x64.msi</Additional_Download_URL_1>
+			<Additional_Download_URL_2>http://github.com/plaintool/notetask/releases/download/v1.1.2/notetask-1.1.2-x86.msi</Additional_Download_URL_2>
 		</Download_URLs>
 	</Web_Info>
 	<Permissions>
