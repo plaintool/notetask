@@ -131,6 +131,17 @@ footer#footer {
   box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
 }
 
+.mg-badge {
+  position: fixed;   /* always on screen */
+  right: 20px;       /* distance from right edge */
+  bottom: 20px;      /* distance from bottom */
+  z-index: 9999;     /* stay on top */
+}
+
+.mg-badge img {
+  display: block;
+}
+
 .zoom-img {
     cursor: pointer;
 }
