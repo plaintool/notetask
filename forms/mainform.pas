@@ -3227,6 +3227,7 @@ begin
     if (TempRect.Width > 0) or (TempRect.Height > 0) then
       taskGrid.Selection := TRect.Create(TempRect.Left, TempRect.Top, TempRect.Right, TempRect.Bottom);
     taskGrid.TopRow := TempTopRow;
+    ChangeLastText;
     SetFilter;
     SetInfo;
     SetNote;
