@@ -934,8 +934,8 @@ begin
         WordStr := Copy(S, Start, i - Start + 1); // Extract the block content
 
         // Validate block: length requirements and no line breaks
-        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and
-           (Pos(#13, WordStr) = 0) and (Pos(#10, WordStr) = 0) then
+        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and (Pos(#13, WordStr) = 0) and
+          (Pos(#10, WordStr) = 0) then
         begin
           // Remove single preceding space from NewS if present
           if (Length(NewS) > 0) and (NewS[Length(NewS)] = ' ') then
@@ -1008,8 +1008,8 @@ begin
         // Found a closing backtick
         WordStr := Copy(S, Start, i - Start + 1);
         // Check if it's a valid tag (length, no line breaks)
-        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and
-           (Pos(#13, WordStr) = 0) and (Pos(#10, WordStr) = 0) then
+        if (Length(WordStr) > 2) and (Length(WordStr) <= MaxTagLength) and (Pos(#13, WordStr) = 0) and
+          (Pos(#10, WordStr) = 0) then
         begin
           // Valid tag: add to list and remove from output
           List.Add(StringReplace(WordStr, '`', '', [rfReplaceAll]));
@@ -1045,25 +1045,44 @@ begin
       end;
     end;
 
-    // Process regular prefix tags when Backtick is False, or when in Backtick mode but no valid backtick tag was found
-    if (not Backtick) and (S[i] in ['@', '#', '%', '+', '$']) and ((i = 1) or (S[i-1] in [#32, #13, #10])) then
+    // Process regular prefix tags with Unicode support
+    // Rule: Tag starts with prefix and must be preceded by a space or start of string
+    if (not Backtick) and (S[i] in ['@', '#', '%', '+', '$']) and ((i = 1) or (S[i - 1] = ' ')) then
     begin
       Start := i;
       Inc(i);
-      // Collect alphanumeric characters, hyphens, and underscores
-      // Also check that we have at least one alphanumeric character
       HasAlphaNum := False;
-      while (i <= Length(S)) and (S[i] in ['0'..'9', 'A'..'Z', 'a'..'z', '-', '_']) and (i - Start < MaxTagLength) do
+
+      // Scan until an invalid character or max length is reached
+      while (i <= Length(S)) and (i - Start < MaxTagLength) do
       begin
-        if S[i] in ['0'..'9', 'A'..'Z', 'a'..'z'] then
+            { Unicode logic: If the character is within the ASCII range (0..127)
+              and is NOT a letter, digit, hyphen, or underscore, it's a delimiter.
+              Characters above #127 (Unicode/Cyrillic) are treated as part of the tag. }
+        if (S[i] <= #127) and not (S[i] in ['a'..'z', 'A'..'Z', '0'..'9', '-', '_']) then
+          Break;
+
+        // Ensure the tag contains at least one alphanumeric character (not just -- or __)
+        if not (S[i] in ['-', '_']) then
           HasAlphaNum := True;
+
         Inc(i);
       end;
 
-      WordStr := Copy(S, Start, i - Start);
-      // Add tag if length is valid and contains at least one alphanumeric character
-      if (Length(WordStr) > 1) and (Length(WordStr) <= MaxTagLength) and HasAlphaNum and not TryStrToFloat(WordStr, Num) then
-        List.Add(WordStr);
+      // STRICT VALIDATION OF TAG ENDING
+      // Rule: Tag must end at string end, at a space, or at [,;] followed by a space.
+      // If stopped by any other character (like @ or .), it's not a valid tag.
+      if (i > Start + 1) and HasAlphaNum then
+      begin
+        if (i > Length(S)) or (S[i] = ' ') or ((S[i] in [',', ';', '.']) and (i < Length(S)) and (S[i + 1] = ' ')) then
+        begin
+          WordStr := Copy(S, Start, i - Start);
+          // Final check to ensure it's not a plain number
+          if not TryStrToFloat(WordStr, Num) then
+            List.Add(WordStr);
+        end;
+      end;
+      // Note: We don't use 'Continue' here so the loop naturally moves to the next character
     end
     else
     begin

@@ -638,6 +638,7 @@ type
     procedure PanelMemoEnter(Sender: TObject);
     procedure PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure MemoEnter(Sender: TObject);
+    procedure MemoExit(Sender: TObject);
     procedure MemoChange(Sender: TObject);
     procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure MemoKeyPress(Sender: TObject; var Key: char);
@@ -2416,6 +2417,7 @@ begin
     EditControlSetBounds(PanelMemo, aCol, aRow);
     Memo.PopupMenu := PopupMemo;
     Memo.OnEnter := @MemoEnter; // Event Enter
+    Memo.OnExit := @MemoExit; // Event Exit
     Memo.OnChange := @MemoChange; // Event Change
     Memo.OnKeyDown := @MemoKeyDown; // Event KeyDown
     Memo.OnMouseDown := @MemoNoteMouseDown; // Event MouseDown
@@ -4709,7 +4711,7 @@ begin
     {$ENDIF}
   end
   else
-  if (Key = VK_BACK) then
+  if (Key = VK_BACK) then // Backspace
   begin
     if memoNote.SelLength > 0 then
     begin
@@ -4819,6 +4821,13 @@ begin
       taskGrid.SetFocus;
 end;
 
+procedure TformNotetask.memoNoteKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
+begin
+  FNoteLastSelText := (Sender as TMemo).SelText;
+  FNoteLastSelStart := (Sender as TMemo).SelStart;
+  FNoteLastSelLength := (Sender as TMemo).SelLength;
+end;
+
 procedure TformNotetask.memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   if (Button = mbMiddle) and (ssCtrl in Shift) then // Middle button + Ctrl
@@ -4869,13 +4878,6 @@ begin
       aZoomOut.Execute;
     Handled := True;
   end;
-end;
-
-procedure TformNotetask.memoNoteKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
-begin
-  FNoteLastSelText := (Sender as TMemo).SelText;
-  FNoteLastSelStart := (Sender as TMemo).SelStart;
-  FNoteLastSelLength := (Sender as TMemo).SelLength;
 end;
 
 procedure TformNotetask.memoNoteChange(Sender: TObject);
@@ -6179,16 +6181,9 @@ begin
   end;
 end;
 
-procedure TformNotetask.MemoKeyPress(Sender: TObject; var Key: char);
+procedure TformNotetask.MemoExit(Sender: TObject);
 begin
-  // Event KeyPress for Amount column only
-  // Replace comma with dot for decimal input
-  if Key in ['.', ','] then
-    Key := DefaultFormatSettings.DecimalSeparator;
-
-  // Allow digits and one decimal point
-  if not (Key in ['0'..'9', DefaultFormatSettings.DecimalSeparator, '-', '+', '/', '*', '%', '^', '(', ')', ' ', #8, #13]) then
-    Key := #0; // Block other keys
+  EditComplete;
 end;
 
 procedure TformNotetask.MemoChange(Sender: TObject);
@@ -6203,6 +6198,18 @@ begin
     SetNote;
   if (taskGrid.Col = COL_AMOUNT) then
     SetInfo;
+end;
+
+procedure TformNotetask.MemoKeyPress(Sender: TObject; var Key: char);
+begin
+  // Event KeyPress for Amount column only
+  // Replace comma with dot for decimal input
+  if Key in ['.', ','] then
+    Key := DefaultFormatSettings.DecimalSeparator;
+
+  // Allow digits and one decimal point
+  if not (Key in ['0'..'9', DefaultFormatSettings.DecimalSeparator, '-', '+', '/', '*', '%', '^', '(', ')', ' ', #8, #13]) then
+    Key := #0; // Block other keys
 end;
 
 procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
