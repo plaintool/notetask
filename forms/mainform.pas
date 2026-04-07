@@ -3695,11 +3695,16 @@ begin
   FillGrid;
   if (newRow > -1) then
   begin
-    ResetRowHeight(True, -1);
-    taskGrid.Row := newRow;
-    taskGrid.Col := selCol;
-    taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
-    ResetRowHeight(True, -1);
+    taskGrid.OnSelection := nil;
+    try
+      ResetRowHeight(True, -1);
+      taskGrid.Row := newRow;
+      taskGrid.Col := selCol;
+      taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
+      ResetRowHeight(True, -1);
+    finally
+      taskGrid.OnSelection := @taskGridSelection;
+    end;
   end;
   SetChanged;
   SetNote;
@@ -3728,11 +3733,16 @@ begin
   FillGrid;
   if (newRow > -1) then
   begin
-    ResetRowHeight(True, -1);
-    taskGrid.Row := newRow;
-    taskGrid.Col := selCol;
-    taskGrid.Selection := TGridRect.Create(selLeft, newRow - selLen + 1, selRight, newRow);
-    ResetRowHeight(True, -1);
+    taskGrid.OnSelection := nil;
+    try
+      ResetRowHeight(True, -1);
+      taskGrid.Row := newRow;
+      taskGrid.Col := selCol;
+      taskGrid.Selection := TGridRect.Create(selLeft, newRow - selLen + 1, selRight, newRow);
+      ResetRowHeight(True, -1);
+    finally
+      taskGrid.OnSelection := @taskGridSelection;
+    end;
   end;
   SetChanged;
   SetNote;
