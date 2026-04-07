@@ -3763,15 +3763,17 @@ begin
       selEnd := newRow + selLen - 1
     else
       selEnd := newRow - selLen - 1;
+
+    ResetRowHeight;
+    SetTabs;
+    SetChanged;
+    SetNote;
+    SetTags;
+    SetInfo;
+
     taskGrid.Col := selCol;
     taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
   end;
-  ResetRowHeight;
-  SetTabs;
-  SetChanged;
-  SetNote;
-  SetTags;
-  SetInfo;
 end;
 
 procedure TformNotetask.aMoveTaskRightExecute(Sender: TObject);
@@ -3800,15 +3802,17 @@ begin
       selEnd := newRow + selLen - 1
     else
       selEnd := newRow - selLen - 1;
+
+    ResetRowHeight;
+    SetTabs;
+    SetChanged;
+    SetNote;
+    SetTags;
+    SetInfo;
+
     taskGrid.Col := selCol;
     taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
   end;
-  ResetRowHeight;
-  SetTabs;
-  SetChanged;
-  SetNote;
-  SetTags;
-  SetInfo;
 end;
 
 procedure TformNotetask.aIndentTasksExecute(Sender: TObject);
