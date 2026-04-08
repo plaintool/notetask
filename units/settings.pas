@@ -104,6 +104,7 @@ begin
     JSONObj.Add('EnterSubmit', Form.EnterSubmit);
     JSONObj.Add('BidiRightToLeft', Form.BiDiRightToLeft);
     JSONObj.Add('Language', Language);
+    JSONObj.Add('AutoCheckUpdates', Form.AutoCheckUpdates);
 
     // Save font
     JSONObj.Add('FontName', Form.Font.Name);
@@ -220,6 +221,9 @@ begin
           if (JSONObj.FindPath('Language').AsString <> string.Empty) and (Language <> JSONObj.FindPath('Language').AsString) then
             Language := JSONObj.FindPath('Language').AsString;
         end;
+
+        if JSONObj.FindPath('AutoCheckUpdates') <> nil then
+          Form.AutoCheckUpdates := JSONObj.FindPath('AutoCheckUpdates').AsBoolean;
 
         // Printer
         if JSONObj.FindPath('PrinterPaperName') <> nil then

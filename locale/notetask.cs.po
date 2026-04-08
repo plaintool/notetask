@@ -454,6 +454,10 @@ msgstr "O programu..."
 msgid "Archive tasks ↔"
 msgstr "Archivovat úkoly ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "Automatická kontrola aktualizací"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "Směr čtení: zprava doleva"
@@ -1090,4 +1094,3 @@ msgstr "Co najít:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Čím nahradit:"
-

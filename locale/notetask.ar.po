@@ -454,6 +454,10 @@ msgstr "حول..."
 msgid "Archive tasks ↔"
 msgstr "أرشفة المهام ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "التحقق التلقائي من التحديثات"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "ترتيب القراءة: من اليمين إلى اليسار"

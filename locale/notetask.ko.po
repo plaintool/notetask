@@ -454,6 +454,10 @@ msgstr "정보..."
 msgid "Archive tasks ↔"
 msgstr "작업 아카이브 ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "자동 업데이트 확인"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "읽기 순서: 오른쪽에서 왼쪽으로"

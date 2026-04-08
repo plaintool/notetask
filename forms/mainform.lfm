@@ -488,7 +488,7 @@ object formNotetask: TformNotetask
       object menuRenameGroup: TMenuItem
         Action = aRenameGroup
       end
-      object MenuItem1: TMenuItem
+      object menuEditGroupTooltip: TMenuItem
         Action = aEditGroupTooltip
       end
       object Separator16: TMenuItem
@@ -608,19 +608,19 @@ object formNotetask: TformNotetask
         object menuChinese: TMenuItem
           Action = aLangChinese
         end
-        object MenuItem3: TMenuItem
+        object menuCzech: TMenuItem
           Action = aLangCzech
         end
-        object MenuItem4: TMenuItem
+        object menuDanish: TMenuItem
           Action = aLangDanish
         end
-        object MenuItem5: TMenuItem
+        object menuDutch: TMenuItem
           Action = aLangDutch
         end
         object menuEnglish: TMenuItem
           Action = aLangEnglish
         end
-        object MenuItem6: TMenuItem
+        object menuFinnish: TMenuItem
           Action = aLangFinnish
         end
         object menuFrench: TMenuItem
@@ -629,16 +629,16 @@ object formNotetask: TformNotetask
         object menuGerman: TMenuItem
           Action = aLangGerman
         end
-        object MenuItem7: TMenuItem
+        object menuGreek: TMenuItem
           Action = aLangGreek
         end
-        object MenuItem8: TMenuItem
+        object menuHebrew: TMenuItem
           Action = aLangHebrew
         end
         object menuHindi: TMenuItem
           Action = aLangHindi
         end
-        object MenuItem9: TMenuItem
+        object menuIndonesian: TMenuItem
           Action = aLangIndonesian
         end
         object menuItalian: TMenuItem
@@ -650,13 +650,13 @@ object formNotetask: TformNotetask
         object menuKorean: TMenuItem
           Action = aLangKorean
         end
-        object MenuItem10: TMenuItem
+        object menuPolish: TMenuItem
           Action = aLangPolish
         end
         object menuPortuguese: TMenuItem
           Action = aLangPortuguese
         end
-        object MenuItem11: TMenuItem
+        object menuRomanian: TMenuItem
           Action = aLangRomanian
         end
         object menuRussian: TMenuItem
@@ -665,10 +665,10 @@ object formNotetask: TformNotetask
         object menuSpanish: TMenuItem
           Action = aLangSpanish
         end
-        object MenuItem12: TMenuItem
+        object menuSwedish: TMenuItem
           Action = aLangSwedish
         end
-        object MenuItem13: TMenuItem
+        object menuTurkish: TMenuItem
           Action = aLangTurkish
         end
         object menuUkrainian: TMenuItem
@@ -680,6 +680,10 @@ object formNotetask: TformNotetask
       end
       object menuDonate: TMenuItem
         Action = aDonate
+      end
+      object menuAutoCheckUpdates: TMenuItem
+        Action = aAutoCheckUpdates
+        AutoCheck = True
       end
       object menuCheckforupdates: TMenuItem
         Action = aCheckforupdates
@@ -973,21 +977,6 @@ object formNotetask: TformNotetask
       ShortCut = 16473
       OnExecute = aSaveNotesAsExecute
     end
-    object aCheckforupdates: TAction
-      Category = 'Help'
-      Caption = 'Check for updates'
-      OnExecute = aCheckforupdatesExecute
-    end
-    object aDonate: TAction
-      Category = 'Help'
-      Caption = 'Buy me a coffee...'
-      OnExecute = aDonateExecute
-    end
-    object aAbout: TAction
-      Category = 'Help'
-      Caption = 'About...'
-      OnExecute = aAboutExecute
-    end
     object aEditGroupTooltip: TAction
       Category = 'Group'
       Caption = 'Edit Group Tooltip'
@@ -1258,6 +1247,28 @@ object formNotetask: TformNotetask
       Caption = 'Ukrainian'
       OnExecute = aLangUkrainianExecute
     end
+    object aAutoCheckUpdates: TAction
+      Category = 'Help'
+      AutoCheck = True
+      Caption = 'Auto check updates'
+      Checked = True
+      OnExecute = aAutoCheckUpdatesExecute
+    end
+    object aCheckforupdates: TAction
+      Category = 'Help'
+      Caption = 'Check for updates'
+      OnExecute = aCheckforupdatesExecute
+    end
+    object aDonate: TAction
+      Category = 'Help'
+      Caption = 'Buy me a coffee...'
+      OnExecute = aDonateExecute
+    end
+    object aAbout: TAction
+      Category = 'Help'
+      Caption = 'About...'
+      OnExecute = aAboutExecute
+    end
   end
   object openDialog: TOpenDialog
     Title = 'Opening'
@@ -1380,19 +1391,19 @@ object formNotetask: TformNotetask
   object PopupTabs: TPopupMenu
     Left = 160
     Top = 240
-    object ContextInsertGroup: TMenuItem
+    object contextInsertGroup: TMenuItem
       Action = aInsertGroup
     end
-    object ContextDuplicateGroup: TMenuItem
+    object contextDuplicateGroup: TMenuItem
       Action = aDuplicateGroup
     end
-    object ContextDeleteGroup: TMenuItem
+    object contextDeleteGroup: TMenuItem
       Action = aDeleteGroup
     end
-    object ContextRenameGroup: TMenuItem
+    object contextRenameGroup: TMenuItem
       Action = aRenameGroup
     end
-    object MenuItem2: TMenuItem
+    object contextEditGroupTooltip: TMenuItem
       Action = aEditGroupTooltip
     end
   end

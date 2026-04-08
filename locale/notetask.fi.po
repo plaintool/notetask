@@ -454,6 +454,10 @@ msgstr "Tietoja..."
 msgid "Archive tasks ↔"
 msgstr "Arkistoi tehtävät ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "Automaattinen päivitysten tarkistus"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "Lukujärjestys: oikealta vasemmalle"
@@ -1090,4 +1094,3 @@ msgstr "Etsi mitä:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Korvaa tällä:"
-

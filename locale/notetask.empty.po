@@ -451,6 +451,10 @@ msgstr ""
 msgid "Archive tasks ↔"
 msgstr ""
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr ""
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr ""

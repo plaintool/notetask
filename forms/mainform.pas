@@ -49,6 +49,7 @@ type
     aAbout: TAction;
     aCopy: TAction;
     aCheckforupdates: TAction;
+    aAutoCheckUpdates: TAction;
     aLangTurkish: TAction;
     aLangGreek: TAction;
     aLangHebrew: TAction;
@@ -133,17 +134,18 @@ type
     contextZoom140: TMenuItem;
     contextZoom150: TMenuItem;
     ImagesBtn: TImageList;
-    MenuItem10: TMenuItem;
-    MenuItem11: TMenuItem;
-    MenuItem12: TMenuItem;
-    MenuItem13: TMenuItem;
-    MenuItem3: TMenuItem;
-    MenuItem4: TMenuItem;
-    MenuItem5: TMenuItem;
-    MenuItem6: TMenuItem;
-    MenuItem7: TMenuItem;
-    MenuItem8: TMenuItem;
-    MenuItem9: TMenuItem;
+    menuPolish: TMenuItem;
+    menuRomanian: TMenuItem;
+    menuSwedish: TMenuItem;
+    menuTurkish: TMenuItem;
+    menuAutoCheckUpdates: TMenuItem;
+    menuCzech: TMenuItem;
+    menuDanish: TMenuItem;
+    menuDutch: TMenuItem;
+    menuFinnish: TMenuItem;
+    menuGreek: TMenuItem;
+    menuHebrew: TMenuItem;
+    menuIndonesian: TMenuItem;
     menuZoomIn: TMenuItem;
     menuZoomOut: TMenuItem;
     menuDefaultZoom: TMenuItem;
@@ -181,8 +183,8 @@ type
     menuHideNoteText: TMenuItem;
     contextSplitTasks: TMenuItem;
     menuCheckforupdates: TMenuItem;
-    MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
+    menuEditGroupTooltip: TMenuItem;
+    contextEditGroupTooltip: TMenuItem;
     menuFilter: TMenuItem;
     contextDeleteTags: TMenuItem;
     menuSplitTasks: TMenuItem;
@@ -351,11 +353,12 @@ type
     Separator16: TMenuItem;
     menuMoveGroupRight: TMenuItem;
     PopupTabs: TPopupMenu;
-    ContextInsertGroup: TMenuItem;
+    contextInsertGroup: TMenuItem;
     contextInsertTask: TMenuItem;
-    ContextRenameGroup: TMenuItem;
-    ContextDuplicateGroup: TMenuItem;
-    ContextDeleteGroup: TMenuItem;
+    contextRenameGroup: TMenuItem;
+    contextDuplicateGroup: TMenuItem;
+    contextDeleteGroup: TMenuItem;
+    procedure aAutoCheckUpdatesExecute(Sender: TObject);
     procedure aCheckforupdatesExecute(Sender: TObject);
     procedure aEditGroupTooltipExecute(Sender: TObject);
     procedure aFilterExecute(Sender: TObject);
@@ -583,6 +586,7 @@ type
     FLineCount: integer;
     FWordWrap: boolean;
     FEnterSubmit: boolean;
+    FAutoCheckUpdates: boolean;
     FSortOrder: TSortOrder;
     FSortColumn: integer;
     FMatchCase: boolean;
@@ -775,6 +779,7 @@ type
     property ReadOnly: boolean read FReadOnly write SetReadOnly;
     property WordWrap: boolean read FWordWrap write FWordWrap;
     property EnterSubmit: boolean read FEnterSubmit write FEnterSubmit;
+    property AutoCheckUpdates: boolean read FAutoCheckUpdates write FAutoCheckUpdates;
     property BiDiRightToLeft: boolean read FBiDiRightToLeft write SetBiDiRightToLeft;
     property ShowArchived: boolean read FShowArchived write SetShowArchived;
     property ShowDuration: boolean read FShowDuration write SetShowDuration;
@@ -957,6 +962,7 @@ begin
   FReadOnly := False;
   FWordWrap := True;
   FEnterSubmit := True;
+  FAutoCheckUpdates := True;
   FShowTime := True;
   FHideNoteText := False;
   FShowStatusBar := True;
@@ -1031,6 +1037,7 @@ begin
   aWordWrap.Checked := FWordWrap;
   memoNote.WordWrap := FWordWrap;
   aEnterSubmit.Checked := FEnterSubmit;
+  aAutoCheckUpdates.Checked := FAutoCheckUpdates;
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
   aShowArchived.Checked := FShowArchived;
   ShowTags := FShowTags;
@@ -1134,6 +1141,10 @@ begin
   AdjustMultiButton;
 
   if (ReadOnly) then ShowMessage(rfilereadonly);
+
+  // Check new version if needed
+  if AutoCheckUpdates then
+    CheckGithubLatestVersion(True);
 end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -3605,6 +3616,13 @@ end;
 procedure TformNotetask.aCheckforupdatesExecute(Sender: TObject);
 begin
   CheckGithubLatestVersion;
+end;
+
+procedure TformNotetask.aAutoCheckUpdatesExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  FAutoCheckUpdates := aAutoCheckUpdates.Checked;
 end;
 
 procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);

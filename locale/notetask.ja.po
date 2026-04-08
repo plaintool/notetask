@@ -454,6 +454,10 @@ msgstr "このアプリについて..."
 msgid "Archive tasks ↔"
 msgstr "タスクをアーカイブ ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "自動更新チェック"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "読みの順序：右から左"

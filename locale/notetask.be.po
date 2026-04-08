@@ -454,6 +454,10 @@ msgstr "Пра..."
 msgid "Archive tasks ↔"
 msgstr "Архіваваць задачы ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "Аўта праверка абнаўленняў"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "Напрамак чытання: справа налева"
@@ -1090,4 +1094,3 @@ msgstr "Знайсці што:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Замяніць на:"
-

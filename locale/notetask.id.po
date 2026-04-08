@@ -454,6 +454,10 @@ msgstr "Tentang..."
 msgid "Archive tasks ↔"
 msgstr "Arsipkan tugas ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "Periksa update otomatis"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "Urutan baca: kanan ke kiri"
@@ -1090,4 +1094,3 @@ msgstr "Cari:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Ganti dengan:"
-

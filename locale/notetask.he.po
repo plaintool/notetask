@@ -454,6 +454,10 @@ msgstr "אודות..."
 msgid "Archive tasks ↔"
 msgstr "העלה למחסנית משימות ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "בדיקה אוטומטית של עדכונים"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "סדר קריאה: מימין לשמאל"
@@ -1090,4 +1094,3 @@ msgstr "מצא מה:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "החלף ב:"
-

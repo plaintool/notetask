@@ -454,6 +454,10 @@ msgstr "Hakkında..."
 msgid "Archive tasks ↔"
 msgstr "Görevleri arşivle ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "Otomatik güncelleme kontrolü"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "Okuma sırası: sağdan sola"
@@ -1090,4 +1094,3 @@ msgstr "Aranan:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Yeni değer:"
-

@@ -454,6 +454,10 @@ msgstr "关于..."
 msgid "Archive tasks ↔"
 msgstr "归档任务 ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "自动更新检查"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "阅读顺序：从右到左"

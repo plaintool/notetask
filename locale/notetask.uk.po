@@ -454,6 +454,10 @@ msgstr "Про програму..."
 msgid "Archive tasks ↔"
 msgstr "Архівувати завдання ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "Авто перевірка оновлень"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "Порядок читання: справа наліво"

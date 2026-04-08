@@ -344,11 +344,10 @@ msgid "USDT"
 msgstr ""
 
 #: tformdonatenotetask.labelurl.caption
-#, fuzzy
 #| msgid "https://changelly.com/buy-crypto?amount=15&from=usd"
 msgctxt "tformdonatenotetask.labelurl.caption"
 msgid "Changelly.com"
-msgstr "https://changelly.com/buy-crypto?amount=15&from=usd"
+msgstr ""
 
 #: tformdonatenotetask.labelurl.hint
 msgctxt "tformdonatenotetask.labelurl.hint"
@@ -455,6 +454,10 @@ msgstr "Σχετικά..."
 #: tformnotetask.aarchivetasks.caption
 msgid "Archive tasks ↔"
 msgstr "Αρχειοθετήστε εργασίες ↔"
+
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "Αυτόματος έλεγχος ενημερώσεων"
 
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
@@ -1092,4 +1095,3 @@ msgstr "Εύρεση:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Αντικατάσταση με:"
-

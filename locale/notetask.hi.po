@@ -454,6 +454,10 @@ msgstr "के बारे में..."
 msgid "Archive tasks ↔"
 msgstr "कार्य संग्रहीत करें ↔"
 
+#: tformnotetask.aautocheckupdates.caption
+msgid "Auto check updates"
+msgstr "अपडेट्स की ऑटो जांच"
+
 #: tformnotetask.abidirighttoleft.caption
 msgid "Reading order: right to left"
 msgstr "पढ़ने का क्रम: दाएं से बाएं"
