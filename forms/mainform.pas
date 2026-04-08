@@ -6357,12 +6357,12 @@ var
 begin
   if Assigned(Sender) then
   begin
-    if (Sender is TPanel) and (aRow > 0) and (aRow < taskGrid.RowCount) then
+    if (Sender is TPanel) and (aCol = COL_TASK) and (aRow > 0) and (aRow < taskGrid.RowCount) then
       Indent := Tasks.GetTask(aRow).FIndentLevel * Canvas.TextWidth(' ') * 2;
 
     Rect := taskGrid.CellRect(aCol, aRow);
     Sender.SetBounds(Rect.Left + OffsetLeft + Indent, Max(Rect.Top, taskGrid.RowHeights[0]) + OffsetTop,
-      Rect.Right - Rect.Left + OffsetRight,
+      Rect.Right - Rect.Left + OffsetRight - Indent,
       Rect.Bottom - Rect.Top + OffsetBottom);
   end;
 end;
