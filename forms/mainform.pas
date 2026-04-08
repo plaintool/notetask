@@ -549,6 +549,8 @@ type
     FChanged: boolean;
     FBackup: boolean;
     FReadOnly: boolean;
+    FFormSettingsLoaded: boolean;
+    FGridSettingsLoaded: boolean;
     FOriginalFontSize: integer;
     FMemoStartEdit: boolean;
     FMemoOldText: TCaption;
@@ -1022,8 +1024,8 @@ begin
   ResourceBitmapStarGray.TransparentColor := clFuchsia;
   ResourceBitmapStarGray.Transparent := True;
 
-  LoadFormSettings(Self, tagsEdit);
-  LoadGridSettings(Self, taskGrid, string.Empty);
+  FFormSettingsLoaded := LoadFormSettings(Self, tagsEdit);
+  FGridSettingsLoaded := LoadGridSettings(Self, taskGrid, string.Empty);
 
   // After load settings
   aWordWrap.Checked := FWordWrap;
@@ -1066,8 +1068,10 @@ end;
 
 procedure TformNotetask.FormDestroy(Sender: TObject);
 begin
-  SaveFormSettings(Self, tagsEdit);
-  SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+  if FFormSettingsLoaded then
+    SaveFormSettings(Self, tagsEdit);
+  if FGridSettingsLoaded then
+    SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
   // Free allocated resources
   Tasks.Free;
@@ -3154,7 +3158,8 @@ var
 begin
   if Screen.ActiveForm <> Self then exit;
 
-  SaveFormSettings(self, tagsEdit); // Save setting for new process
+  if FFormSettingsLoaded then
+    SaveFormSettings(self, tagsEdit); // Save setting for new process
 
   Process := TProcess.Create(nil); // Create a new process
   try
@@ -5040,7 +5045,7 @@ begin
     EditComplete;
 
     // Save settings for current file
-    if SaveSetting then
+    if SaveSetting and FGridSettingsLoaded then
       SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
     taskGrid.Clean;
@@ -5076,7 +5081,7 @@ begin
     ReadOnly := False;
 
     // Load saved settings for new file
-    LoadGridSettings(Self, taskGrid, string.Empty);
+    FGridSettingsLoaded := LoadGridSettings(Self, taskGrid, string.Empty);
 
     ApplyGridSettings;
     SetZoom(FZoom);
@@ -5109,7 +5114,7 @@ begin
     exit;
   end;
   // Save settings for current file
-  if (saveSettings) then
+  if saveSettings and FGridSettingsLoaded then
     SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
 
   EncryptedOld := FEncrypted;
@@ -5214,7 +5219,7 @@ begin
   Tasks := TTasks.Create(TextToStringList(Content));
 
   // Load saved settings for file
-  LoadGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+  FGridSettingsLoaded := LoadGridSettings(Self, taskGrid, ExtractFileName(FFileName));
   ApplyGridSettings;
   SetZoom(FZoom);
   SetFilter;
