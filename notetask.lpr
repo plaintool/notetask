@@ -33,8 +33,8 @@ uses
 begin
   RequireDerivedFormResource := True;
   Language := GetOSLanguage;
-  Application.Title := 'Notetask';
-  Application.Scaled := True;
+  Application.Title:='Notetask';
+  Application.Scaled:=True;
   Application.Initialize;
   {$IFDEF WINDOWS}
   ApplyDarkStyle;
