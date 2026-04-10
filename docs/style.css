@@ -131,6 +131,10 @@ footer#footer {
   box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
 }
 
+.centered {
+  text-align: center !important;
+}
+
 .mg-badge {
   position: fixed;   /* always on screen */
   right: 20px;       /* distance from right edge */
@@ -143,7 +147,7 @@ footer#footer {
 }
 
 .zoom-img {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .zoom-overlay {
