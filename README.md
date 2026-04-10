@@ -119,7 +119,7 @@ The status bar provides a concise, real-time overview of the current task list. 
 
 ```md
 ## Group // Tooltip
-- [x] Date, Amount, ~~**Text `tag`**~~ // Note #texttag <br>
+- [x] Date, Amount, ~~**[2-space indent]Text `tag`**~~ // Note #texttag <br>
 ```
 ### Legend
 
@@ -129,6 +129,7 @@ The status bar provides a concise, real-time overview of the current task list. 
 - `- [x] or - [ ]` — task completion status ([x] = done, [ ] = pending)
 - `Date` — task date and optional timestamp in ISO 8601 format `yyyy-MM-ddTHH:mm:ss`
 - `Amount` — numeric value related to the task (e.g., cost, quantity), using a dot `.` as the decimal separator
+- `2-space indent` — leading spaces before the task text define visual indentation (2 spaces = 1 level)
 - `~~**Text**~~` — task description, bold if marked as favorite with a star, and crossed out if archived (inactive regardless of completion)
 - ``` `tag` ``` — tags are collected from any position in the task text when enclosed in backticks, and after saving the task they are stored immediately after the task text, separated by a space
 - `// Note` — comment or additional information about the task
