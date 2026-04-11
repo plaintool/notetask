@@ -2564,6 +2564,7 @@ begin
   if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
     SetInfo;
 
+  FLastText := string.Empty;
   AdjustMultiButton;
 
   if (aRow <> FLastRow) or (taskGrid.Selection.Top <> FLastSelection.Top) or (taskGrid.Selection.Bottom <> FLastSelection.Bottom) then
