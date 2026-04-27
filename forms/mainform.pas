@@ -1097,6 +1097,7 @@ var
   FilePath: string;
   FileOpened: boolean;
   TagsHeight: integer;
+  Th: TCheckUpdateThread;
 begin
   Visible := False;
 
@@ -1144,7 +1145,10 @@ begin
 
   // Check new version if needed
   if AutoCheckUpdates then
-    CheckGithubLatestVersion(True);
+  begin
+    Th := TCheckUpdateThread.Create(False);
+    Th.FreeOnTerminate := True;
+  end;
 end;
 
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -3615,8 +3619,10 @@ begin
 end;
 
 procedure TformNotetask.aCheckforupdatesExecute(Sender: TObject);
+var
+  LatestVersion: string;
 begin
-  CheckGithubLatestVersion;
+  CheckGithubLatestVersion(LatestVersion, REPO);
 end;
 
 procedure TformNotetask.aAutoCheckUpdatesExecute(Sender: TObject);

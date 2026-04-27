@@ -46,6 +46,16 @@ uses
   fpjson,
   jsonparser;
 
+type
+  TCheckUpdateThread = class(TThread)
+  private
+    FLatestVersion: string;
+  protected
+    procedure Execute; override;
+    procedure UpdateAvailable;
+    procedure Finish;
+  end;
+
 function GetOSLanguage: string;
 
 function ApplicationTranslate(const Language: string; AForm: TCustomForm = nil): boolean;
@@ -62,7 +72,7 @@ function IsSystemKey(Key: word): boolean;
 
 function GetAppVersion: string;
 
-function CheckGithubLatestVersion(const Silent: boolean = False; const Repo: string = 'plaintool/notetask'): boolean;
+function CheckGithubLatestVersion(out Version: string; const Repo: string; const Silent: boolean = False): boolean;
 
 var
   Language: string;
@@ -72,7 +82,34 @@ resourcestring
   newversionuptodate = 'Your version is up to date.';
   newversioncheckerror = 'Error checking version:';
 
+const
+  REPO = 'plaintool/notetask';
+
 implementation
+
+procedure TCheckUpdateThread.Execute;
+begin
+  try
+    if CheckGithubLatestVersion(FLatestVersion, REPO, True) then
+    begin
+      Synchronize(@Finish);
+      Synchronize(@UpdateAvailable);
+    end;
+  finally
+    Synchronize(@Finish);
+  end;
+end;
+
+procedure TCheckUpdateThread.UpdateAvailable;
+begin
+  if MessageDlg(Format(newversion, [FLatestVersion]), mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+    OpenURL(Format('https://github.com/%s/releases/latest', [REPO]));
+end;
+
+procedure TCheckUpdateThread.Finish;
+begin
+  Screen.Cursor := crDefault;
+end;
 
 function GetOSLanguage: string;
   {platform-independent method to read the language of the user interface}
@@ -520,7 +557,7 @@ begin
   end;
 end;
 
-function CheckGithubLatestVersion(const Silent: boolean = False; const Repo: string = 'plaintool/notetask'): boolean;
+function CheckGithubLatestVersion(out Version: string; const Repo: string; const Silent: boolean = False): boolean;
 var
   JsonData: TJSONData;
   LatestVersion, Msg: string;
@@ -530,6 +567,7 @@ var
   ErrorMsg: string;
 
 {$IFDEF WINDOWS}
+
   function HttpGetWinInet(const AUrl: string): string;
   var
     hInet, hUrl: HINTERNET;
@@ -564,6 +602,7 @@ var
       InternetCloseHandle(hInet);
     end;
   end;
+
 {$ELSE}
 
   function HttpGetCurl(const AUrl: string): string;
@@ -708,6 +747,7 @@ var
 {$ENDIF}
 begin
   Result := False;
+  Version := string.Empty;
   try
     CurrentVersion := GetAppVersion;
     Url := Format('https://api.github.com/repos/%s/releases/latest', [Repo]);
@@ -771,17 +811,20 @@ begin
         if AnsiLowerCase(StringReplace(LatestVersion, 'v', '', [rfReplaceAll])) <> AnsiLowerCase(
           StringReplace(CurrentVersion, 'v', '', [rfReplaceAll])) then
         begin
-          Msg := Format(newversion, [LatestVersion]);
-          if MessageDlg(Msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-            OpenURL(Format('https://github.com/%s/releases/latest', [Repo]));
+          Version := LatestVersion;
+          if not Silent then
+          begin
+            Msg := Format(newversion, [LatestVersion]);
+            if MessageDlg(Msg, mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+              OpenURL(Format('https://github.com/%s/releases/latest', [Repo]));
+          end;
+          Result := True;
         end
         else
         begin
           if not Silent then
             ShowMessage(newversionuptodate);
         end;
-
-        Result := True;
       finally
         JsonData.Free;
       end;
