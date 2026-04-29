@@ -20,9 +20,17 @@ A simple application for creating and organizing task lists, offering essential 
 >- [Installation](#installation)
 >   - [Windows](#windows)
 >   - [Linux](#linux)
->- [Featured on](#featured-on)
 >- [Donate](#donate-)
 >- [Licensing](#licensing)
+
+<p align="left">
+  <a href="https://www.majorgeeks.com/files/details/notetask.html">
+    <img src="https://majorgeeks.com/images/mg_approved.gif" alt="MajorGeeks Approved" height="80">
+  </a>
+  <a href="https://www.softpedia.com/get/Office-tools/Diary-Organizers-Calendar/Notetask.shtml">
+    <img src="https://cdnssl.softpedia.com/_img/softpedia_100_free.png" alt="Softpedia" height="80">
+  </a>
+</p>
 
 ## What is it?
 
@@ -221,15 +229,6 @@ If no terminal emulator is installed, you can add one, for example:
 ```bash
 sudo dnf install -y xterm
 ```
-
-## Featured on
-
-Notetask has been reviewed and listed on reputable software directories:
-
-[![MajorGeeks](https://img.shields.io/badge/MajorGeeks-Visit-darkolivegreen?style=for-the-badge)](https://www.majorgeeks.com/files/details/notetask.html)
-[![Softpedia](https://img.shields.io/badge/Softpedia-Visit-navy?style=for-the-badge)](https://www.softpedia.com/get/Office-tools/Diary-Organizers-Calendar/Notetask.shtml)
-[![AlternativeTo](https://img.shields.io/badge/AlternativeTo-Visit-dodgerblue?style=for-the-badge)](https://alternativeto.net/software/notetask/about/)
-
 
 ## Donate 💖
 
