@@ -30,6 +30,9 @@ A simple application for creating and organizing task lists, offering essential 
   <a href="https://www.softpedia.com/get/Office-tools/Diary-Organizers-Calendar/Notetask.shtml">
     <img src="https://cdnssl.softpedia.com/_img/softpedia_100_free.png" alt="Softpedia" height="80">
   </a>
+    <a href="https://notetask.updatestar.com">
+    <img src="https://www.updatestar.com/images/uploads/safetoinstallaward.png" alt="Safetoinstallaward" height="80">
+  </a>
 </p>
 
 ## What is it?
