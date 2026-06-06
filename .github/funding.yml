@@ -1,0 +1,4 @@
+# GitHub Sponsors configuration file
+
+# Custom donation links for Lava.top and NOWPayments
+custom: ['https://app.lava.top/en/astverskoy?tabId=about&currency=EUR', 'https://nowpayments.io/donation/astverskoy']

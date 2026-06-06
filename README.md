@@ -237,14 +237,12 @@ sudo dnf install -y xterm
 
 If you like Notetask and want to support its development, you can send a donation:
 
-| Currency | Network | Wallet Address |
-|----------|-----------------|----------------|
-| USDT     | Tron (TRC20)    | `TYSJJHjpu6aqr8UsGaCTLxDyh6HKWoNQ8k` |
-| USDT     | Ethereum (ERC20), Binance Smart Chain (BEP20) | `0x328e689E961c3Abb143835f8677947Fa9eaF9f6F` |
-| BTC      | Bitcoin (BTC)   | `bc1qp8m5j75yd58zhf9hl0a753shay093j2548f84e` |
-| ETH      | Ethereum (ERC20)| `0x328e689E961c3Abb143835f8677947Fa9eaF9f6F` |
+You can support Notetask development through one of the following options:
 
-Every little help is appreciated! 🙏
+💳&nbsp;[Donate with Bank Card or PayPal](https://app.lava.top/en/astverskoy?tabId=about&currency=EUR)  
+&nbsp;₿&nbsp;&nbsp; [Donate with Cryptocurrency](https://nowpayments.io/donation/astverskoy)
+
+Every contribution helps improve Notetask and keep the project active. Thank you for your support! 🙏
 
 ## Licensing
 
