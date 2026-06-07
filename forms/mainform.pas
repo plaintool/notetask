@@ -35,7 +35,7 @@ uses
   LCLType,
   LConvEncoding,
   PrintersDlgs,
-  DateTimePicker,
+  uDateTimePicker,
   GridPrn,
   task,
   lineending,

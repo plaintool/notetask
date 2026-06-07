@@ -328,6 +328,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="uWin32WidgetSetDark"/>
       </Unit>
+      <Unit>
+        <Filename Value="common\udatetimepicker.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UDateTimePicker"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
