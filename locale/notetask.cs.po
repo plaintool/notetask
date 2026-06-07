@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
-"Last-Translator: \n"
+"Last-Translator: plaintool <astverskoy@gmail.com>\n"
 "Language-Team: \n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -270,8 +270,8 @@ msgstr ""
 msgid "Notetask © 2024"
 msgstr "Notetask © 2024"
 
-#: tformdonatenotetask.buttonok.caption
-msgctxt "tformdonatenotetask.buttonok.caption"
+#: tformdonatenotetask.btnok.caption
+msgctxt "tformdonatenotetask.btnok.caption"
 msgid "OK"
 msgstr "OK"
 
@@ -279,87 +279,34 @@ msgstr "OK"
 msgid "Buy me a coffee"
 msgstr "Přispějte mi na kávu"
 
-#: tformdonatenotetask.editwallet1.text
-msgid "bc1qp8m5j75yd58zhf9hl0a753shay093j2548f84e"
+#: tformdonatenotetask.labelbank.caption
+msgid "Donate with Bank Card or PayPal"
+msgstr "Přispět bankovní kartou nebo přes PayPal"
+
+#: tformdonatenotetask.labelbank.hint
+msgid "https://app.lava.top/en/astverskoy?tabId=about&currency=EUR"
 msgstr ""
 
-#: tformdonatenotetask.editwallet2.text
-msgctxt "tformdonatenotetask.editwallet2.text"
-msgid "0x328e689E961c3Abb143835f8677947Fa9eaF9f6F"
+#: tformdonatenotetask.labelcontribution.caption
+msgid "Every contribution helps keep the project active and moving forward. Thank you for your support!"
+msgstr "Každý příspěvek pomáhá udržovat projekt aktivní a posouvat jej vpřed. Děkujeme za vaši podporu!"
+
+#: tformdonatenotetask.labelcrypto.caption
+msgid "Donate with Cryptocurrency"
+msgstr "Přispět kryptoměnou"
+
+#: tformdonatenotetask.labelcrypto.hint
+msgid "https://nowpayments.io/donation/astverskoy"
 msgstr ""
 
-#: tformdonatenotetask.editwallet3.text
-msgctxt "tformdonatenotetask.editwallet3.text"
-msgid "0x328e689E961c3Abb143835f8677947Fa9eaF9f6F"
-msgstr ""
-
-#: tformdonatenotetask.editwallet4.text
-msgid "TYSJJHjpu6aqr8UsGaCTLxDyh6HKWoNQ8k"
-msgstr ""
-
-#: tformdonatenotetask.label1.caption
-msgctxt "tformdonatenotetask.label1.caption"
+#: tformdonatenotetask.labeldonate.caption
+msgctxt "tformdonatenotetask.labeldonate.caption"
 msgid "Hey there! Fuel this passion project with a little caffeine boost! Every donation helps keep the code rolling and the coffee brewing. Thanks for supporting the work and the developer behind it!"
 msgstr "Ahoj! Podpořte tento vášnivý projekt malým kofeinovým povzbuzením! Každý příspěvek pomáhá udržet kód v chodu a kávu vařit. Děkujeme za podporu práce a vývojáře za ní!"
 
-#: tformdonatenotetask.label10.caption
-msgctxt "tformdonatenotetask.label10.caption"
-msgid "Feel free to make a donation through any exchange, for example:"
-msgstr "Neváhejte a přispějte přes jakoukoli směnárnu, například:"
-
-#: tformdonatenotetask.label2.caption
-msgid "BTC"
-msgstr ""
-
-#: tformdonatenotetask.label3.caption
-msgid "Bitcoin (BTC)"
-msgstr ""
-
-#: tformdonatenotetask.label4.caption
-msgid "ETH"
-msgstr ""
-
-#: tformdonatenotetask.label5.caption
-msgctxt "tformdonatenotetask.label5.caption"
-msgid "Ethereum (ERC20)"
-msgstr ""
-
-#: tformdonatenotetask.label6.caption
-msgctxt "tformdonatenotetask.label6.caption"
-msgid "USDT"
-msgstr ""
-
-#: tformdonatenotetask.label7.caption
-msgctxt "tformdonatenotetask.label7.caption"
-msgid "ETH Ethereum (ERC20), BSC Binance Smart Chain (BEP20)"
-msgstr ""
-
-#: tformdonatenotetask.label8.caption
-msgid "TRX Tron (TRC20)"
-msgstr ""
-
-#: tformdonatenotetask.label9.caption
-msgctxt "tformdonatenotetask.label9.caption"
-msgid "USDT"
-msgstr ""
-
-#: tformdonatenotetask.labelurl.caption
-msgctxt "tformdonatenotetask.labelurl.caption"
-msgid "Changelly.com"
-msgstr ""
-
-#: tformdonatenotetask.labelurl.hint
-msgctxt "tformdonatenotetask.labelurl.hint"
-msgid "https://changelly.com/buy-crypto?amount=15&from=usd"
-msgstr ""
-
-#: tformdonatenotetask.labelurl1.caption
-msgid "How to do it easily"
-msgstr ""
-
-#: tformdonatenotetask.labelurl1.hint
-msgid "https://plaintool.github.io/notetask/donate.htm"
-msgstr ""
+#: tformdonatenotetask.labelsupport.caption
+msgid "You can support development through one of the following options:"
+msgstr "Vývoj můžete podpořit jedním z následujících způsobů:"
 
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"

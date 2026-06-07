@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
-"Last-Translator: \n"
+"Last-Translator: plaintool <astverskoy@gmail.com>\n"
 "Language-Team: \n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -270,96 +270,43 @@ msgstr ""
 msgid "Notetask © 2024"
 msgstr "Notetask © 2024"
 
-#: tformdonatenotetask.buttonok.caption
-msgctxt "tformdonatenotetask.buttonok.caption"
+#: tformdonatenotetask.btnok.caption
+msgctxt "tformdonatenotetask.btnok.caption"
 msgid "OK"
-msgstr "OK"
+msgstr "확인"
 
 #: tformdonatenotetask.caption
 msgid "Buy me a coffee"
 msgstr "커피 한 잔 주세요"
 
-#: tformdonatenotetask.editwallet1.text
-msgid "bc1qp8m5j75yd58zhf9hl0a753shay093j2548f84e"
+#: tformdonatenotetask.labelbank.caption
+msgid "Donate with Bank Card or PayPal"
+msgstr "은행 카드 또는 PayPal로 후원하기"
+
+#: tformdonatenotetask.labelbank.hint
+msgid "https://app.lava.top/en/astverskoy?tabId=about&currency=EUR"
 msgstr ""
 
-#: tformdonatenotetask.editwallet2.text
-msgctxt "tformdonatenotetask.editwallet2.text"
-msgid "0x328e689E961c3Abb143835f8677947Fa9eaF9f6F"
+#: tformdonatenotetask.labelcontribution.caption
+msgid "Every contribution helps keep the project active and moving forward. Thank you for your support!"
+msgstr "모든 기부는 프로젝트를 지속적으로 운영하고 발전시키는 데 도움이 됩니다. 후원해 주셔서 감사합니다!"
+
+#: tformdonatenotetask.labelcrypto.caption
+msgid "Donate with Cryptocurrency"
+msgstr "암호화폐로 후원하기"
+
+#: tformdonatenotetask.labelcrypto.hint
+msgid "https://nowpayments.io/donation/astverskoy"
 msgstr ""
 
-#: tformdonatenotetask.editwallet3.text
-msgctxt "tformdonatenotetask.editwallet3.text"
-msgid "0x328e689E961c3Abb143835f8677947Fa9eaF9f6F"
-msgstr ""
-
-#: tformdonatenotetask.editwallet4.text
-msgid "TYSJJHjpu6aqr8UsGaCTLxDyh6HKWoNQ8k"
-msgstr ""
-
-#: tformdonatenotetask.label1.caption
-msgctxt "tformdonatenotetask.label1.caption"
+#: tformdonatenotetask.labeldonate.caption
+msgctxt "tformdonatenotetask.labeldonate.caption"
 msgid "Hey there! Fuel this passion project with a little caffeine boost! Every donation helps keep the code rolling and the coffee brewing. Thanks for supporting the work and the developer behind it!"
 msgstr "안녕하세요! 이 열정 가득한 프로젝트에 약간의 카페인 부스트를 주세요! 후원 덕분에 코드가 계속 이어지고 커피가 준비됩니다. 이 프로젝트와 개발자를 지원해 주셔서 감사합니다!"
 
-#: tformdonatenotetask.label10.caption
-msgctxt "tformdonatenotetask.label10.caption"
-msgid "Feel free to make a donation through any exchange, for example:"
-msgstr "어떤 거래소를 통해서도 기부하셔도 됩니다. 예를 들어:"
-
-#: tformdonatenotetask.label2.caption
-msgid "BTC"
-msgstr ""
-
-#: tformdonatenotetask.label3.caption
-msgid "Bitcoin (BTC)"
-msgstr ""
-
-#: tformdonatenotetask.label4.caption
-msgid "ETH"
-msgstr ""
-
-#: tformdonatenotetask.label5.caption
-msgctxt "tformdonatenotetask.label5.caption"
-msgid "Ethereum (ERC20)"
-msgstr ""
-
-#: tformdonatenotetask.label6.caption
-msgctxt "tformdonatenotetask.label6.caption"
-msgid "USDT"
-msgstr ""
-
-#: tformdonatenotetask.label7.caption
-msgctxt "tformdonatenotetask.label7.caption"
-msgid "ETH Ethereum (ERC20), BSC Binance Smart Chain (BEP20)"
-msgstr ""
-
-#: tformdonatenotetask.label8.caption
-msgid "TRX Tron (TRC20)"
-msgstr ""
-
-#: tformdonatenotetask.label9.caption
-msgctxt "tformdonatenotetask.label9.caption"
-msgid "USDT"
-msgstr ""
-
-#: tformdonatenotetask.labelurl.caption
-msgctxt "tformdonatenotetask.labelurl.caption"
-msgid "Changelly.com"
-msgstr ""
-
-#: tformdonatenotetask.labelurl.hint
-msgctxt "tformdonatenotetask.labelurl.hint"
-msgid "https://changelly.com/buy-crypto?amount=15&from=usd"
-msgstr ""
-
-#: tformdonatenotetask.labelurl1.caption
-msgid "How to do it easily"
-msgstr ""
-
-#: tformdonatenotetask.labelurl1.hint
-msgid "https://plaintool.github.io/notetask/donate.htm"
-msgstr ""
+#: tformdonatenotetask.labelsupport.caption
+msgid "You can support development through one of the following options:"
+msgstr "다음 방법 중 하나를 통해 개발을 지원할 수 있습니다:"
 
 #: tformfindtext.buttoncancel.caption
 msgctxt "tformfindtext.buttoncancel.caption"
