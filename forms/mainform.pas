@@ -743,6 +743,7 @@ type
     procedure DelayedSetMemoFocus(Data: PtrInt);
     procedure DelayedFinishTagEdit(Data: PtrInt);
     procedure DelayedInvalidate(Data: PtrInt);
+    procedure FixDatePickerFont(Data: PtrInt);
   public
     FZoom: float;
     FShowArchived: boolean;
@@ -1904,7 +1905,6 @@ begin
         begin
           bgFill := ThemeColor(clWhite, clBlack); // Not done but arhive warning color
           Grid.Canvas.Font.Color := ThemeColor(clRowNotDone_Light, clRowNotDone_Dark);
-          ;
         end
         else
         begin
@@ -2404,6 +2404,7 @@ begin
     end;
     Memo.Font.Name := taskGrid.Font.Name;
     Memo.Font.Size := taskGrid.Font.Size;
+    Memo.Font.Bold := taskGrid.Cells[COL_STAR, aRow] = '1';
     Memo.HideSelection := False;
     Memo.BorderStyle := bsNone;
     Memo.ScrollBars := ssNone;
@@ -2472,8 +2473,7 @@ begin
     DatePicker.Visible := False;
     DatePicker.AutoSize := False;
     DatePicker.BorderStyle := bsNone;
-    DatePicker.ParentFont := True;
-    DatePicker.ArrowShape := asClassicSmaller;
+    DatePicker.ArrowShape := asModernLarger;
     DatePicker.Options := [dtpoFlatButton];
     if (FShowTime) then
       DatePicker.Kind := dtkDateTime
@@ -2498,6 +2498,9 @@ begin
     DatePicker.OnKeyDown := @DatePickerKeyDown; // Event KeyDown
 
     Editor := DatePicker;
+
+    Application.QueueAsyncCall(@FixDatePickerFont, 0);
+
     if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
     begin
       DatePicker.Visible := False;
@@ -2526,6 +2529,17 @@ end;
 procedure TformNotetask.DelayedInvalidate(Data: PtrInt);
 begin
   Repaint;
+end;
+
+procedure TformNotetask.FixDatePickerFont(Data: PtrInt);
+begin
+  if Assigned(DatePicker) then
+  begin
+    DatePicker.ParentFont := False;
+    DatePicker.Font.Name := taskGrid.Font.Name;
+    DatePicker.Font.Size := taskGrid.Font.Size;
+    DatePicker.Font.Bold := taskGrid.Cells[COL_STAR, taskGrid.Row] = '1';
+  end;
 end;
 
 procedure TformNotetask.taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer;
