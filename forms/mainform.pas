@@ -4895,6 +4895,9 @@ begin
     else
       FMemoSelStartClicked := (Sender as TMemo).SelStart;
   end;
+  // Force set focus
+  if (Sender as TMemo).Visible and (Sender as TMemo).CanFocus and not (Sender as TMemo).Focused then
+    (Sender as TMemo).SetFocus;
 end;
 
 procedure TformNotetask.memoNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
