@@ -299,13 +299,18 @@ begin
 end;
 
 function DateTimeToString(Value: TDateTime; ADisplayTime: boolean = True): string;
+var
+  TimeFmt: string;
 begin
   if (Value <> 0) then
   begin
     if (not ADisplayTime) then
       Result := FormatDateTime(FormatSettings.ShortDateFormat, Value)
     else
-      Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + FormatSettings.LongTimeFormat, Value);
+    begin
+      TimeFmt := StringReplace(FormatSettings.LongTimeFormat, 'h', 'hh', [rfReplaceAll]);
+      Result := FormatDateTime(FormatSettings.ShortDateFormat + ' ' + TimeFmt, Value);
+    end;
   end
   else
     Result := string.Empty;
