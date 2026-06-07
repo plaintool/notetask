@@ -25,6 +25,7 @@ type
     buttonOk: TButton;
     imageLogo: TImage;
     labelBy: TLabel;
+    LabelLicUrl1: TLabel;
     labelName: TLabel;
     labelLic: TLabel;
     LabelLicUrl: TLabel;
@@ -57,7 +58,7 @@ end;
 
 procedure TformAboutNotetask.LabelLicUrlClick(Sender: TObject);
 begin
-  OpenUrl(labelLicUrl.Caption);
+  OpenUrl((Sender as TLabel).Hint);
 end;
 
 end.

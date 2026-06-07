@@ -9,6 +9,7 @@ object formAboutNotetask: TformAboutNotetask
   ClientHeight = 282
   ClientWidth = 466
   Color = clWhite
+  LCLVersion = '4.6.0.0'
   Scaled = False
   OnCreate = FormCreate
   object buttonOk: TButton
@@ -183,12 +184,15 @@ object formAboutNotetask: TformAboutNotetask
     Cursor = crHandPoint
     Left = 140
     Height = 15
+    Hint = 'mailto:astverskoy@gmail.com'
     Top = 132
-    Width = 160
-    Caption = 'mailto:astverskoy@gmail.com'
+    Width = 123
+    Caption = 'astverskoy@gmail.com'
     Font.Color = clBlue
     Font.Style = [fsUnderline]
     ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
     WordWrap = True
     OnClick = LabelLicUrlClick
   end
@@ -219,5 +223,21 @@ object formAboutNotetask: TformAboutNotetask
     Alignment = taCenter
     Caption = 'the GNU General Public License, Version 3 '
     WordWrap = True
+  end
+  object LabelLicUrl1: TLabel
+    Cursor = crHandPoint
+    Left = 307
+    Height = 15
+    Hint = 'https://github.com/plaintool/notetask'
+    Top = 132
+    Width = 138
+    Caption = 'github: plaintool/notetask'
+    Font.Color = clBlue
+    Font.Style = [fsUnderline]
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
+    WordWrap = True
+    OnClick = LabelLicUrlClick
   end
 end

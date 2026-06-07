@@ -45,7 +45,7 @@ msgstr "Nelze najít"
 
 #: mainform.rchatgpt
 msgid "https://chatgpt.com?q="
-msgstr ""
+msgstr "https://chatgpt.com?q="
 
 #: mainform.rclearconfirm
 msgid "Are you sure you want to clear the data in the selected area?"
@@ -252,19 +252,34 @@ msgstr "O programu"
 
 #: tformaboutnotetask.labelby.caption
 msgid "by Alexander Tverskoy is licensed under"
-msgstr ""
+msgstr "by Alexander Tverskoy is licensed under"
 
 #: tformaboutnotetask.labelby1.caption
 msgid "the GNU General Public License, Version 3 "
-msgstr ""
+msgstr "the GNU General Public License, Version 3 "
 
 #: tformaboutnotetask.labellic.caption
 msgid "For questions or feedback, contact me at"
-msgstr ""
+msgstr "For questions or feedback, contact me at"
 
 #: tformaboutnotetask.labellicurl.caption
+msgctxt "tformaboutnotetask.labellicurl.caption"
+msgid "astverskoy@gmail.com"
+msgstr "astverskoy@gmail.com"
+
+#: tformaboutnotetask.labellicurl.hint
+msgctxt "tformaboutnotetask.labellicurl.hint"
 msgid "mailto:astverskoy@gmail.com"
-msgstr ""
+msgstr "mailto:astverskoy@gmail.com"
+
+#: tformaboutnotetask.labellicurl1.caption
+msgid "github: plaintool/notetask"
+msgstr "github: plaintool/notetask"
+
+#: tformaboutnotetask.labellicurl1.hint
+msgctxt "tformaboutnotetask.labellicurl1.hint"
+msgid "https://github.com/plaintool/notetask"
+msgstr "https://github.com/plaintool/notetask"
 
 #: tformaboutnotetask.labelname.caption
 msgid "Notetask © 2024"
@@ -285,7 +300,7 @@ msgstr "Přispět bankovní kartou nebo přes PayPal"
 
 #: tformdonatenotetask.labelbank.hint
 msgid "https://app.lava.top/en/astverskoy?tabId=about&currency=EUR"
-msgstr ""
+msgstr "https://app.lava.top/en/astverskoy?tabId=about&currency=EUR"
 
 #: tformdonatenotetask.labelcontribution.caption
 msgid "Every contribution helps keep the project active and moving forward. Thank you for your support!"
@@ -297,7 +312,7 @@ msgstr "Přispět kryptoměnou"
 
 #: tformdonatenotetask.labelcrypto.hint
 msgid "https://nowpayments.io/donation/astverskoy"
-msgstr ""
+msgstr "https://nowpayments.io/donation/astverskoy"
 
 #: tformdonatenotetask.labeldonate.caption
 msgctxt "tformdonatenotetask.labeldonate.caption"
@@ -787,11 +802,11 @@ msgstr "Notetask"
 
 #: tformnotetask.contextansi.caption
 msgid "ANSI"
-msgstr ""
+msgstr "ANSI"
 
 #: tformnotetask.contextascii.caption
 msgid "ASCII"
-msgstr ""
+msgstr "ASCII"
 
 #: tformnotetask.contextcolor.caption
 msgctxt "tformnotetask.contextcolor.caption"
@@ -815,7 +830,7 @@ msgstr "Smazat"
 
 #: tformnotetask.contextmacintoshcr.caption
 msgid "MacintoshCR"
-msgstr ""
+msgstr "MacintoshCR"
 
 #: tformnotetask.contextresetcolor.caption
 msgid "Reset color"
@@ -823,71 +838,71 @@ msgstr "Resetovat barvu"
 
 #: tformnotetask.contextunixlf.caption
 msgid "UnixLF"
-msgstr ""
+msgstr "UnixLF"
 
 #: tformnotetask.contextutf16bebom.caption
 msgid "UTF-16 BE BOM"
-msgstr ""
+msgstr "UTF-16 BE BOM"
 
 #: tformnotetask.contextutf16lebom.caption
 msgid "UTF-16 LE BOM"
-msgstr ""
+msgstr "UTF-16 LE BOM"
 
 #: tformnotetask.contextutf8.caption
 msgid "UTF-8"
-msgstr ""
+msgstr "UTF-8"
 
 #: tformnotetask.contextutf8bom.caption
 msgid "UTF-8 BOM"
-msgstr ""
+msgstr "UTF-8 BOM"
 
 #: tformnotetask.contextwindowscrlf.caption
 msgid "WindowsCRLF"
-msgstr ""
+msgstr "WindowsCRLF"
 
 #: tformnotetask.contextzoom100.caption
 msgid "100%"
-msgstr ""
+msgstr "100%"
 
 #: tformnotetask.contextzoom110.caption
 msgid "110%"
-msgstr ""
+msgstr "110%"
 
 #: tformnotetask.contextzoom120.caption
 msgid "120%"
-msgstr ""
+msgstr "120%"
 
 #: tformnotetask.contextzoom130.caption
 msgid "130%"
-msgstr ""
+msgstr "130%"
 
 #: tformnotetask.contextzoom140.caption
 msgid "140%"
-msgstr ""
+msgstr "140%"
 
 #: tformnotetask.contextzoom150.caption
 msgid "150%"
-msgstr ""
+msgstr "150%"
 
 #: tformnotetask.contextzoom50.caption
 msgid "50%"
-msgstr ""
+msgstr "50%"
 
 #: tformnotetask.contextzoom60.caption
 msgid "60%"
-msgstr ""
+msgstr "60%"
 
 #: tformnotetask.contextzoom70.caption
 msgid "70%"
-msgstr ""
+msgstr "70%"
 
 #: tformnotetask.contextzoom80.caption
 msgid "80%"
-msgstr ""
+msgstr "80%"
 
 #: tformnotetask.contextzoom90.caption
 msgid "90%"
-msgstr ""
+msgstr "90%"
 
 #: tformnotetask.filterbox.hint
 msgid ""

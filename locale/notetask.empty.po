@@ -260,7 +260,22 @@ msgid "For questions or feedback, contact me at"
 msgstr ""
 
 #: tformaboutnotetask.labellicurl.caption
+msgctxt "tformaboutnotetask.labellicurl.caption"
+msgid "astverskoy@gmail.com"
+msgstr ""
+
+#: tformaboutnotetask.labellicurl.hint
+msgctxt "tformaboutnotetask.labellicurl.hint"
 msgid "mailto:astverskoy@gmail.com"
+msgstr ""
+
+#: tformaboutnotetask.labellicurl1.caption
+msgid "github: plaintool/notetask"
+msgstr ""
+
+#: tformaboutnotetask.labellicurl1.hint
+msgctxt "tformaboutnotetask.labellicurl1.hint"
+msgid "https://github.com/plaintool/notetask"
 msgstr ""
 
 #: tformaboutnotetask.labelname.caption
