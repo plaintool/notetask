@@ -418,11 +418,11 @@ type
     procedure memoNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure memoNoteMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
     procedure tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure tagsEditTagClick(Sender: TObject; const TagText: string);
+    procedure tagsEditTagClick(Sender: TObject; const TagText: string; const TagIndex: integer);
     procedure tagsEditBeforeChange(Sender: TObject; Tags: string; Operation: TTagEditOperation; var AllowChange: boolean);
     procedure tagsEditChange(Sender: TObject);
-    procedure tagsEditTagAdd(Sender: TObject; const TagText: string);
-    procedure tagsEditTagRemove(Sender: TObject; const TagText: string);
+    procedure tagsEditTagAdd(Sender: TObject; const TagText: string; const TagIndex: integer);
+    procedure tagsEditTagRemove(Sender: TObject; const TagText: string; const TagIndex: integer);
     procedure tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
     procedure tagsEditExit(Sender: TObject);
     procedure groupTabsChange(Sender: TObject);
@@ -4990,7 +4990,7 @@ begin
       taskGrid.SetFocus;
 end;
 
-procedure TformNotetask.tagsEditTagClick(Sender: TObject; const TagText: string);
+procedure TformNotetask.tagsEditTagClick(Sender: TObject; const TagText: string; const TagIndex: integer);
 begin
   if (filterBox.Text <> TagText) then
   begin
@@ -5016,12 +5016,12 @@ begin
   CalcRowHeight(True);
 end;
 
-procedure TformNotetask.tagsEditTagAdd(Sender: TObject; const TagText: string);
+procedure TformNotetask.tagsEditTagAdd(Sender: TObject; const TagText: string; const TagIndex: integer);
 begin
   TagsAdd(taskGrid.Selection, TagText);
 end;
 
-procedure TformNotetask.tagsEditTagRemove(Sender: TObject; const TagText: string);
+procedure TformNotetask.tagsEditTagRemove(Sender: TObject; const TagText: string; const TagIndex: integer);
 var
   i: integer;
   task: TTask;
@@ -5031,10 +5031,14 @@ begin
     if Tasks.Map(i) > -1 then
     begin
       task := Tasks.GetTask(i);
-      StringListRemove(task.Tags, TagText);
+      if TagIndex >= 0 then
+        task.Tags.Delete(TagIndex)
+      else
+        StringListRemove(task.Tags, TagText);
       if task.Tags.Count = 0 then
         task.TagsWidth := 0;
     end;
+  SetTags;
 end;
 
 procedure TformNotetask.tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
