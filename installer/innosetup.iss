@@ -28,27 +28,51 @@ Root: HKA; Subkey: "Software\Classes\Applications\notetask.exe\shell\open\comman
 #define MyAppPublisher "Alexander Tverskoy"
 #define MyAppURL "https://github.com/plaintool/notetask"
 #define MyAppExeName "notetask.exe"
+#define CurrentYear    GetDateTimeString('yyyy','','')
 
 [Setup]
 AppId={{F803A17B-C1FD-4B8A-8284-0AEDA0F8B73D}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
+AppVerName={#MyAppName} {#MyAppVersion}
+
+VersionInfoDescription={#MyAppName} installer
+VersionInfoProductName={#MyAppName}
+VersionInfoVersion={#MyAppVersion}
+
+AppCopyright={#CurrentYear} {#MyAppPublisher}
+
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
+
+UninstallDisplayName={#MyAppName} {#MyAppVersion}
 UninstallDisplayIcon={app}\notetask.exe
-DefaultDirName={autopf}\{#MyAppName}
-ArchitecturesAllowed=x64compatible x86 arm64
-ArchitecturesInstallIn64BitMode=x64compatible arm64
-DisableProgramGroupPage=yes
+
+RestartApplications=no
+
+ShowLanguageDialog=yes
+UsePreviousLanguage=no
+LanguageDetectionMethod=uilanguage
+
 LicenseFile=.\LICENSE.rtf
+
+WizardStyle=modern
+
+SetupIconFile=..\notetask.ico
+WizardSmallImageFile=.\wizardsmallimagefile.png
+
+DefaultDirName={autopf}\{#MyAppName}
+ArchitecturesAllowed=x64compatible x86
+ArchitecturesInstallIn64BitMode=x64compatible
+DisableProgramGroupPage=yes
+
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=.\
 OutputBaseFilename=notetask-{#MyAppVersion}-any-x86-x64
 Compression=lzma
 SolidCompression=yes
-WizardStyle=modern
 
 [Languages]
 Name: "arabic"; MessagesFile: "compiler:Languages\Arabic.isl"

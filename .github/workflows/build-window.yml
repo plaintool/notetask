@@ -28,7 +28,7 @@ jobs:
         run: |
           choco install lazarus -y
           choco install wixtoolset -y
-          choco install innosetup --version=6.6.1 -y
+          choco install innosetup --version=6.7.3 -y
           $fpcDir = "C:\\Lazarus\\fpc\\3.2.2"
           $zipPath = "$env:RUNNER_TEMP\\fpc-i386.exe"
           curl.exe -L "https://sourceforge.net/projects/freepascal/files/Win32/3.2.2/fpc-3.2.2.i386-win32.exe/download" -o $zipPath

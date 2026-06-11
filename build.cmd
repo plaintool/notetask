@@ -49,7 +49,9 @@ IF "%CERTFILE%"=="" (
     )
 )
 SET "CERTPASS=1234"
-SET "TIMESTAMP_URL=http://timestamp.digicert.com"
+::SET "TIMESTAMP_URL=http://timestamp.digicert.com"
+SET "TIMESTAMP_URL=http://timestamp.sectigo.com"
+::SET "TIMESTAMP_URL=http://ts.ssl.com"
 
 ::Sign the executable in the same folder
 if exist "notetask.exe" (

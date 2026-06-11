@@ -20,9 +20,14 @@ uses
   Unix,
   {$ENDIF}
   PasZLib,
+  {$PUSH}
+  {$WARNINGS OFF}
+  {$HINTS OFF}
+  {$NOTES OFF}
   DCPcrypt2,
   DCPrijndael,
   DCPsha256;
+  {$POP}
 
 /// Compresses InputStream and returns a memory stream with original size prepended.
 function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;

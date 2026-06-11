@@ -41,7 +41,9 @@ IF "%CERTFILE%"=="" (
     )
 )
 SET "CERTPASS=1234"
-SET "TIMESTAMP_URL=http://timestamp.digicert.com"
+::SET "TIMESTAMP_URL=http://timestamp.digicert.com"
+SET "TIMESTAMP_URL=http://timestamp.sectigo.com"
+::SET "TIMESTAMP_URL=http://ts.ssl.com"
 
 if not "%CERTFILE%"=="" (
     if exist "%CERTFILE%" (

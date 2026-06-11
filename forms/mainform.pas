@@ -8006,7 +8006,7 @@ var
         begin
           h := drawrect.bottom - drawrect.top + 2;
           if (force) and (h < taskGrid.DefaultRowHeight) then
-            h := Max(taskGrid.Canvas.TextHeight('A') + 2, Round(taskGrid.DefaultRowHeight * FZoom));
+            h := Max(taskGrid.Canvas.TextHeight('A') + 2, integer(Round(taskGrid.DefaultRowHeight * FZoom)));
           FLastRowHeights[row] := h;
           taskGrid.RowHeights[row] := h;
           task.FRowHeight := h;
