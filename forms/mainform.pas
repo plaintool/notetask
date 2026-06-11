@@ -6534,6 +6534,7 @@ begin
       FillGrid;
       SetNote;
       SetTags;
+      CalcRowHeight(True);
       SetChanged; // Mark that data has changed
 
       // Restore selection
