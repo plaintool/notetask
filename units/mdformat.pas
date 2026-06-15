@@ -59,6 +59,14 @@ var
     if Length(Part) > 2 then
     begin
       Result := True;
+      // Extract and trim the amount string
+      if (TryStrToFloatLimited(Part[0].Trim, Result1.FAmount)) then
+      begin
+        Result1.FText := JoinArrayText(Part, 1, Separator);
+        if (Length(Result1.FText) > 0) and (Result1.FText.StartsWith(sp)) then
+          Delete(Result1.FText, 1, 1); // Delete space in begining
+      end
+      else
       // Extract and trim the date string
       if (TryStrToDateTimeISO(Part[0].Trim, Result1.FDate)) then
       begin
@@ -70,14 +78,6 @@ var
           Result1.FText := JoinArrayText(Part, 1, Separator);
           Result1.FAmount := 0;
         end;
-        if (Length(Result1.FText) > 0) and (Result1.FText.StartsWith(sp)) then
-          Delete(Result1.FText, 1, 1); // Delete space in begining
-      end
-      else
-      // Extract and trim the amount string
-      if (TryStrToFloatLimited(Part[0].Trim, Result1.FAmount)) then
-      begin
-        Result1.FText := JoinArrayText(Part, 1, Separator);
         if (Length(Result1.FText) > 0) and (Result1.FText.StartsWith(sp)) then
           Delete(Result1.FText, 1, 1); // Delete space in begining
       end
