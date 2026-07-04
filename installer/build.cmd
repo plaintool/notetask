@@ -26,12 +26,24 @@ IF NOT "%PLATFORM%"=="x64" IF NOT "%PLATFORM%"=="x86" (
     exit /b 1
 )
 
+echo.
+echo ############################################################
+echo #                Build MSI %PLATFORM% peruser              #
+echo ############################################################
+echo.
+
 :: --- Build peruser ---
 echo Compiling msisetup_peruser.wxs with candle for %PLATFORM%...
 candle -nologo "%SOURCE_DIR%\msisetup_peruser.wxs" -out "%SOURCE_DIR%\peruser.wixobj" -ext WixUIExtension -dPlatform=%PLATFORM% -dVersion=%VERSION%
 echo Linking peruser.wixobj into notetask-%VERSION%-%PLATFORM%.msi with light...
 light -nologo -sice:ICE61 -sice:ICE91 "%SOURCE_DIR%\peruser.wixobj" -out "%SOURCE_DIR%\notetask-%VERSION%-%PLATFORM%.msi" -ext WixUIExtension
 echo File created: notetask-%VERSION%-%PLATFORM%.msi
+echo.
+
+echo.
+echo ############################################################
+echo #                 Build MSI %PLATFORM% permachine          #
+echo ############################################################
 echo.
 
 :: --- Build permachine ---
@@ -47,6 +59,12 @@ echo Deleting temporary .wixobj and .wixpdb files...
 del /q "%SOURCE_DIR%\*.wixobj" >nul
 del /q "%SOURCE_DIR%\*.wixpdb" >nul
 echo Cleanup completed.
+echo.
+
+echo.
+echo ############################################################
+echo #                     Sign %PLATFORM% installers           #
+echo ############################################################
 echo.
 
 :: --- Sign installers ---
@@ -96,6 +114,12 @@ if not "%CERTFILE%"=="" (
 ) else (
     echo Skipping signing: CERTFILE not set.
 )
+
+echo.
+echo ############################################################
+echo #                       Build Portable                     #
+echo ############################################################
+echo.
 
 :: --- Portable ---
 if "%BUILD_PORTABLE%"=="1" (

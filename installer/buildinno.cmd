@@ -1,6 +1,12 @@
 @echo off
 setlocal
 
+echo.
+echo ############################################################
+echo #                Build InnoSetup installer                 #
+echo ############################################################
+echo.
+
 :: Define paths
 SET "SOURCE_DIR=%~dp0"
 SET "VERSION=%VERSION%"
@@ -19,6 +25,12 @@ xcopy "%source%\*" "%destination%\" /y /i /s
 :: --- Build inno setup ---
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "%SOURCE_DIR%\innosetup.iss"
 echo File created: notetask-any-x86-x64.exe
+echo.
+
+echo.
+echo ############################################################
+echo #                Sign InnoSetup installer                  #
+echo ############################################################
 echo.
 
 ::Wait 2 seconds to ensure file is free

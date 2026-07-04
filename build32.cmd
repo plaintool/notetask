@@ -33,6 +33,19 @@ if not exist "%FPC32%" (
     exit /b 1
 )
 
+:: Updating and building dependencies
+call "%~dp0dependencies32.cmd"
+if %ERRORLEVEL% neq 0 (
+    echo Dependency build failed!
+    exit /b %ERRORLEVEL%
+)
+
+echo.
+echo ############################################################
+echo #                     Build x86                            #
+echo ############################################################
+echo.
+
 ::Rename existing 64-bit exe to notetask64.exe to avoid overwriting
 if exist "notetask.exe" (
     echo Renaming existing 64-bit executable...
@@ -64,6 +77,12 @@ if exist "notetask64.exe" (
 )
 
 echo 32-bit build completed successfully
+
+echo.
+echo ############################################################
+echo #                       Signing x86                        #
+echo ############################################################
+echo.
 
 ::Wait 2 seconds to ensure file is free
 timeout /t 2 /nobreak >nul
