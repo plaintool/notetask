@@ -1,22 +1,37 @@
-# Makefile for building the notetask Lazarus project in Release mode
-
-# Path to lazbuild
+# Lazarus build tool
 LAZBUILD = lazbuild
 
-# Lazarus project file
-PROJECT = notetask.lpi
+# Main project file
+PROJECT = pobatch.lpi
 
-# Target build mode
-MODE = Release
+# Build mode
+BUILD_MODE = Release
 
-# Default target
-all:
-	@echo "Building project in $(MODE) mode..."
-	$(LAZBUILD) --build-mode=$(MODE) $(PROJECT)
+# Additional options (e.g. --cpu=i386 for 32-bit)
+LAZBUILD_OPTS =
 
-# Clean target
+# Dependency LPK packages to build first
+DEP_LPKS = \
+    libs/darkmode/darkmode.lpk \
+    libs/dcpcrypt/dcpcrypt.lpk \
+    libs/gridprinter/gridprinter.lpk \
+    libs/tagedit/tagedit.lpk
+    
+# Default target: build dependencies then the project
+all: deps
+	@echo "Building main project..."
+	$(LAZBUILD) --build-mode=$(BUILD_MODE) $(LAZBUILD_OPTS) $(PROJECT)
+
+# Build all dependency packages
+deps:
+	@for lpk in $(DEP_LPKS); do \
+		echo "Building $$lpk"; \
+		$(LAZBUILD) $$lpk $(LAZBUILD_OPTS) -q || exit 1; \
+	done
+
+# Remove compiled units and the final binary
 clean:
-	@echo "Cleaning up compiled units..."
 	find . -type f \( -name "*.o" -o -name "*.ppu" -o -name "*.compiled" \) -delete
-	rm -f notetask
+	rm -f pobatch
 
+.PHONY: all deps clean
