@@ -73,7 +73,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="forms;units;common"/>
+            <OtherUnitFiles Value="forms;units"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -122,7 +122,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="forms;units;common"/>
+            <OtherUnitFiles Value="forms;units"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -160,6 +160,18 @@
     </RunParams>
     <RequiredPackages>
       <Item>
+        <PackageName Value="darkmode"/>
+      </Item>
+      <Item>
+        <PackageName Value="dcpcrypt"/>
+      </Item>
+      <Item>
+        <PackageName Value="gridprinter"/>
+      </Item>
+      <Item>
+        <PackageName Value="tageditpackage"/>
+      </Item>
+      <Item>
         <PackageName Value="DateTimeCtrls"/>
       </Item>
       <Item>
@@ -196,11 +208,6 @@
       <Unit>
         <Filename Value="units\settings.pas"/>
         <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\gridprn.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="GridPrn"/>
       </Unit>
       <Unit>
         <Filename Value="units\systemtool.pas"/>
@@ -266,40 +273,6 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="common\DCPrijndael.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\dcprijndael.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="DCPrijndael"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\dcpsha256.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="DCPsha256"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\dcpblockciphers.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="DCPblockciphers"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\dcpconst.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="DCPconst"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\dcpcrypt2.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="DCPcrypt2"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\dcpbase64.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="DCPbase64"/>
-      </Unit>
-      <Unit>
         <Filename Value="forms\forminput.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formInputText"/>
@@ -307,36 +280,9 @@
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="common\TagColorItems.pas"/>
+        <Filename Value="units\udatetimepicker.pas"/>
         <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\TagEdit.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\TagCheckPopup.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\udarkstyle.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="uDarkStyle"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\uimport.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="uImport"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\uwin32widgetsetdark.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="uWin32WidgetSetDark"/>
-      </Unit>
-      <Unit>
-        <Filename Value="common\udatetimepicker.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UDateTimePicker"/>
+        <UnitName Value="uDateTimePicker"/>
       </Unit>
     </Units>
   </ProjectOptions>

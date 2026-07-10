@@ -16,7 +16,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms,
   SysUtils,
-  systemtool,
+  systemtool, uDateTimePicker,
   mainform,
   forminput,
   formmemo,
