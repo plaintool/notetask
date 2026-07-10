@@ -2,7 +2,7 @@
 LAZBUILD = lazbuild
 
 # Main project file
-PROJECT = pobatch.lpi
+PROJECT = notetask.lpi
 
 # Build mode
 BUILD_MODE = Release
@@ -15,7 +15,7 @@ DEP_LPKS = \
     libs/darkmode/darkmode.lpk \
     libs/dcpcrypt/dcpcrypt.lpk \
     libs/gridprinter/gridprinter.lpk \
-    libs/tagedit/tagedit.lpk
+    libs/tagedit/tageditpackage.lpk
     
 # Default target: build dependencies then the project
 all: deps
@@ -32,6 +32,6 @@ deps:
 # Remove compiled units and the final binary
 clean:
 	find . -type f \( -name "*.o" -o -name "*.ppu" -o -name "*.compiled" \) -delete
-	rm -f pobatch
+	rm -f notetask
 
 .PHONY: all deps clean
