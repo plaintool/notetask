@@ -2194,6 +2194,7 @@ procedure TCustomDateTimePicker.SelectTextPartUnderMouse(XMouse: Integer);
 var
   I, M, NX: Integer;
   InTime: Boolean;
+  FGap:Integer;
 
 begin
   UpdateIfUserChangedText;
@@ -2207,9 +2208,15 @@ begin
     InTime := False;
     if FTimeWidth > 0 then begin
       if FDateWidth > 0 then begin
-        if NX >= FDateWidth + FDigitWidth then begin
+        FGap := Canvas.GetTextWidth(' ');
+        //if NX >= FDateWidth + FDigitWidth then begin
+        //  InTime := True;
+        //  NX := NX - FDateWidth - 2 * FDigitWidth;
+        //end;
+        if NX >= FDateWidth + FGap div 2 then
+        begin
           InTime := True;
-          NX := NX - FDateWidth - 2 * FDigitWidth;
+          NX := NX - FDateWidth - FGap;
         end;
       end else
         InTime := True;
@@ -3288,7 +3295,7 @@ begin
               TrimRight(FDateSeparator), TextStyle);
           end;
           if FTimeWidth > 0 then
-            R.Right := R.Right + Canvas.TextWidth(' ');
+            R.Right := R.Right + Canvas.TextWidth(' '); // 2 * FDigitWidth
 
         end;
         R.Left := R.Right;
