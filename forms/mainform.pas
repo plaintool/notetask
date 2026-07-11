@@ -5177,7 +5177,7 @@ begin
   EditComplete;
 
   FreeFile;
-  ReadOnly := not TryLockFile(FFileName, FSReserved);
+  ReadOnly := not TFileManager.TryLockFile(FFileName, FSReserved);
 
   if (TCrypto.CheckEncryptedFile(FFileName)) then
   begin
@@ -5226,7 +5226,7 @@ begin
 
         Bytes := TCrypto.DecryptData(TCrypto.LoadFileAsBytes(FFileName), Token, FSalt, FKeyEnc, FKeyAuth);
         if (Bytes <> nil) then
-          ReadTextFile(Bytes, Content, FEncoding, FLineEnding, FLineCount)
+          TFileManager.ReadTextFile(Bytes, Content, FEncoding, FLineEnding, FLineCount)
         else
         begin
           FFileName := FileNameOld;
@@ -5254,10 +5254,10 @@ begin
       end;
     end
     else
-      ReadTextFile(Bytes, Content, FEncoding, FLineEnding, FLineCount);
+      TFileManager.ReadTextFile(Bytes, Content, FEncoding, FLineEnding, FLineCount);
   end
   else
-    ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
+    TFileManager.ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
 
   tagsEdit.SuggestedItems.Clear;
   if Assigned(Tasks) then
@@ -5337,10 +5337,10 @@ begin
           try
             EditComplete;
             FreeFile;
-            SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, Token, FSalt, FKeyEnc, FKeyAuth);
+            TFileManager.SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, Token, FSalt, FKeyEnc, FKeyAuth);
             SetChanged(False);
             Tasks.CreateBackupInit;
-            ReadOnly := not TryLockFile(fileName, FSReserved);
+            ReadOnly := not TFileManager.TryLockFile(fileName, FSReserved);
             Result := True;
           except
             on E: Exception do
@@ -5648,7 +5648,7 @@ begin
     begin
       ScriptEncoding := TEncoding.GetEncoding(65001); // UTF-8 BOM
       try
-        SaveTextFile(TempFile, Script, ScriptEncoding, TLineEnding.WindowsCRLF);
+        TFileManager.SaveTextFile(TempFile, Script, ScriptEncoding, TLineEnding.WindowsCRLF);
       finally
         ScriptEncoding.Free;
       end;
@@ -5728,7 +5728,7 @@ begin
     {$ELSE}
     if usePowershell then
     begin
-      PwshPath := FindPowerShellCore; // Search for pwsh.exe
+      PwshPath := TFileManager.FindPowerShellCore; // Search for pwsh.exe
       if PwshPath <> '' then
         Process.Executable := PwshPath
       else
@@ -8153,7 +8153,7 @@ begin
 
   if Assigned(FEncoding) then
   begin
-    statusBar.Panels[1].Text := UpperCase(GetEncodingName(FEncoding));
+    statusBar.Panels[1].Text := UpperCase(TFileManager.GetEncodingName(FEncoding));
 
     // Encoding menuZoomIn check
     contextANSI.Checked := FEncoding = TEncoding.ANSI;

@@ -25,54 +25,79 @@ uses
   lineending,
   cryptoutils;
 
-function FindPowerShellCore: string;
-
-procedure UpdateFileReadAccess(const FileName: string);
-
-function GetEncodingName(Encoding: TEncoding): string;
-
-function IsUserEncoding(Enc: TEncoding): boolean;
-
-function IsBOMEncoding(Encoding: TEncoding): boolean;
-
-function IsValidUTF8(var Buffer: TBytes; BytesRead: integer): boolean;
-
-function IsValidAscii(var Buffer: TBytes; BytesRead: integer): boolean;
-
-function IsValidAnsi(var Buffer: TBytes; BytesRead: integer): boolean;
-
-function DetectEncoding(const Buffer: TBytes): TEncoding; overload;
-
-function DetectEncoding(const FileName: string): TEncoding; overload;
-
-function DetectLineEnding(const Buffer: TBytes; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding; overload;
-
-function DetectLineEnding(const FileName: string; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding; overload;
-
-function EndsWithLineBreak(const Buffer: TBytes): boolean; overload;
-
-function EndsWithLineBreak(const FileName: string): boolean; overload;
-
-function TryLockFile(const AFileName: string; out Stream: TFileStream): boolean;
-
-procedure ReadTextFile(const Bytes: TBytes; out Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding;
-  out LineCount: integer); overload;
-
-procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
-  out LineEnding: TLineEnding; out LineCount: integer); overload;
-
-procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding;
-  Encrypt: boolean; Token: string; var Salt, KeyEnc, KeyAuth: TBytes); overload;
-
-procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding); overload;
-
 var
   UTF8BOMEncoding: TEncoding;
-  UTF16LEBOMEncoding, UTF16BEBOMEncoding: TEncoding;
+  UTF16LEBOMEncoding: TEncoding;
+  UTF16BEBOMEncoding: TEncoding;
+
+type
+  TFileManager = class
+  public
+    /// Searches for PowerShell Core (pwsh.exe) in standard directories and PATH.
+    class function FindPowerShellCore: string; static;
+
+    /// Updates the last access time of a file without modifying its content or other timestamps.
+    class procedure UpdateFileReadAccess(const FileName: string); static;
+
+    /// Returns a human-readable name for the given encoding (e.g., 'UTF-8', 'ANSI').
+    class function GetEncodingName(Encoding: TEncoding): string; static;
+
+    /// Checks whether the encoding is a user-defined (non-standard) encoding.
+    class function IsUserEncoding(Enc: TEncoding): boolean; static;
+
+    /// Determines if the encoding includes a Byte Order Mark (BOM) preamble.
+    class function IsBOMEncoding(Encoding: TEncoding): boolean; static;
+
+    /// Validates whether a byte buffer contains a correct UTF-8 sequence.
+    class function IsValidUTF8(var Buffer: TBytes; BytesRead: integer): boolean; static;
+
+    /// Checks if the byte buffer consists only of ASCII characters (0..127).
+    class function IsValidAscii(var Buffer: TBytes; BytesRead: integer): boolean; static;
+
+    /// Checks if a byte buffer can be considered valid ANSI (i.e., no UTF-8/16 sequences).
+    class function IsValidAnsi(var Buffer: TBytes; BytesRead: integer): boolean; static;
+
+    /// Detects the text encoding of a byte buffer by BOM or content heuristics.
+    class function DetectEncoding(const Buffer: TBytes): TEncoding; overload; static;
+
+    /// Detects the text encoding of a file by reading its bytes.
+    class function DetectEncoding(const FileName: string): TEncoding; overload; static;
+
+    /// Detects the dominant line ending style from a byte buffer.
+    class function DetectLineEnding(const Buffer: TBytes; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding; overload; static;
+
+    /// Detects the dominant line ending style of a file.
+    class function DetectLineEnding(const FileName: string; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding; overload; static;
+
+    /// Checks whether a byte buffer ends with a line break (CR or LF).
+    class function EndsWithLineBreak(const Buffer: TBytes): boolean; overload; static;
+
+    /// Checks whether a file ends with a line break.
+    class function EndsWithLineBreak(const FileName: string): boolean; overload; static;
+
+    /// Attempts to lock a file for exclusive access and returns a file stream if successful.
+    class function TryLockFile(const AFileName: string; out Stream: TFileStream): boolean; static;
+
+    /// Loads text content from a byte array, detecting encoding and line endings.
+    class procedure ReadTextFile(const Bytes: TBytes; out Content: string; out FileEncoding: TEncoding;
+      out LineEnding: TLineEnding; out LineCount: integer); overload; static;
+
+    /// Loads text content from a file, detecting encoding and line endings.
+    class procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
+      out LineEnding: TLineEnding; out LineCount: integer); overload; static;
+
+    /// Saves a string list to a file with optional encryption and specified encoding/line endings.
+    class procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding;
+      LineEnding: TLineEnding; Encrypt: boolean; Token: string; var Salt, KeyEnc, KeyAuth: TBytes); overload; static;
+
+    /// Saves a string list to a file without encryption, using the specified encoding and line endings.
+    class procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding;
+      LineEnding: TLineEnding); overload; static;
+  end;
 
 implementation
 
-function FindPowerShellCore: string;
+class function TFileManager.FindPowerShellCore: string;
 var
   SearchPaths: array of string;
   PathEnv, PathPart, TrimmedPath: string;
@@ -106,7 +131,7 @@ begin
   end;
 end;
 
-procedure UpdateFileReadAccess(const FileName: string);
+class procedure TFileManager.UpdateFileReadAccess(const FileName: string);
 var
   {$IFDEF UNIX}
   t: utimbuf;
@@ -144,7 +169,7 @@ begin
   {$ENDIF}
 end;
 
-function GetEncodingName(Encoding: TEncoding): string;
+class function TFileManager.GetEncodingName(Encoding: TEncoding): string;
 begin
   if Encoding = TEncoding.UTF8 then
     Result := 'UTF-8'
@@ -170,12 +195,12 @@ begin
     Result := 'Unknown';
 end;
 
-function IsUserEncoding(Enc: TEncoding): boolean;
+class function TFileManager.IsUserEncoding(Enc: TEncoding): boolean;
 begin
   Result := Assigned(Enc) and not TEncoding.IsStandardEncoding(Enc);
 end;
 
-function IsBOMEncoding(Encoding: TEncoding): boolean;
+class function TFileManager.IsBOMEncoding(Encoding: TEncoding): boolean;
 begin
   // Assume false by default
   Result := False;
@@ -194,7 +219,7 @@ begin
     exit(True);
 end;
 
-function IsValidUTF8(var Buffer: TBytes; BytesRead: integer): boolean;
+class function TFileManager.IsValidUTF8(var Buffer: TBytes; BytesRead: integer): boolean;
 var
   i: integer;
   remaining: integer;
@@ -263,7 +288,7 @@ begin
       end;
 
       // Add 6 bits to the code point
-      codePoint := (codePoint shl 6) or (LongWord(Buffer[i] and $3F));
+      codePoint := (codePoint shl 6) or (longword(Buffer[i] and $3F));
       Dec(remaining);
 
       // If sequence is complete, validate the code point
@@ -320,7 +345,7 @@ begin
     Result := False;
 end;
 
-function IsValidAscii(var Buffer: TBytes; BytesRead: integer): boolean;
+class function TFileManager.IsValidAscii(var Buffer: TBytes; BytesRead: integer): boolean;
 var
   i: integer;
 begin
@@ -336,7 +361,7 @@ begin
   end;
 end;
 
-function IsValidAnsi(var Buffer: TBytes; BytesRead: integer): boolean;
+class function TFileManager.IsValidAnsi(var Buffer: TBytes; BytesRead: integer): boolean;
 var
   i: integer;
 begin
@@ -434,7 +459,7 @@ begin
   end;
 end;
 
-function DetectEncoding(const Buffer: TBytes): TEncoding; overload;
+class function TFileManager.DetectEncoding(const Buffer: TBytes): TEncoding;
 var
   ContentBuffer: TBytes = nil;
   BytesToCheck: integer;
@@ -471,7 +496,7 @@ begin
     Result := TEncoding.UTF8;
 end;
 
-function DetectEncoding(const FileName: string): TEncoding;
+class function TFileManager.DetectEncoding(const FileName: string): TEncoding;
 var
   Bytes: TBytes;
 begin
@@ -479,7 +504,7 @@ begin
   Result := DetectEncoding(Bytes);
 end;
 
-function DetectLineEnding(const Buffer: TBytes; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding; overload;
+class function TFileManager.DetectLineEnding(const Buffer: TBytes; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding;
 var
   Text: unicodestring;
   Ch, PrevCh: widechar;
@@ -566,7 +591,7 @@ begin
   end;
 end;
 
-function DetectLineEnding(const FileName: string; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding;
+class function TFileManager.DetectLineEnding(const FileName: string; Encoding: TEncoding; MaxLines: integer = 100): TLineEnding;
 var
   Bytes: TBytes;
 begin
@@ -574,7 +599,7 @@ begin
   Result := DetectLineEnding(Bytes, Encoding, MaxLines);
 end;
 
-function EndsWithLineBreak(const Buffer: TBytes): boolean;
+class function TFileManager.EndsWithLineBreak(const Buffer: TBytes): boolean;
 begin
   Result := False;
   if Length(Buffer) = 0 then Exit;
@@ -583,7 +608,7 @@ begin
     Result := True;
 end;
 
-function EndsWithLineBreak(const FileName: string): boolean;
+class function TFileManager.EndsWithLineBreak(const FileName: string): boolean;
 var
   Bytes: TBytes;
 begin
@@ -591,7 +616,7 @@ begin
   Result := EndsWithLineBreak(Bytes);
 end;
 
-function TryLockFile(const AFileName: string; out Stream: TFileStream): boolean;
+class function TFileManager.TryLockFile(const AFileName: string; out Stream: TFileStream): boolean;
 var
   fs: TFileStream;
 begin
@@ -653,8 +678,8 @@ begin
   {$ENDIF}
 end;
 
-procedure ReadTextFile(const Bytes: TBytes; out Content: string; out FileEncoding: TEncoding; out LineEnding: TLineEnding;
-  out LineCount: integer);
+class procedure TFileManager.ReadTextFile(const Bytes: TBytes; out Content: string; out FileEncoding: TEncoding;
+  out LineEnding: TLineEnding; out LineCount: integer);
 var
   StringList: TStringList;
   MemoryStream: TMemoryStream;
@@ -709,7 +734,7 @@ begin
   end;
 end;
 
-procedure ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
+class procedure TFileManager.ReadTextFile(const FileName: string; out Content: string; out FileEncoding: TEncoding;
   out LineEnding: TLineEnding; out LineCount: integer);
 var
   Bytes: TBytes;
@@ -718,7 +743,7 @@ begin
   ReadTextFile(Bytes, Content, FileEncoding, LineEnding, LineCount);
 end;
 
-procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding;
+class procedure TFileManager.SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding;
   LineEnding: TLineEnding; Encrypt: boolean; Token: string; var Salt, KeyEnc, KeyAuth: TBytes);
 var
   FileStream: TFileStream;
@@ -799,7 +824,8 @@ begin
   end;
 end;
 
-procedure SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding; LineEnding: TLineEnding);
+class procedure TFileManager.SaveTextFile(const FileName: string; StringList: TStringList; FileEncoding: TEncoding;
+  LineEnding: TLineEnding);
 var
   dummy: TBytes = nil;
 begin
@@ -816,11 +842,11 @@ initialization
   UTF16BEBOMEncoding := TEncoding.GetEncoding(1201);
 
 finalization
-  if (Assigned(UTF8BOMEncoding)) then
+  if Assigned(UTF8BOMEncoding) then
     UTF8BOMEncoding.Free;
-  if (Assigned(UTF16LEBOMEncoding)) then
+  if Assigned(UTF16LEBOMEncoding) then
     UTF16LEBOMEncoding.Free;
-  if (Assigned(UTF16BEBOMEncoding)) then
+  if Assigned(UTF16BEBOMEncoding) then
     UTF16BEBOMEncoding.Free;
 
 end.
