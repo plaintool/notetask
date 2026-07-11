@@ -919,7 +919,7 @@ resourcestring
 
 implementation
 
-uses filemanager, settings, systemtool, crypto, forminput, formmemo, formfind, formreplace, formabout, formdonate;
+uses filemanager, settings, systemtool, cryptoutils, forminput, formmemo, formfind, formreplace, formabout, formdonate;
 
   {$R *.lfm}
 

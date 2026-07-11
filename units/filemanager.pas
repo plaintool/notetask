@@ -23,7 +23,7 @@ uses
   Windows,
   {$ENDIF}
   lineending,
-  crypto;
+  cryptoutils;
 
 function FindPowerShellCore: string;
 
