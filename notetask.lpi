@@ -160,10 +160,10 @@
     </RunParams>
     <RequiredPackages>
       <Item>
-        <PackageName Value="helpers"/>
+        <PackageName Value="LCL"/>
       </Item>
       <Item>
-        <PackageName Value="toolkit"/>
+        <PackageName Value="DateTimeCtrls"/>
       </Item>
       <Item>
         <PackageName Value="darkmode"/>
@@ -172,19 +172,19 @@
         <PackageName Value="dcpcrypt"/>
       </Item>
       <Item>
+        <PackageName Value="filemanager"/>
+      </Item>
+      <Item>
         <PackageName Value="gridprinter"/>
+      </Item>
+      <Item>
+        <PackageName Value="helpers"/>
       </Item>
       <Item>
         <PackageName Value="tageditpackage"/>
       </Item>
       <Item>
-        <PackageName Value="DateTimeCtrls"/>
-      </Item>
-      <Item>
-        <PackageName Value="Printer4Lazarus"/>
-      </Item>
-      <Item>
-        <PackageName Value="LCL"/>
+        <PackageName Value="toolkit"/>
       </Item>
     </RequiredPackages>
     <Units>
@@ -198,14 +198,6 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit>
-      <Unit>
-        <Filename Value="units\lineending.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="units\filemanager.pas"/>
-        <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="units\task.pas"/>
