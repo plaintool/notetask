@@ -160,6 +160,12 @@
     </RunParams>
     <RequiredPackages>
       <Item>
+        <PackageName Value="helpers"/>
+      </Item>
+      <Item>
+        <PackageName Value="toolkit"/>
+      </Item>
+      <Item>
         <PackageName Value="darkmode"/>
       </Item>
       <Item>
@@ -258,10 +264,6 @@
       </Unit>
       <Unit>
         <Filename Value="units\mdformat.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="units\mathparser.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>

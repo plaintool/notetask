@@ -29,62 +29,76 @@ uses
   DCPsha256;
   {$POP}
 
-/// Compresses InputStream and returns a memory stream with original size prepended.
-function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
+type
+  TCrypto = class
+  private
+    {$IFDEF MSWINDOWS}
+    /// Initialize crypto libraries on first call
+    /// Dynamically loads bcrypt.dll (Vista+) and gets pointers to legacy CryptoAPI functions
+    class procedure InitializeCryptoFunctions; static;
 
-/// Decompresses InputStream using stored original size and returns resulting memory stream.
-function DecompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
+    /// Wrapper function to generate cryptographically secure random bytes
+    /// Works on Windows XP (using CryptGenRandom) and newer Windows versions (using BCryptGenRandom)
+    class function GenerateRandomBytes(len: integer): TBytes; static;
+    {$ENDIF}
 
-/// Generate cryptographically secure random bytes.
-function GetRandomBytes(len: integer): TBytes;
+    // Gentle cleaning of TMemoryStream
+    class procedure FreeMemoryStreamSecure(var Stream: TMemoryStream); static;
 
-/// Encrypts PlainData using Hash and returns combined TBytes: IV(16) || HMAC(32) || CipherText.
-function EncryptData(const PlainData: TBytes; const Token: string; var Salt, KeyEnc, KeyAuth: TBytes): TBytes;
+    /// Compresses InputStream and returns a memory stream with original size prepended.
+    class function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream; static;
 
-/// Decrypts CipherData using Hash and returns decrypted TBytes, empty on error.
-function DecryptData(const CipherData: TBytes; const Token: string; out Salt, KeyEnc, KeyAuth: TBytes): TBytes;
+    /// Decompresses InputStream using stored original size and returns resulting memory stream.
+    class function DecompressMemoryStream(InputStream: TMemoryStream): TMemoryStream; static;
 
-/// GetHash replacement that uses PBKDF2-HMAC-SHA256.
-/// - Token: user password (string). It will be treated as UTF-8 bytes.
-/// - Salt: if not assigned, will be generated (16 bytes) using GetRandomBytes.
-/// Returns 32-byte derived key.
-function GetHash(const Token: string; var Salt: TBytes; len: integer = 64): TBytes;
+    /// Generate cryptographically secure random bytes.
+    class function GetRandomBytes(len: integer): TBytes; static;
 
-/// Checks if FileName could be encrypted with our format (IV + HMAC + CipherText) without password.
-function CheckEncryptedFile(const FileName: string): boolean;
+    /// GetHash replacement that uses PBKDF2-HMAC-SHA256.
+    /// - Token: user password (string). It will be treated as UTF-8 bytes.
+    /// - Salt: if not assigned, will be generated (16 bytes) using GetRandomBytes.
+    /// Returns 32-byte derived key.
+    class function GetHash(const Token: string; var Salt: TBytes; len: integer = 64): TBytes; static;
 
-/// Loads the entire file as TBytes array.
-function LoadFileAsBytes(const FileName: string): TBytes;
+    /// Convert TBytes to array of byte given length
+    class procedure BytesToArray(const Src: TBytes; var Dest: array of byte; DestLen: integer = -1); static;
 
-/// Convert TBytes to array of byte given length
-procedure BytesToArray(const Src: TBytes; var Dest: array of byte; DestLen: integer = -1);
+    /// Constant-time comparison
+    class function ConstantTimeCompare(const A, B: array of byte): boolean; static;
 
-/// Constant-time comparison
-function ConstantTimeCompare(const A, B: array of byte): boolean;
+    /// HMAC-SHA256 using TDCP_sha256 from DCPcrypt
+    /// Input: Key (any length), Data (any length)
+    /// Output: 32-byte MAC
+    class function HMAC_SHA256(const Key, Data: TBytes): TBytes; static;
 
-// Gentle cleaning of TBytes
-procedure FreeBytesSecure(var Bytes: TBytes);
+    /// PBKDF2-HMAC-SHA256 implementation (RFC 2898-like)
+    /// Password: arbitrary bytes (we will pass UTF-8 bytes of Token)
+    /// Salt: arbitrary bytes
+    /// Iterations: number of iterations (>= 1)
+    /// DKLen: desired output length in bytes
+    class function PBKDF2_HMAC_SHA256(const Password, Salt: TBytes; Iterations, DKLen: integer): TBytes; static;
+  public
+    /// Encrypts PlainData using Hash and returns combined TBytes: IV(16) || HMAC(32) || CipherText.
+    class function EncryptData(const PlainData: TBytes; const Token: string; var Salt, KeyEnc, KeyAuth: TBytes): TBytes; static;
 
-// Gentle cleaning of TMemoryStream
-procedure FreeMemoryStreamSecure(var Stream: TMemoryStream);
+    /// Decrypts CipherData using Hash and returns decrypted TBytes, empty on error.
+    class function DecryptData(const CipherData: TBytes; const Token: string; out Salt, KeyEnc, KeyAuth: TBytes): TBytes; static;
 
-// Gentle cleaning of string
-procedure ClearStringSecure(var S: string);
+    /// Checks if FileName could be encrypted with our format (IV + HMAC + CipherText) without password.
+    class function CheckEncryptedFile(const FileName: string): boolean; static;
 
-/// Returns an independent copy of a TBytes array
-function CopyBytes(const Source: TBytes): TBytes;
+    /// Returns an independent copy of a TBytes array
+    class function CopyBytes(const Source: TBytes): TBytes; static;
 
-/// HMAC-SHA256 using TDCP_sha256 from DCPcrypt
-/// Input: Key (any length), Data (any length)
-/// Output: 32-byte MAC
-function HMAC_SHA256(const Key, Data: TBytes): TBytes;
+    /// Loads the entire file as TBytes array.
+    class function LoadFileAsBytes(const FileName: string): TBytes; static;
 
-/// PBKDF2-HMAC-SHA256 implementation (RFC 2898-like)
-/// Password: arbitrary bytes (we will pass UTF-8 bytes of Token)
-/// Salt: arbitrary bytes
-/// Iterations: number of iterations (>= 1)
-/// DKLen: desired output length in bytes
-function PBKDF2_HMAC_SHA256(const Password, Salt: TBytes; Iterations, DKLen: integer): TBytes;
+    /// Gentle cleaning of string
+    class procedure ClearStringSecure(var S: string); static;
+
+    /// Gentle cleaning of TBytes
+    class procedure FreeBytesSecure(var Bytes: TBytes); static;
+  end;
 
 implementation
 
@@ -93,7 +107,9 @@ const
   HASH_ITERATIONS = 50000;
   MAX_ALLOWED_UNCOMPRESSED = 512 * 1024 * 1024;
 
-{$IFDEF MSWINDOWS}
+  {%Region -fold Windows Utils}
+  {$IFDEF WINDOWS}
+
 type
   NTSTATUS = longint;
   PUCHAR = pbyte;
@@ -130,9 +146,7 @@ var
   BCryptLibHandle: THandle = 0;
   AdvApiLibHandle: THandle = 0;
 
-// Initialize crypto libraries on first call
-// Dynamically loads bcrypt.dll (Vista+) and gets pointers to legacy CryptoAPI functions
-procedure InitializeCryptoFunctions;
+class procedure TCrypto.InitializeCryptoFunctions;
 begin
   if LibrariesInitialized then Exit;
 
@@ -163,9 +177,7 @@ begin
   LibrariesInitialized := True;
 end;
 
-// Wrapper function to generate cryptographically secure random bytes
-// Works on Windows XP (using CryptGenRandom) and newer Windows versions (using BCryptGenRandom)
-function GenerateRandomBytes(len: integer): TBytes;
+class function TCrypto.GenerateRandomBytes(len: integer): TBytes;
 var
   hProv: HCRYPTPROV;
 begin
@@ -173,7 +185,7 @@ begin
   SetLength(Result, len);
 
   // Initialize libraries on first call
-  InitializeCryptoFunctions;
+  TCrypto.InitializeCryptoFunctions;
 
   // First try: Use BCryptGenRandom (available on Windows Vista and later)
   if Assigned(BCryptGenRandomPtr) then
@@ -206,95 +218,12 @@ begin
   raise Exception.Create('Operation failed');
 end;
 
-{$ENDIF}
+  {$ENDIF}
+  {%EndRegion}
 
-function CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
-var
-  Source, Dest: pchar;
-  SourceLen, DestLen: cardinal;
-  MemPtr: pchar;
-begin
-  if InputStream.Size = 0 then
-  begin
-    Result := TMemoryStream.Create;
-    Exit;
-  end;
+  {%Region -fold Encrypt / Decrypt}
 
-  InputStream.Position := 0;
-  SourceLen := InputStream.Size;
-  Source := InputStream.Memory;
-
-  Result := TMemoryStream.Create;
-  try
-    // calculate maximum possible compressed size
-    DestLen := SourceLen + ((SourceLen + 7) shr 3) + ((SourceLen + 63) shr 6) + 11;
-
-    // allocate buffer (4 bytes for original size header + compressed data)
-    Result.SetSize(4 + DestLen);
-
-    MemPtr := Result.Memory;
-
-    // leave 4 bytes at start for OriginalSize
-    Dest := MemPtr;
-    Inc(pbyte(Dest), 4);
-
-    // compress updates DestLen with actual compressed size
-    if compress(Dest, DestLen, Source, SourceLen) <> Z_OK then
-      raise Exception.Create('Compression failed');
-
-    // store original (uncompressed) size in the first 4 bytes
-    PCardinal(MemPtr)^ := SourceLen;
-
-    // shrink buffer to real compressed size
-    Result.SetSize(4 + DestLen);
-    Result.Position := 0;
-  except
-    Result.Free;
-    raise;
-  end;
-end;
-
-function DecompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
-var
-  Source, Dest: pchar;
-  OriginalSize, DestLen: cardinal;
-  MemPtr: pchar;
-begin
-  if InputStream.Size = 0 then
-  begin
-    Result := TMemoryStream.Create;
-    Exit;
-  end;
-
-  InputStream.Position := 0;
-  MemPtr := InputStream.Memory;
-
-  // read original uncompressed size
-  OriginalSize := PCardinal(MemPtr)^;
-
-  if (InputStream.Size < 4 + 1) or (OriginalSize = 0) or (OriginalSize > MAX_ALLOWED_UNCOMPRESSED) then
-    raise Exception.Create('Operation failed');
-
-  Source := MemPtr;
-  Inc(pbyte(Source), 4); // compressed data starts after 4 bytes
-
-  Result := TMemoryStream.Create;
-  try
-    DestLen := OriginalSize;
-    Result.SetSize(DestLen);
-    Dest := Result.Memory;
-
-    if uncompress(Dest, DestLen, Source, InputStream.Size - 4) <> Z_OK then
-      raise Exception.Create('Operation failed');
-
-    Result.Position := 0;
-  except
-    Result.Free;
-    raise;
-  end;
-end;
-
-function EncryptData(const PlainData: TBytes; const Token: string; var Salt, KeyEnc, KeyAuth: TBytes): TBytes;
+class function TCrypto.EncryptData(const PlainData: TBytes; const Token: string; var Salt, KeyEnc, KeyAuth: TBytes): TBytes;
 var
   Cipher: TDCP_rijndael;
   Sha256: TDCP_sha256;
@@ -320,12 +249,12 @@ begin
       InputStream.WriteBuffer(PlainData[0], Length(PlainData));
 
     // generate random IV
-    BytesToArray(GetRandomBytes(16), IV);
+    TCrypto.BytesToArray(TCrypto.GetRandomBytes(16), IV);
 
     // derive keys directly from precomputed hash (32 bytes for AES-256)
     if (Length(KeyEnc) <> 32) or (Length(KeyAuth) <> 32) then
     begin
-      Hash := GetHash(Token, Salt);
+      Hash := TCrypto.GetHash(Token, Salt);
       if Length(Hash) < 64 then raise Exception.Create('Operation failed');
       SetLength(KeyEnc, 32);
       SetLength(KeyAuth, 32);
@@ -334,7 +263,7 @@ begin
     end;
 
     // compress before encryption
-    CompressedStream := CompressMemoryStream(InputStream);
+    CompressedStream := TCrypto.CompressMemoryStream(InputStream);
     try
       CompressedStream.Position := 0;
 
@@ -347,7 +276,7 @@ begin
         Cipher.Burn;
       end;
     finally
-      FreeMemoryStreamSecure(CompressedStream);
+      TCrypto.FreeMemoryStreamSecure(CompressedStream);
     end;
 
     // compute data to authenticate
@@ -359,7 +288,7 @@ begin
         OutputStream.Size);
 
     // compute HMAC
-    BytesToArray(HMAC_SHA256(KeyAuth, DataToAuth), HMAC);
+    TCrypto.BytesToArray(TCrypto.HMAC_SHA256(KeyAuth, DataToAuth), HMAC);
 
     // allocate container: MAGIC + SALT + IV + HMAC + CipherText
     SetLength(Container, int64(Length(FILE_MAGIC)) + int64(Length(Salt)) + int64(Length(IV)) + int64(Length(HMAC)) + OutputStream.Size);
@@ -390,17 +319,17 @@ begin
     // clear sensitive memory
     FillChar(HMAC, SizeOf(HMAC), 0);
     FillChar(IV, SizeOf(IV), 0);
-    FreeBytesSecure(DataToAuth);
-    FreeBytesSecure(Hash);
+    TCrypto.FreeBytesSecure(DataToAuth);
+    TCrypto.FreeBytesSecure(Hash);
 
-    FreeMemoryStreamSecure(InputStream);
-    FreeMemoryStreamSecure(OutputStream);
+    TCrypto.FreeMemoryStreamSecure(InputStream);
+    TCrypto.FreeMemoryStreamSecure(OutputStream);
     Cipher.Free;
     Sha256.Free;
   end;
 end;
 
-function DecryptData(const CipherData: TBytes; const Token: string; out Salt, KeyEnc, KeyAuth: TBytes): TBytes;
+class function TCrypto.DecryptData(const CipherData: TBytes; const Token: string; out Salt, KeyEnc, KeyAuth: TBytes): TBytes;
 var
   Cipher: TDCP_rijndael;
   Sha256: TDCP_sha256;
@@ -449,14 +378,14 @@ begin
       EncryptedSize := InputStream.Size - (int64(SizeOf(Magic)) + int64(Length(Salt)) + int64(SizeOf(IV)) + int64(SizeOf(HMAC)));
       if EncryptedSize < 0 then
       begin
-        FreeBytesSecure(Salt);
+        TCrypto.FreeBytesSecure(Salt);
         Exit;
       end;
       EncryptedStream.CopyFrom(InputStream, EncryptedSize);
       EncryptedStream.Position := 0;
 
       // derive keys
-      Hash := GetHash(Token, Salt);
+      Hash := TCrypto.GetHash(Token, Salt);
       if Length(Hash) < 64 then raise Exception.Create('Operation failed');
       KeyEnc := nil;
       KeyAuth := nil;
@@ -473,15 +402,15 @@ begin
         Move(EncryptedStream.Memory^, DataToVerify[Length(Salt) + SizeOf(IV)],
           EncryptedStream.Size);
       // compute expected HMAC
-      BytesToArray(HMAC_SHA256(KeyAuth, DataToVerify), ExpectedHMAC);
+      TCrypto.BytesToArray(TCrypto.HMAC_SHA256(KeyAuth, DataToVerify), ExpectedHMAC);
       FillChar(DataToVerify[0], Length(DataToVerify), 0);
 
       // verify HMAC using constant-time comparison
-      if not ConstantTimeCompare(HMAC, ExpectedHMAC) then
+      if not TCrypto.ConstantTimeCompare(HMAC, ExpectedHMAC) then
       begin
-        FreeBytesSecure(Salt);
-        FreeBytesSecure(KeyEnc);
-        FreeBytesSecure(KeyAuth);
+        TCrypto.FreeBytesSecure(Salt);
+        TCrypto.FreeBytesSecure(KeyEnc);
+        TCrypto.FreeBytesSecure(KeyAuth);
         Exit;
       end;
 
@@ -498,13 +427,13 @@ begin
       // decompress
       if OutputStream.Size > 0 then
       begin
-        DecompressedStream := DecompressMemoryStream(OutputStream);
+        DecompressedStream := TCrypto.DecompressMemoryStream(OutputStream);
         try
           SetLength(OutBytes, DecompressedStream.Size);
           DecompressedStream.Position := 0;
           DecompressedStream.ReadBuffer(OutBytes[0], DecompressedStream.Size);
         finally
-          FreeMemoryStreamSecure(DecompressedStream);
+          TCrypto.FreeMemoryStreamSecure(DecompressedStream);
         end;
 
         Result := Outbytes;
@@ -515,96 +444,25 @@ begin
       FillChar(HMAC, SizeOf(HMAC), 0);
       FillChar(ExpectedHMAC, SizeOf(ExpectedHMAC), 0);
       FillChar(Magic, SizeOf(Magic), 0);
-      FreeBytesSecure(DataToVerify);
-      FreeBytesSecure(Hash);
+      TCrypto.FreeBytesSecure(DataToVerify);
+      TCrypto.FreeBytesSecure(Hash);
       EncryptedSize := 0;
 
-      FreeMemoryStreamSecure(InputStream);
-      FreeMemoryStreamSecure(EncryptedStream);
-      FreeMemoryStreamSecure(OutputStream);
+      TCrypto.FreeMemoryStreamSecure(InputStream);
+      TCrypto.FreeMemoryStreamSecure(EncryptedStream);
+      TCrypto.FreeMemoryStreamSecure(OutputStream);
       Cipher.Free;
       Sha256.Free;
     end;
   except
-    FreeBytesSecure(Salt);
-    FreeBytesSecure(KeyEnc);
-    FreeBytesSecure(KeyAuth);
+    TCrypto.FreeBytesSecure(Salt);
+    TCrypto.FreeBytesSecure(KeyEnc);
+    TCrypto.FreeBytesSecure(KeyAuth);
     raise;
   end;
 end;
 
-function GetRandomBytes(len: integer): TBytes;
-  {$IFDEF UNIX}
-var
-  stream: TFileStream;
-  {$ENDIF}
-begin
-  Result := nil;
-  if len <= 0 then
-    Exit;
-  SetLength(Result, len);
-  {$IFDEF UNIX}
-    stream := TFileStream.Create('/dev/urandom', fmOpenRead);
-  try
-    if stream.Read(Result[0], len) <> len then
-    begin
-      FreeBytesSecure(Result);
-      raise Exception.Create('Operation failed');
-    end;
-  finally
-    stream.Free;
-  end;
-  {$ELSE}
-  // On Windows, use BCryptGenRandom (CNG)
-  try
-    Result := GenerateRandomBytes(len);
-  except
-    FreeBytesSecure(Result);
-    raise Exception.Create('Operation failed');
-  end;
-  {$ENDIF}
-end;
-
-function GetHash(const Token: string; var Salt: TBytes; len: integer = 64): TBytes;
-var
-  PasswordBytes: TBytes = nil;
-  Derived: TBytes;
-  TempToken: string;
-begin
-  Result := nil;
-  try
-    // Ensure salt exists (16 bytes)
-    if (not Assigned(Salt)) or (Length(Salt) <> 16) then
-      Salt := GetRandomBytes(16);
-
-    // Convert Token (Unicode) to UTF-8 bytes
-    TempToken := UTF8Encode(Token);
-    try
-      SetLength(PasswordBytes, Length(TempToken));
-      if Length(PasswordBytes) > 0 then
-        Move(TempToken[1], PasswordBytes[0], Length(PasswordBytes));
-    finally
-      ClearStringSecure(TempToken);
-    end;
-
-    // Derive key with PBKDF2-HMAC-SHA256
-    Derived := PBKDF2_HMAC_SHA256(PasswordBytes, Salt, HASH_ITERATIONS, len);
-
-    // Return derived key
-    SetLength(Result, len);
-    if Length(Derived) >= len then
-      Move(Derived[0], Result[0], len)
-    else
-      FillChar(Result[0], len, 0);
-  finally
-    // clear sensitive memory
-    if (Assigned(PasswordBytes)) and (Length(PasswordBytes) > 0) then
-      FreeBytesSecure(PasswordBytes);
-    FreeBytesSecure(Derived);
-  end;
-end;
-
-function CheckEncryptedFile(const FileName: string): boolean;
+class function TCrypto.CheckEncryptedFile(const FileName: string): boolean;
 var
   FS: TFileStream;
   Magic: array[0..3] of byte = (0, 0, 0, 0);
@@ -625,7 +483,19 @@ begin
   end;
 end;
 
-function LoadFileAsBytes(const FileName: string): TBytes;
+{%EndRegion}
+
+{%Region Crypto utils}
+
+class function TCrypto.CopyBytes(const Source: TBytes): TBytes;
+begin
+  Result := nil;
+  SetLength(Result, Length(Source));
+  if Length(Source) > 0 then
+    Move(Source[0], Result[0], Length(Source));
+end;
+
+class function TCrypto.LoadFileAsBytes(const FileName: string): TBytes;
 var
   FS: TFileStream;
 begin
@@ -643,7 +513,199 @@ begin
   end;
 end;
 
-procedure BytesToArray(const Src: TBytes; var Dest: array of byte; DestLen: integer = -1);
+class procedure TCrypto.ClearStringSecure(var S: string);
+begin
+  if S <> string.Empty then
+  begin
+    FillChar(S[1], Length(S) * SizeOf(char), 0);
+    S := string.Empty;
+  end;
+end;
+
+class procedure TCrypto.FreeBytesSecure(var Bytes: TBytes);
+begin
+  if Length(Bytes) > 0 then
+    FillChar(Bytes[0], Length(Bytes), 0);
+  SetLength(Bytes, 0);
+end;
+
+{%EndRegion}
+
+{%Region -fold Class functions}
+
+class procedure TCrypto.FreeMemoryStreamSecure(var Stream: TMemoryStream);
+begin
+  if Assigned(Stream) then
+  begin
+    if Stream.Size > 0 then
+    begin
+      // fill memory with zeros
+      FillChar(Stream.Memory^, Stream.Size, 0);
+      Stream.Clear;
+    end;
+    Stream.Free;
+    Stream := nil;
+  end;
+end;
+
+class function TCrypto.CompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
+var
+  Source, Dest: pchar;
+  SourceLen, DestLen: cardinal;
+  MemPtr: pchar;
+begin
+  if InputStream.Size = 0 then
+  begin
+    Result := TMemoryStream.Create;
+    Exit;
+  end;
+
+  InputStream.Position := 0;
+  SourceLen := InputStream.Size;
+  Source := InputStream.Memory;
+
+  Result := TMemoryStream.Create;
+  try
+    // calculate maximum possible compressed size
+    DestLen := SourceLen + ((SourceLen + 7) shr 3) + ((SourceLen + 63) shr 6) + 11;
+
+    // allocate buffer (4 bytes for original size header + compressed data)
+    Result.SetSize(4 + DestLen);
+
+    MemPtr := Result.Memory;
+
+    // leave 4 bytes at start for OriginalSize
+    Dest := MemPtr;
+    Inc(pbyte(Dest), 4);
+
+    // compress updates DestLen with actual compressed size
+    if compress(Dest, DestLen, Source, SourceLen) <> Z_OK then
+      raise Exception.Create('Compression failed');
+
+    // store original (uncompressed) size in the first 4 bytes
+    PCardinal(MemPtr)^ := SourceLen;
+
+    // shrink buffer to real compressed size
+    Result.SetSize(4 + DestLen);
+    Result.Position := 0;
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+class function TCrypto.DecompressMemoryStream(InputStream: TMemoryStream): TMemoryStream;
+var
+  Source, Dest: pchar;
+  OriginalSize, DestLen: cardinal;
+  MemPtr: pchar;
+begin
+  if InputStream.Size = 0 then
+  begin
+    Result := TMemoryStream.Create;
+    Exit;
+  end;
+
+  InputStream.Position := 0;
+  MemPtr := InputStream.Memory;
+
+  // read original uncompressed size
+  OriginalSize := PCardinal(MemPtr)^;
+
+  if (InputStream.Size < 4 + 1) or (OriginalSize = 0) or (OriginalSize > MAX_ALLOWED_UNCOMPRESSED) then
+    raise Exception.Create('Operation failed');
+
+  Source := MemPtr;
+  Inc(pbyte(Source), 4); // compressed data starts after 4 bytes
+
+  Result := TMemoryStream.Create;
+  try
+    DestLen := OriginalSize;
+    Result.SetSize(DestLen);
+    Dest := Result.Memory;
+
+    if uncompress(Dest, DestLen, Source, InputStream.Size - 4) <> Z_OK then
+      raise Exception.Create('Operation failed');
+
+    Result.Position := 0;
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+class function TCrypto.GetRandomBytes(len: integer): TBytes;
+  {$IFDEF UNIX}
+var
+  stream: TFileStream;
+  {$ENDIF}
+begin
+  Result := nil;
+  if len <= 0 then
+    Exit;
+  SetLength(Result, len);
+  {$IFDEF UNIX}
+    stream := TFileStream.Create('/dev/urandom', fmOpenRead);
+  try
+    if stream.Read(Result[0], len) <> len then
+    begin
+      TCrypto.FreeBytesSecure(Result);
+      raise Exception.Create('Operation failed');
+    end;
+  finally
+    stream.Free;
+  end;
+  {$ELSE}
+  // On Windows, use BCryptGenRandom (CNG)
+  try
+    Result := TCrypto.GenerateRandomBytes(len);
+  except
+    TCrypto.FreeBytesSecure(Result);
+    raise Exception.Create('Operation failed');
+  end;
+  {$ENDIF}
+end;
+
+class function TCrypto.GetHash(const Token: string; var Salt: TBytes; len: integer = 64): TBytes;
+var
+  PasswordBytes: TBytes = nil;
+  Derived: TBytes;
+  TempToken: string;
+begin
+  Result := nil;
+  try
+    // Ensure salt exists (16 bytes)
+    if (not Assigned(Salt)) or (Length(Salt) <> 16) then
+      Salt := TCrypto.GetRandomBytes(16);
+
+    // Convert Token (Unicode) to UTF-8 bytes
+    TempToken := UTF8Encode(Token);
+    try
+      SetLength(PasswordBytes, Length(TempToken));
+      if Length(PasswordBytes) > 0 then
+        Move(TempToken[1], PasswordBytes[0], Length(PasswordBytes));
+    finally
+      TCrypto.ClearStringSecure(TempToken);
+    end;
+
+    // Derive key with PBKDF2-HMAC-SHA256
+    Derived := TCrypto.PBKDF2_HMAC_SHA256(PasswordBytes, Salt, HASH_ITERATIONS, len);
+
+    // Return derived key
+    SetLength(Result, len);
+    if Length(Derived) >= len then
+      Move(Derived[0], Result[0], len)
+    else
+      FillChar(Result[0], len, 0);
+  finally
+    // clear sensitive memory
+    if (Assigned(PasswordBytes)) and (Length(PasswordBytes) > 0) then
+      TCrypto.FreeBytesSecure(PasswordBytes);
+    TCrypto.FreeBytesSecure(Derived);
+  end;
+end;
+
+class procedure TCrypto.BytesToArray(const Src: TBytes; var Dest: array of byte; DestLen: integer = -1);
 var
   CopyLen: integer;
   RealDestLen: integer;
@@ -677,7 +739,7 @@ begin
     FillChar(Src[0], Length(Src), 0);
 end;
 
-function ConstantTimeCompare(const A, B: array of byte): boolean;
+class function TCrypto.ConstantTimeCompare(const A, B: array of byte): boolean;
 var
   i: integer;
   diff: byte;
@@ -691,46 +753,7 @@ begin
   Result := diff = 0;
 end;
 
-procedure FreeBytesSecure(var Bytes: TBytes);
-begin
-  if Length(Bytes) > 0 then
-    FillChar(Bytes[0], Length(Bytes), 0);
-  SetLength(Bytes, 0);
-end;
-
-procedure FreeMemoryStreamSecure(var Stream: TMemoryStream);
-begin
-  if Assigned(Stream) then
-  begin
-    if Stream.Size > 0 then
-    begin
-      // fill memory with zeros
-      FillChar(Stream.Memory^, Stream.Size, 0);
-      Stream.Clear;
-    end;
-    Stream.Free;
-    Stream := nil;
-  end;
-end;
-
-procedure ClearStringSecure(var S: string);
-begin
-  if S <> string.Empty then
-  begin
-    FillChar(S[1], Length(S) * SizeOf(char), 0);
-    S := string.Empty;
-  end;
-end;
-
-function CopyBytes(const Source: TBytes): TBytes;
-begin
-  Result := nil;
-  SetLength(Result, Length(Source));
-  if Length(Source) > 0 then
-    Move(Source[0], Result[0], Length(Source));
-end;
-
-function HMAC_SHA256(const Key, Data: TBytes): TBytes;
+class function TCrypto.HMAC_SHA256(const Key, Data: TBytes): TBytes;
 var
   Sha: TDCP_sha256;
   BlockKey: array[0..63] of byte = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -814,11 +837,11 @@ begin
     FillChar(IKeyPad, SizeOf(IKeyPad), 0);
     FillChar(OKeyPad, SizeOf(OKeyPad), 0);
     FillChar(TempHash, SizeOf(TempHash), 0);
-    FreeBytesSecure(TempData);
+    TCrypto.FreeBytesSecure(TempData);
   end;
 end;
 
-function PBKDF2_HMAC_SHA256(const Password, Salt: TBytes; Iterations, DKLen: integer): TBytes;
+class function TCrypto.PBKDF2_HMAC_SHA256(const Password, Salt: TBytes; Iterations, DKLen: integer): TBytes;
 var
   HLen: integer;
   L, i, j, k: integer;
@@ -862,14 +885,14 @@ begin
         Move(Salt[0], TmpKey[0], Length(Salt));
       Move(IntBlock[0], TmpKey[Length(Salt)], 4);
 
-      Accumulator := HMAC_SHA256(Password, TmpKey);
+      Accumulator := TCrypto.HMAC_SHA256(Password, TmpKey);
       // U1 = HMAC(Password, Salt || INT(i))
       U := Accumulator;
 
       // iterate U2..Uc
       for j := 2 to Iterations do
       begin
-        U := HMAC_SHA256(Password, U);  // Uj = HMAC(Password, Uj-1)
+        U := TCrypto.HMAC_SHA256(Password, U);  // Uj = HMAC(Password, Uj-1)
         for k := 0 to HLen - 1 do
           Accumulator[k] := Accumulator[k] xor U[k];
       end;
@@ -888,12 +911,14 @@ begin
     end;
   finally
     // clear locals
-    FreeBytesSecure(TBlk);
-    FreeBytesSecure(U);
+    TCrypto.FreeBytesSecure(TBlk);
+    TCrypto.FreeBytesSecure(U);
     FillChar(IntBlock, SizeOf(IntBlock), 0);
-    FreeBytesSecure(TmpKey);
-    FreeBytesSecure(Accumulator);
+    TCrypto.FreeBytesSecure(TmpKey);
+    TCrypto.FreeBytesSecure(Accumulator);
   end;
 end;
+
+{%EndRegion}
 
 end.

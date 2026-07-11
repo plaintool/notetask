@@ -987,9 +987,9 @@ begin
   FSortOrder := soAscending;
   FKeyPressed := string.Empty;
   FEncrypted := False;
-  FreeBytesSecure(FKeyEnc);
-  FreeBytesSecure(FKeyAuth);
-  FreeBytesSecure(FSalt);
+  TCrypto.FreeBytesSecure(FKeyEnc);
+  TCrypto.FreeBytesSecure(FKeyAuth);
+  TCrypto.FreeBytesSecure(FSalt);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
 
@@ -5109,9 +5109,9 @@ begin
     panelTabs.Visible := False;
 
     FEncrypted := False;
-    FreeBytesSecure(FKeyEnc);
-    FreeBytesSecure(FKeyAuth);
-    FreeBytesSecure(FSalt);
+    TCrypto.FreeBytesSecure(FKeyEnc);
+    TCrypto.FreeBytesSecure(FKeyAuth);
+    TCrypto.FreeBytesSecure(FSalt);
 
     // Encoding of new file
     FEncoding := TEncoding.UTF8;
@@ -5166,12 +5166,12 @@ begin
   EncryptedOld := FEncrypted;
   FEncrypted := False;
 
-  KeyEncOld := CopyBytes(FKeyEnc);
-  KeyAuthOld := CopyBytes(FKeyAuth);
-  SaltOld := CopyBytes(FSalt);
-  FreeBytesSecure(FKeyEnc);
-  FreeBytesSecure(FKeyAuth);
-  FreeBytesSecure(FSalt);
+  KeyEncOld := TCrypto.CopyBytes(FKeyEnc);
+  KeyAuthOld := TCrypto.CopyBytes(FKeyAuth);
+  SaltOld := TCrypto.CopyBytes(FSalt);
+  TCrypto.FreeBytesSecure(FKeyEnc);
+  TCrypto.FreeBytesSecure(FKeyAuth);
+  TCrypto.FreeBytesSecure(FSalt);
   FileNameOld := FFileName;
   FFileName := fileName;
   EditComplete;
@@ -5179,10 +5179,10 @@ begin
   FreeFile;
   ReadOnly := not TryLockFile(FFileName, FSReserved);
 
-  if (CheckEncryptedFile(FFileName)) then
+  if (TCrypto.CheckEncryptedFile(FFileName)) then
   begin
     FEncrypted := True;
-    Bytes := DecryptData(LoadFileAsBytes(FFileName), string.Empty, FSalt, FKeyEnc, FKeyAuth);
+    Bytes := TCrypto.DecryptData(TCrypto.LoadFileAsBytes(FFileName), string.Empty, FSalt, FKeyEnc, FKeyAuth);
     if Bytes = nil then
     begin
       // Create an instance of the form
@@ -5217,14 +5217,14 @@ begin
           else
           begin
             FEncrypted := EncryptedOld;
-            FKeyEnc := CopyBytes(KeyEncOld);
-            FKeyAuth := CopyBytes(KeyAuthOld);
-            FSalt := CopyBytes(SaltOld);
+            FKeyEnc := TCrypto.CopyBytes(KeyEncOld);
+            FKeyAuth := TCrypto.CopyBytes(KeyAuthOld);
+            FSalt := TCrypto.CopyBytes(SaltOld);
             exit(False);
           end;
         end;
 
-        Bytes := DecryptData(LoadFileAsBytes(FFileName), Token, FSalt, FKeyEnc, FKeyAuth);
+        Bytes := TCrypto.DecryptData(TCrypto.LoadFileAsBytes(FFileName), Token, FSalt, FKeyEnc, FKeyAuth);
         if (Bytes <> nil) then
           ReadTextFile(Bytes, Content, FEncoding, FLineEnding, FLineCount)
         else
@@ -5239,17 +5239,17 @@ begin
           else
           begin
             FEncrypted := EncryptedOld;
-            FKeyEnc := CopyBytes(KeyEncOld);
-            FKeyAuth := CopyBytes(KeyAuthOld);
-            FSalt := CopyBytes(SaltOld);
+            FKeyEnc := TCrypto.CopyBytes(KeyEncOld);
+            FKeyAuth := TCrypto.CopyBytes(KeyAuthOld);
+            FSalt := TCrypto.CopyBytes(SaltOld);
             exit(False);
           end;
         end;
       finally
-        ClearStringSecure(Token);
-        FreeBytesSecure(KeyEncOld);
-        FreeBytesSecure(KeyAuthOld);
-        FreeBytesSecure(SaltOld);
+        TCrypto.ClearStringSecure(Token);
+        TCrypto.FreeBytesSecure(KeyEncOld);
+        TCrypto.FreeBytesSecure(KeyAuthOld);
+        TCrypto.FreeBytesSecure(SaltOld);
         Hide;
       end;
     end
@@ -5308,9 +5308,9 @@ begin
           begin
             FEncrypted := True;
             Token := editText.Text;
-            FreeBytesSecure(FSalt);
-            FreeBytesSecure(FKeyEnc);
-            FreeBytesSecure(FKeyAuth);
+            TCrypto.FreeBytesSecure(FSalt);
+            TCrypto.FreeBytesSecure(FKeyEnc);
+            TCrypto.FreeBytesSecure(FKeyAuth);
           end
           else
           begin
@@ -5325,9 +5325,9 @@ begin
       if saveAs then
       begin
         FEncrypted := False;
-        FreeBytesSecure(FSalt);
-        FreeBytesSecure(FKeyEnc);
-        FreeBytesSecure(FKeyAuth);
+        TCrypto.FreeBytesSecure(FSalt);
+        TCrypto.FreeBytesSecure(FKeyEnc);
+        TCrypto.FreeBytesSecure(FKeyAuth);
       end;
 
       TaskList := Tasks.ToStringList;
@@ -5360,7 +5360,7 @@ begin
 
     SetInfo;
   finally
-    ClearStringSecure(Token);
+    TCrypto.ClearStringSecure(Token);
   end;
 end;
 

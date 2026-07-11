@@ -475,7 +475,7 @@ function DetectEncoding(const FileName: string): TEncoding;
 var
   Bytes: TBytes;
 begin
-  Bytes := LoadFileAsBytes(FileName);
+  Bytes := TCrypto.LoadFileAsBytes(FileName);
   Result := DetectEncoding(Bytes);
 end;
 
@@ -570,7 +570,7 @@ function DetectLineEnding(const FileName: string; Encoding: TEncoding; MaxLines:
 var
   Bytes: TBytes;
 begin
-  Bytes := LoadFileAsBytes(FileName);
+  Bytes := TCrypto.LoadFileAsBytes(FileName);
   Result := DetectLineEnding(Bytes, Encoding, MaxLines);
 end;
 
@@ -587,7 +587,7 @@ function EndsWithLineBreak(const FileName: string): boolean;
 var
   Bytes: TBytes;
 begin
-  Bytes := LoadFileAsBytes(FileName);
+  Bytes := TCrypto.LoadFileAsBytes(FileName);
   Result := EndsWithLineBreak(Bytes);
 end;
 
@@ -714,7 +714,7 @@ procedure ReadTextFile(const FileName: string; out Content: string; out FileEnco
 var
   Bytes: TBytes;
 begin
-  Bytes := LoadFileAsBytes(FileName);
+  Bytes := TCrypto.LoadFileAsBytes(FileName);
   ReadTextFile(Bytes, Content, FileEncoding, LineEnding, LineCount);
 end;
 
@@ -765,7 +765,7 @@ begin
         Bytes := TextBytes;
 
       // Encrypt bytes
-      Bytes := EncryptData(Bytes, Token, Salt, KeyEnc, KeyAuth);
+      Bytes := TCrypto.EncryptData(Bytes, Token, Salt, KeyEnc, KeyAuth);
 
       // Write encrypted bytes to file
       if Length(Bytes) > 0 then
@@ -806,7 +806,7 @@ begin
   try
     SaveTextFile(FileName, StringList, FileEncoding, LineEnding, False, string.Empty, dummy, dummy, dummy);
   finally
-    FreeBytesSecure(dummy);
+    TCrypto.FreeBytesSecure(dummy);
   end;
 end;
 
