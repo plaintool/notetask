@@ -45,7 +45,7 @@ var
 
 implementation
 
-uses systemtool;
+uses consts, localize, darkutils;
 
   {$R *.lfm}
 
@@ -53,10 +53,10 @@ uses systemtool;
 
 procedure TformDonateNotetask.FormCreate(Sender: TObject);
 begin
-  ApplicationTranslate(language, self);
+  TLocalize.ApplicationTranslate(APP_NAME, language, self);
 
-  labelBank.Font.Color := ThemeColor(clBlue, clSkyBlue);
-  labelCrypto.Font.Color := ThemeColor(clBlue, clSkyBlue);
+  labelBank.Font.Color := TDarkUtils.ThemeColor(clBlue, clSkyBlue);
+  labelCrypto.Font.Color := TDarkUtils.ThemeColor(clBlue, clSkyBlue);
 end;
 
 procedure TformDonateNotetask.labelBankClick(Sender: TObject);

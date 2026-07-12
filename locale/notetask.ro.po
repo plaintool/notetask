@@ -202,19 +202,6 @@ msgstr "Fără titlu"
 msgid "&Yes"
 msgstr "&Da"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "Este disponibilă o nouă versiune: %s. Deschideți pagina GitHub pentru descărcare?"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "Eroare la verificarea versiunii:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "Versiunea dvs. este la zi."
-
 #: task.rdays
 msgid "d"
 msgstr "z"
@@ -1056,3 +1043,4 @@ msgstr "Caută:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Înlocuiește cu:"
+

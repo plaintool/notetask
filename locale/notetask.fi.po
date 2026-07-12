@@ -202,19 +202,6 @@ msgstr "Nimetön"
 msgid "&Yes"
 msgstr "Kyllä"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "Uusi versio saatavilla: %s. Avataanko GitHub-sivu ladataksesi sen?"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "Virhe tarkistettaessa versiota:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "Versiosi on ajan tasalla."
-
 #: task.rdays
 msgid "d"
 msgstr "pv"
@@ -1056,3 +1043,4 @@ msgstr "Etsi mitä:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Korvaa tällä:"
+

@@ -22,7 +22,7 @@ uses
   StrUtils,
   DateUtils,
   TagEdit,
-  formattool;
+  arrayhelpers;
 
 type
   // Class representing a single task
@@ -198,7 +198,7 @@ const
 
 implementation
 
-uses mdformat;
+uses mdformat, mathparser, stringhelper, stringshelper;
 
   { TTask }
 
@@ -279,7 +279,7 @@ end;
 
 procedure TTask.FillTags;
 begin
-  FillTagsFromString(FTags, FText, True);
+  FTags.FillTagsFromString(FText, True);
 end;
 
 function TTask.MatchesFilter(const Filter: string; DisplayTime: boolean): boolean;
@@ -329,10 +329,10 @@ var
     else
     begin
       // String comparison
-      if Op = '=' then Result := ULower(A) = ULower(B)
-      else if (Op = '<>') or (Op = '!=') then Result := ULower(A) <> ULower(B)
-      else if Op = '!' then Result := Pos(ULower(B), ULower(A)) = 0
-      else if Op = '#' then Result := Pos(ULower('#' + B), ULower(A)) > 0
+      if Op = '=' then Result := A.UTF8Lower = B.UTF8Lower
+      else if (Op = '<>') or (Op = '!=') then Result := A.UTF8Lower <> B.UTF8Lower
+      else if Op = '!' then Result := Pos(B.UTF8Lower, A.UTF8Lower) = 0
+      else if Op = '#' then Result := Pos('#' + B.UTF8Lower, A.UTF8Lower) > 0
       else
         Result := False;
     end;
@@ -347,7 +347,7 @@ var
     begin
       if Op = '#' then
       begin
-        if Pos(ULower(A), ULower(FTags[i])) > 0 then
+        if Pos(A.UTF8Lower, FTags[i].UTF8Lower) > 0 then
         begin
           if not OpAnd then exit(True);
         end
@@ -359,7 +359,7 @@ var
       else
       if Op = string.Empty then
       begin
-        if Pos(ULower(A), ULower(FTags[i])) > 0 then
+        if Pos(A.UTF8Lower, FTags[i].UTF8Lower) > 0 then
         begin
           if not OpAnd then exit(True);
         end
@@ -388,7 +388,7 @@ begin
   if (TrimFilter = string.Empty) then
     Exit(True); // Empty filter matches everything
 
-  if StartsWithOperator(TrimFilter, Oper, ValuePart) then
+  if TrimFilter.StartsWithOperator(Oper, ValuePart) then
   begin
     DateAsStr := DateTimeToString(FDate, DisplayTime);
     // Compare with operator
@@ -470,11 +470,11 @@ begin
     end;
 
     // No operator, simple substring search
-    if (Pos(ULower(TrimFilter), ULower(FText)) > 0) then Exit(True);
-    if (Pos(ULower(TrimFilter), ULower(FNote)) > 0) then Exit(True);
-    if (Pos(ULower(TrimFilter), ULower(FloatToStr(FAmount))) > 0) then Exit(True);
+    if (Pos(TrimFilter.UTF8Lower, FText.UTF8Lower) > 0) then Exit(True);
+    if (Pos(TrimFilter.UTF8Lower, FNote.UTF8Lower) > 0) then Exit(True);
+    if (Pos(TrimFilter.UTF8Lower, FloatToStr(FAmount).UTF8Lower) > 0) then Exit(True);
     DateAsStr := DateTimeToString(FDate, DisplayTime);
-    if (Pos(ULower(TrimFilter), ULower(DateAsStr)) > 0) then Exit(True);
+    if (Pos(TrimFilter.UTF8Lower, DateAsStr.UTF8Lower) > 0) then Exit(True);
     if CompareWithTags(TrimFilter, string.Empty) then Exit(True);
   end;
   Result := False;
@@ -674,7 +674,7 @@ begin
   Result := FGroupNameList[aIndex].TrimLeft([' ', '#']).Trim;
 
   if (Striket) and (GetGroupFiltered(aIndex, False, string.Empty, False)) then
-    Result := ApplyCombiningChar(Result);
+    Result := Result.ApplyCombiningChar;
 end;
 
 function TTasks.GetGroupHint(Index: integer): string;
@@ -785,7 +785,7 @@ end;
 
 procedure TTasks.InsertMap(Pos, Value: integer; Delta: integer = 1);
 begin
-  InsertAtPos(FMapGrid, Pos, Value, Delta);
+  FMapGrid.InsertAtPos(Pos, Value, Delta);
 end;
 
 function TTasks.AddTask(const TaskString: string): integer;
@@ -868,16 +868,16 @@ begin
       #13, string.Empty).Replace('<br>', sLineBreak);
 
     // Calculate indent level: 2 spaces = 1 level, odd space kept as text
-    Task.Text := ExtractIndent(Task.Text, Indent);
+    Task.Text := Task.Text.ExtractIndent(Indent);
     if Indent > 0 then
     begin
       Task.FIndentLevel := Task.FIndentLevel + Indent;
-      Grid.Cells[COL_TASK, Row] := TrimLeadingSpaces(Grid.Cells[COL_TASK, Row], Indent * 2);
+      Grid.Cells[COL_TASK, Row] := Grid.Cells[COL_TASK, Row].TrimLeadingSpaces(Indent * 2);
       if Assigned(Memo) then
         Memo.Text := Grid.Cells[COL_TASK, Row];
     end;
 
-    if not TryStrToFloat(CleanNumeric(Grid.Cells[COL_AMOUNT, Row]), pAmount) then
+    if not TryStrToFloat(TMathParser.CleanNumeric(Grid.Cells[COL_AMOUNT, Row]), pAmount) then
     begin
       pAmount := 0; // If parsing the amount failed, set to 0
       Grid.Cells[COL_AMOUNT, Row] := string.Empty;
@@ -1627,7 +1627,7 @@ var
     begin
       if (TempTask.Text <> string.Empty) then
       begin
-        GetTask(row).Text := ExtractIndent(CleanString(TempTask.Text), GetTask(row).FIndentLevel);
+        GetTask(row).Text := TempTask.Text.ReplaceTabCharWithSpace.ExtractIndent(GetTask(row).FIndentLevel);
 
         if (Rect.Width > 0) then
         begin
@@ -1639,7 +1639,7 @@ var
       if Rect.Width = 0 then
       begin
         if (TempTask.Note <> string.Empty) then
-          GetTask(row).Text := CleanString(TempTask.Note)
+          GetTask(row).Text := TempTask.Note.ReplaceTabCharWithSpace
         else
         if (TempTask.Date <> 0) then
           GetTask(row).Text := TempTask.DateOriginal // DateTimeToStringISO(TempTask.Date)
@@ -1660,14 +1660,14 @@ var
     begin
       if (TempTask.Note <> string.Empty) then
       begin
-        GetTask(row).Note := CleanString(TempTask.Note);
+        GetTask(row).Note := TempTask.Note.ReplaceTabCharWithSpace;
         GetTask(row).NoteItalic := TempTask.NoteItalic;
       end
       else
       if Rect.Width = 0 then
       begin
         if (TempTask.Text <> string.Empty) then
-          GetTask(row).Note := CleanString(TempTask.Text)
+          GetTask(row).Note := TempTask.Text.ReplaceTabCharWithSpace
         else
         if (TempTask.Date <> 0) then
           GetTask(row).Note := TempTask.DateOriginal // DateTimeToStringISO(TempTask.Date)
@@ -1688,10 +1688,10 @@ var
       else
       if Rect.Width = 0 then
       begin
-        if (TempTask.Text <> string.Empty) and (TryStrToFloatLimited(CleanNumeric(TempTask.Text), TempAmount)) then
+        if (TempTask.Text <> string.Empty) and (TMathParser.CleanNumeric(TempTask.Text).ToFloatTry(TempAmount)) then
           GetTask(row).Amount := TempAmount
         else
-        if (TempTask.Note <> string.Empty) and (TryStrToFloatLimited(CleanNumeric(TempTask.Note), TempAmount)) then
+        if (TempTask.Note <> string.Empty) and (TMathParser.CleanNumeric(TempTask.Note).ToFloatTry(TempAmount)) then
           GetTask(row).Amount := TempAmount
         else
           GetTask(row).Amount := 0;
@@ -1707,10 +1707,10 @@ var
       else
       if Rect.Width = 0 then
       begin
-        if (TempTask.Text <> string.Empty) and (TryStrToDateTimeISO(TempTask.Text, TempDate)) then
+        if (TempTask.Text <> string.Empty) and (TempTask.Text.ToDateTimeISOTry(TempDate)) then
           GetTask(row).Date := TempDate
         else
-        if (TempTask.Note <> string.Empty) and (TryStrToDateTimeISO(TempTask.Note, TempDate)) then
+        if (TempTask.Note <> string.Empty) and (TempTask.Note.ToDateTimeISOTry(TempDate)) then
           GetTask(row).Date := TempDate
         else
           GetTask(row).Date := 0;
@@ -1740,9 +1740,9 @@ begin
     IsRowEmpty := False;
 
   if (Assigned(Value)) then
-    ListTasks := TextToStringList(Value^, True)
+    ListTasks := Value^.ToStringList(True)
   else
-    ListTasks := TextToStringList(Clipboard.AsText, True);
+    ListTasks := Clipboard.AsText.ToStringList(True);
 
   // Handle SortOrder: reverse the list for descending order
   if (Grid.Selection.Height = 0) and (SortOrder = soDescending) then
@@ -1751,7 +1751,7 @@ begin
 
   // Replace tabs in strings
   for row := 0 to ListTasks.Count - 1 do
-    ListTasks[row] := CleanString(ListTasks[row]);
+    ListTasks[row] := ListTasks[row].ReplaceTabCharWithSpace;
 
   TempTasks := TTasks.Create(ListTasks);
   try
@@ -1843,8 +1843,8 @@ begin
       FTaskList[i].FillTags;
       Up.AddStrings(FTaskList[i].Tags);
 
-      FillTagsFromString(Down, FTaskList[i].FText);
-      FillTagsFromString(Down, FTaskList[i].FNote);
+      Down.FillTagsFromString(FTaskList[i].FText);
+      Down.FillTagsFromString(FTaskList[i].FNote);
     end;
 
     // All Groups
@@ -1855,12 +1855,12 @@ begin
           FGroupList[i][j].FillTags;
           Up.AddStrings(FGroupList[i][j].Tags);
 
-          FillTagsFromString(Down, FGroupList[i][j].FText);
-          FillTagsFromString(Down, FGroupList[i][j].FNote);
+          Down.FillTagsFromString(FGroupList[i][j].FText);
+          Down.FillTagsFromString(FGroupList[i][j].FNote);
         end;
 
     // Add prefixes
-    AddPrefixTags(Up);
+    Up.AddExtractedColonPrefixes;
 
     // Add Tags
     FTags.Clear;

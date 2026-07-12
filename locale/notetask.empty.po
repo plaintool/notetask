@@ -199,19 +199,6 @@ msgstr ""
 msgid "&Yes"
 msgstr ""
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr ""
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr ""
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr ""
-
 #: task.rdays
 msgid "d"
 msgstr ""

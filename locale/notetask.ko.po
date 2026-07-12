@@ -202,19 +202,6 @@ msgstr "제목 없음"
 msgid "&Yes"
 msgstr "예"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "새 버전 사용 가능: %s. 다운로드하려면 GitHub 페이지를 열겠습니까?"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "버전 확인 오류:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "사용 중인 버전은 최신입니다."
-
 #: task.rdays
 msgid "d"
 msgstr "일"
@@ -1056,3 +1043,4 @@ msgstr "찾을 내용:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "다음으로 바꾸기:"
+

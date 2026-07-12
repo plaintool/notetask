@@ -37,14 +37,15 @@ uses
   PrintersDlgs,
   uDateTimePicker,
   GridPrn,
+  TagEdit,
   task,
   lineending,
-  formattool,
-  TagEdit;
+  arrayhelpers;
 
 type
   { TformNotetask }
   TformNotetask = class(TForm)
+    {%Region -fold Form Common}
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
@@ -544,6 +545,7 @@ type
     procedure aMoveGroupLeftExecute(Sender: TObject);
     procedure aMoveGroupRightExecute(Sender: TObject);
     procedure aHideNoteTextExecute(Sender: TObject);
+    {%EndRegion}
   private
     Memo: TMemo;
     PanelMemo: TPanel;
@@ -606,7 +608,7 @@ type
     FLastText: string;
     FLastFilter: string;
     FLastTextMatch: boolean;
-    FLastRowMem: array of integer;
+    FLastRowMem: TIntegerArray;
     FLastTabMouseX: integer;
     FLastTabTarget: integer;
     FLastTabFilter: integer;
@@ -818,61 +820,6 @@ var
   ResourceBitmapStarGold: TBitmap;
   ResourceBitmapStarGray: TBitmap;
 
-const
-  DefRowHeight = 22;
-  {$IFDEF UNIX}
-  DefFontSize = 10;
-  {$ELSE}
-  DefFontSize = 9;
-  {$ENDIF}
-
-  TagsColorBrigtness = 80;
-  TagsColorSaturation = 80;
-  TagsDimnessSelected = 55;
-  TagsDimnessPrint = 60;
-  TagsDimnessColor = 45;
-  TagsDimness = 35;
-
-  IndentStr = '  ';
-  CommentSlashStr = '//';
-  CommentHashStr = '#';
-  CommentStarStr = '*';
-  CommentMinusStr = '--';
-  CommentSemicolonStr = ';';
-  CommentTwoColonStr = '::';
-  CommentREMStr = 'REM ';
-  CommentApostropheStr = '''';
-  mailto = 'mailto:';
-  http = 'http://';
-
-  // Light theme colors
-  clRowHighlight_Light = TColor($FFF0DC);       // RGB(220,240,255)
-  clRowFocused_Light = TColor($FFDCC8);         // RGB(200,220,255)
-  clRowExpired_Light = TColor($DCDCFF);         // RGB(255,220,220)
-  clRowNotDone_Light = TColor($000096);         // RGB(150,0,0)
-  clPlanned_Light = TColor($B40000);            // RGB(0,0,180)
-  clReadOnly_Light = TColor($F0F0F0);           // RGB(240,240,240)
-  clSplitFilter_Light = TColor($FAFAFA);        // RGB(250,250,250)
-  clSpit_Light = TColor($E9E9E9);               // RGB(233,233,233)
-  clSplitHighlight_Light = TColor($D2D2D2);     // RGB(210,210,210)
-  clTagSuffix_Light = TColor($FEFEFE);          // RGB(254,254,254)
-  clDuplicateHighlight_Light = TColor($AAFFFF); // RGB(255,255,170)
-  clGridLineColor_Light = TColor($CACACA);      // RGB(202,202,202)
-
-  // Dark theme colors
-  clRowHighlight_Dark = TColor($463027);        // RGB(39, 48, 70)
-  clRowFocused_Dark = TColor($6C4C38);          // RGB(56, 76, 108)
-  clRowExpired_Dark = TColor($2D2D50);          // RGB(80, 45, 45)
-  clRowNotDone_Dark = TColor($9696FF);          // RGB(255,150,150)
-  clPlanned_Dark = TColor($FF8C00);             // RGB(0, 140, 255)
-  clReadOnly_Dark = TColor($404040);            // RGB(64, 64, 64)
-  clSplitFilter_Dark = TColor($505050);         // RGB(80, 80, 80)
-  clSplit_Dark = TColor($404040);               // RGB(64, 64, 64)
-  clSplitHighlight_Dark = TColor($505050);      // RGB(80, 80, 80)
-  clTagSuffix_Dark = TColor($303030);           // RGB(48, 48, 48)
-  clDuplicateHighlight_Dark = TColor($008C8C);  // RGB(140, 140, 0)
-  clGridLineColor_Dark = TColor($8C8C8C);       // RGB(140, 140, 140)
-
 resourcestring
   rapp = 'Notetask';
   runtitled = 'Untitled';
@@ -919,7 +866,8 @@ resourcestring
 
 implementation
 
-uses filemngr, settings, systemtool, cryptoutils, forminput, formmemo, formfind, formreplace, formabout, formdonate;
+uses consts, mathparser, filemngr, settings, controlshelper, cryptoutils, stringgridhelper, forminput, formmemo, formfind,
+  formreplace, formabout, formdonate, osutils, stringhelper, stringshelper, darkutils, localize, checkupdates, hotkeyhelper;
 
   {$R *.lfm}
 
@@ -936,7 +884,7 @@ begin
   tagsEdit.DragIndicatorColor := clRed;
   tagsEdit.SelectionRectColor := clSilver;
   tagsEdit.TagHoverColor := clNone;
-  tagsEdit.TagSuffixColor := ThemeColor(clTagSuffix_Light, clTagSuffix_Dark);
+  tagsEdit.TagSuffixColor := TDarkUtils.ThemeColor(clTagSuffix_Light, clTagSuffix_Dark);
   tagsEdit.RoundCorners := 20;
   tagsEdit.TagHeightFactor := 2;
   tagsEdit.AutoColorSeed := 14;
@@ -946,7 +894,7 @@ begin
   tagsEdit.BackSpaceEditTag := True;
   tagsEdit.ShowHint := True;
   tagsEdit.SuggestedButtonCaption := string.Empty;
-  ImagesMisc.GetBitmap(ThemeValue(0, 1), tagsEdit.SuggestedButtonGlyph);
+  ImagesMisc.GetBitmap(TDarkUtils.ThemeValue(0, 1), tagsEdit.SuggestedButtonGlyph);
   tagsEdit.PopupMenu := PopupTags;
   tagsEdit.OnKeyDown := @tagsEditKeyDown;
   tagsEdit.OnTagClick := @tagsEditTagClick;
@@ -995,12 +943,12 @@ begin
 
   // Set colors
   Self.Color := clWindow;
-  taskGrid.GridLineColor := ThemeColor(clGridLineColor_Light, clGridLineColor_Dark);
-  taskGrid.FixedHotColor := ThemeColor(clSplitHighlight_Light, clSplitHighlight_Dark);
-  panelNote.Color := ThemeColor(clSpit_Light, clSplit_Dark);
-  Splitter.Color := ThemeColor(clSpit_Light, clSplit_Dark);
-  SplitTags.Color := ThemeColor(clSpit_Light, clSplit_Dark);
-  SplitFilter.Color := ThemeColor(clSplitFilter_Light, clSplitFilter_Dark);
+  taskGrid.GridLineColor := TDarkUtils.ThemeColor(clGridLineColor_Light, clGridLineColor_Dark);
+  taskGrid.FixedHotColor := TDarkUtils.ThemeColor(clSplitHighlight_Light, clSplitHighlight_Dark);
+  panelNote.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);
+  Splitter.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);
+  SplitTags.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);
+  SplitFilter.Color := TDarkUtils.ThemeColor(clSplitFilter_Light, clSplitFilter_Dark);
 
   // Remove standart border
   UpdateComboRegion(filterBox);
@@ -1147,7 +1095,7 @@ begin
   // Check new version if needed
   if AutoCheckUpdates then
   begin
-    Th := TCheckUpdateThread.Create(False);
+    Th := TCheckUpdateThread.Create(REPO, APP_NAME, False);
     Th.FreeOnTerminate := True;
   end;
 end;
@@ -1807,19 +1755,19 @@ begin
   // Align panelFunc to bottom-right of taskGrid
   if FBiDiRightToLeft then
   begin
-    if GetActualScrollBarVisibility(taskGrid, ssVertical) then
+    if taskGrid.GetActualScrollBarVisibility(ssVertical) then
       panelFunc.Left := taskGrid.Left + GetSystemMetrics(SM_CXVSCROLL) + 5
     else
       panelFunc.Left := taskGrid.Left + 5;
   end
   else
   begin
-    if GetActualScrollBarVisibility(taskGrid, ssVertical) then
+    if taskGrid.GetActualScrollBarVisibility(ssVertical) then
       panelFunc.Left := taskGrid.Left + taskGrid.Width - panelFunc.Width - GetSystemMetrics(SM_CXVSCROLL) - 5
     else
       panelFunc.Left := taskGrid.Left + taskGrid.Width - panelFunc.Width - 5;
   end;
-  if GetActualScrollBarVisibility(taskGrid, ssHorizontal) then
+  if taskGrid.GetActualScrollBarVisibility(ssHorizontal) then
     panelFunc.Top := taskGrid.Top + taskGrid.Height - panelFunc.Height - GetSystemMetrics(SM_CYHSCROLL) - 5
   else
     panelFunc.Top := taskGrid.Top + taskGrid.Height - panelFunc.Height - 5;
@@ -1843,7 +1791,7 @@ var
   Indent: integer = 0;
 begin
   Grid := Sender as TStringGrid;
-  bgFill := ThemeColor(clWhite, clBlack);
+  bgFill := TDarkUtils.ThemeColor(clWhite, clBlack);
 
   // Border for fixed cells
   if (aRow < Grid.FixedRows) or (aCol < Grid.FixedCols) then
@@ -1875,8 +1823,8 @@ begin
       ((IsEditing and ((Assigned(TaskGrid.Editor) and taskGrid.Editor.Focused) or (Assigned(Memo) and Memo.Focused))) or
       (not IsEditing)) then
     begin
-      bgFill := ThemeColor(clRowFocused_Light, clRowFocused_Dark);    // Focused
-      Grid.Canvas.Font.Color := ThemeColor(clBlack, clWhite);
+      bgFill := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);    // Focused
+      Grid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
     end
     else
     if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
@@ -1887,8 +1835,8 @@ begin
     else
     if gdRowHighlight in aState then
     begin
-      bgFill := ThemeColor(clRowHighlight_Light, clRowHighlight_Dark); // Highlight
-      Grid.Canvas.Font.Color := ThemeColor(clBlack, clWhite);
+      bgFill := TDarkUtils.ThemeColor(clRowHighlight_Light, clRowHighlight_Dark); // Highlight
+      Grid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
     end
     else
     begin
@@ -1897,18 +1845,18 @@ begin
         Task := Tasks.GetTask(ARow);
         if (ShowColumnDate) and (not Task.Done) and (Task.Date > 0) and (Task.Date < Now) then // Color expired Task
         begin
-          bgFill := ThemeColor(clRowExpired_Light, clRowExpired_Dark); // Expired warning red
-          Grid.Canvas.Font.Color := ThemeColor(clBlack, clWhite);
+          bgFill := TDarkUtils.ThemeColor(clRowExpired_Light, clRowExpired_Dark); // Expired warning red
+          Grid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
         end
         else
         if (not Task.Done) and (Task.Archive) then
         begin
-          bgFill := ThemeColor(clWhite, clBlack); // Not done but arhive warning color
-          Grid.Canvas.Font.Color := ThemeColor(clRowNotDone_Light, clRowNotDone_Dark);
+          bgFill := TDarkUtils.ThemeColor(clWhite, clBlack); // Not done but arhive warning color
+          Grid.Canvas.Font.Color := TDarkUtils.ThemeColor(clRowNotDone_Light, clRowNotDone_Dark);
         end
         else
         begin
-          bgFill := ThemeColor(clWhite, clBlack); // All other white
+          bgFill := TDarkUtils.ThemeColor(clWhite, clBlack); // All other white
           Grid.Canvas.Font.Color := Font.Color;
         end;
       end;
@@ -1927,7 +1875,7 @@ begin
         Grid.Canvas.Font.Style := Grid.Canvas.Font.Style + [fsItalic];
 
       if (aCol = COL_DATE) and (Task.Date > Now) and (not (gdSelected in aState)) then
-        Grid.Canvas.Font.Color := ThemeColor(clPlanned_Light, clPlanned_Dark);
+        Grid.Canvas.Font.Color := TDarkUtils.ThemeColor(clPlanned_Light, clPlanned_Dark);
     end;
 
     // Fill the cell background
@@ -1960,7 +1908,7 @@ begin
         begin
           BitTags := tagsEdit.GetTagsBitmap(Task.Tags, Round(Max(Max(Font.Size div 2, 8) * FZoom, 1)),
             Min(ARect.Width, Round(500 * FZoom)), ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected,
-            ifthen(bgFill <> ThemeColor(clWhite, clBlack), TagsDimnessColor, TagsDimness)), ColorToRGB(bgFill));
+            ifthen(bgFill <> TDarkUtils.ThemeColor(clWhite, clBlack), TagsDimnessColor, TagsDimness)), ColorToRGB(bgFill));
           try
             BitTags.TransparentColor := clWhite;
             BitTags.Transparent := True;
@@ -1990,7 +1938,7 @@ begin
         (Trim(Value) = Trim(FLastText)) and (taskGrid.Selection.Height = 0) and ((aCol <> FLastCol) or (aRow <> FLastRow)) then
       begin
         Grid.canvas.Brush.Style := bsSolid;
-        Grid.canvas.Brush.Color := ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark);
+        Grid.canvas.Brush.Color := TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark);
       end
       else
         Grid.canvas.Brush.Style := bsClear;
@@ -2046,11 +1994,11 @@ begin
         Flags := Flags or DT_WORDBREAK;
 
       if (FHideNoteText) and (aCol = COL_NOTE) then
-        Value := MaskTextWithBullets(Value, Grid.Canvas, FLineEnding);
+        Value := Value.MaskTextWithBullets(Grid.Canvas, FLineEnding.Value);
 
       if (Value = string.Empty) or (filterBox.Text = string.Empty) or (Grid.canvas.Brush.Color =
-        ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark)) or
-        (Pos(ULower(Trim(filterBox.Text)), ULower(ifthen(aCol = COL_AMOUNT, ReplaceStr(Value, ' ', ''), Value))) = 0) or
+        TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark)) or
+        (Pos(Trim(filterBox.Text).UTF8Lower, ifthen(aCol = COL_AMOUNT, ReplaceStr(Value, ' ', ''), Value).UTF8Lower) = 0) or
         ((FHideNoteText) and (aCol = COL_NOTE)) then
       begin
         DrawText(Grid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
@@ -2060,8 +2008,9 @@ begin
         if (aCol = COL_AMOUNT) then Value := ReplaceStr(Value, ' ', '');
 
         DrawHighlightedText(Grid.Canvas, Value, Trim(filterBox.Text), DrawRect,
-          ifthen(bgFill <> ThemeColor(clWhite, clBlack), tagsEdit.BlendColors(ThemeColor(clDuplicateHighlight_Light,
-          clDuplicateHighlight_Dark), bgFill, 50), ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark)), aCol);
+          ifthen(bgFill <> TDarkUtils.ThemeColor(clWhite, clBlack), tagsEdit.BlendColors(
+          TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark), bgFill, 50),
+          TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark)), aCol);
       end;
     end;
   end;
@@ -2119,8 +2068,8 @@ var
       Exit;
     end;
 
-    LowerText := ULower(aText);
-    LowerFilter := ULower(aFilterText);
+    LowerText := aText.UTF8Lower;
+    LowerFilter := aFilterText.UTF8Lower;
     CurrentPos := 1;
 
     while CurrentPos <= Length(aText) do
@@ -2400,7 +2349,7 @@ begin
     end
     else
     begin
-      Memo.Color := ThemeColor(clRowFocused_Light, clRowFocused_Dark);
+      Memo.Color := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);
     end;
     Memo.Font.Name := taskGrid.Font.Name;
     Memo.Font.Size := taskGrid.Font.Size;
@@ -2769,13 +2718,13 @@ end;
 
 procedure TformNotetask.panelNoteMouseEnter(Sender: TObject);
 begin
-  panelNote.Color := ThemeColor(clSplitHighlight_Light, clSplitHighlight_Dark);
+  panelNote.Color := TDarkUtils.ThemeColor(clSplitHighlight_Light, clSplitHighlight_Dark);
 end;
 
 procedure TformNotetask.panelNoteMouseLeave(Sender: TObject);
 begin
   FNoteSelecting := False;
-  panelNote.Color := ThemeColor(clSpit_Light, clSplit_Dark);
+  panelNote.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);
 end;
 
 procedure TformNotetask.panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -2980,7 +2929,7 @@ var
   HoverTag: string;
   HoverIndex: integer;
 begin
-  HoverTag := GetBeforeColon(LowerCase(tagsEdit.HoveredTag));
+  HoverTag := LowerCase(tagsEdit.HoveredTag).SubStringBeforeColon;
   HoverIndex := tagsEdit.TagColors.IndexOf(HoverTag);
 
   if HoverIndex >= 0 then
@@ -3004,7 +2953,7 @@ var
   HoverTag: string;
   HoverIndex: integer;
 begin
-  HoverTag := GetBeforeColon(LowerCase(tagsEdit.HoveredTag));
+  HoverTag := LowerCase(tagsEdit.HoveredTag).SubStringBeforeColon;
   HoverIndex := tagsEdit.TagColors.IndexOf(HoverTag);
 
   if HoverIndex >= 0 then
@@ -3560,7 +3509,7 @@ begin
   TaskText := '[ ]';
   if Length(filterBox.Text) > 0 then
   begin
-    StartsWithOperator(filterBox.Text, Oper, Value);
+    string(filterBox.Text).StartsWithOperator(Oper, Value);
     if (Length(Oper) = 0) or (Oper = '#') or (Oper = '=') then
     begin
       if Trim(Value) <> string.Empty then
@@ -3636,7 +3585,7 @@ procedure TformNotetask.aCheckforupdatesExecute(Sender: TObject);
 var
   LatestVersion: string;
 begin
-  CheckGithubLatestVersion(LatestVersion, REPO);
+  CheckGithubLatestVersion(LatestVersion, REPO, APP_NAME);
 end;
 
 procedure TformNotetask.aAutoCheckUpdatesExecute(Sender: TObject);
@@ -4044,7 +3993,7 @@ begin
       Result := Tasks.InsertGroup(newName);
       if (Result <> FindGroupRealIndex(groupTabs.TabIndex)) then
       begin
-        InsertAtPos(FLastRowMem, Result, 0);
+        FLastRowMem.InsertAtPos(Result, 0);
         SetTabs;
         ChangeGroup(FindGroupTabIndex(Result));
         SetChanged;
@@ -4129,7 +4078,7 @@ begin
     begin
       if (Tasks.CopyGroup(FindGroupRealIndex(groupTabs.TabIndex), editText.Text)) then
       begin
-        InsertAtPos(FLastRowMem, FindGroupRealIndex(groupTabs.TabIndex) + 1, FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)]);
+        FLastRowMem.InsertAtPos(FindGroupRealIndex(groupTabs.TabIndex) + 1, FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)]);
         SetTabs;
         ChangeGroup(groupTabs.TabIndex + 1);
         SetChanged;
@@ -4153,11 +4102,11 @@ begin
   begin
     if (Tasks.DeleteGroup(FindGroupRealIndex(groupTabs.TabIndex))) then
     begin
-      DeleteAtPos(FLastRowMem, FindGroupRealIndex(groupTabs.TabIndex));
-      Mem := CloneArray(FLastRowMem);
+      FLastRowMem.DeleteAtPos(FindGroupRealIndex(groupTabs.TabIndex));
+      Mem := FLastRowMem.CloneArray;
       SetTabs;
       ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
-      FLastRowMem := CloneArray(Mem);
+      FLastRowMem := Mem.CloneArray;
       if (Length(FLastRowMem) > Tasks.SelectedGroup) then
         taskGrid.Row := FLastRowMem[Tasks.SelectedGroup];
       SetChanged;
@@ -4689,8 +4638,8 @@ var
   Render: string;
 begin
   // Test for letter, number, space, back, enter, shift or delete key for backup
-  if (Shift * [ssCtrl, ssAlt] = []) and ((not IsSystemKey(Key)) or (Key = VK_SPACE) or (Key = VK_BACK) or
-    (Key = VK_RETURN) or (ssShift in Shift) or ((Key = VK_DELETE) and (memoNote.SelLength = 0))) then
+  if (Shift * [ssCtrl, ssAlt] = []) and ((not THotKeyData.Create(Key).IsSystemKey) or (Key = VK_SPACE) or
+    (Key = VK_BACK) or (Key = VK_RETURN) or (ssShift in Shift) or ((Key = VK_DELETE) and (memoNote.SelLength = 0))) then
   begin
     if (not FMemoNoteFirstKey) then
     begin
@@ -4835,7 +4784,7 @@ begin
   else
   if (ssCtrl in Shift) and (Key = VK_RETURN) and (trim(memoNote.SelText) <> string.Empty) then // Ctrl + Enter
   begin
-    Render := RenderWordCanvas(memoNote.SelText, Font.Name, Max(ifthen(Font.Size = 0, 10, Font.Size) - 2, 2));
+    Render := memoNote.SelText.ToASCIITextArt(Font.Name, Max(ifthen(Font.Size = 0, 10, Font.Size) - 2, 2));
     if (Render <> memoNote.SelText) then
     begin
       MemoNoteBackup;
@@ -4895,7 +4844,7 @@ begin
       if (FNoteLastSelLength < 1) or (((Sender as TMemo).SelStart < FNoteLastSelStart) or
         ((Sender as TMemo).SelStart > FNoteLastSelStart + FNoteLastSelLength)) or (not TryOpenAsUrl(Trim(FNoteLastSelText))) then
       begin
-        MemoTokenAtPos(Sender as TMemo, (Sender as TMemo).SelStart, ':/?#[]@!$&''()*+,;=-_.~%');
+        (Sender as TMemo).MemoTokenAtPos((Sender as TMemo).SelStart, ':/?#[]@!$&''()*+,;=-_.~%');
         FNoteLastSelText := (Sender as TMemo).SelText;
         FNoteLastSelStart := (Sender as TMemo).SelStart;
         FNoteLastSelLength := (Sender as TMemo).SelLength;
@@ -4954,7 +4903,7 @@ begin
   else
     Pos := (Sender as TMemo).SelStart;
 
-  MemoTokenAtPos(Sender as TMemo, Pos, '_-@');
+  (Sender as TMemo).MemoTokenAtPos(Pos, '_-@');
   FMemoSelStartClicked := -1;
 end;
 
@@ -5034,7 +4983,7 @@ begin
       if TagIndex >= 0 then
         task.Tags.Delete(TagIndex)
       else
-        StringListRemove(task.Tags, TagText);
+        task.Tags.RemoveAll(TagText);
       if task.Tags.Count = 0 then
         task.TagsWidth := 0;
     end;
@@ -5262,7 +5211,7 @@ begin
   tagsEdit.SuggestedItems.Clear;
   if Assigned(Tasks) then
     Tasks.Free;
-  Tasks := TTasks.Create(TextToStringList(Content));
+  Tasks := TTasks.Create(Content.ToStringList);
 
   // Load saved settings for file
   FGridSettingsLoaded := LoadGridSettings(Self, taskGrid, ExtractFileName(FFileName));
@@ -5508,7 +5457,7 @@ begin
     // Show the form as a modal dialog
     if ShowModal = mrOk then
     begin
-      OpenURL(rchatgpt + EncodeUrl(Trim(formMemoText.memoText.Text)));
+      OpenURL(rchatgpt + Trim(formMemoText.memoText.Text).AsEncodedUrl);
     end;
   finally
     Hide;
@@ -5518,13 +5467,13 @@ end;
 function TformNotetask.TryOpenAsUrl(Value: string): boolean;
 begin
   Result := False;
-  if IsURL(Value) then
+  if Value.IsUrlSimilar then
   begin
-    OpenURL(IfThen(HasScheme(Value), Value, http + Value));
+    OpenURL(IfThen(Value.HasUrlScheme, Value, http + Value));
     Result := True;
   end
   else
-  if IsEmail(Value) then
+  if Value.IsEmail then
   begin
     OpenURL(IfThen(AnsiStartsText(mailto, Value), Value, mailto + Value));
     Result := True;
@@ -5625,7 +5574,7 @@ begin
     maxPreview := 30;
 
     // Get the current console encoding
-    ConsoleEncoding := GetConsoleEncoding;
+    ConsoleEncoding := TOS.GetConsoleEncoding;
 
     {$IFDEF UNIX}
     Script.Add('#!/bin/bash');
@@ -5888,7 +5837,7 @@ begin
   task := Tasks.GetTask(aRow);
 
   // Default text color
-  ACanvas.Font.Color := ThemeColor(clBlack, clWhite);
+  ACanvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
   ACanvas.Font.Style := [];
 
   // Color and style
@@ -5907,7 +5856,7 @@ begin
     ACanvas.Font.Style := ACanvas.Font.Style + [fsItalic];
 
   if (aCol = COL_DATE) and (task.Date > Now) then
-    ACanvas.Font.Color := ThemeColor(clPlanned_Light, clPlanned_Dark);
+    ACanvas.Font.Color := TDarkUtils.ThemeColor(clPlanned_Light, clPlanned_Dark);
 
   // Text styles
   with ACanvas.TextStyle do
@@ -5938,7 +5887,7 @@ begin
         BitTags := tagsEdit.GetTagsBitmap(Task.Tags, Round(TGridPrinter(Sender).ScaleY(Max(ACanvas.Font.Size, 10))),
           Min(ARect.Width, TGridPrinter(Sender).ScaleY(500)), ARect.Height, 2, TagsDimnessPrint);
         try
-          BitTags.TransparentColor := ThemeColor(clWhite, clBlack);
+          BitTags.TransparentColor := TDarkUtils.ThemeColor(clWhite, clBlack);
           BitTags.Transparent := True;
           if BitTags.Width < aRect.Width - 50 then
           begin
@@ -6197,7 +6146,7 @@ begin
   if (taskGrid.Col <> COL_AMOUNT) then
     Memo.SelText := UTF8Key
   else
-    Memo.SelText := CleanNumericExpression(UTF8Key);
+    Memo.SelText := TMathParser.CleanNumericExpression(UTF8Key);
 end;
 
 procedure TformNotetask.taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
@@ -6225,7 +6174,7 @@ begin
   if (FKeyPressed <> string.Empty) and (FKeyPressed <> #13) then
   begin
     if (taskGrid.Col = COL_AMOUNT) then
-      Memo.SelText := CleanNumericExpression(FKeyPressed)
+      Memo.SelText := TMathParser.CleanNumericExpression(FKeyPressed)
     else
       Memo.SelText := FKeyPressed;
     FKeyPressed := string.Empty;
@@ -6238,7 +6187,7 @@ begin
   end
   else
   begin
-    Memo.Color := ThemeColor(clRowFocused_Light, clRowFocused_Dark);
+    Memo.Color := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);
   end;
 end;
 
@@ -6278,7 +6227,7 @@ var
   nextCol: integer;
 begin
   // Test for letter, number, space or back key for backup
-  if (Shift * [ssCtrl, ssAlt] = []) and ((not IsSystemKey(Key)) or (Key = VK_SPACE) or (Key = VK_BACK)) then
+  if (Shift * [ssCtrl, ssAlt] = []) and ((not THotKeyData.Create(Key).IsSystemKey) or (Key = VK_SPACE) or (Key = VK_BACK)) then
   begin
     if (not FMemoFirstKey) then
     begin
@@ -6332,12 +6281,12 @@ begin
   if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
   begin
     DatePicker.Color := clHighlight;
-    DatePicker.Font.Color := ThemeColor(clWhite, clBlack);
+    DatePicker.Font.Color := TDarkUtils.ThemeColor(clWhite, clBlack);
   end
   else
   begin
-    DatePicker.Color := ThemeColor(clRowFocused_Light, clRowFocused_Dark);
-    DatePicker.Font.Color := ThemeColor(clBlack, clWhite);
+    DatePicker.Color := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);
+    DatePicker.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
   end;
 end;
 
@@ -7408,18 +7357,18 @@ begin
 
   while Pos <= Len do
   begin
-    if IsUTF8Char(S, Pos, ' ') then
+    if S.IsUTF8Char(Pos, ' ') then
     begin
       // If space, extend deletion
       Inc(DeleteCount);
       Inc(Pos);
     end
-    else if (IsUTF8Char(S, Pos, #13)) or (IsUTF8Char(S, Pos, #10)) then
+    else if (S.IsUTF8Char(Pos, #13)) or (S.IsUTF8Char(Pos, #10)) then
     begin
       // If CR, delete it and check for following LF
       Inc(DeleteCount);
       Inc(Pos);
-      if (Pos <= Len) and (IsUTF8Char(S, Pos, #10)) then
+      if (Pos <= Len) and (S.IsUTF8Char(Pos, #10)) then
       begin
         Inc(DeleteCount);
         Inc(Pos);
@@ -7492,7 +7441,7 @@ end;
 procedure TformNotetask.BackupSelectedState(aRowMem: boolean = False);
 begin
   if (aRowMem) then
-    FLoadedRowMem := CloneArray(FLastRowMem);
+    FLoadedRowMem := FLastRowMem.CloneArray;
   FLoadedSelectedTab := groupTabs.TabIndex;
   FLoadedSelectedRow := taskGrid.Row;
   FLoadedSelection := taskGrid.Selection;
@@ -7507,7 +7456,7 @@ var
 begin
   // Restore rows memory
   if (aRowMem) and (Length(FLoadedRowMem) > 0) then
-    CopyToArray(FLastRowMem, FLoadedRowMem);
+    FLoadedRowMem.CopyToArray(FLastRowMem);
 
   if (groupTabs.Tabs.Count > 0) and ((FLoadedSelectedTab < 0) or (FLoadedSelectedTab >= groupTabs.Tabs.Count)) then
     FLoadedSelectedTab := 0;
@@ -7627,14 +7576,14 @@ begin
   if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) or (taskGrid.Selection.Width > 0) then
   begin
     btnMulti.Hint := aDuplicateTasks.Caption + ' (Ctrl+D)';
-    btnMulti.ImageIndex := ThemeValue(2, 3);
-    btnMulti.HotImageIndex := ThemeValue(3, 2);
+    btnMulti.ImageIndex := TDarkUtils.ThemeValue(2, 3);
+    btnMulti.HotImageIndex := TDarkUtils.ThemeValue(3, 2);
   end
   else
   begin
     btnMulti.Hint := aInsertTask.Caption + ' (Ins)';
-    btnMulti.ImageIndex := ThemeValue(0, 1);
-    btnMulti.HotImageIndex := ThemeValue(1, 0);
+    btnMulti.ImageIndex := TDarkUtils.ThemeValue(0, 1);
+    btnMulti.HotImageIndex := TDarkUtils.ThemeValue(1, 0);
   end;
 end;
 
@@ -7677,7 +7626,7 @@ begin
     memoNote.BorderSpacing.Left := 0;
     memoNote.BorderSpacing.Right := 10;
     tagsEdit.BiDiMode := bdRightToLeft;
-    SetCursorTo(panelNote, 'RIGHTARROW');
+    TOS.SetCursorTo(panelNote, 'RIGHTARROW');
   end
   else
   begin
@@ -7690,7 +7639,7 @@ begin
     memoNote.BorderSpacing.Right := 0;
     memoNote.BiDiMode := bdLeftToRight;
     tagsEdit.BiDiMode := bdLeftToRight;
-    SetCursorTo(panelNote, 'LEFTARROW');
+    TOS.SetCursorTo(panelNote, 'LEFTARROW');
     for i := 1 to taskGrid.Columns.Count - 2 do
     begin
       if (i = COL_AMOUNT - 1) then
@@ -8272,7 +8221,7 @@ begin
 
             if i = taskGrid.Selection.Top then
               firstTags.Assign(curtags)
-            else if not StringListsEqual(firstTags, curtags) then
+            else if not firstTags.Equal(curtags) then
               HasDiff := True;
           end;
         if (tags.Count > 0) then
@@ -8340,7 +8289,7 @@ begin
           end;
         memoNote.Lines.Text := notes.Text;
         memoNote.ReadOnly := True;
-        memoNote.Color := ThemeColor(clReadOnly_Light, clReadOnly_Dark);
+        memoNote.Color := TDarkUtils.ThemeColor(clReadOnly_Light, clReadOnly_Dark);
       end
       else if Tasks.Map(taskGrid.Row) > -1 then
       begin
@@ -8423,6 +8372,13 @@ begin
 end;
 
 procedure TformNotetask.SetZoom(Value: float);
+
+  function SameFloat(A, B: double; Eps: double): boolean;
+  begin
+    // Compare floats with epsilon
+    Result := Abs(A - B) < Eps;
+  end;
+
 begin
   FZoom := Value;
   taskGrid.Font.Assign(Font);
@@ -8577,8 +8533,10 @@ begin
   if (aLanguage <> string.Empty) then
   begin
     Language := aLanguage;
-    if not ApplicationTranslate(Language) then
+    if not TLocalize.ApplicationTranslate(APP_NAME, Language) then
       Language := 'en';
+
+    TLocalize.UpdatePackageTranslations(APP_NAME, 'checkupdates', Language);
   end;
 
   openDialog.Filter := ropendialogfilter;
@@ -8666,7 +8624,7 @@ begin
       mrNo:
       begin
         // Reset group rows memory
-        FLastRowMem := CloneArray(FLoadedRowMem);
+        FLastRowMem := FLoadedRowMem.CloneArray;
         // Do not save, but allow form to close
         Result := True;
       end;

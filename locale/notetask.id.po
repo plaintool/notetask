@@ -202,19 +202,6 @@ msgstr "Tanpa judul"
 msgid "&Yes"
 msgstr "&Ya"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "Versi baru tersedia: %s. Buka halaman GitHub untuk mengunduh?"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "Kesalahan memeriksa versi:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "Versi Anda sudah terbaru."
-
 #: task.rdays
 msgid "d"
 msgstr "h\"  # har"
@@ -1056,3 +1043,4 @@ msgstr "Cari:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Ganti dengan:"
+

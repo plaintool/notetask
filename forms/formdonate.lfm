@@ -10,7 +10,7 @@ object formDonateNotetask: TformDonateNotetask
   ClientWidth = 447
   Color = clWindow
   Position = poDesktopCenter
-  LCLVersion = '4.6.0.0'
+  LCLVersion = '4.8.0.0'
   OnCreate = FormCreate
   object BtnOk: TButton
     Left = 362

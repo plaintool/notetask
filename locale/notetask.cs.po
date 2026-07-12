@@ -202,19 +202,6 @@ msgstr "Bez názvu"
 msgid "&Yes"
 msgstr "&Ano"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "Je k dispozici nová verze: %s. Otevřít stránku GitHub pro stažení?"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "Chyba při kontrole verze:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "Vaše verze je aktuální."
-
 #: task.rdays
 msgid "d"
 msgstr "d"
@@ -1056,3 +1043,4 @@ msgstr "Co najít:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Čím nahradit:"
+

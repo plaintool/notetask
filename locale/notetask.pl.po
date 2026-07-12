@@ -202,19 +202,6 @@ msgstr "Bez nazwy"
 msgid "&Yes"
 msgstr "&Tak"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "Dostępna nowa wersja: %s. Otworzyć stronę GitHub, aby pobrać?"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "Błąd podczas sprawdzania wersji:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "Twoja wersja jest aktualna."
-
 #: task.rdays
 msgid "d"
 msgstr "d"
@@ -1056,3 +1043,4 @@ msgstr "Znajdź:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Zastąp przez:"
+

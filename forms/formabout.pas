@@ -44,7 +44,7 @@ var
 
 implementation
 
-uses systemtool;
+uses localize, checkupdates, darkutils;
 
   {$R *.lfm}
 
@@ -53,7 +53,7 @@ uses systemtool;
 procedure TformAboutNotetask.FormCreate(Sender: TObject);
 begin
   labelName.Caption := 'Notetask © ' + GetAppVersion;
-  LabelLicUrl.Font.Color := ThemeColor(clBlue, clSkyBlue);
+  LabelLicUrl.Font.Color := TDarkUtils.ThemeColor(clBlue, clSkyBlue);
 end;
 
 procedure TformAboutNotetask.LabelLicUrlClick(Sender: TObject);

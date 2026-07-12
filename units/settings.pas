@@ -20,7 +20,8 @@ uses
   Printers,
   fpjson,
   mainform,
-  TagEdit;
+  TagEdit,
+  localize;
 
 type
   TGridSettings = record
@@ -37,8 +38,6 @@ procedure SaveGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string)
 function LoadGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string): boolean;
 
 implementation
-
-uses systemtool;
 
 function GetSettingsDirectory(fileName: string = ''): string;
   {$IFDEF Windows}

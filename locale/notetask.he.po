@@ -202,19 +202,6 @@ msgstr "ללא כותרת"
 msgid "&Yes"
 msgstr "&כן"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "קיימת גרסה חדשה: %s. האם לפתוח את דף GitHub להורדה?"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "שגיאה בבדיקת הגרסה:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "הגרסה שלך עדכנית."
-
 #: task.rdays
 msgid "d"
 msgstr "י"
@@ -1056,3 +1043,4 @@ msgstr "מצא מה:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "החלף ב:"
+

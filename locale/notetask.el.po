@@ -202,19 +202,6 @@ msgstr "Χωρίς τίτλο"
 msgid "&Yes"
 msgstr "&Ναι"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "Διαθέσιμη νέα έκδοση: %s. Άνοιγμα σελίδας GitHub για λήψη;"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "Σφάλμα ελέγχου έκδοσης:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "Η έκδοσή σας είναι ενημερωμένη."
-
 #: task.rdays
 msgid "d"
 msgstr "η"
@@ -263,7 +250,6 @@ msgid "For questions or feedback, contact me at"
 msgstr "Για ερωτήσεις ή σχόλια, επικοινωνήστε μαζί μου στο"
 
 #: tformaboutnotetask.labellicurl.caption
-#| msgid "mailto:astverskoy@gmail.com"
 msgctxt "tformaboutnotetask.labellicurl.caption"
 msgid "astverskoy@gmail.com"
 msgstr "astverskoy@gmail.com"
@@ -1057,3 +1043,4 @@ msgstr "Εύρεση:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Αντικατάσταση με:"
+

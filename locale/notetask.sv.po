@@ -202,19 +202,6 @@ msgstr "Namnlös"
 msgid "&Yes"
 msgstr "&Ja"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "Ny version tillgänglig: %s. Öppna GitHub-sidan för att ladda ner?"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "Fel vid versionskontroll:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "Din version är uppdaterad."
-
 #: task.rdays
 msgid "d"
 msgstr "d"
@@ -1056,3 +1043,4 @@ msgstr "Sök efter:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Ersätt med:"
+

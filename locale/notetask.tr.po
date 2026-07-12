@@ -202,19 +202,6 @@ msgstr "Başlıksız"
 msgid "&Yes"
 msgstr "Evet"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "Yeni sürüm mevcut: %s. İndirmek için GitHub sayfasını açılsın mı?"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "Sürüm kontrol hatası:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "Sürümünüz güncel."
-
 #: task.rdays
 msgid "d"
 msgstr "g"
@@ -1056,3 +1043,4 @@ msgstr "Aranan:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Yeni değer:"
+

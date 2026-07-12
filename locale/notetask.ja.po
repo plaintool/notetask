@@ -202,19 +202,6 @@ msgstr "無題"
 msgid "&Yes"
 msgstr "はい"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "新しいバージョンがあります: %s. ダウンロードのためGitHubページを開きますか？"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "バージョンの確認中にエラーが発生しました:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "あなたのバージョンは最新です。"
-
 #: task.rdays
 msgid "d"
 msgstr "日"
@@ -1056,3 +1043,4 @@ msgstr "検索する文字列:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "置換後:"
+

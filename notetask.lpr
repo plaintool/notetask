@@ -16,12 +16,14 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms,
   SysUtils,
-  systemtool, uDateTimePicker,
+  uDateTimePicker,
+  Consts,
   mainform,
   forminput,
   formmemo,
   formfind,
-  formreplace
+  formreplace,
+  localize
   {$IFDEF WINDOWS}
   ,uDarkStyle
   ,uWin32WidgetSetDark
@@ -35,9 +37,9 @@ begin
   GlobalSkipIfNoLeaks := True;
   {$ENDIF}
   RequireDerivedFormResource := True;
-  Language := GetOSLanguage;
-  Application.Title := 'Notetask';
-  Application.Scaled := True;
+  Language := TLocalize.GetOSLanguage;
+  Application.Title:='Notetask';
+  Application.Scaled:=True;
   Application.Initialize;
   {$IFDEF WINDOWS}
   ApplyDarkStyle;
@@ -47,6 +49,7 @@ begin
   Application.CreateForm(TformReplaceText, formReplaceText);
   Application.CreateForm(TformInputText, formInputText);
   Application.CreateForm(TformMemoText, formMemoText);
-  ApplicationTranslate(Language);
+  TLocalize.ApplicationTranslate(APP_NAME, Language);
+  TLocalize.UpdatePackageTranslations(APP_NAME, 'checkupdates', Language);
   Application.Run;
 end.

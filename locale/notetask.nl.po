@@ -202,19 +202,6 @@ msgstr "Naamloos"
 msgid "&Yes"
 msgstr "&Ja"
 
-#: systemtool.newversion
-#, object-pascal-format
-msgid "New version available: %s. Open GitHub page to download?"
-msgstr "Nieuwe versie beschikbaar: %s. GitHub-pagina openen om te downloaden?"
-
-#: systemtool.newversioncheckerror
-msgid "Error checking version:"
-msgstr "Fout bij controleren van versie:"
-
-#: systemtool.newversionuptodate
-msgid "Your version is up to date."
-msgstr "Je versie is up-to-date."
-
 #: task.rdays
 msgid "d"
 msgstr "d"
@@ -263,7 +250,6 @@ msgid "For questions or feedback, contact me at"
 msgstr "Voor vragen of feedback, neem contact met me op via"
 
 #: tformaboutnotetask.labellicurl.caption
-#| msgid "mailto:astverskoy@gmail.com"
 msgctxt "tformaboutnotetask.labellicurl.caption"
 msgid "astverskoy@gmail.com"
 msgstr "astverskoy@gmail.com"
@@ -1057,3 +1043,4 @@ msgstr "Zoeken naar:"
 #: tformreplacetext.labelwith.caption
 msgid "Replace with:"
 msgstr "Vervangen door:"
+
