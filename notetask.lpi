@@ -73,7 +73,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="forms;units"/>
+            <OtherUnitFiles Value="src"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -152,72 +152,72 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="forms\mainform.pas"/>
+        <Filename Value="src\mainform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="forms\formmemo.pas"/>
+        <Filename Value="src\formmemo.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formMemoText"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="forms\formfind.pas"/>
+        <Filename Value="src\formfind.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formFindText"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="forms\formreplace.pas"/>
+        <Filename Value="src\formreplace.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formReplaceText"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="forms\formabout.pas"/>
+        <Filename Value="src\formabout.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formAboutNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="forms\formdonate.pas"/>
+        <Filename Value="src\formdonate.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formDonateNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="forms\forminput.pas"/>
+        <Filename Value="src\forminput.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formInputText"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="units\consts.pas"/>
+        <Filename Value="src\consts.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="units\task.pas"/>
+        <Filename Value="src\task.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="units\settings.pas"/>
+        <Filename Value="src\settings.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="units\mdformat.pas"/>
+        <Filename Value="src\mdformat.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="units\udatetimepicker.pas"/>
+        <Filename Value="src\udatetimepicker.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="uDateTimePicker"/>
       </Unit>
@@ -231,7 +231,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="forms;units"/>
+      <OtherUnitFiles Value="src"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
