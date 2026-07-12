@@ -65,16 +65,31 @@ cd /d "%~dp0"
 :: Jump to the main part to avoid executing the subroutine
 goto :Main
 
-:: Subroutine to build a single component
+:: Build a single component with all parameters passed explicitly
 :BuildComponent
+set "comp=%~1"
+set "lower=%~2"
+set "branch=%~3"
+set "lpkname=%~4"
+set "revert=%~5"
+set "pullflag=%~6"
+set "buildflag=%~7"
+
+:: If lpk file is specified, form full path; otherwise leave empty
+if not "%lpkname%"=="" (
+    set "lpkfull=%~dp0libs\%lower%\%lpkname%"
+) else (
+    set "lpkfull="
+)
+
 call "%~dp0dependency.cmd" ^
-    "%~1" ^
-    "libs/%~2" ^
-    "https://github.com/plainlib/%~2.git" ^
-    "main" ^
-    "%~dp0libs\%~2\%~2.lpk" ^
-    "" ^
-    %DO_PULL% %DO_BUILD%
+    "%comp%" ^
+    "libs/%lower%" ^
+    "https://github.com/plainlib/%lower%.git" ^
+    "%branch%" ^
+    "%lpkfull%" ^
+    "%revert%" ^
+    %pullflag% %buildflag%
 
 if errorlevel 1 (
     if not defined CI pause
@@ -82,28 +97,29 @@ if errorlevel 1 (
 )
 exit /b 0
 
+:: Main part
 :Main
 
 :: Build DarkMode
-call :BuildComponent DarkMode darkmode
+call :BuildComponent DarkMode darkmode main darkmode.lpk "" %DO_PULL% %DO_BUILD%
 
 :: Build DCPCrypt
-call :BuildComponent DCPCrypt dcpcrypt
+call :BuildComponent DCPCrypt dcpcrypt main dcpcrypt.lpk "" %DO_PULL% %DO_BUILD%
 
 :: Build FileManager
-call :BuildComponent FileManager filemanager
+call :BuildComponent FileManager filemanager main filemanager.lpk "" %DO_PULL% %DO_BUILD%
 
 :: Build GridPrinter
-call :BuildComponent GridPrinter gridprinter
+call :BuildComponent GridPrinter gridprinter main gridprinter.lpk "" %DO_PULL% %DO_BUILD%
 
 :: Build Helpers
-call :BuildComponent Helpers helpers
+call :BuildComponent Helpers helpers main helpers.lpk "" %DO_PULL% %DO_BUILD%
 
 :: Build TagEdit
-call :BuildComponent TagEdit tagedit
+call :BuildComponent TagEdit tagedit main tageditpackage.lpk "" %DO_PULL% %DO_BUILD%
 
 :: Build Toolkit
-call :BuildComponent Toolkit toolkit
+call :BuildComponent Toolkit toolkit main toolkit.lpk "" %DO_PULL% %DO_BUILD%
 
 echo.
 echo Dependencies OK
