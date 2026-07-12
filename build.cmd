@@ -120,15 +120,6 @@ echo                        Signing %ARCH_LABEL%
 echo ############################################################
 echo.
 
-:: Copy OpenSSL DLLs (paths differ per architecture)
-IF "%ARCH%"=="32" (
-    copy /Y "%~dp0libs\openssl\libcrypto-1_1.dll" "%~dp0"
-    copy /Y "%~dp0libs\openssl\libssl-1_1.dll" "%~dp0"
-) ELSE (
-    copy /y "%~dp0libs\openssl\libcrypto-1_1-x64.dll" "%~dp0" >NUL
-    copy /Y "%~dp0libs\openssl\libssl-1_1-x64.dll"    "%~dp0" >NUL
-)
-
 echo Wait 2 seconds to ensure file is free
 ping 127.0.0.1 -n 3 >nul
 
@@ -156,12 +147,8 @@ SET "TIMESTAMP_URL=http://timestamp.sectigo.com"
 :: Set architecture-specific file names for signing
 IF "%ARCH%"=="32" (
     SET "EXE_NAME=%APP_NAME%32.exe"
-    SET "DLL_SSL=libssl-1_1.dll"
-    SET "DLL_CRYPTO=libcrypto-1_1.dll"
 ) ELSE (
     SET "EXE_NAME=%APP_NAME%.exe"
-    SET "DLL_SSL=libssl-1_1-x64.dll"
-    SET "DLL_CRYPTO=libcrypto-1_1-x64.dll"
 )
 
 ::Sign the executable and DLLs in the same folder
@@ -171,22 +158,6 @@ if exist "%EXE_NAME%" (
             if exist "%SIGNTOOL%" (
                 echo Signing executable...
                 "%SIGNTOOL%" sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%EXE_NAME%" < nul
-                IF %ERRORLEVEL% EQU 0 (
-                    echo Signing completed successfully
-                ) else (
-                    echo Signing failed
-                    if not defined CI pause
-                )
-                echo Signing %DLL_SSL%...
-                "%SIGNTOOL%" sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%DLL_SSL%" < nul
-                IF %ERRORLEVEL% EQU 0 (
-                    echo Signing completed successfully
-                ) else (
-                    echo Signing failed
-                    if not defined CI pause
-                )
-                echo Signing %DLL_CRYPTO%...
-                "%SIGNTOOL%" sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%DLL_CRYPTO%" < nul
                 IF %ERRORLEVEL% EQU 0 (
                     echo Signing completed successfully
                 ) else (

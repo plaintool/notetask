@@ -62,33 +62,49 @@ IF "%ARCH%"=="32" (
 
 cd /d "%~dp0"
 
-:: Build DarkMode
-call "%~dp0dependency.cmd" DarkMode libs/darkmode https://github.com/plainlib/darkmode.git main "%~dp0libs\darkmode\darkmode.lpk" "" %DO_PULL% %DO_BUILD%
+:: Jump to the main part to avoid executing the subroutine
+goto :Main
+
+:: Subroutine to build a single component
+:BuildComponent
+call "%~dp0dependency.cmd" ^
+    "%~1" ^
+    "libs/%~2" ^
+    "https://github.com/plainlib/%~2.git" ^
+    "main" ^
+    "%~dp0libs\%~2\%~2.lpk" ^
+    "" ^
+    %DO_PULL% %DO_BUILD%
+
 if errorlevel 1 (
     if not defined CI pause
     exit /b %errorlevel%
 )
+exit /b 0
+
+:Main
+
+:: Build DarkMode
+call :BuildComponent DarkMode darkmode
 
 :: Build DCPCrypt
-call "%~dp0dependency.cmd" DCPCrypt libs/dcpcrypt https://gisthub.com/plainlib/dcpcrypt.git main "%~dp0libs\dcpcrypt\dcpcrypt.lpk" "" %DO_PULL% %DO_BUILD%
-if errorlevel 1 (
-    if not defined CI pause
-    exit /b %errorlevel%
-)
+call :BuildComponent DCPCrypt dcpcrypt
+
+:: Build FileManager
+call :BuildComponent FileManager filemanager
 
 :: Build GridPrinter
-call "%~dp0dependency.cmd" GridPrinter libs/gridprinter https://gisthub.com/plainlib/gridprinter.git main "%~dp0libs\gridprinter\gridprinter.lpk" "" %DO_PULL% %DO_BUILD%
-if errorlevel 1 (
-    if not defined CI pause
-    exit /b %errorlevel%
-)
+call :BuildComponent GridPrinter gridprinter
+
+:: Build Helpers
+call :BuildComponent Helpers helpers
 
 :: Build TagEdit
-call "%~dp0dependency.cmd" TagEdit libs/tagedit https://gisthub.com/plainlib/tagedit.git main "%~dp0libs\tagedit\tagedit.lpk" "" %DO_PULL% %DO_BUILD%
-if errorlevel 1 (
-    if not defined CI pause
-    exit /b %errorlevel%
-)
+call :BuildComponent TagEdit tagedit
 
+:: Build Toolkit
+call :BuildComponent Toolkit toolkit
+
+echo.
 echo Dependencies OK
 exit /b 0

@@ -14,8 +14,11 @@ LAZBUILD_OPTS =
 DEP_LPKS = \
     libs/darkmode/darkmode.lpk \
     libs/dcpcrypt/dcpcrypt.lpk \
+    libs/filemanager/filemanager.lpk \
     libs/gridprinter/gridprinter.lpk \
-    libs/tagedit/tageditpackage.lpk
+    libs/helpers/helpers.lpk \
+    libs/tagedit/tageditpackage.lpk \
+    libs/toolkit/toolkit.lpk
     
 # Default target: build dependencies then the project
 all: deps
