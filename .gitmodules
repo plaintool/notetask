@@ -1,0 +1,28 @@
+[submodule "libs/darkmode"]
+	path = libs/darkmode
+	url = https://github.com/plainlib/darkmode.git
+	branch = main
+[submodule "libs/dcpcrypt"]
+	path = libs/dcpcrypt
+	url = https://github.com/plainlib/dcpcrypt.git
+	branch = main
+[submodule "libs/filemanager"]
+	path = libs/filemanager
+	url = https://github.com/plainlib/filemanager.git
+	branch = main
+[submodule "libs/gridprinter"]
+	path = libs/gridprinter
+	url = https://github.com/plainlib/gridprinter.git
+	branch = main
+[submodule "libs/helpers"]
+	path = libs/helpers
+	url = https://github.com/plainlib/helpers.git
+	branch = main
+[submodule "libs/tagedit"]
+	path = libs/tagedit
+	url = https://github.com/plainlib/tagedit.git
+	branch = main
+[submodule "libs/toolkit"]
+	path = libs/toolkit
+	url = https://github.com/plainlib/toolkit.git
+	branch = main

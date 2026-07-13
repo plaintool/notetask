@@ -42,35 +42,39 @@ echo                 Build %DEP_NAME% (%ARCH_LABEL%)
 echo ############################################################
 echo.
 
-:: ----- Decide whether to attempt subtree pull -----
+:: ----- Decide whether to update submodule -----
 if /i not "%DO_PULL%"=="true" (
-    echo Skipping %DEP_NAME% subtree pull because DO_PULL is not "true".
-    goto skip_update
+    echo Getting current %DEP_NAME% submodule version
+    git submodule update --init -- %DEP_PATH%
+    if errorlevel 1 (
+        echo WARNING: Failed to get current %DEP_NAME% submodule version
+    )
+    goto process_lpk
 )
 
-echo Checking %DEP_NAME% subtree state
+echo Checking %DEP_NAME% submodule state
 
-:: Check for unstaged changes in the subtree
-git diff --quiet -- %DEP_PATH%
+:: Check for local changes in the submodule
+git -C %DEP_PATH% diff --quiet
 if errorlevel 1 (
-    echo WARNING: %DEP_NAME% has unstaged changes, skipping subtree update
-    goto skip_update
+    echo WARNING: %DEP_NAME% has unstaged changes, skipping submodule update
+    goto process_lpk
 )
 
-:: Check for staged changes in the subtree
-git diff --cached --quiet -- %DEP_PATH%
+:: Check for staged changes in the submodule
+git -C %DEP_PATH% diff --cached --quiet
 if errorlevel 1 (
-    echo WARNING: %DEP_NAME% has staged changes, skipping subtree update
-    goto skip_update
+    echo WARNING: %DEP_NAME% has staged changes, skipping submodule update
+    goto process_lpk
 )
 
-:: No local changes – safe to attempt pull
-echo Updating %DEP_NAME% subtree
-git subtree pull --prefix=%DEP_PATH% %DEP_REPO% %DEP_BRANCH% --squash
+:: No local changes – safe to update to the latest branch commit
+echo Updating %DEP_NAME% submodule
+git submodule update --init --remote -- %DEP_PATH%
 if errorlevel 1 (
-    echo WARNING: %DEP_NAME% subtree update failed, continuing with existing code
+    echo WARNING: %DEP_NAME% submodule update failed, continuing with existing version
 ) else (
-    echo %DEP_NAME% subtree updated successfully
+    echo %DEP_NAME% submodule updated successfully
 )
 
 goto process_lpk
