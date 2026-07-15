@@ -19,7 +19,7 @@ object formNotetask: TformNotetask
   OnKeyUp = FormKeyUp
   OnResize = FormResize
   OnShow = FormShow
-  object taskGrid: TStringGrid
+  object Grid: TStringGrid
     Left = 0
     Height = 296
     Top = 24
@@ -73,26 +73,26 @@ object formNotetask: TformNotetask
     TabOrder = 0
     TitleImageList = ImagesTitle
     UseXORFeatures = True
-    OnCheckboxToggled = taskGridCheckboxToggled
-    OnColRowDeleted = taskGridColRowDeleted
-    OnColRowInserted = taskGridColRowInserted
-    OnColRowMoved = taskGridColRowMoved
-    OnDrawCell = taskGridDrawCell
-    OnHeaderClick = taskGridHeaderClick
-    OnHeaderSized = taskGridHeaderSized
-    OnKeyDown = taskGridKeyDown
-    OnMouseDown = taskGridMouseDown
-    OnMouseLeave = taskGridMouseLeave
-    OnMouseUp = taskGridMouseUp
-    OnMouseWheel = taskGridMouseWheel
-    OnResize = taskGridResize
-    OnSelectEditor = taskGridSelectEditor
-    OnSelection = taskGridSelection
-    OnSelectCell = taskGridSelectCell
-    OnSetCheckboxState = taskGridSetCheckboxState
-    OnTopLeftChanged = taskGridTopLeftChanged
-    OnUserCheckboxBitmap = taskGridUserCheckboxBitmap
-    OnUTF8KeyPress = taskGridUTF8KeyPress
+    OnCheckboxToggled = GridCheckboxToggled
+    OnColRowDeleted = GridColRowDeleted
+    OnColRowInserted = GridColRowInserted
+    OnColRowMoved = GridColRowMoved
+    OnDrawCell = GridDrawCell
+    OnHeaderClick = GridHeaderClick
+    OnHeaderSized = GridHeaderSized
+    OnKeyDown = GridKeyDown
+    OnMouseDown = GridMouseDown
+    OnMouseLeave = GridMouseLeave
+    OnMouseUp = GridMouseUp
+    OnMouseWheel = GridMouseWheel
+    OnResize = GridResize
+    OnSelectEditor = GridSelectEditor
+    OnSelection = GridSelection
+    OnSelectCell = GridSelectCell
+    OnSetCheckboxState = GridSetCheckboxState
+    OnTopLeftChanged = GridTopLeftChanged
+    OnUserCheckboxBitmap = GridUserCheckboxBitmap
+    OnUTF8KeyPress = GridUTF8KeyPress
   end
   object statusBar: TStatusBar
     Left = 0
@@ -157,7 +157,7 @@ object formNotetask: TformNotetask
     OnMouseLeave = panelNoteMouseLeave
     OnMouseMove = panelNoteMouseMove
     OnMouseUp = panelNoteMouseUp
-    object memoNote: TMemo
+    object MemoNote: TMemo
       Left = 10
       Height = 128
       Top = 0
@@ -170,15 +170,15 @@ object formNotetask: TformNotetask
       ScrollBars = ssAutoBoth
       TabOrder = 0
       WordWrap = False
-      OnChange = memoNoteChange
-      OnDblClick = memoNoteDblClick
-      OnEnter = memoNoteEnter
-      OnExit = memoNoteExit
-      OnKeyDown = memoNoteKeyDown
-      OnKeyUp = memoNoteKeyUp
-      OnMouseDown = memoNoteMouseDown
-      OnMouseUp = memoNoteMouseUp
-      OnMouseWheel = memoNoteMouseWheel
+      OnChange = MemoNoteChange
+      OnDblClick = MemoNoteDblClick
+      OnEnter = MemoNoteEnter
+      OnExit = MemoNoteExit
+      OnKeyDown = MemoNoteKeyDown
+      OnKeyUp = MemoNoteKeyUp
+      OnMouseDown = MemoNoteMouseDown
+      OnMouseUp = MemoNoteMouseUp
+      OnMouseWheel = MemoNoteMouseWheel
     end
   end
   object panelTabs: TPanel
@@ -203,23 +203,23 @@ object formNotetask: TformNotetask
       ResizeAnchor = akRight
       OnChangeBounds = SplitFilterChangeBounds
     end
-    object groupTabs: TTabControl
+    object TabsGroup: TTabControl
       Left = 0
       Height = 24
       Top = 0
       Width = 639
-      OnChange = groupTabsChange
+      OnChange = TabsGroupChange
       Align = alClient
       Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
-      OnMouseDown = groupTabsMouseDown
-      OnMouseLeave = groupTabsMouseLeave
-      OnMouseMove = groupTabsMouseMove
-      OnMouseUp = groupTabsMouseUp
+      OnMouseDown = TabsGroupMouseDown
+      OnMouseLeave = TabsGroupMouseLeave
+      OnMouseMove = TabsGroupMouseMove
+      OnMouseUp = TabsGroupMouseUp
     end
-    object filterBox: TComboBox
+    object FilterBox: TComboBox
       Left = 644
       Height = 23
       Hint = 'The filter searches text in any field.'#13#10'- Tags can be chosen from a dropdown list.'#13#10'- Use # at the start to search only in tags.'#13#10'- The list also includes text tags starting with @, #, %, +, or $.'#13#10'- Use ! at the start for negation (not contains).'#13#10'- Supports =, !=, >, <, >=, <= for amounts and dates.'#13#10'- 1 / 0 filter by task completion.'#13#10'- * / !* filter by task favorite.'
@@ -238,8 +238,8 @@ object formNotetask: TformNotetask
       ShowHint = True
       TabOrder = 2
       TextHint = 'Type to filter...'
-      OnChange = filterBoxChange
-      OnKeyDown = filterBoxKeyDown
+      OnChange = FilterBoxChange
+      OnKeyDown = FilterBoxKeyDown
     end
     object filterClear: TSpeedButton
       Left = 834
@@ -278,7 +278,7 @@ object formNotetask: TformNotetask
     ResizeAnchor = akBottom
     Visible = False
   end
-  object panelTags: TScrollBox
+  object PanelTags: TScrollBox
     Left = 0
     Height = 32
     Top = 458

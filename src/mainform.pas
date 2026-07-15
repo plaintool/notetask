@@ -45,7 +45,7 @@ uses
 type
   { TformNotetask }
   TformNotetask = class(TForm)
-    {%Region -fold Form Common}
+    {%Region -fold Vars}
     aArchiveTasks: TAction;
     aAbout: TAction;
     aCopy: TAction;
@@ -118,10 +118,10 @@ type
     contextRunTerminal1: TMenuItem;
     contextSelectAll1: TMenuItem;
     contextUndo1: TMenuItem;
-    filterBox: TComboBox;
+    FilterBox: TComboBox;
     filterClear: TSpeedButton;
     fontDialog: TFontDialog;
-    groupTabs: TTabControl;
+    TabsGroup: TTabControl;
     contextColor: TMenuItem;
     contextResetColor: TMenuItem;
     contextZoom90: TMenuItem;
@@ -153,7 +153,7 @@ type
     menuZoom: TMenuItem;
     ImagesMisc: TImageList;
     MainMenu: TMainMenu;
-    memoNote: TMemo;
+    MemoNote: TMemo;
     menuFile: TMenuItem;
     menuFormat: TMenuItem;
     menuFont: TMenuItem;
@@ -239,7 +239,7 @@ type
     printDialog: TPrintDialog;
     saveDialog: TSaveDialog;
     saveNotesDialog: TSaveDialog;
-    panelTags: TScrollBox;
+    PanelTags: TScrollBox;
     Separator1: TMenuItem;
     menuExit: TMenuItem;
     Separator10: TMenuItem;
@@ -259,7 +259,7 @@ type
     SplitFilter: TSplitter;
     SplitTags: TSplitter;
     statusBar: TStatusBar;
-    taskGrid: TStringGrid;
+    Grid: TStringGrid;
     aLangEnglish: TAction;
     menuLanguage: TMenuItem;
     Separator9: TMenuItem;
@@ -359,117 +359,22 @@ type
     contextRenameGroup: TMenuItem;
     contextDuplicateGroup: TMenuItem;
     contextDeleteGroup: TMenuItem;
-    procedure aAutoCheckUpdatesExecute(Sender: TObject);
-    procedure aCheckforupdatesExecute(Sender: TObject);
-    procedure aEditGroupTooltipExecute(Sender: TObject);
-    procedure aFilterExecute(Sender: TObject);
-    procedure aLangCzechExecute(Sender: TObject);
-    procedure aLangDanishExecute(Sender: TObject);
-    procedure aLangDutchExecute(Sender: TObject);
-    procedure aLangFinnishExecute(Sender: TObject);
-    procedure aLangGreekExecute(Sender: TObject);
-    procedure aLangHebrewExecute(Sender: TObject);
-    procedure aLangIndonesianExecute(Sender: TObject);
-    procedure aLangPolishExecute(Sender: TObject);
-    procedure aLangRomanianExecute(Sender: TObject);
-    procedure aLangSwedishExecute(Sender: TObject);
-    procedure aLangTurkishExecute(Sender: TObject);
-    procedure aShowTagsExecute(Sender: TObject);
-    procedure aSplitTasksExecute(Sender: TObject);
-    procedure aZoomDefaultExecute(Sender: TObject);
-    procedure aZoomInExecute(Sender: TObject);
-    procedure aZoomOutExecute(Sender: TObject);
-    procedure btnMultiClick(Sender: TObject);
-    procedure contextCopyTagsClick(Sender: TObject);
-    procedure contextDeleteTagsClick(Sender: TObject);
-    procedure contextColorClick(Sender: TObject);
-    procedure contextResetColorClick(Sender: TObject);
-    procedure contextZoom100Click(Sender: TObject);
-    procedure contextZoom110Click(Sender: TObject);
-    procedure contextZoom120Click(Sender: TObject);
-    procedure contextZoom130Click(Sender: TObject);
-    procedure contextZoom140Click(Sender: TObject);
-    procedure contextZoom150Click(Sender: TObject);
-    procedure contextZoom50Click(Sender: TObject);
-    procedure contextZoom60Click(Sender: TObject);
-    procedure contextZoom70Click(Sender: TObject);
-    procedure contextZoom80Click(Sender: TObject);
-    procedure contextZoom90Click(Sender: TObject);
-    procedure filterBoxChange(Sender: TObject);
-    procedure filterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure filterClearClick(Sender: TObject);
+    {%EndRegion}
+    {%Region -fold Events}
+    // Form Events
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure FormKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
+    procedure FormResize(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure FormKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
+    // Application Events
     procedure ApplicationOnException(Sender: TObject; E: Exception);
     procedure ApplicationOnQueryEndSession(var CanEnd: boolean);
     procedure ApplicationOnShowHint(var HintStr: string; var CanShow: boolean; var HintInfo: THintInfo);
-    procedure memoNoteDblClick(Sender: TObject);
-    procedure memoNoteEnter(Sender: TObject);
-    procedure memoNoteExit(Sender: TObject);
-    procedure memoNoteChange(Sender: TObject);
-    procedure memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure memoNoteKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure memoNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure memoNoteMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
-    procedure tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure tagsEditTagClick(Sender: TObject; const TagText: string; const TagIndex: integer);
-    procedure tagsEditBeforeChange(Sender: TObject; Tags: string; Operation: TTagEditOperation; var AllowChange: boolean);
-    procedure tagsEditChange(Sender: TObject);
-    procedure tagsEditTagAdd(Sender: TObject; const TagText: string; const TagIndex: integer);
-    procedure tagsEditTagRemove(Sender: TObject; const TagText: string; const TagIndex: integer);
-    procedure tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
-    procedure tagsEditExit(Sender: TObject);
-    procedure groupTabsChange(Sender: TObject);
-    procedure groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure groupTabsMouseLeave(Sender: TObject);
-    procedure groupTabsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
-    procedure groupTabsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure panelNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure panelNoteMouseEnter(Sender: TObject);
-    procedure panelNoteMouseLeave(Sender: TObject);
-    procedure panelNoteMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
-    procedure panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure SplitFilterChangeBounds(Sender: TObject);
-    procedure statusBarContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
-    procedure contextCopyStatusbarClick(Sender: TObject);
-    procedure contextANSIClick(Sender: TObject);
-    procedure contextASCIIClick(Sender: TObject);
-    procedure contextMacintoshCRClick(Sender: TObject);
-    procedure contextUnixLFClick(Sender: TObject);
-    procedure contextUTF16BEBOMClick(Sender: TObject);
-    procedure contextUTF16LEBOMClick(Sender: TObject);
-    procedure contextUTF8BOMClick(Sender: TObject);
-    procedure contextUTF8Click(Sender: TObject);
-    procedure contextWindowsCRLFClick(Sender: TObject);
-    procedure taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
-    procedure taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-    procedure taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-    procedure taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
-    procedure taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
-    procedure taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
-    procedure taskGridKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure taskGridMouseLeave(Sender: TObject);
-    procedure taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
-    procedure taskGridResize(Sender: TObject);
-    procedure taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
-    procedure taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
-    procedure taskGridTopLeftChanged(Sender: TObject);
-    procedure taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState;
-      var ABitmap: TBitmap);
-    procedure taskGridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-    procedure taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
-    procedure taskGridSelection(Sender: TObject; aCol, aRow: integer);
-    procedure taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
-    procedure aSaveNotesAsExecute(Sender: TObject);
+    // Actions Events
     procedure aDuplicateTasksExecute(Sender: TObject);
     procedure aEnterSubmitExecute(Sender: TObject);
     procedure aRunPowershellExecute(Sender: TObject);
@@ -545,12 +450,119 @@ type
     procedure aMoveGroupLeftExecute(Sender: TObject);
     procedure aMoveGroupRightExecute(Sender: TObject);
     procedure aHideNoteTextExecute(Sender: TObject);
+    procedure aSaveNotesAsExecute(Sender: TObject);
+    procedure aAutoCheckUpdatesExecute(Sender: TObject);
+    procedure aCheckforupdatesExecute(Sender: TObject);
+    procedure aEditGroupTooltipExecute(Sender: TObject);
+    procedure aFilterExecute(Sender: TObject);
+    procedure aLangCzechExecute(Sender: TObject);
+    procedure aLangDanishExecute(Sender: TObject);
+    procedure aLangDutchExecute(Sender: TObject);
+    procedure aLangFinnishExecute(Sender: TObject);
+    procedure aLangGreekExecute(Sender: TObject);
+    procedure aLangHebrewExecute(Sender: TObject);
+    procedure aLangIndonesianExecute(Sender: TObject);
+    procedure aLangPolishExecute(Sender: TObject);
+    procedure aLangRomanianExecute(Sender: TObject);
+    procedure aLangSwedishExecute(Sender: TObject);
+    procedure aLangTurkishExecute(Sender: TObject);
+    procedure aShowTagsExecute(Sender: TObject);
+    procedure aSplitTasksExecute(Sender: TObject);
+    procedure aZoomDefaultExecute(Sender: TObject);
+    procedure aZoomInExecute(Sender: TObject);
+    procedure aZoomOutExecute(Sender: TObject);
+    // Context Menu Events
+    procedure contextCopyTagsClick(Sender: TObject);
+    procedure contextDeleteTagsClick(Sender: TObject);
+    procedure contextColorClick(Sender: TObject);
+    procedure contextResetColorClick(Sender: TObject);
+    procedure contextZoom100Click(Sender: TObject);
+    procedure contextZoom110Click(Sender: TObject);
+    procedure contextZoom120Click(Sender: TObject);
+    procedure contextZoom130Click(Sender: TObject);
+    procedure contextZoom140Click(Sender: TObject);
+    procedure contextZoom150Click(Sender: TObject);
+    procedure contextZoom50Click(Sender: TObject);
+    procedure contextZoom60Click(Sender: TObject);
+    procedure contextZoom70Click(Sender: TObject);
+    procedure contextZoom80Click(Sender: TObject);
+    procedure contextZoom90Click(Sender: TObject);
+    procedure contextCopyStatusbarClick(Sender: TObject);
+    procedure contextANSIClick(Sender: TObject);
+    procedure contextASCIIClick(Sender: TObject);
+    procedure contextMacintoshCRClick(Sender: TObject);
+    procedure contextUnixLFClick(Sender: TObject);
+    procedure contextUTF16BEBOMClick(Sender: TObject);
+    procedure contextUTF16LEBOMClick(Sender: TObject);
+    procedure contextUTF8BOMClick(Sender: TObject);
+    procedure contextUTF8Click(Sender: TObject);
+    procedure contextWindowsCRLFClick(Sender: TObject);
+    // Memo Note Events
+    procedure MemoNoteDblClick(Sender: TObject);
+    procedure MemoNoteEnter(Sender: TObject);
+    procedure MemoNoteExit(Sender: TObject);
+    procedure MemoNoteChange(Sender: TObject);
+    procedure MemoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure MemoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure MemoNoteKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure MemoNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure MemoNoteMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
+    procedure panelNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure panelNoteMouseEnter(Sender: TObject);
+    procedure panelNoteMouseLeave(Sender: TObject);
+    procedure panelNoteMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+    procedure panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    // TagEdit Events
+    procedure tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure tagsEditTagClick(Sender: TObject; const TagText: string; const TagIndex: integer);
+    procedure tagsEditBeforeChange(Sender: TObject; Tags: string; Operation: TTagEditOperation; var AllowChange: boolean);
+    procedure tagsEditChange(Sender: TObject);
+    procedure tagsEditTagAdd(Sender: TObject; const TagText: string; const TagIndex: integer);
+    procedure tagsEditTagRemove(Sender: TObject; const TagText: string; const TagIndex: integer);
+    procedure tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
+    procedure tagsEditExit(Sender: TObject);
+    // Tabs Group Events
+    procedure TabsGroupChange(Sender: TObject);
+    procedure TabsGroupMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure TabsGroupMouseLeave(Sender: TObject);
+    procedure TabsGroupMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+    procedure TabsGroupMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    // Grid Events
+    procedure GridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
+    procedure GridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+    procedure GridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+    procedure GridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
+    procedure GridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
+    procedure GridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
+    procedure GridKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure GridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure GridMouseLeave(Sender: TObject);
+    procedure GridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure GridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
+    procedure GridResize(Sender: TObject);
+    procedure GridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
+    procedure GridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
+    procedure GridTopLeftChanged(Sender: TObject);
+    procedure GridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState;
+      var ABitmap: TBitmap);
+    procedure GridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+    procedure GridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
+    procedure GridSelection(Sender: TObject; aCol, aRow: integer);
+    procedure GridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
+    // All Events
+    procedure btnMultiClick(Sender: TObject);
+    procedure FilterBoxChange(Sender: TObject);
+    procedure FilterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure filterClearClick(Sender: TObject);
+    procedure SplitFilterChangeBounds(Sender: TObject);
+    procedure statusBarContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
     {%EndRegion}
   private
+    {%Region -fold Private Vars}
     Memo: TMemo;
     PanelMemo: TPanel;
     DatePicker: TDateTimePicker;
-    tagsEdit: TTagEdit;
+    TagEdit: TTagEdit;
     FChanged: boolean;
     FBackup: boolean;
     FReadOnly: boolean;
@@ -630,6 +642,8 @@ type
     FSReserved: TFileStream;
     FRepaint: boolean;
     FDuplicateHighlight: boolean;
+    {%EndRegion}
+    {%Region -fold Private Mathods}
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = -1);
     procedure UpdateComboRegion(Combo: TComboBox; AInsetLeft: integer = 1; AInsetTop: integer = 1;
@@ -677,22 +691,6 @@ type
     procedure CompleteTasks(aRow: integer = 0);
     procedure StarTasks(aRow: integer = 0);
     procedure IndentTasks(Outdent: boolean = False);
-    procedure SetReadOnly(Value: boolean);
-    procedure SetZoom(Value: float);
-    procedure SetBiDiRightToLeft(Value: boolean);
-    procedure SetShowStatusBar(Value: boolean);
-    procedure SetShowTags(Value: boolean);
-    procedure SetShowNote(Value: boolean);
-    procedure SetShowDuration(Value: boolean);
-    procedure SetShowTime(Value: boolean);
-    procedure SetHideNoteText(Value: boolean);
-    procedure SetShowArchived(Value: boolean);
-    procedure SetShowColumnDone(Value: boolean);
-    procedure SetShowColumnTask(Value: boolean);
-    procedure SetShowColumnNote(Value: boolean);
-    procedure SetShowColumnDate(Value: boolean);
-    procedure SetShowColumnAmount(Value: boolean);
-    procedure SetShowColumnFavorite(Value: boolean);
     procedure ApplyColumnSetting;
     procedure ApplySortArrow;
     procedure ApplySorting;
@@ -746,7 +744,35 @@ type
     procedure DelayedFinishTagEdit(Data: PtrInt);
     procedure DelayedInvalidate(Data: PtrInt);
     procedure FixDatePickerFont(Data: PtrInt);
+    procedure AlignBottomControls;
+    procedure SetLanguage(aLanguage: string = string.Empty);
+    procedure FillGrid;
+    procedure NewFile(SaveSetting: boolean = True);
+    function OpenFile(fileName: string; saveSettings: boolean = True; ShowTrigger: boolean = False): boolean;
+    function SaveFile(fileName: string = string.Empty; saveAs: boolean = False; encrypt: boolean = False): boolean;
+    function SaveFileAs: boolean;
+    procedure ApplyGridSettings;
+    {%EndRegion}
+    {%Region -fold Private Setters}
+    procedure SetReadOnly(Value: boolean);
+    procedure SetZoom(Value: float);
+    procedure SetBiDiRightToLeft(Value: boolean);
+    procedure SetShowStatusBar(Value: boolean);
+    procedure SetShowTags(Value: boolean);
+    procedure SetShowNote(Value: boolean);
+    procedure SetShowDuration(Value: boolean);
+    procedure SetShowTime(Value: boolean);
+    procedure SetHideNoteText(Value: boolean);
+    procedure SetShowArchived(Value: boolean);
+    procedure SetShowColumnDone(Value: boolean);
+    procedure SetShowColumnTask(Value: boolean);
+    procedure SetShowColumnNote(Value: boolean);
+    procedure SetShowColumnDate(Value: boolean);
+    procedure SetShowColumnAmount(Value: boolean);
+    procedure SetShowColumnFavorite(Value: boolean);
+    {%EndRegion}
   public
+    {%Region -fold Public Vars}
     FZoom: float;
     FShowArchived: boolean;
     FShowDuration: boolean;
@@ -764,20 +790,15 @@ type
     {$IFDEF UNIX}
     FWindowStateLoaded: TWindowState;
     {$ENDIF}
-
-    procedure SetLanguage(aLanguage: string = string.Empty);
-    procedure FillGrid;
-    procedure NewFile(SaveSetting: boolean = True);
-    function OpenFile(fileName: string; saveSettings: boolean = True; ShowTrigger: boolean = False): boolean;
-    function SaveFile(fileName: string = string.Empty; saveAs: boolean = False; encrypt: boolean = False): boolean;
-    function SaveFileAs: boolean;
-    procedure ApplyGridSettings;
-    procedure AlignBottomControls;
+    {%EndRegion}
+    {%Region -fold Public Methods}
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean; overload;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; out aRowsChanged: integer; Silent: boolean): boolean;
       overload;
     function Replace(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
+    {%EndRegion}
+    {%Region -fold Public Properties}
     property Zoom: float read FZoom write SetZoom;
     property ReadOnly: boolean read FReadOnly write SetReadOnly;
     property WordWrap: boolean read FWordWrap write FWordWrap;
@@ -810,6 +831,7 @@ type
     property MemoNoteScroll: integer read GetMemoNoteScroll write FLoadedMemoNoteScroll;
     property MemoNoteSelStart: integer read GetMemoNoteSelStart write FLoadedMemoNoteSelStart;
     property MemoNoteSelLength: integer read GetMemoNoteSelLength write FLoadedMemoNoteSelLength;
+    {%EndRegion}
   end;
 
 var
@@ -819,6 +841,8 @@ var
   ResourceBitmapUncheck: TBitmap;
   ResourceBitmapStarGold: TBitmap;
   ResourceBitmapStarGray: TBitmap;
+
+  {%Region -fold Resource String}
 
 resourcestring
   rapp = 'Notetask';
@@ -864,46 +888,48 @@ resourcestring
   ryes = '&Yes';
   rno = '&No';
 
+  {%EndRegion}
+
 implementation
 
-uses consts, mathparser, filemngr, settings, controlshelper, cryptoutils, stringgridhelper, forminput, formmemo, formfind,
+uses Consts, mathparser, filemngr, settings, controlshelper, cryptoutils, stringgridhelper, forminput, formmemo, formfind,
   formreplace, formabout, formdonate, osutils, stringhelper, stringshelper, darkutils, localize, checkupdates, hotkeyhelper;
 
   {$R *.lfm}
 
-  { TformNotetask }
+  {%Region -fold Form Events}
 
 procedure TformNotetask.FormCreate(Sender: TObject);
 begin
   // Init components
-  tagsEdit := TTagEdit.Create(Self);
-  tagsEdit.Parent := panelTags;
-  tagsEdit.AutoSuggest := True;
-  tagsEdit.Align := alTop;
-  tagsEdit.AutoSizeHeight := True;
-  tagsEdit.DragIndicatorColor := clRed;
-  tagsEdit.SelectionRectColor := clSilver;
-  tagsEdit.TagHoverColor := clNone;
-  tagsEdit.TagSuffixColor := TDarkUtils.ThemeColor(clTagSuffix_Light, clTagSuffix_Dark);
-  tagsEdit.RoundCorners := 20;
-  tagsEdit.TagHeightFactor := 2;
-  tagsEdit.AutoColorSeed := 14;
-  tagsEdit.EditMinWidth := 150;
-  tagsEdit.AutoColorBrigtness := TagsColorBrigtness;
-  tagsEdit.AutoColorSaturation := TagsColorSaturation;
-  tagsEdit.BackSpaceEditTag := True;
-  tagsEdit.ShowHint := True;
-  tagsEdit.SuggestedButtonCaption := string.Empty;
-  ImagesMisc.GetBitmap(TDarkUtils.ThemeValue(0, 1), tagsEdit.SuggestedButtonGlyph);
-  tagsEdit.PopupMenu := PopupTags;
-  tagsEdit.OnKeyDown := @tagsEditKeyDown;
-  tagsEdit.OnTagClick := @tagsEditTagClick;
-  tagsEdit.OnBeforeChange := @tagsEditBeforeChange;
-  tagsEdit.OnChange := @tagsEditChange;
-  tagsEdit.OnTagAdd := @tagsEditTagAdd;
-  tagsEdit.OnTagRemove := @tagsEditTagRemove;
-  tagsEdit.OnTagReorder := @tagsEditTagReorder;
-  tagsEdit.OnExit := @tagsEditExit;
+  TagEdit := TTagEdit.Create(Self);
+  TagEdit.Parent := PanelTags;
+  TagEdit.AutoSuggest := True;
+  TagEdit.Align := alTop;
+  TagEdit.AutoSizeHeight := True;
+  TagEdit.DragIndicatorColor := clRed;
+  TagEdit.SelectionRectColor := clSilver;
+  TagEdit.TagHoverColor := clNone;
+  TagEdit.TagSuffixColor := TDarkUtils.ThemeColor(clTagSuffix_Light, clTagSuffix_Dark);
+  TagEdit.RoundCorners := 20;
+  TagEdit.TagHeightFactor := 2;
+  TagEdit.AutoColorSeed := 14;
+  TagEdit.EditMinWidth := 150;
+  TagEdit.AutoColorBrigtness := TagsColorBrigtness;
+  TagEdit.AutoColorSaturation := TagsColorSaturation;
+  TagEdit.BackSpaceEditTag := True;
+  TagEdit.ShowHint := True;
+  TagEdit.SuggestedButtonCaption := string.Empty;
+  ImagesMisc.GetBitmap(TDarkUtils.ThemeValue(0, 1), TagEdit.SuggestedButtonGlyph);
+  TagEdit.PopupMenu := PopupTags;
+  TagEdit.OnKeyDown := @tagsEditKeyDown;
+  TagEdit.OnTagClick := @tagsEditTagClick;
+  TagEdit.OnBeforeChange := @tagsEditBeforeChange;
+  TagEdit.OnChange := @tagsEditChange;
+  TagEdit.OnTagAdd := @tagsEditTagAdd;
+  TagEdit.OnTagRemove := @tagsEditTagRemove;
+  TagEdit.OnTagReorder := @tagsEditTagReorder;
+  TagEdit.OnExit := @tagsEditExit;
 
   // Initialize variables
   FZoom := 1;
@@ -943,21 +969,21 @@ begin
 
   // Set colors
   Self.Color := clWindow;
-  taskGrid.GridLineColor := TDarkUtils.ThemeColor(clGridLineColor_Light, clGridLineColor_Dark);
-  taskGrid.FixedHotColor := TDarkUtils.ThemeColor(clSplitHighlight_Light, clSplitHighlight_Dark);
+  Grid.GridLineColor := TDarkUtils.ThemeColor(clGridLineColor_Light, clGridLineColor_Dark);
+  Grid.FixedHotColor := TDarkUtils.ThemeColor(clSplitHighlight_Light, clSplitHighlight_Dark);
   panelNote.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);
   Splitter.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);
   SplitTags.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);
   SplitFilter.Color := TDarkUtils.ThemeColor(clSplitFilter_Light, clSplitFilter_Dark);
 
   // Remove standart border
-  UpdateComboRegion(filterBox);
+  UpdateComboRegion(FilterBox);
 
   Application.OnException := @ApplicationOnException;
   Application.OnQueryEndSession := @ApplicationOnQueryEndSession;
   Application.OnShowHint := @ApplicationOnShowHint;
 
-  taskGrid.DefaultRowHeight := DefRowHeight;
+  Grid.DefaultRowHeight := DefRowHeight;
 
   // Create TBitmap objects
   ResourceBitmapCheck := TBitmap.Create;
@@ -979,12 +1005,12 @@ begin
   ResourceBitmapStarGray.TransparentColor := clFuchsia;
   ResourceBitmapStarGray.Transparent := True;
 
-  FFormSettingsLoaded := LoadFormSettings(Self, tagsEdit);
-  FGridSettingsLoaded := LoadGridSettings(Self, taskGrid, string.Empty);
+  FFormSettingsLoaded := LoadFormSettings(Self, TagEdit);
+  FGridSettingsLoaded := LoadGridSettings(Self, Grid, string.Empty);
 
   // After load settings
   aWordWrap.Checked := FWordWrap;
-  memoNote.WordWrap := FWordWrap;
+  MemoNote.WordWrap := FWordWrap;
   aEnterSubmit.Checked := FEnterSubmit;
   aAutoCheckUpdates.Checked := FAutoCheckUpdates;
   aBidiRightToLeft.Checked := FBiDiRightToLeft;
@@ -1025,9 +1051,9 @@ end;
 procedure TformNotetask.FormDestroy(Sender: TObject);
 begin
   if FFormSettingsLoaded then
-    SaveFormSettings(Self, tagsEdit);
+    SaveFormSettings(Self, TagEdit);
   if FGridSettingsLoaded then
-    SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+    SaveGridSettings(Self, Grid, ExtractFileName(FFileName));
 
   // Free allocated resources
   Tasks.Free;
@@ -1038,7 +1064,7 @@ begin
 
   FreeFile;
 
-  tagsEdit.Free;
+  TagEdit.Free;
 end;
 
 procedure TformNotetask.FormShow(Sender: TObject);
@@ -1065,11 +1091,11 @@ begin
   SetCaption;
 
   // Save panel height as it gets cleared during restore on Linux
-  TagsHeight := panelTags.Height;
+  TagsHeight := PanelTags.Height;
   RestoreSelectedState(True, True, True);
-  panelTags.Height := TagsHeight;
+  PanelTags.Height := TagsHeight;
 
-  Tasks.CalcTagsWidths(-1, taskGrid.Columns[COL_TASK - 1].Width, tagsEdit, Font);
+  Tasks.CalcTagsWidths(-1, Grid.Columns[COL_TASK - 1].Width, TagEdit, Font);
   SetZoom(FZoom);
   CorrectGridSelection;
 
@@ -1100,9 +1126,21 @@ begin
   end;
 end;
 
+procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+begin
+  CanClose := IsCanClose;
+end;
+
+procedure TformNotetask.FormResize(Sender: TObject);
+begin
+  GridResize(Sender);
+
+  AlignBottomControls;
+end;
+
 procedure TformNotetask.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
-  if memoNote.Focused or filterBox.Focused or tagsEdit.Focused then
+  if MemoNote.Focused or FilterBox.Focused or TagEdit.Focused then
     exit;
 
   if Screen.ActiveForm <> Self then
@@ -1136,7 +1174,7 @@ begin
     else
     begin
       if (not FIsEditing) then
-        EditCell(taskGrid.Col, taskGrid.Row);
+        EditCell(Grid.Col, Grid.Row);
     end;
     Key := 0;
   end
@@ -1166,17 +1204,17 @@ begin
     Key := 0;
   end
   else
-  if not (ssCtrl in Shift) and not (ssShift in Shift) and (Key = VK_ADD) and (groupTabs.Tabs.Count > 1) and (not IsEditing) then // NUMPAD+
+  if not (ssCtrl in Shift) and not (ssShift in Shift) and (Key = VK_ADD) and (TabsGroup.Tabs.Count > 1) and (not IsEditing) then // NUMPAD+
   begin
     EditComplete;
-    ChangeGroup(groupTabs.TabIndex + 1);
+    ChangeGroup(TabsGroup.TabIndex + 1);
     Key := 0;
   end
-  else if not (ssCtrl in Shift) and not (ssShift in Shift) and (Key = VK_SUBTRACT) and (groupTabs.Tabs.Count > 1) and (not IsEditing) then
+  else if not (ssCtrl in Shift) and not (ssShift in Shift) and (Key = VK_SUBTRACT) and (TabsGroup.Tabs.Count > 1) and (not IsEditing) then
     // NUMPAD-
   begin
     EditComplete;
-    ChangeGroup(groupTabs.TabIndex - 1);
+    ChangeGroup(TabsGroup.TabIndex - 1);
     Key := 0;
   end
   else
@@ -1292,8 +1330,8 @@ begin
     if IsEditing then
     begin
       EditComplete;
-      if taskGrid.Row > 0 then
-        taskGrid.Row := taskGrid.Row - 1;
+      if Grid.Row > 0 then
+        Grid.Row := Grid.Row - 1;
       Key := 0;
     end;
   end
@@ -1303,17 +1341,17 @@ begin
     if IsEditing then
     begin
       EditComplete;
-      if (taskGrid.Row < taskGrid.RowCount - 1) then
-        taskGrid.Row := taskGrid.Row + 1;
+      if (Grid.Row < Grid.RowCount - 1) then
+        Grid.Row := Grid.Row + 1;
       Key := 0;
     end;
   end
   else
   if (Key in [VK_SPACE]) then // Space
   begin
-    if (not IsEditing) and (taskGrid.Focused) then
+    if (not IsEditing) and (Grid.Focused) then
     begin
-      if (not taskGrid.Columns[COL_DONE - 1].Visible) or (taskGrid.Col = COL_STAR) then
+      if (not Grid.Columns[COL_DONE - 1].Visible) or (Grid.Col = COL_STAR) then
         StarTasks
       else
         CompleteTasks;
@@ -1326,7 +1364,7 @@ begin
     if IsEditing then
       EditComplete(False, True)
     else
-      taskGrid.ClearSelections;
+      Grid.ClearSelections;
     Key := 0;
   end
   else
@@ -1334,14 +1372,14 @@ begin
   begin
     if IsEditing then
     begin
-      if (taskGrid.Col in [COL_AMOUNT, COL_DATE]) or ((taskGrid.Col in [COL_TASK, COL_NOTE]) and
+      if (Grid.Col in [COL_AMOUNT, COL_DATE]) or ((Grid.Col in [COL_TASK, COL_NOTE]) and
         ((FEnterSubmit and (Shift = [])) or (not FEnterSubmit and ((Shift = [ssCtrl]) or (Shift = [ssShift]))))) then
       begin
         EditComplete(True);
         Key := 0;
       end
       else
-      if (taskGrid.Col in [COL_TASK, COL_NOTE]) and (FEnterSubmit) and (Shift = [ssCtrl]) then
+      if (Grid.Col in [COL_TASK, COL_NOTE]) and (FEnterSubmit) and (Shift = [ssCtrl]) then
       begin
         Memo.SelText := sLineBreak;
         Key := 0;
@@ -1349,13 +1387,13 @@ begin
     end
     else
     begin
-      if (taskGrid.Col in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
+      if (Grid.Col in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
         FMemoNeedSelectAll := False
       else
-      if (taskGrid.Col = COL_DONE) then
+      if (Grid.Col = COL_DONE) then
         CompleteTasks
       else
-      if (taskGrid.Col = COL_STAR) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) then
+      if (Grid.Col = COL_STAR) and (Grid.Selection.Height = 0) and (Grid.Selection.Width = 0) then
         StarTasks;
     end;
   end;
@@ -1368,18 +1406,6 @@ begin
     Key := 0; // block menuZoomIn flicker when Alt+Shift
     Exit;
   end;
-end;
-
-procedure TformNotetask.FormResize(Sender: TObject);
-begin
-  taskGridResize(Sender);
-
-  AlignBottomControls;
-end;
-
-procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
-begin
-  CanClose := IsCanClose;
 end;
 
 procedure TformNotetask.FormDropFiles(Sender: TObject; const FileNames: array of string);
@@ -1396,6 +1422,10 @@ begin
       OpenFile(FileNames[0]);
   end;
 end;
+
+{%EndRegion}
+
+{%Region -fold Application Events}
 
 procedure TformNotetask.ApplicationOnException(Sender: TObject; E: Exception);
 begin
@@ -1419,7 +1449,7 @@ begin
     Application.HintPause := 100;
 
     // Determine which tab is under the mouse cursor
-    TabIndex := groupTabs.IndexOfTabAt(HintInfo.CursorPos.X, 5);
+    TabIndex := TabsGroup.IndexOfTabAt(HintInfo.CursorPos.X, 5);
 
     if TabIndex >= 0 then
     begin
@@ -1441,7 +1471,2678 @@ begin
     Application.HintPause := 500;
 end;
 
-procedure TformNotetask.taskGridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
+{%EndRegion}
+
+{%Region -fold Action Events}
+
+procedure TformNotetask.aNewExecute(Sender: TObject);
+begin
+  NewFile;
+end;
+
+procedure TformNotetask.aNewWindowExecute(Sender: TObject);
+var
+  Process: TProcess;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if FFormSettingsLoaded then
+    SaveFormSettings(self, TagEdit); // Save setting for new process
+
+  Process := TProcess.Create(nil); // Create a new process
+  try
+    Process.Executable := ParamStr(0); // Set the executable to the current application
+    Process.Options := []; // No wait, open and forget
+    Process.Execute; // Execute the new instance
+  finally
+    Process.Free; // Free the process object
+  end;
+end;
+
+procedure TformNotetask.aOpenExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if (IsCanClose) and (openDialog.Execute) then
+  begin
+    OpenFile(openDialog.FileName);
+  end;
+end;
+
+procedure TformNotetask.aSaveAsExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  SaveFileAs;
+end;
+
+procedure TformNotetask.aSaveExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  SaveFile(FFileName);
+end;
+
+procedure TformNotetask.aUndoExecute(Sender: TObject);
+var
+  TempRect: TRect;
+  TempLastRow, TempLastCol: integer;
+  TempTopRow: integer;
+begin
+  if FilterBox.Focused then exit;
+  if MemoNote.Focused then
+  begin
+    MemoNoteUndo;
+    exit;
+  end
+  else
+  if TagEdit.Focused and not TagEdit.ReadOnly and TagEdit.EditBox.CanUndo then
+  begin
+    TagEdit.EditBox.Undo;
+    exit;
+  end;
+
+  if Screen.ActiveForm <> Self then exit;
+
+  if not IsEditing then
+  begin
+    TempTopRow := Grid.TopRow;
+    TempRect := FLastGridSelection;
+    TempLastRow := FLastGridRow;
+    TempLastCol := FLastGridCol;
+    GridBackupSelection;
+
+    Tasks.UndoBackup;
+
+    FillGrid;
+    ResetRowHeight;
+    Grid.Col := TempLastCol;
+    if (TempLastRow > 1) then
+      Grid.Row := TempLastRow;
+    if (TempRect.Width > 0) or (TempRect.Height > 0) then
+      Grid.Selection := TRect.Create(TempRect.Left, TempRect.Top, TempRect.Right, TempRect.Bottom);
+    Grid.TopRow := TempTopRow;
+    ChangeLastText;
+    SetFilter;
+    SetInfo;
+    SetNote;
+    SetTags;
+  end
+  else
+  if (Grid.InplaceEditor.InheritsFrom(TPanel)) then
+    MemoUndo; //(Grid.InplaceEditor as TCustomEdit).Undo;
+end;
+
+procedure TformNotetask.aUndoAllExecute(Sender: TObject);
+var
+  Confirm: TModalResult;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if not IsEditing then
+  begin
+    // Need confirm?
+    Confirm := MessageDlg(rundoconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+    if Confirm = mrYes then
+    begin
+      FLineEnding := FLineEndingOriginal;
+      FEncoding := FEncodingOriginal;
+      BackupSelectedState;
+      Tasks.UndoBackupInit;
+      FillGrid;
+      ResetRowHeight;
+      SetFilter;
+      SetInfo;
+      SetNote;
+      SetTags;
+      SetTabs;
+      GridClearSelection;
+      Tasks.CreateBackup;
+      SetChanged(False);
+      RestoreSelectedState(True, False);
+    end;
+  end;
+end;
+
+procedure TformNotetask.aCutExecute(Sender: TObject);
+begin
+  if FilterBox.Focused then exit;
+  if MemoNote.Focused then
+  begin
+    MemoNoteBackup;
+    MemoNote.CutToClipboard;
+    exit;
+  end
+  else
+  if TagEdit.Focused then
+  begin
+    TagEdit.EditBox.CutToClipboard;
+    exit;
+  end;
+
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  if not IsEditing then
+  begin
+    Tasks.CopyToClipboard(Grid);
+    if (Grid.Selection.Width < 3) then
+      ClearSelected(False)
+    else
+      DeleteTasks(False);
+  end
+  else
+  if (Grid.InplaceEditor.InheritsFrom(TPanel)) then
+  begin
+    MemoBackup;
+    Memo.CutToClipboard;
+  end;
+end;
+
+procedure TformNotetask.aCopyExecute(Sender: TObject);
+begin
+  if FilterBox.Focused then exit;
+  if MemoNote.Focused then
+  begin
+    MemoNote.CopyToClipboard;
+    exit;
+  end
+  else
+  if TagEdit.SelectedTags.Count > 0 then
+  begin
+    Clipboard.AsText := TagEdit.SelectedTags.DelimitedText;
+    exit;
+  end
+  else
+  if TagEdit.HoveredTag <> string.Empty then
+  begin
+    Clipboard.AsText := TagEdit.HoveredTag;
+    exit;
+  end
+  else
+  if TagEdit.EditBox.Focused then
+  begin
+    TagEdit.EditBox.CopyToClipboard;
+    exit;
+  end;
+
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  if not IsEditing then
+    Tasks.CopyToClipboard(Grid, FShowNote)
+  else
+  if (Grid.InplaceEditor.InheritsFrom(TPanel)) then
+    Memo.CopyToClipboard;
+end;
+
+procedure TformNotetask.aPasteExecute(Sender: TObject);
+var
+  Sel: TGridRect;
+begin
+  if FilterBox.Focused then exit;
+  if MemoNote.Focused then
+  begin
+    if (not MemoNote.ReadOnly) then
+    begin
+      MemoNoteBackup;
+      PasteWithLineEnding(MemoNote);
+    end;
+    exit;
+  end
+  else
+  if TagEdit.Focused then
+  begin
+    if not TagEdit.ReadOnly then
+      TagEdit.EditBox.PasteFromClipboard;
+    exit;
+  end;
+
+  if Screen.ActiveForm <> Self then exit;
+
+  if not IsEditing then
+  begin
+    Sel := Tasks.PasteFromClipboard(Grid, SortOrder);
+    FillGrid;
+    CalcRowHeight(True);
+    if (Assigned(DatePicker)) then
+      DatePicker.DateTime := Tasks.GetTask(Grid.Row).Date;
+    if (SortColumn = COL_NUM) then
+      Grid.Selection := Sel;
+    SetChanged;
+    SetInfo;
+    SetNote;
+    SetTags;
+    SetFilter;
+  end
+  else
+  if (Grid.InplaceEditor.InheritsFrom(TPanel)) then
+  begin
+    MemoBackup;
+    PasteWithLineEnding(Memo);
+  end;
+end;
+
+procedure TformNotetask.aDeleteExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if FilterBox.Focused then exit;
+
+  if MemoNote.Focused then
+  begin
+    if (not MemoNote.ReadOnly) then
+    begin
+      MemoNoteBackup;
+      MemoNote.ClearSelection;
+    end;
+    exit;
+  end
+  else
+  if TagEdit.Focused then
+  begin
+    {$IFDEF UNIX}
+    if not tagsEdit.ReadOnly then
+    begin
+      if tagsEdit.EditBox.SelLength = 0 then
+        tagsEdit.EditBox.SelLength := CalcDeleteCount(tagsEdit.EditBox.Text, tagsEdit.EditBox.SelStart);
+      tagsEdit.EditBox.ClearSelection;
+    end;
+    {$ENDIF}
+    exit;
+  end;
+
+  if Grid.RowCount < 2 then exit;
+  if not IsEditing then
+  begin
+    ClearSelected(False);
+    if ShowDuration then FillGrid;
+    SetInfo;
+    SetNote;
+    SetTags;
+  end
+  else
+  if (Grid.InplaceEditor is TPanel) then
+    with Memo do
+    begin
+      {$IFDEF UNIX}
+      if SelLength = 0 then
+      begin
+        SelStart := SelStart;
+        SelLength := 1;
+      end
+      else
+        MemoBackup;
+      ClearSelection;
+      {$ELSE}
+      MemoDelKey(False);
+      {$ENDIF}
+    end;
+end;
+
+procedure TformNotetask.aSelectAllExecute(Sender: TObject);
+begin
+  if FilterBox.Focused then exit;
+  if MemoNote.Focused then
+  begin
+    MemoNote.SelStart := 0;
+    MemoNote.SelLength := Length(MemoNote.Text);
+    exit;
+  end
+  else
+  if TagEdit.Focused then
+  begin
+    TagEdit.EditBox.SelectAll;
+    exit;
+  end;
+
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  if not IsEditing then
+  begin
+    Grid.Selection := TGridRect.Create(COL_NUM, 0, COL_STAR, Grid.RowCount);
+    FLastSelectionHeight := Grid.Selection.Height;
+    SetInfo;
+    SetNote;
+    SetTags;
+  end
+  else
+  if (Grid.InplaceEditor.InheritsFrom(TPanel)) then
+  begin
+    Memo.SelStart := 0;
+    Memo.SelLength := Length(Memo.Text);
+  end;
+end;
+
+procedure TformNotetask.aExitExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if IsCanClose then
+    Application.Terminate;
+end;
+
+procedure TformNotetask.aFontExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  fontDialog.Font := Font;
+  if fontDialog.Execute then  // Open the font dialog
+  begin
+    // Apply the selected font to the form
+    Self.Font := fontDialog.Font;
+    FOriginalFontSize := ifthen(Font.Size > 0, Font.Size, Screen.SystemFont.Size);
+    if FOriginalFontSize = 0 then
+    begin
+      FOriginalFontSize := DefFontSize;
+      {$IFDEF UNIX}
+      Self.Font.Size := DefFontSize;
+      {$ENDIF}
+    end;
+    SetZoom(FZoom);
+  end;
+end;
+
+procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
+var
+  Ind: integer;
+  TaskText, Oper, Value: string;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if TabsGroup.Tabs.Count = 0 then exit;
+
+  EditComplete;
+  GridBackupSelection;
+
+  TaskText := '[ ]';
+  if Length(FilterBox.Text) > 0 then
+  begin
+    string(FilterBox.Text).StartsWithOperator(Oper, Value);
+    if (Length(Oper) = 0) or (Oper = '#') or (Oper = '=') then
+    begin
+      if Trim(Value) <> string.Empty then
+        TaskText += ' `' + Trim(Value) + '`'
+      else
+      if Value <> string.Empty then
+        TaskText += ' ' + Value;
+    end;
+  end;
+
+  Ind := Tasks.InsertTask(TaskText, Grid.Row);
+  FLastText := string.Empty;
+  FillGrid;
+  ResetRowHeight;
+  if (Ind > 0) then
+    Grid.Row := Tasks.ReverseMap(Ind)
+  else
+    Grid.Row := Grid.Row + 1;
+
+  if Visible and Grid.Visible and Grid.CanFocus then
+    Grid.SetFocus;
+  AdjustMultiButton;
+  ResetRowHeight;
+  SetTabs;
+  SetInfo;
+  SetChanged;
+  SetNote;
+  SetTags;
+end;
+
+procedure TformNotetask.aDuplicateTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  DuplicateTasks;
+end;
+
+procedure TformNotetask.aMergeTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  MergeTasks;
+end;
+
+procedure TformNotetask.aSplitTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  SplitTasks;
+end;
+
+procedure TformNotetask.aZoomDefaultExecute(Sender: TObject);
+begin
+  Zoom := 1;
+end;
+
+procedure TformNotetask.aZoomInExecute(Sender: TObject);
+begin
+  if Zoom < 4.9 then
+    Zoom := Zoom + 0.1;
+end;
+
+procedure TformNotetask.aZoomOutExecute(Sender: TObject);
+begin
+  if Zoom > 0.2 then
+    Zoom := Zoom - 0.1;
+end;
+
+procedure TformNotetask.aCheckforupdatesExecute(Sender: TObject);
+var
+  LatestVersion: string;
+begin
+  CheckGithubLatestVersion(LatestVersion, REPO, APP_NAME);
+end;
+
+procedure TformNotetask.aAutoCheckUpdatesExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  FAutoCheckUpdates := aAutoCheckUpdates.Checked;
+end;
+
+procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  DeleteTasks;
+end;
+
+procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
+var
+  newRow, selLen, selCol, selLeft, selRight: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 3 then exit;
+
+  GridBackupSelection;
+  selLen := Grid.Selection.Bottom - Grid.Selection.Top + 1;
+  selLeft := Grid.Selection.Left;
+  selRight := Grid.Selection.Right;
+  selCol := Grid.Col;
+
+  if (SortOrder = soAscending) then
+    newRow := Tasks.MoveTasksTop(Grid.Selection.Top, Grid.Selection.Bottom, FShowArchived)
+  else
+    newRow := Tasks.MoveTasksBottom(Grid.Selection.Bottom, Grid.Selection.Top, FShowArchived);
+
+  FillGrid;
+  if (newRow > -1) then
+  begin
+    ResetRowHeight;
+    Grid.Row := 0;
+    Grid.Col := selCol;
+    Grid.Selection := TGridRect.Create(selLeft, 0, selRight, selLen);
+  end;
+  SetChanged;
+  SetNote;
+  SetTags;
+  SetInfo;
+end;
+
+procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
+var
+  newRow, selLen, selCol, selLeft, selRight: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 3 then exit;
+
+  GridBackupSelection;
+  selLen := Grid.Selection.Bottom - Grid.Selection.Top + 1;
+  selLeft := Grid.Selection.Left;
+  selRight := Grid.Selection.Right;
+  selCol := Grid.Col;
+
+  if (SortOrder = soAscending) then
+    newRow := Tasks.MoveTasksBottom(Grid.Selection.Top, Grid.Selection.Bottom, FShowArchived)
+  else
+    newRow := Tasks.MoveTasksTop(Grid.Selection.Bottom, Grid.Selection.Top, FShowArchived);
+
+  FillGrid;
+  if (newRow > -1) then
+  begin
+    ResetRowHeight;
+    Grid.Row := Grid.RowCount - selLen;
+    Grid.Col := selCol;
+    Grid.Selection := TGridRect.Create(selLeft, Grid.RowCount - selLen, selRight, Grid.RowCount);
+  end;
+  SetChanged;
+  SetNote;
+  SetTags;
+  SetInfo;
+end;
+
+procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
+var
+  newRow, selLen, selCol, selLeft, selRight: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 3 then exit;
+
+  GridBackupSelection;
+  selLen := Grid.Selection.Bottom - Grid.Selection.Top + 1;
+  selLeft := Grid.Selection.Left;
+  selRight := Grid.Selection.Right;
+  selCol := Grid.Col;
+
+  if (SortOrder = soAscending) then
+    newRow := Tasks.MoveTasksUp(Grid.Selection.Top, Grid.Selection.Bottom)
+  else
+    newRow := Tasks.MoveTasksDown(Grid.Selection.Bottom, Grid.Selection.Top);
+
+  FillGrid;
+  if (newRow > -1) then
+  begin
+    Grid.OnSelection := nil;
+    try
+      ResetRowHeight(True, -1);
+      Grid.Row := newRow;
+      Grid.Col := selCol;
+      Grid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
+      ResetRowHeight(True, -1);
+    finally
+      Grid.OnSelection := @GridSelection;
+    end;
+  end;
+  SetChanged;
+  SetNote;
+  SetTags;
+  SetInfo;
+end;
+
+procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
+var
+  newRow, selLen, selCol, selLeft, selRight: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 3 then exit;
+
+  GridBackupSelection;
+  selLen := Grid.Selection.Bottom - Grid.Selection.Top + 1;
+  selLeft := Grid.Selection.Left;
+  selRight := Grid.Selection.Right;
+  selCol := Grid.Col;
+
+  if (SortOrder = soAscending) then
+    newRow := Tasks.MoveTasksDown(Grid.Selection.Top, Grid.Selection.Bottom)
+  else
+    newRow := Tasks.MoveTasksUp(Grid.Selection.Bottom, Grid.Selection.Top);
+
+  FillGrid;
+  if (newRow > -1) then
+  begin
+    Grid.OnSelection := nil;
+    try
+      ResetRowHeight(True, -1);
+      Grid.Row := newRow;
+      Grid.Col := selCol;
+      Grid.Selection := TGridRect.Create(selLeft, newRow - selLen + 1, selRight, newRow);
+      ResetRowHeight(True, -1);
+    finally
+      Grid.OnSelection := @GridSelection;
+    end;
+  end;
+  SetChanged;
+  SetNote;
+  SetTags;
+  SetInfo;
+end;
+
+procedure TformNotetask.aMoveTaskLeftExecute(Sender: TObject);
+var
+  newRow, selCol, selLen, selLeft, selRight, selEnd: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if (TabsGroup.TabIndex <= 0) then exit;
+  if Grid.RowCount < 2 then exit;
+
+  GridBackupSelection;
+  selLen := Grid.Selection.Bottom - Grid.Selection.Top + 1;
+  selLeft := Grid.Selection.Left;
+  selRight := Grid.Selection.Right;
+  selCol := Grid.Col;
+
+  newRow := Tasks.MoveGroupTasks(Grid.Selection.Top, Grid.Selection.Bottom, Tasks.GetLeftGroup(
+    Tasks.SelectedGroup, FShowArchived, FilterBox.Text, FShowTime));
+
+  if (newRow > -1) then
+  begin
+    ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
+    newRow := Tasks.ReverseMap(newRow);
+    Grid.Row := newRow;
+    if (SortOrder = soAscending) then
+      selEnd := newRow + selLen - 1
+    else
+      selEnd := newRow - selLen - 1;
+
+    ResetRowHeight;
+    SetTabs;
+    SetChanged;
+    SetNote;
+    SetTags;
+    SetInfo;
+
+    Grid.Col := selCol;
+    Grid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
+  end;
+end;
+
+procedure TformNotetask.aMoveTaskRightExecute(Sender: TObject);
+var
+  newRow, selCol, selLen, selLeft, selRight, selEnd: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if (TabsGroup.TabIndex >= TabsGroup.Tabs.Count - 1) then exit;
+  if Grid.RowCount < 2 then exit;
+
+  GridBackupSelection;
+  selLen := Grid.Selection.Bottom - Grid.Selection.Top + 1;
+  selLeft := Grid.Selection.Left;
+  selRight := Grid.Selection.Right;
+  selCol := Grid.Col;
+
+  newRow := Tasks.MoveGroupTasks(Grid.Selection.Top, Grid.Selection.Bottom, Tasks.GetRightGroup(
+    Tasks.SelectedGroup, FShowArchived, FilterBox.Text, FShowTime));
+
+  if (newRow > -1) then
+  begin
+    ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
+    newRow := Tasks.ReverseMap(newRow);
+    Grid.Row := newRow;
+    if (SortOrder = soAscending) then
+      selEnd := newRow + selLen - 1
+    else
+      selEnd := newRow - selLen - 1;
+
+    ResetRowHeight;
+    SetTabs;
+    SetChanged;
+    SetNote;
+    SetTags;
+    SetInfo;
+
+    Grid.Col := selCol;
+    Grid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
+  end;
+end;
+
+procedure TformNotetask.aIndentTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+  EditComplete;
+  IndentTasks;
+end;
+
+procedure TformNotetask.aOutdentTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+  EditComplete;
+  IndentTasks(True);
+end;
+
+procedure TformNotetask.aArchiveTasksExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  ArchiveTasks;
+end;
+
+procedure TformNotetask.aDateTimeExecute(Sender: TObject);
+var
+  PosStart: integer;
+  CurrentDateTimeISO: string;
+  CurrentDateTime: string;
+
+  procedure InsertDateToCell(ACol, ARow: integer);
+  begin
+    if (Grid.RowCount > 1) then
+    begin
+      if (Grid.Cells[ACol, ARow].Trim = string.Empty) or (ACol = COL_DATE) then
+        Grid.Cells[ACol, ARow] := CurrentDateTime
+      else
+        Grid.Cells[ACol, ARow] := Grid.Cells[ACol, ARow].Trim + ' ' + CurrentDateTime;
+      Tasks.SetTask(Grid, Memo, ARow, False, FShowTime);
+      if Assigned(DatePicker) then
+        DatePicker.DateTime := Now;
+      if (FShowDuration) and (ACol = COL_DATE) then
+        FillGrid;
+    end
+    else
+    begin
+      Tasks.InsertTask('- [ ] ' + CurrentDateTimeISO + ',', ARow);
+      FillGrid;
+      Grid.Row := Grid.Row + 1;
+    end;
+    SetChanged;
+    SetInfo;
+  end;
+
+var
+  c, r: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  CurrentDateTime := DateTimeToString(Now, FShowTime);
+  CurrentDateTimeISO := DateTimeToStringISO(Now, FShowTime);
+
+  if MemoNote.Focused then
+  begin
+    PosStart := MemoNote.SelStart;
+    MemoNote.SelText := CurrentDateTime;
+    MemoNote.SelStart := PosStart;
+    MemoNote.SelLength := Length(CurrentDateTime);
+  end
+  else
+  if IsEditing then
+  begin
+    if (Grid.Col = COL_DATE) then
+    begin
+      Grid.Cells[COL_DATE, Grid.Row] := CurrentDateTime;
+      DatePicker.DateTime := Now;
+    end
+    else
+    if (Grid.Col in [COL_TASK, COL_NOTE]) then
+    begin
+      PosStart := Memo.SelStart;
+      Memo.SelText := CurrentDateTime;
+      Memo.SelStart := PosStart;
+      Memo.SelLength := Length(CurrentDateTime);
+    end;
+    Tasks.SetTask(Grid, Memo, Grid.Row, FBackup, FShowTime);
+    SetChanged;
+    SetInfo;
+  end
+  else
+  begin
+    Tasks.CreateBackup;
+    for r := Grid.Selection.Top to Grid.Selection.Bottom do
+      for c := Grid.Selection.Left to Grid.Selection.Right do
+        if (c > 0) then
+          InsertDateToCell(c, r);
+  end;
+end;
+
+procedure TformNotetask.aFilterExecute(Sender: TObject);
+begin
+  panelTabs.Visible := (not panelTabs.Visible and not FilterBox.Focused) or
+    (not ((TabsGroup.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty)));
+  Invalidate;
+  Application.ProcessMessages;
+  if (panelTabs.Visible) then
+  begin
+    if FilterBox.Focused then
+    begin
+      if Visible and Grid.Visible and Grid.CanFocus then
+      begin
+        FilterBox.Text := string.Empty;
+        FLastFilter := '-1';
+        filterBoxChange(Self);
+        Grid.SetFocus;
+      end;
+    end
+    else
+    begin
+      if (Length(FilterBox.Text) = 0) then
+      begin
+        if Assigned(Memo) and (Memo.SelText <> string.Empty) then
+        begin
+          FilterBox.Text := Memo.SelText;
+          FLastFilter := '-1';
+          filterBoxChange(Self);
+        end
+        else
+        if MemoNote.Visible and MemoNote.Focused and (MemoNote.SelText <> string.Empty) then
+        begin
+          FilterBox.Text := MemoNote.SelText;
+          FLastFilter := '-1';
+          filterBoxChange(Self);
+        end;
+      end;
+
+      if Visible and FilterBox.Visible and FilterBox.CanFocus then
+        FilterBox.SetFocus;
+    end;
+  end
+  else
+  begin
+    FilterBox.Text := string.Empty;
+    FLastFilter := '-1';
+    filterBoxChange(Self);
+  end;
+end;
+
+procedure TformNotetask.aInsertGroupExecute(Sender: TObject);
+var
+  Result: integer;
+  newName: string;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  // Create an instance of the form
+  with formInputText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    SetMode(aInsertGroup.Caption, rentergroupname, rOK);
+
+    // Show the form as a modal dialog
+    if ShowModal = mrOk then
+    begin
+      EditComplete;
+      newName := editText.Text;
+      if (newName = rgroupuntitled) then newName := string.Empty;
+
+      Result := Tasks.InsertGroup(newName);
+      if (Result <> FindGroupRealIndex(TabsGroup.TabIndex)) then
+      begin
+        FLastRowMem.InsertAtPos(Result, 0);
+        SetTabs;
+        ChangeGroup(FindGroupTabIndex(Result));
+        SetChanged;
+      end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aRenameGroupExecute(Sender: TObject);
+var
+  newName: string;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if TabsGroup.Tabs.Count < 1 then exit;
+
+  // Create an instance of the form
+  with formInputText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    SetMode(aRenameGroup.Caption, rentergroupname, rOK, Tasks.GetGroupNameForTab(FindGroupRealIndex(TabsGroup.TabIndex), False));
+
+    // Show the form as a modal dialog
+    if (ShowModal = mrOk) {and (editText.Text <> TabsGroup.Tabs[TabsGroup.TabIndex])} then
+    begin
+      newName := editText.Text;
+      if (newName = rgroupuntitled) and (TabsGroup.TabIndex = 0) then newName := string.Empty;
+
+      if (Tasks.RenameGroup(FindGroupRealIndex(TabsGroup.TabIndex), newName)) then
+      begin
+        SetTabs;
+        SetChanged;
+      end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aEditGroupTooltipExecute(Sender: TObject);
+begin
+  if (TabsGroup.TabIndex = 0) and (Tasks.GroupNames[0] = string.Empty) then
+    exit;
+  if TabsGroup.Tabs.Count < 1 then exit;
+
+  with formMemoText do
+  try
+    if not formMemoText.Showed then
+    begin
+      Left := self.Left + 14;
+      Top := self.top + 52;
+    end;
+    SetMode(rapp, aEditGroupTooltip.Caption, rOK, Tasks.GetGroupHint(FindGroupRealIndex(TabsGroup.TabIndex)), 400, 180, FWordWrap, True);
+
+    // Show the form as a modal dialog
+    if ShowModal = mrOk then
+    begin
+      Tasks.RehintGroup(FindGroupRealIndex(TabsGroup.TabIndex), formMemoText.memoText.Text);
+      SetChanged;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aDuplicateGroupExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if TabsGroup.Tabs.Count < 1 then exit;
+
+  // Create an instance of the form
+  with formInputText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    SetMode(aDuplicateGroup.Caption, rentergroupname, rOK, Tasks.GetGroupNameForTab(FindGroupRealIndex(TabsGroup.TabIndex), False));
+
+    // Show the form as a modal dialog
+    if (ShowModal = mrOk) then
+    begin
+      if (Tasks.CopyGroup(FindGroupRealIndex(TabsGroup.TabIndex), editText.Text)) then
+      begin
+        FLastRowMem.InsertAtPos(FindGroupRealIndex(TabsGroup.TabIndex) + 1, FLastRowMem[FindGroupRealIndex(TabsGroup.TabIndex)]);
+        SetTabs;
+        ChangeGroup(TabsGroup.TabIndex + 1);
+        SetChanged;
+      end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aDeleteGroupExecute(Sender: TObject);
+var
+  Confirm: integer;
+  Mem: TIntegerArray;
+begin
+  if TabsGroup.Tabs.Count < 1 then exit;
+
+  Confirm := MessageDlg(rdeletegroupconfirm, mtConfirmation, [mbYes, mbNo], 0);
+
+  if (Confirm = mrYes) then
+  begin
+    if (Tasks.DeleteGroup(FindGroupRealIndex(TabsGroup.TabIndex))) then
+    begin
+      FLastRowMem.DeleteAtPos(FindGroupRealIndex(TabsGroup.TabIndex));
+      Mem := FLastRowMem.CloneArray;
+      SetTabs;
+      ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
+      FLastRowMem := Mem.CloneArray;
+      if (Length(FLastRowMem) > Tasks.SelectedGroup) then
+        Grid.Row := FLastRowMem[Tasks.SelectedGroup];
+      SetChanged;
+    end;
+  end;
+end;
+
+procedure TformNotetask.aMoveGroupLeftExecute(Sender: TObject);
+begin
+  MoveTabLeft(TabsGroup.TabIndex);
+end;
+
+procedure TformNotetask.aMoveGroupRightExecute(Sender: TObject);
+begin
+  MoveTabRight(TabsGroup.TabIndex);
+end;
+
+procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  pageSetupDialog.Execute;
+end;
+
+procedure TformNotetask.aPrintExecute(Sender: TObject);
+var
+  gridPrinter: TGridPrinter;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  if printDialog.Execute then
+  begin
+    gridPrinter := TGridPrinter.Create(self);
+    try
+      gridPrinter.Grid := Grid;
+      gridPrinter.OnGetCellText := @PrinterGetCellText;
+      gridPrinter.OnPrepareCanvas := @PrinterPrepareCanvas;
+      gridPrinter.OnBeforePrintCell := @PrinterBeforePrintCell;
+      gridPrinter.Orientation := Printer.Orientation;
+      gridPrinter.Margins.Left := pageSetupDialog.MarginLeft / 100;
+      gridPrinter.Margins.Right := pageSetupDialog.MarginRight / 100;
+      gridPrinter.Margins.Top := pageSetupDialog.MarginTop / 100;
+      gridPrinter.Margins.Bottom := pageSetupDialog.MarginBottom / 100;
+      gridPrinter.FixedLineColor := clSilver;
+      gridPrinter.BorderLineColor := clSilver;
+      gridPrinter.GridLineColor := clSilver;
+      gridPrinter.Footer.LineColor := clSilver;
+      gridPrinter.Header.LineColor := clSilver;
+
+      gridPrinter.Print;
+    finally
+      gridPrinter.Free;
+    end;
+  end;
+end;
+
+procedure TformNotetask.aShowArchivedExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowArchived := aShowArchived.Checked;
+end;
+
+procedure TformNotetask.aShowDurationExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowDuration := aShowDuration.Checked;
+end;
+
+procedure TformNotetask.aShowTimeExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  EditComplete;
+  ShowTime := aShowTime.Checked;
+  FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aShowTagsExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowTags := aShowTags.Checked;
+end;
+
+procedure TformNotetask.aShowNoteExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowNote := aShowNote.Checked;
+end;
+
+procedure TformNotetask.aHideNoteTextExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  EditComplete;
+  HideNoteText := aHideNoteText.Checked;
+  FillGrid;
+end;
+
+procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowStatusBar := aShowStatusBar.Checked;
+  SetInfo;
+end;
+
+procedure TformNotetask.aShowColumnDoneExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowColumnDone := aShowColumnDone.Checked;
+end;
+
+procedure TformNotetask.aShowColumnTaskExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowColumnTask := aShowColumnTask.Checked;
+end;
+
+procedure TformNotetask.aShowColumnNoteExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowColumnNote := aShowColumnNote.Checked;
+end;
+
+procedure TformNotetask.aShowColumnDateExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowColumnDate := aShowColumnDate.Checked;
+end;
+
+procedure TformNotetask.aShowColumnAmountExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowColumnAmount := aShowColumnAmount.Checked;
+end;
+
+procedure TformNotetask.aShowColumnFavoriteExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  ShowColumnFavorite := aShowColumnFavorite.Checked;
+end;
+
+procedure TformNotetask.aWordWrapExecute(Sender: TObject);
+var
+  sel: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  EditComplete;
+  FWordWrap := aWordWrap.Checked;
+  sel := MemoNote.SelLength;
+  MemoNote.WordWrap := FWordWrap;
+  if sel = 0 then
+    MemoNote.SelLength := 0;
+  CalcRowHeight(True);
+  Invalidate;
+end;
+
+procedure TformNotetask.aEnterSubmitExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  FEnterSubmit := aEnterSubmit.Checked;
+end;
+
+procedure TformNotetask.aBidiRightToLeftExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+
+  EditComplete;
+  BiDiRightToLeft := aBidiRightToLeft.Checked;
+  ResetRowHeight;
+  Invalidate;
+end;
+
+procedure TformNotetask.aChatGptExecute(Sender: TObject);
+begin
+  if Grid.RowCount < 2 then exit;
+
+  ExecuteChatGpt;
+end;
+
+procedure TformNotetask.aRunTerminalExecute(Sender: TObject);
+begin
+  if Grid.RowCount < 2 then exit;
+
+  ExecuteTerminal(False);
+end;
+
+procedure TformNotetask.aRunPowershellExecute(Sender: TObject);
+begin
+  if Grid.RowCount < 2 then exit;
+
+  ExecuteTerminal;
+end;
+
+procedure TformNotetask.aGoToExecute(Sender: TObject);
+var
+  rowNum: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  // Create an instance of the form
+  with formInputText do
+  try
+    Left := self.Left + 14;
+    Top := self.top + 52;
+    SetMode(rgototask, rtasknumber, rgoto, IntToStr(Grid.Row), True);
+
+    // Show the form as a modal dialog
+    if ShowModal = mrOk then
+    begin
+      // Try to convert the entered value to an integer
+      if TryStrToInt(editText.Text, rowNum) then
+      begin
+        // Ensure the entered row is within the valid range
+        if (rowNum >= 1) and (rowNum <= Tasks.Count) then
+        begin
+          // Move to the specified row
+          Grid.Row := Tasks.ReverseMap(rowNum - 1);
+        end
+        else
+          ShowMessage(rnumstringtoolarge);
+      end;
+    end;
+  finally
+    Hide;
+  end;
+end;
+
+procedure TformNotetask.aFindExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  formFindText.editFind.Text := FindText;
+  if (formFindText.Left = 0) then
+    formFindText.Left := self.Left + 80;
+  if (formFindText.Top = 0) then
+    formFindText.Top := self.top + 100;
+  formFindText.Show;
+end;
+
+procedure TformNotetask.aReplaceExecute(Sender: TObject);
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  formReplaceText.editFind.Text := FindText;
+  if (formReplaceText.Left = 0) then
+    formReplaceText.Left := self.Left + 80;
+  if (formReplaceText.Top = 0) then
+    formReplaceText.Top := self.top + 100;
+  formReplaceText.Show;
+end;
+
+procedure TformNotetask.aFindNextExecute(Sender: TObject);
+begin
+  if Grid.RowCount < 2 then exit;
+
+  if (assigned(formFindText)) and (formFindText.Visible) then
+  begin
+    MatchCase := formFindText.checkMatchCase.Checked;
+    WrapAround := formFindText.checkWrapAround.Checked;
+  end;
+
+  if (FindText = string.Empty) and (Clipboard.AsText <> string.Empty) then
+    FindText := Clipboard.AsText;
+
+  if (FindText <> string.Empty) then
+  begin
+    FFindF3 := True;
+    Find(FindText, MatchCase, WrapAround, True);
+  end
+  else
+    aFind.Execute;
+end;
+
+procedure TformNotetask.aFindPrevExecute(Sender: TObject);
+begin
+  if Grid.RowCount < 2 then exit;
+
+  if (FindText = string.Empty) and (Clipboard.AsText <> string.Empty) then
+    FindText := Clipboard.AsText;
+
+  if (FindText <> string.Empty) then
+  begin
+    FFindF3 := True;
+    Find(FindText, MatchCase, WrapAround, False);
+  end
+  else
+    aFind.Execute;
+end;
+
+procedure TformNotetask.aAboutExecute(Sender: TObject);
+begin
+  formAboutNotetask := TformAboutNotetask.Create(Application);
+  try
+    formAboutNotetask.Left := Self.Left + 100;
+    formAboutNotetask.Top := Self.Top + 100;
+    formAboutNotetask.ShowModal;
+  finally
+    formAboutNotetask.Free;
+  end;
+end;
+
+procedure TformNotetask.aLangArabicExecute(Sender: TObject);
+begin
+  SetLanguage('ar');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangBelarusianExecute(Sender: TObject);
+begin
+  SetLanguage('be');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangChineseExecute(Sender: TObject);
+begin
+  SetLanguage('zh');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangCzechExecute(Sender: TObject);
+begin
+  SetLanguage('cs');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangDanishExecute(Sender: TObject);
+begin
+  SetLanguage('da');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangDutchExecute(Sender: TObject);
+begin
+  SetLanguage('nl');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangEnglishExecute(Sender: TObject);
+begin
+  SetLanguage('en');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangFinnishExecute(Sender: TObject);
+begin
+  SetLanguage('fi');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangFrenchExecute(Sender: TObject);
+begin
+  SetLanguage('fr');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangGermanExecute(Sender: TObject);
+begin
+  SetLanguage('de');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangGreekExecute(Sender: TObject);
+begin
+  SetLanguage('el');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangHebrewExecute(Sender: TObject);
+begin
+  SetLanguage('he');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangHindiExecute(Sender: TObject);
+begin
+  SetLanguage('hi');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangIndonesianExecute(Sender: TObject);
+begin
+  SetLanguage('id');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangItalianExecute(Sender: TObject);
+begin
+  SetLanguage('it');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangJapaneseExecute(Sender: TObject);
+begin
+  SetLanguage('ja');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangKoreanExecute(Sender: TObject);
+begin
+  SetLanguage('ko');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangPolishExecute(Sender: TObject);
+begin
+  SetLanguage('pl');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangPortugueseExecute(Sender: TObject);
+begin
+  SetLanguage('pt');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangRomanianExecute(Sender: TObject);
+begin
+  SetLanguage('ro');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangRussianExecute(Sender: TObject);
+begin
+  SetLanguage('ru');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangSpanishExecute(Sender: TObject);
+begin
+  SetLanguage('es');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangSwedishExecute(Sender: TObject);
+begin
+  SetLanguage('sv');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangTurkishExecute(Sender: TObject);
+begin
+  SetLanguage('tr');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aLangUkrainianExecute(Sender: TObject);
+begin
+  SetLanguage('uk');
+  if ShowDuration then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.aDonateExecute(Sender: TObject);
+begin
+  formDonateNotetask := TformDonateNotetask.Create(Application);
+  try
+    formDonateNotetask.Left := Self.Left + 100;
+    formDonateNotetask.Top := Self.Top + 100;
+    formDonateNotetask.ShowModal;
+  finally
+    formDonateNotetask.Free;
+  end;
+end;
+
+procedure TformNotetask.aSaveNotesAsExecute(Sender: TObject);
+var
+  notes: TStringList;
+  fileName: string;
+  i: integer;
+const
+  MAX_FILE_NAME_LEN = 50;
+begin
+  notes := TStringList.Create;
+  try
+    fileName := string.Empty;
+    notes.LineBreak := FLineEnding.Value;
+    notes.Options := notes.Options - [soTrailingLineBreak];
+
+    if Grid.Selection.Height > 0 then
+    begin
+      // Multiple rows selected — concatenate notes
+      for i := Grid.Selection.Top to Grid.Selection.Bottom do
+        if Tasks.Map(i) > -1 then
+        begin
+          notes.Add(Tasks.GetTask(i).Note);
+          if (i = Grid.Selection.Top) then
+            fileName := Tasks.GetTask(i).Text;
+        end;
+    end
+    else if Tasks.Map(Grid.Row) > -1 then
+    begin
+      // Single row selected
+      notes.Add(Tasks.GetTask(Grid.Row).Note);
+      fileName += Tasks.GetTask(Grid.Row).Text;
+    end;
+
+    // limit file name length
+    if Length(fileName) > MAX_FILE_NAME_LEN then
+      fileName := Copy(fileName, 1, MAX_FILE_NAME_LEN);
+
+    // sanitize forbidden characters
+    fileName := StringReplace(fileName, '\', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '/', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, ':', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '*', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '?', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '"', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '<', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '>', '_', [rfReplaceAll]);
+    fileName := StringReplace(fileName, '|', '_', [rfReplaceAll]);
+
+    saveNotesDialog.FileName := fileName;
+    if (saveNotesDialog.Execute) then
+      notes.SaveToFile(saveNotesDialog.FileName, FEncoding);
+  finally
+    notes.Free;
+  end;
+end;
+
+{%EndRegion}
+
+{%Region -fold Context Menu}
+
+procedure TformNotetask.contextCopyStatusbarClick(Sender: TObject);
+var
+  PanelText: string;
+begin
+  if (FStatusPanelIndex >= 0) and (FStatusPanelIndex < statusBar.Panels.Count) then
+  begin
+    PanelText := statusBar.Panels[FStatusPanelIndex].Text;
+    if PanelText <> string.Empty then
+      Clipboard.AsText := PanelText;
+  end;
+end;
+
+procedure TformNotetask.contextCopyTagsClick(Sender: TObject);
+begin
+  if TagEdit.SelectedTags.Count > 0 then
+    Clipboard.AsText := TagEdit.SelectedTags.DelimitedText
+  else
+  if TagEdit.HoveredTag <> string.Empty then
+    Clipboard.AsText := TagEdit.HoveredTag;
+end;
+
+procedure TformNotetask.contextDeleteTagsClick(Sender: TObject);
+begin
+  if TagEdit.SelectedTags.Count > 0 then
+    TagEdit.RemoveSelectedTags
+  else
+  if TagEdit.HoveredTag <> string.Empty then
+    TagEdit.RemoveTag(TagEdit.HoveredTag, True);
+end;
+
+procedure TformNotetask.contextColorClick(Sender: TObject);
+var
+  HoverTag: string;
+  HoverIndex: integer;
+begin
+  HoverTag := LowerCase(TagEdit.HoveredTag).SubStringBeforeColon;
+  HoverIndex := TagEdit.TagColors.IndexOf(HoverTag);
+
+  if HoverIndex >= 0 then
+    colorDialog.Color := TagEdit.TagColors.Items[HoverIndex].Color
+  else
+    colorDialog.Color := TagEdit.GetAutoColor(HoverTag);
+
+  if (colorDialog.Execute) then
+  begin
+    if HoverIndex >= 0 then
+      TagEdit.TagColors.Items[HoverIndex].Color := colorDialog.Color
+    else
+      TagEdit.TagColors.Add(HoverTag, colorDialog.Color);
+    TagEdit.Invalidate;
+    GridInvalidate;
+  end;
+end;
+
+procedure TformNotetask.contextResetColorClick(Sender: TObject);
+var
+  HoverTag: string;
+  HoverIndex: integer;
+begin
+  HoverTag := LowerCase(TagEdit.HoveredTag).SubStringBeforeColon;
+  HoverIndex := TagEdit.TagColors.IndexOf(HoverTag);
+
+  if HoverIndex >= 0 then
+  begin
+    TagEdit.TagColors.Delete(HoverIndex);
+
+    TagEdit.Invalidate;
+    GridInvalidate;
+  end;
+end;
+
+procedure TformNotetask.contextZoom50Click(Sender: TObject);
+begin
+  SetZoom(0.5);
+end;
+
+procedure TformNotetask.contextZoom60Click(Sender: TObject);
+begin
+  SetZoom(0.6);
+end;
+
+procedure TformNotetask.contextZoom70Click(Sender: TObject);
+begin
+  SetZoom(0.7);
+end;
+
+procedure TformNotetask.contextZoom80Click(Sender: TObject);
+begin
+  SetZoom(0.8);
+end;
+
+procedure TformNotetask.contextZoom90Click(Sender: TObject);
+begin
+  SetZoom(0.9);
+end;
+
+procedure TformNotetask.contextZoom100Click(Sender: TObject);
+begin
+  SetZoom(1.0);
+end;
+
+procedure TformNotetask.contextZoom110Click(Sender: TObject);
+begin
+  SetZoom(1.1);
+end;
+
+procedure TformNotetask.contextZoom120Click(Sender: TObject);
+begin
+  SetZoom(1.2);
+end;
+
+procedure TformNotetask.contextZoom130Click(Sender: TObject);
+begin
+  SetZoom(1.3);
+end;
+
+procedure TformNotetask.contextZoom140Click(Sender: TObject);
+begin
+  SetZoom(1.4);
+end;
+
+procedure TformNotetask.contextZoom150Click(Sender: TObject);
+begin
+  SetZoom(1.5);
+end;
+
+procedure TformNotetask.contextWindowsCRLFClick(Sender: TObject);
+begin
+  FLineEnding := TLineEnding.WindowsCRLF;
+  if (contextWindowsCRLF.Checked = False) then
+  begin
+    contextWindowsCRLF.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextUnixLFClick(Sender: TObject);
+begin
+  FLineEnding := TLineEnding.UnixLF;
+  if (contextUnixLF.Checked = False) then
+  begin
+    contextUnixLF.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextMacintoshCRClick(Sender: TObject);
+begin
+  FLineEnding := TLineEnding.MacintoshCR;
+  if (contextMacintoshCR.Checked = False) then
+  begin
+    contextMacintoshCR.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextANSIClick(Sender: TObject);
+begin
+  FEncoding := TEncoding.ANSI;
+  if (contextANSI.Checked = False) then
+  begin
+    contextANSI.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextASCIIClick(Sender: TObject);
+begin
+  FEncoding := TEncoding.ASCII;
+  if (contextASCII.Checked = False) then
+  begin
+    contextASCII.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextUTF8Click(Sender: TObject);
+begin
+  FEncoding := TEncoding.UTF8;
+  if (contextUTF8.Checked = False) then
+  begin
+    contextUTF8.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextUTF8BOMClick(Sender: TObject);
+begin
+  FEncoding := UTF8BOMEncoding;
+  if (contextUTF8BOM.Checked = False) then
+  begin
+    contextUTF8BOM.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextUTF16BEBOMClick(Sender: TObject);
+begin
+  FEncoding := UTF16BEBOMEncoding;
+  if (contextUTF16BEBOM.Checked = False) then
+  begin
+    contextUTF16BEBOM.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.contextUTF16LEBOMClick(Sender: TObject);
+begin
+  FEncoding := UTF16LEBOMEncoding;
+  if (contextUTF16LEBOM.Checked = False) then
+  begin
+    contextUTF16LEBOM.Checked := True;
+    SetInfo;
+    SetChanged;
+  end;
+end;
+
+{%EndRegion}
+
+{%Region -fold Memo Note Events}
+
+procedure TformNotetask.MemoNoteEnter(Sender: TObject);
+begin
+  {$IFDEF UNIX}
+     aDelete.ShortCut:=0;
+  {$ELSE}
+  ; // NOP
+  {$ENDIF}
+end;
+
+procedure TformNotetask.MemoNoteExit(Sender: TObject);
+begin
+  {$IFDEF UNIX}
+     aDelete.ShortCut:=VK_DELETE;
+  {$ELSE}
+  ; // NOP
+  {$ENDIF}
+
+  SetFilter;
+end;
+
+procedure TformNotetask.MemoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  LinesPerPage, NewPos: integer;
+  Render: string;
+begin
+  // Test for letter, number, space, back, enter, shift or delete key for backup
+  if (Shift * [ssCtrl, ssAlt] = []) and ((not THotKeyData.Create(Key).IsSystemKey) or (Key = VK_SPACE) or
+    (Key = VK_BACK) or (Key = VK_RETURN) or (ssShift in Shift) or ((Key = VK_DELETE) and (MemoNote.SelLength = 0))) then
+  begin
+    if (not FMemoNoteFirstKey) then
+    begin
+      FMemoNoteFirstKey := True;
+      MemoNoteBackup;
+    end;
+  end
+  else
+    FMemoNoteFirstKey := False;
+
+  if (not (ssShift in Shift)) and (Key = VK_PRIOR) then
+  begin
+    LinesPerPage := MemoNote.ClientHeight div Canvas.TextHeight('Wg');
+    NewPos := Max(0, MemoNote.CaretPos.Y - LinesPerPage);
+    if (NewPos = 0) then
+      MemoNote.SelStart := 0
+    else
+      MemoNote.CaretPos := Point(0, NewPos);
+    MemoNote.VertScrollBar.Position := MemoNote.CaretPos.Y - (LinesPerPage div 2);
+    MemoNote.Invalidate;
+    Key := 0;
+  end
+  else
+  if (not (ssShift in Shift)) and (Key = VK_NEXT) then
+  begin
+    LinesPerPage := MemoNote.ClientHeight div Canvas.TextHeight('Wg');
+    NewPos := Min(MemoNote.Lines.Count - 1, MemoNote.CaretPos.Y + LinesPerPage);
+    if NewPos >= MemoNote.Lines.Count - 1 then
+      MemoNote.SelStart := MemoNote.GetTextLen - Length(unicodestring(MemoNote.Lines[MemoNote.Lines.Count - 1]))
+    else
+      MemoNote.CaretPos := Point(0, NewPos);
+    MemoNote.VertScrollBar.Position := MemoNote.CaretPos.Y - (LinesPerPage div 2);
+    MemoNote.Invalidate;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
+  begin
+    MemoNote.CopyToClipboard;
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
+  begin
+    MemoNote.SelStart := 0;
+    MemoNote.SelLength := Length(MemoNote.Text);
+    Key := 0;
+  end
+  else
+  if (Shift = [ssCtrl]) and (Key = VK_F) then // Ctrl + F
+  begin
+    aFind.Execute;
+    Key := 0;
+  end
+  else
+  if not (ssCtrl in Shift) and not (ssShift in Shift) and (Key = VK_TAB) then // Tab
+  begin
+    SelectNext(ActiveControl, True, True);
+    Key := 0;
+  end
+  else
+  if MemoNote.ReadOnly then exit
+  else
+  if Key = VK_DELETE then // Delete
+  begin
+    {$IFDEF UNIX}
+    if MemoNote.SelLength > 0 then
+        MemoNoteBackup;
+    {$ELSE}
+    MemoDelKey;
+    Key := 0;
+    {$ENDIF}
+  end
+  else
+  if (Key = VK_BACK) then // Backspace
+  begin
+    if MemoNote.SelLength > 0 then
+    begin
+      MemoNoteBackup;
+    end;
+  end
+  else
+  if (ssShift in Shift) and (Key = VK_TAB) then // Shift + Tab
+  begin
+    MemoNoteOutdent;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_TAB) then // Tab
+  begin
+    MemoNoteIndent;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_OEM_2) then // Ctrl + /
+  begin
+    MemoNoteToggleComment(CommentSlashStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_OEM_MINUS) then // Ctrl + -
+  begin
+    MemoNoteToggleComment(CommentMinusStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_3) then // Ctrl + #
+  begin
+    MemoNoteToggleComment(CommentHashStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_8) then // Ctrl + *
+  begin
+    MemoNoteToggleComment(CommentStarStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_OEM_1) then // Ctrl + :
+  begin
+    MemoNoteToggleComment(CommentREMStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_4) then // Ctrl + 4
+  begin
+    MemoNoteToggleComment(CommentSemicolonStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_6) then // Ctrl + 6
+  begin
+    MemoNoteToggleComment(CommentTwocolonStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_OEM_7) then // Ctrl + '
+  begin
+    MemoNoteToggleComment(CommentApostropheStr);
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_RETURN) and (trim(MemoNote.SelText) <> string.Empty) then // Ctrl + Enter
+  begin
+    Render := MemoNote.SelText.ToASCIITextArt(Font.Name, Max(ifthen(Font.Size = 0, 10, Font.Size) - 2, 2));
+    if (Render <> MemoNote.SelText) then
+    begin
+      MemoNoteBackup;
+      MemoNote.SelText := Render;
+    end;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_Z) then // Ctrl + Shift + Z
+  begin
+    aUndoAll.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
+  begin
+    MemoNoteUndo;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
+  begin
+    MemoNoteBackup;
+    MemoNote.CutToClipboard;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
+  begin
+    MemoNoteBackup;
+    PasteWithLineEnding(MemoNote);
+    Key := 0;
+  end
+  else
+  if Key = VK_ESCAPE then // Escape
+    if Visible and Grid.Visible and Grid.CanFocus then
+      Grid.SetFocus;
+end;
+
+procedure TformNotetask.MemoNoteKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
+begin
+  FNoteLastSelText := (Sender as TMemo).SelText;
+  FNoteLastSelStart := (Sender as TMemo).SelStart;
+  FNoteLastSelLength := (Sender as TMemo).SelLength;
+end;
+
+procedure TformNotetask.MemoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  if (Button = mbMiddle) and (ssCtrl in Shift) then // Middle button + Ctrl
+    aZoomDefault.Execute
+  else
+  if not (ssDouble in Shift) then
+  begin
+    if ssCtrl in Shift then
+    begin
+      // if no selection try select full url
+      if (FNoteLastSelLength < 1) or (((Sender as TMemo).SelStart < FNoteLastSelStart) or
+        ((Sender as TMemo).SelStart > FNoteLastSelStart + FNoteLastSelLength)) or (not TryOpenAsUrl(Trim(FNoteLastSelText))) then
+      begin
+        (Sender as TMemo).MemoTokenAtPos((Sender as TMemo).SelStart, ':/?#[]@!$&''()*+,;=-_.~%');
+        FNoteLastSelText := (Sender as TMemo).SelText;
+        FNoteLastSelStart := (Sender as TMemo).SelStart;
+        FNoteLastSelLength := (Sender as TMemo).SelLength;
+      end
+      else
+      begin
+        (Sender as TMemo).SelStart := FNoteLastSelStart;
+        (Sender as TMemo).SelLength := FNoteLastSelLength;
+      end;
+    end
+    else
+      FMemoSelStartClicked := (Sender as TMemo).SelStart;
+  end;
+  // Force set focus
+  if (Sender as TMemo).Visible and (Sender as TMemo).CanFocus and not (Sender as TMemo).Focused then
+    (Sender as TMemo).SetFocus;
+end;
+
+procedure TformNotetask.MemoNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  if not (ssCtrl in Shift) then
+  begin
+    FNoteLastSelText := (Sender as TMemo).SelText;
+    FNoteLastSelStart := (Sender as TMemo).SelStart;
+    FNoteLastSelLength := (Sender as TMemo).SelLength;
+  end;
+end;
+
+procedure TformNotetask.MemoNoteMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
+  MousePos: TPoint; var Handled: boolean);
+begin
+  if ssCtrl in Shift then
+  begin
+    if WheelDelta > 0 then
+      aZoomIn.Execute
+    else
+      aZoomOut.Execute;
+    Handled := True;
+  end;
+end;
+
+procedure TformNotetask.MemoNoteChange(Sender: TObject);
+begin
+  Grid.Cells[COL_NOTE, Grid.Row] := MemoNote.Text;
+  Tasks.SetTask(Grid, Memo, Grid.Row, FBackup, FShowTime);
+  CalcRowHeight(True, Grid.Row);
+  SetChanged;
+end;
+
+procedure TformNotetask.MemoNoteDblClick(Sender: TObject);
+var
+  Pos: integer;
+begin
+  if FMemoSelStartClicked >= 0 then
+    Pos := FMemoSelStartClicked
+  else
+    Pos := (Sender as TMemo).SelStart;
+
+  (Sender as TMemo).MemoTokenAtPos(Pos, '_-@');
+  FMemoSelStartClicked := -1;
+end;
+
+procedure TformNotetask.panelNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  if (Button = mbLeft) or (Button = mbRight) then
+  begin
+    if not MemoNote.Focused then MemoNote.SetFocus;
+    FNoteSelecting := True;
+    SelectMemoLine(GetLineAtPos(Y));
+
+    if (Button = mbRight) then
+      PopupMemo.PopUp;
+  end;
+end;
+
+procedure TformNotetask.panelNoteMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+var
+  Index: integer;
+  IndexEnd: integer;
+begin
+  if (FNoteSelecting) then
+  begin
+    Index := Self.GetLineAtPos(Y);
+    IndexEnd := Self.GetLineAtEnd;
+    if (Index <> FNoteLastIndex) then
+    begin
+      if (Index >= 0) and (Index <= IndexEnd) then
+      begin
+        SelectMemoLine(Index, True);
+        FNoteLastIndex := Index;
+      end;
+
+      // Scroll
+      //if (Index < 0) then
+      //begin
+      //  {$IFDEF UNIX}
+      //  if (MemoNote.VertScrollBar.Position > 0) then
+      //  begin
+      //    Application.ProcessMessages;
+      //    MemoNote.VertScrollBar.Position := MemoNote.VertScrollBar.Position + Canvas.TextHeight('Th');
+      //  end;
+      //  {$ELSE}
+      //  if (MemoNote.VertScrollBar.Position > 0) then
+      //    MemoNote.VertScrollBar.Position := MemoNote.VertScrollBar.Position - 1;
+      //  {$ENDIF}
+      //end
+      //else
+      //if (Index > IndexEnd) then
+      //begin
+      //  {$IFDEF UNIX}
+      //  Application.ProcessMessages;
+      //  MemoNote.VertScrollBar.Position := MemoNote.VertScrollBar.Position + Canvas.TextHeight('Th');
+      //  {$ELSE}
+      //  MemoNote.VertScrollBar.Position := MemoNote.VertScrollBar.Position + 1;
+      //  {$ENDIF}
+      //end;
+    end;
+  end;
+
+end;
+
+procedure TformNotetask.panelNoteMouseEnter(Sender: TObject);
+begin
+  panelNote.Color := TDarkUtils.ThemeColor(clSplitHighlight_Light, clSplitHighlight_Dark);
+end;
+
+procedure TformNotetask.panelNoteMouseLeave(Sender: TObject);
+begin
+  FNoteSelecting := False;
+  panelNote.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);
+end;
+
+procedure TformNotetask.panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  FNoteSelecting := False;
+end;
+
+procedure TformNotetask.MemoNoteSetScrollPosition(Value: integer);
+begin
+  {$IFDEF UNIX}
+  MemoNote.Visible := False;
+  Application.ProcessMessages;
+  MemoNote.VertScrollBar.Position;
+  MemoNote.VertScrollBar.Position := Value;
+  MemoNote.Visible := True;
+  if (MemoNote.CanFocus) then MemoNote.SetFocus;
+  {$ELSE}
+  MemoNote.VertScrollBar.Position := 0;
+  MemoNote.VertScrollBar.Position := Value;
+  {$ENDIF}
+end;
+
+procedure TformNotetask.MemoNoteBackup;
+begin
+  FMemoNoteBackup := MemoNote.Text;
+  FMemoNoteSelStartBackup := MemoNote.SelStart;
+  FMemoNoteSelLengthBackup := MemoNote.SelLength;
+  FMemoNoteCaretBackup := MemoNote.CaretPos;
+  FMemoNoteVertScrollBackup := MemoNote.VertScrollBar.Position;
+end;
+
+procedure TformNotetask.MemoNoteUndo;
+var
+  newBackup: TCaption;
+  SelStart, SelLength: integer;
+begin
+  // Save current selection and text
+  newBackup := MemoNote.Text;
+  SelStart := MemoNote.SelStart;
+  SelLength := MemoNote.SelLength;
+
+  // Restore from backup
+  MemoNote.Text := FMemoNoteBackup;
+  MemoNote.CaretPos := FMemoNoteCaretBackup;
+  MemoNote.SelStart := FMemoNoteSelStartBackup;
+  MemoNote.SelLength := FMemoNoteSelLengthBackup;
+
+  // Adjust scroll position
+  MemoNoteSetScrollPosition(FMemoNoteVertScrollBackup);
+
+  // Option with scroll centering
+  //if (FMemoNoteVertScrollBackup > 0) then
+  //begin
+  //  LinesPerPage := MemoNote.ClientHeight div Canvas.TextHeight('Wg');
+  //  MemoNote.VertScrollBar.Position := MemoNote.VertScrollBar.Position + LinesPerPage div 2;
+  //end;
+
+  // Update backup
+  FMemoNotebackup := newBackup;
+  FMemoNoteSelStartBackup := SelStart;
+  FMemoNoteSelLengthBackup := SelLength;
+end;
+
+procedure TformNotetask.MemoNoteIndent;
+var
+  SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
+  CaretPos: TPoint;
+  Offset: integer;
+begin
+  MemoNoteBackup;
+  if (MemoNote.SelLength > 0) then
+  begin
+    SelStartPos := MemoNote.SelStart;
+    SelEndPos := SelStartPos + MemoNote.SelLength;
+    CaretPos := Point(MemoNote.CaretPos.X, MemoNote.CaretPos.Y);
+
+    MemoNote.Lines.BeginUpdate;
+
+    // Calculate start line number of selection
+    MemoNote.SelStart := SelStartPos;
+    StartLine := MemoNote.CaretPos.Y;
+
+    // Calculate end line number of selection
+    MemoNote.SelStart := SelEndPos;
+    EndLine := MemoNote.CaretPos.Y;
+
+    // Restore selection
+    MemoNote.SelStart := SelStartPos;
+    MemoNote.SelLength := SelEndPos - SelStartPos;
+
+    MemoNote.Lines.EndUpdate;
+
+    // If last line not selected decrement endline
+    if (StartLine <> EndLine) and (SelEndPos - SelStartPos > 0) and (EndLine = CaretPos.Y) and
+      ((CaretPos.X = 0) or ((CaretPos.X = (SelEndPos - SelStartPos)) and (MemoNote.SelText[Length(MemoNote.SelText)] in [#10, #13]))) then
+      Dec(EndLine);
+
+    // Add IndentStr at the start of each selected line
+    for i := StartLine to EndLine do
+      MemoNote.Lines[i] := IndentStr + MemoNote.Lines[i];
+
+    // Adjust selection length to include inserted spaces
+    Offset := Length(IndentStr) * (EndLine - StartLine + 1);
+    MemoNote.SelStart := SelStartPos;
+    MemoNote.SelLength := SelEndPos - SelStartPos + Offset;
+  end
+  else
+    MemoNote.SelText := IndentStr;
+end;
+
+procedure TformNotetask.MemoNoteOutdent;
+var
+  SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
+  CaretPos: TPoint;
+  Offset: integer;
+  line: string;
+begin
+  MemoNoteBackup;
+  SelStartPos := MemoNote.SelStart;
+  SelEndPos := SelStartPos + MemoNote.SelLength;
+  CaretPos := Point(MemoNote.CaretPos.X, MemoNote.CaretPos.Y);
+
+  MemoNote.Lines.BeginUpdate;
+
+  // Calculate start line number of selection
+  MemoNote.SelStart := SelStartPos;
+  StartLine := MemoNote.CaretPos.Y;
+
+  // Calculate end line number of selection
+  MemoNote.SelStart := SelEndPos;
+  EndLine := MemoNote.CaretPos.Y;
+
+  // Restore selection
+  MemoNote.SelStart := SelStartPos;
+  MemoNote.SelLength := SelEndPos - SelStartPos;
+
+  MemoNote.Lines.EndUpdate;
+
+  // If last line not selected decrement endline
+  if (StartLine <> EndLine) and (SelEndPos - SelStartPos > 0) and (EndLine = CaretPos.Y) and
+    ((CaretPos.X = 0) or ((CaretPos.X = (SelEndPos - SelStartPos)) and (MemoNote.SelText[Length(MemoNote.SelText)] in [#10, #13]))) then
+    Dec(EndLine);
+
+  // Remove IndentStr at the start of each selected line if present
+  Offset := 0;
+  for i := StartLine to EndLine do
+  begin
+    line := MemoNote.Lines[i];
+    if Length(line) >= Length(IndentStr) then
+    begin
+      if Copy(line, 1, Length(IndentStr)) = IndentStr then
+      begin
+        Delete(line, 1, Length(IndentStr));
+        MemoNote.Lines[i] := line;
+        Offset += Length(IndentStr);
+      end;
+    end;
+  end;
+
+  // Adjust selection length to account for removed spaces
+  MemoNote.SelStart := SelStartPos;
+  MemoNote.SelLength := SelEndPos - SelStartPos - Offset;
+end;
+
+procedure TformNotetask.MemoNoteToggleComment(aComment: string);
+var
+  SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
+  CaretPos: TPoint;
+  line, trimmed, resultStr: string;
+  AllCommented: boolean;
+  MinIndent, CurrentIndent: integer;
+  CommentOffset: integer;
+  FirstCommentPos, j, wordWidth, Count: integer;
+begin
+  {$IFDEF UNIX}
+  MemoNote.Tag := MemoNote.VertScrollBar.Position;
+  {$ENDIF}
+  MemoNoteBackup;
+
+  // If no selection and the cursor is on an empty line -> insert a line of the comment character
+  if (MemoNote.SelLength = 0) then
+  begin
+    line := Trim(MemoNote.Lines[MemoNote.CaretPos.Y]);
+    if line = string.Empty then
+    begin
+      // Create a string of the comment character, approximate length to fit the editor width
+      // Calculate how many times we can repeat the full word
+      wordWidth := Canvas.TextWidth(aComment);
+      if wordWidth > 0 then
+        Count := Min(MemoNote.ClientWidth, 800) div wordWidth
+      else
+        Count := 60; // fallback value
+
+      // Build the repeated string
+      resultStr := string.Empty;
+      for j := 1 to Count do
+        resultStr := resultStr + aComment;
+
+      MemoNote.Lines[MemoNote.CaretPos.Y] := resultStr;
+
+      {$IFDEF UNIX}
+    if (MemoNote.Tag > 0) then
+      MemoNoteSetScrollPosition(MemoNote.Tag);
+      {$ENDIF}
+
+      Exit; // Stop method execution, nothing else to do
+    end;
+  end;
+
+  FirstCommentPos := -1;
+  SelStartPos := MemoNote.SelStart;
+  SelEndPos := SelStartPos + MemoNote.SelLength;
+  CaretPos := Point(MemoNote.CaretPos.X, MemoNote.CaretPos.Y);
+
+  MemoNote.Lines.BeginUpdate;
+
+  // Calculate start and end lines of selection
+  MemoNote.SelStart := SelStartPos;
+  StartLine := MemoNote.CaretPos.Y;
+
+  MemoNote.SelStart := SelEndPos;
+  EndLine := MemoNote.CaretPos.Y;
+
+  // Restore selection
+  MemoNote.SelStart := SelStartPos;
+  MemoNote.SelLength := SelEndPos - SelStartPos;
+
+  MemoNote.Lines.EndUpdate;
+
+  // If last line not selected decrement endline
+  if (StartLine <> EndLine) and (SelEndPos - SelStartPos > 0) and (EndLine = CaretPos.Y) and
+    ((CaretPos.X = 0) or ((CaretPos.X = (SelEndPos - SelStartPos)) and (MemoNote.SelText[Length(MemoNote.SelText)] in [#10, #13]))) then
+    Dec(EndLine);
+
+  // Find minimum IndentStr among non-empty lines
+  MinIndent := MaxInt;
+  for i := StartLine to EndLine do
+  begin
+    line := MemoNote.Lines[i];
+    trimmed := TrimLeft(line);
+    if trimmed <> '' then
+    begin
+      CurrentIndent := Length(line) - Length(trimmed);
+      if CurrentIndent < MinIndent then
+        MinIndent := CurrentIndent;
+    end;
+  end;
+  if MinIndent = MaxInt then
+    MinIndent := 0;
+
+  // Determine if all non-empty lines are already commented
+  AllCommented := True;
+  for i := StartLine to EndLine do
+  begin
+    trimmed := TrimLeft(MemoNote.Lines[i]);
+    if (trimmed <> '') and (UpperCase(Copy(trimmed, 1, Length(aComment))) <> UpperCase(aComment)) then
+    begin
+      AllCommented := False;
+      Break;
+    end;
+  end;
+
+  CommentOffset := 0;
+
+  // Add or remove aComment for each line
+  for i := StartLine to EndLine do
+  begin
+    line := MemoNote.Lines[i];
+    trimmed := TrimLeft(line);
+
+    if trimmed = '' then
+      Continue; // skip empty lines
+
+    if AllCommented then
+    begin
+      // Remove aComment, keep spaces after it
+      if UpperCase(Copy(trimmed, 1, Length(aComment))) = UpperCase(aComment) then
+      begin
+        Delete(trimmed, 1, Length(aComment));
+        MemoNote.Lines[i] := StringOfChar(' ', Length(line) - Length(TrimLeft(line))) + trimmed;
+        CommentOffset -= Length(aComment);
+      end;
+    end
+    else
+    begin
+      // Add aComment at MinIndent, keep extra spaces
+      if Length(line) > MinIndent then
+        MemoNote.Lines[i] := Copy(line, 1, MinIndent) + aComment + Copy(line, MinIndent + 1, MaxInt)
+      else
+        MemoNote.Lines[i] := StringOfChar(' ', MinIndent) + aComment;
+      CommentOffset += Length(aComment);
+
+      // Calculate first comment position
+      if (i = startline) then
+      begin
+        FirstCommentPos := 0;
+        for j := 0 to i - 1 do
+        begin
+          FirstCommentPos := FirstCommentPos + Length(unicodestring(MemoNote.Lines[j])) + 1;
+          {$IFDEF WINDOWS}
+          //if (FLineEnding = TLineEnding.WindowsCRLF) then
+             Inc(FirstCommentPos);
+          {$ENDIF}
+        end;
+      end;
+    end;
+  end;
+
+  // Restore original selection with offset
+  if FirstCommentPos > -1 then
+    MemoNote.SelStart := FirstCommentPos
+  else
+    MemoNote.SelStart := SelStartPos;
+  MemoNote.SelLength := (SelEndPos - SelStartPos) + CommentOffset;
+  {$IFDEF UNIX}
+  if (MemoNote.Tag > 0) then
+    MemoNoteSetScrollPosition(MemoNote.Tag);
+  {$ENDIF}
+end;
+
+{%EndRegion}
+
+{%Region -fold Tags Edit Events}
+
+procedure TformNotetask.tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+begin
+  if TagEdit.ReadOnly then exit
+  else
+  if Key = VK_DELETE then // Delete
+  begin
+    {$IFDEF UNIX}
+    {$ELSE}
+    if (TagEdit.EditBox.SelLength = 0) then
+      TagEdit.EditBox.SelLength := CalcDeleteCount(TagEdit.EditBox.Text, TagEdit.EditBox.SelStart);
+    TagEdit.EditBox.ClearSelection;
+    Key := 0;
+    {$ENDIF}
+  end
+  else
+  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_Z) then // Ctrl + Shift + Z
+  begin
+    aUndoAll.Execute;
+    Key := 0;
+  end
+  else
+  if (ssCtrl in Shift) and (Key = VK_Z) and (not TagEdit.EditBox.Focused) then // Ctrl + Z
+  begin
+    aUndo.Execute;
+    Key := 0;
+  end
+  else
+  if Key = VK_ESCAPE then // Escape
+    if Grid.Visible and Grid.CanFocus then
+      Grid.SetFocus;
+end;
+
+procedure TformNotetask.tagsEditTagClick(Sender: TObject; const TagText: string; const TagIndex: integer);
+begin
+  if (FilterBox.Text <> TagText) then
+  begin
+    FilterBox.Text := TagText;
+    FLastFilter := '-1';
+    filterBoxChange(Self);
+  end
+  else
+    filterClearClick(Sender);
+end;
+
+procedure TformNotetask.tagsEditBeforeChange(Sender: TObject; Tags: string; Operation: TTagEditOperation; var AllowChange: boolean);
+begin
+  Tasks.CreateBackup;
+end;
+
+procedure TformNotetask.tagsEditChange(Sender: TObject);
+begin
+  SetFilter;
+  SetChanged;
+  Grid.Invalidate;
+  Application.ProcessMessages;
+  CalcRowHeight(True);
+end;
+
+procedure TformNotetask.tagsEditTagAdd(Sender: TObject; const TagText: string; const TagIndex: integer);
+begin
+  TagsAdd(Grid.Selection, TagText);
+end;
+
+procedure TformNotetask.tagsEditTagRemove(Sender: TObject; const TagText: string; const TagIndex: integer);
+var
+  i: integer;
+  task: TTask;
+begin
+  //  Tasks.CreateBackup;
+  for i := Grid.Selection.Top to Grid.Selection.Bottom do
+    if Tasks.Map(i) > -1 then
+    begin
+      task := Tasks.GetTask(i);
+      if TagIndex >= 0 then
+        task.Tags.Delete(TagIndex)
+      else
+        task.Tags.RemoveAll(TagText);
+      if task.Tags.Count = 0 then
+        task.TagsWidth := 0;
+    end;
+  SetTags;
+end;
+
+procedure TformNotetask.tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
+var
+  i: integer;
+begin
+  Tasks.CreateBackup;
+  for i := Grid.Selection.Top to Grid.Selection.Bottom do
+    if Tasks.Map(i) > -1 then
+      Tasks.GetTask(i).Tags.Assign(TagEdit.Items);
+end;
+
+procedure TformNotetask.tagsEditExit(Sender: TObject);
+begin
+  FLastGridSelection := Grid.Selection;
+  Application.QueueAsyncCall(@DelayedFinishTagEdit, 0);
+end;
+
+{%EndRegion}
+
+{%Region -fold Group Tabs}
+
+procedure TformNotetask.TabsGroupChange(Sender: TObject);
+begin
+  EditComplete;
+  TagEdit.FinishEdit;
+
+  if (Length(FLastRowMem) > Tasks.SelectedGroup) then
+    FLastRowMem[Tasks.SelectedGroup] := Grid.Row;
+
+  if (TabsGroup.TabIndex >= 0) then
+    Tasks.ChangeGroup(FindGroupRealIndex(TabsGroup.TabIndex), True);
+
+  FillGrid;
+
+  if (Length(FLastRowMem) > Tasks.SelectedGroup) then
+    Grid.Row := FLastRowMem[Tasks.SelectedGroup]
+  else
+    Grid.Row := 1;
+  Grid.ClearSelections;
+
+  if (TabsGroup.TabIndex <> FLastTabIndex) then
+  begin
+    Tasks.CreateBackup;
+    GridBackupSelection;
+  end;
+
+  FLastTabIndex := TabsGroup.TabIndex;
+
+  Tasks.CalcTagsWidths(-1, Grid.Columns[COL_TASK - 1].Width, TagEdit, Font);
+  ChangeLastText;
+  CalcRowHeight(True);
+  SetNote;
+  SetTags;
+  SetInfo;
+end;
+
+procedure TformNotetask.TabsGroupMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  if (Button = mbLeft) then
+    if (TabsGroup.IndexOfTabAt(X, Y) = TabsGroup.TabIndex) and not ((TabsGroup.TabIndex = 0) and (Tasks.GroupNames[0] = string.Empty)) then
+    begin
+      FDragTab := TabsGroup.TabIndex;
+      FLastTabMouseX := 0;
+    end;
+end;
+
+procedure TformNotetask.TabsGroupMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+var
+  target: integer;
+begin
+  if not (ssLeft in Shift) then
+  begin
+    TabsGroupMouseLeave(Self);
+    exit;
+  end;
+
+  target := TabsGroup.IndexOfTabAt(X, Y);
+  if FDragTab >= 0 then
+  begin
+    if target >= 0 then
+    begin
+      if (FLastTabMouseX <> X) and (FLastTabMouseX > 0) then  Screen.Cursor := crDrag;
+      if (target > FDragTab) and (FLastTabMouseX < X) then
+        MoveTabRight(TabsGroup.TabIndex)
+      else
+      if (target < FDragTab) and (FLastTabMouseX > X) then
+        MoveTabLeft(TabsGroup.TabIndex);
+    end;
+  end;
+  // Hide hint if long move
+  Application.HintPause := 100;
+  if (target <> FLastTabTarget) then
+    Application.HideHint;
+  FLastTabMouseX := X;
+  FLastTabTarget := target;
+end;
+
+procedure TformNotetask.TabsGroupMouseLeave(Sender: TObject);
+begin
+  FLastTabMouseX := 0;
+  Application.HintPause := 500;
+  DisableDrag;
+end;
+
+procedure TformNotetask.TabsGroupMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+var
+  TabIndex: integer;
+begin
+  FLastTabMouseX := 0;
+  DisableDrag;
+
+  if Button = mbRight then
+  begin
+    TabIndex := TabsGroup.IndexOfTabAt(X, Y);
+    if TabIndex <> -1 then
+      TabsGroup.TabIndex := TabIndex;
+    PopupTabs.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
+  end;
+end;
+
+{%EndRegion}
+
+{%Region -fold Task Grid}
+
+procedure TformNotetask.GridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
 var
   LastTask: integer;
 begin
@@ -1457,32 +4158,32 @@ begin
       SortOrder := soDescending
     else
       SortOrder := soAscending;
-    taskGrid.SortOrder := SortOrder;
+    Grid.SortOrder := SortOrder;
 
     FSortColumn := Index;
 
     ApplySorting;
 
-    taskGrid.Row := Tasks.ReverseMap(LastTask);
+    Grid.Row := Tasks.ReverseMap(LastTask);
   end
   else
     // Set LastTask when clicked on begining of LastTask
   begin
-    if (ssShift in GetKeyShiftState) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Top <> index) then
+    if (ssShift in GetKeyShiftState) and (Grid.Selection.Height = 0) and (Grid.Selection.Top <> index) then
     begin
-      taskGrid.Selection := TGridRect.Create(COL_DONE, taskGrid.Selection.Top, COL_STAR, index);
+      Grid.Selection := TGridRect.Create(COL_DONE, Grid.Selection.Top, COL_STAR, index);
     end
     else
     begin
-      taskGrid.Row := index;
-      taskGrid.Selection := TGridRect.Create(COL_DONE, index, COL_STAR, index);
+      Grid.Row := index;
+      Grid.Selection := TGridRect.Create(COL_DONE, index, COL_STAR, index);
     end;
     // Trigger event
-    taskGrid.OnSelection(taskGrid, taskGrid.Col, taskGrid.Row);
+    Grid.OnSelection(Grid, Grid.Col, Grid.Row);
   end;
 end;
 
-procedure TformNotetask.taskGridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
+procedure TformNotetask.GridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
 var
   MousePosScreen, MousePosClient, CheckBoxCenter: TPoint;
   CheckBoxRect: TRect;
@@ -1497,10 +4198,10 @@ begin
     MousePosScreen := Mouse.CursorPos;
 
     // Convert screen coordinates to client coordinates (relative to the form)
-    MousePosClient := taskGrid.ScreenToClient(MousePosScreen);
+    MousePosClient := Grid.ScreenToClient(MousePosScreen);
 
     // Get the center of the checkbox (approximately the center of the cell)
-    CheckBoxCenter := taskGrid.CellRect(ACol, ARow).CenterPoint;
+    CheckBoxCenter := Grid.CellRect(ACol, ARow).CenterPoint;
 
     // Define the 16x16 rectangle around the checkbox
     CheckBoxRect.Left := CheckBoxCenter.X - CheckBoxSize div 2;
@@ -1524,10 +4225,10 @@ begin
     MousePosScreen := Mouse.CursorPos;
 
     // Convert screen coordinates to client coordinates (relative to the form)
-    MousePosClient := taskGrid.ScreenToClient(MousePosScreen);
+    MousePosClient := Grid.ScreenToClient(MousePosScreen);
 
     // Check if the mouse is within the 16x16 checkbox area
-    if not PtInRect(taskGrid.CellRect(ACol, ARow), MousePosClient) then
+    if not PtInRect(Grid.CellRect(ACol, ARow), MousePosClient) then
     begin
       // If the mouse is outside the checkbox, prevent the state from being changed
       FDisableStarToggle := True;
@@ -1538,7 +4239,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
+procedure TformNotetask.GridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
 begin
   if (aCol = COL_DONE) then
   begin
@@ -1555,7 +4256,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+procedure TformNotetask.GridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
 begin
   if (not IsColumn) then
   begin
@@ -1565,7 +4266,7 @@ begin
       Tasks.CreateBackup;
     end;
     Tasks.AddMap(Tasks.AddTask('[ ]'));
-    taskGrid.Cells[COL_DONE, tIndex] := '0';
+    Grid.Cells[COL_DONE, tIndex] := '0';
     SetInfo;
     SetChanged;
     SetNote;
@@ -1573,7 +4274,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+procedure TformNotetask.GridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
 begin
   if (not IsColumn) then
   begin
@@ -1585,45 +4286,45 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
+procedure TformNotetask.GridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
 begin
-  taskGridResize(Sender);
+  GridResize(Sender);
   if IsColumn then
     CalcRowHeight(True);
-  EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
-  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 2, -2, -2, 0);
+  EditControlSetBounds(PanelMemo, Grid.Col, Grid.Row);
+  EditControlSetBounds(DatePicker, Grid.Col, Grid.Row, 2, -2, -2, 0);
 end;
 
-procedure TformNotetask.taskGridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
+procedure TformNotetask.GridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
 begin
   FIsSelecting := True;
   AdjustMultiButton;
 end;
 
-procedure TformNotetask.taskGridKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+procedure TformNotetask.GridKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
-  Grid: TStringGrid;
+  TempGrid: TStringGrid;
   i: integer;
   //Sel:TGridRect;
   //Col: integer;
 begin
-  Grid := Sender as TStringGrid;
+  TempGrid := Sender as TStringGrid;
 
   // Remove due to conflict with standard selection behavior
   //// Shift + Home -> select from current position to first visible column
   //if (Key = VK_HOME) and (ssShift in Shift) and not (ssCtrl in Shift) then
   //begin
-  //  Sel:=  Grid.Selection;
-  //  Col := Grid.Col;
-  //  for i := 1 to Grid.ColCount - 1 do
-  //    if Grid.ColWidths[i] > 0 then
+  //  Sel:=  TempGrid.Selection;
+  //  Col := TempGrid.Col;
+  //  for i := 1 to TempGrid.ColCount - 1 do
+  //    if TempGrid.ColWidths[i] > 0 then
   //    begin
-  //      Grid.Col := i;
+  //      TempGrid.Col := i;
   //      Break;
   //    end;
-  //  Grid.ClearSelections;
-  //  Grid.Selection := Rect(Grid.Col, Sel.Top, Sel.Right, Sel.Bottom);
-  //  Grid.Update;
+  //  TempGrid.ClearSelections;
+  //  TempGrid.Selection := Rect(TempGrid.Col, Sel.Top, Sel.Right, Sel.Bottom);
+  //  TempGrid.Update;
   //  Key := 0;
   //  Exit;
   //end
@@ -1631,18 +4332,18 @@ begin
   //// Shift + End -> select from current position to last visible column
   //if (Key = VK_END) and (ssShift in Shift) and not (ssCtrl in Shift) then
   //begin
-  //  Sel:=  Grid.Selection;
-  //  Col := Grid.Col;
+  //  Sel:=  TempGrid.Selection;
+  //  Col := TempGrid.Col;
 
-  //  for i := Grid.ColCount - 1 downto 0 do
-  //    if Grid.ColWidths[i] > 0 then
+  //  for i := TempGrid.ColCount - 1 downto 0 do
+  //    if TempGrid.ColWidths[i] > 0 then
   //    begin
-  //      Grid.Col := i;
+  //      TempGrid.Col := i;
   //      Break;
   //    end;
-  //  Grid.ClearSelections;
-  //  Grid.Selection := Rect(Sel.Left, Sel.Top, Grid.Col, Sel.Bottom);
-  //  Grid.Update;
+  //  TempGrid.ClearSelections;
+  //  TempGrid.Selection := Rect(Sel.Left, Sel.Top, TempGrid.Col, Sel.Bottom);
+  //  TempGrid.Update;
   //  Key := 0;
   //  Exit;
   //end
@@ -1651,10 +4352,10 @@ begin
   // Default HOME -> move to first visible column
   if (Key = VK_HOME) and not (ssCtrl in Shift) and not (ssShift in Shift) then
   begin
-    for i := 1 to Grid.ColCount - 1 do
-      if Grid.ColWidths[i] > 0 then
+    for i := 1 to TempGrid.ColCount - 1 do
+      if TempGrid.ColWidths[i] > 0 then
       begin
-        Grid.Col := i;
+        TempGrid.Col := i;
         Break;
       end;
     Key := 0;
@@ -1664,10 +4365,10 @@ begin
   // Default END -> move to last visible column
   if (Key = VK_END) and not (ssCtrl in Shift) and not (ssShift in Shift) then
   begin
-    for i := Grid.ColCount - 1 downto 0 do
-      if Grid.ColWidths[i] > 0 then
+    for i := TempGrid.ColCount - 1 downto 0 do
+      if TempGrid.ColWidths[i] > 0 then
       begin
-        Grid.Col := i;
+        TempGrid.Col := i;
         Break;
       end;
     Key := 0;
@@ -1675,7 +4376,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+procedure TformNotetask.GridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   FIsSelecting := False;
 
@@ -1683,36 +4384,36 @@ begin
     aZoomDefault.Execute;
 end;
 
-procedure TformNotetask.taskGridMouseLeave(Sender: TObject);
+procedure TformNotetask.GridMouseLeave(Sender: TObject);
 begin
   FIsSelecting := False;
 end;
 
-procedure TformNotetask.taskGridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+procedure TformNotetask.GridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
   Cell: TPoint;
 begin
   if (Button = mbRight) and (not IsEditing) then
   begin
-    if (taskGrid.Selection.Height = 0) then
+    if (Grid.Selection.Height = 0) then
     begin
       // Get the row index at the mouse coordinates
-      Cell := taskGrid.MouseToCell(TPoint.Create(X, Y));
+      Cell := Grid.MouseToCell(TPoint.Create(X, Y));
 
       // Check if the row index is valid
-      if (Cell.Y >= 0) and (Cell.Y < taskGrid.RowCount) then
-        taskGrid.Row := Cell.Y;
+      if (Cell.Y >= 0) and (Cell.Y < Grid.RowCount) then
+        Grid.Row := Cell.Y;
       if (Cell.X > 0) and (Cell.X < 5) then
-        taskGrid.Col := Cell.X;
+        Grid.Col := Cell.X;
 
-      if Visible and taskGrid.Visible and taskGrid.CanFocus then
-        taskGrid.SetFocus;
+      if Visible and Grid.Visible and Grid.CanFocus then
+        Grid.SetFocus;
     end;
     Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
   end;
 
-  if (Button = mbLeft) and (ssCtrl in Shift) and (taskGrid.Col in [COL_TASK, COL_NOTE]) then
-    TryOpenAsUrl(Trim(taskGrid.Cells[taskGrid.Col, taskGrid.Row]));
+  if (Button = mbLeft) and (ssCtrl in Shift) and (Grid.Col in [COL_TASK, COL_NOTE]) then
+    TryOpenAsUrl(Trim(Grid.Cells[Grid.Col, Grid.Row]));
 
   if (not FRepaint) then
   begin
@@ -1721,7 +4422,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
+procedure TformNotetask.GridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint; var Handled: boolean);
 begin
   if IsEditing then
@@ -1737,7 +4438,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridResize(Sender: TObject);
+procedure TformNotetask.GridResize(Sender: TObject);
 var
   Rect: TRect;
 begin
@@ -1746,36 +4447,36 @@ begin
   {$ENDIF}
 
   // Get the cell dimensions
-  Rect := taskGrid.CellRect(taskGrid.Col, taskGrid.Row);
+  Rect := Grid.CellRect(Grid.Col, Grid.Row);
 
   // Update the size and position of the Memo
-  if Assigned(taskGrid.Editor) and (taskGrid.Editor is TPanel) then
-    TPanel(taskGrid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
+  if Assigned(Grid.Editor) and (Grid.Editor is TPanel) then
+    TPanel(Grid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
 
-  // Align panelFunc to bottom-right of taskGrid
+  // Align panelFunc to bottom-right of Grid
   if FBiDiRightToLeft then
   begin
-    if taskGrid.GetActualScrollBarVisibility(ssVertical) then
-      panelFunc.Left := taskGrid.Left + GetSystemMetrics(SM_CXVSCROLL) + 5
+    if Grid.GetActualScrollBarVisibility(ssVertical) then
+      panelFunc.Left := Grid.Left + GetSystemMetrics(SM_CXVSCROLL) + 5
     else
-      panelFunc.Left := taskGrid.Left + 5;
+      panelFunc.Left := Grid.Left + 5;
   end
   else
   begin
-    if taskGrid.GetActualScrollBarVisibility(ssVertical) then
-      panelFunc.Left := taskGrid.Left + taskGrid.Width - panelFunc.Width - GetSystemMetrics(SM_CXVSCROLL) - 5
+    if Grid.GetActualScrollBarVisibility(ssVertical) then
+      panelFunc.Left := Grid.Left + Grid.Width - panelFunc.Width - GetSystemMetrics(SM_CXVSCROLL) - 5
     else
-      panelFunc.Left := taskGrid.Left + taskGrid.Width - panelFunc.Width - 5;
+      panelFunc.Left := Grid.Left + Grid.Width - panelFunc.Width - 5;
   end;
-  if taskGrid.GetActualScrollBarVisibility(ssHorizontal) then
-    panelFunc.Top := taskGrid.Top + taskGrid.Height - panelFunc.Height - GetSystemMetrics(SM_CYHSCROLL) - 5
+  if Grid.GetActualScrollBarVisibility(ssHorizontal) then
+    panelFunc.Top := Grid.Top + Grid.Height - panelFunc.Height - GetSystemMetrics(SM_CYHSCROLL) - 5
   else
-    panelFunc.Top := taskGrid.Top + taskGrid.Height - panelFunc.Height - 5;
+    panelFunc.Top := Grid.Top + Grid.Height - panelFunc.Height - 5;
 end;
 
-procedure TformNotetask.taskGridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
+procedure TformNotetask.GridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
 var
-  Grid: TStringGrid;
+  TempGrid: TStringGrid;
   Value: string;
   DrawRect: TRect;
   bgFill: TColor;
@@ -1790,53 +4491,53 @@ var
   OriginalLeft, OriginalRight: integer;
   Indent: integer = 0;
 begin
-  Grid := Sender as TStringGrid;
+  TempGrid := Sender as TStringGrid;
   bgFill := TDarkUtils.ThemeColor(clWhite, clBlack);
 
   // Border for fixed cells
-  if (aRow < Grid.FixedRows) or (aCol < Grid.FixedCols) then
+  if (aRow < TempGrid.FixedRows) or (aCol < TempGrid.FixedCols) then
   begin
-    Grid.Canvas.Pen.Color := clSilver;
-    Grid.Canvas.Pen.Style := psSolid;
-    Grid.Canvas.Pen.Width := 1;
-    Grid.Canvas.Pen.Width := 0;
-    Grid.Canvas.Brush.Style := bsClear;
-    Grid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
+    TempGrid.Canvas.Pen.Color := clSilver;
+    TempGrid.Canvas.Pen.Style := psSolid;
+    TempGrid.Canvas.Pen.Width := 1;
+    TempGrid.Canvas.Pen.Width := 0;
+    TempGrid.Canvas.Brush.Style := bsClear;
+    TempGrid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
 
-    if (aRow = 0) and (aCol = COL_NUM) and (SortColumn = COL_NUM) and Assigned(taskGrid.TitleImageList) then
+    if (aRow = 0) and (aCol = COL_NUM) and (SortColumn = COL_NUM) and Assigned(TempGrid.TitleImageList) then
     begin
       if SortOrder = soAscending then
         ImgIndex := 0
       else
         ImgIndex := 1;
 
-      ImgX := aRect.Right - taskGrid.TitleImageList.Width - 4;
-      ImgY := aRect.Top + ((aRect.Bottom - aRect.Top - taskGrid.TitleImageList.Height) div 2);
+      ImgX := aRect.Right - TempGrid.TitleImageList.Width - 4;
+      ImgY := aRect.Top + ((aRect.Bottom - aRect.Top - TempGrid.TitleImageList.Height) div 2);
 
-      taskGrid.TitleImageList.Draw(Grid.Canvas, ImgX, ImgY, ImgIndex, True);
+      TempGrid.TitleImageList.Draw(TempGrid.Canvas, ImgX, ImgY, ImgIndex, True);
     end;
   end
   else
   begin
     // Determine background color
-    if (gdFocused in aState) and (taskGrid.Selection.Height = 0) and (taskGrid.Selection.Width = 0) and
-      ((IsEditing and ((Assigned(TaskGrid.Editor) and taskGrid.Editor.Focused) or (Assigned(Memo) and Memo.Focused))) or
+    if (gdFocused in aState) and (TempGrid.Selection.Height = 0) and (TempGrid.Selection.Width = 0) and
+      ((IsEditing and ((Assigned(TempGrid.Editor) and TempGrid.Editor.Focused) or (Assigned(Memo) and Memo.Focused))) or
       (not IsEditing)) then
     begin
       bgFill := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);    // Focused
-      Grid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
+      TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
     end
     else
-    if (gdSelected in aState) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+    if (gdSelected in aState) and ((TempGrid.Selection.Height > 0) or (TempGrid.Selection.Width > 0)) then
     begin
       bgFill := clHighlight;    // Multiselect
-      Grid.Canvas.Font.Color := clWhite;
+      TempGrid.Canvas.Font.Color := clWhite;
     end
     else
     if gdRowHighlight in aState then
     begin
       bgFill := TDarkUtils.ThemeColor(clRowHighlight_Light, clRowHighlight_Dark); // Highlight
-      Grid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
+      TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
     end
     else
     begin
@@ -1846,18 +4547,18 @@ begin
         if (ShowColumnDate) and (not Task.Done) and (Task.Date > 0) and (Task.Date < Now) then // Color expired Task
         begin
           bgFill := TDarkUtils.ThemeColor(clRowExpired_Light, clRowExpired_Dark); // Expired warning red
-          Grid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
+          TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
         end
         else
         if (not Task.Done) and (Task.Archive) then
         begin
           bgFill := TDarkUtils.ThemeColor(clWhite, clBlack); // Not done but arhive warning color
-          Grid.Canvas.Font.Color := TDarkUtils.ThemeColor(clRowNotDone_Light, clRowNotDone_Dark);
+          TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clRowNotDone_Light, clRowNotDone_Dark);
         end
         else
         begin
           bgFill := TDarkUtils.ThemeColor(clWhite, clBlack); // All other white
-          Grid.Canvas.Font.Color := Font.Color;
+          TempGrid.Canvas.Font.Color := Font.Color;
         end;
       end;
     end;
@@ -1866,37 +4567,37 @@ begin
     begin
       Task := Tasks.GetTask(ARow);
       if Task.Star then
-        Grid.Canvas.Font.Style := Grid.Canvas.Font.Style + [fsBold];
+        TempGrid.Canvas.Font.Style := TempGrid.Canvas.Font.Style + [fsBold];
 
       if (aCol = COL_TASK) and (Task.Archive) then
-        Grid.Canvas.Font.Style := Grid.Canvas.Font.Style + [fsStrikeOut];
+        TempGrid.Canvas.Font.Style := TempGrid.Canvas.Font.Style + [fsStrikeOut];
 
       if (aCol = COL_NOTE) and (Task.NoteItalic) then
-        Grid.Canvas.Font.Style := Grid.Canvas.Font.Style + [fsItalic];
+        TempGrid.Canvas.Font.Style := TempGrid.Canvas.Font.Style + [fsItalic];
 
       if (aCol = COL_DATE) and (Task.Date > Now) and (not (gdSelected in aState)) then
-        Grid.Canvas.Font.Color := TDarkUtils.ThemeColor(clPlanned_Light, clPlanned_Dark);
+        TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clPlanned_Light, clPlanned_Dark);
     end;
 
     // Fill the cell background
-    Grid.Canvas.Brush.Color := bgFill;
-    Grid.canvas.Brush.Style := bsSolid;
-    Grid.canvas.FillRect(aRect);
+    TempGrid.Canvas.Brush.Color := bgFill;
+    TempGrid.canvas.Brush.Style := bsSolid;
+    TempGrid.canvas.FillRect(aRect);
 
     if (aCol in [COL_DONE, COL_STAR]) then
     begin
-      Grid.DefaultDrawCell(aCol, aRow, aRect, aState);
+      TempGrid.DefaultDrawCell(aCol, aRow, aRect, aState);
       exit;
     end;
 
-    if (aCol = COL_AMOUNT) and (TryStrToFloat(Grid.Cells[ACol, ARow], Amount)) then
+    if (aCol = COL_AMOUNT) and (TryStrToFloat(TempGrid.Cells[ACol, ARow], Amount)) then
     begin
       FS := DefaultFormatSettings;
       FS.ThousandSeparator := ' ';
-      Value := FormatFloat('#,##0.##########', StrToFloat(Grid.Cells[ACol, ARow]), FS);
+      Value := FormatFloat('#,##0.##########', StrToFloat(TempGrid.Cells[ACol, ARow]), FS);
     end
     else
-      Value := Grid.Cells[ACol, ARow];
+      Value := TempGrid.Cells[ACol, ARow];
 
     if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
     begin
@@ -1906,7 +4607,7 @@ begin
         Indent := Task.FIndentLevel * Canvas.TextWidth(' ') * 2;
         if Task.Tags.Count > 0 then
         begin
-          BitTags := tagsEdit.GetTagsBitmap(Task.Tags, Round(Max(Max(Font.Size div 2, 8) * FZoom, 1)),
+          BitTags := TagEdit.GetTagsBitmap(Task.Tags, Round(Max(Max(Font.Size div 2, 8) * FZoom, 1)),
             Min(ARect.Width, Round(500 * FZoom)), ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected,
             ifthen(bgFill <> TDarkUtils.ThemeColor(clWhite, clBlack), TagsDimnessColor, TagsDimness)), ColorToRGB(bgFill));
           try
@@ -1916,10 +4617,10 @@ begin
             Task.TagsWidth := TagsWidth;
             if TagsWidth < aRect.Width - 50 then
             begin
-              if taskGrid.BiDiMode = bdLeftToRight then
-                Grid.canvas.Draw(aRect.Right - TagsWidth - 5, aRect.Top, BitTags)
+              if TempGrid.BiDiMode = bdLeftToRight then
+                TempGrid.canvas.Draw(aRect.Right - TagsWidth - 5, aRect.Top, BitTags)
               else
-                Grid.canvas.Draw(aRect.Left + 5, aRect.Top, BitTags);
+                TempGrid.canvas.Draw(aRect.Left + 5, aRect.Top, BitTags);
             end
             else
               TagsWidth := 0;
@@ -1935,13 +4636,13 @@ begin
     if Length(Value) > 0 then
     begin
       if FDuplicateHighlight and not (gdSelected in aState) and (FLastText <> string.Empty) and
-        (Trim(Value) = Trim(FLastText)) and (taskGrid.Selection.Height = 0) and ((aCol <> FLastCol) or (aRow <> FLastRow)) then
+        (Trim(Value) = Trim(FLastText)) and (TempGrid.Selection.Height = 0) and ((aCol <> FLastCol) or (aRow <> FLastRow)) then
       begin
-        Grid.canvas.Brush.Style := bsSolid;
-        Grid.canvas.Brush.Color := TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark);
+        TempGrid.canvas.Brush.Style := bsSolid;
+        TempGrid.canvas.Brush.Color := TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark);
       end
       else
-        Grid.canvas.Brush.Style := bsClear;
+        TempGrid.canvas.Brush.Style := bsClear;
 
       DrawRect := aRect;
       DrawRect.Inflate(-4, 0);
@@ -1970,7 +4671,7 @@ begin
       if FWordWrap then
         Flags := Flags or DT_WORDBREAK;
 
-      DrawText(Grid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
+      DrawText(TempGrid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
 
       // Second pass: actual text drawing
       // Restore the reduced area for drawing
@@ -1994,27 +4695,674 @@ begin
         Flags := Flags or DT_WORDBREAK;
 
       if (FHideNoteText) and (aCol = COL_NOTE) then
-        Value := Value.MaskTextWithBullets(Grid.Canvas, FLineEnding.Value);
+        Value := Value.MaskTextWithBullets(TempGrid.Canvas, FLineEnding.Value);
 
-      if (Value = string.Empty) or (filterBox.Text = string.Empty) or (Grid.canvas.Brush.Color =
+      if (Value = string.Empty) or (FilterBox.Text = string.Empty) or (TempGrid.canvas.Brush.Color =
         TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark)) or
-        (Pos(Trim(filterBox.Text).UTF8Lower, ifthen(aCol = COL_AMOUNT, ReplaceStr(Value, ' ', ''), Value).UTF8Lower) = 0) or
+        (Pos(Trim(FilterBox.Text).UTF8Lower, ifthen(aCol = COL_AMOUNT, ReplaceStr(Value, ' ', ''), Value).UTF8Lower) = 0) or
         ((FHideNoteText) and (aCol = COL_NOTE)) then
       begin
-        DrawText(Grid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
+        DrawText(TempGrid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
       end
       else
       begin
         if (aCol = COL_AMOUNT) then Value := ReplaceStr(Value, ' ', '');
 
-        DrawHighlightedText(Grid.Canvas, Value, Trim(filterBox.Text), DrawRect,
-          ifthen(bgFill <> TDarkUtils.ThemeColor(clWhite, clBlack), tagsEdit.BlendColors(
+        DrawHighlightedText(TempGrid.Canvas, Value, Trim(FilterBox.Text), DrawRect,
+          ifthen(bgFill <> TDarkUtils.ThemeColor(clWhite, clBlack), TagEdit.BlendColors(
           TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark), bgFill, 50),
           TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark)), aCol);
       end;
     end;
   end;
 end;
+
+procedure TformNotetask.GridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
+var
+  sDateTime: TDateTime;
+begin
+  if FReadOnly then
+  begin
+    Editor := nil;  // disable editor — grid stays view-only
+    exit;
+  end;
+
+  if (aCol in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
+  begin
+    PanelMemo := TPanel.Create(Self);
+    PanelMemo.Parent := Grid;
+    PanelMemo.BorderStyle := bsNone;
+    PanelMemo.Caption := string.Empty;
+    PanelMemo.BevelOuter := bvNone;
+    PanelMemo.TabStop := False;
+    PanelMemo.Visible := False;
+    PanelMemo.OnEnter := @PanelMemoEnter; // Event Enter
+    PanelMemo.OnUTF8KeyPress := @PanelMemoUTF8KeyPress; // Event UTF8KeyPress
+    Memo := TMemo.Create(Self);
+    Memo.Parent := PanelMemo;
+    Memo.Align := alClient;
+    if (Grid.IsCellSelected[aCol, aRow]) and ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) then
+    begin
+      Memo.Color := clHighlight;
+      Memo.Font.Color := clWhite;
+    end
+    else
+    begin
+      Memo.Color := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);
+    end;
+    Memo.Font.Name := Grid.Font.Name;
+    Memo.Font.Size := Grid.Font.Size;
+    Memo.Font.Bold := Grid.Cells[COL_STAR, aRow] = '1';
+    Memo.HideSelection := False;
+    Memo.BorderStyle := bsNone;
+    Memo.ScrollBars := ssNone;
+    Memo.TabStop := False;
+    Memo.WantTabs := True;
+    Memo.WordWrap := (FWordWrap) and (aCol <> COL_AMOUNT);
+    Memo.WantReturns := aCol in [COL_TASK, COL_NOTE];
+    if (FBiDiRightToLeft) then
+    begin
+      if aCol = COL_AMOUNT then
+      begin
+        Memo.ParentBiDiMode := False;
+        Memo.BiDiMode := bdLeftToRight;
+        Memo.Alignment := taRightJustify;
+      end
+      else
+        Memo.BiDiMode := bdRightToLeft;
+    end
+    else
+    begin
+      if aCol = COL_AMOUNT then
+      begin
+        Memo.ParentBiDiMode := False;
+        Memo.BiDiMode := bdLeftToRight;
+        Memo.Alignment := taRightJustify;
+      end
+      else
+        Memo.BiDiMode := bdLeftToRight;
+    end;
+    EditControlSetBounds(PanelMemo, aCol, aRow);
+    Memo.PopupMenu := PopupMemo;
+    Memo.OnEnter := @MemoEnter; // Event Enter
+    Memo.OnExit := @MemoExit; // Event Exit
+    Memo.OnChange := @MemoChange; // Event Change
+    Memo.OnKeyDown := @MemoKeyDown; // Event KeyDown
+    Memo.OnMouseDown := @MemoNoteMouseDown; // Event MouseDown
+    Memo.OnDblClick := @MemoNoteDblClick; // Event MouseDown
+    Memo.OnKeyUp := @MemoNoteKeyUp; // Event KeyUp
+    Memo.OnMouseUp := @MemoNoteMouseUp; // Event MouseUp
+    if (aCol = COL_AMOUNT) then
+      Memo.OnKeyPress := @MemoKeyPress; // Event KeyPress for amount column only
+    Memo.Text := Grid.Cells[aCol, aRow];
+    Memo.SelStart := Length(Memo.Text);
+    Memo.SelLength := 0;
+    MemoBackup;
+
+    Editor := PanelMemo;
+
+    if (FIsSelecting) or (Grid.Selection.Height > 0) or (Grid.Selection.Width > 0) then
+    begin
+      PanelMemo.Visible := False;
+      FIsSelecting := False;
+      FIsEditing := False;
+    end
+    else
+    begin
+      PanelMemo.Visible := True;
+      FIsEditing := True;
+      FMemoStartEdit := True;
+    end;
+  end
+  else
+  if (aCol = COL_DATE) then
+  begin
+    DatePicker := TDateTimePicker.Create(Self);
+    DatePicker.Visible := False;
+    DatePicker.AutoSize := False;
+    DatePicker.BorderStyle := bsNone;
+    DatePicker.ArrowShape := asModernLarger;
+    DatePicker.Options := [dtpoFlatButton];
+    if (FShowTime) then
+      DatePicker.Kind := dtkDateTime
+    else
+      DatePicker.Kind := dtkDate;
+    DatePicker.TimeDisplay := tdHMS;
+    DatePicker.ParentBiDiMode := False;
+    DatePicker.BiDiMode := bdLeftToRight;
+
+    EditControlSetBounds(DatePicker, aCol, aRow, 2, -2, -2, 0);
+
+    if (Grid.Cells[aCol, aRow] = string.Empty) then
+      DatePicker.DateTime := Now
+    else
+    begin
+      TryStrToDateTime(Grid.Cells[aCol, aRow], sDateTime);
+      DatePicker.DateTime := sDateTime;
+    end;
+
+    DatePicker.OnChange := @DatePickerChange; // Event Change
+    DatePicker.OnEnter := @DatePickerEnter; // Event Enter
+    DatePicker.OnKeyDown := @DatePickerKeyDown; // Event KeyDown
+
+    Editor := DatePicker;
+
+    Application.QueueAsyncCall(@FixDatePickerFont, 0);
+
+    if (FIsSelecting) or (Grid.Selection.Height > 0) or (Grid.Selection.Width > 0) then
+    begin
+      DatePicker.Visible := False;
+      FIsSelecting := False;
+      FIsEditing := False;
+    end
+    else
+    begin
+      DatePicker.Visible := True;
+      FIsEditing := True;
+    end;
+  end;
+end;
+
+procedure TformNotetask.GridTopLeftChanged(Sender: TObject);
+begin
+  EditComplete;
+
+  if Grid.TopRow = 1 then
+    Application.QueueAsyncCall(@DelayedInvalidate, 0);
+
+  if Grid.TopRow + Grid.VisibleRowCount >= Grid.RowCount then
+    Application.QueueAsyncCall(@DelayedInvalidate, 0);
+end;
+
+procedure TformNotetask.GridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer;
+  const CheckedState: TCheckboxState; var ABitmap: TBitmap);
+begin
+  // Check if we're in the correct column
+  if aCol = COL_DONE then
+  begin
+    // Assign the appropriate bitmap based on the CheckedState
+    if CheckedState = cbChecked then
+      ABitmap := ResourceBitmapCheck // Use check bitmap
+    else
+      ABitmap := ResourceBitmapUncheck; // Use uncheck bitmap
+  end
+  else
+  if aCol = COL_STAR then
+  begin
+    // Assign the appropriate bitmap based on the CheckedState
+    if CheckedState = cbChecked then
+      ABitmap := ResourceBitmapStarGold // Use check bitmap
+    else
+      ABitmap := ResourceBitmapStarGray; // Use uncheck bitmap
+  end;
+end;
+
+procedure TformNotetask.GridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+begin
+  if (not IsColumn) then
+  begin
+    Tasks.MoveTask(sIndex, tIndex);
+    FillGrid;
+    SetChanged;
+  end;
+end;
+
+procedure TformNotetask.GridSelection(Sender: TObject; aCol, aRow: integer);
+var
+  Modified: boolean = False;
+begin
+  if (Grid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
+    SetInfo;
+
+  FLastText := string.Empty;
+  AdjustMultiButton;
+
+  if (aRow <> FLastRow) or (Grid.Selection.Top <> FLastSelection.Top) or (Grid.Selection.Bottom <> FLastSelection.Bottom) then
+  begin
+    FLastRow := aRow;
+    Modified := True;
+    SetNote;
+    SetTags;
+  end;
+
+  if (aCol <> FLastCol) or (Grid.Selection.Left <> FLastSelection.Left) or (Grid.Selection.Right <> FLastSelection.Right) then
+  begin
+    FLastCol := aCol;
+    Modified := True;
+  end;
+  if Modified then
+    ChangeLastText(Grid.Cells[aCol, aRow], aCol, aRow);
+
+  // Save row to mem
+  if Length(FLastRowMem) > FindGroupRealIndex(TabsGroup.TabIndex) then
+    FLastRowMem[FindGroupRealIndex(TabsGroup.TabIndex)] := aRow;
+
+  FLastSelectionHeight := Grid.Selection.Height;
+  FLastSelection := Grid.Selection;
+end;
+
+{%EndRegion}
+
+{%Region -fold All Events}
+
+procedure TformNotetask.btnMultiClick(Sender: TObject);
+begin
+  if btnMulti.ImageIndex in [0, 1] then aInsertTask.Execute
+  else
+  if btnMulti.ImageIndex in [2, 3] then aDuplicateTasks.Execute;
+end;
+
+procedure TformNotetask.FilterBoxChange(Sender: TObject);
+var
+  LastTask, LastTab: integer;
+  LastSelTop, LastSelBottom: integer;
+  LastRect, NewRect: TGridRect;
+begin
+  if FLastFilter = FilterBox.Text then Exit;
+  FLastFilter := FilterBox.Text;
+
+  LastTask := Tasks.Map(Grid.Row);
+  LastTab := FindGroupRealIndex(TabsGroup.TabIndex);
+  LastSelTop := Tasks.Map(Grid.Selection.Top);
+  LastSelBottom := Tasks.Map(Grid.Selection.Bottom);
+  LastRect := Grid.Selection;
+
+  if (Trim(FilterBox.Text) <> string.Empty) and (FLastTabFilter < 0) then
+  begin
+    FLastTabFilter := LastTab;
+  end;
+  SetTabs;
+  FillGrid;
+
+  if (LastTab = FindGroupRealIndex(TabsGroup.TabIndex)) then
+    Grid.Row := Tasks.ReverseMap(LastTask);
+
+  if Trim(FilterBox.Text) = string.Empty then
+    FLastTabFilter := -1;
+
+  NewRect := Rect(LastRect.Left, Tasks.ReverseMap(LastSelTop), LastRect.Right, Tasks.ReverseMap(LastSelBottom));
+  if (LastRect.Height = NewRect.Height) then
+    Grid.Selection := NewRect
+  else
+    Grid.ClearSelections;
+  CalcRowHeight;
+  ChangeLastText;
+  SetInfo;
+  SetNote;
+  SetTags;
+end;
+
+procedure TformNotetask.FilterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  SelStart, SelLen: integer;
+  ClipText: string;
+begin
+  SelStart := FilterBox.SelStart;
+  SelLen := FilterBox.SelLength;
+
+  case Key of
+    VK_DELETE: // Delete
+    begin
+      if SelLen > 0 then
+        FilterBox.Text := string(Copy(unicodestring(FilterBox.Text), 1, SelStart) +
+          Copy(unicodestring(FilterBox.Text), SelStart + SelLen + 1, MaxInt))
+      else
+        FilterBox.Text := string(Copy(unicodestring(FilterBox.Text), 1, SelStart) +
+          Copy(unicodestring(FilterBox.Text), SelStart + 2, MaxInt));
+      FilterBox.SelStart := SelStart;
+      Key := 0;
+    end;
+
+    Ord('A'): if ssCtrl in Shift then // Ctrl + A
+      begin
+        FilterBox.SelectAll;
+        Key := 0;
+      end;
+
+    Ord('C'): if ssCtrl in Shift then // Ctrl + C
+      begin
+        if SelLen > 0 then
+        begin
+          ClipText := string(Copy(unicodestring(FilterBox.Text), SelStart + 1, SelLen));
+          Clipboard.AsText := ClipText;
+        end;
+        Key := 0;
+      end;
+
+    Ord('X'): if ssCtrl in Shift then // Ctrl + X
+      begin
+        if SelLen > 0 then
+        begin
+          ClipText := string(Copy(unicodestring(FilterBox.Text), SelStart + 1, SelLen));
+          Clipboard.AsText := ClipText;
+          FilterBox.Text := string(Copy(unicodestring(FilterBox.Text), 1, SelStart) +
+            Copy(unicodestring(FilterBox.Text), SelStart + SelLen + 1, MaxInt));
+        end;
+        Key := 0;
+      end;
+
+    Ord('V'): if ssCtrl in Shift then // Ctrl + V
+      begin
+        ClipText := Clipboard.AsText;
+        FilterBox.Text := string(Copy(unicodestring(FilterBox.Text), 1, SelStart) + unicodestring(ClipText) +
+          Copy(unicodestring(FilterBox.Text), SelStart + SelLen + 1, MaxInt));
+        FilterBox.SelStart := SelStart + Length(unicodestring(ClipText));
+        Key := 0;
+      end;
+
+    VK_UP, VK_DOWN:
+      if (((FilterBox.GetTextLen > 0) and (FilterBox.SelLength = 0)) or (FilterBox.Items.Count = 0)) and
+        (Visible and Grid.Visible and Grid.CanFocus) then
+      begin
+        Grid.SetFocus;
+        Key := 0;
+      end;
+    VK_ESCAPE:
+      if Visible and Grid.Visible and Grid.CanFocus then
+        Grid.SetFocus;
+    else
+  end;
+  FilterBox.OnChange(Self);
+end;
+
+procedure TformNotetask.filterClearClick(Sender: TObject);
+begin
+  FilterBox.Text := string.Empty;
+  FilterBox.OnChange(Self);
+  if Visible and Grid.Visible and Grid.CanFocus then
+    Grid.SetFocus;
+end;
+
+procedure TformNotetask.SplitFilterChangeBounds(Sender: TObject);
+begin
+  UpdateComboRegion(FilterBox);
+end;
+
+procedure TformNotetask.statusBarContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
+var
+  i, PosX: integer;
+begin
+  // If menuZoomIn called by keyboard MousePos is invalid
+  if (MousePos.X < 0) or (MousePos.Y < 0) then
+  begin
+    Handled := True;
+    exit;
+  end;
+
+  FStatusPanelIndex := -1;
+  PosX := 0;
+  for i := 0 to statusBar.Panels.Count - 1 do
+  begin
+    Inc(PosX, statusBar.Panels[i].Width);
+    if (MousePos.X < PosX) or (i = statusBar.Panels.Count - 1) then
+    begin
+      FStatusPanelIndex := i;
+      Break;
+    end;
+  end;
+
+  if (FStatusPanelIndex > 2) and (FStatusPanelIndex < statusBar.Panels.Count) then
+    PopupStatusbar.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
+  else
+  if (FStatusPanelIndex = 0) then
+    PopupZoom.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
+  else
+  if (FStatusPanelIndex = 1) and (not FReadOnly) then
+    PopupEncoding.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
+  else
+  if (FStatusPanelIndex = 2) and (not FReadOnly) then
+    PopupLineEnding.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y);
+end;
+
+{%EndRegion}
+
+{%Region -fold Private Setters}
+
+procedure TformNotetask.SetReadOnly(Value: boolean);
+begin
+  FReadOnly := Value;
+  aUndo.Enabled := not Value;
+  aUndoAll.Enabled := not Value;
+  aCut.Enabled := not Value;
+  aPaste.Enabled := not Value;
+  aDelete.Enabled := not Value;
+  aReplace.Enabled := not Value;
+  aDateTime.Enabled := not Value;
+  aInsertGroup.Enabled := not Value;
+  aRenameGroup.Enabled := not Value;
+  aEditGroupTooltip.Enabled := not Value;
+  aDuplicateGroup.Enabled := not Value;
+  aDeleteGroup.Enabled := not Value;
+  aMoveGroupLeft.Enabled := not Value;
+  aMoveGroupRight.Enabled := not Value;
+  aMoveTaskLeft.Enabled := not Value;
+  aMoveTaskRight.Enabled := not Value;
+  aInsertTask.Enabled := not Value;
+  aMergeTasks.Enabled := not Value;
+  aSplitTasks.Enabled := not Value;
+  aDuplicateTasks.Enabled := not Value;
+  aDeleteTasks.Enabled := not Value;
+  aArchiveTasks.Enabled := not Value;
+  aMoveTaskTop.Enabled := not Value;
+  aMoveTaskUp.Enabled := not Value;
+  aMoveTaskDown.Enabled := not Value;
+  aMoveTaskBottom.Enabled := not Value;
+  aIndentTasks.Enabled := not Value;
+  aOutdentTasks.Enabled := not Value;
+  contextDeleteTags.Enabled := not Value;
+end;
+
+procedure TformNotetask.SetZoom(Value: float);
+
+  function SameFloat(A, B: double; Eps: double): boolean;
+  begin
+    // Compare floats with epsilon
+    Result := Abs(A - B) < Eps;
+  end;
+
+begin
+  FZoom := Value;
+  Grid.Font.Assign(Font);
+  Grid.Font.Size := Round(Max(1, FOriginalFontSize * FZoom));
+  MemoNote.Font.Assign(Font);
+  MemoNote.Font.Size := Grid.Font.Size;
+  if Assigned(Memo) then
+  begin
+    Memo.Font.Assign(Font);
+    Memo.Font.Size := Grid.Font.Size;
+  end;
+  if Assigned(DatePicker) then
+  begin
+    DatePicker.Font.Assign(Font);
+    DatePicker.Font.Size := Grid.Font.Size;
+  end;
+
+  contextZoom50.Checked := SameFloat(FZoom, 0.5, 0.001);
+  contextZoom60.Checked := SameFloat(FZoom, 0.6, 0.001);
+  contextZoom70.Checked := SameFloat(FZoom, 0.7, 0.001);
+  contextZoom80.Checked := SameFloat(FZoom, 0.8, 0.001);
+  contextZoom90.Checked := SameFloat(FZoom, 0.9, 0.001);
+  contextZoom100.Checked := SameFloat(FZoom, 1.0, 0.001);
+  contextZoom110.Checked := SameFloat(FZoom, 1.1, 0.001);
+  contextZoom120.Checked := SameFloat(FZoom, 1.2, 0.001);
+  contextZoom130.Checked := SameFloat(FZoom, 1.3, 0.001);
+  contextZoom140.Checked := SameFloat(FZoom, 1.4, 0.001);
+  contextZoom150.Checked := SameFloat(FZoom, 1.5, 0.001);
+
+  CalcRowHeight(True);
+  SetInfo;
+end;
+
+procedure TformNotetask.SetBiDiRightToLeft(Value: boolean);
+var
+  i: integer;
+begin
+  FBiDiRightToLeft := Value;
+
+  if (Value) then
+  begin
+    Grid.BiDiMode := bdRightToLeft;
+    TabsGroup.BiDiMode := bdRightToLeft;
+    for i := 1 to Grid.Columns.Count - 2 do
+    begin
+      if (i in [COL_AMOUNT - 1]) then
+        Grid.Columns[i].Alignment := taLeftJustify
+      else
+        Grid.Columns[i].Alignment := taRightJustify;
+    end;
+    FilterBox.BiDiMode := bdRightToLeft;
+    MemoNote.BiDiMode := bdRightToLeft;
+    MemoNote.Alignment := taRightJustify;
+    MemoNote.BorderSpacing.Left := 0;
+    MemoNote.BorderSpacing.Right := 10;
+    TagEdit.BiDiMode := bdRightToLeft;
+    TOS.SetCursorTo(panelNote, 'RIGHTARROW');
+  end
+  else
+  begin
+    Grid.BiDiMode := bdLeftToRight;
+    TabsGroup.BiDiMode := bdLeftToRight;
+    FilterBox.BiDiMode := bdLeftToRight;
+    MemoNote.BiDiMode := bdLeftToRight;
+    MemoNote.Alignment := taLeftJustify;
+    MemoNote.BorderSpacing.Left := 10;
+    MemoNote.BorderSpacing.Right := 0;
+    MemoNote.BiDiMode := bdLeftToRight;
+    TagEdit.BiDiMode := bdLeftToRight;
+    TOS.SetCursorTo(panelNote, 'LEFTARROW');
+    for i := 1 to Grid.Columns.Count - 2 do
+    begin
+      if (i = COL_AMOUNT - 1) then
+        Grid.Columns[i].Alignment := taRightJustify
+      else
+        Grid.Columns[i].Alignment := taLeftJustify;
+    end;
+  end;
+  GridResize(Self);
+end;
+
+procedure TformNotetask.SetShowStatusBar(Value: boolean);
+begin
+  FShowStatusBar := Value;
+
+  aShowStatusBar.Checked := FShowStatusBar;
+  StatusBar.Visible := FShowStatusBar;
+end;
+
+procedure TformNotetask.SetShowDuration(Value: boolean);
+begin
+  FShowDuration := Value;
+
+  CalcDefaultColWidth;
+  FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.SetShowTime(Value: boolean);
+begin
+  aShowTime.Checked := Value;
+  FShowTime := Value;
+end;
+
+procedure TformNotetask.SetShowTags(Value: boolean);
+begin
+  FShowTags := Value;
+
+  aShowTags.Checked := FShowTags;
+  PanelTags.Visible := FShowTags;
+  SplitTags.Visible := FShowTags;
+
+  AlignBottomControls;
+
+  if Visible and PanelTags.Visible and TagEdit.CanFocus then
+    TagEdit.SetFocus;
+
+  SetTags;
+end;
+
+procedure TformNotetask.SetShowNote(Value: boolean);
+begin
+  FShowNote := Value;
+
+  aShowNote.Checked := FShowNote;
+  panelNote.Visible := FShowNote;
+  Splitter.Visible := FShowNote;
+
+  AlignBottomControls;
+
+  if Visible and panelNote.Visible and MemoNote.CanFocus then
+    MemoNote.SetFocus;
+
+  SetNote;
+end;
+
+procedure TformNotetask.SetHideNoteText(Value: boolean);
+begin
+  aHideNoteText.Checked := Value;
+  FHideNoteText := Value;
+end;
+
+procedure TformNotetask.SetShowArchived(Value: boolean);
+var
+  LastTask: integer;
+  LastTab: integer;
+begin
+  LastTask := Tasks.Map(Grid.Row);
+  LastTab := FindGroupRealIndex(TabsGroup.TabIndex);
+  FShowArchived := Value;
+  aShowArchived.Checked := FShowArchived;
+  SetTabs;
+  FillGrid;
+  if (LastTab = FindGroupRealIndex(TabsGroup.TabIndex)) then
+    Grid.Row := Tasks.ReverseMap(LastTask);
+  ResetRowHeight;
+  SetInfo;
+  SetNote;
+  SetTags;
+end;
+
+procedure TformNotetask.SetShowColumnDone(Value: boolean);
+begin
+  FShowColumnDone := Value;
+  Grid.Columns.Items[COL_DONE - 1].Visible := FShowColumnDone;
+end;
+
+procedure TformNotetask.SetShowColumnTask(Value: boolean);
+begin
+  FShowColumnTask := Value;
+  Grid.Columns.Items[COL_TASK - 1].Visible := FShowColumnTask;
+  CalcRowHeight(True);
+end;
+
+procedure TformNotetask.SetShowColumnNote(Value: boolean);
+begin
+  FShowColumnNote := Value;
+  Grid.Columns.Items[COL_NOTE - 1].Visible := FShowColumnNote;
+  CalcRowHeight(True);
+end;
+
+procedure TformNotetask.SetShowColumnAmount(Value: boolean);
+begin
+  FShowColumnAmount := Value;
+  Grid.Columns.Items[COL_AMOUNT - 1].Visible := FShowColumnAmount;
+  SetInfo;
+end;
+
+procedure TformNotetask.SetShowColumnDate(Value: boolean);
+begin
+  FShowColumnDate := Value;
+  Grid.Columns.Items[COL_DATE - 1].Visible := FShowColumnDate;
+end;
+
+procedure TformNotetask.SetShowColumnFavorite(Value: boolean);
+begin
+  FShowColumnFavorite := Value;
+  Grid.Columns.Items[COL_STAR - 1].Visible := FShowColumnFavorite;
+end;
+
+{%EndRegion}
+
+{%Region -fild Private Methods}
 
 procedure TformNotetask.DrawHighlightedText(aCanvas: TCanvas; const aText, aFilterText: string; aRect: TRect;
   aColor: TColor; aCol: integer);
@@ -2318,163 +5666,6 @@ begin
   end;
 end;
 
-procedure TformNotetask.taskGridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
-var
-  sDateTime: TDateTime;
-begin
-  if FReadOnly then
-  begin
-    Editor := nil;  // disable editor — grid stays view-only
-    exit;
-  end;
-
-  if (aCol in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
-  begin
-    PanelMemo := TPanel.Create(Self);
-    PanelMemo.Parent := taskGrid;
-    PanelMemo.BorderStyle := bsNone;
-    PanelMemo.Caption := string.Empty;
-    PanelMemo.BevelOuter := bvNone;
-    PanelMemo.TabStop := False;
-    PanelMemo.Visible := False;
-    PanelMemo.OnEnter := @PanelMemoEnter; // Event Enter
-    PanelMemo.OnUTF8KeyPress := @PanelMemoUTF8KeyPress; // Event UTF8KeyPress
-    Memo := TMemo.Create(Self);
-    Memo.Parent := PanelMemo;
-    Memo.Align := alClient;
-    if (taskGrid.IsCellSelected[aCol, aRow]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
-    begin
-      Memo.Color := clHighlight;
-      Memo.Font.Color := clWhite;
-    end
-    else
-    begin
-      Memo.Color := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);
-    end;
-    Memo.Font.Name := taskGrid.Font.Name;
-    Memo.Font.Size := taskGrid.Font.Size;
-    Memo.Font.Bold := taskGrid.Cells[COL_STAR, aRow] = '1';
-    Memo.HideSelection := False;
-    Memo.BorderStyle := bsNone;
-    Memo.ScrollBars := ssNone;
-    Memo.TabStop := False;
-    Memo.WantTabs := True;
-    Memo.WordWrap := (FWordWrap) and (aCol <> COL_AMOUNT);
-    Memo.WantReturns := aCol in [COL_TASK, COL_NOTE];
-    if (FBiDiRightToLeft) then
-    begin
-      if aCol = COL_AMOUNT then
-      begin
-        Memo.ParentBiDiMode := False;
-        Memo.BiDiMode := bdLeftToRight;
-        Memo.Alignment := taRightJustify;
-      end
-      else
-        Memo.BiDiMode := bdRightToLeft;
-    end
-    else
-    begin
-      if aCol = COL_AMOUNT then
-      begin
-        Memo.ParentBiDiMode := False;
-        Memo.BiDiMode := bdLeftToRight;
-        Memo.Alignment := taRightJustify;
-      end
-      else
-        Memo.BiDiMode := bdLeftToRight;
-    end;
-    EditControlSetBounds(PanelMemo, aCol, aRow);
-    Memo.PopupMenu := PopupMemo;
-    Memo.OnEnter := @MemoEnter; // Event Enter
-    Memo.OnExit := @MemoExit; // Event Exit
-    Memo.OnChange := @MemoChange; // Event Change
-    Memo.OnKeyDown := @MemoKeyDown; // Event KeyDown
-    Memo.OnMouseDown := @MemoNoteMouseDown; // Event MouseDown
-    Memo.OnDblClick := @MemoNoteDblClick; // Event MouseDown
-    Memo.OnKeyUp := @MemoNoteKeyUp; // Event KeyUp
-    Memo.OnMouseUp := @MemoNoteMouseUp; // Event MouseUp
-    if (aCol = COL_AMOUNT) then
-      Memo.OnKeyPress := @MemoKeyPress; // Event KeyPress for amount column only
-    Memo.Text := taskGrid.Cells[aCol, aRow];
-    Memo.SelStart := Length(Memo.Text);
-    Memo.SelLength := 0;
-    MemoBackup;
-
-    Editor := PanelMemo;
-
-    if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
-    begin
-      PanelMemo.Visible := False;
-      FIsSelecting := False;
-      FIsEditing := False;
-    end
-    else
-    begin
-      PanelMemo.Visible := True;
-      FIsEditing := True;
-      FMemoStartEdit := True;
-    end;
-  end
-  else
-  if (aCol = COL_DATE) then
-  begin
-    DatePicker := TDateTimePicker.Create(Self);
-    DatePicker.Visible := False;
-    DatePicker.AutoSize := False;
-    DatePicker.BorderStyle := bsNone;
-    DatePicker.ArrowShape := asModernLarger;
-    DatePicker.Options := [dtpoFlatButton];
-    if (FShowTime) then
-      DatePicker.Kind := dtkDateTime
-    else
-      DatePicker.Kind := dtkDate;
-    DatePicker.TimeDisplay := tdHMS;
-    DatePicker.ParentBiDiMode := False;
-    DatePicker.BiDiMode := bdLeftToRight;
-
-    EditControlSetBounds(DatePicker, aCol, aRow, 2, -2, -2, 0);
-
-    if (taskGrid.Cells[aCol, aRow] = string.Empty) then
-      DatePicker.DateTime := Now
-    else
-    begin
-      TryStrToDateTime(taskGrid.Cells[aCol, aRow], sDateTime);
-      DatePicker.DateTime := sDateTime;
-    end;
-
-    DatePicker.OnChange := @DatePickerChange; // Event Change
-    DatePicker.OnEnter := @DatePickerEnter; // Event Enter
-    DatePicker.OnKeyDown := @DatePickerKeyDown; // Event KeyDown
-
-    Editor := DatePicker;
-
-    Application.QueueAsyncCall(@FixDatePickerFont, 0);
-
-    if (FIsSelecting) or (taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0) then
-    begin
-      DatePicker.Visible := False;
-      FIsSelecting := False;
-      FIsEditing := False;
-    end
-    else
-    begin
-      DatePicker.Visible := True;
-      FIsEditing := True;
-    end;
-  end;
-end;
-
-procedure TformNotetask.taskGridTopLeftChanged(Sender: TObject);
-begin
-  EditComplete;
-
-  if taskGrid.TopRow = 1 then
-    Application.QueueAsyncCall(@DelayedInvalidate, 0);
-
-  if taskGrid.TopRow + taskGrid.VisibleRowCount >= taskGrid.RowCount then
-    Application.QueueAsyncCall(@DelayedInvalidate, 0);
-end;
-
 procedure TformNotetask.DelayedInvalidate(Data: PtrInt);
 begin
   Repaint;
@@ -2485,2519 +5676,10 @@ begin
   if Assigned(DatePicker) then
   begin
     DatePicker.ParentFont := False;
-    DatePicker.Font.Name := taskGrid.Font.Name;
-    DatePicker.Font.Size := taskGrid.Font.Size;
-    DatePicker.Font.Bold := taskGrid.Cells[COL_STAR, taskGrid.Row] = '1';
+    DatePicker.Font.Name := Grid.Font.Name;
+    DatePicker.Font.Size := Grid.Font.Size;
+    DatePicker.Font.Bold := Grid.Cells[COL_STAR, Grid.Row] = '1';
   end;
-end;
-
-procedure TformNotetask.taskGridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer;
-  const CheckedState: TCheckboxState; var ABitmap: TBitmap);
-begin
-  // Check if we're in the correct column
-  if aCol = COL_DONE then
-  begin
-    // Assign the appropriate bitmap based on the CheckedState
-    if CheckedState = cbChecked then
-      ABitmap := ResourceBitmapCheck // Use check bitmap
-    else
-      ABitmap := ResourceBitmapUncheck; // Use uncheck bitmap
-  end
-  else
-  if aCol = COL_STAR then
-  begin
-    // Assign the appropriate bitmap based on the CheckedState
-    if CheckedState = cbChecked then
-      ABitmap := ResourceBitmapStarGold // Use check bitmap
-    else
-      ABitmap := ResourceBitmapStarGray; // Use uncheck bitmap
-  end;
-end;
-
-procedure TformNotetask.taskGridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-begin
-  if (not IsColumn) then
-  begin
-    Tasks.MoveTask(sIndex, tIndex);
-    FillGrid;
-    SetChanged;
-  end;
-end;
-
-procedure TformNotetask.taskGridSelection(Sender: TObject; aCol, aRow: integer);
-var
-  Modified: boolean = False;
-begin
-  if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
-    SetInfo;
-
-  FLastText := string.Empty;
-  AdjustMultiButton;
-
-  if (aRow <> FLastRow) or (taskGrid.Selection.Top <> FLastSelection.Top) or (taskGrid.Selection.Bottom <> FLastSelection.Bottom) then
-  begin
-    FLastRow := aRow;
-    Modified := True;
-    SetNote;
-    SetTags;
-  end;
-
-  if (aCol <> FLastCol) or (taskGrid.Selection.Left <> FLastSelection.Left) or (taskGrid.Selection.Right <> FLastSelection.Right) then
-  begin
-    FLastCol := aCol;
-    Modified := True;
-  end;
-  if Modified then
-    ChangeLastText(taskGrid.Cells[aCol, aRow], aCol, aRow);
-
-  // Save row to mem
-  if Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex) then
-    FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)] := aRow;
-
-  FLastSelectionHeight := taskGrid.Selection.Height;
-  FLastSelection := taskGrid.Selection;
-end;
-
-procedure TformNotetask.groupTabsChange(Sender: TObject);
-begin
-  EditComplete;
-  tagsEdit.FinishEdit;
-
-  if (Length(FLastRowMem) > Tasks.SelectedGroup) then
-    FLastRowMem[Tasks.SelectedGroup] := taskGrid.Row;
-
-  if (groupTabs.TabIndex >= 0) then
-    Tasks.ChangeGroup(FindGroupRealIndex(groupTabs.TabIndex), True);
-
-  FillGrid;
-
-  if (Length(FLastRowMem) > Tasks.SelectedGroup) then
-    taskGrid.Row := FLastRowMem[Tasks.SelectedGroup]
-  else
-    taskGrid.Row := 1;
-  taskGrid.ClearSelections;
-
-  if (groupTabs.TabIndex <> FLastTabIndex) then
-  begin
-    Tasks.CreateBackup;
-    GridBackupSelection;
-  end;
-
-  FLastTabIndex := groupTabs.TabIndex;
-
-  Tasks.CalcTagsWidths(-1, taskGrid.Columns[COL_TASK - 1].Width, tagsEdit, Font);
-  ChangeLastText;
-  CalcRowHeight(True);
-  SetNote;
-  SetTags;
-  SetInfo;
-end;
-
-procedure TformNotetask.groupTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-begin
-  if (Button = mbLeft) then
-    if (groupTabs.IndexOfTabAt(X, Y) = groupTabs.TabIndex) and not ((groupTabs.TabIndex = 0) and (Tasks.GroupNames[0] = string.Empty)) then
-    begin
-      FDragTab := groupTabs.TabIndex;
-      FLastTabMouseX := 0;
-    end;
-end;
-
-procedure TformNotetask.groupTabsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
-var
-  target: integer;
-begin
-  if not (ssLeft in Shift) then
-  begin
-    groupTabsMouseLeave(Self);
-    exit;
-  end;
-
-  target := groupTabs.IndexOfTabAt(X, Y);
-  if FDragTab >= 0 then
-  begin
-    if target >= 0 then
-    begin
-      if (FLastTabMouseX <> X) and (FLastTabMouseX > 0) then  Screen.Cursor := crDrag;
-      if (target > FDragTab) and (FLastTabMouseX < X) then
-        MoveTabRight(groupTabs.TabIndex)
-      else
-      if (target < FDragTab) and (FLastTabMouseX > X) then
-        MoveTabLeft(groupTabs.TabIndex);
-    end;
-  end;
-  // Hide hint if long move
-  Application.HintPause := 100;
-  if (target <> FLastTabTarget) then
-    Application.HideHint;
-  FLastTabMouseX := X;
-  FLastTabTarget := target;
-end;
-
-procedure TformNotetask.groupTabsMouseLeave(Sender: TObject);
-begin
-  FLastTabMouseX := 0;
-  Application.HintPause := 500;
-  DisableDrag;
-end;
-
-procedure TformNotetask.groupTabsMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-var
-  TabIndex: integer;
-begin
-  FLastTabMouseX := 0;
-  DisableDrag;
-
-  if Button = mbRight then
-  begin
-    TabIndex := groupTabs.IndexOfTabAt(X, Y);
-    if TabIndex <> -1 then
-      groupTabs.TabIndex := TabIndex;
-    PopupTabs.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
-  end;
-end;
-
-procedure TformNotetask.panelNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-begin
-  if (Button = mbLeft) or (Button = mbRight) then
-  begin
-    if not memoNote.Focused then memoNote.SetFocus;
-    FNoteSelecting := True;
-    SelectMemoLine(GetLineAtPos(Y));
-
-    if (Button = mbRight) then
-      PopupMemo.PopUp;
-  end;
-end;
-
-procedure TformNotetask.panelNoteMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
-var
-  Index: integer;
-  IndexEnd: integer;
-begin
-  if (FNoteSelecting) then
-  begin
-    Index := Self.GetLineAtPos(Y);
-    IndexEnd := Self.GetLineAtEnd;
-    if (Index <> FNoteLastIndex) then
-    begin
-      if (Index >= 0) and (Index <= IndexEnd) then
-      begin
-        SelectMemoLine(Index, True);
-        FNoteLastIndex := Index;
-      end;
-
-      // Scroll
-      //if (Index < 0) then
-      //begin
-      //  {$IFDEF UNIX}
-      //  if (memoNote.VertScrollBar.Position > 0) then
-      //  begin
-      //    Application.ProcessMessages;
-      //    memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + Canvas.TextHeight('Th');
-      //  end;
-      //  {$ELSE}
-      //  if (memoNote.VertScrollBar.Position > 0) then
-      //    memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position - 1;
-      //  {$ENDIF}
-      //end
-      //else
-      //if (Index > IndexEnd) then
-      //begin
-      //  {$IFDEF UNIX}
-      //  Application.ProcessMessages;
-      //  memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + Canvas.TextHeight('Th');
-      //  {$ELSE}
-      //  memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + 1;
-      //  {$ENDIF}
-      //end;
-    end;
-  end;
-
-end;
-
-procedure TformNotetask.panelNoteMouseEnter(Sender: TObject);
-begin
-  panelNote.Color := TDarkUtils.ThemeColor(clSplitHighlight_Light, clSplitHighlight_Dark);
-end;
-
-procedure TformNotetask.panelNoteMouseLeave(Sender: TObject);
-begin
-  FNoteSelecting := False;
-  panelNote.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);
-end;
-
-procedure TformNotetask.panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-begin
-  FNoteSelecting := False;
-end;
-
-procedure TformNotetask.statusBarContextPopup(Sender: TObject; MousePos: TPoint; var Handled: boolean);
-var
-  i, PosX: integer;
-begin
-  // If menuZoomIn called by keyboard MousePos is invalid
-  if (MousePos.X < 0) or (MousePos.Y < 0) then
-  begin
-    Handled := True;
-    exit;
-  end;
-
-  FStatusPanelIndex := -1;
-  PosX := 0;
-  for i := 0 to statusBar.Panels.Count - 1 do
-  begin
-    Inc(PosX, statusBar.Panels[i].Width);
-    if (MousePos.X < PosX) or (i = statusBar.Panels.Count - 1) then
-    begin
-      FStatusPanelIndex := i;
-      Break;
-    end;
-  end;
-
-  if (FStatusPanelIndex > 2) and (FStatusPanelIndex < statusBar.Panels.Count) then
-    PopupStatusbar.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
-  else
-  if (FStatusPanelIndex = 0) then
-    PopupZoom.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
-  else
-  if (FStatusPanelIndex = 1) and (not FReadOnly) then
-    PopupEncoding.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y)
-  else
-  if (FStatusPanelIndex = 2) and (not FReadOnly) then
-    PopupLineEnding.PopUp(statusBar.ClientToScreen(MousePos).X, statusBar.ClientToScreen(MousePos).Y);
-end;
-
-procedure TformNotetask.filterBoxChange(Sender: TObject);
-var
-  LastTask, LastTab: integer;
-  LastSelTop, LastSelBottom: integer;
-  LastRect, NewRect: TGridRect;
-begin
-  if FLastFilter = filterBox.Text then Exit;
-  FLastFilter := filterBox.Text;
-
-  LastTask := Tasks.Map(taskGrid.Row);
-  LastTab := FindGroupRealIndex(groupTabs.TabIndex);
-  LastSelTop := Tasks.Map(taskGrid.Selection.Top);
-  LastSelBottom := Tasks.Map(taskGrid.Selection.Bottom);
-  LastRect := taskGrid.Selection;
-
-  if (Trim(filterBox.Text) <> string.Empty) and (FLastTabFilter < 0) then
-  begin
-    FLastTabFilter := LastTab;
-  end;
-  SetTabs;
-  FillGrid;
-
-  if (LastTab = FindGroupRealIndex(groupTabs.TabIndex)) then
-    taskGrid.Row := Tasks.ReverseMap(LastTask);
-
-  if Trim(filterBox.Text) = string.Empty then
-    FLastTabFilter := -1;
-
-  NewRect := Rect(LastRect.Left, Tasks.ReverseMap(LastSelTop), LastRect.Right, Tasks.ReverseMap(LastSelBottom));
-  if (LastRect.Height = NewRect.Height) then
-    taskGrid.Selection := NewRect
-  else
-    taskGrid.ClearSelections;
-  CalcRowHeight;
-  ChangeLastText;
-  SetInfo;
-  SetNote;
-  SetTags;
-end;
-
-procedure TformNotetask.filterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-var
-  SelStart, SelLen: integer;
-  ClipText: string;
-begin
-  SelStart := filterBox.SelStart;
-  SelLen := filterBox.SelLength;
-
-  case Key of
-    VK_DELETE: // Delete
-    begin
-      if SelLen > 0 then
-        filterBox.Text := string(Copy(unicodestring(filterBox.Text), 1, SelStart) +
-          Copy(unicodestring(filterBox.Text), SelStart + SelLen + 1, MaxInt))
-      else
-        filterBox.Text := string(Copy(unicodestring(filterBox.Text), 1, SelStart) +
-          Copy(unicodestring(filterBox.Text), SelStart + 2, MaxInt));
-      filterBox.SelStart := SelStart;
-      Key := 0;
-    end;
-
-    Ord('A'): if ssCtrl in Shift then // Ctrl + A
-      begin
-        filterBox.SelectAll;
-        Key := 0;
-      end;
-
-    Ord('C'): if ssCtrl in Shift then // Ctrl + C
-      begin
-        if SelLen > 0 then
-        begin
-          ClipText := string(Copy(unicodestring(filterBox.Text), SelStart + 1, SelLen));
-          Clipboard.AsText := ClipText;
-        end;
-        Key := 0;
-      end;
-
-    Ord('X'): if ssCtrl in Shift then // Ctrl + X
-      begin
-        if SelLen > 0 then
-        begin
-          ClipText := string(Copy(unicodestring(filterBox.Text), SelStart + 1, SelLen));
-          Clipboard.AsText := ClipText;
-          filterBox.Text := string(Copy(unicodestring(filterBox.Text), 1, SelStart) +
-            Copy(unicodestring(filterBox.Text), SelStart + SelLen + 1, MaxInt));
-        end;
-        Key := 0;
-      end;
-
-    Ord('V'): if ssCtrl in Shift then // Ctrl + V
-      begin
-        ClipText := Clipboard.AsText;
-        filterBox.Text := string(Copy(unicodestring(filterBox.Text), 1, SelStart) + unicodestring(ClipText) +
-          Copy(unicodestring(filterBox.Text), SelStart + SelLen + 1, MaxInt));
-        filterBox.SelStart := SelStart + Length(unicodestring(ClipText));
-        Key := 0;
-      end;
-
-    VK_UP, VK_DOWN:
-      if (((filterBox.GetTextLen > 0) and (filterBox.SelLength = 0)) or (filterBox.Items.Count = 0)) and
-        (Visible and taskGrid.Visible and taskGrid.CanFocus) then
-      begin
-        taskGrid.SetFocus;
-        Key := 0;
-      end;
-    VK_ESCAPE:
-      if Visible and taskGrid.Visible and taskGrid.CanFocus then
-        taskGrid.SetFocus;
-    else
-  end;
-  filterBox.OnChange(Self);
-end;
-
-procedure TformNotetask.filterClearClick(Sender: TObject);
-begin
-  filterBox.Text := string.Empty;
-  filterBox.OnChange(Self);
-  if Visible and taskGrid.Visible and taskGrid.CanFocus then
-    taskGrid.SetFocus;
-end;
-
-procedure TformNotetask.SplitFilterChangeBounds(Sender: TObject);
-begin
-  UpdateComboRegion(filterBox);
-end;
-
-procedure TformNotetask.contextCopyStatusbarClick(Sender: TObject);
-var
-  PanelText: string;
-begin
-  if (FStatusPanelIndex >= 0) and (FStatusPanelIndex < statusBar.Panels.Count) then
-  begin
-    PanelText := statusBar.Panels[FStatusPanelIndex].Text;
-    if PanelText <> string.Empty then
-      Clipboard.AsText := PanelText;
-  end;
-end;
-
-procedure TformNotetask.contextCopyTagsClick(Sender: TObject);
-begin
-  if tagsEdit.SelectedTags.Count > 0 then
-    Clipboard.AsText := tagsEdit.SelectedTags.DelimitedText
-  else
-  if tagsEdit.HoveredTag <> string.Empty then
-    Clipboard.AsText := tagsEdit.HoveredTag;
-end;
-
-procedure TformNotetask.contextDeleteTagsClick(Sender: TObject);
-begin
-  if tagsEdit.SelectedTags.Count > 0 then
-    tagsEdit.RemoveSelectedTags
-  else
-  if tagsEdit.HoveredTag <> string.Empty then
-    tagsEdit.RemoveTag(tagsEdit.HoveredTag, True);
-end;
-
-procedure TformNotetask.contextColorClick(Sender: TObject);
-var
-  HoverTag: string;
-  HoverIndex: integer;
-begin
-  HoverTag := LowerCase(tagsEdit.HoveredTag).SubStringBeforeColon;
-  HoverIndex := tagsEdit.TagColors.IndexOf(HoverTag);
-
-  if HoverIndex >= 0 then
-    colorDialog.Color := tagsEdit.TagColors.Items[HoverIndex].Color
-  else
-    colorDialog.Color := tagsEdit.GetAutoColor(HoverTag);
-
-  if (colorDialog.Execute) then
-  begin
-    if HoverIndex >= 0 then
-      tagsEdit.TagColors.Items[HoverIndex].Color := colorDialog.Color
-    else
-      tagsEdit.TagColors.Add(HoverTag, colorDialog.Color);
-    tagsEdit.Invalidate;
-    GridInvalidate;
-  end;
-end;
-
-procedure TformNotetask.contextResetColorClick(Sender: TObject);
-var
-  HoverTag: string;
-  HoverIndex: integer;
-begin
-  HoverTag := LowerCase(tagsEdit.HoveredTag).SubStringBeforeColon;
-  HoverIndex := tagsEdit.TagColors.IndexOf(HoverTag);
-
-  if HoverIndex >= 0 then
-  begin
-    tagsEdit.TagColors.Delete(HoverIndex);
-
-    tagsEdit.Invalidate;
-    GridInvalidate;
-  end;
-end;
-
-procedure TformNotetask.contextZoom50Click(Sender: TObject);
-begin
-  SetZoom(0.5);
-end;
-
-procedure TformNotetask.contextZoom60Click(Sender: TObject);
-begin
-  SetZoom(0.6);
-end;
-
-procedure TformNotetask.contextZoom70Click(Sender: TObject);
-begin
-  SetZoom(0.7);
-end;
-
-procedure TformNotetask.contextZoom80Click(Sender: TObject);
-begin
-  SetZoom(0.8);
-end;
-
-procedure TformNotetask.contextZoom90Click(Sender: TObject);
-begin
-  SetZoom(0.9);
-end;
-
-procedure TformNotetask.contextZoom100Click(Sender: TObject);
-begin
-  SetZoom(1.0);
-end;
-
-procedure TformNotetask.contextZoom110Click(Sender: TObject);
-begin
-  SetZoom(1.1);
-end;
-
-procedure TformNotetask.contextZoom120Click(Sender: TObject);
-begin
-  SetZoom(1.2);
-end;
-
-procedure TformNotetask.contextZoom130Click(Sender: TObject);
-begin
-  SetZoom(1.3);
-end;
-
-procedure TformNotetask.contextZoom140Click(Sender: TObject);
-begin
-  SetZoom(1.4);
-end;
-
-procedure TformNotetask.contextZoom150Click(Sender: TObject);
-begin
-  SetZoom(1.5);
-end;
-
-procedure TformNotetask.contextWindowsCRLFClick(Sender: TObject);
-begin
-  FLineEnding := TLineEnding.WindowsCRLF;
-  if (contextWindowsCRLF.Checked = False) then
-  begin
-    contextWindowsCRLF.Checked := True;
-    SetInfo;
-    SetChanged;
-  end;
-end;
-
-procedure TformNotetask.contextUnixLFClick(Sender: TObject);
-begin
-  FLineEnding := TLineEnding.UnixLF;
-  if (contextUnixLF.Checked = False) then
-  begin
-    contextUnixLF.Checked := True;
-    SetInfo;
-    SetChanged;
-  end;
-end;
-
-procedure TformNotetask.contextMacintoshCRClick(Sender: TObject);
-begin
-  FLineEnding := TLineEnding.MacintoshCR;
-  if (contextMacintoshCR.Checked = False) then
-  begin
-    contextMacintoshCR.Checked := True;
-    SetInfo;
-    SetChanged;
-  end;
-end;
-
-procedure TformNotetask.contextANSIClick(Sender: TObject);
-begin
-  FEncoding := TEncoding.ANSI;
-  if (contextANSI.Checked = False) then
-  begin
-    contextANSI.Checked := True;
-    SetInfo;
-    SetChanged;
-  end;
-end;
-
-procedure TformNotetask.contextASCIIClick(Sender: TObject);
-begin
-  FEncoding := TEncoding.ASCII;
-  if (contextASCII.Checked = False) then
-  begin
-    contextASCII.Checked := True;
-    SetInfo;
-    SetChanged;
-  end;
-end;
-
-procedure TformNotetask.contextUTF8Click(Sender: TObject);
-begin
-  FEncoding := TEncoding.UTF8;
-  if (contextUTF8.Checked = False) then
-  begin
-    contextUTF8.Checked := True;
-    SetInfo;
-    SetChanged;
-  end;
-end;
-
-procedure TformNotetask.contextUTF8BOMClick(Sender: TObject);
-begin
-  FEncoding := UTF8BOMEncoding;
-  if (contextUTF8BOM.Checked = False) then
-  begin
-    contextUTF8BOM.Checked := True;
-    SetInfo;
-    SetChanged;
-  end;
-end;
-
-procedure TformNotetask.contextUTF16BEBOMClick(Sender: TObject);
-begin
-  FEncoding := UTF16BEBOMEncoding;
-  if (contextUTF16BEBOM.Checked = False) then
-  begin
-    contextUTF16BEBOM.Checked := True;
-    SetInfo;
-    SetChanged;
-  end;
-end;
-
-procedure TformNotetask.contextUTF16LEBOMClick(Sender: TObject);
-begin
-  FEncoding := UTF16LEBOMEncoding;
-  if (contextUTF16LEBOM.Checked = False) then
-  begin
-    contextUTF16LEBOM.Checked := True;
-    SetInfo;
-    SetChanged;
-  end;
-end;
-
-procedure TformNotetask.btnMultiClick(Sender: TObject);
-begin
-  if btnMulti.ImageIndex in [0, 1] then aInsertTask.Execute
-  else
-  if btnMulti.ImageIndex in [2, 3] then aDuplicateTasks.Execute;
-end;
-
-procedure TformNotetask.aNewExecute(Sender: TObject);
-begin
-  NewFile;
-end;
-
-procedure TformNotetask.aNewWindowExecute(Sender: TObject);
-var
-  Process: TProcess;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if FFormSettingsLoaded then
-    SaveFormSettings(self, tagsEdit); // Save setting for new process
-
-  Process := TProcess.Create(nil); // Create a new process
-  try
-    Process.Executable := ParamStr(0); // Set the executable to the current application
-    Process.Options := []; // No wait, open and forget
-    Process.Execute; // Execute the new instance
-  finally
-    Process.Free; // Free the process object
-  end;
-end;
-
-procedure TformNotetask.aOpenExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if (IsCanClose) and (openDialog.Execute) then
-  begin
-    OpenFile(openDialog.FileName);
-  end;
-end;
-
-procedure TformNotetask.aSaveAsExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  SaveFileAs;
-end;
-
-procedure TformNotetask.aSaveExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  SaveFile(FFileName);
-end;
-
-procedure TformNotetask.aUndoExecute(Sender: TObject);
-var
-  TempRect: TRect;
-  TempLastRow, TempLastCol: integer;
-  TempTopRow: integer;
-begin
-  if filterBox.Focused then exit;
-  if memoNote.Focused then
-  begin
-    MemoNoteUndo;
-    exit;
-  end
-  else
-  if tagsEdit.Focused and not tagsEdit.ReadOnly and tagsEdit.EditBox.CanUndo then
-  begin
-    tagsEdit.EditBox.Undo;
-    exit;
-  end;
-
-  if Screen.ActiveForm <> Self then exit;
-
-  if not IsEditing then
-  begin
-    TempTopRow := taskGrid.TopRow;
-    TempRect := FLastGridSelection;
-    TempLastRow := FLastGridRow;
-    TempLastCol := FLastGridCol;
-    GridBackupSelection;
-
-    Tasks.UndoBackup;
-
-    FillGrid;
-    ResetRowHeight;
-    taskGrid.Col := TempLastCol;
-    if (TempLastRow > 1) then
-      taskGrid.Row := TempLastRow;
-    if (TempRect.Width > 0) or (TempRect.Height > 0) then
-      taskGrid.Selection := TRect.Create(TempRect.Left, TempRect.Top, TempRect.Right, TempRect.Bottom);
-    taskGrid.TopRow := TempTopRow;
-    ChangeLastText;
-    SetFilter;
-    SetInfo;
-    SetNote;
-    SetTags;
-  end
-  else
-  if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
-    MemoUndo; //(taskGrid.InplaceEditor as TCustomEdit).Undo;
-end;
-
-procedure TformNotetask.aUndoAllExecute(Sender: TObject);
-var
-  Confirm: TModalResult;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if not IsEditing then
-  begin
-    // Need confirm?
-    Confirm := MessageDlg(rundoconfirm, mtConfirmation, [mbYes, mbNo], 0);
-
-    if Confirm = mrYes then
-    begin
-      FLineEnding := FLineEndingOriginal;
-      FEncoding := FEncodingOriginal;
-      BackupSelectedState;
-      Tasks.UndoBackupInit;
-      FillGrid;
-      ResetRowHeight;
-      SetFilter;
-      SetInfo;
-      SetNote;
-      SetTags;
-      SetTabs;
-      GridClearSelection;
-      Tasks.CreateBackup;
-      SetChanged(False);
-      RestoreSelectedState(True, False);
-    end;
-  end;
-end;
-
-procedure TformNotetask.aCutExecute(Sender: TObject);
-begin
-  if filterBox.Focused then exit;
-  if memoNote.Focused then
-  begin
-    MemoNoteBackup;
-    memoNote.CutToClipboard;
-    exit;
-  end
-  else
-  if tagsEdit.Focused then
-  begin
-    tagsEdit.EditBox.CutToClipboard;
-    exit;
-  end;
-
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  if not IsEditing then
-  begin
-    Tasks.CopyToClipboard(taskGrid);
-    if (taskGrid.Selection.Width < 3) then
-      ClearSelected(False)
-    else
-      DeleteTasks(False);
-  end
-  else
-  if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
-  begin
-    MemoBackup;
-    Memo.CutToClipboard;
-  end;
-end;
-
-procedure TformNotetask.aCopyExecute(Sender: TObject);
-begin
-  if filterBox.Focused then exit;
-  if memoNote.Focused then
-  begin
-    memoNote.CopyToClipboard;
-    exit;
-  end
-  else
-  if tagsEdit.SelectedTags.Count > 0 then
-  begin
-    Clipboard.AsText := tagsEdit.SelectedTags.DelimitedText;
-    exit;
-  end
-  else
-  if tagsEdit.HoveredTag <> string.Empty then
-  begin
-    Clipboard.AsText := tagsEdit.HoveredTag;
-    exit;
-  end
-  else
-  if tagsEdit.EditBox.Focused then
-  begin
-    tagsEdit.EditBox.CopyToClipboard;
-    exit;
-  end;
-
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  if not IsEditing then
-    Tasks.CopyToClipboard(taskGrid, FShowNote)
-  else
-  if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
-    Memo.CopyToClipboard;
-end;
-
-procedure TformNotetask.aPasteExecute(Sender: TObject);
-var
-  Sel: TGridRect;
-begin
-  if filterBox.Focused then exit;
-  if memoNote.Focused then
-  begin
-    if (not memoNote.ReadOnly) then
-    begin
-      MemoNoteBackup;
-      PasteWithLineEnding(memoNote);
-    end;
-    exit;
-  end
-  else
-  if tagsEdit.Focused then
-  begin
-    if not tagsEdit.ReadOnly then
-      tagsEdit.EditBox.PasteFromClipboard;
-    exit;
-  end;
-
-  if Screen.ActiveForm <> Self then exit;
-
-  if not IsEditing then
-  begin
-    Sel := Tasks.PasteFromClipboard(taskGrid, SortOrder);
-    FillGrid;
-    CalcRowHeight(True);
-    if (Assigned(DatePicker)) then
-      DatePicker.DateTime := Tasks.GetTask(taskGrid.Row).Date;
-    if (SortColumn = COL_NUM) then
-      taskGrid.Selection := Sel;
-    SetChanged;
-    SetInfo;
-    SetNote;
-    SetTags;
-    SetFilter;
-  end
-  else
-  if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
-  begin
-    MemoBackup;
-    PasteWithLineEnding(Memo);
-  end;
-end;
-
-procedure TformNotetask.aDeleteExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if filterBox.Focused then exit;
-
-  if memoNote.Focused then
-  begin
-    if (not memoNote.ReadOnly) then
-    begin
-      MemoNoteBackup;
-      memoNote.ClearSelection;
-    end;
-    exit;
-  end
-  else
-  if tagsEdit.Focused then
-  begin
-    {$IFDEF UNIX}
-    if not tagsEdit.ReadOnly then
-    begin
-      if tagsEdit.EditBox.SelLength = 0 then
-        tagsEdit.EditBox.SelLength := CalcDeleteCount(tagsEdit.EditBox.Text, tagsEdit.EditBox.SelStart);
-      tagsEdit.EditBox.ClearSelection;
-    end;
-    {$ENDIF}
-    exit;
-  end;
-
-  if taskGrid.RowCount < 2 then exit;
-  if not IsEditing then
-  begin
-    ClearSelected(False);
-    if ShowDuration then FillGrid;
-    SetInfo;
-    SetNote;
-    SetTags;
-  end
-  else
-  if (taskGrid.InplaceEditor is TPanel) then
-    with Memo do
-    begin
-      {$IFDEF UNIX}
-      if SelLength = 0 then
-      begin
-        SelStart := SelStart;
-        SelLength := 1;
-      end
-      else
-        MemoBackup;
-      ClearSelection;
-      {$ELSE}
-      MemoDelKey(False);
-      {$ENDIF}
-    end;
-end;
-
-procedure TformNotetask.aSelectAllExecute(Sender: TObject);
-begin
-  if filterBox.Focused then exit;
-  if memoNote.Focused then
-  begin
-    memoNote.SelStart := 0;
-    memoNote.SelLength := Length(memoNote.Text);
-    exit;
-  end
-  else
-  if tagsEdit.Focused then
-  begin
-    tagsEdit.EditBox.SelectAll;
-    exit;
-  end;
-
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  if not IsEditing then
-  begin
-    taskGrid.Selection := TGridRect.Create(COL_NUM, 0, COL_STAR, taskGrid.RowCount);
-    FLastSelectionHeight := taskGrid.Selection.Height;
-    SetInfo;
-    SetNote;
-    SetTags;
-  end
-  else
-  if (taskGrid.InplaceEditor.InheritsFrom(TPanel)) then
-  begin
-    Memo.SelStart := 0;
-    Memo.SelLength := Length(Memo.Text);
-  end;
-end;
-
-procedure TformNotetask.aExitExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if IsCanClose then
-    Application.Terminate;
-end;
-
-procedure TformNotetask.aFontExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  fontDialog.Font := Font;
-  if fontDialog.Execute then  // Open the font dialog
-  begin
-    // Apply the selected font to the form
-    Self.Font := fontDialog.Font;
-    FOriginalFontSize := ifthen(Font.Size > 0, Font.Size, Screen.SystemFont.Size);
-    if FOriginalFontSize = 0 then
-    begin
-      FOriginalFontSize := DefFontSize;
-      {$IFDEF UNIX}
-      Self.Font.Size := DefFontSize;
-      {$ENDIF}
-    end;
-    SetZoom(FZoom);
-  end;
-end;
-
-procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
-var
-  Ind: integer;
-  TaskText, Oper, Value: string;
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if groupTabs.Tabs.Count = 0 then exit;
-
-  EditComplete;
-  GridBackupSelection;
-
-  TaskText := '[ ]';
-  if Length(filterBox.Text) > 0 then
-  begin
-    string(filterBox.Text).StartsWithOperator(Oper, Value);
-    if (Length(Oper) = 0) or (Oper = '#') or (Oper = '=') then
-    begin
-      if Trim(Value) <> string.Empty then
-        TaskText += ' `' + Trim(Value) + '`'
-      else
-      if Value <> string.Empty then
-        TaskText += ' ' + Value;
-    end;
-  end;
-
-  Ind := Tasks.InsertTask(TaskText, taskGrid.Row);
-  FLastText := string.Empty;
-  FillGrid;
-  ResetRowHeight;
-  if (Ind > 0) then
-    taskGrid.Row := Tasks.ReverseMap(Ind)
-  else
-    taskGrid.Row := taskGrid.Row + 1;
-
-  if Visible and taskGrid.Visible and taskGrid.CanFocus then
-    taskGrid.SetFocus;
-  AdjustMultiButton;
-  ResetRowHeight;
-  SetTabs;
-  SetInfo;
-  SetChanged;
-  SetNote;
-  SetTags;
-end;
-
-procedure TformNotetask.aDuplicateTasksExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  DuplicateTasks;
-end;
-
-procedure TformNotetask.aMergeTasksExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  MergeTasks;
-end;
-
-procedure TformNotetask.aSplitTasksExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  SplitTasks;
-end;
-
-procedure TformNotetask.aZoomDefaultExecute(Sender: TObject);
-begin
-  Zoom := 1;
-end;
-
-procedure TformNotetask.aZoomInExecute(Sender: TObject);
-begin
-  if Zoom < 4.9 then
-    Zoom := Zoom + 0.1;
-end;
-
-procedure TformNotetask.aZoomOutExecute(Sender: TObject);
-begin
-  if Zoom > 0.2 then
-    Zoom := Zoom - 0.1;
-end;
-
-procedure TformNotetask.aCheckforupdatesExecute(Sender: TObject);
-var
-  LatestVersion: string;
-begin
-  CheckGithubLatestVersion(LatestVersion, REPO, APP_NAME);
-end;
-
-procedure TformNotetask.aAutoCheckUpdatesExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  FAutoCheckUpdates := aAutoCheckUpdates.Checked;
-end;
-
-procedure TformNotetask.aDeleteTasksExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  DeleteTasks;
-end;
-
-procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
-var
-  newRow, selLen, selCol, selLeft, selRight: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 3 then exit;
-
-  GridBackupSelection;
-  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
-  selLeft := taskGrid.Selection.Left;
-  selRight := taskGrid.Selection.Right;
-  selCol := taskGrid.Col;
-
-  if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTasksTop(taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowArchived)
-  else
-    newRow := Tasks.MoveTasksBottom(taskGrid.Selection.Bottom, taskGrid.Selection.Top, FShowArchived);
-
-  FillGrid;
-  if (newRow > -1) then
-  begin
-    ResetRowHeight;
-    taskGrid.Row := 0;
-    taskGrid.Col := selCol;
-    taskGrid.Selection := TGridRect.Create(selLeft, 0, selRight, selLen);
-  end;
-  SetChanged;
-  SetNote;
-  SetTags;
-  SetInfo;
-end;
-
-procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
-var
-  newRow, selLen, selCol, selLeft, selRight: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 3 then exit;
-
-  GridBackupSelection;
-  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
-  selLeft := taskGrid.Selection.Left;
-  selRight := taskGrid.Selection.Right;
-  selCol := taskGrid.Col;
-
-  if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTasksBottom(taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowArchived)
-  else
-    newRow := Tasks.MoveTasksTop(taskGrid.Selection.Bottom, taskGrid.Selection.Top, FShowArchived);
-
-  FillGrid;
-  if (newRow > -1) then
-  begin
-    ResetRowHeight;
-    taskGrid.Row := taskGrid.RowCount - selLen;
-    taskGrid.Col := selCol;
-    taskGrid.Selection := TGridRect.Create(selLeft, taskGrid.RowCount - selLen, selRight, taskGrid.RowCount);
-  end;
-  SetChanged;
-  SetNote;
-  SetTags;
-  SetInfo;
-end;
-
-procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
-var
-  newRow, selLen, selCol, selLeft, selRight: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 3 then exit;
-
-  GridBackupSelection;
-  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
-  selLeft := taskGrid.Selection.Left;
-  selRight := taskGrid.Selection.Right;
-  selCol := taskGrid.Col;
-
-  if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTasksUp(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
-  else
-    newRow := Tasks.MoveTasksDown(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
-
-  FillGrid;
-  if (newRow > -1) then
-  begin
-    taskGrid.OnSelection := nil;
-    try
-      ResetRowHeight(True, -1);
-      taskGrid.Row := newRow;
-      taskGrid.Col := selCol;
-      taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
-      ResetRowHeight(True, -1);
-    finally
-      taskGrid.OnSelection := @taskGridSelection;
-    end;
-  end;
-  SetChanged;
-  SetNote;
-  SetTags;
-  SetInfo;
-end;
-
-procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
-var
-  newRow, selLen, selCol, selLeft, selRight: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 3 then exit;
-
-  GridBackupSelection;
-  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
-  selLeft := taskGrid.Selection.Left;
-  selRight := taskGrid.Selection.Right;
-  selCol := taskGrid.Col;
-
-  if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTasksDown(taskGrid.Selection.Top, taskGrid.Selection.Bottom)
-  else
-    newRow := Tasks.MoveTasksUp(taskGrid.Selection.Bottom, taskGrid.Selection.Top);
-
-  FillGrid;
-  if (newRow > -1) then
-  begin
-    taskGrid.OnSelection := nil;
-    try
-      ResetRowHeight(True, -1);
-      taskGrid.Row := newRow;
-      taskGrid.Col := selCol;
-      taskGrid.Selection := TGridRect.Create(selLeft, newRow - selLen + 1, selRight, newRow);
-      ResetRowHeight(True, -1);
-    finally
-      taskGrid.OnSelection := @taskGridSelection;
-    end;
-  end;
-  SetChanged;
-  SetNote;
-  SetTags;
-  SetInfo;
-end;
-
-procedure TformNotetask.aMoveTaskLeftExecute(Sender: TObject);
-var
-  newRow, selCol, selLen, selLeft, selRight, selEnd: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if (groupTabs.TabIndex <= 0) then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  GridBackupSelection;
-  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
-  selLeft := taskGrid.Selection.Left;
-  selRight := taskGrid.Selection.Right;
-  selCol := taskGrid.Col;
-
-  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.GetLeftGroup(
-    Tasks.SelectedGroup, FShowArchived, filterBox.Text, FShowTime));
-
-  if (newRow > -1) then
-  begin
-    ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
-    newRow := Tasks.ReverseMap(newRow);
-    taskGrid.Row := newRow;
-    if (SortOrder = soAscending) then
-      selEnd := newRow + selLen - 1
-    else
-      selEnd := newRow - selLen - 1;
-
-    ResetRowHeight;
-    SetTabs;
-    SetChanged;
-    SetNote;
-    SetTags;
-    SetInfo;
-
-    taskGrid.Col := selCol;
-    taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
-  end;
-end;
-
-procedure TformNotetask.aMoveTaskRightExecute(Sender: TObject);
-var
-  newRow, selCol, selLen, selLeft, selRight, selEnd: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if (groupTabs.TabIndex >= groupTabs.Tabs.Count - 1) then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  GridBackupSelection;
-  selLen := taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1;
-  selLeft := taskGrid.Selection.Left;
-  selRight := taskGrid.Selection.Right;
-  selCol := taskGrid.Col;
-
-  newRow := Tasks.MoveGroupTasks(taskGrid.Selection.Top, taskGrid.Selection.Bottom, Tasks.GetRightGroup(
-    Tasks.SelectedGroup, FShowArchived, filterBox.Text, FShowTime));
-
-  if (newRow > -1) then
-  begin
-    ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
-    newRow := Tasks.ReverseMap(newRow);
-    taskGrid.Row := newRow;
-    if (SortOrder = soAscending) then
-      selEnd := newRow + selLen - 1
-    else
-      selEnd := newRow - selLen - 1;
-
-    ResetRowHeight;
-    SetTabs;
-    SetChanged;
-    SetNote;
-    SetTags;
-    SetInfo;
-
-    taskGrid.Col := selCol;
-    taskGrid.Selection := TGridRect.Create(selLeft, newRow, selRight, selEnd);
-  end;
-end;
-
-procedure TformNotetask.aIndentTasksExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-  EditComplete;
-  IndentTasks;
-end;
-
-procedure TformNotetask.aOutdentTasksExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-  EditComplete;
-  IndentTasks(True);
-end;
-
-procedure TformNotetask.aArchiveTasksExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  ArchiveTasks;
-end;
-
-procedure TformNotetask.aDateTimeExecute(Sender: TObject);
-var
-  PosStart: integer;
-  CurrentDateTimeISO: string;
-  CurrentDateTime: string;
-
-  procedure InsertDateToCell(ACol, ARow: integer);
-  begin
-    if (taskGrid.RowCount > 1) then
-    begin
-      if (taskGrid.Cells[ACol, ARow].Trim = string.Empty) or (ACol = COL_DATE) then
-        taskGrid.Cells[ACol, ARow] := CurrentDateTime
-      else
-        taskGrid.Cells[ACol, ARow] := taskGrid.Cells[ACol, ARow].Trim + ' ' + CurrentDateTime;
-      Tasks.SetTask(taskGrid, Memo, ARow, False, FShowTime);
-      if Assigned(DatePicker) then
-        DatePicker.DateTime := Now;
-      if (FShowDuration) and (ACol = COL_DATE) then
-        FillGrid;
-    end
-    else
-    begin
-      Tasks.InsertTask('- [ ] ' + CurrentDateTimeISO + ',', ARow);
-      FillGrid;
-      taskGrid.Row := taskGrid.Row + 1;
-    end;
-    SetChanged;
-    SetInfo;
-  end;
-
-var
-  c, r: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  CurrentDateTime := DateTimeToString(Now, FShowTime);
-  CurrentDateTimeISO := DateTimeToStringISO(Now, FShowTime);
-
-  if memoNote.Focused then
-  begin
-    PosStart := memoNote.SelStart;
-    memoNote.SelText := CurrentDateTime;
-    memoNote.SelStart := PosStart;
-    memoNote.SelLength := Length(CurrentDateTime);
-  end
-  else
-  if IsEditing then
-  begin
-    if (taskGrid.Col = COL_DATE) then
-    begin
-      taskGrid.Cells[COL_DATE, taskGrid.Row] := CurrentDateTime;
-      DatePicker.DateTime := Now;
-    end
-    else
-    if (taskGrid.Col in [COL_TASK, COL_NOTE]) then
-    begin
-      PosStart := Memo.SelStart;
-      Memo.SelText := CurrentDateTime;
-      Memo.SelStart := PosStart;
-      Memo.SelLength := Length(CurrentDateTime);
-    end;
-    Tasks.SetTask(taskGrid, Memo, taskGrid.Row, FBackup, FShowTime);
-    SetChanged;
-    SetInfo;
-  end
-  else
-  begin
-    Tasks.CreateBackup;
-    for r := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-      for c := taskGrid.Selection.Left to taskGrid.Selection.Right do
-        if (c > 0) then
-          InsertDateToCell(c, r);
-  end;
-end;
-
-procedure TformNotetask.aFilterExecute(Sender: TObject);
-begin
-  panelTabs.Visible := (not panelTabs.Visible and not filterBox.Focused) or
-    (not ((groupTabs.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty)));
-  Invalidate;
-  Application.ProcessMessages;
-  if (panelTabs.Visible) then
-  begin
-    if filterBox.Focused then
-    begin
-      if Visible and taskGrid.Visible and taskGrid.CanFocus then
-      begin
-        filterBox.Text := string.Empty;
-        FLastFilter := '-1';
-        filterBoxChange(Self);
-        taskGrid.SetFocus;
-      end;
-    end
-    else
-    begin
-      if (Length(filterBox.Text) = 0) then
-      begin
-        if Assigned(Memo) and (Memo.SelText <> string.Empty) then
-        begin
-          filterBox.Text := Memo.SelText;
-          FLastFilter := '-1';
-          filterBoxChange(Self);
-        end
-        else
-        if memoNote.Visible and memoNote.Focused and (memoNote.SelText <> string.Empty) then
-        begin
-          filterBox.Text := memoNote.SelText;
-          FLastFilter := '-1';
-          filterBoxChange(Self);
-        end;
-      end;
-
-      if Visible and filterBox.Visible and filterBox.CanFocus then
-        filterBox.SetFocus;
-    end;
-  end
-  else
-  begin
-    filterBox.Text := string.Empty;
-    FLastFilter := '-1';
-    filterBoxChange(Self);
-  end;
-end;
-
-procedure TformNotetask.aInsertGroupExecute(Sender: TObject);
-var
-  Result: integer;
-  newName: string;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  // Create an instance of the form
-  with formInputText do
-  try
-    Left := self.Left + 14;
-    Top := self.top + 52;
-    SetMode(aInsertGroup.Caption, rentergroupname, rOK);
-
-    // Show the form as a modal dialog
-    if ShowModal = mrOk then
-    begin
-      EditComplete;
-      newName := editText.Text;
-      if (newName = rgroupuntitled) then newName := string.Empty;
-
-      Result := Tasks.InsertGroup(newName);
-      if (Result <> FindGroupRealIndex(groupTabs.TabIndex)) then
-      begin
-        FLastRowMem.InsertAtPos(Result, 0);
-        SetTabs;
-        ChangeGroup(FindGroupTabIndex(Result));
-        SetChanged;
-      end;
-    end;
-  finally
-    Hide;
-  end;
-end;
-
-procedure TformNotetask.aRenameGroupExecute(Sender: TObject);
-var
-  newName: string;
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if groupTabs.Tabs.Count < 1 then exit;
-
-  // Create an instance of the form
-  with formInputText do
-  try
-    Left := self.Left + 14;
-    Top := self.top + 52;
-    SetMode(aRenameGroup.Caption, rentergroupname, rOK, Tasks.GetGroupNameForTab(FindGroupRealIndex(groupTabs.TabIndex), False));
-
-    // Show the form as a modal dialog
-    if (ShowModal = mrOk) {and (editText.Text <> groupTabs.Tabs[groupTabs.TabIndex])} then
-    begin
-      newName := editText.Text;
-      if (newName = rgroupuntitled) and (groupTabs.TabIndex = 0) then newName := string.Empty;
-
-      if (Tasks.RenameGroup(FindGroupRealIndex(groupTabs.TabIndex), newName)) then
-      begin
-        SetTabs;
-        SetChanged;
-      end;
-    end;
-  finally
-    Hide;
-  end;
-end;
-
-procedure TformNotetask.aEditGroupTooltipExecute(Sender: TObject);
-begin
-  if (groupTabs.TabIndex = 0) and (Tasks.GroupNames[0] = string.Empty) then
-    exit;
-  if groupTabs.Tabs.Count < 1 then exit;
-
-  with formMemoText do
-  try
-    if not formMemoText.Showed then
-    begin
-      Left := self.Left + 14;
-      Top := self.top + 52;
-    end;
-    SetMode(rapp, aEditGroupTooltip.Caption, rOK, Tasks.GetGroupHint(FindGroupRealIndex(groupTabs.TabIndex)), 400, 180, FWordWrap, True);
-
-    // Show the form as a modal dialog
-    if ShowModal = mrOk then
-    begin
-      Tasks.RehintGroup(FindGroupRealIndex(groupTabs.TabIndex), formMemoText.memoText.Text);
-      SetChanged;
-    end;
-  finally
-    Hide;
-  end;
-end;
-
-procedure TformNotetask.aDuplicateGroupExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if groupTabs.Tabs.Count < 1 then exit;
-
-  // Create an instance of the form
-  with formInputText do
-  try
-    Left := self.Left + 14;
-    Top := self.top + 52;
-    SetMode(aDuplicateGroup.Caption, rentergroupname, rOK, Tasks.GetGroupNameForTab(FindGroupRealIndex(groupTabs.TabIndex), False));
-
-    // Show the form as a modal dialog
-    if (ShowModal = mrOk) then
-    begin
-      if (Tasks.CopyGroup(FindGroupRealIndex(groupTabs.TabIndex), editText.Text)) then
-      begin
-        FLastRowMem.InsertAtPos(FindGroupRealIndex(groupTabs.TabIndex) + 1, FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)]);
-        SetTabs;
-        ChangeGroup(groupTabs.TabIndex + 1);
-        SetChanged;
-      end;
-    end;
-  finally
-    Hide;
-  end;
-end;
-
-procedure TformNotetask.aDeleteGroupExecute(Sender: TObject);
-var
-  Confirm: integer;
-  Mem: TIntegerArray;
-begin
-  if groupTabs.Tabs.Count < 1 then exit;
-
-  Confirm := MessageDlg(rdeletegroupconfirm, mtConfirmation, [mbYes, mbNo], 0);
-
-  if (Confirm = mrYes) then
-  begin
-    if (Tasks.DeleteGroup(FindGroupRealIndex(groupTabs.TabIndex))) then
-    begin
-      FLastRowMem.DeleteAtPos(FindGroupRealIndex(groupTabs.TabIndex));
-      Mem := FLastRowMem.CloneArray;
-      SetTabs;
-      ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
-      FLastRowMem := Mem.CloneArray;
-      if (Length(FLastRowMem) > Tasks.SelectedGroup) then
-        taskGrid.Row := FLastRowMem[Tasks.SelectedGroup];
-      SetChanged;
-    end;
-  end;
-end;
-
-procedure TformNotetask.aMoveGroupLeftExecute(Sender: TObject);
-begin
-  MoveTabLeft(groupTabs.TabIndex);
-end;
-
-procedure TformNotetask.aMoveGroupRightExecute(Sender: TObject);
-begin
-  MoveTabRight(groupTabs.TabIndex);
-end;
-
-procedure TformNotetask.aPagePropertiesExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  pageSetupDialog.Execute;
-end;
-
-procedure TformNotetask.aPrintExecute(Sender: TObject);
-var
-  gridPrinter: TGridPrinter;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  if printDialog.Execute then
-  begin
-    gridPrinter := TGridPrinter.Create(self);
-    try
-      gridPrinter.Grid := taskGrid;
-      gridPrinter.OnGetCellText := @PrinterGetCellText;
-      gridPrinter.OnPrepareCanvas := @PrinterPrepareCanvas;
-      gridPrinter.OnBeforePrintCell := @PrinterBeforePrintCell;
-      gridPrinter.Orientation := Printer.Orientation;
-      gridPrinter.Margins.Left := pageSetupDialog.MarginLeft / 100;
-      gridPrinter.Margins.Right := pageSetupDialog.MarginRight / 100;
-      gridPrinter.Margins.Top := pageSetupDialog.MarginTop / 100;
-      gridPrinter.Margins.Bottom := pageSetupDialog.MarginBottom / 100;
-      gridPrinter.FixedLineColor := clSilver;
-      gridPrinter.BorderLineColor := clSilver;
-      gridPrinter.GridLineColor := clSilver;
-      gridPrinter.Footer.LineColor := clSilver;
-      gridPrinter.Header.LineColor := clSilver;
-
-      gridPrinter.Print;
-    finally
-      gridPrinter.Free;
-    end;
-  end;
-end;
-
-procedure TformNotetask.aShowArchivedExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowArchived := aShowArchived.Checked;
-end;
-
-procedure TformNotetask.aShowDurationExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowDuration := aShowDuration.Checked;
-end;
-
-procedure TformNotetask.aShowTimeExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  EditComplete;
-  ShowTime := aShowTime.Checked;
-  FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aShowTagsExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowTags := aShowTags.Checked;
-end;
-
-procedure TformNotetask.aShowNoteExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowNote := aShowNote.Checked;
-end;
-
-procedure TformNotetask.aHideNoteTextExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  EditComplete;
-  HideNoteText := aHideNoteText.Checked;
-  FillGrid;
-end;
-
-procedure TformNotetask.aShowStatusBarExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowStatusBar := aShowStatusBar.Checked;
-  SetInfo;
-end;
-
-procedure TformNotetask.aShowColumnDoneExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowColumnDone := aShowColumnDone.Checked;
-end;
-
-procedure TformNotetask.aShowColumnTaskExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowColumnTask := aShowColumnTask.Checked;
-end;
-
-procedure TformNotetask.aShowColumnNoteExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowColumnNote := aShowColumnNote.Checked;
-end;
-
-procedure TformNotetask.aShowColumnDateExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowColumnDate := aShowColumnDate.Checked;
-end;
-
-procedure TformNotetask.aShowColumnAmountExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowColumnAmount := aShowColumnAmount.Checked;
-end;
-
-procedure TformNotetask.aShowColumnFavoriteExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  ShowColumnFavorite := aShowColumnFavorite.Checked;
-end;
-
-procedure TformNotetask.aWordWrapExecute(Sender: TObject);
-var
-  sel: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  EditComplete;
-  FWordWrap := aWordWrap.Checked;
-  sel := memoNote.SelLength;
-  memoNote.WordWrap := FWordWrap;
-  if sel = 0 then
-    memoNote.SelLength := 0;
-  CalcRowHeight(True);
-  Invalidate;
-end;
-
-procedure TformNotetask.aEnterSubmitExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  FEnterSubmit := aEnterSubmit.Checked;
-end;
-
-procedure TformNotetask.aBidiRightToLeftExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-
-  EditComplete;
-  BiDiRightToLeft := aBidiRightToLeft.Checked;
-  ResetRowHeight;
-  Invalidate;
-end;
-
-procedure TformNotetask.aChatGptExecute(Sender: TObject);
-begin
-  if taskGrid.RowCount < 2 then exit;
-
-  ExecuteChatGpt;
-end;
-
-procedure TformNotetask.aRunTerminalExecute(Sender: TObject);
-begin
-  if taskGrid.RowCount < 2 then exit;
-
-  ExecuteTerminal(False);
-end;
-
-procedure TformNotetask.aRunPowershellExecute(Sender: TObject);
-begin
-  if taskGrid.RowCount < 2 then exit;
-
-  ExecuteTerminal;
-end;
-
-procedure TformNotetask.aGoToExecute(Sender: TObject);
-var
-  rowNum: integer;
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  // Create an instance of the form
-  with formInputText do
-  try
-    Left := self.Left + 14;
-    Top := self.top + 52;
-    SetMode(rgototask, rtasknumber, rgoto, IntToStr(taskGrid.Row), True);
-
-    // Show the form as a modal dialog
-    if ShowModal = mrOk then
-    begin
-      // Try to convert the entered value to an integer
-      if TryStrToInt(editText.Text, rowNum) then
-      begin
-        // Ensure the entered row is within the valid range
-        if (rowNum >= 1) and (rowNum <= Tasks.Count) then
-        begin
-          // Move to the specified row
-          taskGrid.Row := Tasks.ReverseMap(rowNum - 1);
-        end
-        else
-          ShowMessage(rnumstringtoolarge);
-      end;
-    end;
-  finally
-    Hide;
-  end;
-end;
-
-procedure TformNotetask.aFindExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  formFindText.editFind.Text := FindText;
-  if (formFindText.Left = 0) then
-    formFindText.Left := self.Left + 80;
-  if (formFindText.Top = 0) then
-    formFindText.Top := self.top + 100;
-  formFindText.Show;
-end;
-
-procedure TformNotetask.aReplaceExecute(Sender: TObject);
-begin
-  if Screen.ActiveForm <> Self then exit;
-  if taskGrid.RowCount < 2 then exit;
-
-  formReplaceText.editFind.Text := FindText;
-  if (formReplaceText.Left = 0) then
-    formReplaceText.Left := self.Left + 80;
-  if (formReplaceText.Top = 0) then
-    formReplaceText.Top := self.top + 100;
-  formReplaceText.Show;
-end;
-
-procedure TformNotetask.aFindNextExecute(Sender: TObject);
-begin
-  if taskGrid.RowCount < 2 then exit;
-
-  if (assigned(formFindText)) and (formFindText.Visible) then
-  begin
-    MatchCase := formFindText.checkMatchCase.Checked;
-    WrapAround := formFindText.checkWrapAround.Checked;
-  end;
-
-  if (FindText = string.Empty) and (Clipboard.AsText <> string.Empty) then
-    FindText := Clipboard.AsText;
-
-  if (FindText <> string.Empty) then
-  begin
-    FFindF3 := True;
-    Find(FindText, MatchCase, WrapAround, True);
-  end
-  else
-    aFind.Execute;
-end;
-
-procedure TformNotetask.aFindPrevExecute(Sender: TObject);
-begin
-  if taskGrid.RowCount < 2 then exit;
-
-  if (FindText = string.Empty) and (Clipboard.AsText <> string.Empty) then
-    FindText := Clipboard.AsText;
-
-  if (FindText <> string.Empty) then
-  begin
-    FFindF3 := True;
-    Find(FindText, MatchCase, WrapAround, False);
-  end
-  else
-    aFind.Execute;
-end;
-
-procedure TformNotetask.aAboutExecute(Sender: TObject);
-begin
-  formAboutNotetask := TformAboutNotetask.Create(Application);
-  try
-    formAboutNotetask.Left := Self.Left + 100;
-    formAboutNotetask.Top := Self.Top + 100;
-    formAboutNotetask.ShowModal;
-  finally
-    formAboutNotetask.Free;
-  end;
-end;
-
-procedure TformNotetask.aLangArabicExecute(Sender: TObject);
-begin
-  SetLanguage('ar');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangBelarusianExecute(Sender: TObject);
-begin
-  SetLanguage('be');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangChineseExecute(Sender: TObject);
-begin
-  SetLanguage('zh');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangCzechExecute(Sender: TObject);
-begin
-  SetLanguage('cs');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangDanishExecute(Sender: TObject);
-begin
-  SetLanguage('da');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangDutchExecute(Sender: TObject);
-begin
-  SetLanguage('nl');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangEnglishExecute(Sender: TObject);
-begin
-  SetLanguage('en');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangFinnishExecute(Sender: TObject);
-begin
-  SetLanguage('fi');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangFrenchExecute(Sender: TObject);
-begin
-  SetLanguage('fr');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangGermanExecute(Sender: TObject);
-begin
-  SetLanguage('de');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangGreekExecute(Sender: TObject);
-begin
-  SetLanguage('el');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangHebrewExecute(Sender: TObject);
-begin
-  SetLanguage('he');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangHindiExecute(Sender: TObject);
-begin
-  SetLanguage('hi');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangIndonesianExecute(Sender: TObject);
-begin
-  SetLanguage('id');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangItalianExecute(Sender: TObject);
-begin
-  SetLanguage('it');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangJapaneseExecute(Sender: TObject);
-begin
-  SetLanguage('ja');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangKoreanExecute(Sender: TObject);
-begin
-  SetLanguage('ko');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangPolishExecute(Sender: TObject);
-begin
-  SetLanguage('pl');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangPortugueseExecute(Sender: TObject);
-begin
-  SetLanguage('pt');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangRomanianExecute(Sender: TObject);
-begin
-  SetLanguage('ro');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangRussianExecute(Sender: TObject);
-begin
-  SetLanguage('ru');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangSpanishExecute(Sender: TObject);
-begin
-  SetLanguage('es');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangSwedishExecute(Sender: TObject);
-begin
-  SetLanguage('sv');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangTurkishExecute(Sender: TObject);
-begin
-  SetLanguage('tr');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aLangUkrainianExecute(Sender: TObject);
-begin
-  SetLanguage('uk');
-  if ShowDuration then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.aDonateExecute(Sender: TObject);
-begin
-  formDonateNotetask := TformDonateNotetask.Create(Application);
-  try
-    formDonateNotetask.Left := Self.Left + 100;
-    formDonateNotetask.Top := Self.Top + 100;
-    formDonateNotetask.ShowModal;
-  finally
-    formDonateNotetask.Free;
-  end;
-end;
-
-procedure TformNotetask.memoNoteEnter(Sender: TObject);
-begin
-  {$IFDEF UNIX}
-     aDelete.ShortCut:=0;
-  {$ELSE}
-  ; // NOP
-  {$ENDIF}
-end;
-
-procedure TformNotetask.memoNoteExit(Sender: TObject);
-begin
-  {$IFDEF UNIX}
-     aDelete.ShortCut:=VK_DELETE;
-  {$ELSE}
-  ; // NOP
-  {$ENDIF}
-
-  SetFilter;
-end;
-
-procedure TformNotetask.memoNoteKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-var
-  LinesPerPage, NewPos: integer;
-  Render: string;
-begin
-  // Test for letter, number, space, back, enter, shift or delete key for backup
-  if (Shift * [ssCtrl, ssAlt] = []) and ((not THotKeyData.Create(Key).IsSystemKey) or (Key = VK_SPACE) or
-    (Key = VK_BACK) or (Key = VK_RETURN) or (ssShift in Shift) or ((Key = VK_DELETE) and (memoNote.SelLength = 0))) then
-  begin
-    if (not FMemoNoteFirstKey) then
-    begin
-      FMemoNoteFirstKey := True;
-      MemoNoteBackup;
-    end;
-  end
-  else
-    FMemoNoteFirstKey := False;
-
-  if (not (ssShift in Shift)) and (Key = VK_PRIOR) then
-  begin
-    LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
-    NewPos := Max(0, memoNote.CaretPos.Y - LinesPerPage);
-    if (NewPos = 0) then
-      memoNote.SelStart := 0
-    else
-      memoNote.CaretPos := Point(0, NewPos);
-    MemoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
-    memoNote.Invalidate;
-    Key := 0;
-  end
-  else
-  if (not (ssShift in Shift)) and (Key = VK_NEXT) then
-  begin
-    LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
-    NewPos := Min(memoNote.Lines.Count - 1, memoNote.CaretPos.Y + LinesPerPage);
-    if NewPos >= memoNote.Lines.Count - 1 then
-      memoNote.SelStart := memoNote.GetTextLen - Length(unicodestring(memoNote.Lines[memoNote.Lines.Count - 1]))
-    else
-      memoNote.CaretPos := Point(0, NewPos);
-    MemoNote.VertScrollBar.Position := memoNote.CaretPos.Y - (LinesPerPage div 2);
-    memoNote.Invalidate;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
-  begin
-    MemoNote.CopyToClipboard;
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_A) then // Ctrl + A
-  begin
-    memoNote.SelStart := 0;
-    memoNote.SelLength := Length(memoNote.Text);
-    Key := 0;
-  end
-  else
-  if (Shift = [ssCtrl]) and (Key = VK_F) then // Ctrl + F
-  begin
-    aFind.Execute;
-    Key := 0;
-  end
-  else
-  if not (ssCtrl in Shift) and not (ssShift in Shift) and (Key = VK_TAB) then // Tab
-  begin
-    SelectNext(ActiveControl, True, True);
-    Key := 0;
-  end
-  else
-  if memoNote.ReadOnly then exit
-  else
-  if Key = VK_DELETE then // Delete
-  begin
-    {$IFDEF UNIX}
-    if memoNote.SelLength > 0 then
-        MemoNoteBackup;
-    {$ELSE}
-    MemoDelKey;
-    Key := 0;
-    {$ENDIF}
-  end
-  else
-  if (Key = VK_BACK) then // Backspace
-  begin
-    if memoNote.SelLength > 0 then
-    begin
-      MemoNoteBackup;
-    end;
-  end
-  else
-  if (ssShift in Shift) and (Key = VK_TAB) then // Shift + Tab
-  begin
-    MemoNoteOutdent;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_TAB) then // Tab
-  begin
-    MemoNoteIndent;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_OEM_2) then // Ctrl + /
-  begin
-    MemoNoteToggleComment(CommentSlashStr);
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_OEM_MINUS) then // Ctrl + -
-  begin
-    MemoNoteToggleComment(CommentMinusStr);
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_3) then // Ctrl + #
-  begin
-    MemoNoteToggleComment(CommentHashStr);
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_8) then // Ctrl + *
-  begin
-    MemoNoteToggleComment(CommentStarStr);
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_OEM_1) then // Ctrl + :
-  begin
-    MemoNoteToggleComment(CommentREMStr);
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_4) then // Ctrl + 4
-  begin
-    MemoNoteToggleComment(CommentSemicolonStr);
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_6) then // Ctrl + 6
-  begin
-    MemoNoteToggleComment(CommentTwocolonStr);
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_OEM_7) then // Ctrl + '
-  begin
-    MemoNoteToggleComment(CommentApostropheStr);
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_RETURN) and (trim(memoNote.SelText) <> string.Empty) then // Ctrl + Enter
-  begin
-    Render := memoNote.SelText.ToASCIITextArt(Font.Name, Max(ifthen(Font.Size = 0, 10, Font.Size) - 2, 2));
-    if (Render <> memoNote.SelText) then
-    begin
-      MemoNoteBackup;
-      memoNote.SelText := Render;
-    end;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_Z) then // Ctrl + Shift + Z
-  begin
-    aUndoAll.Execute;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_Z) then // Ctrl + Z
-  begin
-    MemoNoteUndo;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_X) then // Ctrl + X
-  begin
-    MemoNoteBackup;
-    memoNote.CutToClipboard;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
-  begin
-    MemoNoteBackup;
-    PasteWithLineEnding(memoNote);
-    Key := 0;
-  end
-  else
-  if Key = VK_ESCAPE then // Escape
-    if Visible and taskGrid.Visible and taskGrid.CanFocus then
-      taskGrid.SetFocus;
-end;
-
-procedure TformNotetask.memoNoteKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
-begin
-  FNoteLastSelText := (Sender as TMemo).SelText;
-  FNoteLastSelStart := (Sender as TMemo).SelStart;
-  FNoteLastSelLength := (Sender as TMemo).SelLength;
-end;
-
-procedure TformNotetask.memoNoteMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-begin
-  if (Button = mbMiddle) and (ssCtrl in Shift) then // Middle button + Ctrl
-    aZoomDefault.Execute
-  else
-  if not (ssDouble in Shift) then
-  begin
-    if ssCtrl in Shift then
-    begin
-      // if no selection try select full url
-      if (FNoteLastSelLength < 1) or (((Sender as TMemo).SelStart < FNoteLastSelStart) or
-        ((Sender as TMemo).SelStart > FNoteLastSelStart + FNoteLastSelLength)) or (not TryOpenAsUrl(Trim(FNoteLastSelText))) then
-      begin
-        (Sender as TMemo).MemoTokenAtPos((Sender as TMemo).SelStart, ':/?#[]@!$&''()*+,;=-_.~%');
-        FNoteLastSelText := (Sender as TMemo).SelText;
-        FNoteLastSelStart := (Sender as TMemo).SelStart;
-        FNoteLastSelLength := (Sender as TMemo).SelLength;
-      end
-      else
-      begin
-        (Sender as TMemo).SelStart := FNoteLastSelStart;
-        (Sender as TMemo).SelLength := FNoteLastSelLength;
-      end;
-    end
-    else
-      FMemoSelStartClicked := (Sender as TMemo).SelStart;
-  end;
-  // Force set focus
-  if (Sender as TMemo).Visible and (Sender as TMemo).CanFocus and not (Sender as TMemo).Focused then
-    (Sender as TMemo).SetFocus;
-end;
-
-procedure TformNotetask.memoNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-begin
-  if not (ssCtrl in Shift) then
-  begin
-    FNoteLastSelText := (Sender as TMemo).SelText;
-    FNoteLastSelStart := (Sender as TMemo).SelStart;
-    FNoteLastSelLength := (Sender as TMemo).SelLength;
-  end;
-end;
-
-procedure TformNotetask.memoNoteMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
-  MousePos: TPoint; var Handled: boolean);
-begin
-  if ssCtrl in Shift then
-  begin
-    if WheelDelta > 0 then
-      aZoomIn.Execute
-    else
-      aZoomOut.Execute;
-    Handled := True;
-  end;
-end;
-
-procedure TformNotetask.memoNoteChange(Sender: TObject);
-begin
-  taskGrid.Cells[COL_NOTE, taskGrid.Row] := memoNote.Text;
-  Tasks.SetTask(taskGrid, Memo, taskGrid.Row, FBackup, FShowTime);
-  CalcRowHeight(True, taskGrid.Row);
-  SetChanged;
-end;
-
-procedure TformNotetask.memoNoteDblClick(Sender: TObject);
-var
-  Pos: integer;
-begin
-  if FMemoSelStartClicked >= 0 then
-    Pos := FMemoSelStartClicked
-  else
-    Pos := (Sender as TMemo).SelStart;
-
-  (Sender as TMemo).MemoTokenAtPos(Pos, '_-@');
-  FMemoSelStartClicked := -1;
-end;
-
-procedure TformNotetask.tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-begin
-  if tagsEdit.ReadOnly then exit
-  else
-  if Key = VK_DELETE then // Delete
-  begin
-    {$IFDEF UNIX}
-    {$ELSE}
-    if (tagsEdit.EditBox.SelLength = 0) then
-      tagsEdit.EditBox.SelLength := CalcDeleteCount(tagsEdit.EditBox.Text, tagsEdit.EditBox.SelStart);
-    tagsEdit.EditBox.ClearSelection;
-    Key := 0;
-    {$ENDIF}
-  end
-  else
-  if (ssCtrl in Shift) and (ssShift in Shift) and (Key = VK_Z) then // Ctrl + Shift + Z
-  begin
-    aUndoAll.Execute;
-    Key := 0;
-  end
-  else
-  if (ssCtrl in Shift) and (Key = VK_Z) and (not tagsEdit.EditBox.Focused) then // Ctrl + Z
-  begin
-    aUndo.Execute;
-    Key := 0;
-  end
-  else
-  if Key = VK_ESCAPE then // Escape
-    if taskGrid.Visible and taskGrid.CanFocus then
-      taskGrid.SetFocus;
-end;
-
-procedure TformNotetask.tagsEditTagClick(Sender: TObject; const TagText: string; const TagIndex: integer);
-begin
-  if (filterBox.Text <> TagText) then
-  begin
-    filterBox.Text := TagText;
-    FLastFilter := '-1';
-    filterBoxChange(Self);
-  end
-  else
-    filterClearClick(Sender);
-end;
-
-procedure TformNotetask.tagsEditBeforeChange(Sender: TObject; Tags: string; Operation: TTagEditOperation; var AllowChange: boolean);
-begin
-  Tasks.CreateBackup;
-end;
-
-procedure TformNotetask.tagsEditChange(Sender: TObject);
-begin
-  SetFilter;
-  SetChanged;
-  taskGrid.Invalidate;
-  Application.ProcessMessages;
-  CalcRowHeight(True);
-end;
-
-procedure TformNotetask.tagsEditTagAdd(Sender: TObject; const TagText: string; const TagIndex: integer);
-begin
-  TagsAdd(taskGrid.Selection, TagText);
-end;
-
-procedure TformNotetask.tagsEditTagRemove(Sender: TObject; const TagText: string; const TagIndex: integer);
-var
-  i: integer;
-  task: TTask;
-begin
-  //  Tasks.CreateBackup;
-  for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-    if Tasks.Map(i) > -1 then
-    begin
-      task := Tasks.GetTask(i);
-      if TagIndex >= 0 then
-        task.Tags.Delete(TagIndex)
-      else
-        task.Tags.RemoveAll(TagText);
-      if task.Tags.Count = 0 then
-        task.TagsWidth := 0;
-    end;
-  SetTags;
-end;
-
-procedure TformNotetask.tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
-var
-  i: integer;
-begin
-  Tasks.CreateBackup;
-  for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-    if Tasks.Map(i) > -1 then
-      Tasks.GetTask(i).Tags.Assign(tagsEdit.Items);
 end;
 
 procedure TformNotetask.TagsAdd(const Rect: TRect; const TagText: string);
@@ -5015,18 +5697,12 @@ begin
     Tasks.GetTask(Rect.Top).Tags.Add(TagText);
 end;
 
-procedure TformNotetask.tagsEditExit(Sender: TObject);
-begin
-  FLastGridSelection := taskGrid.Selection;
-  Application.QueueAsyncCall(@DelayedFinishTagEdit, 0);
-end;
-
 procedure TformNotetask.DelayedFinishTagEdit(Data: PtrInt);
 begin
-  if (Trim(tagsEdit.EditBox.Text) <> string.Empty) then
+  if (Trim(TagEdit.EditBox.Text) <> string.Empty) then
   begin
-    TagsAdd(FLastGridSelection, tagsEdit.EditBox.Text);
-    tagsEdit.EditBox.Text := string.Empty;
+    TagsAdd(FLastGridSelection, TagEdit.EditBox.Text);
+    TagEdit.EditBox.Text := string.Empty;
     SetTags;
   end;
 end;
@@ -5041,11 +5717,11 @@ begin
 
     // Save settings for current file
     if SaveSetting and FGridSettingsLoaded then
-      SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+      SaveGridSettings(Self, Grid, ExtractFileName(FFileName));
 
-    taskGrid.Clean;
-    taskGrid.RowCount := 2;
-    tagsEdit.SuggestedItems.Clear;
+    Grid.Clean;
+    Grid.RowCount := 2;
+    TagEdit.SuggestedItems.Clear;
     FilterBox.Clear;
     FLastFilter := '-1';
 
@@ -5076,15 +5752,15 @@ begin
     ReadOnly := False;
 
     // Load saved settings for new file
-    FGridSettingsLoaded := LoadGridSettings(Self, taskGrid, string.Empty);
+    FGridSettingsLoaded := LoadGridSettings(Self, Grid, string.Empty);
 
     ApplyGridSettings;
     SetZoom(FZoom);
 
     SetFilter;
 
-    taskGrid.Row := 1;
-    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Row, taskGrid.Selection.Right, taskGrid.Row);
+    Grid.Row := 1;
+    Grid.Selection := Rect(Grid.Selection.Left, Grid.Row, Grid.Selection.Right, Grid.Row);
 
     FLineEndingOriginal := FLineEnding;
     FEncodingOriginal := FEncoding;
@@ -5110,7 +5786,7 @@ begin
   end;
   // Save settings for current file
   if saveSettings and FGridSettingsLoaded then
-    SaveGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+    SaveGridSettings(Self, Grid, ExtractFileName(FFileName));
 
   EncryptedOld := FEncrypted;
   FEncrypted := False;
@@ -5208,13 +5884,13 @@ begin
   else
     TFileManager.ReadTextFile(FFileName, Content, FEncoding, FLineEnding, FLineCount);
 
-  tagsEdit.SuggestedItems.Clear;
+  TagEdit.SuggestedItems.Clear;
   if Assigned(Tasks) then
     Tasks.Free;
   Tasks := TTasks.Create(Content.ToStringList);
 
   // Load saved settings for file
-  FGridSettingsLoaded := LoadGridSettings(Self, taskGrid, ExtractFileName(FFileName));
+  FGridSettingsLoaded := LoadGridSettings(Self, Grid, ExtractFileName(FFileName));
   ApplyGridSettings;
   SetZoom(FZoom);
   SetFilter;
@@ -5336,7 +6012,7 @@ procedure TformNotetask.ApplyGridSettings;
 begin
   SetChanged(False);
 
-  filterBox.Left := 0;
+  FilterBox.Left := 0;
   SplitFilter.Left := 0;
   ShowNote := FShowNote;
   ShowTags := FShowTags;
@@ -5351,9 +6027,9 @@ begin
 
   FillGrid;
 
-  taskGrid.Row := 1;
-  taskGrid.Col := COL_TASK;
-  groupTabs.TabIndex := 0;
+  Grid.Row := 1;
+  Grid.Col := COL_TASK;
+  TabsGroup.TabIndex := 0;
   ResetRowHeight;
   SetInfo;
   SetNote;
@@ -5367,7 +6043,7 @@ procedure TformNotetask.AlignBottomControls;
 var
   BottomPos: integer;
 begin
-  //if (StatusBar.Top < panelNote.Top) or (StatusBar.Top < panelTags.Top) then
+  //if (StatusBar.Top < panelNote.Top) or (StatusBar.Top < PanelTags.Top) then
   //  StatusBar.Top := ClientHeight - StatusBar.Height;
 
   // Start from the bottom of the client area
@@ -5377,11 +6053,11 @@ begin
   StatusBar.Top := BottomPos - StatusBar.Height;
   BottomPos := StatusBar.Top;
 
-  // Align panelTags above SplitTags
-  panelTags.Top := BottomPos - panelTags.Height;
-  BottomPos := panelTags.Top;
+  // Align PanelTags above SplitTags
+  PanelTags.Top := BottomPos - PanelTags.Height;
+  BottomPos := PanelTags.Top;
 
-  // Align SplitTags above panelTags
+  // Align SplitTags above PanelTags
   SplitTags.Top := BottomPos - SplitTags.Height;
   BottomPos := SplitTags.Top;
 
@@ -5399,26 +6075,26 @@ begin
     Splitter.Top := 0;
     panelNote.Top := Splitter.Top + Splitter.Height;
     SplitTags.Top := panelNote.Top + panelNote.Height;
-    panelTags.Top := SplitTags.Top + SplitTags.Height;
-    StatusBar.Top := panelTags.Top + panelTags.Height;
+    PanelTags.Top := SplitTags.Top + SplitTags.Height;
+    StatusBar.Top := PanelTags.Top + PanelTags.Height;
   end;
 end;
 
 function TformNotetask.IsExecuteValueNote(memoPriority: boolean = False): boolean;
 begin
-  Result := (((taskGrid.Selection.Left = COL_NOTE) and (taskGrid.Selection.Right >= COL_NOTE)) or
-    ((panelNote.Visible) and ((memoPriority) or (memoNote.SelLength > 0) or (memoNote.Focused)))) and
-    (panelNote.Visible) and (memoNote.SelLength > 0);
+  Result := (((Grid.Selection.Left = COL_NOTE) and (Grid.Selection.Right >= COL_NOTE)) or
+    ((panelNote.Visible) and ((memoPriority) or (MemoNote.SelLength > 0) or (MemoNote.Focused)))) and
+    (panelNote.Visible) and (MemoNote.SelLength > 0);
 end;
 
 function TformNotetask.GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
 begin
   // If note column is selected or note panel visible
-  if (((taskGrid.Selection.Left = COL_NOTE) and (taskGrid.Selection.Right >= COL_NOTE)) or
-    ((panelNote.Visible) and ((memoPriority) or (memoNote.SelLength > 0) or (memoNote.Focused)))) then
+  if (((Grid.Selection.Left = COL_NOTE) and (Grid.Selection.Right >= COL_NOTE)) or
+    ((panelNote.Visible) and ((memoPriority) or (MemoNote.SelLength > 0) or (MemoNote.Focused)))) then
   begin
-    if (panelNote.Visible) and (memoNote.SelLength > 0) then
-      Result := memoNote.SelText
+    if (panelNote.Visible) and (MemoNote.SelLength > 0) then
+      Result := MemoNote.SelText
     else
     begin
       if (Assigned(PanelMemo)) and (PanelMemo.Visible) and (Memo.SelLength > 0) then
@@ -5443,7 +6119,7 @@ procedure TformNotetask.ExecuteChatGpt;
 var
   Value: string;
 begin
-  Value := GetExecuteValue(taskGrid.Row);
+  Value := GetExecuteValue(Grid.Row);
 
   with formMemoText do
   try
@@ -5580,7 +6256,7 @@ begin
     Script.Add('#!/bin/bash');
     {$ENDIF}
 
-    for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+    for i := Grid.Selection.Top to Grid.Selection.Bottom do
     begin
       AddLine(i);
       if (IsExecuteValueNote(True)) then break;
@@ -5704,70 +6380,15 @@ begin
   end;
 end;
 
-procedure TformNotetask.aSaveNotesAsExecute(Sender: TObject);
-var
-  notes: TStringList;
-  fileName: string;
-  i: integer;
-const
-  MAX_FILE_NAME_LEN = 50;
-begin
-  notes := TStringList.Create;
-  try
-    fileName := string.Empty;
-    notes.LineBreak := FLineEnding.Value;
-    notes.Options := notes.Options - [soTrailingLineBreak];
-
-    if taskGrid.Selection.Height > 0 then
-    begin
-      // Multiple rows selected — concatenate notes
-      for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-        if Tasks.Map(i) > -1 then
-        begin
-          notes.Add(Tasks.GetTask(i).Note);
-          if (i = taskGrid.Selection.Top) then
-            fileName := Tasks.GetTask(i).Text;
-        end;
-    end
-    else if Tasks.Map(taskGrid.Row) > -1 then
-    begin
-      // Single row selected
-      notes.Add(Tasks.GetTask(taskGrid.Row).Note);
-      fileName += Tasks.GetTask(taskGrid.Row).Text;
-    end;
-
-    // limit file name length
-    if Length(fileName) > MAX_FILE_NAME_LEN then
-      fileName := Copy(fileName, 1, MAX_FILE_NAME_LEN);
-
-    // sanitize forbidden characters
-    fileName := StringReplace(fileName, '\', '_', [rfReplaceAll]);
-    fileName := StringReplace(fileName, '/', '_', [rfReplaceAll]);
-    fileName := StringReplace(fileName, ':', '_', [rfReplaceAll]);
-    fileName := StringReplace(fileName, '*', '_', [rfReplaceAll]);
-    fileName := StringReplace(fileName, '?', '_', [rfReplaceAll]);
-    fileName := StringReplace(fileName, '"', '_', [rfReplaceAll]);
-    fileName := StringReplace(fileName, '<', '_', [rfReplaceAll]);
-    fileName := StringReplace(fileName, '>', '_', [rfReplaceAll]);
-    fileName := StringReplace(fileName, '|', '_', [rfReplaceAll]);
-
-    saveNotesDialog.FileName := fileName;
-    if (saveNotesDialog.Execute) then
-      notes.SaveToFile(saveNotesDialog.FileName, FEncoding);
-  finally
-    notes.Free;
-  end;
-end;
-
 procedure TformNotetask.MoveTabLeft(Index: integer);
 var
   Result: integer;
   RowMem: integer = -1;
 begin
   if (Index = 1) and (Tasks.GroupNames[0] = string.Empty) then exit;
-  if groupTabs.Tabs.Count < 1 then exit;
+  if TabsGroup.Tabs.Count < 1 then exit;
 
-  Result := Tasks.MoveGroupLeft(FindGroupRealIndex(Index), ShowArchived, filterBox.Text, FShowTime);
+  Result := Tasks.MoveGroupLeft(FindGroupRealIndex(Index), ShowArchived, FilterBox.Text, FShowTime);
   if (Length(FLastRowMem) > Result) then
     RowMem := FLastRowMem[Result];
   Result := FindGroupTabIndex(Result);
@@ -5794,9 +6415,9 @@ var
   RowMem: integer = -1;
 begin
   if (Index = 0) and (Tasks.GroupNames[0] = string.Empty) then exit;
-  if groupTabs.Tabs.Count < 1 then exit;
+  if TabsGroup.Tabs.Count < 1 then exit;
 
-  Result := Tasks.MoveGroupRight(FindGroupRealIndex(Index), ShowArchived, filterBox.Text, FShowTime);
+  Result := Tasks.MoveGroupRight(FindGroupRealIndex(Index), ShowArchived, FilterBox.Text, FShowTime);
   if (Length(FLastRowMem) > Result) then
     RowMem := FLastRowMem[Result];
   Result := FindGroupTabIndex(Result);
@@ -5820,10 +6441,10 @@ procedure TformNotetask.ChangeGroup(Index: integer);
 var
   force: boolean;
 begin
-  if (Index < 0) or (index > groupTabs.Tabs.Count - 1) then exit;
-  force := groupTabs.TabIndex = Index;
-  groupTabs.TabIndex := Index;
-  if (force) then groupTabsChange(groupTabs);
+  if (Index < 0) or (index > TabsGroup.Tabs.Count - 1) then exit;
+  force := TabsGroup.TabIndex = Index;
+  TabsGroup.TabIndex := Index;
+  if (force) then TabsGroupChange(TabsGroup);
 end;
 
 procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
@@ -5880,25 +6501,25 @@ begin
       Task := Tasks.GetTask(ARow);
       if Task.Tags.Count > 0 then
       begin
-        mRoundCorners := tagsEdit.RoundCorners;
-        mTagBorderWidth := tagsEdit.TagBorderWidth;
-        tagsEdit.RoundCorners := TGridPrinter(Sender).ScaleY(tagsEdit.RoundCorners);
-        tagsEdit.TagBorderWidth := TGridPrinter(Sender).ScaleY(tagsEdit.TagBorderWidth);
-        BitTags := tagsEdit.GetTagsBitmap(Task.Tags, Round(TGridPrinter(Sender).ScaleY(Max(ACanvas.Font.Size, 10))),
+        mRoundCorners := TagEdit.RoundCorners;
+        mTagBorderWidth := TagEdit.TagBorderWidth;
+        TagEdit.RoundCorners := TGridPrinter(Sender).ScaleY(TagEdit.RoundCorners);
+        TagEdit.TagBorderWidth := TGridPrinter(Sender).ScaleY(TagEdit.TagBorderWidth);
+        BitTags := TagEdit.GetTagsBitmap(Task.Tags, Round(TGridPrinter(Sender).ScaleY(Max(ACanvas.Font.Size, 10))),
           Min(ARect.Width, TGridPrinter(Sender).ScaleY(500)), ARect.Height, 2, TagsDimnessPrint);
         try
           BitTags.TransparentColor := TDarkUtils.ThemeColor(clWhite, clBlack);
           BitTags.Transparent := True;
           if BitTags.Width < aRect.Width - 50 then
           begin
-            if taskGrid.BiDiMode = bdLeftToRight then
-              ACanvas.Draw(aRect.Right - BitTags.Width - 5, aRect.Top + tagsEdit.TagBorderWidth, BitTags)
+            if Grid.BiDiMode = bdLeftToRight then
+              ACanvas.Draw(aRect.Right - BitTags.Width - 5, aRect.Top + TagEdit.TagBorderWidth, BitTags)
             else
-              ACanvas.Draw(aRect.Left + 5, aRect.Top + tagsEdit.TagBorderWidth, BitTags);
+              ACanvas.Draw(aRect.Left + 5, aRect.Top + TagEdit.TagBorderWidth, BitTags);
           end;
         finally
-          tagsEdit.RoundCorners := mRoundCorners;
-          tagsEdit.TagBorderWidth := mTagBorderWidth;
+          TagEdit.RoundCorners := mRoundCorners;
+          TagEdit.TagBorderWidth := mTagBorderWidth;
           BitTags.Free;
         end;
       end;
@@ -5937,14 +6558,14 @@ begin
   LineHeight := Canvas.TextHeight('Th');
   if LineHeight <= 0 then Exit(0);
   {$IFDEF UNIX}
-  FirstVisibleLine := memoNote.VertScrollBar.Position div LineHeight;
+  FirstVisibleLine := MemoNote.VertScrollBar.Position div LineHeight;
   {$ELSE}
-  FirstVisibleLine := memoNote.VertScrollBar.Position;
+  FirstVisibleLine := MemoNote.VertScrollBar.Position;
   {$ENDIF}
-  Result := FirstVisibleLine + (memoNote.ClientHeight - memoNote.ClientHeight mod LineHeight) div LineHeight;
+  Result := FirstVisibleLine + (MemoNote.ClientHeight - MemoNote.ClientHeight mod LineHeight) div LineHeight;
 
   if Result < 0 then Result := 0;
-  if Result >= memoNote.Lines.Count then Result := memoNote.Lines.Count - 1;
+  if Result >= MemoNote.Lines.Count then Result := MemoNote.Lines.Count - 1;
 end;
 
 function TformNotetask.GetLineAtPos(Y: integer): integer;
@@ -5958,11 +6579,11 @@ begin
   LineHeight := Canvas.TextHeight('Th');
   if LineHeight <= 0 then Exit(0);
   {$IFDEF UNIX}
-  FirstVisibleLine := memoNote.VertScrollBar.Position div LineHeight;
-  PixelOffset := memoNote.VertScrollBar.Position mod LineHeight;
+  FirstVisibleLine := MemoNote.VertScrollBar.Position div LineHeight;
+  PixelOffset := MemoNote.VertScrollBar.Position mod LineHeight;
   Result := FirstVisibleLine + (Y + PixelOffset) div LineHeight;
   {$ELSE}
-  FirstVisibleLine := memoNote.VertScrollBar.Position;
+  FirstVisibleLine := MemoNote.VertScrollBar.Position;
   Result := FirstVisibleLine + Y div LineHeight;
   {$ENDIF}
 
@@ -5970,7 +6591,7 @@ begin
   else
   if Result < 0 then Result := 0
   else
-  if Result >= memoNote.Lines.Count then Result := memoNote.Lines.Count;
+  if Result >= MemoNote.Lines.Count then Result := MemoNote.Lines.Count;
 end;
 
 procedure TformNotetask.EditCell(aCol: integer = -1; aRow: integer = -1);
@@ -5978,19 +6599,19 @@ var
   Value: string;
 begin
   if (aCol >= 0) then
-    taskGrid.Col := aCol
+    Grid.Col := aCol
   else
-    aCol := taskGrid.Col;
+    aCol := Grid.Col;
   if (aRow >= 0) then
-    taskGrid.Row := aRow
+    Grid.Row := aRow
   else
-    aRow := taskGrid.Row;
+    aRow := Grid.Row;
   FIsEditing := True;
-  taskGrid.EditorMode := True; //Set editing mode
+  Grid.EditorMode := True; //Set editing mode
 
   if (Assigned(PanelMemo)) and (PanelMemo.Visible) then
   begin
-    EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
+    EditControlSetBounds(PanelMemo, Grid.Col, Grid.Row);
     Value := Tasks.GetTaskValue(aCol, aRow);
     if (aCol <> COL_AMOUNT) or (Value <> '0') then
       Memo.Text := Value;
@@ -6001,7 +6622,7 @@ begin
   end;
   if (Assigned(DatePicker)) and (DatePicker.Visible) then
   begin
-    EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 2, -2, -2, 0);
+    EditControlSetBounds(DatePicker, Grid.Col, Grid.Row, 2, -2, -2, 0);
   end;
 end;
 
@@ -6009,11 +6630,11 @@ procedure TformNotetask.EditComplete(aEnter: boolean = False; aEscape: boolean =
 begin
   if IsEditing then
   begin
-    if (taskGrid.Col = COL_DATE) and (Assigned(DatePicker)) then
+    if (Grid.Col = COL_DATE) and (Assigned(DatePicker)) then
     begin
       if (aEnter) then
       begin
-        if taskGrid.Cells[taskGrid.Col, taskGrid.Row] = string.empty then
+        if Grid.Cells[Grid.Col, Grid.Row] = string.empty then
           DatePickerChange(DatePicker);
       end
       else
@@ -6028,22 +6649,22 @@ begin
       end;
     end;
 
-    if (taskGrid.Col in [COL_TASK, COL_NOTE, COL_AMOUNT]) and (Assigned(Memo)) then
+    if (Grid.Col in [COL_TASK, COL_NOTE, COL_AMOUNT]) and (Assigned(Memo)) then
     begin
       // Pressing the Escape key cancels editing
       if (aEscape) then
         Memo.Text := FMemoOldText
       else
-      if taskGrid.Col in [COL_TASK, COL_NOTE] then
+      if Grid.Col in [COL_TASK, COL_NOTE] then
         SetFilter;
     end;
 
-    taskGrid.EditorMode := False;
+    Grid.EditorMode := False;
     FIsEditing := False;
     ChangeLastText;
     ResetRowHeight;
-    if Visible and taskGrid.Visible and taskGrid.CanFocus then
-      taskGrid.SetFocus;
+    if Visible and Grid.Visible and Grid.CanFocus then
+      Grid.SetFocus;
   end;
 end;
 
@@ -6052,7 +6673,7 @@ var
   s: string;
 begin
   {$IFDEF UNIX}
-  memoNote.Tag := memoNote.VertScrollBar.Position;
+  MemoNote.Tag := MemoNote.VertScrollBar.Position;
   {$ENDIF}
   if Clipboard.HasFormat(CF_TEXT) then
   begin
@@ -6067,8 +6688,8 @@ begin
     AMemo.SelText := s;
   end;
   {$IFDEF UNIX}
-  if (memoNote.Tag > 0) then
-    MemoNoteSetScrollPosition(memoNote.Tag);
+  if (MemoNote.Tag > 0) then
+    MemoNoteSetScrollPosition(MemoNote.Tag);
   {$ENDIF}
 end;
 
@@ -6092,34 +6713,34 @@ var
   newStart, newLength: integer;
 begin
   {$IFDEF UNIX}
-  memoNote.Tag := memoNote.VertScrollBar.Position;
+  MemoNote.Tag := MemoNote.VertScrollBar.Position;
   {$ENDIF}
-  memoNote.CaretPos := Point(0, LineIndex);
-  memoNote.SelLength := Length(unicodestring(memoNote.Lines[LineIndex]));
+  MemoNote.CaretPos := Point(0, LineIndex);
+  MemoNote.SelLength := Length(unicodestring(MemoNote.Lines[LineIndex]));
 
   if (not Move) then
   begin
-    FNoteSelStart := memoNote.SelStart;
-    FNoteSelLength := memoNote.SelLength;
+    FNoteSelStart := MemoNote.SelStart;
+    FNoteSelLength := MemoNote.SelLength;
   end;
 
   if (Move) then
   begin
-    newStart := memoNote.SelStart;
-    newLength := memoNote.SelLength;
+    newStart := MemoNote.SelStart;
+    newLength := MemoNote.SelLength;
 
     if (newStart > FNoteSelStart) then
     begin
-      memoNote.SelStart := FNoteSelStart;
-      memoNote.SelLength := newStart + newLength - FNoteSelStart;
+      MemoNote.SelStart := FNoteSelStart;
+      MemoNote.SelLength := newStart + newLength - FNoteSelStart;
     end
     else
-      memoNote.SelLength := FNoteSelStart + FNoteSelLength - newStart;
+      MemoNote.SelLength := FNoteSelStart + FNoteSelLength - newStart;
   end;
 
   {$IFDEF UNIX}
-  if (memoNote.Tag > 0) then
-    MemoNoteSetScrollPosition(memoNote.Tag);
+  if (MemoNote.Tag > 0) then
+    MemoNoteSetScrollPosition(MemoNote.Tag);
   {$ENDIF}
 end;
 
@@ -6143,13 +6764,13 @@ begin
   if UTF8Key = #8 then  // backspace
     Memo.SelText := string.Empty
   else
-  if (taskGrid.Col <> COL_AMOUNT) then
+  if (Grid.Col <> COL_AMOUNT) then
     Memo.SelText := UTF8Key
   else
     Memo.SelText := TMathParser.CleanNumericExpression(UTF8Key);
 end;
 
-procedure TformNotetask.taskGridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
+procedure TformNotetask.GridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
 begin
   {$IFDEF UNIX}
   FKeyPressed := UTF8Key;
@@ -6161,10 +6782,10 @@ end;
 procedure TformNotetask.MemoEnter(Sender: TObject);
 begin
   FMemoStartEdit := True;
-  FMemoOldText := taskGrid.Cells[TaskGrid.Col, TaskGrid.Row];
+  FMemoOldText := Grid.Cells[Grid.Col, Grid.Row];
 
   // If amount column selected then clean when edit
-  if (FMemoNeedSelectAll) and (taskGrid.Col in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
+  if (FMemoNeedSelectAll) and (Grid.Col in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
   begin
     Memo.SelStart := 0;
     Memo.SelLength := Length(Memo.Text);
@@ -6173,14 +6794,14 @@ begin
 
   if (FKeyPressed <> string.Empty) and (FKeyPressed <> #13) then
   begin
-    if (taskGrid.Col = COL_AMOUNT) then
+    if (Grid.Col = COL_AMOUNT) then
       Memo.SelText := TMathParser.CleanNumericExpression(FKeyPressed)
     else
       Memo.SelText := FKeyPressed;
     FKeyPressed := string.Empty;
   end;
 
-  if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+  if (Grid.IsCellSelected[Grid.Col, Grid.Row]) and ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) then
   begin
     Memo.Color := clHighlight;
     Memo.Font.Color := clWhite;
@@ -6198,15 +6819,15 @@ end;
 
 procedure TformNotetask.MemoChange(Sender: TObject);
 begin
-  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := TMemo(Sender).Text;
-  Tasks.SetTask(taskGrid, Memo, taskGrid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
+  Grid.Cells[Grid.Col, Grid.Row] := TMemo(Sender).Text;
+  Tasks.SetTask(Grid, Memo, Grid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
   FMemoStartEdit := False;
   SetChanged;
-  CalcRowHeight(True, taskGrid.Row);
-  EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
-  if (taskGrid.Col = COL_NOTE) then
+  CalcRowHeight(True, Grid.Row);
+  EditControlSetBounds(PanelMemo, Grid.Col, Grid.Row);
+  if (Grid.Col = COL_NOTE) then
     SetNote;
-  if (taskGrid.Col = COL_AMOUNT) then
+  if (Grid.Col = COL_AMOUNT) then
     SetInfo;
 end;
 
@@ -6243,7 +6864,7 @@ begin
     Key := 0;
     EditComplete(True);
 
-    with taskGrid do
+    with Grid do
     begin
       nextCol := Col + 1;
       while (nextCol < ColCount) and (not Columns.Items[nextCol - 1].Visible) do
@@ -6274,11 +6895,11 @@ end;
 
 procedure TformNotetask.DatePickerEnter(Sender: TObject);
 begin
-  FDatePickerOldDate := Tasks.GetTask(taskGrid.Row).Date;
+  FDatePickerOldDate := Tasks.GetTask(Grid.Row).Date;
   FDatePickerDateSet := False;
   if (FBackup) then Tasks.CreateBackup;
   if (DatePicker.DateTime = 0) then DatePicker.DateTime := Now;
-  if (taskGrid.IsCellSelected[taskGrid.Col, taskGrid.Row]) and ((taskGrid.Selection.Height > 0) or (taskGrid.Selection.Width > 0)) then
+  if (Grid.IsCellSelected[Grid.Col, Grid.Row]) and ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) then
   begin
     DatePicker.Color := clHighlight;
     DatePicker.Font.Color := TDarkUtils.ThemeColor(clWhite, clBlack);
@@ -6293,10 +6914,10 @@ end;
 procedure TformNotetask.DatePickerChange(Sender: TObject);
 begin
   FDatePickerDateSet := True;
-  taskGrid.Cells[taskGrid.Col, taskGrid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime, FShowTime);
-  Tasks.SetTask(taskGrid, Memo, taskGrid.Row, False, FShowTime);
+  Grid.Cells[Grid.Col, Grid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime, FShowTime);
+  Tasks.SetTask(Grid, Memo, Grid.Row, False, FShowTime);
   SetChanged;
-  EditControlSetBounds(DatePicker, taskGrid.Col, taskGrid.Row, 2, -2, -2, 0);
+  EditControlSetBounds(DatePicker, Grid.Col, Grid.Row, 2, -2, -2, 0);
   if (FShowDuration) then FillGrid;
   SetInfo;
 end;
@@ -6310,7 +6931,7 @@ begin
     Key := 0;
     EditComplete(FDatePickerDateSet, not FDatePickerDateSet);
 
-    with taskGrid do
+    with Grid do
     begin
       if Row < RowCount - 1 then
       begin
@@ -6334,11 +6955,11 @@ var
 begin
   if Assigned(Sender) then
   begin
-    if (Sender is TPanel) and (aCol = COL_TASK) and (aRow > 0) and (aRow < taskGrid.RowCount) then
+    if (Sender is TPanel) and (aCol = COL_TASK) and (aRow > 0) and (aRow < Grid.RowCount) then
       Indent := Tasks.GetTask(aRow).FIndentLevel * Canvas.TextWidth(' ') * 2;
 
-    Rect := taskGrid.CellRect(aCol, aRow);
-    Sender.SetBounds(Rect.Left + OffsetLeft + Indent, Max(Rect.Top, taskGrid.RowHeights[0]) + OffsetTop,
+    Rect := Grid.CellRect(aCol, aRow);
+    Sender.SetBounds(Rect.Left + OffsetLeft + Indent, Max(Rect.Top, Grid.RowHeights[0]) + OffsetTop,
       Rect.Right - Rect.Left + OffsetRight - Indent,
       Rect.Bottom - Rect.Top + OffsetBottom);
   end;
@@ -6356,7 +6977,7 @@ begin
   if (Confirm = mrYes) or (not ShowConfirm) then
   begin
     GridBackupSelection;
-    Tasks.ClearTasksInRect(taskGrid, taskGrid.Selection);
+    Tasks.ClearTasksInRect(Grid, Grid.Selection);
     if (Assigned(Memo)) then
     begin
       Memo.OnChange := nil;
@@ -6383,21 +7004,21 @@ begin
 
   DisableGridEvents;
   try
-    Original := taskGrid.Selection;
-    taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
-    Tasks.CopyToClipboard(taskGrid, FShowNote, @Value);
-    Back := taskGrid.Selection;
+    Original := Grid.Selection;
+    Grid.Selection := TGridRect.Create(0, Grid.Selection.Top, Grid.Columns.Count, Grid.Selection.Bottom);
+    Tasks.CopyToClipboard(Grid, FShowNote, @Value);
+    Back := Grid.Selection;
     if (SortOrder = soAscending) then
     begin
-      taskGrid.Row := taskGrid.Selection.Bottom;
-      taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Bottom, taskGrid.Columns.Count, taskGrid.Selection.Bottom);
+      Grid.Row := Grid.Selection.Bottom;
+      Grid.Selection := TGridRect.Create(0, Grid.Selection.Bottom, Grid.Columns.Count, Grid.Selection.Bottom);
     end
     else
     begin
-      taskGrid.Row := taskGrid.Selection.Top;
-      taskGrid.Selection := TGridRect.Create(0, taskGrid.Selection.Top, taskGrid.Columns.Count, taskGrid.Selection.Top);
+      Grid.Row := Grid.Selection.Top;
+      Grid.Selection := TGridRect.Create(0, Grid.Selection.Top, Grid.Columns.Count, Grid.Selection.Top);
     end;
-    Tasks.PasteFromClipboard(taskGrid, SortOrder, False, @Value);
+    Tasks.PasteFromClipboard(Grid, SortOrder, False, @Value);
     if (SortOrder = soAscending) then
       Sel := TGridRect.Create(Original.Left, Back.Bottom + 1, Original.Right, Back.Bottom + Back.Height + 1)
     else
@@ -6409,10 +7030,10 @@ begin
   if (SortColumn = COL_NUM) then
   begin
     if (SortOrder = soAscending) then
-      taskGrid.Row := Sel.Top
+      Grid.Row := Sel.Top
     else
-      taskGrid.Row := Sel.Bottom;
-    taskGrid.Selection := Sel;
+      Grid.Row := Sel.Bottom;
+    Grid.Selection := Sel;
     FLastSelectionHeight := Sel.Height;
   end;
   CalcRowHeight(True);
@@ -6433,7 +7054,7 @@ begin
   if (ReadOnly) then exit;
 
   // If multiple rows are selected
-  if (taskGrid.Selection.Height > 0) then
+  if (Grid.Selection.Height > 0) then
   begin
     Confirm := MessageDlg(rmergesconfirm, mtConfirmation, [mbYes, mbNo], 0);
 
@@ -6447,9 +7068,9 @@ begin
 
       DisableGridEvents;
       try
-        Task := Tasks.GetTask(taskGrid.Selection.Top);
+        Task := Tasks.GetTask(Grid.Selection.Top);
         MaxDate := Task.Date;
-        for i := taskGrid.Selection.Top + 1 to taskGrid.Selection.Bottom do
+        for i := Grid.Selection.Top + 1 to Grid.Selection.Bottom do
         begin
           Target := Tasks.GetTask(i);
           if (task.Text <> Target.Text) then
@@ -6475,11 +7096,11 @@ begin
             Task.Tags.Sorted := False;
           end;
         end;
-        for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top + 1 do
+        for i := Grid.Selection.Bottom downto Grid.Selection.Top + 1 do
           Tasks.DeleteTask(i);
 
         // Mem selection
-        Sel := taskGrid.Selection;
+        Sel := Grid.Selection;
       finally
         EnableGridEvents;
       end;
@@ -6491,8 +7112,8 @@ begin
       SetChanged; // Mark that data has changed
 
       // Restore selection
-      taskGrid.Row := Sel.Top;
-      taskGrid.Selection := TGridRect.Create(Sel.Left, Sel.Top, Sel.Right, Sel.Top);
+      Grid.Row := Sel.Top;
+      Grid.Selection := TGridRect.Create(Sel.Left, Sel.Top, Sel.Right, Sel.Top);
     end;
   end;
 end;
@@ -6510,11 +7131,11 @@ begin
 
   // Check if the current column can be split
   colToSplit := -1;
-  for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+  for i := Grid.Selection.Top to Grid.Selection.Bottom do
   begin
-    if (taskGrid.Col = COL_TASK) and (Pos(FLineEnding.Value, Tasks.GetTask(i).Text) > 0) then
+    if (Grid.Col = COL_TASK) and (Pos(FLineEnding.Value, Tasks.GetTask(i).Text) > 0) then
       colToSplit := COL_TASK
-    else if (taskGrid.Col = COL_NOTE) and (Pos(FLineEnding.Value, Tasks.GetTask(i).Note) > 0) then
+    else if (Grid.Col = COL_NOTE) and (Pos(FLineEnding.Value, Tasks.GetTask(i).Note) > 0) then
       colToSplit := COL_NOTE;
   end;
 
@@ -6542,12 +7163,12 @@ begin
     Lines2.LineBreak := FLineEnding.Value;
 
     // Cache selected tasks (avoid accessing the grid during modifications)
-    SetLength(TasksToSplit, taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1);
+    SetLength(TasksToSplit, Grid.Selection.Bottom - Grid.Selection.Top + 1);
     for i := 0 to High(TasksToSplit) do
-      TasksToSplit[i] := Tasks.GetTask(taskGrid.Selection.Top + i);
+      TasksToSplit[i] := Tasks.GetTask(Grid.Selection.Top + i);
 
     // Process tasks in order
-    index := taskGrid.Selection.Top;
+    index := Grid.Selection.Top;
     for i := 0 to High(TasksToSplit) do
     begin
       Task := TasksToSplit[i];
@@ -6628,7 +7249,7 @@ begin
   end;
 
   // Refresh grid and UI
-  Sel := taskGrid.Selection;
+  Sel := Grid.Selection;
   FillGrid;
   CalcRowHeight(True);
   SetInfo;
@@ -6638,9 +7259,9 @@ begin
 
   // Restore selection
   if (SortColumn = COL_NUM) then
-    taskGrid.Selection := TGridRect.Create(sel.Left, sel.Top, Sel.Right, index + (Sel.Bottom - Sel.Top))
+    Grid.Selection := TGridRect.Create(sel.Left, sel.Top, Sel.Right, index + (Sel.Bottom - Sel.Top))
   else
-    taskGrid.Selection := Sel;
+    Grid.Selection := Sel;
 end;
 
 procedure TformNotetask.DeleteTask(aRow: integer = 0; ShowConfirm: boolean = True);
@@ -6652,7 +7273,7 @@ begin
 
   // Get current RowIndex selected
   if (aRow = 0) then
-    RowIndex := taskGrid.Row
+    RowIndex := Grid.Row
   else
     RowIndex := aRow;
   if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
@@ -6672,7 +7293,7 @@ begin
       end;
 
       // RemoveTask from collection
-      taskGrid.DeleteRow(RowIndex);
+      Grid.DeleteRow(RowIndex);
       FillGrid;
       ResetRowHeight;
       SetTabs;
@@ -6680,7 +7301,7 @@ begin
       SetNote;
       SetTags;
       SetChanged; // Mark that data has changed
-      FLastText := taskGrid.Cells[taskGrid.Col, taskGrid.Row];
+      FLastText := Grid.Cells[Grid.Col, Grid.Row];
     end;
   end;
 end;
@@ -6692,7 +7313,7 @@ begin
   if (ReadOnly) then exit;
 
   // If multiple rows are selected
-  if (taskGrid.Selection.Height > 0) then
+  if (Grid.Selection.Height > 0) then
   begin
     Confirm := mrYes;
 
@@ -6711,20 +7332,20 @@ begin
       DisableGridEvents;
       try
         // Delete rows from the end to avoid index shifting
-        for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
+        for i := Grid.Selection.Bottom downto Grid.Selection.Top do
         begin
           RowIndex := i;
-          if (RowIndex > 0) and (RowIndex <= Tasks.Count) and (taskGrid.RowCount > RowIndex) then
+          if (RowIndex > 0) and (RowIndex <= Tasks.Count) and (Grid.RowCount > RowIndex) then
           begin
             // Remove the task from the collection
-            taskGrid.DeleteRow(RowIndex);
+            Grid.DeleteRow(RowIndex);
           end;
         end;
       finally
         EnableGridEvents;
       end;
 
-      taskGrid.ClearSelections;
+      Grid.ClearSelections;
       FillGrid;
       ResetRowHeight;
       SetTabs;
@@ -6732,7 +7353,7 @@ begin
       SetNote;
       SetTags;
       SetChanged; // Mark that data has changed
-      FLastText := taskGrid.Cells[taskGrid.Col, taskGrid.Row];
+      FLastText := Grid.Cells[Grid.Col, Grid.Row];
     end;
   end
   else
@@ -6748,7 +7369,7 @@ begin
 
   // Get current RowIndex selected
   if (aRow = 0) then
-    RowIndex := taskGrid.Row
+    RowIndex := Grid.Row
   else
     RowIndex := aRow;
   if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
@@ -6785,7 +7406,7 @@ begin
   if (ReadOnly) then exit;
 
   // If multiple rows are selected
-  if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+  if (Grid.Selection.Width > 0) or (Grid.Selection.Height > 0) then
   begin
     // Request confirmation for archiving
     Confirm := MessageDlg(rarchivesconfirm, mtConfirmation, [mbYes, mbNo], 0);
@@ -6802,7 +7423,7 @@ begin
       DisableGridEvents;
       try
         // Archive tasks from the end to avoid index shifting
-        for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
+        for i := Grid.Selection.Bottom downto Grid.Selection.Top do
         begin
           RowIndex := i;
           if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
@@ -6836,7 +7457,7 @@ begin
   if (ReadOnly) or (not ShowColumnDone) then exit;
 
   // If multiple rows are selected
-  if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+  if (Grid.Selection.Width > 0) or (Grid.Selection.Height > 0) then
   begin
     if FBackup then
     begin
@@ -6847,7 +7468,7 @@ begin
     DisableGridEvents;
     try
       // Mark tasks as completed from the end to avoid index shifting
-      for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
+      for i := Grid.Selection.Bottom downto Grid.Selection.Top do
       begin
         RowIndex := i;
         if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
@@ -6857,14 +7478,14 @@ begin
 
           if Tasks.GetTask(RowIndex).Done then
           begin
-            taskGrid.Cells[COL_DONE, RowIndex] := '1';
-            if (taskGrid.Columns.Items[COL_DATE - 1].Visible) and (taskGrid.Cells[COL_DATE, RowIndex] = string.Empty) then
-              taskGrid.Cells[COL_DATE, RowIndex] := DateTimeToString(Now, FShowTime);
+            Grid.Cells[COL_DONE, RowIndex] := '1';
+            if (Grid.Columns.Items[COL_DATE - 1].Visible) and (Grid.Cells[COL_DATE, RowIndex] = string.Empty) then
+              Grid.Cells[COL_DATE, RowIndex] := DateTimeToString(Now, FShowTime);
           end
           else
-            taskGrid.Cells[COL_DONE, RowIndex] := '0';
+            Grid.Cells[COL_DONE, RowIndex] := '0';
 
-          Tasks.SetTask(taskGrid, Memo, RowIndex, False, FShowTime); // Backup created on start
+          Tasks.SetTask(Grid, Memo, RowIndex, False, FShowTime); // Backup created on start
         end;
       end;
     finally
@@ -6878,7 +7499,7 @@ begin
   begin
     // Get current RowIndex selected if no multiple selection
     if (aRow = 0) then
-      RowIndex := taskGrid.Row
+      RowIndex := Grid.Row
     else
       RowIndex := aRow;
 
@@ -6896,14 +7517,14 @@ begin
       if Tasks.GetTask(RowIndex).Done then
       begin
         Check := True;
-        taskGrid.Cells[COL_DONE, RowIndex] := '1';
-        if (taskGrid.Columns.Items[COL_DATE - 1].Visible) and (taskGrid.Cells[COL_DATE, RowIndex] = string.Empty) then
-          taskGrid.Cells[COL_DATE, RowIndex] := DateTimeToString(Now, FShowTime);
+        Grid.Cells[COL_DONE, RowIndex] := '1';
+        if (Grid.Columns.Items[COL_DATE - 1].Visible) and (Grid.Cells[COL_DATE, RowIndex] = string.Empty) then
+          Grid.Cells[COL_DATE, RowIndex] := DateTimeToString(Now, FShowTime);
       end
       else
-        taskGrid.Cells[COL_DONE, RowIndex] := '0';
+        Grid.Cells[COL_DONE, RowIndex] := '0';
 
-      Tasks.SetTask(taskGrid, Memo, RowIndex, False, FShowTime);
+      Tasks.SetTask(Grid, Memo, RowIndex, False, FShowTime);
       if (ShowDuration) and (Check) then FillGrid;
       SetChanged; // Mark that data has changed
       SetInfo;
@@ -6919,16 +7540,16 @@ begin
   if (ReadOnly) then exit;
 
   // Detect selected rows
-  if (taskGrid.Selection.Width > 0) or (taskGrid.Selection.Height > 0) then
+  if (Grid.Selection.Width > 0) or (Grid.Selection.Height > 0) then
   begin
-    SetLength(Rows, taskGrid.Selection.Bottom - taskGrid.Selection.Top + 1);
+    SetLength(Rows, Grid.Selection.Bottom - Grid.Selection.Top + 1);
     for i := 0 to High(Rows) do
-      Rows[i] := taskGrid.Selection.Top + i;
+      Rows[i] := Grid.Selection.Top + i;
   end
   else
   begin
     if aRow = 0 then
-      RowIndex := taskGrid.Row
+      RowIndex := Grid.Row
     else
       RowIndex := aRow;
     SetLength(Rows, 1);
@@ -6949,11 +7570,11 @@ begin
       Tasks.StarTask(RowIndex, False);
 
       if Tasks.GetTask(RowIndex).Star then
-        taskGrid.Cells[COL_STAR, RowIndex] := '1'
+        Grid.Cells[COL_STAR, RowIndex] := '1'
       else
-        taskGrid.Cells[COL_STAR, RowIndex] := '0';
+        Grid.Cells[COL_STAR, RowIndex] := '0';
 
-      Tasks.SetTask(taskGrid, Memo, RowIndex, False, FShowTime);
+      Tasks.SetTask(Grid, Memo, RowIndex, False, FShowTime);
     end;
   end;
 
@@ -6975,7 +7596,7 @@ begin
     Tasks.CreateBackup;
   end;
   // Mark tasks as completed from the end to avoid index shifting
-  for i := taskGrid.Selection.Bottom downto taskGrid.Selection.Top do
+  for i := Grid.Selection.Bottom downto Grid.Selection.Top do
   begin
     RowIndex := i;
     if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
@@ -6994,9 +7615,9 @@ end;
 
 procedure TformNotetask.GridBackupSelection;
 begin
-  FLastGridSelection := taskGrid.Selection;
-  FLastGridRow := taskGrid.Row;
-  FLastGridCol := taskGrid.Col;
+  FLastGridSelection := Grid.Selection;
+  FLastGridRow := Grid.Row;
+  FLastGridCol := Grid.Col;
 end;
 
 procedure TformNotetask.GridClearSelection;
@@ -7006,322 +7627,9 @@ begin
   FLastGridSelection := TRect.Empty;
   FLastGridRow := 1;
   FLastGridCol := COL_TASK;
-  taskGrid.ClearSelections;
-  taskGrid.Row := 1;
-  taskGrid.Col := COL_TASK;
-end;
-
-procedure TformNotetask.MemoNoteSetScrollPosition(Value: integer);
-begin
-  {$IFDEF UNIX}
-  memoNote.Visible := False;
-  Application.ProcessMessages;
-  memoNote.VertScrollBar.Position;
-  memoNote.VertScrollBar.Position := Value;
-  memoNote.Visible := True;
-  if (memoNote.CanFocus) then memoNote.SetFocus;
-  {$ELSE}
-  memoNote.VertScrollBar.Position := 0;
-  memoNote.VertScrollBar.Position := Value;
-  {$ENDIF}
-end;
-
-procedure TformNotetask.MemoNoteBackup;
-begin
-  FMemoNoteBackup := memoNote.Text;
-  FMemoNoteSelStartBackup := memoNote.SelStart;
-  FMemoNoteSelLengthBackup := memoNote.SelLength;
-  FMemoNoteCaretBackup := memoNote.CaretPos;
-  FMemoNoteVertScrollBackup := memoNote.VertScrollBar.Position;
-end;
-
-procedure TformNotetask.MemoNoteUndo;
-var
-  newBackup: TCaption;
-  SelStart, SelLength: integer;
-begin
-  // Save current selection and text
-  newBackup := MemoNote.Text;
-  SelStart := memoNote.SelStart;
-  SelLength := memoNote.SelLength;
-
-  // Restore from backup
-  memoNote.Text := FMemoNoteBackup;
-  memoNote.CaretPos := FMemoNoteCaretBackup;
-  memoNote.SelStart := FMemoNoteSelStartBackup;
-  memoNote.SelLength := FMemoNoteSelLengthBackup;
-
-  // Adjust scroll position
-  MemoNoteSetScrollPosition(FMemoNoteVertScrollBackup);
-
-  // Option with scroll centering
-  //if (FMemoNoteVertScrollBackup > 0) then
-  //begin
-  //  LinesPerPage := memoNote.ClientHeight div Canvas.TextHeight('Wg');
-  //  memoNote.VertScrollBar.Position := memoNote.VertScrollBar.Position + LinesPerPage div 2;
-  //end;
-
-  // Update backup
-  FMemoNotebackup := newBackup;
-  FMemoNoteSelStartBackup := SelStart;
-  FMemoNoteSelLengthBackup := SelLength;
-end;
-
-procedure TformNotetask.MemoNoteIndent;
-var
-  SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
-  CaretPos: TPoint;
-  Offset: integer;
-begin
-  MemoNoteBackup;
-  if (memoNote.SelLength > 0) then
-  begin
-    SelStartPos := memoNote.SelStart;
-    SelEndPos := SelStartPos + memoNote.SelLength;
-    CaretPos := Point(memoNote.CaretPos.X, memoNote.CaretPos.Y);
-
-    memoNote.Lines.BeginUpdate;
-
-    // Calculate start line number of selection
-    memoNote.SelStart := SelStartPos;
-    StartLine := memoNote.CaretPos.Y;
-
-    // Calculate end line number of selection
-    memoNote.SelStart := SelEndPos;
-    EndLine := memoNote.CaretPos.Y;
-
-    // Restore selection
-    memoNote.SelStart := SelStartPos;
-    memoNote.SelLength := SelEndPos - SelStartPos;
-
-    memoNote.Lines.EndUpdate;
-
-    // If last line not selected decrement endline
-    if (StartLine <> EndLine) and (SelEndPos - SelStartPos > 0) and (EndLine = CaretPos.Y) and
-      ((CaretPos.X = 0) or ((CaretPos.X = (SelEndPos - SelStartPos)) and (MemoNote.SelText[Length(MemoNote.SelText)] in [#10, #13]))) then
-      Dec(EndLine);
-
-    // Add IndentStr at the start of each selected line
-    for i := StartLine to EndLine do
-      memoNote.Lines[i] := IndentStr + memoNote.Lines[i];
-
-    // Adjust selection length to include inserted spaces
-    Offset := Length(IndentStr) * (EndLine - StartLine + 1);
-    memoNote.SelStart := SelStartPos;
-    memoNote.SelLength := SelEndPos - SelStartPos + Offset;
-  end
-  else
-    memoNote.SelText := IndentStr;
-end;
-
-procedure TformNotetask.MemoNoteOutdent;
-var
-  SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
-  CaretPos: TPoint;
-  Offset: integer;
-  line: string;
-begin
-  MemoNoteBackup;
-  SelStartPos := memoNote.SelStart;
-  SelEndPos := SelStartPos + memoNote.SelLength;
-  CaretPos := Point(memoNote.CaretPos.X, memoNote.CaretPos.Y);
-
-  memoNote.Lines.BeginUpdate;
-
-  // Calculate start line number of selection
-  memoNote.SelStart := SelStartPos;
-  StartLine := memoNote.CaretPos.Y;
-
-  // Calculate end line number of selection
-  memoNote.SelStart := SelEndPos;
-  EndLine := memoNote.CaretPos.Y;
-
-  // Restore selection
-  memoNote.SelStart := SelStartPos;
-  memoNote.SelLength := SelEndPos - SelStartPos;
-
-  memoNote.Lines.EndUpdate;
-
-  // If last line not selected decrement endline
-  if (StartLine <> EndLine) and (SelEndPos - SelStartPos > 0) and (EndLine = CaretPos.Y) and
-    ((CaretPos.X = 0) or ((CaretPos.X = (SelEndPos - SelStartPos)) and (MemoNote.SelText[Length(MemoNote.SelText)] in [#10, #13]))) then
-    Dec(EndLine);
-
-  // Remove IndentStr at the start of each selected line if present
-  Offset := 0;
-  for i := StartLine to EndLine do
-  begin
-    line := memoNote.Lines[i];
-    if Length(line) >= Length(IndentStr) then
-    begin
-      if Copy(line, 1, Length(IndentStr)) = IndentStr then
-      begin
-        Delete(line, 1, Length(IndentStr));
-        memoNote.Lines[i] := line;
-        Offset += Length(IndentStr);
-      end;
-    end;
-  end;
-
-  // Adjust selection length to account for removed spaces
-  memoNote.SelStart := SelStartPos;
-  memoNote.SelLength := SelEndPos - SelStartPos - Offset;
-end;
-
-procedure TformNotetask.MemoNoteToggleComment(aComment: string);
-var
-  SelStartPos, SelEndPos, StartLine, EndLine, i: integer;
-  CaretPos: TPoint;
-  line, trimmed, resultStr: string;
-  AllCommented: boolean;
-  MinIndent, CurrentIndent: integer;
-  CommentOffset: integer;
-  FirstCommentPos, j, wordWidth, Count: integer;
-begin
-  {$IFDEF UNIX}
-  memoNote.Tag := memoNote.VertScrollBar.Position;
-  {$ENDIF}
-  MemoNoteBackup;
-
-  // If no selection and the cursor is on an empty line -> insert a line of the comment character
-  if (memoNote.SelLength = 0) then
-  begin
-    line := Trim(memoNote.Lines[memoNote.CaretPos.Y]);
-    if line = string.Empty then
-    begin
-      // Create a string of the comment character, approximate length to fit the editor width
-      // Calculate how many times we can repeat the full word
-      wordWidth := Canvas.TextWidth(aComment);
-      if wordWidth > 0 then
-        Count := Min(memoNote.ClientWidth, 800) div wordWidth
-      else
-        Count := 60; // fallback value
-
-      // Build the repeated string
-      resultStr := string.Empty;
-      for j := 1 to Count do
-        resultStr := resultStr + aComment;
-
-      memoNote.Lines[memoNote.CaretPos.Y] := resultStr;
-
-      {$IFDEF UNIX}
-    if (memoNote.Tag > 0) then
-      MemoNoteSetScrollPosition(memoNote.Tag);
-      {$ENDIF}
-
-      Exit; // Stop method execution, nothing else to do
-    end;
-  end;
-
-  FirstCommentPos := -1;
-  SelStartPos := memoNote.SelStart;
-  SelEndPos := SelStartPos + memoNote.SelLength;
-  CaretPos := Point(memoNote.CaretPos.X, memoNote.CaretPos.Y);
-
-  memoNote.Lines.BeginUpdate;
-
-  // Calculate start and end lines of selection
-  memoNote.SelStart := SelStartPos;
-  StartLine := memoNote.CaretPos.Y;
-
-  memoNote.SelStart := SelEndPos;
-  EndLine := memoNote.CaretPos.Y;
-
-  // Restore selection
-  memoNote.SelStart := SelStartPos;
-  memoNote.SelLength := SelEndPos - SelStartPos;
-
-  memoNote.Lines.EndUpdate;
-
-  // If last line not selected decrement endline
-  if (StartLine <> EndLine) and (SelEndPos - SelStartPos > 0) and (EndLine = CaretPos.Y) and
-    ((CaretPos.X = 0) or ((CaretPos.X = (SelEndPos - SelStartPos)) and (MemoNote.SelText[Length(MemoNote.SelText)] in [#10, #13]))) then
-    Dec(EndLine);
-
-  // Find minimum IndentStr among non-empty lines
-  MinIndent := MaxInt;
-  for i := StartLine to EndLine do
-  begin
-    line := memoNote.Lines[i];
-    trimmed := TrimLeft(line);
-    if trimmed <> '' then
-    begin
-      CurrentIndent := Length(line) - Length(trimmed);
-      if CurrentIndent < MinIndent then
-        MinIndent := CurrentIndent;
-    end;
-  end;
-  if MinIndent = MaxInt then
-    MinIndent := 0;
-
-  // Determine if all non-empty lines are already commented
-  AllCommented := True;
-  for i := StartLine to EndLine do
-  begin
-    trimmed := TrimLeft(memoNote.Lines[i]);
-    if (trimmed <> '') and (UpperCase(Copy(trimmed, 1, Length(aComment))) <> UpperCase(aComment)) then
-    begin
-      AllCommented := False;
-      Break;
-    end;
-  end;
-
-  CommentOffset := 0;
-
-  // Add or remove aComment for each line
-  for i := StartLine to EndLine do
-  begin
-    line := memoNote.Lines[i];
-    trimmed := TrimLeft(line);
-
-    if trimmed = '' then
-      Continue; // skip empty lines
-
-    if AllCommented then
-    begin
-      // Remove aComment, keep spaces after it
-      if UpperCase(Copy(trimmed, 1, Length(aComment))) = UpperCase(aComment) then
-      begin
-        Delete(trimmed, 1, Length(aComment));
-        memoNote.Lines[i] := StringOfChar(' ', Length(line) - Length(TrimLeft(line))) + trimmed;
-        CommentOffset -= Length(aComment);
-      end;
-    end
-    else
-    begin
-      // Add aComment at MinIndent, keep extra spaces
-      if Length(line) > MinIndent then
-        memoNote.Lines[i] := Copy(line, 1, MinIndent) + aComment + Copy(line, MinIndent + 1, MaxInt)
-      else
-        memoNote.Lines[i] := StringOfChar(' ', MinIndent) + aComment;
-      CommentOffset += Length(aComment);
-
-      // Calculate first comment position
-      if (i = startline) then
-      begin
-        FirstCommentPos := 0;
-        for j := 0 to i - 1 do
-        begin
-          FirstCommentPos := FirstCommentPos + Length(unicodestring(memoNote.Lines[j])) + 1;
-          {$IFDEF WINDOWS}
-          //if (FLineEnding = TLineEnding.WindowsCRLF) then
-             Inc(FirstCommentPos);
-          {$ENDIF}
-        end;
-      end;
-    end;
-  end;
-
-  // Restore original selection with offset
-  if FirstCommentPos > -1 then
-    memoNote.SelStart := FirstCommentPos
-  else
-    memoNote.SelStart := SelStartPos;
-  memoNote.SelLength := (SelEndPos - SelStartPos) + CommentOffset;
-  {$IFDEF UNIX}
-  if (memoNote.Tag > 0) then
-    MemoNoteSetScrollPosition(memoNote.Tag);
-  {$ENDIF}
+  Grid.ClearSelections;
+  Grid.Row := 1;
+  Grid.Col := COL_TASK;
 end;
 
 procedure TformNotetask.MemoBackup;
@@ -7390,7 +7698,7 @@ var
   DeleteCount: integer;
 begin
   if aMemoNote then
-    TargetMemo := memoNote
+    TargetMemo := MemoNote
   else
     TargetMemo := Memo;
 
@@ -7416,9 +7724,9 @@ var
 begin
   Result := 0;
 
-  for i := 1 to taskGrid.TopRow do
+  for i := 1 to Grid.TopRow do
   begin
-    Result += taskGrid.RowHeights[i] + taskGrid.GridLineWidth;
+    Result += Grid.RowHeights[i] + Grid.GridLineWidth;
   end;
 end;
 
@@ -7427,27 +7735,27 @@ var
   TempHeight: integer;
 begin
   // Check if the row indices are valid
-  if (RowIndex1 < 0) or (RowIndex1 >= taskGrid.RowCount) or (RowIndex2 < 0) or (RowIndex2 >= taskGrid.RowCount) then
+  if (RowIndex1 < 0) or (RowIndex1 >= Grid.RowCount) or (RowIndex2 < 0) or (RowIndex2 >= Grid.RowCount) then
     Exit; // Exit if the indices are invalid
 
   // Store the height of the first row
-  TempHeight := taskGrid.RowHeights[RowIndex1];
+  TempHeight := Grid.RowHeights[RowIndex1];
 
   // Swap the heights of the two rows
-  taskGrid.RowHeights[RowIndex1] := taskGrid.RowHeights[RowIndex2];
-  taskGrid.RowHeights[RowIndex2] := TempHeight;
+  Grid.RowHeights[RowIndex1] := Grid.RowHeights[RowIndex2];
+  Grid.RowHeights[RowIndex2] := TempHeight;
 end;
 
 procedure TformNotetask.BackupSelectedState(aRowMem: boolean = False);
 begin
   if (aRowMem) then
     FLoadedRowMem := FLastRowMem.CloneArray;
-  FLoadedSelectedTab := groupTabs.TabIndex;
-  FLoadedSelectedRow := taskGrid.Row;
-  FLoadedSelection := taskGrid.Selection;
-  FLoadedMemoNoteSelStart := memoNote.SelStart;
-  FLoadedMemoNoteSelLength := memoNote.SelLength;
-  FLoadedMemoNoteScroll := memoNote.VertScrollBar.Position;
+  FLoadedSelectedTab := TabsGroup.TabIndex;
+  FLoadedSelectedRow := Grid.Row;
+  FLoadedSelection := Grid.Selection;
+  FLoadedMemoNoteSelStart := MemoNote.SelStart;
+  FLoadedMemoNoteSelLength := MemoNote.SelLength;
+  FLoadedMemoNoteScroll := MemoNote.VertScrollBar.Position;
 end;
 
 procedure TformNotetask.RestoreSelectedState(aRowMem: boolean = True; aRowMemPriority: boolean = True; aFocusMemo: boolean = False);
@@ -7458,7 +7766,7 @@ begin
   if (aRowMem) and (Length(FLoadedRowMem) > 0) then
     FLoadedRowMem.CopyToArray(FLastRowMem);
 
-  if (groupTabs.Tabs.Count > 0) and ((FLoadedSelectedTab < 0) or (FLoadedSelectedTab >= groupTabs.Tabs.Count)) then
+  if (TabsGroup.Tabs.Count > 0) and ((FLoadedSelectedTab < 0) or (FLoadedSelectedTab >= TabsGroup.Tabs.Count)) then
     FLoadedSelectedTab := 0;
 
   // Restore last open tab and rows
@@ -7468,16 +7776,16 @@ begin
     if (Length(FLastRowMem) > FindGroupRealIndex(0)) then
       FirstTabRow := FLastRowMem[FindGroupRealIndex(0)];
     if (FLoadedSelectedTab > 0) then
-      groupTabs.TabIndex := FLoadedSelectedTab
+      TabsGroup.TabIndex := FLoadedSelectedTab
     else
     if (FLoadedSelectedTab = 0) and (FindGroupRealIndex(0) > 0) then
-      groupTabsChange(groupTabs);
+      TabsGroupChange(TabsGroup);
 
-    if (aRowMem) and (aRowMemPriority) and (Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex)) then
-      taskGrid.Row := FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)]
+    if (aRowMem) and (aRowMemPriority) and (Length(FLastRowMem) > FindGroupRealIndex(TabsGroup.TabIndex)) then
+      Grid.Row := FLastRowMem[FindGroupRealIndex(TabsGroup.TabIndex)]
     else
     if (FLoadedSelectedRow > 0) then
-      taskGrid.Row := FLoadedSelectedRow;
+      Grid.Row := FLoadedSelectedRow;
 
     // Set current row to mem
     if (Length(FLastRowMem) > 0) then
@@ -7494,27 +7802,27 @@ begin
   // Restore task grid selection
   if (FLoadedSelection.Left > 0) or (FLoadedSelection.Right > 0) or (FLoadedSelection.Top > 0) or (FLoadedSelection.Bottom > 0) then
   begin
-    taskGrid.Col := FLoadedSelection.Left;
-    taskGrid.Selection := TGridRect.Create(FLoadedSelection);
+    Grid.Col := FLoadedSelection.Left;
+    Grid.Selection := TGridRect.Create(FLoadedSelection);
     FLoadedSelection := Rect(0, 0, 0, 0);
     SetNote;
     SetTags;
   end;
 
-  if (memoNote.Visible) and (Showing) then
+  if (MemoNote.Visible) and (Showing) then
   begin
     // Restore memo note SelStart
     if (FLoadedMemoNoteSelStart > 0) then
     begin
-      memoNote.SelStart := FLoadedMemoNoteSelStart;
+      MemoNote.SelStart := FLoadedMemoNoteSelStart;
       FLoadedMemoNoteSelStart := 0;
     end;
 
     // Restore memo note SelLength
     if (FLoadedMemoNoteSelLength > 0) then
     begin
-      if memoNote.CanFocus then memoNote.SetFocus;
-      memoNote.SelLength := FLoadedMemoNoteSelLength;
+      if MemoNote.CanFocus then MemoNote.SetFocus;
+      MemoNote.SelLength := FLoadedMemoNoteSelLength;
       FLoadedMemoNoteSelLength := 0;
     end;
 
@@ -7539,8 +7847,8 @@ begin
   FAdjustingScrollBars := True;
   try
     // Calculate widths
-    totalWidth := taskGrid.GridWidth;
-    visibleWidth := taskGrid.ClientWidth;
+    totalWidth := Grid.GridWidth;
+    visibleWidth := Grid.ClientWidth;
 
     if totalWidth > visibleWidth then
       newStyle := ssAutoBoth
@@ -7548,15 +7856,15 @@ begin
       newStyle := ssAutoVertical;
 
     // Only change when necessary (prevents extra events)
-    if taskGrid.ScrollBars <> newStyle then
+    if Grid.ScrollBars <> newStyle then
     begin
-      taskGrid.ScrollBars := newStyle;
+      Grid.ScrollBars := newStyle;
 
       // If we disabled horizontal scrollbar, try to hide native scrollbar
-      if (newStyle = ssAutoVertical) and (taskGrid.HandleAllocated) then
+      if (newStyle = ssAutoVertical) and (Grid.HandleAllocated) then
       begin
         // Try to hide native horizontal scrollbar (widgetset dependent)
-        ShowScrollBar(taskGrid.Handle, SB_HORZ, False);
+        ShowScrollBar(Grid.Handle, SB_HORZ, False);
       end;
     end;
   finally
@@ -7567,13 +7875,13 @@ end;
 procedure TformNotetask.GridInvalidate;
 begin
   Application.ProcessMessages;
-  taskGrid.Invalidate;
+  Grid.Invalidate;
   Application.ProcessMessages;
 end;
 
 procedure TformNotetask.AdjustMultiButton;
 begin
-  if (taskGrid.Selection.Height > 0) or (FLastSelectionHeight > 0) or (taskGrid.Selection.Width > 0) then
+  if (Grid.Selection.Height > 0) or (FLastSelectionHeight > 0) or (Grid.Selection.Width > 0) then
   begin
     btnMulti.Hint := aDuplicateTasks.Caption + ' (Ctrl+D)';
     btnMulti.ImageIndex := TDarkUtils.ThemeValue(2, 3);
@@ -7603,173 +7911,6 @@ begin
   Result := True;
 end;
 
-procedure TformNotetask.SetBiDiRightToLeft(Value: boolean);
-var
-  i: integer;
-begin
-  FBiDiRightToLeft := Value;
-
-  if (Value) then
-  begin
-    taskGrid.BiDiMode := bdRightToLeft;
-    groupTabs.BiDiMode := bdRightToLeft;
-    for i := 1 to taskGrid.Columns.Count - 2 do
-    begin
-      if (i in [COL_AMOUNT - 1]) then
-        taskGrid.Columns[i].Alignment := taLeftJustify
-      else
-        taskGrid.Columns[i].Alignment := taRightJustify;
-    end;
-    filterBox.BiDiMode := bdRightToLeft;
-    memoNote.BiDiMode := bdRightToLeft;
-    memoNote.Alignment := taRightJustify;
-    memoNote.BorderSpacing.Left := 0;
-    memoNote.BorderSpacing.Right := 10;
-    tagsEdit.BiDiMode := bdRightToLeft;
-    TOS.SetCursorTo(panelNote, 'RIGHTARROW');
-  end
-  else
-  begin
-    taskGrid.BiDiMode := bdLeftToRight;
-    groupTabs.BiDiMode := bdLeftToRight;
-    filterBox.BiDiMode := bdLeftToRight;
-    memoNote.BiDiMode := bdLeftToRight;
-    memoNote.Alignment := taLeftJustify;
-    memoNote.BorderSpacing.Left := 10;
-    memoNote.BorderSpacing.Right := 0;
-    memoNote.BiDiMode := bdLeftToRight;
-    tagsEdit.BiDiMode := bdLeftToRight;
-    TOS.SetCursorTo(panelNote, 'LEFTARROW');
-    for i := 1 to taskGrid.Columns.Count - 2 do
-    begin
-      if (i = COL_AMOUNT - 1) then
-        taskGrid.Columns[i].Alignment := taRightJustify
-      else
-        taskGrid.Columns[i].Alignment := taLeftJustify;
-    end;
-  end;
-  taskGridResize(Self);
-end;
-
-procedure TformNotetask.SetShowStatusBar(Value: boolean);
-begin
-  FShowStatusBar := Value;
-
-  aShowStatusBar.Checked := FShowStatusBar;
-  StatusBar.Visible := FShowStatusBar;
-end;
-
-procedure TformNotetask.SetShowArchived(Value: boolean);
-var
-  LastTask: integer;
-  LastTab: integer;
-begin
-  LastTask := Tasks.Map(taskGrid.Row);
-  LastTab := FindGroupRealIndex(groupTabs.TabIndex);
-  FShowArchived := Value;
-  aShowArchived.Checked := FShowArchived;
-  SetTabs;
-  FillGrid;
-  if (LastTab = FindGroupRealIndex(groupTabs.TabIndex)) then
-    taskGrid.Row := Tasks.ReverseMap(LastTask);
-  ResetRowHeight;
-  SetInfo;
-  SetNote;
-  SetTags;
-end;
-
-procedure TformNotetask.SetShowDuration(Value: boolean);
-begin
-  FShowDuration := Value;
-
-  CalcDefaultColWidth;
-  FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.SetShowTime(Value: boolean);
-begin
-  aShowTime.Checked := Value;
-  FShowTime := Value;
-end;
-
-procedure TformNotetask.SetShowTags(Value: boolean);
-begin
-  FShowTags := Value;
-
-  aShowTags.Checked := FShowTags;
-  panelTags.Visible := FShowTags;
-  SplitTags.Visible := FShowTags;
-
-  AlignBottomControls;
-
-  if Visible and panelTags.Visible and tagsEdit.CanFocus then
-    tagsEdit.SetFocus;
-
-  SetTags;
-end;
-
-procedure TformNotetask.SetShowNote(Value: boolean);
-begin
-  FShowNote := Value;
-
-  aShowNote.Checked := FShowNote;
-  panelNote.Visible := FShowNote;
-  Splitter.Visible := FShowNote;
-
-  AlignBottomControls;
-
-  if Visible and panelNote.Visible and memoNote.CanFocus then
-    memoNote.SetFocus;
-
-  SetNote;
-end;
-
-procedure TformNotetask.SetHideNoteText(Value: boolean);
-begin
-  aHideNoteText.Checked := Value;
-  FHideNoteText := Value;
-end;
-
-procedure TformNotetask.SetShowColumnDone(Value: boolean);
-begin
-  FShowColumnDone := Value;
-  taskGrid.Columns.Items[COL_DONE - 1].Visible := FShowColumnDone;
-end;
-
-procedure TformNotetask.SetShowColumnTask(Value: boolean);
-begin
-  FShowColumnTask := Value;
-  taskGrid.Columns.Items[COL_TASK - 1].Visible := FShowColumnTask;
-  CalcRowHeight(True);
-end;
-
-procedure TformNotetask.SetShowColumnNote(Value: boolean);
-begin
-  FShowColumnNote := Value;
-  taskGrid.Columns.Items[COL_NOTE - 1].Visible := FShowColumnNote;
-  CalcRowHeight(True);
-end;
-
-procedure TformNotetask.SetShowColumnAmount(Value: boolean);
-begin
-  FShowColumnAmount := Value;
-  taskGrid.Columns.Items[COL_AMOUNT - 1].Visible := FShowColumnAmount;
-  SetInfo;
-end;
-
-procedure TformNotetask.SetShowColumnDate(Value: boolean);
-begin
-  FShowColumnDate := Value;
-  taskGrid.Columns.Items[COL_DATE - 1].Visible := FShowColumnDate;
-end;
-
-procedure TformNotetask.SetShowColumnFavorite(Value: boolean);
-begin
-  FShowColumnFavorite := Value;
-  taskGrid.Columns.Items[COL_STAR - 1].Visible := FShowColumnFavorite;
-end;
-
 procedure TformNotetask.ApplyColumnSetting;
 begin
   aShowDuration.Checked := FShowDuration;
@@ -7780,12 +7921,12 @@ begin
   aShowColumnDate.Checked := FShowColumnDate;
   aShowColumnAmount.Checked := FShowColumnAmount;
   aShowColumnFavorite.Checked := FShowColumnFavorite;
-  taskGrid.Columns.Items[COL_DONE - 1].Visible := FShowColumnDone;
-  taskGrid.Columns.Items[COL_TASK - 1].Visible := FShowColumnTask;
-  taskGrid.Columns.Items[COL_NOTE - 1].Visible := FShowColumnNote;
-  taskGrid.Columns.Items[COL_AMOUNT - 1].Visible := FShowColumnAmount;
-  taskGrid.Columns.Items[COL_DATE - 1].Visible := FShowColumnDate;
-  taskGrid.Columns.Items[COL_STAR - 1].Visible := FShowColumnFavorite;
+  Grid.Columns.Items[COL_DONE - 1].Visible := FShowColumnDone;
+  Grid.Columns.Items[COL_TASK - 1].Visible := FShowColumnTask;
+  Grid.Columns.Items[COL_NOTE - 1].Visible := FShowColumnNote;
+  Grid.Columns.Items[COL_AMOUNT - 1].Visible := FShowColumnAmount;
+  Grid.Columns.Items[COL_DATE - 1].Visible := FShowColumnDate;
+  Grid.Columns.Items[COL_STAR - 1].Visible := FShowColumnFavorite;
 
   ApplySortArrow;
 end;
@@ -7794,14 +7935,14 @@ procedure TformNotetask.ApplySortArrow;
 var
   i: integer;
 begin
-  for i := 0 to taskGrid.Columns.Count - 1 do
-    taskGrid.Columns[i].Title.ImageIndex := -1;
+  for i := 0 to Grid.Columns.Count - 1 do
+    Grid.Columns[i].Title.ImageIndex := -1;
   if (SortColumn > COL_NUM) then
   begin
     if SortOrder = soAscending then
-      taskGrid.Columns[SortColumn - 1].Title.ImageIndex := 0
+      Grid.Columns[SortColumn - 1].Title.ImageIndex := 0
     else
-      taskGrid.Columns[SortColumn - 1].Title.ImageIndex := 1;
+      Grid.Columns[SortColumn - 1].Title.ImageIndex := 1;
   end;
 end;
 
@@ -7812,12 +7953,12 @@ begin
   FillGrid;
   ResetRowHeight;
 
-  for i := 0 to taskGrid.Columns.Count - 1 do
-    taskGrid.Columns[i].Title.ImageIndex := -1;
+  for i := 0 to Grid.Columns.Count - 1 do
+    Grid.Columns[i].Title.ImageIndex := -1;
 
   ApplySortingActions;
 
-  FLastRow := taskGrid.Row;
+  FLastRow := Grid.Row;
   SetNote;
   SetTags;
 end;
@@ -7832,15 +7973,15 @@ begin
   aMoveTaskRight.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
 
   if (SortColumn = COL_NUM) then
-    taskGrid.Options := taskGrid.Options + [goRowMoving]
+    Grid.Options := Grid.Options + [goRowMoving]
   else
-    taskGrid.Options := taskGrid.Options - [goRowMoving];
+    Grid.Options := Grid.Options - [goRowMoving];
 end;
 
 procedure TformNotetask.FillGrid;
 begin
   DisableGridEvents;
-  Tasks.FillGrid(taskGrid, FShowArchived, FShowDuration, FShowTime, SortOrder, SortColumn, FilterBox.Text);
+  Tasks.FillGrid(Grid, FShowArchived, FShowDuration, FShowTime, SortOrder, SortColumn, FilterBox.Text);
   CalcRowHeight;
   EnableGridEvents;
 end;
@@ -7848,9 +7989,9 @@ end;
 procedure TformNotetask.CalcDefaultColWidth;
 begin
   if (FShowDuration) then
-    taskGrid.DefaultColWidth := Round((Canvas.TextWidth('10.10sec') + 10) * FZoom)
+    Grid.DefaultColWidth := Round((Canvas.TextWidth('10.10sec') + 10) * FZoom)
   else
-    taskGrid.DefaultColWidth := Round(Canvas.TextWidth('10000') * FZoom);
+    Grid.DefaultColWidth := Round(Canvas.TextWidth('10000') * FZoom);
 end;
 
 procedure TformNotetask.ResetRowHeight(aCalcRowHeight: boolean = True; aRow: integer = 0);
@@ -7858,36 +7999,36 @@ var
   i: integer;
   h: integer;
 begin
-  taskGrid.BeginUpdate;
+  Grid.BeginUpdate;
   try
-    h := Max(Canvas.TextHeight('A') + 2, taskGrid.DefaultRowHeight);
+    h := Max(Canvas.TextHeight('A') + 2, Grid.DefaultRowHeight);
 
     // if -1 only selection
     if (aRow = -1) then
     begin
-      for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
-        taskGrid.RowHeights[i] := h;
+      for i := Grid.Selection.Top to Grid.Selection.Bottom do
+        Grid.RowHeights[i] := h;
     end
     else
     // if 0 for all rows
     if (aRow = 0) then
     begin
-      for i := 1 to taskGrid.RowCount - 1 do
+      for i := 1 to Grid.RowCount - 1 do
       begin
-        if taskGrid.RowHeights[i] <> h then
-          taskGrid.RowHeights[i] := h;
+        if Grid.RowHeights[i] <> h then
+          Grid.RowHeights[i] := h;
       end;
     end
     else // if valid row just that row
-      taskGrid.RowHeights[aRow] := taskGrid.DefaultRowHeight;
+      Grid.RowHeights[aRow] := Grid.DefaultRowHeight;
 
-    if (Assigned(Memo)) and ((aRow = 0) or (aRow = taskGrid.Row)) then
+    if (Assigned(Memo)) and ((aRow = 0) or (aRow = Grid.Row)) then
       Memo.Height := h;
 
     if (aCalcRowHeight) then
       CalcRowHeight(False, aRow);
   finally
-    taskGrid.EndUpdate;
+    Grid.EndUpdate;
   end;
 end;
 
@@ -7905,23 +8046,23 @@ var
     h: integer;
     OldBold: boolean;
   begin
-    OldBold := taskGrid.Canvas.Font.Bold;
+    OldBold := Grid.Canvas.Font.Bold;
     for row := FromRow to ToRow do
     begin
       task := Tasks.GetTask(row);
       if aForce or (task.FRowHeight = 0) then
       begin
-        drawrect := taskGrid.CellRect(col, row);
+        drawrect := Grid.CellRect(col, row);
         drawrect.Inflate(-4, 0);
 
-        Text := taskGrid.Cells[col, row];
+        Text := Grid.Cells[col, row];
         if Text = string.Empty then Text := 'Wg';
 
         // Reduce text area by TagsWidth for text measurement
         if (col in [COL_TASK, COL_NOTE]) then
         begin
           if task.Star then
-            taskGrid.Canvas.Font.Bold := True;
+            Grid.Canvas.Font.Bold := True;
 
           if (col = COL_TASK) then
           begin
@@ -7947,47 +8088,47 @@ var
         Text := StringReplace(Text, #$0A, #$0A+ '+', [rfReplaceAll]);
         {$ENDIF}
 
-        DrawText(taskGrid.canvas.handle, PChar(Text), Length(Text), drawrect, Flags);
-        taskGrid.Canvas.Font.Bold := OldBold;
+        DrawText(Grid.canvas.handle, PChar(Text), Length(Text), drawrect, Flags);
+        Grid.Canvas.Font.Bold := OldBold;
 
         // The greater than sign is important because values may differ across fields, need max
-        if force or (abs(drawrect.bottom - drawrect.top) > taskGrid.RowHeights[row]) then
+        if force or (abs(drawrect.bottom - drawrect.top) > Grid.RowHeights[row]) then
         begin
           h := drawrect.bottom - drawrect.top + 2;
-          if (force) and (h < taskGrid.DefaultRowHeight) then
-            h := Max(taskGrid.Canvas.TextHeight('A') + 2, integer(Round(taskGrid.DefaultRowHeight * FZoom)));
+          if (force) and (h < Grid.DefaultRowHeight) then
+            h := Max(Grid.Canvas.TextHeight('A') + 2, integer(Round(Grid.DefaultRowHeight * FZoom)));
           FLastRowHeights[row] := h;
-          taskGrid.RowHeights[row] := h;
+          Grid.RowHeights[row] := h;
           task.FRowHeight := h;
         end
         else
-          FLastRowHeights[row] := taskGrid.RowHeights[row];
+          FLastRowHeights[row] := Grid.RowHeights[row];
       end
       else
       begin
         FLastRowHeights[row] := task.FRowHeight;
-        taskGrid.RowHeights[row] := task.FRowHeight;
+        Grid.RowHeights[row] := task.FRowHeight;
       end;
     end;
   end;
 
 begin
-  taskGrid.BeginUpdate;
+  Grid.BeginUpdate;
   try
-    SetLength(FLastRowHeights, taskGrid.RowCount);
+    SetLength(FLastRowHeights, Grid.RowCount);
 
     // if -1 only selection
     if aRow = -1 then
     begin
-      FromRow := taskGrid.Selection.Top;
-      ToRow := taskGrid.Selection.Bottom;
+      FromRow := Grid.Selection.Top;
+      ToRow := Grid.Selection.Bottom;
     end
     else
     // if 0 for all rows
     if aRow = 0 then
     begin
       FromRow := 1;
-      ToRow := taskGrid.RowCount - 1;
+      ToRow := Grid.RowCount - 1;
     end
     else // if valid row just that row
     begin
@@ -8000,7 +8141,7 @@ begin
     if (ShowColumnNote) then CalcCol(COL_NOTE);
 
     // Header, tabs, first col
-    taskGrid.RowHeights[0] := Round(Max(Canvas.TextHeight('A') + 4, taskGrid.DefaultRowHeight) * FZoom);
+    Grid.RowHeights[0] := Round(Max(Canvas.TextHeight('A') + 4, Grid.DefaultRowHeight) * FZoom);
     if (aForce) then
     begin
       {$IFDEF UNIX}
@@ -8011,9 +8152,9 @@ begin
       CalcDefaultColWidth;
     end;
 
-    EditControlSetBounds(PanelMemo, taskGrid.Col, taskGrid.Row);
+    EditControlSetBounds(PanelMemo, Grid.Col, Grid.Row);
   finally
-    taskGrid.EndUpdate;
+    Grid.EndUpdate;
   end;
 end;
 
@@ -8022,20 +8163,20 @@ begin
   if (Length(FLastRowHeights) > aRow) then
     Result := FLastRowHeights[aRow]
   else
-    Result := taskGrid.DefaultRowHeight;
+    Result := Grid.DefaultRowHeight;
 end;
 
 procedure TformNotetask.ChangeLastText(Value: string = string.Empty; aCol: integer = -1; aRow: integer = -1);
 begin
-  if aCol < 0 then aCol := taskGrid.Col;
-  if aRow < 0 then aRow := taskGrid.Row;
-  if Value = string.Empty then Value := taskGrid.Cells[aCol, aRow];
+  if aCol < 0 then aCol := Grid.Col;
+  if aRow < 0 then aRow := Grid.Row;
+  if Value = string.Empty then Value := Grid.Cells[aCol, aRow];
   if (aCol > 0) and (aRow > 0) then
   begin
     if FDuplicateHighlight and ((FLastText <> string.Empty) or (Value <> string.Empty)) then
     begin
       FLastText := Value;
-      if Tasks.HasDuplicateMatches(FLastText) and (taskGrid.Selection.Height = 0) then
+      if Tasks.HasDuplicateMatches(FLastText) and (Grid.Selection.Height = 0) then
       begin
         GridInvalidate;
         FLastTextMatch := True;
@@ -8055,9 +8196,9 @@ end;
 procedure TformNotetask.SetChanged(aChanged: boolean = True);
 begin
   if (aChanged = False) then
-    taskGrid.Modified := False;
+    Grid.Modified := False;
 
-  FChanged := taskGrid.Modified or aChanged;
+  FChanged := Grid.Modified or aChanged;
   aSave.Enabled := FChanged and not FReadOnly;
   aUndo.Enabled := FChanged;
   aUndoAll.Enabled := FChanged;
@@ -8123,15 +8264,15 @@ begin
   end;
 
   // Task counts
-  if (taskGrid.Selection.Height = 0) then
+  if (Grid.Selection.Height = 0) then
   begin
     CurAll := Tasks.CalcCount(ShowArchived, False, FilterBox.Text, 0, 0, FShowTime);
     CurDone := Tasks.CalcCount(ShowArchived, True, FilterBox.Text, 0, 0, FShowTime);
   end
   else
   begin
-    CurAll := Tasks.CalcCount(ShowArchived, False, FilterBox.Text, taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowTime);
-    CurDone := Tasks.CalcCount(ShowArchived, True, FilterBox.Text, taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowTime);
+    CurAll := Tasks.CalcCount(ShowArchived, False, FilterBox.Text, Grid.Selection.Top, Grid.Selection.Bottom, FShowTime);
+    CurDone := Tasks.CalcCount(ShowArchived, True, FilterBox.Text, Grid.Selection.Top, Grid.Selection.Bottom, FShowTime);
   end;
   if (CurAll = CurDone) or (CurDone = 0) then
     statusBar.Panels[3].Text := CurAll.ToString + rrows
@@ -8141,15 +8282,15 @@ begin
   // Task amounts
   if (ShowColumnAmount) then
   begin
-    if (taskGrid.Selection.Height = 0) then
+    if (Grid.Selection.Height = 0) then
     begin
       SumAll := Tasks.CalcSum(ShowArchived, False, FilterBox.Text, 0, 0, FShowTime);
       SumDone := Tasks.CalcSum(ShowArchived, True, FilterBox.Text, 0, 0, FShowTime);
     end
     else
     begin
-      SumAll := Tasks.CalcSum(ShowArchived, False, FilterBox.Text, taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowTime);
-      SumDone := Tasks.CalcSum(ShowArchived, True, FilterBox.Text, taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowTime);
+      SumAll := Tasks.CalcSum(ShowArchived, False, FilterBox.Text, Grid.Selection.Top, Grid.Selection.Bottom, FShowTime);
+      SumDone := Tasks.CalcSum(ShowArchived, True, FilterBox.Text, Grid.Selection.Top, Grid.Selection.Bottom, FShowTime);
     end;
     if (SumAll <> 0) then
     begin
@@ -8169,16 +8310,16 @@ begin
   // Task durations
   if (ShowDuration) then
   begin
-    if (taskGrid.Selection.Height = 0) then
+    if (Grid.Selection.Height = 0) then
     begin
       DurationAll := Tasks.CalcDuration(ShowArchived, False, FilterBox.Text, 0, 0, FShowTime);
       DurationCurrent := Tasks.CalcDuration(ShowArchived, True, FilterBox.Text, 0, 0, FShowTime);
     end
     else
     begin
-      DurationAll := Tasks.CalcDuration(ShowArchived, False, FilterBox.Text, taskGrid.Selection.Top, taskGrid.Selection.Bottom, FShowTime);
-      DurationCurrent := Tasks.CalcDuration(ShowArchived, True, FilterBox.Text, taskGrid.Selection.Top,
-        taskGrid.Selection.Bottom, FShowTime);
+      DurationAll := Tasks.CalcDuration(ShowArchived, False, FilterBox.Text, Grid.Selection.Top, Grid.Selection.Bottom, FShowTime);
+      DurationCurrent := Tasks.CalcDuration(ShowArchived, True, FilterBox.Text, Grid.Selection.Top,
+        Grid.Selection.Bottom, FShowTime);
     end;
     if (DurationAll = DurationCurrent) or (DurationCurrent = string.Empty) then
       statusBar.Panels[5].Text := DurationAll
@@ -8208,56 +8349,56 @@ begin
   firstTags.Duplicates := dupIgnore;
 
   try
-    if Assigned(Tasks) and (taskGrid.RowCount > 1) then
+    if Assigned(Tasks) and (Grid.RowCount > 1) then
     begin
-      if taskGrid.Selection.Height > 0 then
+      if Grid.Selection.Height > 0 then
       begin
         // Multiple rows selected — concatenate tags and set read-only
-        for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+        for i := Grid.Selection.Top to Grid.Selection.Bottom do
           if Tasks.Map(i) > -1 then
           begin
             curtags.Assign(Tasks.GetTask(i).Tags);
             tags.AddStrings(curtags);
 
-            if i = taskGrid.Selection.Top then
+            if i = Grid.Selection.Top then
               firstTags.Assign(curtags)
             else if not firstTags.Equal(curtags) then
               HasDiff := True;
           end;
         if (tags.Count > 0) then
         begin
-          if (not HasDiff) and (Tasks.Map(taskGrid.Selection.Top) > -1) then
-            tagsEdit.Items.Assign(Tasks.GetTask(taskGrid.Selection.Top).Tags)
+          if (not HasDiff) and (Tasks.Map(Grid.Selection.Top) > -1) then
+            TagEdit.Items.Assign(Tasks.GetTask(Grid.Selection.Top).Tags)
           else
-            tagsEdit.Items.Assign(tags);
+            TagEdit.Items.Assign(tags);
         end
         else
-          tagsEdit.Items.Clear;
-        tagsEdit.ReadOnly := FReadOnly;
-        tagsEdit.AllowReorder := not HasDiff;
-        tagsEdit.Color := clDefault;
+          TagEdit.Items.Clear;
+        TagEdit.ReadOnly := FReadOnly;
+        TagEdit.AllowReorder := not HasDiff;
+        TagEdit.Color := clDefault;
       end
-      else if Tasks.Map(taskGrid.Row) > -1 then
+      else if Tasks.Map(Grid.Row) > -1 then
       begin
         // Single row selected — set editable tag
-        tagsEdit.Items.Assign(Tasks.GetTask(taskGrid.Row).Tags);
-        tagsEdit.ReadOnly := FReadOnly;
-        tagsEdit.AllowReorder := True;
-        tagsEdit.Color := clDefault;
+        TagEdit.Items.Assign(Tasks.GetTask(Grid.Row).Tags);
+        TagEdit.ReadOnly := FReadOnly;
+        TagEdit.AllowReorder := True;
+        TagEdit.Color := clDefault;
       end
       else
       begin
-        tagsEdit.Items.Clear;
-        tagsEdit.ReadOnly := True;
+        TagEdit.Items.Clear;
+        TagEdit.ReadOnly := True;
       end;
     end
     else
     begin
-      tagsEdit.Items.Clear;
-      tagsEdit.ReadOnly := True;
+      TagEdit.Items.Clear;
+      TagEdit.ReadOnly := True;
     end;
   finally
-    tagsEdit.ClearSelection;
+    TagEdit.ClearSelection;
     tags.Free;
     curtags.Free;
     firstTags.Free;
@@ -8272,47 +8413,47 @@ var
 begin
   if (not ShowNote) then exit;
 
-  memoNote.OnChange := nil;
+  MemoNote.OnChange := nil;
   notes := TStringList.Create;
   try
-    if Assigned(Tasks) and (taskGrid.RowCount > 1) then
+    if Assigned(Tasks) and (Grid.RowCount > 1) then
     begin
-      if taskGrid.Selection.Height > 0 then
+      if Grid.Selection.Height > 0 then
       begin
         // Multiple rows selected — concatenate notes and set read-only
-        for i := taskGrid.Selection.Top to taskGrid.Selection.Bottom do
+        for i := Grid.Selection.Top to Grid.Selection.Bottom do
           if Tasks.Map(i) > -1 then
           begin
             note := Tasks.GetTask(i).Note;
             if note <> string.Empty then
               notes.Add(note);
           end;
-        memoNote.Lines.Text := notes.Text;
-        memoNote.ReadOnly := True;
-        memoNote.Color := TDarkUtils.ThemeColor(clReadOnly_Light, clReadOnly_Dark);
+        MemoNote.Lines.Text := notes.Text;
+        MemoNote.ReadOnly := True;
+        MemoNote.Color := TDarkUtils.ThemeColor(clReadOnly_Light, clReadOnly_Dark);
       end
-      else if Tasks.Map(taskGrid.Row) > -1 then
+      else if Tasks.Map(Grid.Row) > -1 then
       begin
         // Single row selected — set editable note
-        memoNote.Text := Tasks.GetTask(taskGrid.Row).Note;
-        memoNote.ReadOnly := FReadOnly;
-        memoNote.Color := clDefault;
+        MemoNote.Text := Tasks.GetTask(Grid.Row).Note;
+        MemoNote.ReadOnly := FReadOnly;
+        MemoNote.Color := clDefault;
       end
       else
       begin
-        memoNote.Text := string.Empty;
-        memoNote.ReadOnly := True;
+        MemoNote.Text := string.Empty;
+        MemoNote.ReadOnly := True;
       end;
     end
     else
     begin
-      memoNote.Text := string.Empty;
-      memoNote.ReadOnly := True;
+      MemoNote.Text := string.Empty;
+      MemoNote.ReadOnly := True;
     end;
   finally
     notes.Free;
     MemoNoteBackup;
-    memoNote.OnChange := @memoNoteChange;
+    MemoNote.OnChange := @memoNoteChange;
   end;
 end;
 
@@ -8321,95 +8462,20 @@ var
   i: integer;
   SortedState: boolean;
 begin
-  if FillTags and (taskGrid.Row > 0) then
+  if FillTags and (Grid.Row > 0) then
     Tasks.FillTags;
-  SortedState := filterBox.Sorted;
-  filterBox.Sorted := False;
-  filterBox.Items.Assign(Tasks.Tags);
-  tagsEdit.SuggestedItemsSorted := False;
-  tagsEdit.SuggestedItems := Tasks.Tags;
+  SortedState := FilterBox.Sorted;
+  FilterBox.Sorted := False;
+  FilterBox.Items.Assign(Tasks.Tags);
+  TagEdit.SuggestedItemsSorted := False;
+  TagEdit.SuggestedItems := Tasks.Tags;
 
   // Remove ` from each item directly
   for i := 0 to filterBox.Items.Count - 1 do
     filterBox.Items[i] := StringReplace(filterBox.Items[i], '`', '', [rfReplaceAll]);
-  filterBox.Sorted := SortedState;
+  FilterBox.Sorted := SortedState;
 
-  UpdateComboRegion(filterBox);
-end;
-
-procedure TformNotetask.SetReadOnly(Value: boolean);
-begin
-  FReadOnly := Value;
-  aUndo.Enabled := not Value;
-  aUndoAll.Enabled := not Value;
-  aCut.Enabled := not Value;
-  aPaste.Enabled := not Value;
-  aDelete.Enabled := not Value;
-  aReplace.Enabled := not Value;
-  aDateTime.Enabled := not Value;
-  aInsertGroup.Enabled := not Value;
-  aRenameGroup.Enabled := not Value;
-  aEditGroupTooltip.Enabled := not Value;
-  aDuplicateGroup.Enabled := not Value;
-  aDeleteGroup.Enabled := not Value;
-  aMoveGroupLeft.Enabled := not Value;
-  aMoveGroupRight.Enabled := not Value;
-  aMoveTaskLeft.Enabled := not Value;
-  aMoveTaskRight.Enabled := not Value;
-  aInsertTask.Enabled := not Value;
-  aMergeTasks.Enabled := not Value;
-  aSplitTasks.Enabled := not Value;
-  aDuplicateTasks.Enabled := not Value;
-  aDeleteTasks.Enabled := not Value;
-  aArchiveTasks.Enabled := not Value;
-  aMoveTaskTop.Enabled := not Value;
-  aMoveTaskUp.Enabled := not Value;
-  aMoveTaskDown.Enabled := not Value;
-  aMoveTaskBottom.Enabled := not Value;
-  aIndentTasks.Enabled := not Value;
-  aOutdentTasks.Enabled := not Value;
-  contextDeleteTags.Enabled := not Value;
-end;
-
-procedure TformNotetask.SetZoom(Value: float);
-
-  function SameFloat(A, B: double; Eps: double): boolean;
-  begin
-    // Compare floats with epsilon
-    Result := Abs(A - B) < Eps;
-  end;
-
-begin
-  FZoom := Value;
-  taskGrid.Font.Assign(Font);
-  taskGrid.Font.Size := Round(Max(1, FOriginalFontSize * FZoom));
-  memoNote.Font.Assign(Font);
-  memoNote.Font.Size := taskGrid.Font.Size;
-  if Assigned(Memo) then
-  begin
-    Memo.Font.Assign(Font);
-    Memo.Font.Size := taskGrid.Font.Size;
-  end;
-  if Assigned(DatePicker) then
-  begin
-    DatePicker.Font.Assign(Font);
-    DatePicker.Font.Size := taskGrid.Font.Size;
-  end;
-
-  contextZoom50.Checked := SameFloat(FZoom, 0.5, 0.001);
-  contextZoom60.Checked := SameFloat(FZoom, 0.6, 0.001);
-  contextZoom70.Checked := SameFloat(FZoom, 0.7, 0.001);
-  contextZoom80.Checked := SameFloat(FZoom, 0.8, 0.001);
-  contextZoom90.Checked := SameFloat(FZoom, 0.9, 0.001);
-  contextZoom100.Checked := SameFloat(FZoom, 1.0, 0.001);
-  contextZoom110.Checked := SameFloat(FZoom, 1.1, 0.001);
-  contextZoom120.Checked := SameFloat(FZoom, 1.2, 0.001);
-  contextZoom130.Checked := SameFloat(FZoom, 1.3, 0.001);
-  contextZoom140.Checked := SameFloat(FZoom, 1.4, 0.001);
-  contextZoom150.Checked := SameFloat(FZoom, 1.5, 0.001);
-
-  CalcRowHeight(True);
-  SetInfo;
+  UpdateComboRegion(FilterBox);
 end;
 
 procedure TformNotetask.SetTabs(Change: boolean = True);
@@ -8419,7 +8485,7 @@ var
   LastIndex, LastRealIndex: integer;
   FoundTab: boolean;
 begin
-  LastRealIndex := FindGroupRealIndex(groupTabs.TabIndex);
+  LastRealIndex := FindGroupRealIndex(TabsGroup.TabIndex);
   SetLength(FGroupIndexMap, 0);
   Clean := TStringList.Create;
   try
@@ -8433,7 +8499,7 @@ begin
       end
       else
       begin
-        if not Tasks.GetGroupFiltered(i, ShowArchived, filterBox.Text, FShowTime) then
+        if not Tasks.GetGroupFiltered(i, ShowArchived, FilterBox.Text, FShowTime) then
         begin
           Clean.Add(Tasks.GetGroupNameForTab(i));
           SetLength(FGroupIndexMap, Length(FGroupIndexMap) + 1);
@@ -8442,20 +8508,20 @@ begin
       end;
     end;
 
-    groupTabs.Tabs := Clean;
+    TabsGroup.Tabs := Clean;
     SetTabsVisible;
 
     if (LastRealIndex < 0) and (FLastTabFilter >= 0) then LastRealIndex := FLastTabFilter;
 
-    if (Change) and (groupTabs.Visible) and (LastRealIndex >= 0) then
+    if (Change) and (TabsGroup.Visible) and (LastRealIndex >= 0) then
     begin
       FoundTab := False;
       LastIndex := FindGroupTabIndex(LastRealIndex);
-      if (LastIndex > 0) and (LastIndex < groupTabs.Tabs.Count) then
-        groupTabs.TabIndex := LastIndex
+      if (LastIndex > 0) and (LastIndex < TabsGroup.Tabs.Count) then
+        TabsGroup.TabIndex := LastIndex
       else
-      if (LastIndex >= groupTabs.Tabs.Count) then
-        groupTabs.TabIndex := groupTabs.Tabs.Count - 1
+      if (LastIndex >= TabsGroup.Tabs.Count) then
+        TabsGroup.TabIndex := TabsGroup.Tabs.Count - 1
       else
       if (LastIndex < 0) then
       begin
@@ -8464,30 +8530,30 @@ begin
         begin
           Inc(i);
           LastIndex := FindGroupTabIndex(i);
-          if (LastIndex >= 0) and (LastIndex < groupTabs.Tabs.Count) then
+          if (LastIndex >= 0) and (LastIndex < TabsGroup.Tabs.Count) then
           begin
-            groupTabs.TabIndex := LastIndex;
+            TabsGroup.TabIndex := LastIndex;
             FoundTab := True;
             break;
           end;
         end;
         if (not FoundTab) then
-          groupTabs.TabIndex := groupTabs.Tabs.Count - 1;
+          TabsGroup.TabIndex := TabsGroup.Tabs.Count - 1;
       end;
 
       // Change group if tab was changed
-      if (LastRealIndex <> FindGroupRealIndex(groupTabs.TabIndex)) then
-        groupTabsChange(groupTabs);
+      if (LastRealIndex <> FindGroupRealIndex(TabsGroup.TabIndex)) then
+        TabsGroupChange(TabsGroup);
     end
     else
-    if not groupTabs.Visible then
+    if not TabsGroup.Visible then
     begin
-      groupTabs.TabIndex := 0;
-      groupTabsChange(groupTabs);
+      TabsGroup.TabIndex := 0;
+      TabsGroupChange(TabsGroup);
     end
     else
     if LastRealIndex < 0 then
-      groupTabsChange(groupTabs);
+      TabsGroupChange(TabsGroup);
 
     // Set selected row memory for tabs
     SetLength(FLastRowMem, Tasks.CountGroup);
@@ -8498,8 +8564,8 @@ end;
 
 procedure TformNotetask.SetTabsVisible;
 begin
-  panelTabs.Visible := (filterbox.Text <> string.Empty) or (filterBox.Focused) or
-    (not ((groupTabs.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty)));
+  panelTabs.Visible := (FilterBox.Text <> string.Empty) or (FilterBox.Focused) or
+    (not ((TabsGroup.Tabs.Count = 1) and (Tasks.GroupNames[0] = string.Empty)));
 end;
 
 procedure TformNotetask.SetLanguage(aLanguage: string = string.Empty);
@@ -8541,16 +8607,16 @@ begin
 
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
-  if Assigned(tagsEdit) then
+  if Assigned(TagEdit) then
   begin
-    tagsEdit.RemoveConfirmMessage := rremovetag;
-    tagsEdit.RemoveConfirmTitle := rremovetagtitle;
-    tagsEdit.TextHint := renternewtag;
-    tagsEdit.EditBox.Hint := renternewtaghint;
+    TagEdit.RemoveConfirmMessage := rremovetag;
+    TagEdit.RemoveConfirmTitle := rremovetagtitle;
+    TagEdit.TextHint := renternewtag;
+    TagEdit.EditBox.Hint := renternewtaghint;
   end;
 
-  if (Assigned(Tasks)) and (Tasks.GroupNames[0] = string.Empty) and (groupTabs.Tabs.Count > 0) then
-    groupTabs.Tabs[0] := rgroupuntitled;
+  if (Assigned(Tasks)) and (Tasks.GroupNames[0] = string.Empty) and (TabsGroup.Tabs.Count > 0) then
+    TabsGroup.Tabs[0] := rgroupuntitled;
 
   case Language of
     'ar': aLangArabic.Checked := True;
@@ -8594,16 +8660,16 @@ end;
 
 procedure TformNotetask.DisableGridEvents;
 begin
-  taskGrid.OnSelectCell := nil;
-  taskGrid.OnSelection := nil;
-  taskGrid.OnSelectEditor := nil;
+  Grid.OnSelectCell := nil;
+  Grid.OnSelection := nil;
+  Grid.OnSelectEditor := nil;
 end;
 
 procedure TformNotetask.EnableGridEvents;
 begin
-  taskGrid.OnSelectEditor := @taskGridSelectEditor;
-  taskGrid.OnSelection := @taskGridSelection;
-  taskGrid.OnSelectCell := @taskGridSelectCell;
+  Grid.OnSelectEditor := @GridSelectEditor;
+  Grid.OnSelection := @GridSelection;
+  Grid.OnSelectCell := @GridSelectCell;
 end;
 
 function TformNotetask.IsCanClose: boolean;
@@ -8639,33 +8705,33 @@ end;
 procedure TformNotetask.CorrectGridSelection;
 begin
   // Check and fix Row if it's out of bounds
-  if taskGrid.Row >= taskGrid.RowCount then
-    taskGrid.Row := taskGrid.RowCount - 1;
+  if Grid.Row >= Grid.RowCount then
+    Grid.Row := Grid.RowCount - 1;
 
   // Only fix Selection.Bottom if it's out of bounds
-  if (taskGrid.Selection.Bottom < 1) or (taskGrid.Selection.Bottom >= taskGrid.RowCount) then
-    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.Selection.Top, taskGrid.Selection.Right, taskGrid.RowCount - 1);
+  if (Grid.Selection.Bottom < 1) or (Grid.Selection.Bottom >= Grid.RowCount) then
+    Grid.Selection := Rect(Grid.Selection.Left, Grid.Selection.Top, Grid.Selection.Right, Grid.RowCount - 1);
 
   // Only fix Selection.Top if it's out of bounds
-  if (taskGrid.Selection.Top < 1) or (taskGrid.Selection.Top >= taskGrid.RowCount) then
-    taskGrid.Selection := Rect(taskGrid.Selection.Left, taskGrid.RowCount - 1, taskGrid.Selection.Right, taskGrid.Selection.Bottom);
+  if (Grid.Selection.Top < 1) or (Grid.Selection.Top >= Grid.RowCount) then
+    Grid.Selection := Rect(Grid.Selection.Left, Grid.RowCount - 1, Grid.Selection.Right, Grid.Selection.Bottom);
 end;
 
 function TformNotetask.GetSelectedTab: integer;
 begin
-  Result := groupTabs.TabIndex;
+  Result := TabsGroup.TabIndex;
 end;
 
 function TformNotetask.GetSelectedRow: integer;
 begin
-  Result := taskGrid.Row;
+  Result := Grid.Row;
 end;
 
 function TformNotetask.GetSelectedRows: TIntegerArray;
 begin
   try
-    if (groupTabs.Visible) and (groupTabs.TabIndex >= 0) and (Length(FLastRowMem) > FindGroupRealIndex(groupTabs.TabIndex)) then
-      FLastRowMem[FindGroupRealIndex(groupTabs.TabIndex)] := GetSelectedRow;
+    if (TabsGroup.Visible) and (TabsGroup.TabIndex >= 0) and (Length(FLastRowMem) > FindGroupRealIndex(TabsGroup.TabIndex)) then
+      FLastRowMem[FindGroupRealIndex(TabsGroup.TabIndex)] := GetSelectedRow;
   except
     // just insure
   end;
@@ -8674,28 +8740,32 @@ end;
 
 function TformNotetask.GetSelection: TRect;
 begin
-  Result := taskGrid.Selection;
+  Result := Grid.Selection;
 end;
 
 function TformNotetask.GetMemoNoteScroll: integer;
 begin
-  Result := memoNote.VertScrollBar.Position;
+  Result := MemoNote.VertScrollBar.Position;
 end;
 
 function TformNotetask.GetMemoNoteSelStart: integer;
 begin
-  Result := memoNote.SelStart;
+  Result := MemoNote.SelStart;
 end;
 
 function TformNotetask.GetMemoNoteSelLength: integer;
 begin
-  Result := memoNote.SelLength;
+  Result := MemoNote.SelLength;
 end;
 
 function TformNotetask.GetIsEditing: boolean;
 begin
-  Result := (taskGrid.EditorMode) or (FIsEditing);
+  Result := (Grid.EditorMode) or (FIsEditing);
 end;
+
+{%EndRegion}
+
+{%Region -fold Public Methods}
 
 function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
 var
@@ -8755,7 +8825,7 @@ var
   procedure IncCurCol;
   begin
     Inc(CurCol);
-    taskGrid.Col := CurCol;
+    Grid.Col := CurCol;
     Memo.SelStart := 0;
     Memo.SelLength := 0;
   end;
@@ -8763,7 +8833,7 @@ var
   procedure DecCurCol;
   begin
     Dec(CurCol);
-    taskGrid.Col := CurCol;
+    Grid.Col := CurCol;
     Memo.SelStart := Length(unicodestring(Memo.Text));
     Memo.SelLength := 0;
   end;
@@ -8774,9 +8844,9 @@ var
     begin
       if (aText = FFoundText) then
       begin
-        taskGrid.Row := FLastFoundRow;
-        taskGrid.Col := FLastFoundCol;
-        taskGrid.EditorMode := True;
+        Grid.Row := FLastFoundRow;
+        Grid.Col := FLastFoundCol;
+        Grid.EditorMode := True;
         FMemoOldText := Memo.Text;
         Memo.SelStart := FLastFoundSelStart;
         Memo.SelLength := FLastFoundSelLength;
@@ -8789,8 +8859,8 @@ var
       begin
         FLastFoundRow := StartRow;
         FLastFoundCol := StartCol;
-        taskGrid.Row := FLastFoundRow;
-        taskGrid.Col := FLastFoundCol;
+        Grid.Row := FLastFoundRow;
+        Grid.Col := FLastFoundCol;
       end;
     end;
     if (not Silent) then
@@ -8799,7 +8869,7 @@ var
   end;
 
 begin
-  if (FFindActive) or (taskGrid.RowCount = 0) then exit;
+  if (FFindActive) or (Grid.RowCount = 0) then exit;
   FFindActive := True;
   aRowsChanged := 0;
   FDuplicateHighlight := False;
@@ -8813,13 +8883,13 @@ begin
     WrapAround := aWrapAround;
 
     // Search in Note if selected
-    if self.ActiveControl = memoNote then
+    if self.ActiveControl = MemoNote then
     begin
       sValue := unicodestring(MemoNote.Text);
       sText := unicodestring(aText);
       if (Pos(UnicodeLowerCase(sText), UnicodeLowerCase(sValue)) > 0) then
       begin
-        if (FindMemo(memoNote)) then
+        if (FindMemo(MemoNote)) then
         begin
           FFoundText := aText;
           Result := True;
@@ -8829,15 +8899,15 @@ begin
         begin
           if (aDirectionDown) then
           begin
-            memoNote.SelStart := 0;
-            memoNote.SelLength := 0;
+            MemoNote.SelStart := 0;
+            MemoNote.SelLength := 0;
           end
           else
           begin
-            memoNote.SelStart := Length(memoNote.Text);
-            memoNote.SelLength := 0;
+            MemoNote.SelStart := Length(MemoNote.Text);
+            MemoNote.SelLength := 0;
           end;
-          FindMemo(memoNote);
+          FindMemo(MemoNote);
           FFoundText := aText;
           Result := True;
         end
@@ -8849,12 +8919,12 @@ begin
       exit;
     end;
 
-    StartRow := taskGrid.Row;
-    StartCol := taskGrid.Col;
+    StartRow := Grid.Row;
+    StartCol := Grid.Col;
     LastDate := False;
-    if taskGrid.Col = COL_DONE then taskGrid.Col := COL_TASK;
+    if Grid.Col = COL_DONE then Grid.Col := COL_TASK;
     FMemoNeedSelectAll := False;
-    taskGrid.EditorMode := True;
+    Grid.EditorMode := True;
     if (Memo.SelStart > Length(unicodestring(Memo.Text)) - 1) then
     begin
       if (aDirectionDown) then
@@ -8868,32 +8938,32 @@ begin
     Memo.SelLength := 0;
 
     // For the date, we move to the next or prev line if on the found one
-    if (aDirectionDown) and (FLastFoundCol = COL_DATE) and (taskGrid.Col = COL_DATE) then
+    if (aDirectionDown) and (FLastFoundCol = COL_DATE) and (Grid.Col = COL_DATE) then
     begin
-      if (taskGrid.Row < taskGrid.RowCount - 1) then
+      if (Grid.Row < Grid.RowCount - 1) then
       begin
-        taskGrid.Row := taskGrid.Row + 1;
+        Grid.Row := Grid.Row + 1;
         Inc(aRowsChanged);
-        taskGrid.Col := COL_DONE;
+        Grid.Col := COL_DONE;
       end
       else
         LastDate := True;
     end
     else
-    if (not aDirectionDown) and (FLastFoundCol = COL_DATE) and (taskGrid.Col = COL_DATE) then
+    if (not aDirectionDown) and (FLastFoundCol = COL_DATE) and (Grid.Col = COL_DATE) then
     begin
-      if (taskGrid.Row > 1) then
+      if (Grid.Row > 1) then
       begin
-        taskGrid.Row := taskGrid.Row - 1;
+        Grid.Row := Grid.Row - 1;
         Inc(aRowsChanged);
-        taskGrid.Col := COL_DATE;
+        Grid.Col := COL_DATE;
       end
       else
         LastDate := True;
     end;
 
-    CurRow := taskGrid.Row;
-    CurCol := taskGrid.Col;
+    CurRow := Grid.Row;
+    CurCol := Grid.Col;
     Counter := 0;
 
     repeat
@@ -8904,10 +8974,10 @@ begin
         if (Pos(UnicodeLowerCase(sText), UnicodeLowerCase(sValue)) > 0) and (FindMemo(Memo)) then
         begin
           FMemoNeedSelectAll := False;
-          taskGrid.EditorMode := True;
+          Grid.EditorMode := True;
           FMemoOldText := Memo.Text;
-          FLastFoundRow := taskGrid.Row;
-          FLastFoundCol := taskGrid.Col;
+          FLastFoundRow := Grid.Row;
+          FLastFoundCol := Grid.Col;
           FLastFoundSelStart := Memo.SelStart;
           FLastFoundSelLength := Memo.SelLength;
           FFoundText := aText;
@@ -8925,12 +8995,12 @@ begin
         sValue := unicodestring(DateTimeToString(DatePicker.DateTime));
         sText := unicodestring(aText);
         if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and
-          (taskGrid.Cells[taskGrid.Col, taskGrid.Row] <> string.Empty) and (not LastDate) then
+          (Grid.Cells[Grid.Col, Grid.Row] <> string.Empty) and (not LastDate) then
         begin
           FMemoNeedSelectAll := False;
-          taskGrid.EditorMode := True;
-          FLastFoundRow := taskGrid.Row;
-          FLastFoundCol := taskGrid.Col;
+          Grid.EditorMode := True;
+          FLastFoundRow := Grid.Row;
+          FLastFoundCol := Grid.Col;
           FLastFoundSelStart := 0;
           FLastFoundSelLength := Length(sValue);
           FFoundText := aText;
@@ -8955,16 +9025,16 @@ begin
       else
       begin
         // Move to row
-        if ((aDirectionDown) and (CurRow < taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow > 0)) then
+        if ((aDirectionDown) and (CurRow < Grid.RowCount)) or ((not aDirectionDown) and (CurRow > 0)) then
         begin
           // Move to next row
           if (aDirectionDown) then
           begin
             Inc(CurRow);
             CurCol := COL_DONE;
-            taskGrid.Row := taskGrid.Row + 1;
+            Grid.Row := Grid.Row + 1;
             Inc(aRowsChanged);
-            taskGrid.Col := COL_TASK;
+            Grid.Col := COL_TASK;
             Memo.SelStart := 0;
             Memo.SelLength := 0;
           end
@@ -8973,9 +9043,9 @@ begin
           begin
             Dec(CurRow);
             CurCol := COL_DATE;
-            taskGrid.Row := taskGrid.Row - 1;
+            Grid.Row := Grid.Row - 1;
             Inc(aRowsChanged);
-            taskGrid.Col := COL_DATE;
+            Grid.Col := COL_DATE;
             Memo.SelStart := Length(unicodestring(Memo.Text)) - 1;
             Memo.SelLength := 0;
           end;
@@ -8984,7 +9054,7 @@ begin
       end;
 
       // Move to begin
-      if ((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or ((not aDirectionDown) and (CurRow = 0)) then
+      if ((aDirectionDown) and (CurRow >= Grid.RowCount)) or ((not aDirectionDown) and (CurRow = 0)) then
       begin
         if (WrapAround) then
         begin
@@ -8992,20 +9062,20 @@ begin
           if (aDirectionDown) then
           begin
             CurRow := 1;
-            taskGrid.Row := 1;
+            Grid.Row := 1;
             Inc(aRowsChanged);
             CurCol := COL_TASK;
-            taskGrid.Col := COL_TASK;
+            Grid.Col := COL_TASK;
             Memo.SelStart := 0;
           end
           else
             // Move to begin end
           begin
-            CurRow := taskGrid.RowCount - 1;
-            taskGrid.Row := taskGrid.RowCount - 1;
+            CurRow := Grid.RowCount - 1;
+            Grid.Row := Grid.RowCount - 1;
             Inc(aRowsChanged);
             CurCol := COL_DATE;
-            taskGrid.Col := COL_DATE;
+            Grid.Col := COL_DATE;
           end;
           Inc(Counter);
         end
@@ -9029,11 +9099,11 @@ begin
         if (CurCol = COL_TASK) and (not ShowColumnTask) then DecCurCol;
       end;
 
-    until ((not WrapAround) and (((aDirectionDown) and (CurRow >= taskGrid.RowCount)) or
-        ((not aDirectionDown) and (CurRow = 0)))) or (WrapAround and (Counter > taskGrid.RowCount)) or
+    until ((not WrapAround) and (((aDirectionDown) and (CurRow >= Grid.RowCount)) or
+        ((not aDirectionDown) and (CurRow = 0)))) or (WrapAround and (Counter > Grid.RowCount)) or
       (not FFindF3 and not formFindText.Visible and not formReplaceText.Visible);
 
-    if (WrapAround and (Counter > taskGrid.RowCount)) then
+    if (WrapAround and (Counter > Grid.RowCount)) then
       exit(NotFound);
 
     Result := True;
@@ -9062,8 +9132,8 @@ var
   end;
 
 begin
-  if self.ActiveControl = memoNote then
-    Target := memoNote
+  if self.ActiveControl = MemoNote then
+    Target := MemoNote
   else
     Target := Memo;
 
@@ -9075,8 +9145,8 @@ begin
     FindNextExecute
   else
   begin
-    if self.ActiveControl = memoNote then
-      Target := memoNote
+    if self.ActiveControl = MemoNote then
+      Target := MemoNote
     else
     begin
       FMemoOldText := Memo.Text;
@@ -9106,15 +9176,15 @@ var
 begin
   FBackup := False;
   sShowNote := FShowNote;
-  if self.ActiveControl <> memoNote then
+  if self.ActiveControl <> MemoNote then
     FShowNote := False;
   GridBackupSelection;
   Tasks.CreateBackup; // FBackup = false here
   Enabled := False;
   try
-    if self.ActiveControl = memoNote then
+    if self.ActiveControl = MemoNote then
     begin
-      Target := memoNote;
+      Target := MemoNote;
       MemoNoteBackup;
     end
     else
@@ -9136,8 +9206,8 @@ begin
     begin
       FDuplicateHighlight := False;
 
-      if self.ActiveControl = memoNote then
-        Target := memoNote
+      if self.ActiveControl = MemoNote then
+        Target := MemoNote
       else
       begin
         FMemoOldText := Memo.Text;
@@ -9151,7 +9221,7 @@ begin
       // Safeguard to prevent infinite loop
       if aWrapAround then
       begin
-        if self.ActiveControl = memoNote then
+        if self.ActiveControl = MemoNote then
         begin
           if (Target.SelStart > LastPos) then CounterPos += Target.SelStart - LastPos
           else
@@ -9163,7 +9233,7 @@ begin
         else
         begin
           if (RowsChanged > 0) then CounterRow += RowsChanged;
-          if (CounterRow > taskGrid.RowCount - 1) then break;
+          if (CounterRow > Grid.RowCount - 1) then break;
         end;
       end;
     end;
@@ -9176,5 +9246,7 @@ begin
     Enabled := True;
   end;
 end;
+
+{%EndRegion}
 
 end.

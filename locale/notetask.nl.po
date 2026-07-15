@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: PoBatch 1.0.0\n"
 
 #: formfind.rdirectiondown
 msgid "Down"
@@ -920,6 +920,36 @@ msgstr "Typ om te filteren..."
 msgid "Font select"
 msgstr "Lettertype selecteren"
 
+#: tformnotetask.grid.columns[0].title.caption
+msgctxt "tformnotetask.grid.columns[0].title.caption"
+msgid "Done"
+msgstr "Voltooid"
+
+#: tformnotetask.grid.columns[1].title.caption
+msgctxt "tformnotetask.grid.columns[1].title.caption"
+msgid "Task"
+msgstr "Taak"
+
+#: tformnotetask.grid.columns[2].title.caption
+msgctxt "tformnotetask.grid.columns[2].title.caption"
+msgid "Note"
+msgstr "Notitie"
+
+#: tformnotetask.grid.columns[3].title.caption
+msgctxt "tformnotetask.grid.columns[3].title.caption"
+msgid "Amount"
+msgstr "Hoeveelheid"
+
+#: tformnotetask.grid.columns[4].title.caption
+msgctxt "tformnotetask.grid.columns[4].title.caption"
+msgid "Date"
+msgstr "Datum"
+
+#: tformnotetask.grid.columns[5].title.caption
+msgctxt "tformnotetask.grid.columns[5].title.caption"
+msgid "Star"
+msgstr "Ster"
+
 #: tformnotetask.menuedit.caption
 msgid "Edit"
 msgstr "Bewerken"
@@ -971,35 +1001,6 @@ msgstr "Opslaan"
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "Opslaan"
-
-#: tformnotetask.taskgrid.columns[0].title.caption
-msgid "Done"
-msgstr "Voltooid"
-
-#: tformnotetask.taskgrid.columns[1].title.caption
-msgctxt "tformnotetask.taskgrid.columns[1].title.caption"
-msgid "Task"
-msgstr "Taak"
-
-#: tformnotetask.taskgrid.columns[2].title.caption
-msgctxt "tformnotetask.taskgrid.columns[2].title.caption"
-msgid "Note"
-msgstr "Notitie"
-
-#: tformnotetask.taskgrid.columns[3].title.caption
-msgctxt "tformnotetask.taskgrid.columns[3].title.caption"
-msgid "Amount"
-msgstr "Hoeveelheid"
-
-#: tformnotetask.taskgrid.columns[4].title.caption
-msgctxt "tformnotetask.taskgrid.columns[4].title.caption"
-msgid "Date"
-msgstr "Datum"
-
-#: tformnotetask.taskgrid.columns[5].title.caption
-msgctxt "tformnotetask.taskgrid.columns[5].title.caption"
-msgid "Star"
-msgstr "Ster"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"
