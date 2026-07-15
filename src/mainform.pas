@@ -739,7 +739,6 @@ type
     function GetMemoNoteScroll: integer;
     function GetMemoNoteSelStart: integer;
     function GetMemoNoteSelLength: integer;
-    procedure DrawHighlightedText(aCanvas: TCanvas; const aText, aFilterText: string; aRect: TRect; aColor: TColor; aCol: integer);
     procedure DelayedSetMemoFocus(Data: PtrInt);
     procedure DelayedFinishTagEdit(Data: PtrInt);
     procedure DelayedInvalidate(Data: PtrInt);
@@ -893,7 +892,8 @@ resourcestring
 implementation
 
 uses Consts, mathparser, filemngr, settings, controlshelper, cryptoutils, stringgridhelper, forminput, formmemo, formfind,
-  formreplace, formabout, formdonate, osutils, stringhelper, stringshelper, darkutils, localize, checkupdates, hotkeyhelper;
+  formreplace, formabout, formdonate, osutils, stringhelper, stringshelper, darkutils, localize, checkupdates, hotkeyhelper,
+  pascalutils;
 
   {$R *.lfm}
 
@@ -4142,6 +4142,404 @@ end;
 
 {%Region -fold Task Grid}
 
+procedure TformNotetask.GridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
+var
+  TempGrid: TStringGrid;
+  Value: string;
+  DrawRect: TRect;
+  bgFill: TColor;
+  Flags: cardinal;
+  Task: TTask;
+  Amount: double;
+  FS: TFormatSettings;
+  ImgIndex: integer;
+  ImgX, ImgY: integer;
+  BitTags: TBitmap;
+  TagsWidth: integer = 0;
+  OriginalLeft, OriginalRight: integer;
+  Indent: integer = 0;
+begin
+  TempGrid := Sender as TStringGrid;
+  bgFill := TDarkUtils.ThemeColor(clWhite, clBlack);
+
+  // Border for fixed cells
+  if (aRow < TempGrid.FixedRows) or (aCol < TempGrid.FixedCols) then
+  begin
+    TempGrid.Canvas.Pen.Color := clSilver;
+    TempGrid.Canvas.Pen.Style := psSolid;
+    TempGrid.Canvas.Pen.Width := 1;
+    TempGrid.Canvas.Pen.Width := 0;
+    TempGrid.Canvas.Brush.Style := bsClear;
+    TempGrid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
+
+    if (aRow = 0) and (aCol = COL_NUM) and (SortColumn = COL_NUM) and Assigned(TempGrid.TitleImageList) then
+    begin
+      if SortOrder = soAscending then
+        ImgIndex := 0
+      else
+        ImgIndex := 1;
+
+      ImgX := aRect.Right - TempGrid.TitleImageList.Width - 4;
+      ImgY := aRect.Top + ((aRect.Bottom - aRect.Top - TempGrid.TitleImageList.Height) div 2);
+
+      TempGrid.TitleImageList.Draw(TempGrid.Canvas, ImgX, ImgY, ImgIndex, True);
+    end;
+  end
+  else
+  begin
+    // Determine background color
+    if (gdFocused in aState) and (TempGrid.Selection.Height = 0) and (TempGrid.Selection.Width = 0) and
+      ((IsEditing and ((Assigned(TempGrid.Editor) and TempGrid.Editor.Focused) or (Assigned(Memo) and Memo.Focused))) or
+      (not IsEditing)) then
+    begin
+      bgFill := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);    // Focused
+      TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
+    end
+    else
+    if (gdSelected in aState) and ((TempGrid.Selection.Height > 0) or (TempGrid.Selection.Width > 0)) then
+    begin
+      bgFill := clHighlight;    // Multiselect
+      TempGrid.Canvas.Font.Color := clWhite;
+    end
+    else
+    if gdRowHighlight in aState then
+    begin
+      bgFill := TDarkUtils.ThemeColor(clRowHighlight_Light, clRowHighlight_Dark); // Highlight
+      TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
+    end
+    else
+    begin
+      if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
+      begin
+        Task := Tasks.GetTask(ARow);
+        if (ShowColumnDate) and (not Task.Done) and (Task.Date > 0) and (Task.Date < Now) then // Color expired Task
+        begin
+          bgFill := TDarkUtils.ThemeColor(clRowExpired_Light, clRowExpired_Dark); // Expired warning red
+          TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
+        end
+        else
+        if (not Task.Done) and (Task.Archive) then
+        begin
+          bgFill := TDarkUtils.ThemeColor(clWhite, clBlack); // Not done but arhive warning color
+          TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clRowNotDone_Light, clRowNotDone_Dark);
+        end
+        else
+        begin
+          bgFill := TDarkUtils.ThemeColor(clWhite, clBlack); // All other white
+          TempGrid.Canvas.Font.Color := Font.Color;
+        end;
+      end;
+    end;
+
+    if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
+    begin
+      Task := Tasks.GetTask(ARow);
+      if Task.Star then
+        TempGrid.Canvas.Font.Style := TempGrid.Canvas.Font.Style + [fsBold];
+
+      if (aCol = COL_TASK) and (Task.Archive) then
+        TempGrid.Canvas.Font.Style := TempGrid.Canvas.Font.Style + [fsStrikeOut];
+
+      if (aCol = COL_NOTE) and (Task.NoteItalic) then
+        TempGrid.Canvas.Font.Style := TempGrid.Canvas.Font.Style + [fsItalic];
+
+      if (aCol = COL_DATE) and (Task.Date > Now) and (not (gdSelected in aState)) then
+        TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clPlanned_Light, clPlanned_Dark);
+    end;
+
+    // Fill the cell background
+    TempGrid.Canvas.Brush.Color := bgFill;
+    TempGrid.canvas.Brush.Style := bsSolid;
+    TempGrid.canvas.FillRect(aRect);
+
+    if (aCol in [COL_DONE, COL_STAR]) then
+    begin
+      TempGrid.DefaultDrawCell(aCol, aRow, aRect, aState);
+      exit;
+    end;
+
+    if (aCol = COL_AMOUNT) and (TryStrToFloat(TempGrid.Cells[ACol, ARow], Amount)) then
+    begin
+      FS := DefaultFormatSettings;
+      FS.ThousandSeparator := ' ';
+      Value := FormatFloat('#,##0.##########', StrToFloat(TempGrid.Cells[ACol, ARow]), FS);
+    end
+    else
+      Value := TempGrid.Cells[ACol, ARow];
+
+    if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
+    begin
+      if (aCol = COL_TASK) then
+      begin
+        Task := Tasks.GetTask(ARow);
+        Indent := Task.FIndentLevel * Canvas.TextWidth(' ') * 2;
+        if Task.Tags.Count > 0 then
+        begin
+          BitTags := TagEdit.GetTagsBitmap(Task.Tags, Round(Max(Max(Font.Size div 2, 8) * FZoom, 1)),
+            Min(ARect.Width, Round(500 * FZoom)), ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected,
+            ifthen(bgFill <> TDarkUtils.ThemeColor(clWhite, clBlack), TagsDimnessColor, TagsDimness)), ColorToRGB(bgFill));
+          try
+            BitTags.TransparentColor := clWhite;
+            BitTags.Transparent := True;
+            TagsWidth := BitTags.Width;
+            Task.TagsWidth := TagsWidth;
+            if TagsWidth < aRect.Width - 50 then
+            begin
+              if TempGrid.BiDiMode = bdLeftToRight then
+                TempGrid.canvas.Draw(aRect.Right - TagsWidth - 5, aRect.Top, BitTags)
+              else
+                TempGrid.canvas.Draw(aRect.Left + 5, aRect.Top, BitTags);
+            end
+            else
+              TagsWidth := 0;
+          finally
+            BitTags.Free;
+          end;
+        end
+        else
+          TagsWidth := Task.TagsWidth;
+      end;
+    end;
+
+    if Length(Value) > 0 then
+    begin
+      if FDuplicateHighlight and not (gdSelected in aState) and (FLastText <> string.Empty) and
+        (Trim(Value) = Trim(FLastText)) and (TempGrid.Selection.Height = 0) and ((aCol <> FLastCol) or (aRow <> FLastRow)) then
+      begin
+        TempGrid.canvas.Brush.Style := bsSolid;
+        TempGrid.canvas.Brush.Color := TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark);
+      end
+      else
+        TempGrid.canvas.Brush.Style := bsClear;
+
+      DrawRect := aRect;
+      DrawRect.Inflate(-4, 0);
+      if (aCol = COL_TASK) then
+        DrawRect.Inflate(-Indent, 0, 0, 0);
+
+      // Save original boundaries
+      OriginalLeft := DrawRect.Left;
+      OriginalRight := DrawRect.Right;
+
+      // Reduce text area by TagsWidth for text measurement
+      if TagsWidth < DrawRect.Width then
+      begin
+        if FBiDiRightToLeft then
+          DrawRect.Left := OriginalLeft + TagsWidth  // For RTL: reserve space on the left
+        else
+          DrawRect.Right := OriginalRight - TagsWidth; // For LTR: reserve space on the right
+      end;
+
+      // First pass: calculate text size
+      Flags := DT_CALCRECT;
+      if FBiDiRightToLeft then
+        Flags := Flags or longword(ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT))
+      else
+        Flags := Flags or longword(ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT));
+      if FWordWrap then
+        Flags := Flags or DT_WORDBREAK;
+
+      DrawText(TempGrid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
+
+      // Second pass: actual text drawing
+      // Restore the reduced area for drawing
+      DrawRect.Left := OriginalLeft;
+      DrawRect.Right := OriginalRight;
+
+      if TagsWidth < DrawRect.Width then
+      begin
+        if FBiDiRightToLeft then
+          DrawRect.Left := OriginalLeft + TagsWidth
+        else
+          DrawRect.Right := OriginalRight - TagsWidth;
+      end;
+
+      Flags := DT_NOPREFIX;
+      if FBiDiRightToLeft then
+        Flags := Flags or longword(ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT))
+      else
+        Flags := Flags or longword(ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT));
+      if FWordWrap then
+        Flags := Flags or DT_WORDBREAK;
+
+      if (FHideNoteText) and (aCol = COL_NOTE) then
+        Value := Value.MaskTextWithBullets(TempGrid.Canvas, FLineEnding.Value);
+
+      if (Value = string.Empty) or (FilterBox.Text = string.Empty) or (TempGrid.canvas.Brush.Color =
+        TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark)) or
+        (Pos(Trim(FilterBox.Text).UTF8Lower, ifthen(aCol = COL_AMOUNT, ReplaceStr(Value, ' ', ''), Value).UTF8Lower) = 0) or
+        ((FHideNoteText) and (aCol = COL_NOTE)) then
+      begin
+        DrawText(TempGrid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
+      end
+      else
+      begin
+        if (aCol = COL_AMOUNT) then Value := ReplaceStr(Value, ' ', '');
+
+        TempGrid.DrawHighlightedText(
+          TempGrid.Canvas,                                 // ACanvas
+          DrawRect,                                        // ARect
+          GridDrawColors(ifthen(bgFill <> TDarkUtils.ThemeColor(clWhite, clBlack), TagEdit.BlendColors(
+          TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark), bgFill, 50),
+          TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark)), clNone, clNone, clNone), // Colors
+          Value,                                           // AText
+          Trim(FilterBox.Text),                            // AFilterText
+          '',                                              // AHintText
+          FWordWrap,                                       // AWordWrap
+          False,                                           // AShowLineBreaks
+          iif(aCol = COL_DATE, False, iif(aCol = COL_AMOUNT, True, FBiDiRightToLeft))  // ABiDiRightToLeft
+          );
+      end;
+    end;
+  end;
+end;
+
+procedure TformNotetask.GridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
+var
+  sDateTime: TDateTime;
+begin
+  if FReadOnly then
+  begin
+    Editor := nil;  // disable editor — grid stays view-only
+    exit;
+  end;
+
+  if (aCol in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
+  begin
+    PanelMemo := TPanel.Create(Self);
+    PanelMemo.Parent := Grid;
+    PanelMemo.BorderStyle := bsNone;
+    PanelMemo.Caption := string.Empty;
+    PanelMemo.BevelOuter := bvNone;
+    PanelMemo.TabStop := False;
+    PanelMemo.Visible := False;
+    PanelMemo.OnEnter := @PanelMemoEnter; // Event Enter
+    PanelMemo.OnUTF8KeyPress := @PanelMemoUTF8KeyPress; // Event UTF8KeyPress
+    Memo := TMemo.Create(Self);
+    Memo.Parent := PanelMemo;
+    Memo.Align := alClient;
+    if (Grid.IsCellSelected[aCol, aRow]) and ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) then
+    begin
+      Memo.Color := clHighlight;
+      Memo.Font.Color := clWhite;
+    end
+    else
+    begin
+      Memo.Color := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);
+    end;
+    Memo.Font.Name := Grid.Font.Name;
+    Memo.Font.Size := Grid.Font.Size;
+    Memo.Font.Bold := Grid.Cells[COL_STAR, aRow] = '1';
+    Memo.HideSelection := False;
+    Memo.BorderStyle := bsNone;
+    Memo.ScrollBars := ssNone;
+    Memo.TabStop := False;
+    Memo.WantTabs := True;
+    Memo.WordWrap := (FWordWrap) and (aCol <> COL_AMOUNT);
+    Memo.WantReturns := aCol in [COL_TASK, COL_NOTE];
+    if (FBiDiRightToLeft) then
+    begin
+      if aCol = COL_AMOUNT then
+      begin
+        Memo.ParentBiDiMode := False;
+        Memo.BiDiMode := bdLeftToRight;
+        Memo.Alignment := taRightJustify;
+      end
+      else
+        Memo.BiDiMode := bdRightToLeft;
+    end
+    else
+    begin
+      if aCol = COL_AMOUNT then
+      begin
+        Memo.ParentBiDiMode := False;
+        Memo.BiDiMode := bdLeftToRight;
+        Memo.Alignment := taRightJustify;
+      end
+      else
+        Memo.BiDiMode := bdLeftToRight;
+    end;
+    EditControlSetBounds(PanelMemo, aCol, aRow);
+    Memo.PopupMenu := PopupMemo;
+    Memo.OnEnter := @MemoEnter; // Event Enter
+    Memo.OnExit := @MemoExit; // Event Exit
+    Memo.OnChange := @MemoChange; // Event Change
+    Memo.OnKeyDown := @MemoKeyDown; // Event KeyDown
+    Memo.OnMouseDown := @MemoNoteMouseDown; // Event MouseDown
+    Memo.OnDblClick := @MemoNoteDblClick; // Event MouseDown
+    Memo.OnKeyUp := @MemoNoteKeyUp; // Event KeyUp
+    Memo.OnMouseUp := @MemoNoteMouseUp; // Event MouseUp
+    if (aCol = COL_AMOUNT) then
+      Memo.OnKeyPress := @MemoKeyPress; // Event KeyPress for amount column only
+    Memo.Text := Grid.Cells[aCol, aRow];
+    Memo.SelStart := Length(Memo.Text);
+    Memo.SelLength := 0;
+    MemoBackup;
+
+    Editor := PanelMemo;
+
+    if (FIsSelecting) or (Grid.Selection.Height > 0) or (Grid.Selection.Width > 0) then
+    begin
+      PanelMemo.Visible := False;
+      FIsSelecting := False;
+      FIsEditing := False;
+    end
+    else
+    begin
+      PanelMemo.Visible := True;
+      FIsEditing := True;
+      FMemoStartEdit := True;
+    end;
+  end
+  else
+  if (aCol = COL_DATE) then
+  begin
+    DatePicker := TDateTimePicker.Create(Self);
+    DatePicker.Visible := False;
+    DatePicker.AutoSize := False;
+    DatePicker.BorderStyle := bsNone;
+    DatePicker.ArrowShape := asModernLarger;
+    DatePicker.Options := [dtpoFlatButton];
+    if (FShowTime) then
+      DatePicker.Kind := dtkDateTime
+    else
+      DatePicker.Kind := dtkDate;
+    DatePicker.TimeDisplay := tdHMS;
+    DatePicker.ParentBiDiMode := False;
+    DatePicker.BiDiMode := bdLeftToRight;
+
+    EditControlSetBounds(DatePicker, aCol, aRow, 2, -2, -2, 0);
+
+    if (Grid.Cells[aCol, aRow] = string.Empty) then
+      DatePicker.DateTime := Now
+    else
+    begin
+      TryStrToDateTime(Grid.Cells[aCol, aRow], sDateTime);
+      DatePicker.DateTime := sDateTime;
+    end;
+
+    DatePicker.OnChange := @DatePickerChange; // Event Change
+    DatePicker.OnEnter := @DatePickerEnter; // Event Enter
+    DatePicker.OnKeyDown := @DatePickerKeyDown; // Event KeyDown
+
+    Editor := DatePicker;
+
+    Application.QueueAsyncCall(@FixDatePickerFont, 0);
+
+    if (FIsSelecting) or (Grid.Selection.Height > 0) or (Grid.Selection.Width > 0) then
+    begin
+      DatePicker.Visible := False;
+      FIsSelecting := False;
+      FIsEditing := False;
+    end
+    else
+    begin
+      DatePicker.Visible := True;
+      FIsEditing := True;
+    end;
+  end;
+end;
+
 procedure TformNotetask.GridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
 var
   LastTask: integer;
@@ -4422,8 +4820,7 @@ begin
   end;
 end;
 
-procedure TformNotetask.GridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer;
-  MousePos: TPoint; var Handled: boolean);
+procedure TformNotetask.GridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
 begin
   if IsEditing then
     EditComplete;
@@ -4472,395 +4869,6 @@ begin
     panelFunc.Top := Grid.Top + Grid.Height - panelFunc.Height - GetSystemMetrics(SM_CYHSCROLL) - 5
   else
     panelFunc.Top := Grid.Top + Grid.Height - panelFunc.Height - 5;
-end;
-
-procedure TformNotetask.GridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
-var
-  TempGrid: TStringGrid;
-  Value: string;
-  DrawRect: TRect;
-  bgFill: TColor;
-  Flags: cardinal;
-  Task: TTask;
-  Amount: double;
-  FS: TFormatSettings;
-  ImgIndex: integer;
-  ImgX, ImgY: integer;
-  BitTags: TBitmap;
-  TagsWidth: integer = 0;
-  OriginalLeft, OriginalRight: integer;
-  Indent: integer = 0;
-begin
-  TempGrid := Sender as TStringGrid;
-  bgFill := TDarkUtils.ThemeColor(clWhite, clBlack);
-
-  // Border for fixed cells
-  if (aRow < TempGrid.FixedRows) or (aCol < TempGrid.FixedCols) then
-  begin
-    TempGrid.Canvas.Pen.Color := clSilver;
-    TempGrid.Canvas.Pen.Style := psSolid;
-    TempGrid.Canvas.Pen.Width := 1;
-    TempGrid.Canvas.Pen.Width := 0;
-    TempGrid.Canvas.Brush.Style := bsClear;
-    TempGrid.Canvas.Rectangle(aRect.Left - 1, aRect.Top - 1, aRect.Right, aRect.Bottom);
-
-    if (aRow = 0) and (aCol = COL_NUM) and (SortColumn = COL_NUM) and Assigned(TempGrid.TitleImageList) then
-    begin
-      if SortOrder = soAscending then
-        ImgIndex := 0
-      else
-        ImgIndex := 1;
-
-      ImgX := aRect.Right - TempGrid.TitleImageList.Width - 4;
-      ImgY := aRect.Top + ((aRect.Bottom - aRect.Top - TempGrid.TitleImageList.Height) div 2);
-
-      TempGrid.TitleImageList.Draw(TempGrid.Canvas, ImgX, ImgY, ImgIndex, True);
-    end;
-  end
-  else
-  begin
-    // Determine background color
-    if (gdFocused in aState) and (TempGrid.Selection.Height = 0) and (TempGrid.Selection.Width = 0) and
-      ((IsEditing and ((Assigned(TempGrid.Editor) and TempGrid.Editor.Focused) or (Assigned(Memo) and Memo.Focused))) or
-      (not IsEditing)) then
-    begin
-      bgFill := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);    // Focused
-      TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
-    end
-    else
-    if (gdSelected in aState) and ((TempGrid.Selection.Height > 0) or (TempGrid.Selection.Width > 0)) then
-    begin
-      bgFill := clHighlight;    // Multiselect
-      TempGrid.Canvas.Font.Color := clWhite;
-    end
-    else
-    if gdRowHighlight in aState then
-    begin
-      bgFill := TDarkUtils.ThemeColor(clRowHighlight_Light, clRowHighlight_Dark); // Highlight
-      TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
-    end
-    else
-    begin
-      if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
-      begin
-        Task := Tasks.GetTask(ARow);
-        if (ShowColumnDate) and (not Task.Done) and (Task.Date > 0) and (Task.Date < Now) then // Color expired Task
-        begin
-          bgFill := TDarkUtils.ThemeColor(clRowExpired_Light, clRowExpired_Dark); // Expired warning red
-          TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
-        end
-        else
-        if (not Task.Done) and (Task.Archive) then
-        begin
-          bgFill := TDarkUtils.ThemeColor(clWhite, clBlack); // Not done but arhive warning color
-          TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clRowNotDone_Light, clRowNotDone_Dark);
-        end
-        else
-        begin
-          bgFill := TDarkUtils.ThemeColor(clWhite, clBlack); // All other white
-          TempGrid.Canvas.Font.Color := Font.Color;
-        end;
-      end;
-    end;
-
-    if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
-    begin
-      Task := Tasks.GetTask(ARow);
-      if Task.Star then
-        TempGrid.Canvas.Font.Style := TempGrid.Canvas.Font.Style + [fsBold];
-
-      if (aCol = COL_TASK) and (Task.Archive) then
-        TempGrid.Canvas.Font.Style := TempGrid.Canvas.Font.Style + [fsStrikeOut];
-
-      if (aCol = COL_NOTE) and (Task.NoteItalic) then
-        TempGrid.Canvas.Font.Style := TempGrid.Canvas.Font.Style + [fsItalic];
-
-      if (aCol = COL_DATE) and (Task.Date > Now) and (not (gdSelected in aState)) then
-        TempGrid.Canvas.Font.Color := TDarkUtils.ThemeColor(clPlanned_Light, clPlanned_Dark);
-    end;
-
-    // Fill the cell background
-    TempGrid.Canvas.Brush.Color := bgFill;
-    TempGrid.canvas.Brush.Style := bsSolid;
-    TempGrid.canvas.FillRect(aRect);
-
-    if (aCol in [COL_DONE, COL_STAR]) then
-    begin
-      TempGrid.DefaultDrawCell(aCol, aRow, aRect, aState);
-      exit;
-    end;
-
-    if (aCol = COL_AMOUNT) and (TryStrToFloat(TempGrid.Cells[ACol, ARow], Amount)) then
-    begin
-      FS := DefaultFormatSettings;
-      FS.ThousandSeparator := ' ';
-      Value := FormatFloat('#,##0.##########', StrToFloat(TempGrid.Cells[ACol, ARow]), FS);
-    end
-    else
-      Value := TempGrid.Cells[ACol, ARow];
-
-    if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
-    begin
-      if (aCol = COL_TASK) then
-      begin
-        Task := Tasks.GetTask(ARow);
-        Indent := Task.FIndentLevel * Canvas.TextWidth(' ') * 2;
-        if Task.Tags.Count > 0 then
-        begin
-          BitTags := TagEdit.GetTagsBitmap(Task.Tags, Round(Max(Max(Font.Size div 2, 8) * FZoom, 1)),
-            Min(ARect.Width, Round(500 * FZoom)), ARect.Height, 2, ifthen(gdSelected in aState, TagsDimnessSelected,
-            ifthen(bgFill <> TDarkUtils.ThemeColor(clWhite, clBlack), TagsDimnessColor, TagsDimness)), ColorToRGB(bgFill));
-          try
-            BitTags.TransparentColor := clWhite;
-            BitTags.Transparent := True;
-            TagsWidth := BitTags.Width;
-            Task.TagsWidth := TagsWidth;
-            if TagsWidth < aRect.Width - 50 then
-            begin
-              if TempGrid.BiDiMode = bdLeftToRight then
-                TempGrid.canvas.Draw(aRect.Right - TagsWidth - 5, aRect.Top, BitTags)
-              else
-                TempGrid.canvas.Draw(aRect.Left + 5, aRect.Top, BitTags);
-            end
-            else
-              TagsWidth := 0;
-          finally
-            BitTags.Free;
-          end;
-        end
-        else
-          TagsWidth := Task.TagsWidth;
-      end;
-    end;
-
-    if Length(Value) > 0 then
-    begin
-      if FDuplicateHighlight and not (gdSelected in aState) and (FLastText <> string.Empty) and
-        (Trim(Value) = Trim(FLastText)) and (TempGrid.Selection.Height = 0) and ((aCol <> FLastCol) or (aRow <> FLastRow)) then
-      begin
-        TempGrid.canvas.Brush.Style := bsSolid;
-        TempGrid.canvas.Brush.Color := TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark);
-      end
-      else
-        TempGrid.canvas.Brush.Style := bsClear;
-
-      DrawRect := aRect;
-      DrawRect.Inflate(-4, 0);
-      if (aCol = COL_TASK) then
-        DrawRect.Inflate(-Indent, 0, 0, 0);
-
-      // Save original boundaries
-      OriginalLeft := DrawRect.Left;
-      OriginalRight := DrawRect.Right;
-
-      // Reduce text area by TagsWidth for text measurement
-      if TagsWidth < DrawRect.Width then
-      begin
-        if FBiDiRightToLeft then
-          DrawRect.Left := OriginalLeft + TagsWidth  // For RTL: reserve space on the left
-        else
-          DrawRect.Right := OriginalRight - TagsWidth; // For LTR: reserve space on the right
-      end;
-
-      // First pass: calculate text size
-      Flags := DT_CALCRECT;
-      if FBiDiRightToLeft then
-        Flags := Flags or longword(ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT))
-      else
-        Flags := Flags or longword(ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT));
-      if FWordWrap then
-        Flags := Flags or DT_WORDBREAK;
-
-      DrawText(TempGrid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
-
-      // Second pass: actual text drawing
-      // Restore the reduced area for drawing
-      DrawRect.Left := OriginalLeft;
-      DrawRect.Right := OriginalRight;
-
-      if TagsWidth < DrawRect.Width then
-      begin
-        if FBiDiRightToLeft then
-          DrawRect.Left := OriginalLeft + TagsWidth
-        else
-          DrawRect.Right := OriginalRight - TagsWidth;
-      end;
-
-      Flags := DT_NOPREFIX;
-      if FBiDiRightToLeft then
-        Flags := Flags or longword(ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT))
-      else
-        Flags := Flags or longword(ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT));
-      if FWordWrap then
-        Flags := Flags or DT_WORDBREAK;
-
-      if (FHideNoteText) and (aCol = COL_NOTE) then
-        Value := Value.MaskTextWithBullets(TempGrid.Canvas, FLineEnding.Value);
-
-      if (Value = string.Empty) or (FilterBox.Text = string.Empty) or (TempGrid.canvas.Brush.Color =
-        TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark)) or
-        (Pos(Trim(FilterBox.Text).UTF8Lower, ifthen(aCol = COL_AMOUNT, ReplaceStr(Value, ' ', ''), Value).UTF8Lower) = 0) or
-        ((FHideNoteText) and (aCol = COL_NOTE)) then
-      begin
-        DrawText(TempGrid.canvas.handle, PChar(Value), Length(Value), DrawRect, Flags);
-      end
-      else
-      begin
-        if (aCol = COL_AMOUNT) then Value := ReplaceStr(Value, ' ', '');
-
-        DrawHighlightedText(TempGrid.Canvas, Value, Trim(FilterBox.Text), DrawRect,
-          ifthen(bgFill <> TDarkUtils.ThemeColor(clWhite, clBlack), TagEdit.BlendColors(
-          TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark), bgFill, 50),
-          TDarkUtils.ThemeColor(clDuplicateHighlight_Light, clDuplicateHighlight_Dark)), aCol);
-      end;
-    end;
-  end;
-end;
-
-procedure TformNotetask.GridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
-var
-  sDateTime: TDateTime;
-begin
-  if FReadOnly then
-  begin
-    Editor := nil;  // disable editor — grid stays view-only
-    exit;
-  end;
-
-  if (aCol in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
-  begin
-    PanelMemo := TPanel.Create(Self);
-    PanelMemo.Parent := Grid;
-    PanelMemo.BorderStyle := bsNone;
-    PanelMemo.Caption := string.Empty;
-    PanelMemo.BevelOuter := bvNone;
-    PanelMemo.TabStop := False;
-    PanelMemo.Visible := False;
-    PanelMemo.OnEnter := @PanelMemoEnter; // Event Enter
-    PanelMemo.OnUTF8KeyPress := @PanelMemoUTF8KeyPress; // Event UTF8KeyPress
-    Memo := TMemo.Create(Self);
-    Memo.Parent := PanelMemo;
-    Memo.Align := alClient;
-    if (Grid.IsCellSelected[aCol, aRow]) and ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) then
-    begin
-      Memo.Color := clHighlight;
-      Memo.Font.Color := clWhite;
-    end
-    else
-    begin
-      Memo.Color := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);
-    end;
-    Memo.Font.Name := Grid.Font.Name;
-    Memo.Font.Size := Grid.Font.Size;
-    Memo.Font.Bold := Grid.Cells[COL_STAR, aRow] = '1';
-    Memo.HideSelection := False;
-    Memo.BorderStyle := bsNone;
-    Memo.ScrollBars := ssNone;
-    Memo.TabStop := False;
-    Memo.WantTabs := True;
-    Memo.WordWrap := (FWordWrap) and (aCol <> COL_AMOUNT);
-    Memo.WantReturns := aCol in [COL_TASK, COL_NOTE];
-    if (FBiDiRightToLeft) then
-    begin
-      if aCol = COL_AMOUNT then
-      begin
-        Memo.ParentBiDiMode := False;
-        Memo.BiDiMode := bdLeftToRight;
-        Memo.Alignment := taRightJustify;
-      end
-      else
-        Memo.BiDiMode := bdRightToLeft;
-    end
-    else
-    begin
-      if aCol = COL_AMOUNT then
-      begin
-        Memo.ParentBiDiMode := False;
-        Memo.BiDiMode := bdLeftToRight;
-        Memo.Alignment := taRightJustify;
-      end
-      else
-        Memo.BiDiMode := bdLeftToRight;
-    end;
-    EditControlSetBounds(PanelMemo, aCol, aRow);
-    Memo.PopupMenu := PopupMemo;
-    Memo.OnEnter := @MemoEnter; // Event Enter
-    Memo.OnExit := @MemoExit; // Event Exit
-    Memo.OnChange := @MemoChange; // Event Change
-    Memo.OnKeyDown := @MemoKeyDown; // Event KeyDown
-    Memo.OnMouseDown := @MemoNoteMouseDown; // Event MouseDown
-    Memo.OnDblClick := @MemoNoteDblClick; // Event MouseDown
-    Memo.OnKeyUp := @MemoNoteKeyUp; // Event KeyUp
-    Memo.OnMouseUp := @MemoNoteMouseUp; // Event MouseUp
-    if (aCol = COL_AMOUNT) then
-      Memo.OnKeyPress := @MemoKeyPress; // Event KeyPress for amount column only
-    Memo.Text := Grid.Cells[aCol, aRow];
-    Memo.SelStart := Length(Memo.Text);
-    Memo.SelLength := 0;
-    MemoBackup;
-
-    Editor := PanelMemo;
-
-    if (FIsSelecting) or (Grid.Selection.Height > 0) or (Grid.Selection.Width > 0) then
-    begin
-      PanelMemo.Visible := False;
-      FIsSelecting := False;
-      FIsEditing := False;
-    end
-    else
-    begin
-      PanelMemo.Visible := True;
-      FIsEditing := True;
-      FMemoStartEdit := True;
-    end;
-  end
-  else
-  if (aCol = COL_DATE) then
-  begin
-    DatePicker := TDateTimePicker.Create(Self);
-    DatePicker.Visible := False;
-    DatePicker.AutoSize := False;
-    DatePicker.BorderStyle := bsNone;
-    DatePicker.ArrowShape := asModernLarger;
-    DatePicker.Options := [dtpoFlatButton];
-    if (FShowTime) then
-      DatePicker.Kind := dtkDateTime
-    else
-      DatePicker.Kind := dtkDate;
-    DatePicker.TimeDisplay := tdHMS;
-    DatePicker.ParentBiDiMode := False;
-    DatePicker.BiDiMode := bdLeftToRight;
-
-    EditControlSetBounds(DatePicker, aCol, aRow, 2, -2, -2, 0);
-
-    if (Grid.Cells[aCol, aRow] = string.Empty) then
-      DatePicker.DateTime := Now
-    else
-    begin
-      TryStrToDateTime(Grid.Cells[aCol, aRow], sDateTime);
-      DatePicker.DateTime := sDateTime;
-    end;
-
-    DatePicker.OnChange := @DatePickerChange; // Event Change
-    DatePicker.OnEnter := @DatePickerEnter; // Event Enter
-    DatePicker.OnKeyDown := @DatePickerKeyDown; // Event KeyDown
-
-    Editor := DatePicker;
-
-    Application.QueueAsyncCall(@FixDatePickerFont, 0);
-
-    if (FIsSelecting) or (Grid.Selection.Height > 0) or (Grid.Selection.Width > 0) then
-    begin
-      DatePicker.Visible := False;
-      FIsSelecting := False;
-      FIsEditing := False;
-    end
-    else
-    begin
-      DatePicker.Visible := True;
-      FIsEditing := True;
-    end;
-  end;
 end;
 
 procedure TformNotetask.GridTopLeftChanged(Sender: TObject);
@@ -5364,308 +5372,6 @@ end;
 
 {%Region -fild Private Methods}
 
-procedure TformNotetask.DrawHighlightedText(aCanvas: TCanvas; const aText, aFilterText: string; aRect: TRect;
-  aColor: TColor; aCol: integer);
-type
-  TTextRange = record
-    StartPos: integer;
-    EndPos: integer;
-    IsMatch: boolean;
-  end;
-  PTextRange = ^TTextRange;
-
-  TLineWord = record
-    word: string;
-    Width: integer;
-    IsMatch: boolean;
-  end;
-var
-  TextRanges: TList;
-  LineWords: array of TLineWord = ();
-  LineStartIndex: integer; // Index of first word in current line
-  LineWidth: integer;      // Current line width
-  Flags: cardinal;
-  CurrentY: integer;
-  LineHeight: integer;
-  SavedBrushStyle: TBrushStyle;
-  SavedBrushColor: TColor;
-  SavedTextColor: TColor;
-  Range: PTextRange;
-  Fragment: string;
-  CurrentWord: string;
-  WordStart, WordEnd: integer;
-  WordWidth: integer;
-  TotalGroupWidth: integer;
-  I, J: integer;
-
-// Build text ranges for highlighting matches
-  procedure BuildTextRanges;
-  var
-    LowerText, LowerFilter: string;
-    CurrentPos, MatchPos: integer;
-    Range: PTextRange;
-  begin
-    if (aFilterText = '') or (aText = '') then
-    begin
-      // No filter text - create single normal range
-      New(Range);
-      Range^.StartPos := 1;
-      Range^.EndPos := Length(aText);
-      Range^.IsMatch := False;
-      TextRanges.Add(Range);
-      Exit;
-    end;
-
-    LowerText := aText.UTF8Lower;
-    LowerFilter := aFilterText.UTF8Lower;
-    CurrentPos := 1;
-
-    while CurrentPos <= Length(aText) do
-    begin
-      MatchPos := Pos(LowerFilter, LowerText, CurrentPos);
-
-      if MatchPos = 0 then
-      begin
-        // No more matches - add remaining text as normal range
-        if CurrentPos <= Length(aText) then
-        begin
-          New(Range);
-          Range^.StartPos := CurrentPos;
-          Range^.EndPos := Length(aText);
-          Range^.IsMatch := False;
-          TextRanges.Add(Range);
-        end;
-        Break;
-      end
-      else
-      begin
-        // Add text before match as normal range
-        if MatchPos > CurrentPos then
-        begin
-          New(Range);
-          Range^.StartPos := CurrentPos;
-          Range^.EndPos := MatchPos - 1;
-          Range^.IsMatch := False;
-          TextRanges.Add(Range);
-        end;
-
-        // Add matching text as highlight range
-        New(Range);
-        Range^.StartPos := MatchPos;
-        Range^.EndPos := MatchPos + Length(aFilterText) - 1;
-        Range^.IsMatch := True;
-        TextRanges.Add(Range);
-
-        CurrentPos := MatchPos + Length(aFilterText);
-      end;
-    end;
-  end;
-
-  // Draw a complete line
-  procedure DrawLine(LineStart, LineEnd: integer; Y: integer);
-  var
-    J, X: integer;
-    DrawRect: TRect;
-    TotalLineWidth: integer;
-  begin
-    // Remove last space
-    LineWords[LineEnd].word := TrimRight(LineWords[LineEnd].word);
-    LineWords[LineEnd].Width := aCanvas.TextWidth(LineWords[LineEnd].word);
-    LineWords[LineStart].word := TrimLeft(LineWords[LineStart].word);
-    LineWords[LineStart].Width := aCanvas.TextWidth(LineWords[LineStart].word);
-
-    // Calculate total width of this line
-    TotalLineWidth := 0;
-    for J := LineStart to LineEnd do
-      TotalLineWidth := TotalLineWidth + LineWords[J].Width;
-
-    // Set starting X based on text direction
-    if FBiDiRightToLeft then
-      X := ifthen(aCol in [COL_DATE], aRect.Left, aRect.Right - TotalLineWidth) // Align line to right
-    else
-      X := ifthen(aCol in [COL_AMOUNT], aRect.Right - TotalLineWidth, aRect.Left); // Align line to left
-
-    // Ensure we don't draw outside the bounds
-    if X < aRect.Left then X := aRect.Left;
-    if X + TotalLineWidth > aRect.Right then
-    begin
-      // Adjust if line is too long (shouldn't happen with proper word wrapping)
-      TotalLineWidth := aRect.Right - X;
-      if FBiDiRightToLeft then
-        X := ifthen(aCol in [COL_DATE], aRect.Left, aRect.Right - TotalLineWidth);
-    end;
-
-    // Draw all words in the line
-    for J := LineStart to LineEnd do
-    begin
-      // Check if we're still within bounds
-      if (X + LineWords[J].Width > aRect.Right) then
-        Break;
-
-      DrawRect := Rect(X, Y, X + LineWords[J].Width, Y + LineHeight);
-      if LineWords[J].IsMatch then
-      begin
-        aCanvas.Brush.Style := bsSolid;
-        aCanvas.Brush.Color := aColor;
-        aCanvas.FillRect(DrawRect);
-      end
-      else
-        aCanvas.Brush.Style := bsClear;
-
-      Flags := DT_NOPREFIX;
-      if FBiDiRightToLeft then
-        Flags := Flags or longword(ifthen(aCol in [COL_DATE], DT_LEFT, DT_RIGHT))
-      else
-        Flags := Flags or longword(ifthen(aCol in [COL_AMOUNT], DT_RIGHT, DT_LEFT));
-      if FWordWrap then
-        Flags := Flags or DT_WORDBREAK;
-
-      DrawText(aCanvas.handle, PChar(LineWords[J].word), Length(LineWords[J].word), DrawRect, Flags);
-      X := X + LineWords[J].Width;
-    end;
-  end;
-
-begin
-  TextRanges := TList.Create;
-  try
-    // Save canvas state
-    SavedBrushStyle := aCanvas.Brush.Style;
-    SavedBrushColor := aCanvas.Brush.Color;
-    SavedTextColor := aCanvas.Font.Color;
-
-    try
-      BuildTextRanges;
-      if TextRanges.Count = 0 then Exit;
-      LineHeight := aCanvas.TextHeight('Wg');
-
-      // First, extract all words from all text ranges
-      SetLength(LineWords, 0);
-
-      for I := 0 to TextRanges.Count - 1 do
-      begin
-        Range := PTextRange(TextRanges[I]);
-        Fragment := Copy(aText, Range^.StartPos, Range^.EndPos - Range^.StartPos + 1);
-
-        WordStart := 1;
-        while WordStart <= Length(Fragment) do
-        begin
-          // Find word boundaries (include spaces and line breaks as separate "words")
-          WordEnd := WordStart;
-
-          if Fragment[WordStart] = ' ' then
-          begin
-            // This is a space - treat it as a separate word
-            while (WordEnd < Length(Fragment)) and (Fragment[WordEnd + 1] = ' ') do
-              Inc(WordEnd);
-          end
-          else if (Fragment[WordStart] = #10) or (Fragment[WordStart] = #13) then
-          begin
-            // This is a line break - handle different line break types
-            if (Fragment[WordStart] = #13) and (WordEnd < Length(Fragment)) and (Fragment[WordEnd + 1] = #10) then
-            begin
-              // Windows line break (CR+LF) - treat as single word
-              Inc(WordEnd);
-            end;
-            // For Unix line breaks (LF only) or Mac classic (CR only), we don't need to do anything else
-            // as WordEnd is already at the current position
-          end
-          else
-          begin
-            // This is a non-space word - continue until space or line break
-            while (WordEnd < Length(Fragment)) and (Fragment[WordEnd + 1] <> ' ') and (Fragment[WordEnd + 1] <> #10) and
-              (Fragment[WordEnd + 1] <> #13) do
-              Inc(WordEnd);
-          end;
-
-          CurrentWord := Copy(Fragment, WordStart, WordEnd - WordStart + 1);
-
-          // For line breaks, use a special representation or calculate width differently
-          if (Fragment[WordStart] = #10) or (Fragment[WordStart] = #13) then
-          begin
-            // Line breaks have zero width for calculation purposes
-            // but we need to handle them specially during drawing
-            WordWidth := 0;
-
-            // Optionally, you could replace line break with a visible character for debugging
-            // CurrentWord := '¶'; // Uncomment for debugging
-            // WordWidth := aCanvas.TextWidth('¶'); // Uncomment for debugging
-          end
-          else
-          begin
-            WordWidth := aCanvas.TextWidth(CurrentWord);
-          end;
-
-          // Add word to array
-          SetLength(LineWords, Length(LineWords) + 1);
-          LineWords[High(LineWords)].word := CurrentWord;
-          LineWords[High(LineWords)].Width := WordWidth;
-          LineWords[High(LineWords)].IsMatch := Range^.IsMatch;
-
-          WordStart := WordEnd + 1;
-        end;
-      end;
-
-      if Length(LineWords) = 0 then Exit;
-
-      // Now break into lines and draw
-      LineStartIndex := 0;
-      LineWidth := 0;
-      CurrentY := aRect.Top;
-
-      for I := 0 to High(LineWords) do
-      begin
-        WordWidth := LineWords[I].Width;
-
-        // Calculate total width from current position to next break (space or line break)
-        TotalGroupWidth := WordWidth;
-
-        // Look ahead to find the next break and calculate total width
-        for J := I + 1 to High(LineWords) do
-        begin
-          // Stop at next break (space or line break)
-          if (LineWords[J].word = ' ') or (LineWords[J].word = #10) or (LineWords[J].word = #13) or
-            (LineWords[J].word = #13#10) then
-            Break;
-
-          TotalGroupWidth := TotalGroupWidth + LineWords[J].Width;
-        end;
-
-        // Check if the entire group fits or if it's a line break
-        if ((LineWidth > 0) and (LineWidth + TotalGroupWidth > aRect.Width)) or (LineWords[I].word = #10) or
-          (LineWords[I].word = #13) or (LineWords[I].word = #13#10) then
-        begin
-          DrawLine(LineStartIndex, I - 1, CurrentY);
-          CurrentY := CurrentY + LineHeight;
-          if CurrentY + LineHeight > aRect.Bottom then
-            Exit;
-          LineStartIndex := I;
-          LineWidth := WordWidth;
-        end
-        else
-        begin
-          LineWidth := LineWidth + WordWidth;
-        end;
-      end;
-
-      // Draw the last line
-      if LineStartIndex <= High(LineWords) then
-        DrawLine(LineStartIndex, High(LineWords), CurrentY);
-
-    finally
-      // Restore canvas state
-      aCanvas.Brush.Style := SavedBrushStyle;
-      aCanvas.Brush.Color := SavedBrushColor;
-      aCanvas.Font.Color := SavedTextColor;
-    end;
-
-  finally
-    // Clean up text ranges
-    for I := 0 to TextRanges.Count - 1 do
-      Dispose(PTextRange(TextRanges[I]));
-    TextRanges.Free;
-  end;
-end;
-
 procedure TformNotetask.DelayedInvalidate(Data: PtrInt);
 begin
   Repaint;
@@ -6090,8 +5796,8 @@ end;
 function TformNotetask.GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
 begin
   // If note column is selected or note panel visible
-  if (((Grid.Selection.Left = COL_NOTE) and (Grid.Selection.Right >= COL_NOTE)) or
-    ((panelNote.Visible) and ((memoPriority) or (MemoNote.SelLength > 0) or (MemoNote.Focused)))) then
+  if (((Grid.Selection.Left = COL_NOTE) and (Grid.Selection.Right >= COL_NOTE)) or ((panelNote.Visible) and
+    ((memoPriority) or (MemoNote.SelLength > 0) or (MemoNote.Focused)))) then
   begin
     if (panelNote.Visible) and (MemoNote.SelLength > 0) then
       Result := MemoNote.SelText
@@ -8994,8 +8700,8 @@ begin
       begin
         sValue := unicodestring(DateTimeToString(DatePicker.DateTime));
         sText := unicodestring(aText);
-        if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and
-          (Grid.Cells[Grid.Col, Grid.Row] <> string.Empty) and (not LastDate) then
+        if (Pos(UnicodeLowerCase(sText), UnicodeLowercase(sValue)) > 0) and (Grid.Cells[Grid.Col, Grid.Row] <> string.Empty) and
+          (not LastDate) then
         begin
           FMemoNeedSelectAll := False;
           Grid.EditorMode := True;
@@ -9099,9 +8805,8 @@ begin
         if (CurCol = COL_TASK) and (not ShowColumnTask) then DecCurCol;
       end;
 
-    until ((not WrapAround) and (((aDirectionDown) and (CurRow >= Grid.RowCount)) or
-        ((not aDirectionDown) and (CurRow = 0)))) or (WrapAround and (Counter > Grid.RowCount)) or
-      (not FFindF3 and not formFindText.Visible and not formReplaceText.Visible);
+    until ((not WrapAround) and (((aDirectionDown) and (CurRow >= Grid.RowCount)) or ((not aDirectionDown) and (CurRow = 0)))) or
+      (WrapAround and (Counter > Grid.RowCount)) or (not FFindF3 and not formFindText.Visible and not formReplaceText.Visible);
 
     if (WrapAround and (Counter > Grid.RowCount)) then
       exit(NotFound);
