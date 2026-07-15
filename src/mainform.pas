@@ -513,14 +513,14 @@ type
     procedure panelNoteMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure panelNoteMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     // TagEdit Events
-    procedure tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure tagsEditTagClick(Sender: TObject; const TagText: string; const TagIndex: integer);
-    procedure tagsEditBeforeChange(Sender: TObject; Tags: string; Operation: TTagEditOperation; var AllowChange: boolean);
-    procedure tagsEditChange(Sender: TObject);
-    procedure tagsEditTagAdd(Sender: TObject; const TagText: string; const TagIndex: integer);
-    procedure tagsEditTagRemove(Sender: TObject; const TagText: string; const TagIndex: integer);
-    procedure tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
-    procedure tagsEditExit(Sender: TObject);
+    procedure TagEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure TagEditTagClick(Sender: TObject; const TagText: string; const TagIndex: integer);
+    procedure TagEditBeforeChange(Sender: TObject; Tags: string; Operation: TTagEditOperation; var AllowChange: boolean);
+    procedure TagEditChange(Sender: TObject);
+    procedure TagEditTagAdd(Sender: TObject; const TagText: string; const TagIndex: integer);
+    procedure TagEditTagRemove(Sender: TObject; const TagText: string; const TagIndex: integer);
+    procedure TagEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
+    procedure TagEditExit(Sender: TObject);
     // Tabs Group Events
     procedure TabsGroupChange(Sender: TObject);
     procedure TabsGroupMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -642,6 +642,7 @@ type
     FSReserved: TFileStream;
     FRepaint: boolean;
     FDuplicateHighlight: boolean;
+    FFitRowHeightToFont: boolean;
     {%EndRegion}
     {%Region -fold Private Mathods}
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
@@ -830,6 +831,7 @@ type
     property MemoNoteScroll: integer read GetMemoNoteScroll write FLoadedMemoNoteScroll;
     property MemoNoteSelStart: integer read GetMemoNoteSelStart write FLoadedMemoNoteSelStart;
     property MemoNoteSelLength: integer read GetMemoNoteSelLength write FLoadedMemoNoteSelLength;
+    property FitRowHeightToFont: boolean read FFitRowHeightToFont write FFitRowHeightToFont;
     {%EndRegion}
   end;
 
@@ -922,14 +924,14 @@ begin
   TagEdit.SuggestedButtonCaption := string.Empty;
   ImagesMisc.GetBitmap(TDarkUtils.ThemeValue(0, 1), TagEdit.SuggestedButtonGlyph);
   TagEdit.PopupMenu := PopupTags;
-  TagEdit.OnKeyDown := @tagsEditKeyDown;
-  TagEdit.OnTagClick := @tagsEditTagClick;
-  TagEdit.OnBeforeChange := @tagsEditBeforeChange;
-  TagEdit.OnChange := @tagsEditChange;
-  TagEdit.OnTagAdd := @tagsEditTagAdd;
-  TagEdit.OnTagRemove := @tagsEditTagRemove;
-  TagEdit.OnTagReorder := @tagsEditTagReorder;
-  TagEdit.OnExit := @tagsEditExit;
+  TagEdit.OnKeyDown := @TagEditKeyDown;
+  TagEdit.OnTagClick := @TagEditTagClick;
+  TagEdit.OnBeforeChange := @TagEditBeforeChange;
+  TagEdit.OnChange := @TagEditChange;
+  TagEdit.OnTagAdd := @TagEditTagAdd;
+  TagEdit.OnTagRemove := @TagEditTagRemove;
+  TagEdit.OnTagReorder := @TagEditTagReorder;
+  TagEdit.OnExit := @TagEditExit;
 
   // Initialize variables
   FZoom := 1;
@@ -966,6 +968,7 @@ begin
   TCrypto.FreeBytesSecure(FSalt);
   openDialog.Filter := ropendialogfilter;
   saveDialog.Filter := rsavedialogfilter;
+  FFitRowHeightToFont := False;
 
   // Set colors
   Self.Color := clWindow;
@@ -983,7 +986,7 @@ begin
   Application.OnQueryEndSession := @ApplicationOnQueryEndSession;
   Application.OnShowHint := @ApplicationOnShowHint;
 
-  Grid.DefaultRowHeight := DefRowHeight;
+  Grid.DefaultRowHeight := iif(FFitRowHeightToFont, Grid.Canvas.TextHeight('Wg') + 2, DefRowHeight);
 
   // Create TBitmap objects
   ResourceBitmapCheck := TBitmap.Create;
@@ -1742,11 +1745,11 @@ begin
   if TagEdit.Focused then
   begin
     {$IFDEF UNIX}
-    if not tagsEdit.ReadOnly then
+    if not TagEdit.ReadOnly then
     begin
-      if tagsEdit.EditBox.SelLength = 0 then
-        tagsEdit.EditBox.SelLength := CalcDeleteCount(tagsEdit.EditBox.Text, tagsEdit.EditBox.SelStart);
-      tagsEdit.EditBox.ClearSelection;
+      if TagEdit.EditBox.SelLength = 0 then
+        TagEdit.EditBox.SelLength := CalcDeleteCount(TagEdit.EditBox.Text, TagEdit.EditBox.SelStart);
+      TagEdit.EditBox.ClearSelection;
     end;
     {$ENDIF}
     exit;
@@ -3581,7 +3584,7 @@ begin
       //  if (MemoNote.VertScrollBar.Position > 0) then
       //  begin
       //    Application.ProcessMessages;
-      //    MemoNote.VertScrollBar.Position := MemoNote.VertScrollBar.Position + Canvas.TextHeight('Th');
+      //    MemoNote.VertScrollBar.Position := MemoNote.VertScrollBar.Position + Canvas.TextHeight('Wg');
       //  end;
       //  {$ELSE}
       //  if (MemoNote.VertScrollBar.Position > 0) then
@@ -3593,7 +3596,7 @@ begin
       //begin
       //  {$IFDEF UNIX}
       //  Application.ProcessMessages;
-      //  MemoNote.VertScrollBar.Position := MemoNote.VertScrollBar.Position + Canvas.TextHeight('Th');
+      //  MemoNote.VertScrollBar.Position := MemoNote.VertScrollBar.Position + Canvas.TextHeight('Wg');
       //  {$ELSE}
       //  MemoNote.VertScrollBar.Position := MemoNote.VertScrollBar.Position + 1;
       //  {$ENDIF}
@@ -3936,7 +3939,7 @@ end;
 
 {%Region -fold Tags Edit Events}
 
-procedure TformNotetask.tagsEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+procedure TformNotetask.TagEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if TagEdit.ReadOnly then exit
   else
@@ -3968,7 +3971,7 @@ begin
       Grid.SetFocus;
 end;
 
-procedure TformNotetask.tagsEditTagClick(Sender: TObject; const TagText: string; const TagIndex: integer);
+procedure TformNotetask.TagEditTagClick(Sender: TObject; const TagText: string; const TagIndex: integer);
 begin
   if (FilterBox.Text <> TagText) then
   begin
@@ -3980,12 +3983,12 @@ begin
     filterClearClick(Sender);
 end;
 
-procedure TformNotetask.tagsEditBeforeChange(Sender: TObject; Tags: string; Operation: TTagEditOperation; var AllowChange: boolean);
+procedure TformNotetask.TagEditBeforeChange(Sender: TObject; Tags: string; Operation: TTagEditOperation; var AllowChange: boolean);
 begin
   Tasks.CreateBackup;
 end;
 
-procedure TformNotetask.tagsEditChange(Sender: TObject);
+procedure TformNotetask.TagEditChange(Sender: TObject);
 begin
   SetFilter;
   SetChanged;
@@ -3994,12 +3997,12 @@ begin
   CalcRowHeight(True);
 end;
 
-procedure TformNotetask.tagsEditTagAdd(Sender: TObject; const TagText: string; const TagIndex: integer);
+procedure TformNotetask.TagEditTagAdd(Sender: TObject; const TagText: string; const TagIndex: integer);
 begin
   TagsAdd(Grid.Selection, TagText);
 end;
 
-procedure TformNotetask.tagsEditTagRemove(Sender: TObject; const TagText: string; const TagIndex: integer);
+procedure TformNotetask.TagEditTagRemove(Sender: TObject; const TagText: string; const TagIndex: integer);
 var
   i: integer;
   task: TTask;
@@ -4019,7 +4022,7 @@ begin
   SetTags;
 end;
 
-procedure TformNotetask.tagsEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
+procedure TformNotetask.TagEditTagReorder(Sender: TObject; const TagText: string; const NewIndex: integer);
 var
   i: integer;
 begin
@@ -4029,7 +4032,7 @@ begin
       Tasks.GetTask(i).Tags.Assign(TagEdit.Items);
 end;
 
-procedure TformNotetask.tagsEditExit(Sender: TObject);
+procedure TformNotetask.TagEditExit(Sender: TObject);
 begin
   FLastGridSelection := Grid.Selection;
   Application.QueueAsyncCall(@DelayedFinishTagEdit, 0);
@@ -5197,6 +5200,8 @@ begin
   contextZoom140.Checked := SameFloat(FZoom, 1.4, 0.001);
   contextZoom150.Checked := SameFloat(FZoom, 1.5, 0.001);
 
+  if FFitRowHeightToFont then
+    Grid.DefaultRowHeight := Grid.Canvas.TextHeight('Wg') + 2;
   CalcRowHeight(True);
   SetInfo;
 end;
@@ -5371,6 +5376,213 @@ end;
 {%EndRegion}
 
 {%Region -fild Private Methods}
+
+procedure TformNotetask.CalcDefaultColWidth;
+begin
+  if (FShowDuration) then
+    Grid.DefaultColWidth := Round((Canvas.TextWidth('10.10sec') + 10) * FZoom)
+  else
+    Grid.DefaultColWidth := Round(Canvas.TextWidth('10000') * FZoom);
+end;
+
+procedure TformNotetask.ResetRowHeight(aCalcRowHeight: boolean = True; aRow: integer = 0);
+var
+  i: integer;
+  h: integer;
+begin
+  Grid.BeginUpdate;
+  try
+    h := Canvas.TextHeight('A') + 2;
+
+    // if -1 only selection
+    if (aRow = -1) then
+    begin
+      for i := Grid.Selection.Top to Grid.Selection.Bottom do
+        Grid.RowHeights[i] := h;
+    end
+    else
+    // if 0 for all rows
+    if (aRow = 0) then
+    begin
+      for i := 1 to Grid.RowCount - 1 do
+      begin
+        if Grid.RowHeights[i] <> h then
+          Grid.RowHeights[i] := h;
+      end;
+    end
+    else // if valid row just that row
+      Grid.RowHeights[aRow] := Grid.DefaultRowHeight;
+
+    if (Assigned(Memo)) and ((aRow = 0) or (aRow = Grid.Row)) then
+      Memo.Height := h;
+
+    if (aCalcRowHeight) then
+      CalcRowHeight(False, aRow);
+  finally
+    Grid.EndUpdate;
+  end;
+end;
+
+procedure TformNotetask.CalcRowHeight(aForce: boolean = False; aRow: integer = 0);
+var
+  FromRow, ToRow: integer;
+
+  procedure CalcCol(col: integer; force: boolean = False);
+  var
+    row: integer;
+    drawrect: TRect;
+    Text: string;
+    task: TTask;
+    Flags: cardinal;
+    h: integer;
+    OldBold: boolean;
+  begin
+    OldBold := Grid.Canvas.Font.Bold;
+    for row := FromRow to ToRow do
+    begin
+      task := Tasks.GetTask(row);
+      if aForce or (task.FRowHeight = 0) then
+      begin
+        drawrect := Grid.CellRect(col, row);
+        drawrect.Inflate(-4, 0);
+
+        Text := Grid.Cells[col, row];
+        if Text = string.Empty then Text := 'Wg';
+
+        // Reduce text area by TagsWidth for text measurement
+        if (col in [COL_TASK, COL_NOTE]) then
+        begin
+          if task.Star then
+            Grid.Canvas.Font.Bold := True;
+
+          if (col = COL_TASK) then
+          begin
+            if task.TagsWidth < drawrect.Width then
+            begin
+              if FBiDiRightToLeft then
+                drawrect.Left := drawrect.Left + task.TagsWidth  // For RTL: reserve space on the left
+              else
+                drawrect.Right := drawrect.Right - task.TagsWidth; // For LTR: reserve space on the right
+            end;
+          end;
+        end;
+
+        Flags := DT_CALCRECT;
+        if FBiDiRightToLeft then
+          Flags := Flags or longword(ifthen(col in [COL_DATE], DT_LEFT, DT_RIGHT))
+        else
+          Flags := Flags or longword(ifthen(col in [COL_AMOUNT], DT_RIGHT, DT_LEFT));
+        if FWordWrap then
+          Flags := Flags or DT_WORDBREAK;
+
+        {$IFDEF UNIX}
+        Text := StringReplace(Text, #$0A, #$0A+ '+', [rfReplaceAll]);
+        {$ENDIF}
+
+        DrawText(Grid.canvas.handle, PChar(Text), Length(Text), drawrect, Flags);
+        Grid.Canvas.Font.Bold := OldBold;
+
+        // The greater than sign is important because values may differ across fields, need max
+        if force or (abs(drawrect.bottom - drawrect.top) > Grid.RowHeights[row]) then
+        begin
+          h := drawrect.bottom - drawrect.top + 2;
+          if (force) and (h < Grid.DefaultRowHeight) then
+            h := Max(Grid.Canvas.TextHeight('Wg') + 2, integer(Round(Grid.DefaultRowHeight * FZoom)));
+          FLastRowHeights[row] := h;
+          Grid.RowHeights[row] := h;
+          task.FRowHeight := h;
+        end
+        else
+          FLastRowHeights[row] := Grid.RowHeights[row];
+      end
+      else
+      begin
+        FLastRowHeights[row] := task.FRowHeight;
+        Grid.RowHeights[row] := task.FRowHeight;
+      end;
+    end;
+  end;
+
+begin
+  Grid.BeginUpdate;
+  try
+    SetLength(FLastRowHeights, Grid.RowCount);
+
+    // if -1 only selection
+    if aRow = -1 then
+    begin
+      FromRow := Grid.Selection.Top;
+      ToRow := Grid.Selection.Bottom;
+    end
+    else
+    // if 0 for all rows
+    if aRow = 0 then
+    begin
+      FromRow := 1;
+      ToRow := Grid.RowCount - 1;
+    end
+    else // if valid row just that row
+    begin
+      FromRow := aRow;
+      ToRow := aRow;
+    end;
+
+    // Force applies only to the priority column
+    if (ShowColumnTask) then CalcCol(COL_TASK, aForce);
+    if (ShowColumnNote) then CalcCol(COL_NOTE);
+
+    // Header, tabs, first col
+    Grid.RowHeights[0] := Round(Max(Canvas.TextHeight('Wg') + 4, Grid.DefaultRowHeight) * FZoom);
+    if (aForce) then
+    begin
+      {$IFDEF UNIX}
+      panelTabs.Height := Canvas.TextHeight('Wg') + 11;
+      {$ELSE}
+      panelTabs.Height := Canvas.TextHeight('Wg') + 8;
+      {$ENDIF}
+      CalcDefaultColWidth;
+    end;
+
+    EditControlSetBounds(PanelMemo, Grid.Col, Grid.Row);
+  finally
+    Grid.EndUpdate;
+  end;
+end;
+
+function TformNotetask.LastRowHeight(aRow: integer): integer;
+begin
+  if (Length(FLastRowHeights) > aRow) then
+    Result := FLastRowHeights[aRow]
+  else
+    Result := Grid.DefaultRowHeight;
+end;
+
+procedure TformNotetask.ChangeLastText(Value: string = string.Empty; aCol: integer = -1; aRow: integer = -1);
+begin
+  if aCol < 0 then aCol := Grid.Col;
+  if aRow < 0 then aRow := Grid.Row;
+  if Value = string.Empty then Value := Grid.Cells[aCol, aRow];
+  if (aCol > 0) and (aRow > 0) then
+  begin
+    if FDuplicateHighlight and ((FLastText <> string.Empty) or (Value <> string.Empty)) then
+    begin
+      FLastText := Value;
+      if Tasks.HasDuplicateMatches(FLastText) and (Grid.Selection.Height = 0) then
+      begin
+        GridInvalidate;
+        FLastTextMatch := True;
+      end
+      else
+      begin
+        if FLastTextMatch then
+          GridInvalidate;
+        FLastTextMatch := False;
+      end;
+      exit;
+    end;
+  end;
+  FLastText := string.Empty;
+end;
 
 procedure TformNotetask.DelayedInvalidate(Data: PtrInt);
 begin
@@ -6261,7 +6473,7 @@ var
   LineHeight: integer;
   FirstVisibleLine: integer;
 begin
-  LineHeight := Canvas.TextHeight('Th');
+  LineHeight := Canvas.TextHeight('Wg');
   if LineHeight <= 0 then Exit(0);
   {$IFDEF UNIX}
   FirstVisibleLine := MemoNote.VertScrollBar.Position div LineHeight;
@@ -6282,7 +6494,7 @@ var
   PixelOffset: integer;
   {$ENDIF}
 begin
-  LineHeight := Canvas.TextHeight('Th');
+  LineHeight := Canvas.TextHeight('Wg');
   if LineHeight <= 0 then Exit(0);
   {$IFDEF UNIX}
   FirstVisibleLine := MemoNote.VertScrollBar.Position div LineHeight;
@@ -7690,213 +7902,6 @@ begin
   Tasks.FillGrid(Grid, FShowArchived, FShowDuration, FShowTime, SortOrder, SortColumn, FilterBox.Text);
   CalcRowHeight;
   EnableGridEvents;
-end;
-
-procedure TformNotetask.CalcDefaultColWidth;
-begin
-  if (FShowDuration) then
-    Grid.DefaultColWidth := Round((Canvas.TextWidth('10.10sec') + 10) * FZoom)
-  else
-    Grid.DefaultColWidth := Round(Canvas.TextWidth('10000') * FZoom);
-end;
-
-procedure TformNotetask.ResetRowHeight(aCalcRowHeight: boolean = True; aRow: integer = 0);
-var
-  i: integer;
-  h: integer;
-begin
-  Grid.BeginUpdate;
-  try
-    h := Max(Canvas.TextHeight('A') + 2, Grid.DefaultRowHeight);
-
-    // if -1 only selection
-    if (aRow = -1) then
-    begin
-      for i := Grid.Selection.Top to Grid.Selection.Bottom do
-        Grid.RowHeights[i] := h;
-    end
-    else
-    // if 0 for all rows
-    if (aRow = 0) then
-    begin
-      for i := 1 to Grid.RowCount - 1 do
-      begin
-        if Grid.RowHeights[i] <> h then
-          Grid.RowHeights[i] := h;
-      end;
-    end
-    else // if valid row just that row
-      Grid.RowHeights[aRow] := Grid.DefaultRowHeight;
-
-    if (Assigned(Memo)) and ((aRow = 0) or (aRow = Grid.Row)) then
-      Memo.Height := h;
-
-    if (aCalcRowHeight) then
-      CalcRowHeight(False, aRow);
-  finally
-    Grid.EndUpdate;
-  end;
-end;
-
-procedure TformNotetask.CalcRowHeight(aForce: boolean = False; aRow: integer = 0);
-var
-  FromRow, ToRow: integer;
-
-  procedure CalcCol(col: integer; force: boolean = False);
-  var
-    row: integer;
-    drawrect: TRect;
-    Text: string;
-    task: TTask;
-    Flags: cardinal;
-    h: integer;
-    OldBold: boolean;
-  begin
-    OldBold := Grid.Canvas.Font.Bold;
-    for row := FromRow to ToRow do
-    begin
-      task := Tasks.GetTask(row);
-      if aForce or (task.FRowHeight = 0) then
-      begin
-        drawrect := Grid.CellRect(col, row);
-        drawrect.Inflate(-4, 0);
-
-        Text := Grid.Cells[col, row];
-        if Text = string.Empty then Text := 'Wg';
-
-        // Reduce text area by TagsWidth for text measurement
-        if (col in [COL_TASK, COL_NOTE]) then
-        begin
-          if task.Star then
-            Grid.Canvas.Font.Bold := True;
-
-          if (col = COL_TASK) then
-          begin
-            if task.TagsWidth < drawrect.Width then
-            begin
-              if FBiDiRightToLeft then
-                drawrect.Left := drawrect.Left + task.TagsWidth  // For RTL: reserve space on the left
-              else
-                drawrect.Right := drawrect.Right - task.TagsWidth; // For LTR: reserve space on the right
-            end;
-          end;
-        end;
-
-        Flags := DT_CALCRECT;
-        if FBiDiRightToLeft then
-          Flags := Flags or longword(ifthen(col in [COL_DATE], DT_LEFT, DT_RIGHT))
-        else
-          Flags := Flags or longword(ifthen(col in [COL_AMOUNT], DT_RIGHT, DT_LEFT));
-        if FWordWrap then
-          Flags := Flags or DT_WORDBREAK;
-
-        {$IFDEF UNIX}
-        Text := StringReplace(Text, #$0A, #$0A+ '+', [rfReplaceAll]);
-        {$ENDIF}
-
-        DrawText(Grid.canvas.handle, PChar(Text), Length(Text), drawrect, Flags);
-        Grid.Canvas.Font.Bold := OldBold;
-
-        // The greater than sign is important because values may differ across fields, need max
-        if force or (abs(drawrect.bottom - drawrect.top) > Grid.RowHeights[row]) then
-        begin
-          h := drawrect.bottom - drawrect.top + 2;
-          if (force) and (h < Grid.DefaultRowHeight) then
-            h := Max(Grid.Canvas.TextHeight('A') + 2, integer(Round(Grid.DefaultRowHeight * FZoom)));
-          FLastRowHeights[row] := h;
-          Grid.RowHeights[row] := h;
-          task.FRowHeight := h;
-        end
-        else
-          FLastRowHeights[row] := Grid.RowHeights[row];
-      end
-      else
-      begin
-        FLastRowHeights[row] := task.FRowHeight;
-        Grid.RowHeights[row] := task.FRowHeight;
-      end;
-    end;
-  end;
-
-begin
-  Grid.BeginUpdate;
-  try
-    SetLength(FLastRowHeights, Grid.RowCount);
-
-    // if -1 only selection
-    if aRow = -1 then
-    begin
-      FromRow := Grid.Selection.Top;
-      ToRow := Grid.Selection.Bottom;
-    end
-    else
-    // if 0 for all rows
-    if aRow = 0 then
-    begin
-      FromRow := 1;
-      ToRow := Grid.RowCount - 1;
-    end
-    else // if valid row just that row
-    begin
-      FromRow := aRow;
-      ToRow := aRow;
-    end;
-
-    // Force applies only to the priority column
-    if (ShowColumnTask) then CalcCol(COL_TASK, aForce);
-    if (ShowColumnNote) then CalcCol(COL_NOTE);
-
-    // Header, tabs, first col
-    Grid.RowHeights[0] := Round(Max(Canvas.TextHeight('A') + 4, Grid.DefaultRowHeight) * FZoom);
-    if (aForce) then
-    begin
-      {$IFDEF UNIX}
-      panelTabs.Height := Canvas.TextHeight('A') + 11;
-      {$ELSE}
-      panelTabs.Height := Canvas.TextHeight('A') + 8;
-      {$ENDIF}
-      CalcDefaultColWidth;
-    end;
-
-    EditControlSetBounds(PanelMemo, Grid.Col, Grid.Row);
-  finally
-    Grid.EndUpdate;
-  end;
-end;
-
-function TformNotetask.LastRowHeight(aRow: integer): integer;
-begin
-  if (Length(FLastRowHeights) > aRow) then
-    Result := FLastRowHeights[aRow]
-  else
-    Result := Grid.DefaultRowHeight;
-end;
-
-procedure TformNotetask.ChangeLastText(Value: string = string.Empty; aCol: integer = -1; aRow: integer = -1);
-begin
-  if aCol < 0 then aCol := Grid.Col;
-  if aRow < 0 then aRow := Grid.Row;
-  if Value = string.Empty then Value := Grid.Cells[aCol, aRow];
-  if (aCol > 0) and (aRow > 0) then
-  begin
-    if FDuplicateHighlight and ((FLastText <> string.Empty) or (Value <> string.Empty)) then
-    begin
-      FLastText := Value;
-      if Tasks.HasDuplicateMatches(FLastText) and (Grid.Selection.Height = 0) then
-      begin
-        GridInvalidate;
-        FLastTextMatch := True;
-      end
-      else
-      begin
-        if FLastTextMatch then
-          GridInvalidate;
-        FLastTextMatch := False;
-      end;
-      exit;
-    end;
-  end;
-  FLastText := string.Empty;
 end;
 
 procedure TformNotetask.SetChanged(aChanged: boolean = True);

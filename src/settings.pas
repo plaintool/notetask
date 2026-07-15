@@ -99,11 +99,14 @@ begin
       JSONObj.Add('Height', Form.ScaleFormTo96(Form.Height));
     end;
     JSONObj.Add('WindowState', Ord(Form.WindowState));
+
+    // Save form parameters
     JSONObj.Add('WordWrap', Form.WordWrap);
     JSONObj.Add('EnterSubmit', Form.EnterSubmit);
     JSONObj.Add('BidiRightToLeft', Form.BiDiRightToLeft);
     JSONObj.Add('Language', Language);
     JSONObj.Add('AutoCheckUpdates', Form.AutoCheckUpdates);
+    JSONObj.Add('FitRowHeightToFont', Form.FitRowHeightToFont);
 
     // Save font
     JSONObj.Add('FontName', Form.Font.Name);
@@ -224,6 +227,9 @@ begin
         if JSONObj.FindPath('AutoCheckUpdates') <> nil then
           Form.AutoCheckUpdates := JSONObj.FindPath('AutoCheckUpdates').AsBoolean;
 
+        if JSONObj.FindPath('FitRowHeightToFont') <> nil then
+          Form.FitRowHeightToFont := JSONObj.FindPath('FitRowHeightToFont').AsBoolean;
+
         // Printer
         if JSONObj.FindPath('PrinterPaperName') <> nil then
           Printer.PaperSize.PaperName := JSONObj.FindPath('PrinterPaperName').AsString;
@@ -236,10 +242,13 @@ begin
         end;
         if JSONObj.FindPath('PrinterMarginLeft') <> nil then
           Form.pageSetupDialog.MarginLeft := JSONObj.FindPath('PrinterMarginLeft').AsInteger;
+
         if JSONObj.FindPath('PrinterMarginRight') <> nil then
           Form.pageSetupDialog.MarginRight := JSONObj.FindPath('PrinterMarginRight').AsInteger;
+
         if JSONObj.FindPath('PrinterMarginTop') <> nil then
           Form.pageSetupDialog.MarginTop := JSONObj.FindPath('PrinterMarginTop').AsInteger;
+
         if JSONObj.FindPath('PrinterMarginBottom') <> nil then
           Form.pageSetupDialog.MarginBottom := JSONObj.FindPath('PrinterMarginBottom').AsInteger;
 

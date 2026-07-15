@@ -45,7 +45,7 @@ var
 
 implementation
 
-uses consts, localize, darkutils;
+uses Consts, localize, darkutils;
 
   {$R *.lfm}
 
