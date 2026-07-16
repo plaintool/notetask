@@ -673,7 +673,6 @@ type
     procedure DisableDrag;
     procedure DisableGridEvents;
     procedure EnableGridEvents;
-    procedure SetChanged(aChanged: boolean = True);
     procedure SetCaption;
     procedure SetInfo;
     procedure SetTags;
@@ -754,6 +753,7 @@ type
     procedure ApplyGridSettings;
     {%EndRegion}
     {%Region -fold Private Setters}
+    procedure SetChanged(Value: boolean);
     procedure SetReadOnly(Value: boolean);
     procedure SetZoom(Value: float);
     procedure SetBiDiRightToLeft(Value: boolean);
@@ -799,6 +799,7 @@ type
     function ReplaceAll(aText, aToText: string; aMatchCase, aWrapAround: boolean): boolean;
     {%EndRegion}
     {%Region -fold Public Properties}
+    property Changed: boolean read FChanged write SetChanged;
     property Zoom: float read FZoom write SetZoom;
     property ReadOnly: boolean read FReadOnly write SetReadOnly;
     property WordWrap: boolean read FWordWrap write FWordWrap;
@@ -1713,7 +1714,7 @@ begin
       DatePicker.DateTime := Tasks.GetTask(Grid.Row).Date;
     if (SortColumn = COL_NUM) then
       Grid.Selection := Sel;
-    SetChanged;
+    Changed := True;
     SetInfo;
     SetNote;
     SetTags;
@@ -1887,7 +1888,7 @@ begin
   ResetRowHeight;
   SetTabs;
   SetInfo;
-  SetChanged;
+  Changed := True;
   SetNote;
   SetTags;
 end;
@@ -1981,7 +1982,7 @@ begin
     Grid.Col := selCol;
     Grid.Selection := TGridRect.Create(selLeft, 0, selRight, selLen);
   end;
-  SetChanged;
+  Changed := True;
   SetNote;
   SetTags;
   SetInfo;
@@ -2013,7 +2014,7 @@ begin
     Grid.Col := selCol;
     Grid.Selection := TGridRect.Create(selLeft, Grid.RowCount - selLen, selRight, Grid.RowCount);
   end;
-  SetChanged;
+  Changed := True;
   SetNote;
   SetTags;
   SetInfo;
@@ -2051,7 +2052,7 @@ begin
       Grid.OnSelection := @GridSelection;
     end;
   end;
-  SetChanged;
+  Changed := True;
   SetNote;
   SetTags;
   SetInfo;
@@ -2089,7 +2090,7 @@ begin
       Grid.OnSelection := @GridSelection;
     end;
   end;
-  SetChanged;
+  Changed := True;
   SetNote;
   SetTags;
   SetInfo;
@@ -2124,7 +2125,7 @@ begin
 
     ResetRowHeight;
     SetTabs;
-    SetChanged;
+    Changed := True;
     SetNote;
     SetTags;
     SetInfo;
@@ -2163,7 +2164,7 @@ begin
 
     ResetRowHeight;
     SetTabs;
-    SetChanged;
+    Changed := True;
     SetNote;
     SetTags;
     SetInfo;
@@ -2223,7 +2224,7 @@ var
       FillGrid;
       Grid.Row := Grid.Row + 1;
     end;
-    SetChanged;
+    Changed := True;
     SetInfo;
   end;
 
@@ -2259,7 +2260,7 @@ begin
       Memo.SelLength := Length(CurrentDateTime);
     end;
     Tasks.SetTask(Grid, Memo, Grid.Row, FBackup, FShowTime);
-    SetChanged;
+    Changed := True;
     SetInfo;
   end
   else
@@ -2348,7 +2349,7 @@ begin
         FLastRowMem.InsertAtPos(Result, 0);
         SetTabs;
         ChangeGroup(FindGroupTabIndex(Result));
-        SetChanged;
+        Self.Changed := True;
       end;
     end;
   finally
@@ -2379,7 +2380,7 @@ begin
       if (Tasks.RenameGroup(FindGroupRealIndex(TabsGroup.TabIndex), newName)) then
       begin
         SetTabs;
-        SetChanged;
+        Self.Changed := True;
       end;
     end;
   finally
@@ -2406,7 +2407,7 @@ begin
     if ShowModal = mrOk then
     begin
       Tasks.RehintGroup(FindGroupRealIndex(TabsGroup.TabIndex), formMemoText.memoText.Text);
-      SetChanged;
+      Self.Changed := True;
     end;
   finally
     Hide;
@@ -2433,7 +2434,7 @@ begin
         FLastRowMem.InsertAtPos(FindGroupRealIndex(TabsGroup.TabIndex) + 1, FLastRowMem[FindGroupRealIndex(TabsGroup.TabIndex)]);
         SetTabs;
         ChangeGroup(TabsGroup.TabIndex + 1);
-        SetChanged;
+        Self.Changed := True;
       end;
     end;
   finally
@@ -2461,7 +2462,7 @@ begin
       FLastRowMem := Mem.CloneArray;
       if (Length(FLastRowMem) > Tasks.SelectedGroup) then
         Grid.Row := FLastRowMem[Tasks.SelectedGroup];
-      SetChanged;
+      Changed := True;
     end;
   end;
 end;
@@ -3156,7 +3157,7 @@ begin
   begin
     contextWindowsCRLF.Checked := True;
     SetInfo;
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -3167,7 +3168,7 @@ begin
   begin
     contextUnixLF.Checked := True;
     SetInfo;
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -3178,7 +3179,7 @@ begin
   begin
     contextMacintoshCR.Checked := True;
     SetInfo;
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -3189,7 +3190,7 @@ begin
   begin
     contextANSI.Checked := True;
     SetInfo;
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -3200,7 +3201,7 @@ begin
   begin
     contextASCII.Checked := True;
     SetInfo;
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -3211,7 +3212,7 @@ begin
   begin
     contextUTF8.Checked := True;
     SetInfo;
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -3222,7 +3223,7 @@ begin
   begin
     contextUTF8BOM.Checked := True;
     SetInfo;
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -3233,7 +3234,7 @@ begin
   begin
     contextUTF16BEBOM.Checked := True;
     SetInfo;
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -3244,7 +3245,7 @@ begin
   begin
     contextUTF16LEBOM.Checked := True;
     SetInfo;
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -3531,7 +3532,7 @@ begin
   Grid.Cells[COL_NOTE, Grid.Row] := MemoNote.Text;
   Tasks.SetTask(Grid, Memo, Grid.Row, FBackup, FShowTime);
   CalcRowHeight(True, Grid.Row);
-  SetChanged;
+  Changed := True;
 end;
 
 procedure TformNotetask.MemoNoteDblClick(Sender: TObject);
@@ -3991,7 +3992,7 @@ end;
 procedure TformNotetask.TagEditChange(Sender: TObject);
 begin
   SetFilter;
-  SetChanged;
+  Changed := True;
   Grid.Invalidate;
   Application.ProcessMessages;
   CalcRowHeight(True);
@@ -4669,7 +4670,7 @@ begin
     Tasks.AddMap(Tasks.AddTask('[ ]'));
     Grid.Cells[COL_DONE, tIndex] := '0';
     SetInfo;
-    SetChanged;
+    Changed := True;
     SetNote;
     SetTags;
   end;
@@ -4914,7 +4915,7 @@ begin
   begin
     Tasks.MoveTask(sIndex, tIndex);
     FillGrid;
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -5128,6 +5129,18 @@ end;
 {%EndRegion}
 
 {%Region -fold Private Setters}
+
+procedure TformNotetask.SetChanged(Value: boolean);
+begin
+  if (Value = False) then
+    Grid.Modified := False;
+
+  FChanged := Grid.Modified or Value;
+  aSave.Enabled := FChanged and not FReadOnly;
+  aUndo.Enabled := FChanged;
+  aUndoAll.Enabled := FChanged;
+  SetCaption;
+end;
 
 procedure TformNotetask.SetReadOnly(Value: boolean);
 begin
@@ -6323,7 +6336,7 @@ begin
     SetTabs(False);
     if (FDragTab >= 0) then FDragTab := Result;
     ChangeGroup(Result);
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -6351,7 +6364,7 @@ begin
     SetTabs(False);
     if (FDragTab >= 0) then FDragTab := Result;
     ChangeGroup(Result);
-    SetChanged;
+    Changed := True;
   end;
 end;
 
@@ -6740,7 +6753,7 @@ begin
   Grid.Cells[Grid.Col, Grid.Row] := TMemo(Sender).Text;
   Tasks.SetTask(Grid, Memo, Grid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
   FMemoStartEdit := False;
-  SetChanged;
+  Changed := True;
   CalcRowHeight(True, Grid.Row);
   EditControlSetBounds(PanelMemo, Grid.Col, Grid.Row);
   if (Grid.Col = COL_NOTE) then
@@ -6834,7 +6847,7 @@ begin
   FDatePickerDateSet := True;
   Grid.Cells[Grid.Col, Grid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime, FShowTime);
   Tasks.SetTask(Grid, Memo, Grid.Row, False, FShowTime);
-  SetChanged;
+  Changed := True;
   EditControlSetBounds(DatePicker, Grid.Col, Grid.Row, 2, -2, -2, 0);
   if (FShowDuration) then FillGrid;
   SetInfo;
@@ -6902,7 +6915,7 @@ begin
       Memo.Clear;
       Memo.OnChange := @MemoChange;
     end;
-    SetChanged;
+    Changed := True;
     SetInfo;
   end;
 end;
@@ -6959,7 +6972,7 @@ begin
   SetInfo;
   SetNote;
   SetTags;
-  SetChanged;
+  Changed := True;
 end;
 
 procedure TformNotetask.MergeTasks;
@@ -7027,7 +7040,7 @@ begin
       SetNote;
       SetTags;
       CalcRowHeight(True);
-      SetChanged; // Mark that data has changed
+      Changed := True;
 
       // Restore selection
       Grid.Row := Sel.Top;
@@ -7173,7 +7186,7 @@ begin
   SetInfo;
   SetNote;
   SetTags;
-  SetChanged;
+  Changed := True;
 
   // Restore selection
   if (SortColumn = COL_NUM) then
@@ -7218,7 +7231,7 @@ begin
       SetInfo;
       SetNote;
       SetTags;
-      SetChanged; // Mark that data has changed
+      Changed := True;
       FLastText := Grid.Cells[Grid.Col, Grid.Row];
     end;
   end;
@@ -7270,7 +7283,7 @@ begin
       SetInfo;
       SetNote;
       SetTags;
-      SetChanged; // Mark that data has changed
+      Changed := True;
       FLastText := Grid.Cells[Grid.Col, Grid.Row];
     end;
   end
@@ -7312,7 +7325,7 @@ begin
       SetInfo;
       SetNote;
       SetTags;
-      SetChanged;
+      Changed := True;
     end;
   end;
 end;
@@ -7359,7 +7372,7 @@ begin
       SetInfo;
       SetNote;
       SetTags;
-      SetChanged; // Mark that data has changed
+      Changed := True;
     end;
   end
   else
@@ -7410,7 +7423,7 @@ begin
       EnableGridEvents;
     end;
     if ShowDuration then FillGrid;
-    SetChanged; // Mark that data has changed
+    Changed := True;
     SetInfo;
   end
   else
@@ -7444,7 +7457,7 @@ begin
 
       Tasks.SetTask(Grid, Memo, RowIndex, False, FShowTime);
       if (ShowDuration) and (Check) then FillGrid;
-      SetChanged; // Mark that data has changed
+      Changed := True;
       SetInfo;
     end;
   end;
@@ -7496,7 +7509,7 @@ begin
     end;
   end;
 
-  SetChanged;  // Mark that data has changed
+  Changed := True;
   CalcRowHeight(True);
   GridInvalidate;
 end;
@@ -7528,7 +7541,7 @@ begin
       CalcRowHeight;
     end;
   end;
-  SetChanged; // Mark that data has changed
+  Changed := True;
 end;
 
 procedure TformNotetask.GridBackupSelection;
@@ -7902,18 +7915,6 @@ begin
   Tasks.FillGrid(Grid, FShowArchived, FShowDuration, FShowTime, SortOrder, SortColumn, FilterBox.Text);
   CalcRowHeight;
   EnableGridEvents;
-end;
-
-procedure TformNotetask.SetChanged(aChanged: boolean = True);
-begin
-  if (aChanged = False) then
-    Grid.Modified := False;
-
-  FChanged := Grid.Modified or aChanged;
-  aSave.Enabled := FChanged and not FReadOnly;
-  aUndo.Enabled := FChanged;
-  aUndoAll.Enabled := FChanged;
-  SetCaption;
 end;
 
 procedure TformNotetask.SetCaption;
