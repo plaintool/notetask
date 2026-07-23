@@ -42,39 +42,24 @@ echo                 Build %DEP_NAME% (%ARCH_LABEL%)
 echo ############################################################
 echo.
 
-:: ----- Decide whether to update submodule -----
-if /i not "%DO_PULL%"=="true" (
-    echo Getting current %DEP_NAME% submodule version
-    git submodule update --init -- %DEP_PATH%
+:: ----- Always ensure submodule exists and is cleanly checked out -----
+echo Syncing %DEP_NAME% submodule (committed version)
+git submodule update --init -- %DEP_PATH%
+if errorlevel 1 (
+    echo WARNING: Failed to initialize/update %DEP_NAME% submodule.
+    echo Possibly local changes exist or network error.
+    goto process_lpk
+)
+
+:: ----- If pulling requested, move to the latest branch commit -----
+if /i "%DO_PULL%"=="true" (
+    echo Pulling latest %DEP_NAME% from branch %DEP_BRANCH%
+    git submodule update --remote -- %DEP_PATH%
     if errorlevel 1 (
-        echo WARNING: Failed to get current %DEP_NAME% submodule version
+        echo WARNING: Failed to update %DEP_NAME% to latest remote commit.
+    ) else (
+        echo %DEP_NAME% submodule updated to latest commit successfully.
     )
-    goto process_lpk
-)
-
-echo Checking %DEP_NAME% submodule state
-
-:: Check for local changes in the submodule
-git -C %DEP_PATH% diff --quiet
-if errorlevel 1 (
-    echo WARNING: %DEP_NAME% has unstaged changes, skipping submodule update
-    goto process_lpk
-)
-
-:: Check for staged changes in the submodule
-git -C %DEP_PATH% diff --cached --quiet
-if errorlevel 1 (
-    echo WARNING: %DEP_NAME% has staged changes, skipping submodule update
-    goto process_lpk
-)
-
-:: No local changes – safe to update to the latest branch commit
-echo Updating %DEP_NAME% submodule
-git submodule update --init --remote -- %DEP_PATH%
-if errorlevel 1 (
-    echo WARNING: %DEP_NAME% submodule update failed, continuing with existing version
-) else (
-    echo %DEP_NAME% submodule updated successfully
 )
 
 goto process_lpk
