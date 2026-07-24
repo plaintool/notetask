@@ -34,7 +34,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check if enough tags exist (at least 2)
+        id: check_tags
+        run: |
+          TAG_COUNT=$(git tag --merged HEAD | wc -l)
+          if [ "$TAG_COUNT" -ge 2 ]; then
+            echo "HAS_TAGS=true" >> $GITHUB_OUTPUT
+          else
+            echo "HAS_TAGS=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Generate changelog from issues
+        if: steps.check_tags.outputs.HAS_TAGS == 'true'
         id: changelog
         uses: janheinrichmerker/action-github-changelog-generator@v2.4
         with:
@@ -53,12 +64,26 @@ jobs:
                   "prefix": "### ✨ Enhancements",
                   "labels": ["enhancement", "enhancement auto"]
                 },
+                "localization": {
+                  "prefix": "### 🌐 Localization",
+                  "labels": ["localization", "localization auto"]
+                },
+                "documentation": {
+                  "prefix": "### 📝 Documentation",
+                  "labels": ["documentation", "documentation auto"]
+                },
                 "bugfixes": {
                   "prefix": "### 🐛 Fixed Bugs",
                   "labels": ["bug", "bug auto"]
                 }
               }
           output: CHANGELOG.md
+
+      - name: Create placeholder changelog when not enough tags
+        if: steps.check_tags.outputs.HAS_TAGS == 'false'
+        run: |
+          echo "## What's Changed" > CHANGELOG.md
+          echo "Initial release" >> CHANGELOG.md
 
       - name: Show generated changelog
         run: cat CHANGELOG.md
