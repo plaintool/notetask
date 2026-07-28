@@ -28,7 +28,7 @@ IF NOT "%PLATFORM%"=="x64" IF NOT "%PLATFORM%"=="x86" (
 
 echo.
 echo ############################################################
-echo #                Build MSI %PLATFORM% peruser              #
+echo                  Build MSI %PLATFORM% peruser               
 echo ############################################################
 echo.
 
@@ -42,7 +42,7 @@ echo.
 
 echo.
 echo ############################################################
-echo #                 Build MSI %PLATFORM% permachine          #
+echo                   Build MSI %PLATFORM% permachine           
 echo ############################################################
 echo.
 
@@ -63,7 +63,7 @@ echo.
 
 echo.
 echo ############################################################
-echo #                     Sign %PLATFORM% installers           #
+echo                       Sign %PLATFORM% installers            
 echo ############################################################
 echo.
 
@@ -92,14 +92,14 @@ if not "%CERTFILE%"=="" (
     if exist "%CERTFILE%" (
         if exist "%SIGNTOOL%" (
             echo Signing MSI files...
-            "%SIGNTOOL%" sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-%VERSION%-%PLATFORM%.msi"
+            "%SIGNTOOL%" sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-%VERSION%-%PLATFORM%.msi" < nul
             IF %ERRORLEVEL% EQU 0 (
                 echo Signing of notetask-%VERSION%-%PLATFORM%.msi completed successfully
             ) else (
                 echo Signing failed for notetask-%VERSION%-%PLATFORM%.msi
             )
 
-            "%SIGNTOOL%" sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-%VERSION%-%PLATFORM%-allusers.msi"
+            "%SIGNTOOL%" sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%SOURCE_DIR%\notetask-%VERSION%-%PLATFORM%-allusers.msi" < nul
             IF %ERRORLEVEL% EQU 0 (
                 echo Signing of notetask-%VERSION%-%PLATFORM%-allusers.msi completed successfully
             ) else (
@@ -115,15 +115,9 @@ if not "%CERTFILE%"=="" (
     echo Skipping signing: CERTFILE not set.
 )
 
-echo.
-echo ############################################################
-echo #                       Build Portable                     #
-echo ############################################################
-echo.
-
 :: --- Portable ---
 if "%BUILD_PORTABLE%"=="1" (
-    powershell -NoProfile -Command "$exe64='%~dp0..\\notetask.exe'; $exe32='%~dp0..\\notetask32.exe'; $settings='%~dp0form_settings.json'; $license='%~dp0LICENSE.rtf'; if ((Test-Path $exe64) -and (Test-Path $exe32) -and (Test-Path $settings) -and (Test-Path $license)) { Compress-Archive -Force -Path $exe64,$exe32,$settings,$license -DestinationPath '%~dp0notetask-%VERSION%-x86-x64-portable.zip' } else { Write-Error 'Portable inputs missing'; exit 1 }"
+    call "%~dp0buildportable.cmd" "%VERSION%"
 )
 
 echo Build and signing completed successfully!

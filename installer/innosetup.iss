@@ -28,6 +28,7 @@ Root: HKA; Subkey: "Software\Classes\Applications\notetask.exe\shell\open\comman
 #define MyAppPublisher "Alexander Tverskoy"
 #define MyAppURL "https://github.com/plaintool/notetask"
 #define MyAppExeName "notetask.exe"
+#define MyAppExeName32 "notetask32.exe"
 #define CurrentYear    GetDateTimeString('yyyy','','')
 
 [Setup]
@@ -105,10 +106,15 @@ Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
+#ifexist "..\" + MyAppExeName
 ; 64-bit
 Source: "..\{#MyAppExeName}"; DestDir: "{app}"; DestName: "{#MyAppExeName}"; Check: Is64BitInstallMode; Flags: ignoreversion
+#endif
+
+#ifexist "..\" + MyAppExeName32
 ; 32-bit
-Source: "..\notetask32.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}"; Check: not Is64BitInstallMode; Flags: ignoreversion
+Source: "..\{#MyAppExeName32}"; DestDir: "{app}"; DestName: "{#MyAppExeName}"; Check: not Is64BitInstallMode; Flags: ignoreversion
+#endif
 ; License
 Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 

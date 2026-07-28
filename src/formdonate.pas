@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------------
-//  Trayslate © 2026 by Alexander Tverskoy
+//  Notetask © 2026 by Alexander Tverskoy
 //  Licensed under the GNU General Public License, Version 3 (GPL-3.0)
 //  You may obtain a copy of the License at https://www.gnu.org/licenses/gpl-3.0.html
 //-----------------------------------------------------------------------------------
