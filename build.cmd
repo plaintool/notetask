@@ -4,12 +4,25 @@ set "APP_NAME=notetask"
 
 :: Determine build architecture: 64-bit by default, 32-bit if first argument is "32"
 SET "ARCH=64"
-IF /I "%1"=="32" SET "ARCH=32"
+SET "SKIP_DEPS=0"
+SET "SKIP_BUILD=0"
+SET "SKIP_SIGN=0"
+SET "SKIP_BINARIES=0"
+:parse_args
+if "%~1"=="" goto :done_parsing
+if /I "%~1"=="32" SET "ARCH=32"
+if /I "%~1"=="--no-deps" SET "SKIP_DEPS=1"
+if /I "%~1"=="--no-build" SET "SKIP_BUILD=1"
+if /I "%~1"=="--no-sign" SET "SKIP_SIGN=1"
+if /I "%~1"=="--no-binary" SET "SKIP_BINARIES=1"
+shift
+goto :parse_args
+:done_parsing
 
 :: Label for console output
 IF "%ARCH%"=="32" (SET "ARCH_LABEL=x86") ELSE (SET "ARCH_LABEL=x64")
-:: Detect if running in CI (non-interactive) environment
 
+:: Detect if running in CI (non-interactive) environment
 :: Skip kill in CI environments
 if defined CI goto :start.build
 
@@ -57,6 +70,7 @@ IF "%ARCH%"=="32" if not exist "%FPC32%" (
 IF "%ARCH%"=="32" set "LAZBUILD_OPTS=%LAZBUILD_OPTS% --cpu=i386 --ws=win32 --compiler=%FPC32%"
 
 :: Updating and building dependencies
+if %SKIP_DEPS%==1 goto :skip_deps
 IF "%ARCH%"=="32" (
     call "%~dp0dependencies.cmd" 32 nopull
 ) ELSE (
@@ -67,7 +81,9 @@ if %ERRORLEVEL% neq 0 (
     if not defined CI pause
     exit /b %ERRORLEVEL%
 )
+:skip_deps
 
+if %SKIP_BUILD%==1 goto :skip_build
 echo.
 echo ############################################################
 echo                      Build %ARCH_LABEL%                   
@@ -113,17 +129,26 @@ IF "%ARCH%"=="32" (
 )
 
 echo Build completed successfully
+:skip_build
 
+if %SKIP_SIGN%==1 goto :skip_sign
 echo.
 echo ############################################################
-echo                        Signing %ARCH_LABEL%               
+echo               Signing %ARCH_LABEL% executable     
 echo ############################################################
 echo.
 
 echo Wait 2 seconds to ensure file is free
 ping 127.0.0.1 -n 3 >nul
 
-::Certificate settings (optional)
+:: Set architecture-specific EXE name
+IF "%ARCH%"=="32" (
+    SET "EXE_NAME=%APP_NAME%32.exe"
+) ELSE (
+    SET "EXE_NAME=%APP_NAME%.exe"
+)
+
+:: Certificate settings (same as before)
 IF "%SIGNTOOL%"=="" (
     SET "SIGNTOOL=C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
 )
@@ -144,25 +169,19 @@ SET "CERTPASS=1234"
 SET "TIMESTAMP_URL=http://timestamp.sectigo.com"
 ::SET "TIMESTAMP_URL=http://ts.ssl.com"
 
-:: Set architecture-specific file names for signing
-IF "%ARCH%"=="32" (
-    SET "EXE_NAME=%APP_NAME%32.exe"
-) ELSE (
-    SET "EXE_NAME=%APP_NAME%.exe"
-)
-
-::Sign the executable and DLLs in the same folder
+::Sign the executable
 if exist "%EXE_NAME%" (
     if not "%CERTFILE%"=="" (
         if exist "%CERTFILE%" (
             if exist "%SIGNTOOL%" (
-                echo Signing executable...
+                echo Signing %EXE_NAME%...
                 "%SIGNTOOL%" sign /f "%CERTFILE%" /p "%CERTPASS%" /fd SHA256 /tr %TIMESTAMP_URL% /td SHA256 "%EXE_NAME%" < nul
                 IF %ERRORLEVEL% EQU 0 (
-                    echo Signing completed successfully
+                    echo Executable signing completed successfully
                 ) else (
-                    echo Signing failed
+                    echo Executable signing failed
                     if not defined CI pause
+                    exit /b %ERRORLEVEL%
                 )
             ) else (
                 echo Skipping signing: signtool not found.
@@ -174,5 +193,22 @@ if exist "%EXE_NAME%" (
         echo Skipping signing: CERTFILE not set.
     )
 ) else (
-    echo Skipping signing: missing executable.
+    echo Skipping signing: executable %EXE_NAME% missing.
+    if not defined CI pause
+    exit /b 1
 )
+:skip_sign
+
+:: Copy and sign binaries using external script
+if %SKIP_BINARIES%==1 goto :skip_binaries
+echo.
+echo Processing binaries...
+call "%~dp0depsbinary.cmd" %ARCH% %APP_NAME%
+if %ERRORLEVEL% neq 0 (
+    echo Binaries processing failed!
+    if not defined CI pause
+    exit /b %ERRORLEVEL%
+)
+:skip_binaries
+
+echo All done.
