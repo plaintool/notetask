@@ -1,0 +1,30 @@
+name: Check Lazarus Versions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check Lazarus package
+        shell: pwsh
+        run: |
+          choco info lazarus
+
+      - name: Check Lazarus versions
+        shell: pwsh
+        run: |
+          choco search lazarus -a
+
+      - name: Install Lazarus 4.8
+        shell: pwsh
+        run: |
+          curl.exe -L "https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%204.8/lazarus-4.8-fpc-3.2.2-win64.exe/download" -o lazarus.exe
+          Start-Process .\lazarus.exe -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART" -Wait
+
+      - name: Check Lazarus version
+        shell: pwsh
+        run: |
+          C:\lazarus\lazbuild.exe --version
