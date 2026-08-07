@@ -1,8 +1,15 @@
 name: Create Issue from Commit
+run-name: 'Issue: ${{ github.event.inputs.commit_sha }}'
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'Commit SHA to process (for reprocessing missed commits)'
+        required: true
+        type: string
 jobs:
   create_issues:
     runs-on: ubuntu-latest
@@ -15,57 +22,46 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Process commits safely
+      - name: Process commits from push or manual dispatch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BEFORE_SHA="${{ github.event.before }}"
-          CURRENT_SHA="${{ github.event.after }}"
-          
-          # Check if BEFORE_SHA exists in the repository
-          if ! git rev-parse --verify "$BEFORE_SHA" > /dev/null 2>&1; then
-            echo "Warning: BEFORE_SHA ($BEFORE_SHA) not found in repository. This can happen with force push after squash/rebasing."
-            echo "Processing only the current commit $CURRENT_SHA"
-            
-            # Get information about the current commit only
-            COMMIT_MSG=$(git log --format="%s" -n 1 $CURRENT_SHA)
-            COMMIT_AUTHOR=$(git log --format="%an" -n 1 $CURRENT_SHA)
-            
-            # Create array with just the current commit
-            COMMITS="$CURRENT_SHA|$COMMIT_MSG|$COMMIT_AUTHOR"
+          # Determine the source of commits: push event or manual dispatch
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            COMMIT_SHA="${{ github.event.inputs.commit_sha }}"
+            echo "Manual dispatch for commit: $COMMIT_SHA"
+            # Retrieve commit details from the repository
+            COMMIT_MSG=$(git log -1 --format=%s "$COMMIT_SHA")
+            COMMIT_AUTHOR=$(git log -1 --format=%an "$COMMIT_SHA")
+            # Build a JSON array mimicking the push event format
+            COMMITS_JSON=$(jq -n \
+              --arg id "$COMMIT_SHA" \
+              --arg msg "$COMMIT_MSG" \
+              --arg author "$COMMIT_AUTHOR" \
+              '[{id: $id, message: $msg, author: {name: $author}}]')
           else
-            echo "Processing commits from $BEFORE_SHA to $CURRENT_SHA"
-            
-            # Check if there are commits in the range
-            if ! git log --oneline $BEFORE_SHA..$CURRENT_SHA --quiet > /dev/null 2>&1; then
-              echo "No commits found in range $BEFORE_SHA..$CURRENT_SHA"
-              echo "This can happen with force push after squash/rebasing."
-              echo "Skipping issue creation."
-              exit 0
-            fi
-            
-            COMMITS=$(git log --pretty=format:"%H|%s|%an" $BEFORE_SHA..$CURRENT_SHA)
+            # Normal push event: use the commits array from the event payload
+            COMMITS_JSON='${{ toJSON(github.event.commits) }}'
           fi
-          
-          # Exit if no commits to process
-          if [ -z "$COMMITS" ]; then
-            echo "No commits to process"
+
+          # Exit early if there are no commits to process
+          if [ -z "$COMMITS_JSON" ] || [ "$COMMITS_JSON" = "[]" ]; then
+            echo "No commits to process. Exiting."
             exit 0
           fi
-          
-          echo "Found commits to process:"
-          echo "$COMMITS"
-          
-          while IFS='|' read -r COMMIT_ID COMMIT_MSG COMMIT_AUTHOR; do
+
+          echo "Commits to process:"
+          echo "$COMMITS_JSON" | jq -r '.[] | "\(.id) by \(.author.name): \(.message)"'
+
+          # Iterate over each commit object and extract the necessary fields
+          echo "$COMMITS_JSON" | jq -c '.[] | {id: .id, message: .message, author: .author.name}' | while read -r commit; do
+            COMMIT_ID=$(echo "$commit" | jq -r '.id')
+            COMMIT_MSG=$(echo "$commit" | jq -r '.message')
+            COMMIT_AUTHOR=$(echo "$commit" | jq -r '.author')
+
             echo "Processing commit: $COMMIT_ID by $COMMIT_AUTHOR"
-            
-            # Additional safety check: verify commit exists
-            if ! git rev-parse --verify "$COMMIT_ID" > /dev/null 2>&1; then
-              echo "Warning: Commit $COMMIT_ID not found, skipping..."
-              continue
-            fi
-            
-            # Convert commit message to uppercase for case-insensitive matching
+
+            # Convert commit message to uppercase for case‑insensitive matching
             upper_msg=$(echo "$COMMIT_MSG" | tr '[:lower:]' '[:upper:]')
             case "$upper_msg" in
                 *"FIX:"*|*"FIXED:"*)
@@ -80,6 +76,9 @@ jobs:
                 *"DOC:"*|*"DOCUMENTATION:"*)
                     type="Documentation"
                     ;;
+                *"LOCALIZATION:"*|*"LOCAL:"*|*"LOC:"*)
+                    type="Localization"
+                    ;;
                 *)
                     type="None"
                     ;;
@@ -87,32 +86,33 @@ jobs:
 
             if [ "$type" != "None" ]; then
               echo "Creating $type issue for commit: $COMMIT_ID"
-              
-              # Remove commit type prefix from title for cleaner issue titles
-              TITLE=$(echo "$COMMIT_MSG" | sed -E 's/^(FIX|FIXED|FEATURE|FEAT|ENHANCEMENT|ENHANCE|DOC|DOCUMENTATION):\s*//i')
-              BODY="**Commit:** https://github.com/$GITHUB_REPOSITORY/commit/$COMMIT_ID\n**Author:** $COMMIT_AUTHOR\n\nThis issue was automatically created from commit $COMMIT_ID"
-              
-              JSON="{\"title\":\"$TITLE\",\"body\":\"$BODY\",\"labels\":[\"$type\",\"Auto\"]}"
-              
-              # Create GitHub issue via API
+
+              # Remove the commit type prefix to create a cleaner issue title
+              TITLE=$(echo "$COMMIT_MSG" | sed -E 's/^(FIX|FIXED|FEATURE|FEAT|ENHANCEMENT|ENHANCE|DOC|DOCUMENTATION|LOCALIZATION|LOCAL|LOC):\s*//i')
+              BODY_TEXT="**Commit:** https://github.com/$GITHUB_REPOSITORY/commit/$COMMIT_ID\n**Author:** $COMMIT_AUTHOR\n\nThis issue was automatically created from commit $COMMIT_ID"
+
+              # Build a valid JSON payload using jq to safely escape special characters
+              JSON=$(jq -n \
+                --arg title "$TITLE" \
+                --arg body "$BODY_TEXT" \
+                --arg type "$type" \
+                '{title: $title, body: $body, labels: [$type, "Auto"]}')
+
+              # Create the GitHub issue via API
               RESPONSE=$(curl -s -X POST \
                 -H "Authorization: token $GITHUB_TOKEN" \
                 -H "Accept: application/vnd.github+json" \
                 -H "Content-Type: application/json" \
                 https://api.github.com/repos/${GITHUB_REPOSITORY}/issues \
                 -d "$JSON")
-              
-              # Extract issue number from API response
-              ISSUE_NUMBER=$(echo "$RESPONSE" | grep -o '"number":[[:space:]]*[0-9]*' | grep -o '[0-9]*')
-              if [ -z "$ISSUE_NUMBER" ]; then
-                ISSUE_NUMBER=$(echo "$RESPONSE" | sed -n 's/.*"number":\([0-9]*\).*/\1/p')
-              fi
-              
-              # If issue was created successfully, close it after a delay
+
+              ISSUE_NUMBER=$(echo "$RESPONSE" | jq -r '.number')
+
+              # If the issue was created successfully, close it after a short delay
               if [ -n "$ISSUE_NUMBER" ] && [ "$ISSUE_NUMBER" != "null" ]; then
                 echo "Waiting 5 seconds before closing issue..."
                 sleep 5
-                
+
                 # Close the issue
                 curl -s -X PATCH \
                   -H "Authorization: token $GITHUB_TOKEN" \
@@ -120,10 +120,12 @@ jobs:
                   -H "Content-Type: application/json" \
                   https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/$ISSUE_NUMBER \
                   -d '{"state":"closed"}'
-                
+
                 echo "Created and closed issue #$ISSUE_NUMBER for commit $COMMIT_ID"
+              else
+                echo "Failed to create issue for commit $COMMIT_ID. Response: $RESPONSE"
               fi
             else
-              echo "Skipping commit $COMMIT_ID - no matching type"
+              echo "Skipping commit $COMMIT_ID – no matching type prefix"
             fi
-          done <<< "$COMMITS"
+          done
