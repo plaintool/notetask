@@ -9,6 +9,8 @@ echo #                                                                    #
 echo ######################################################################
 echo.
 
+call installer\clean.cmd
+
 call build.cmd
 echo Wait 2 seconds to ensure file is free
 timeout /t 2 /nobreak >nul
