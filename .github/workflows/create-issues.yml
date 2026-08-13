@@ -1,5 +1,5 @@
 name: Create Issue from Commit
-run-name: 'Issue: ${{ github.event.inputs.commit_sha }}'
+run-name: "${{ github.event_name == 'push' && github.event.head_commit.message || format('Issue: {0}', github.event.inputs.commit_sha) }}"
 on:
   push:
     branches:
@@ -70,7 +70,7 @@ jobs:
                 *"FEATURE:"*|*"FEAT:"*)
                     type="Feature"
                     ;;
-                *"ENHANCEMENT:"*|*"ENHANCE:"*)
+                *"ENHANCEMENT:"*|*"ENHANCE:"*|*"ENHACE:"*)
                     type="Enhancement"
                     ;;
                 *"DOC:"*|*"DOCUMENTATION:"*)
@@ -88,7 +88,27 @@ jobs:
               echo "Creating $type issue for commit: $COMMIT_ID"
 
               # Remove the commit type prefix to create a cleaner issue title
-              TITLE=$(echo "$COMMIT_MSG" | sed -E 's/^(FIX|FIXED|FEATURE|FEAT|ENHANCEMENT|ENHANCE|DOC|DOCUMENTATION|LOCALIZATION|LOCAL|LOC):\s*//i')
+              TITLE=$(echo "$COMMIT_MSG" | sed -E 's/^(FIX|FIXED|FEATURE|FEAT|ENHANCEMENT|ENHANCE|ENHACE|DOC|DOCUMENTATION|LOCALIZATION|LOCAL|LOC):\s*//i')
+
+              # Check for duplicate issue with the same title among issues labeled "Auto"
+              EXISTING_TITLES=$(GH_TOKEN="$GITHUB_TOKEN" gh issue list --repo "$GITHUB_REPOSITORY" --state all --label Auto --json title --jq '.[].title')
+
+              if echo "$EXISTING_TITLES" | grep -Fxq "$TITLE"; then
+                echo "Duplicate issue with title '$TITLE' already exists. Skipping creation."
+                continue
+              fi
+
+              # Additional check for duplicate issue containing this commit SHA in body
+              SEARCH_QUERY="repo:${GITHUB_REPOSITORY}+is:issue+${COMMIT_ID}+in:body"
+              SEARCH_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/search/issues?q=${SEARCH_QUERY}")
+              TOTAL_COUNT=$(echo "$SEARCH_RESPONSE" | jq -r '.total_count')
+
+              if [ "$TOTAL_COUNT" -gt 0 ]; then
+                EXISTING_NUMBER=$(echo "$SEARCH_RESPONSE" | jq -r '.items[0].number')
+                echo "Issue for commit $COMMIT_ID already exists as #$EXISTING_NUMBER. Skipping creation."
+                continue
+              fi
+
               BODY_TEXT="**Commit:** https://github.com/$GITHUB_REPOSITORY/commit/$COMMIT_ID\n**Author:** $COMMIT_AUTHOR\n\nThis issue was automatically created from commit $COMMIT_ID"
 
               # Build a valid JSON payload using jq to safely escape special characters

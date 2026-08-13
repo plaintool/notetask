@@ -50,6 +50,6 @@ begin
   Application.CreateForm(TformInputText, formInputText);
   Application.CreateForm(TformMemoText, formMemoText);
   TLocalize.ApplicationTranslate(APP_NAME, Language);
-  TLocalize.UpdatePackageTranslations(APP_NAME, 'checkupdates', Language);
+  TLocalize.UpdatePackageTranslations(APP_NAME, 'checkupdates', Language, ['checkupdates']);
   Application.Run;
 end.

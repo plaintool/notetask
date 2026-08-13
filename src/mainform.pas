@@ -8314,7 +8314,7 @@ begin
     if not TLocalize.ApplicationTranslate(APP_NAME, Language) then
       Language := 'en';
 
-    TLocalize.UpdatePackageTranslations(APP_NAME, 'checkupdates', Language);
+    TLocalize.UpdatePackageTranslations(APP_NAME, 'checkupdates', Language, ['checkupdates']);
   end;
 
   openDialog.Filter := ropendialogfilter;
