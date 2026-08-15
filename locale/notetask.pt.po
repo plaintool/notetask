@@ -156,10 +156,12 @@ msgid "Read-only"
 msgstr "Somente leitura"
 
 #: mainform.rremovetag
+msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"
 msgstr "Tem certeza de que deseja remover o(s) tag(s)"
 
 #: mainform.rremovetagtitle
+msgctxt "mainform.rremovetagtitle"
 msgid "Remove tag(s)"
 msgstr "Remover o(s) tag(s)"
 
@@ -1001,6 +1003,16 @@ msgstr "Salvando"
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "Salvando"
+
+#: tformnotetask.tagedit.removeconfirmmessage
+msgctxt "tformnotetask.tagedit.removeconfirmmessage"
+msgid "Are you sure you want to remove tag(s)"
+msgstr "Tem certeza de que deseja remover o(s) tag(s)"
+
+#: tformnotetask.tagedit.removeconfirmtitle
+msgctxt "tformnotetask.tagedit.removeconfirmtitle"
+msgid "Remove tag(s)"
+msgstr "Remover o(s) tag(s)"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

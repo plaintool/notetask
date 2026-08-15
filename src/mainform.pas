@@ -359,6 +359,7 @@ type
     contextRenameGroup: TMenuItem;
     contextDuplicateGroup: TMenuItem;
     contextDeleteGroup: TMenuItem;
+    TagEdit: TTagEdit;
     {%EndRegion}
     {%Region -fold Events}
     // Form Events
@@ -562,7 +563,6 @@ type
     Memo: TMemo;
     PanelMemo: TPanel;
     DatePicker: TDateTimePicker;
-    TagEdit: TTagEdit;
     FChanged: boolean;
     FBackup: boolean;
     FReadOnly: boolean;
@@ -905,34 +905,11 @@ uses Consts, mathparser, filemngr, settings, controlshelper, cryptoutils, string
 procedure TformNotetask.FormCreate(Sender: TObject);
 begin
   // Init components
-  TagEdit := TTagEdit.Create(Self);
-  TagEdit.Parent := PanelTags;
-  TagEdit.AutoSuggest := True;
-  TagEdit.Align := alTop;
-  TagEdit.AutoSizeHeight := True;
-  TagEdit.DragIndicatorColor := clRed;
-  TagEdit.SelectionRectColor := clSilver;
-  TagEdit.TagHoverColor := clNone;
   TagEdit.TagSuffixColor := TDarkUtils.ThemeColor(clTagSuffix_Light, clTagSuffix_Dark);
-  TagEdit.RoundCorners := 20;
-  TagEdit.TagHeightFactor := 2;
-  TagEdit.AutoColorSeed := 14;
-  TagEdit.EditMinWidth := 150;
   TagEdit.AutoColorBrigtness := TagsColorBrigtness;
   TagEdit.AutoColorSaturation := TagsColorSaturation;
-  TagEdit.BackSpaceEditTag := True;
-  TagEdit.ShowHint := True;
   TagEdit.SuggestedButtonCaption := string.Empty;
   ImagesMisc.GetBitmap(TDarkUtils.ThemeValue(0, 1), TagEdit.SuggestedButtonGlyph);
-  TagEdit.PopupMenu := PopupTags;
-  TagEdit.OnKeyDown := @TagEditKeyDown;
-  TagEdit.OnTagClick := @TagEditTagClick;
-  TagEdit.OnBeforeChange := @TagEditBeforeChange;
-  TagEdit.OnChange := @TagEditChange;
-  TagEdit.OnTagAdd := @TagEditTagAdd;
-  TagEdit.OnTagRemove := @TagEditTagRemove;
-  TagEdit.OnTagReorder := @TagEditTagReorder;
-  TagEdit.OnExit := @TagEditExit;
 
   // Initialize variables
   FZoom := 1;
@@ -1067,8 +1044,6 @@ begin
   ResourceBitmapStarGray.Free;
 
   FreeFile;
-
-  TagEdit.Free;
 end;
 
 procedure TformNotetask.FormShow(Sender: TObject);
@@ -7812,6 +7787,8 @@ end;
 
 procedure TformNotetask.AdjustMultiButton;
 begin
+  if not Assigned(btnMulti) then Exit;
+
   if (Grid.Selection.Height > 0) or (FLastSelectionHeight > 0) or (Grid.Selection.Width > 0) then
   begin
     btnMulti.Hint := aDuplicateTasks.Caption + ' (Ctrl+D)';

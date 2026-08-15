@@ -156,10 +156,12 @@ msgid "Read-only"
 msgstr "읽기 전용"
 
 #: mainform.rremovetag
+msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"
 msgstr "태그를 제거하시겠습니까"
 
 #: mainform.rremovetagtitle
+msgctxt "mainform.rremovetagtitle"
 msgid "Remove tag(s)"
 msgstr "태그 제거"
 
@@ -1001,6 +1003,16 @@ msgstr "저장"
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "저장"
+
+#: tformnotetask.tagedit.removeconfirmmessage
+msgctxt "tformnotetask.tagedit.removeconfirmmessage"
+msgid "Are you sure you want to remove tag(s)"
+msgstr "태그를 제거하시겠습니까"
+
+#: tformnotetask.tagedit.removeconfirmtitle
+msgctxt "tformnotetask.tagedit.removeconfirmtitle"
+msgid "Remove tag(s)"
+msgstr "태그 제거"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

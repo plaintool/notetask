@@ -156,10 +156,12 @@ msgid "Read-only"
 msgstr "Skrivskyddad"
 
 #: mainform.rremovetag
+msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"
 msgstr "Är du säker på att du vill ta bort tagg(ar)"
 
 #: mainform.rremovetagtitle
+msgctxt "mainform.rremovetagtitle"
 msgid "Remove tag(s)"
 msgstr "Ta bort tagg(ar)"
 
@@ -1001,6 +1003,16 @@ msgstr "Sparar"
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "Sparar"
+
+#: tformnotetask.tagedit.removeconfirmmessage
+msgctxt "tformnotetask.tagedit.removeconfirmmessage"
+msgid "Are you sure you want to remove tag(s)"
+msgstr "Är du säker på att du vill ta bort tagg(ar)"
+
+#: tformnotetask.tagedit.removeconfirmtitle
+msgctxt "tformnotetask.tagedit.removeconfirmtitle"
+msgid "Remove tag(s)"
+msgstr "Ta bort tagg(ar)"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

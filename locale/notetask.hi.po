@@ -156,10 +156,12 @@ msgid "Read-only"
 msgstr "केवल-पढ़ने योग्य"
 
 #: mainform.rremovetag
+msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"
 msgstr "क्या आप वाकई टैग(स) हटाना चाहते हैं"
 
 #: mainform.rremovetagtitle
+msgctxt "mainform.rremovetagtitle"
 msgid "Remove tag(s)"
 msgstr "टैग(स) हटाएँ"
 
@@ -1001,6 +1003,16 @@ msgstr "सहेजना"
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "सहेजना"
+
+#: tformnotetask.tagedit.removeconfirmmessage
+msgctxt "tformnotetask.tagedit.removeconfirmmessage"
+msgid "Are you sure you want to remove tag(s)"
+msgstr "क्या आप वाकई टैग(स) हटाना चाहते हैं"
+
+#: tformnotetask.tagedit.removeconfirmtitle
+msgctxt "tformnotetask.tagedit.removeconfirmtitle"
+msgid "Remove tag(s)"
+msgstr "टैग(स) हटाएँ"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

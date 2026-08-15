@@ -285,14 +285,51 @@ object formNotetask: TformNotetask
     Width = 851
     HorzScrollBar.Page = 1
     HorzScrollBar.Visible = False
-    VertScrollBar.Increment = 1
-    VertScrollBar.Page = 1
+    VertScrollBar.Increment = 2
+    VertScrollBar.Page = 28
     VertScrollBar.Smooth = True
     VertScrollBar.Tracking = True
     Align = alBottom
     BorderStyle = bsNone
+    ClientHeight = 32
+    ClientWidth = 851
     ParentBackground = False
     TabOrder = 4
+    object TagEdit: TTagEdit
+      Left = 0
+      Height = 28
+      Top = 0
+      Width = 851
+      Align = alTop
+      AutoSuggest = True
+      AutoSizeHeight = True
+      RoundCorners = 20
+      Enabled = True
+      ParentShowHint = False
+      PopupMenu = PopupTags
+      ShowHint = True
+      BackSpaceEditTag = True
+      TagHoverColor = clNone
+      TagHeightFactor = 2
+      AutoColorSeed = 14
+      EditMinWidth = 150
+      RemoveConfirmTitle = 'Remove tag(s)'
+      RemoveConfirmMessage = 'Are you sure you want to remove tag(s)'
+      TagColors = <>
+      SelectionRectColor = clSilver
+      Items.Strings = (
+        'IDE:Lazarus'
+        'Free Pascal'
+      )
+      OnTagClick = TagEditTagClick
+      OnBeforeChange = TagEditBeforeChange
+      OnChange = TagEditChange
+      OnTagAdd = TagEditTagAdd
+      OnTagRemove = TagEditTagRemove
+      OnTagReorder = TagEditTagReorder
+      OnExit = TagEditExit
+      OnKeyDown = TagEditKeyDown
+    end
   end
   object panelFunc: TPanel
     Left = 800

@@ -156,10 +156,12 @@ msgid "Read-only"
 msgstr "Doar citire"
 
 #: mainform.rremovetag
+msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"
 msgstr "Sunteți sigur că doriți să eliminați eticheta/etichetele"
 
 #: mainform.rremovetagtitle
+msgctxt "mainform.rremovetagtitle"
 msgid "Remove tag(s)"
 msgstr "Eliminați eticheta/etichetele"
 
@@ -1001,6 +1003,16 @@ msgstr "Salvare"
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "Salvare"
+
+#: tformnotetask.tagedit.removeconfirmmessage
+msgctxt "tformnotetask.tagedit.removeconfirmmessage"
+msgid "Are you sure you want to remove tag(s)"
+msgstr "Sunteți sigur că doriți să eliminați eticheta/etichetele"
+
+#: tformnotetask.tagedit.removeconfirmtitle
+msgctxt "tformnotetask.tagedit.removeconfirmtitle"
+msgid "Remove tag(s)"
+msgstr "Eliminați eticheta/etichetele"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

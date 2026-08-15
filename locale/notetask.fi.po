@@ -156,10 +156,12 @@ msgid "Read-only"
 msgstr "Vain luku"
 
 #: mainform.rremovetag
+msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"
 msgstr "Haluatteko varmasti poistaa tunnisteen/tunnisteet"
 
 #: mainform.rremovetagtitle
+msgctxt "mainform.rremovetagtitle"
 msgid "Remove tag(s)"
 msgstr "Poista tunniste/tunnisteet"
 
@@ -1001,6 +1003,16 @@ msgstr "Tallennetaan"
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "Tallennetaan"
+
+#: tformnotetask.tagedit.removeconfirmmessage
+msgctxt "tformnotetask.tagedit.removeconfirmmessage"
+msgid "Are you sure you want to remove tag(s)"
+msgstr "Haluatteko varmasti poistaa tunnisteen/tunnisteet"
+
+#: tformnotetask.tagedit.removeconfirmtitle
+msgctxt "tformnotetask.tagedit.removeconfirmtitle"
+msgid "Remove tag(s)"
+msgstr "Poista tunniste/tunnisteet"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"

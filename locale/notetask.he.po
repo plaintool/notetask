@@ -156,10 +156,12 @@ msgid "Read-only"
 msgstr "לקריאה בלבד"
 
 #: mainform.rremovetag
+msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"
 msgstr "האם אתה בטוח שברצונך להסיר תגית(יות)"
 
 #: mainform.rremovetagtitle
+msgctxt "mainform.rremovetagtitle"
 msgid "Remove tag(s)"
 msgstr "הסר תגית(יות)"
 
@@ -1001,6 +1003,16 @@ msgstr "שמירה"
 msgctxt "tformnotetask.savenotesdialog.title"
 msgid "Saving"
 msgstr "שמירה"
+
+#: tformnotetask.tagedit.removeconfirmmessage
+msgctxt "tformnotetask.tagedit.removeconfirmmessage"
+msgid "Are you sure you want to remove tag(s)"
+msgstr "האם אתה בטוח שברצונך להסיר תגית(יות)"
+
+#: tformnotetask.tagedit.removeconfirmtitle
+msgctxt "tformnotetask.tagedit.removeconfirmtitle"
+msgid "Remove tag(s)"
+msgstr "הסר תגית(יות)"
 
 #: tformreplacetext.buttoncancel.caption
 msgctxt "tformreplacetext.buttoncancel.caption"
