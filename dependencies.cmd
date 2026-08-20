@@ -75,9 +75,10 @@ set "revert=%~5"
 set "pullflag=%~6"
 set "buildflag=%~7"
 
-:: If lpk file is specified, form full path; otherwise leave empty
+:: If lpk file(s) are specified, pass them as a comma-separated list
+:: relative to the submodule root; otherwise leave empty.
 if not "%lpkname%"=="" (
-    set "lpkfull=%~dp0libs\%lower%\%lpkname%"
+    set "lpkfull=%lpkname%"
 ) else (
     set "lpkfull="
 )

@@ -3,7 +3,8 @@ setlocal
 
 :: ============================================================
 :: Universal build script for a single Lazarus dependency
-:: Usage: build_dependency.cmd <Name> <SubtreePath> <RepoURL> <Branch> <LpkFile> [RevertFile] [DoPull]
+:: Usage: build_dependency.cmd <Name> <SubtreePath> <RepoURL> <Branch> <LpkFileList> [RevertFile] [DoPull] [DoBuild]
+::   LpkFileList - comma-separated list of .lpk files relative to <SubtreePath>
 ::   DoPull  - set to "true" (case insensitive) to perform git subtree pull; 
 ::             any other value, empty or "false" skips the pull.
 :: Expects LAZBUILD to point to lazbuild.exe
@@ -68,34 +69,41 @@ goto process_lpk
 echo Skipping %DEP_NAME% subtree update due to local changes or DO_PULL policy.
 
 :process_lpk
-:: ----- Decide whether to attempt build lpk -----
+:: Decide whether to attempt build lpk
 if /i not "%DO_BUILD%"=="true" (
     echo Skipping %DEP_NAME% build because DO_BUILD is not "true".
     goto skip_build
 )
 
-echo Processing Lazarus package
-if exist "%DEP_LPK%" (
-    echo Building %DEP_LPK%
-    "%LAZBUILD%" "%DEP_LPK%" %LAZBUILD_OPTS% -q -q
-    if errorlevel 1 (
-        echo ERROR: %DEP_NAME% LPK build failed
-        pause
-        exit /b %errorlevel%
-    )
-    echo %DEP_NAME% LPK processed successfully
+if "%DEP_LPK%"=="" (
+    echo WARNING: no LPK files specified for %DEP_NAME%, skipping.
+    goto fin
+)
 
-    :: Revert auto-generated changes if a revert file is specified
-    if not "%DEP_REVERT%"=="" (
-        if exist "%DEP_PATH%\%DEP_REVERT%" (
-            git checkout -- "%DEP_PATH%\%DEP_REVERT%"
-            if not errorlevel 1 (
-                echo Reverted auto-changes in %DEP_REVERT%
-            )
+echo Processing Lazarus packages
+for %%L in (%DEP_LPK%) do (
+    if exist "%DEP_PATH%\%%L" (
+        echo Building "%DEP_PATH%\%%L"
+        "%LAZBUILD%" "%DEP_PATH%\%%L" %LAZBUILD_OPTS% -q -q
+        if errorlevel 1 (
+            echo ERROR: %DEP_NAME% LPK build failed for "%DEP_PATH%\%%L"
+            pause
+            exit /b 1
+        )
+        echo %DEP_NAME% LPK processed successfully: "%DEP_PATH%\%%L"
+    ) else (
+        echo WARNING: "%DEP_PATH%\%%L" not found, skipping
+    )
+)
+
+:: Revert auto-generated changes if a revert file is specified
+if not "%DEP_REVERT%"=="" (
+    if exist "%DEP_PATH%\%DEP_REVERT%" (
+        git checkout -- "%DEP_PATH%\%DEP_REVERT%"
+        if not errorlevel 1 (
+            echo Reverted auto-changes in %DEP_REVERT%
         )
     )
-) else (
-    echo WARNING: %DEP_LPK% not found, skipping
 )
 
 goto fin
