@@ -23,6 +23,7 @@ on:
 permissions:
   contents: write
   issues: read
+  pull-requests: read
 
 jobs:
   release:
@@ -30,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -130,7 +131,7 @@ jobs:
           EOF
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           pattern: ${{ inputs.artifact_name || github.event.inputs.artifact_name }}
           path: dist

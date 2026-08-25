@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   issues: read
+  pull-requests: read
 
 jobs:
   prepare:
@@ -18,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 

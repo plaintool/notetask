@@ -19,22 +19,48 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
+
+      # Cache installers to avoid re-downloading every run
+      - name: Cache Lazarus installer
+        id: cache-lazarus
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/lazarus-4.8.exe
+          key: lazarus-installer-4.8
+
+      - name: Cache FPC installer
+        id: cache-fpc
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/fpc-i386.exe
+          key: fpc-installer-3.2.2
+
+      - name: Cache Inno Setup installer
+        id: cache-inno
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/innosetup-6.7.3.exe
+          key: inno-installer-6.7.3
 
       - name: Install build dependencies
         shell: pwsh
         run: |
           # Install Lazarus 4.8
           $lazarusInstaller = "$env:RUNNER_TEMP\lazarus-4.8.exe"
-          curl.exe -L "https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%204.8/lazarus-4.8-fpc-3.2.2-win64.exe/download" -o $lazarusInstaller
+          if (-Not (Test-Path $lazarusInstaller)) {
+              curl.exe -L --retry 5 --retry-delay 10 --retry-all-errors --connect-timeout 60 --max-time 900 "https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%204.8/lazarus-4.8-fpc-3.2.2-win64.exe/download" -o $lazarusInstaller
+          }
           Start-Process -FilePath $lazarusInstaller -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART" -Wait
 
           # Install 32-bit FPC
           $fpcDir = "C:\Lazarus\fpc\3.2.2"
           $fpcInstaller = "$env:RUNNER_TEMP\fpc-i386.exe"
-          curl.exe -L "https://sourceforge.net/projects/freepascal/files/Win32/3.2.2/fpc-3.2.2.i386-win32.exe/download" -o $fpcInstaller
+          if (-Not (Test-Path $fpcInstaller)) {
+              curl.exe -L --retry 5 --retry-delay 10 --retry-all-errors --connect-timeout 60 --max-time 900 "https://sourceforge.net/projects/freepascal/files/Win32/3.2.2/fpc-3.2.2.i386-win32.exe/download" -o $fpcInstaller
+          }
           Start-Process -FilePath $fpcInstaller -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART","/DIR=$fpcDir" -Wait
 
           $env:Path = "C:\Lazarus\fpc\3.2.2\bin\i386-win32;$env:Path"
@@ -42,7 +68,9 @@ jobs:
 
           # Install Inno Setup 6.7.3
           $innoInstaller = "$env:RUNNER_TEMP\innosetup-6.7.3.exe"
-          curl.exe -L "https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe" -o $innoInstaller
+          if (-Not (Test-Path $innoInstaller)) {
+              curl.exe -L --retry 5 --retry-delay 10 --retry-all-errors --connect-timeout 60 --max-time 900 "https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe" -o $innoInstaller
+          }
           Start-Process -FilePath $innoInstaller -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART" -Wait
 
       - name: Copy Inno Setup language files
@@ -112,7 +140,7 @@ jobs:
         run: installer\buildinno.cmd %VERSION%
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-windows-artifacts
           path: |
