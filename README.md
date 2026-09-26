@@ -25,13 +25,16 @@ A simple application for creating and organizing task lists, offering essential 
 
 <p align="left">
   <a href="https://www.majorgeeks.com/files/details/notetask.html">
-    <img src="https://majorgeeks.com/images/mg_approved.gif" alt="MajorGeeks Approved" height="80">
+    <img src="https://majorgeeks.com/images/mg_approved.gif" alt="MajorGeeks Approved" height="80" align="middle">
   </a>
   <a href="https://www.softpedia.com/get/Office-tools/Diary-Organizers-Calendar/Notetask.shtml">
-    <img src="https://cdnssl.softpedia.com/_img/softpedia_100_free.png" alt="Softpedia" height="80">
+    <img src="https://cdnssl.softpedia.com/_img/softpedia_100_free.png" alt="Softpedia" height="110" align="middle">
   </a>
-    <a href="https://notetask.updatestar.com">
-    <img src="https://www.updatestar.com/images/uploads/safetoinstallaward.png" alt="Safetoinstallaward" height="80">
+  <a href="https://notetask.sooftware.com/windows">
+    <img src="https://www.sooftware.com/images/logo.png" alt="Sooftware" height="30" align="middle">
+  </a>
+  <a href="https://notetask.updatestar.com">
+    <img src="https://www.updatestar.com/images/uploads/safetoinstallaward.png" alt="Safetoinstallaward" height="80" align="middle">
   </a>
 </p>
 
