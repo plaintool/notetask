@@ -1092,6 +1092,11 @@ begin
     {$ELSE}
     Application.ProcessMessages;
     {$ENDIF}
+  end
+  else
+  begin
+    // Application is terminating, nothing left to initialize
+    Exit;
   end;
 
   // After paint form
@@ -1410,7 +1415,11 @@ end;
 
 procedure TformNotetask.ApplicationOnException(Sender: TObject; E: Exception);
 begin
-  MessageDlg('Notetask', E.Message, mtWarning, [mbOK], 0);
+  {$IFDEF DEBUG}
+  TOS.Log(APP_NAME,
+    'Unhandled exception (' + E.ClassName + '): ' + E.Message + System.LineEnding + TOS.GetExceptionStackTrace(E));
+  {$ENDIF}
+  MessageDlg(rapp, E.Message, mtWarning, [mbOK], 0);
 end;
 
 procedure TformNotetask.ApplicationOnQueryEndSession(var CanEnd: boolean);

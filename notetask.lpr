@@ -38,8 +38,8 @@ begin
   {$ENDIF}
   RequireDerivedFormResource := True;
   Language := TLocalize.GetOSLanguage;
-  Application.Title:='Notetask';
-  Application.Scaled:=True;
+  Application.Title := 'Notetask';
+  Application.Scaled := True;
   Application.Initialize;
   {$IFDEF WINDOWS}
   ApplyDarkStyle;
