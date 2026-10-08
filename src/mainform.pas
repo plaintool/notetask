@@ -532,17 +532,16 @@ type
     procedure GridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
     procedure GridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
     procedure GridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-    procedure GridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
     procedure GridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure GridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
     procedure GridKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure GridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure GridMouseLeave(Sender: TObject);
     procedure GridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure GridMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure GridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
     procedure GridResize(Sender: TObject);
     procedure GridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
-    procedure GridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
     procedure GridTopLeftChanged(Sender: TObject);
     procedure GridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer; const CheckedState: TCheckboxState;
       var ABitmap: TBitmap);
@@ -550,7 +549,23 @@ type
     procedure GridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
     procedure GridSelection(Sender: TObject; aCol, aRow: integer);
     procedure GridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
+    procedure GridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
+    procedure GridSelectEditor(Sender: TObject; aCol, aRow: integer; var Editor: TWinControl);
+    // Inline control events
+    procedure PanelMemoEnter(Sender: TObject);
+    procedure PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
+    procedure MemoEnter(Sender: TObject);
+    procedure MemoExit(Sender: TObject);
+    procedure MemoChange(Sender: TObject);
+    procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure MemoKeyPress(Sender: TObject; var Key: char);
+    procedure DatePickerEnter(Sender: TObject);
+    procedure DatePickerChange(Sender: TObject);
+    procedure DatePickerKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     // All Events
+    procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
+    procedure PrinterBeforePrintCell(Sender: TObject; AGrid: TCustomGrid; ACanvas: TCanvas; ACol, ARow: integer; ARect: TRect);
+    procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
     procedure btnMultiClick(Sender: TObject);
     procedure FilterBoxChange(Sender: TObject);
     procedure FilterBoxKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -649,25 +664,12 @@ type
       OffsetTop: integer = 0; OffsetRight: integer = -8; OffsetBottom: integer = -1);
     procedure UpdateComboRegion(Combo: TComboBox; AInsetLeft: integer = 1; AInsetTop: integer = 1;
       AInsetRight: integer = 0; AInsetBottom: integer = 1);
-    procedure PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
-    procedure PrinterBeforePrintCell(Sender: TObject; AGrid: TCustomGrid; ACanvas: TCanvas; ACol, ARow: integer; ARect: TRect);
-    procedure PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
     function FindGroupTabIndex(Value: integer): integer;
     function FindGroupRealIndex(Value: integer): integer;
     function GetLineAtEnd: integer;
     function GetLineAtPos(Y: integer): integer;
     procedure PasteWithLineEnding(AMemo: TMemo);
     procedure SelectMemoLine(LineIndex: integer; Move: boolean = False);
-    procedure PanelMemoEnter(Sender: TObject);
-    procedure PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
-    procedure MemoEnter(Sender: TObject);
-    procedure MemoExit(Sender: TObject);
-    procedure MemoChange(Sender: TObject);
-    procedure MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure MemoKeyPress(Sender: TObject; var Key: char);
-    procedure DatePickerEnter(Sender: TObject);
-    procedure DatePickerChange(Sender: TObject);
-    procedure DatePickerKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure EditCell(aCol: integer = -1; aRow: integer = -1);
     procedure EditComplete(aEnter: boolean = False; aEscape: boolean = False);
     procedure DisableDrag;
@@ -1571,6 +1573,7 @@ begin
       Tasks.UndoBackupInit;
       FillGrid;
       ResetRowHeight;
+      CalcRowHeight(True);
       SetFilter;
       SetInfo;
       SetNote;
@@ -4121,6 +4124,421 @@ end;
 
 {%Region -fold Task Grid}
 
+procedure TformNotetask.GridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
+var
+  LastTask: integer;
+begin
+  EditComplete;
+  if IsColumn then
+  begin
+    LastTask := Tasks.Map(FLastRow);
+
+    if (FSortColumn <> Index) then
+      SortOrder := soAscending
+    else
+    if SortOrder = soAscending then
+      SortOrder := soDescending
+    else
+      SortOrder := soAscending;
+    Grid.SortOrder := SortOrder;
+
+    FSortColumn := Index;
+
+    ApplySorting;
+
+    Grid.Row := Tasks.ReverseMap(LastTask);
+  end
+  else
+    // Set LastTask when clicked on begining of LastTask
+  begin
+    if (ssShift in GetKeyShiftState) and (Grid.Selection.Height = 0) and (Grid.Selection.Top <> index) then
+    begin
+      Grid.Selection := TGridRect.Create(COL_DONE, Grid.Selection.Top, COL_STAR, index);
+    end
+    else
+    begin
+      Grid.Row := index;
+      Grid.Selection := TGridRect.Create(COL_DONE, index, COL_STAR, index);
+    end;
+    // Trigger event
+    Grid.OnSelection(Grid, Grid.Col, Grid.Row);
+  end;
+end;
+
+procedure TformNotetask.GridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
+var
+  MousePosScreen, MousePosClient, CheckBoxCenter: TPoint;
+  CheckBoxRect: TRect;
+  CheckBoxSize: integer;
+begin
+  if (aCol = COL_DONE) then
+  begin
+    // Define checkbox area size (16x16)
+    CheckBoxSize := 14;
+
+    // Get mouse position in screen coordinates
+    MousePosScreen := Mouse.CursorPos;
+
+    // Convert screen coordinates to client coordinates (relative to the form)
+    MousePosClient := Grid.ScreenToClient(MousePosScreen);
+
+    // Get the center of the checkbox (approximately the center of the cell)
+    CheckBoxCenter := Grid.CellRect(ACol, ARow).CenterPoint;
+
+    // Define the 16x16 rectangle around the checkbox
+    CheckBoxRect.Left := CheckBoxCenter.X - CheckBoxSize div 2;
+    CheckBoxRect.Top := CheckBoxCenter.Y - CheckBoxSize div 2;
+    CheckBoxRect.Right := CheckBoxCenter.X + CheckBoxSize div 2;
+    CheckBoxRect.Bottom := CheckBoxCenter.Y + CheckBoxSize div 2;
+
+    // Check if the mouse is within the 16x16 checkbox area
+    if not PtInRect(CheckBoxRect, MousePosClient) then
+    begin
+      // If the mouse is outside the checkbox, prevent the state from being changed
+      FDisableCheckToggle := True;
+      exit;
+    end;
+    FDisableCheckToggle := False;
+    exit;
+  end;
+  if (aCol = COL_STAR) then
+  begin
+    // Get mouse position in screen coordinates
+    MousePosScreen := Mouse.CursorPos;
+
+    // Convert screen coordinates to client coordinates (relative to the form)
+    MousePosClient := Grid.ScreenToClient(MousePosScreen);
+
+    // Check if the mouse is within the 16x16 checkbox area
+    if not PtInRect(Grid.CellRect(ACol, ARow), MousePosClient) then
+    begin
+      // If the mouse is outside the checkbox, prevent the state from being changed
+      FDisableStarToggle := True;
+      exit;
+    end;
+    FDisableStarToggle := False;
+    exit;
+  end;
+end;
+
+procedure TformNotetask.GridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
+begin
+  if (aCol = COL_DONE) then
+  begin
+    if (FDisableCheckToggle) then exit;
+
+    CompleteTasks(aRow);
+  end
+  else
+  if (aCol = COL_STAR) then
+  begin
+    if (FDisableStarToggle) then exit;
+
+    StarTasks(aRow);
+  end;
+end;
+
+procedure TformNotetask.GridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+begin
+  if (not IsColumn) then
+  begin
+    if FBackup then
+    begin
+      GridBackupSelection;
+      Tasks.CreateBackup;
+    end;
+    Tasks.AddMap(Tasks.AddTask('[ ]'));
+    Grid.Cells[COL_DONE, tIndex] := '0';
+    SetInfo;
+    Changed := True;
+    SetNote;
+    SetTags;
+  end;
+end;
+
+procedure TformNotetask.GridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+begin
+  if (not IsColumn) then
+  begin
+    Tasks.DeleteTask(tIndex);
+    if ShowDuration then FillGrid;
+    SetInfo;
+    SetNote;
+    SetTags;
+  end;
+end;
+
+procedure TformNotetask.GridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
+begin
+  GridResize(Sender);
+  if IsColumn then
+    CalcRowHeight(True);
+  EditControlSetBounds(PanelMemo, Grid.Col, Grid.Row);
+  EditControlSetBounds(DatePicker, Grid.Col, Grid.Row, 2, -2, -2, 0);
+end;
+
+procedure TformNotetask.GridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
+begin
+  FIsSelecting := True;
+  AdjustMultiButton;
+end;
+
+procedure TformNotetask.GridKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  TempGrid: TStringGrid;
+  i: integer;
+  //Sel:TGridRect;
+  //Col: integer;
+begin
+  TempGrid := Sender as TStringGrid;
+
+  // Remove due to conflict with standard selection behavior
+  //// Shift + Home -> select from current position to first visible column
+  //if (Key = VK_HOME) and (ssShift in Shift) and not (ssCtrl in Shift) then
+  //begin
+  //  Sel:=  TempGrid.Selection;
+  //  Col := TempGrid.Col;
+  //  for i := 1 to TempGrid.ColCount - 1 do
+  //    if TempGrid.ColWidths[i] > 0 then
+  //    begin
+  //      TempGrid.Col := i;
+  //      Break;
+  //    end;
+  //  TempGrid.ClearSelections;
+  //  TempGrid.Selection := Rect(TempGrid.Col, Sel.Top, Sel.Right, Sel.Bottom);
+  //  TempGrid.Update;
+  //  Key := 0;
+  //  Exit;
+  //end
+  //else
+  //// Shift + End -> select from current position to last visible column
+  //if (Key = VK_END) and (ssShift in Shift) and not (ssCtrl in Shift) then
+  //begin
+  //  Sel:=  TempGrid.Selection;
+  //  Col := TempGrid.Col;
+
+  //  for i := TempGrid.ColCount - 1 downto 0 do
+  //    if TempGrid.ColWidths[i] > 0 then
+  //    begin
+  //      TempGrid.Col := i;
+  //      Break;
+  //    end;
+  //  TempGrid.ClearSelections;
+  //  TempGrid.Selection := Rect(Sel.Left, Sel.Top, TempGrid.Col, Sel.Bottom);
+  //  TempGrid.Update;
+  //  Key := 0;
+  //  Exit;
+  //end
+  //else
+
+  // Default HOME -> move to first visible column
+  if (Key = VK_HOME) and not (ssCtrl in Shift) and not (ssShift in Shift) then
+  begin
+    for i := 1 to TempGrid.ColCount - 1 do
+      if TempGrid.ColWidths[i] > 0 then
+      begin
+        TempGrid.Col := i;
+        Break;
+      end;
+    Key := 0;
+    Exit;
+  end
+  else
+  // Default END -> move to last visible column
+  if (Key = VK_END) and not (ssCtrl in Shift) and not (ssShift in Shift) then
+  begin
+    for i := TempGrid.ColCount - 1 downto 0 do
+      if TempGrid.ColWidths[i] > 0 then
+      begin
+        TempGrid.Col := i;
+        Break;
+      end;
+    Key := 0;
+    Exit;
+  end;
+end;
+
+procedure TformNotetask.GridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  FIsSelecting := False;
+
+  if (Button = mbMiddle) and (ssCtrl in Shift) then // Middle button + Ctrl
+    aZoomDefault.Execute;
+end;
+
+procedure TformNotetask.GridMouseLeave(Sender: TObject);
+begin
+  FIsSelecting := False;
+end;
+
+procedure TformNotetask.GridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+var
+  Cell: TPoint;
+begin
+  if (Button = mbRight) and (not IsEditing) then
+  begin
+    if (Grid.Selection.Height = 0) then
+    begin
+      // Get the row index at the mouse coordinates
+      Cell := Grid.MouseToCell(TPoint.Create(X, Y));
+
+      // Check if the row index is valid
+      if (Cell.Y >= 0) and (Cell.Y < Grid.RowCount) then
+        Grid.Row := Cell.Y;
+      if (Cell.X > 0) and (Cell.X < 5) then
+        Grid.Col := Cell.X;
+
+      if Visible and Grid.Visible and Grid.CanFocus then
+        Grid.SetFocus;
+    end;
+    Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
+  end;
+
+  if (Button = mbLeft) and (ssCtrl in Shift) and (Grid.Col in [COL_TASK, COL_NOTE]) then
+    TryOpenAsUrl(Trim(Grid.Cells[Grid.Col, Grid.Row]));
+
+  if (not FRepaint) then
+  begin
+    FRepaint := True;
+    GridInvalidate;
+  end;
+end;
+
+procedure TformNotetask.GridMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+begin
+  // Cancel a stuck selection drag in the grid
+  Grid.FixStuckSelection(Shift);
+end;
+
+procedure TformNotetask.GridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
+begin
+  if IsEditing then
+    EditComplete;
+
+  if ssCtrl in Shift then
+  begin
+    if WheelDelta > 0 then
+      aZoomIn.Execute
+    else
+      aZoomOut.Execute;
+    Handled := True;
+  end;
+end;
+
+procedure TformNotetask.GridResize(Sender: TObject);
+var
+  Rect: TRect;
+begin
+  {$IFDEF UNIX}
+  GridAdjustScrollBars;
+  {$ENDIF}
+
+  // Get the cell dimensions
+  Rect := Grid.CellRect(Grid.Col, Grid.Row);
+
+  // Update the size and position of the Memo
+  if Assigned(Grid.Editor) and (Grid.Editor is TPanel) then
+    TPanel(Grid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
+
+  // Align panelFunc to bottom-right of Grid
+  if FBiDiRightToLeft then
+  begin
+    if Grid.GetActualScrollBarVisibility(ssVertical) then
+      panelFunc.Left := Grid.Left + GetSystemMetrics(SM_CXVSCROLL) + 5
+    else
+      panelFunc.Left := Grid.Left + 5;
+  end
+  else
+  begin
+    if Grid.GetActualScrollBarVisibility(ssVertical) then
+      panelFunc.Left := Grid.Left + Grid.Width - panelFunc.Width - GetSystemMetrics(SM_CXVSCROLL) - 5
+    else
+      panelFunc.Left := Grid.Left + Grid.Width - panelFunc.Width - 5;
+  end;
+  if Grid.GetActualScrollBarVisibility(ssHorizontal) then
+    panelFunc.Top := Grid.Top + Grid.Height - panelFunc.Height - GetSystemMetrics(SM_CYHSCROLL) - 5
+  else
+    panelFunc.Top := Grid.Top + Grid.Height - panelFunc.Height - 5;
+end;
+
+procedure TformNotetask.GridTopLeftChanged(Sender: TObject);
+begin
+  EditComplete;
+
+  if Grid.TopRow = 1 then
+    Application.QueueAsyncCall(@DelayedInvalidate, 0);
+
+  if Grid.TopRow + Grid.VisibleRowCount >= Grid.RowCount then
+    Application.QueueAsyncCall(@DelayedInvalidate, 0);
+end;
+
+procedure TformNotetask.GridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer;
+  const CheckedState: TCheckboxState; var ABitmap: TBitmap);
+begin
+  // Check if we're in the correct column
+  if aCol = COL_DONE then
+  begin
+    // Assign the appropriate bitmap based on the CheckedState
+    if CheckedState = cbChecked then
+      ABitmap := ResourceBitmapCheck // Use check bitmap
+    else
+      ABitmap := ResourceBitmapUncheck; // Use uncheck bitmap
+  end
+  else
+  if aCol = COL_STAR then
+  begin
+    // Assign the appropriate bitmap based on the CheckedState
+    if CheckedState = cbChecked then
+      ABitmap := ResourceBitmapStarGold // Use check bitmap
+    else
+      ABitmap := ResourceBitmapStarGray; // Use uncheck bitmap
+  end;
+end;
+
+procedure TformNotetask.GridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+begin
+  if (not IsColumn) then
+  begin
+    Tasks.MoveTask(sIndex, tIndex);
+    FillGrid;
+    Changed := True;
+  end;
+end;
+
+procedure TformNotetask.GridSelection(Sender: TObject; aCol, aRow: integer);
+var
+  Modified: boolean = False;
+begin
+  if (Grid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
+    SetInfo;
+
+  FLastText := string.Empty;
+  AdjustMultiButton;
+
+  if (aRow <> FLastRow) or (Grid.Selection.Top <> FLastSelection.Top) or (Grid.Selection.Bottom <> FLastSelection.Bottom) then
+  begin
+    FLastRow := aRow;
+    Modified := True;
+    SetNote;
+    SetTags;
+  end;
+
+  if (aCol <> FLastCol) or (Grid.Selection.Left <> FLastSelection.Left) or (Grid.Selection.Right <> FLastSelection.Right) then
+  begin
+    FLastCol := aCol;
+    Modified := True;
+  end;
+  if Modified then
+    ChangeLastText(Grid.Cells[aCol, aRow], aCol, aRow);
+
+  // Save row to mem
+  if Length(FLastRowMem) > FindGroupRealIndex(TabsGroup.TabIndex) then
+    FLastRowMem[FindGroupRealIndex(TabsGroup.TabIndex)] := aRow;
+
+  FLastSelectionHeight := Grid.Selection.Height;
+  FLastSelection := Grid.Selection;
+end;
+
 procedure TformNotetask.GridDrawCell(Sender: TObject; aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
 var
   TempGrid: TStringGrid;
@@ -4519,418 +4937,292 @@ begin
   end;
 end;
 
-procedure TformNotetask.GridHeaderClick(Sender: TObject; IsColumn: boolean; Index: integer);
-var
-  LastTask: integer;
+{%EndRegion}
+
+{%Region -fold Inline Control Events}
+
+procedure TformNotetask.PanelMemoEnter(Sender: TObject);
 begin
-  EditComplete;
-  if IsColumn then
-  begin
-    LastTask := Tasks.Map(FLastRow);
+  Application.QueueAsyncCall(@DelayedSetMemoFocus, 0);
+end;
 
-    if (FSortColumn <> Index) then
-      SortOrder := soAscending
-    else
-    if SortOrder = soAscending then
-      SortOrder := soDescending
-    else
-      SortOrder := soAscending;
-    Grid.SortOrder := SortOrder;
-
-    FSortColumn := Index;
-
-    ApplySorting;
-
-    Grid.Row := Tasks.ReverseMap(LastTask);
-  end
+procedure TformNotetask.PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
+begin
+  if UTF8Key = #8 then  // backspace
+    Memo.SelText := string.Empty
   else
-    // Set LastTask when clicked on begining of LastTask
-  begin
-    if (ssShift in GetKeyShiftState) and (Grid.Selection.Height = 0) and (Grid.Selection.Top <> index) then
-    begin
-      Grid.Selection := TGridRect.Create(COL_DONE, Grid.Selection.Top, COL_STAR, index);
-    end
-    else
-    begin
-      Grid.Row := index;
-      Grid.Selection := TGridRect.Create(COL_DONE, index, COL_STAR, index);
-    end;
-    // Trigger event
-    Grid.OnSelection(Grid, Grid.Col, Grid.Row);
-  end;
-end;
-
-procedure TformNotetask.GridSetCheckboxState(Sender: TObject; ACol, ARow: integer; const Value: TCheckboxState);
-var
-  MousePosScreen, MousePosClient, CheckBoxCenter: TPoint;
-  CheckBoxRect: TRect;
-  CheckBoxSize: integer;
-begin
-  if (aCol = COL_DONE) then
-  begin
-    // Define checkbox area size (16x16)
-    CheckBoxSize := 14;
-
-    // Get mouse position in screen coordinates
-    MousePosScreen := Mouse.CursorPos;
-
-    // Convert screen coordinates to client coordinates (relative to the form)
-    MousePosClient := Grid.ScreenToClient(MousePosScreen);
-
-    // Get the center of the checkbox (approximately the center of the cell)
-    CheckBoxCenter := Grid.CellRect(ACol, ARow).CenterPoint;
-
-    // Define the 16x16 rectangle around the checkbox
-    CheckBoxRect.Left := CheckBoxCenter.X - CheckBoxSize div 2;
-    CheckBoxRect.Top := CheckBoxCenter.Y - CheckBoxSize div 2;
-    CheckBoxRect.Right := CheckBoxCenter.X + CheckBoxSize div 2;
-    CheckBoxRect.Bottom := CheckBoxCenter.Y + CheckBoxSize div 2;
-
-    // Check if the mouse is within the 16x16 checkbox area
-    if not PtInRect(CheckBoxRect, MousePosClient) then
-    begin
-      // If the mouse is outside the checkbox, prevent the state from being changed
-      FDisableCheckToggle := True;
-      exit;
-    end;
-    FDisableCheckToggle := False;
-    exit;
-  end;
-  if (aCol = COL_STAR) then
-  begin
-    // Get mouse position in screen coordinates
-    MousePosScreen := Mouse.CursorPos;
-
-    // Convert screen coordinates to client coordinates (relative to the form)
-    MousePosClient := Grid.ScreenToClient(MousePosScreen);
-
-    // Check if the mouse is within the 16x16 checkbox area
-    if not PtInRect(Grid.CellRect(ACol, ARow), MousePosClient) then
-    begin
-      // If the mouse is outside the checkbox, prevent the state from being changed
-      FDisableStarToggle := True;
-      exit;
-    end;
-    FDisableStarToggle := False;
-    exit;
-  end;
-end;
-
-procedure TformNotetask.GridCheckboxToggled(Sender: TObject; aCol, aRow: integer; aState: TCheckboxState);
-begin
-  if (aCol = COL_DONE) then
-  begin
-    if (FDisableCheckToggle) then exit;
-
-    CompleteTasks(aRow);
-  end
+  if (Grid.Col <> COL_AMOUNT) then
+    Memo.SelText := UTF8Key
   else
-  if (aCol = COL_STAR) then
-  begin
-    if (FDisableStarToggle) then exit;
-
-    StarTasks(aRow);
-  end;
+    Memo.SelText := TMathParser.CleanNumericExpression(UTF8Key);
 end;
 
-procedure TformNotetask.GridColRowInserted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-begin
-  if (not IsColumn) then
-  begin
-    if FBackup then
-    begin
-      GridBackupSelection;
-      Tasks.CreateBackup;
-    end;
-    Tasks.AddMap(Tasks.AddTask('[ ]'));
-    Grid.Cells[COL_DONE, tIndex] := '0';
-    SetInfo;
-    Changed := True;
-    SetNote;
-    SetTags;
-  end;
-end;
-
-procedure TformNotetask.GridColRowDeleted(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
-begin
-  if (not IsColumn) then
-  begin
-    Tasks.DeleteTask(tIndex);
-    if ShowDuration then FillGrid;
-    SetInfo;
-    SetNote;
-    SetTags;
-  end;
-end;
-
-procedure TformNotetask.GridHeaderSized(Sender: TObject; IsColumn: boolean; Index: integer);
-begin
-  GridResize(Sender);
-  if IsColumn then
-    CalcRowHeight(True);
-  EditControlSetBounds(PanelMemo, Grid.Col, Grid.Row);
-  EditControlSetBounds(DatePicker, Grid.Col, Grid.Row, 2, -2, -2, 0);
-end;
-
-procedure TformNotetask.GridSelectCell(Sender: TObject; aCol, aRow: integer; var CanSelect: boolean);
-begin
-  FIsSelecting := True;
-  AdjustMultiButton;
-end;
-
-procedure TformNotetask.GridKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-var
-  TempGrid: TStringGrid;
-  i: integer;
-  //Sel:TGridRect;
-  //Col: integer;
-begin
-  TempGrid := Sender as TStringGrid;
-
-  // Remove due to conflict with standard selection behavior
-  //// Shift + Home -> select from current position to first visible column
-  //if (Key = VK_HOME) and (ssShift in Shift) and not (ssCtrl in Shift) then
-  //begin
-  //  Sel:=  TempGrid.Selection;
-  //  Col := TempGrid.Col;
-  //  for i := 1 to TempGrid.ColCount - 1 do
-  //    if TempGrid.ColWidths[i] > 0 then
-  //    begin
-  //      TempGrid.Col := i;
-  //      Break;
-  //    end;
-  //  TempGrid.ClearSelections;
-  //  TempGrid.Selection := Rect(TempGrid.Col, Sel.Top, Sel.Right, Sel.Bottom);
-  //  TempGrid.Update;
-  //  Key := 0;
-  //  Exit;
-  //end
-  //else
-  //// Shift + End -> select from current position to last visible column
-  //if (Key = VK_END) and (ssShift in Shift) and not (ssCtrl in Shift) then
-  //begin
-  //  Sel:=  TempGrid.Selection;
-  //  Col := TempGrid.Col;
-
-  //  for i := TempGrid.ColCount - 1 downto 0 do
-  //    if TempGrid.ColWidths[i] > 0 then
-  //    begin
-  //      TempGrid.Col := i;
-  //      Break;
-  //    end;
-  //  TempGrid.ClearSelections;
-  //  TempGrid.Selection := Rect(Sel.Left, Sel.Top, TempGrid.Col, Sel.Bottom);
-  //  TempGrid.Update;
-  //  Key := 0;
-  //  Exit;
-  //end
-  //else
-
-  // Default HOME -> move to first visible column
-  if (Key = VK_HOME) and not (ssCtrl in Shift) and not (ssShift in Shift) then
-  begin
-    for i := 1 to TempGrid.ColCount - 1 do
-      if TempGrid.ColWidths[i] > 0 then
-      begin
-        TempGrid.Col := i;
-        Break;
-      end;
-    Key := 0;
-    Exit;
-  end
-  else
-  // Default END -> move to last visible column
-  if (Key = VK_END) and not (ssCtrl in Shift) and not (ssShift in Shift) then
-  begin
-    for i := TempGrid.ColCount - 1 downto 0 do
-      if TempGrid.ColWidths[i] > 0 then
-      begin
-        TempGrid.Col := i;
-        Break;
-      end;
-    Key := 0;
-    Exit;
-  end;
-end;
-
-procedure TformNotetask.GridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-begin
-  FIsSelecting := False;
-
-  if (Button = mbMiddle) and (ssCtrl in Shift) then // Middle button + Ctrl
-    aZoomDefault.Execute;
-end;
-
-procedure TformNotetask.GridMouseLeave(Sender: TObject);
-begin
-  FIsSelecting := False;
-end;
-
-procedure TformNotetask.GridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-var
-  Cell: TPoint;
-begin
-  if (Button = mbRight) and (not IsEditing) then
-  begin
-    if (Grid.Selection.Height = 0) then
-    begin
-      // Get the row index at the mouse coordinates
-      Cell := Grid.MouseToCell(TPoint.Create(X, Y));
-
-      // Check if the row index is valid
-      if (Cell.Y >= 0) and (Cell.Y < Grid.RowCount) then
-        Grid.Row := Cell.Y;
-      if (Cell.X > 0) and (Cell.X < 5) then
-        Grid.Col := Cell.X;
-
-      if Visible and Grid.Visible and Grid.CanFocus then
-        Grid.SetFocus;
-    end;
-    Popup.PopUp(Mouse.CursorPos.X, Mouse.CursorPos.Y);
-  end;
-
-  if (Button = mbLeft) and (ssCtrl in Shift) and (Grid.Col in [COL_TASK, COL_NOTE]) then
-    TryOpenAsUrl(Trim(Grid.Cells[Grid.Col, Grid.Row]));
-
-  if (not FRepaint) then
-  begin
-    FRepaint := True;
-    GridInvalidate;
-  end;
-end;
-
-procedure TformNotetask.GridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
-begin
-  if IsEditing then
-    EditComplete;
-
-  if ssCtrl in Shift then
-  begin
-    if WheelDelta > 0 then
-      aZoomIn.Execute
-    else
-      aZoomOut.Execute;
-    Handled := True;
-  end;
-end;
-
-procedure TformNotetask.GridResize(Sender: TObject);
-var
-  Rect: TRect;
+procedure TformNotetask.GridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
 begin
   {$IFDEF UNIX}
-  GridAdjustScrollBars;
+  FKeyPressed := UTF8Key;
+  {$ELSE}
+  ; // NOP
   {$ENDIF}
+end;
 
-  // Get the cell dimensions
-  Rect := Grid.CellRect(Grid.Col, Grid.Row);
+procedure TformNotetask.MemoEnter(Sender: TObject);
+begin
+  FMemoStartEdit := True;
+  FMemoOldText := Grid.Cells[Grid.Col, Grid.Row];
 
-  // Update the size and position of the Memo
-  if Assigned(Grid.Editor) and (Grid.Editor is TPanel) then
-    TPanel(Grid.Editor).SetBounds(Rect.Left + 5, Rect.Top + 1, Rect.Right - Rect.Left - 10, Rect.Bottom - Rect.Top - 3);
-
-  // Align panelFunc to bottom-right of Grid
-  if FBiDiRightToLeft then
+  // If amount column selected then clean when edit
+  if (FMemoNeedSelectAll) and (Grid.Col in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
   begin
-    if Grid.GetActualScrollBarVisibility(ssVertical) then
-      panelFunc.Left := Grid.Left + GetSystemMetrics(SM_CXVSCROLL) + 5
+    Memo.SelStart := 0;
+    Memo.SelLength := Length(Memo.Text);
+  end;
+  FMemoNeedSelectAll := True;
+
+  if (FKeyPressed <> string.Empty) and (FKeyPressed <> #13) then
+  begin
+    if (Grid.Col = COL_AMOUNT) then
+      Memo.SelText := TMathParser.CleanNumericExpression(FKeyPressed)
     else
-      panelFunc.Left := Grid.Left + 5;
+      Memo.SelText := FKeyPressed;
+    FKeyPressed := string.Empty;
+  end;
+
+  if (Grid.IsCellSelected[Grid.Col, Grid.Row]) and ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) then
+  begin
+    Memo.Color := clHighlight;
+    Memo.Font.Color := clWhite;
   end
   else
   begin
-    if Grid.GetActualScrollBarVisibility(ssVertical) then
-      panelFunc.Left := Grid.Left + Grid.Width - panelFunc.Width - GetSystemMetrics(SM_CXVSCROLL) - 5
-    else
-      panelFunc.Left := Grid.Left + Grid.Width - panelFunc.Width - 5;
+    Memo.Color := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);
   end;
-  if Grid.GetActualScrollBarVisibility(ssHorizontal) then
-    panelFunc.Top := Grid.Top + Grid.Height - panelFunc.Height - GetSystemMetrics(SM_CYHSCROLL) - 5
-  else
-    panelFunc.Top := Grid.Top + Grid.Height - panelFunc.Height - 5;
 end;
 
-procedure TformNotetask.GridTopLeftChanged(Sender: TObject);
+procedure TformNotetask.MemoExit(Sender: TObject);
 begin
   EditComplete;
-
-  if Grid.TopRow = 1 then
-    Application.QueueAsyncCall(@DelayedInvalidate, 0);
-
-  if Grid.TopRow + Grid.VisibleRowCount >= Grid.RowCount then
-    Application.QueueAsyncCall(@DelayedInvalidate, 0);
 end;
 
-procedure TformNotetask.GridUserCheckboxBitmap(Sender: TObject; const aCol, aRow: integer;
-  const CheckedState: TCheckboxState; var ABitmap: TBitmap);
+procedure TformNotetask.MemoChange(Sender: TObject);
 begin
-  // Check if we're in the correct column
-  if aCol = COL_DONE then
+  Grid.Cells[Grid.Col, Grid.Row] := TMemo(Sender).Text;
+  Tasks.SetTask(Grid, Memo, Grid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
+  FMemoStartEdit := False;
+  Changed := True;
+  CalcRowHeight(True, Grid.Row);
+  EditControlSetBounds(PanelMemo, Grid.Col, Grid.Row);
+  if (Grid.Col = COL_NOTE) then
+    SetNote;
+  if (Grid.Col = COL_AMOUNT) then
+    SetInfo;
+end;
+
+procedure TformNotetask.MemoKeyPress(Sender: TObject; var Key: char);
+begin
+  // Event KeyPress for Amount column only
+  // Replace comma with dot for decimal input
+  if Key in ['.', ','] then
+    Key := DefaultFormatSettings.DecimalSeparator;
+
+  // Allow digits and one decimal point
+  if not (Key in ['0'..'9', DefaultFormatSettings.DecimalSeparator, '-', '+', '/', '*', '%', '^', '(', ')', ' ', #8, #13]) then
+    Key := #0; // Block other keys
+end;
+
+procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  nextCol: integer;
+begin
+  // Test for letter, number, space or back key for backup
+  if (Shift * [ssCtrl, ssAlt] = []) and ((not THotKeyData.Create(Key).IsSystemKey) or (Key = VK_SPACE) or (Key = VK_BACK)) then
   begin
-    // Assign the appropriate bitmap based on the CheckedState
-    if CheckedState = cbChecked then
-      ABitmap := ResourceBitmapCheck // Use check bitmap
-    else
-      ABitmap := ResourceBitmapUncheck; // Use uncheck bitmap
+    if (not FMemoFirstKey) then
+    begin
+      FMemoFirstKey := True;
+      MemoBackup;
+    end;
   end
   else
-  if aCol = COL_STAR then
+    FMemoFirstKey := False;
+
+  if (Key = VK_TAB) then
   begin
-    // Assign the appropriate bitmap based on the CheckedState
-    if CheckedState = cbChecked then
-      ABitmap := ResourceBitmapStarGold // Use check bitmap
-    else
-      ABitmap := ResourceBitmapStarGray; // Use uncheck bitmap
+    Key := 0;
+    EditComplete(True);
+
+    with Grid do
+    begin
+      nextCol := Col + 1;
+      while (nextCol < ColCount) and (not Columns.Items[nextCol - 1].Visible) do
+        Inc(nextCol);
+
+      if nextCol < ColCount - 1 then
+        Col := nextCol
+      else
+      if Row < RowCount - 1 then
+      begin
+        Row := Row + 1;
+        nextCol := COL_TASK;
+        while (nextCol < ColCount) and (not Columns[nextCol - 1].Visible) do
+          Inc(nextCol);
+        if nextCol < ColCount then
+          Col := nextCol;
+      end;
+    end;
+    EditCell;
+  end
+  else
+  if (Key = VK_BACK) then
+  begin
+    if Memo.SelLength > 0 then
+      MemoBackup;
   end;
 end;
 
-procedure TformNotetask.GridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+procedure TformNotetask.DatePickerEnter(Sender: TObject);
 begin
-  if (not IsColumn) then
+  FDatePickerOldDate := Tasks.GetTask(Grid.Row).Date;
+  FDatePickerDateSet := False;
+  if (FBackup) then Tasks.CreateBackup;
+  if (DatePicker.DateTime = 0) then DatePicker.DateTime := Now;
+  if (Grid.IsCellSelected[Grid.Col, Grid.Row]) and ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) then
   begin
-    Tasks.MoveTask(sIndex, tIndex);
-    FillGrid;
-    Changed := True;
+    DatePicker.Color := clHighlight;
+    DatePicker.Font.Color := TDarkUtils.ThemeColor(clWhite, clBlack);
+  end
+  else
+  begin
+    DatePicker.Color := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);
+    DatePicker.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
   end;
 end;
 
-procedure TformNotetask.GridSelection(Sender: TObject; aCol, aRow: integer);
+procedure TformNotetask.DatePickerChange(Sender: TObject);
+begin
+  FDatePickerDateSet := True;
+  Grid.Cells[Grid.Col, Grid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime, FShowTime);
+  Tasks.SetTask(Grid, Memo, Grid.Row, False, FShowTime);
+  Changed := True;
+  EditControlSetBounds(DatePicker, Grid.Col, Grid.Row, 2, -2, -2, 0);
+  if (FShowDuration) then FillGrid;
+  SetInfo;
+end;
+
+procedure TformNotetask.DatePickerKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
-  Modified: boolean = False;
+  nextCol: integer;
 begin
-  if (Grid.Selection.Height > 0) or (FLastSelectionHeight > 0) then
-    SetInfo;
-
-  FLastText := string.Empty;
-  AdjustMultiButton;
-
-  if (aRow <> FLastRow) or (Grid.Selection.Top <> FLastSelection.Top) or (Grid.Selection.Bottom <> FLastSelection.Bottom) then
+  if (Key = VK_TAB) then
   begin
-    FLastRow := aRow;
-    Modified := True;
-    SetNote;
-    SetTags;
+    Key := 0;
+    EditComplete(FDatePickerDateSet, not FDatePickerDateSet);
+
+    with Grid do
+    begin
+      if Row < RowCount - 1 then
+      begin
+        Row := Row + 1;
+        nextCol := COL_TASK;
+        while (nextCol < ColCount) and (not Columns[nextCol - 1].Visible) do
+          Inc(nextCol);
+        if nextCol < ColCount then
+          Col := nextCol;
+      end;
+    end;
+    EditCell;
   end;
-
-  if (aCol <> FLastCol) or (Grid.Selection.Left <> FLastSelection.Left) or (Grid.Selection.Right <> FLastSelection.Right) then
-  begin
-    FLastCol := aCol;
-    Modified := True;
-  end;
-  if Modified then
-    ChangeLastText(Grid.Cells[aCol, aRow], aCol, aRow);
-
-  // Save row to mem
-  if Length(FLastRowMem) > FindGroupRealIndex(TabsGroup.TabIndex) then
-    FLastRowMem[FindGroupRealIndex(TabsGroup.TabIndex)] := aRow;
-
-  FLastSelectionHeight := Grid.Selection.Height;
-  FLastSelection := Grid.Selection;
 end;
 
 {%EndRegion}
 
 {%Region -fold All Events}
+
+procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
+var
+  task: TTask;
+  ACanvas: TCanvas;
+begin
+  if not Tasks.HasTask(aRow) then exit;
+
+  ACanvas := TGridPrinter(Sender).Canvas;
+  task := Tasks.GetTask(aRow);
+
+  // Default text color
+  ACanvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
+  ACanvas.Font.Style := [];
+
+  // Color and style
+  if (ShowColumnDate) and (not task.Done) and (task.Date > 0) and (task.Date < Now) then
+    ACanvas.Font.Color := clRed
+  else if (not task.Done) and task.Archive then
+    ACanvas.Font.Color := clMaroon;
+
+  if task.Star then
+    ACanvas.Font.Style := ACanvas.Font.Style + [fsBold];
+
+  if (aCol = COL_TASK) and task.Archive then
+    ACanvas.Font.Style := ACanvas.Font.Style + [fsStrikeOut];
+
+  if (aCol = COL_NOTE) and task.NoteItalic then
+    ACanvas.Font.Style := ACanvas.Font.Style + [fsItalic];
+
+  if (aCol = COL_DATE) and (task.Date > Now) then
+    ACanvas.Font.Color := TDarkUtils.ThemeColor(clPlanned_Light, clPlanned_Dark);
+
+  // Text styles
+  with ACanvas.TextStyle do
+  begin
+    SingleLine := not FWordWrap;
+    WordBreak := FWordWrap;
+    RightToLeft := FBiDiRightToLeft;
+  end;
+end;
+
+procedure TformNotetask.PrinterBeforePrintCell(Sender: TObject; AGrid: TCustomGrid; ACanvas: TCanvas; ACol, ARow: integer; ARect: TRect);
+var
+  task: TTask;
+  BitTags: TBitmap;
+  mRoundCorners, mTagBorderWidth: integer;
+begin
+  if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
+  begin
+    if (aCol = COL_TASK) then
+    begin
+      Task := Tasks.GetTask(ARow);
+      if Task.Tags.Count > 0 then
+      begin
+        mRoundCorners := TagEdit.RoundCorners;
+        mTagBorderWidth := TagEdit.TagBorderWidth;
+        TagEdit.RoundCorners := TGridPrinter(Sender).ScaleY(TagEdit.RoundCorners);
+        TagEdit.TagBorderWidth := TGridPrinter(Sender).ScaleY(TagEdit.TagBorderWidth);
+        BitTags := TagEdit.GetTagsBitmap(Task.Tags, Round(TGridPrinter(Sender).ScaleY(Max(ACanvas.Font.Size, 10))),
+          Min(ARect.Width, TGridPrinter(Sender).ScaleY(500)), ARect.Height, 2, TagsDimnessPrint);
+        try
+          BitTags.TransparentColor := TDarkUtils.ThemeColor(clWhite, clBlack);
+          BitTags.Transparent := True;
+          if BitTags.Width < aRect.Width - 50 then
+          begin
+            if Grid.BiDiMode = bdLeftToRight then
+              ACanvas.Draw(aRect.Right - BitTags.Width - 5, aRect.Top + TagEdit.TagBorderWidth, BitTags)
+            else
+              ACanvas.Draw(aRect.Left + 5, aRect.Top + TagEdit.TagBorderWidth, BitTags);
+          end;
+        finally
+          TagEdit.RoundCorners := mRoundCorners;
+          TagEdit.TagBorderWidth := mTagBorderWidth;
+          BitTags.Free;
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TformNotetask.PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
+begin
+  if AGrid is TStringGrid then
+    AText := TStringGrid(AGrid).Cells[ACol, ARow];
+end;
 
 procedure TformNotetask.btnMultiClick(Sender: TObject);
 begin
@@ -6353,92 +6645,6 @@ begin
   if (force) then TabsGroupChange(TabsGroup);
 end;
 
-procedure TformNotetask.PrinterPrepareCanvas(Sender: TObject; aCol, aRow: integer; aState: TGridDrawState);
-var
-  task: TTask;
-  ACanvas: TCanvas;
-begin
-  if not Tasks.HasTask(aRow) then exit;
-
-  ACanvas := TGridPrinter(Sender).Canvas;
-  task := Tasks.GetTask(aRow);
-
-  // Default text color
-  ACanvas.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
-  ACanvas.Font.Style := [];
-
-  // Color and style
-  if (ShowColumnDate) and (not task.Done) and (task.Date > 0) and (task.Date < Now) then
-    ACanvas.Font.Color := clRed
-  else if (not task.Done) and task.Archive then
-    ACanvas.Font.Color := clMaroon;
-
-  if task.Star then
-    ACanvas.Font.Style := ACanvas.Font.Style + [fsBold];
-
-  if (aCol = COL_TASK) and task.Archive then
-    ACanvas.Font.Style := ACanvas.Font.Style + [fsStrikeOut];
-
-  if (aCol = COL_NOTE) and task.NoteItalic then
-    ACanvas.Font.Style := ACanvas.Font.Style + [fsItalic];
-
-  if (aCol = COL_DATE) and (task.Date > Now) then
-    ACanvas.Font.Color := TDarkUtils.ThemeColor(clPlanned_Light, clPlanned_Dark);
-
-  // Text styles
-  with ACanvas.TextStyle do
-  begin
-    SingleLine := not FWordWrap;
-    WordBreak := FWordWrap;
-    RightToLeft := FBiDiRightToLeft;
-  end;
-end;
-
-procedure TformNotetask.PrinterBeforePrintCell(Sender: TObject; AGrid: TCustomGrid; ACanvas: TCanvas; ACol, ARow: integer; ARect: TRect);
-var
-  task: TTask;
-  BitTags: TBitmap;
-  mRoundCorners, mTagBorderWidth: integer;
-begin
-  if (Assigned(Tasks)) and (Tasks.HasTask(ARow)) then
-  begin
-    if (aCol = COL_TASK) then
-    begin
-      Task := Tasks.GetTask(ARow);
-      if Task.Tags.Count > 0 then
-      begin
-        mRoundCorners := TagEdit.RoundCorners;
-        mTagBorderWidth := TagEdit.TagBorderWidth;
-        TagEdit.RoundCorners := TGridPrinter(Sender).ScaleY(TagEdit.RoundCorners);
-        TagEdit.TagBorderWidth := TGridPrinter(Sender).ScaleY(TagEdit.TagBorderWidth);
-        BitTags := TagEdit.GetTagsBitmap(Task.Tags, Round(TGridPrinter(Sender).ScaleY(Max(ACanvas.Font.Size, 10))),
-          Min(ARect.Width, TGridPrinter(Sender).ScaleY(500)), ARect.Height, 2, TagsDimnessPrint);
-        try
-          BitTags.TransparentColor := TDarkUtils.ThemeColor(clWhite, clBlack);
-          BitTags.Transparent := True;
-          if BitTags.Width < aRect.Width - 50 then
-          begin
-            if Grid.BiDiMode = bdLeftToRight then
-              ACanvas.Draw(aRect.Right - BitTags.Width - 5, aRect.Top + TagEdit.TagBorderWidth, BitTags)
-            else
-              ACanvas.Draw(aRect.Left + 5, aRect.Top + TagEdit.TagBorderWidth, BitTags);
-          end;
-        finally
-          TagEdit.RoundCorners := mRoundCorners;
-          TagEdit.TagBorderWidth := mTagBorderWidth;
-          BitTags.Free;
-        end;
-      end;
-    end;
-  end;
-end;
-
-procedure TformNotetask.PrinterGetCellText(Sender: TObject; AGrid: TCustomGrid; ACol, ARow: integer; var AText: string);
-begin
-  if AGrid is TStringGrid then
-    AText := TStringGrid(AGrid).Cells[ACol, ARow];
-end;
-
 function TformNotetask.FindGroupTabIndex(Value: integer): integer;
 var
   i: integer;
@@ -6657,199 +6863,6 @@ begin
     Memo.SetFocus;
     if (Memo.SelLength = 0) then
       Memo.SelStart := Length(Memo.Text);
-  end;
-end;
-
-procedure TformNotetask.PanelMemoEnter(Sender: TObject);
-begin
-  Application.QueueAsyncCall(@DelayedSetMemoFocus, 0);
-end;
-
-procedure TformNotetask.PanelMemoUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
-begin
-  if UTF8Key = #8 then  // backspace
-    Memo.SelText := string.Empty
-  else
-  if (Grid.Col <> COL_AMOUNT) then
-    Memo.SelText := UTF8Key
-  else
-    Memo.SelText := TMathParser.CleanNumericExpression(UTF8Key);
-end;
-
-procedure TformNotetask.GridUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
-begin
-  {$IFDEF UNIX}
-  FKeyPressed := UTF8Key;
-  {$ELSE}
-  ; // NOP
-  {$ENDIF}
-end;
-
-procedure TformNotetask.MemoEnter(Sender: TObject);
-begin
-  FMemoStartEdit := True;
-  FMemoOldText := Grid.Cells[Grid.Col, Grid.Row];
-
-  // If amount column selected then clean when edit
-  if (FMemoNeedSelectAll) and (Grid.Col in [COL_TASK, COL_NOTE, COL_AMOUNT]) then
-  begin
-    Memo.SelStart := 0;
-    Memo.SelLength := Length(Memo.Text);
-  end;
-  FMemoNeedSelectAll := True;
-
-  if (FKeyPressed <> string.Empty) and (FKeyPressed <> #13) then
-  begin
-    if (Grid.Col = COL_AMOUNT) then
-      Memo.SelText := TMathParser.CleanNumericExpression(FKeyPressed)
-    else
-      Memo.SelText := FKeyPressed;
-    FKeyPressed := string.Empty;
-  end;
-
-  if (Grid.IsCellSelected[Grid.Col, Grid.Row]) and ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) then
-  begin
-    Memo.Color := clHighlight;
-    Memo.Font.Color := clWhite;
-  end
-  else
-  begin
-    Memo.Color := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);
-  end;
-end;
-
-procedure TformNotetask.MemoExit(Sender: TObject);
-begin
-  EditComplete;
-end;
-
-procedure TformNotetask.MemoChange(Sender: TObject);
-begin
-  Grid.Cells[Grid.Col, Grid.Row] := TMemo(Sender).Text;
-  Tasks.SetTask(Grid, Memo, Grid.Row, FMemoStartEdit and FBackup, FShowTime); // Backup only on begin edit
-  FMemoStartEdit := False;
-  Changed := True;
-  CalcRowHeight(True, Grid.Row);
-  EditControlSetBounds(PanelMemo, Grid.Col, Grid.Row);
-  if (Grid.Col = COL_NOTE) then
-    SetNote;
-  if (Grid.Col = COL_AMOUNT) then
-    SetInfo;
-end;
-
-procedure TformNotetask.MemoKeyPress(Sender: TObject; var Key: char);
-begin
-  // Event KeyPress for Amount column only
-  // Replace comma with dot for decimal input
-  if Key in ['.', ','] then
-    Key := DefaultFormatSettings.DecimalSeparator;
-
-  // Allow digits and one decimal point
-  if not (Key in ['0'..'9', DefaultFormatSettings.DecimalSeparator, '-', '+', '/', '*', '%', '^', '(', ')', ' ', #8, #13]) then
-    Key := #0; // Block other keys
-end;
-
-procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-var
-  nextCol: integer;
-begin
-  // Test for letter, number, space or back key for backup
-  if (Shift * [ssCtrl, ssAlt] = []) and ((not THotKeyData.Create(Key).IsSystemKey) or (Key = VK_SPACE) or (Key = VK_BACK)) then
-  begin
-    if (not FMemoFirstKey) then
-    begin
-      FMemoFirstKey := True;
-      MemoBackup;
-    end;
-  end
-  else
-    FMemoFirstKey := False;
-
-  if (Key = VK_TAB) then
-  begin
-    Key := 0;
-    EditComplete(True);
-
-    with Grid do
-    begin
-      nextCol := Col + 1;
-      while (nextCol < ColCount) and (not Columns.Items[nextCol - 1].Visible) do
-        Inc(nextCol);
-
-      if nextCol < ColCount - 1 then
-        Col := nextCol
-      else
-      if Row < RowCount - 1 then
-      begin
-        Row := Row + 1;
-        nextCol := COL_TASK;
-        while (nextCol < ColCount) and (not Columns[nextCol - 1].Visible) do
-          Inc(nextCol);
-        if nextCol < ColCount then
-          Col := nextCol;
-      end;
-    end;
-    EditCell;
-  end
-  else
-  if (Key = VK_BACK) then
-  begin
-    if Memo.SelLength > 0 then
-      MemoBackup;
-  end;
-end;
-
-procedure TformNotetask.DatePickerEnter(Sender: TObject);
-begin
-  FDatePickerOldDate := Tasks.GetTask(Grid.Row).Date;
-  FDatePickerDateSet := False;
-  if (FBackup) then Tasks.CreateBackup;
-  if (DatePicker.DateTime = 0) then DatePicker.DateTime := Now;
-  if (Grid.IsCellSelected[Grid.Col, Grid.Row]) and ((Grid.Selection.Height > 0) or (Grid.Selection.Width > 0)) then
-  begin
-    DatePicker.Color := clHighlight;
-    DatePicker.Font.Color := TDarkUtils.ThemeColor(clWhite, clBlack);
-  end
-  else
-  begin
-    DatePicker.Color := TDarkUtils.ThemeColor(clRowFocused_Light, clRowFocused_Dark);
-    DatePicker.Font.Color := TDarkUtils.ThemeColor(clBlack, clWhite);
-  end;
-end;
-
-procedure TformNotetask.DatePickerChange(Sender: TObject);
-begin
-  FDatePickerDateSet := True;
-  Grid.Cells[Grid.Col, Grid.Row] := DateTimeToString(TDateTimePicker(Sender).DateTime, FShowTime);
-  Tasks.SetTask(Grid, Memo, Grid.Row, False, FShowTime);
-  Changed := True;
-  EditControlSetBounds(DatePicker, Grid.Col, Grid.Row, 2, -2, -2, 0);
-  if (FShowDuration) then FillGrid;
-  SetInfo;
-end;
-
-procedure TformNotetask.DatePickerKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
-var
-  nextCol: integer;
-begin
-  if (Key = VK_TAB) then
-  begin
-    Key := 0;
-    EditComplete(FDatePickerDateSet, not FDatePickerDateSet);
-
-    with Grid do
-    begin
-      if Row < RowCount - 1 then
-      begin
-        Row := Row + 1;
-        nextCol := COL_TASK;
-        while (nextCol < ColCount) and (not Columns[nextCol - 1].Visible) do
-          Inc(nextCol);
-        if nextCol < ColCount then
-          Col := nextCol;
-      end;
-    end;
-    EditCell;
   end;
 end;
 

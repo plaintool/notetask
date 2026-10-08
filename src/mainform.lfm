@@ -83,6 +83,7 @@ object formNotetask: TformNotetask
     OnKeyDown = GridKeyDown
     OnMouseDown = GridMouseDown
     OnMouseLeave = GridMouseLeave
+    OnMouseMove = GridMouseMove
     OnMouseUp = GridMouseUp
     OnMouseWheel = GridMouseWheel
     OnResize = GridResize
@@ -305,6 +306,7 @@ object formNotetask: TformNotetask
       AutoSizeHeight = True
       RoundCorners = 20
       Enabled = True
+      Font.Height = -12
       ParentShowHint = False
       PopupMenu = PopupTags
       ShowHint = True
@@ -315,8 +317,10 @@ object formNotetask: TformNotetask
       EditMinWidth = 150
       RemoveConfirmTitle = 'Remove tag(s)'
       RemoveConfirmMessage = 'Are you sure you want to remove tag(s)'
+      ParentFont = False
       TagColors = <>
       SelectionRectColor = clSilver
+      SuggestedButtonCaption = '...'
       Items.Strings = (
         'IDE:Lazarus'
         'Free Pascal'
