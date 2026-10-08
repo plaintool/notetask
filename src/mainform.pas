@@ -1686,6 +1686,7 @@ begin
   if not IsEditing then
   begin
     Sel := Tasks.PasteFromClipboard(Grid, SortOrder);
+    FLastText := string.Empty;
     FillGrid;
     CalcRowHeight(True);
     if (Assigned(DatePicker)) then
