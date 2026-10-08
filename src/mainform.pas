@@ -6791,11 +6791,20 @@ begin
   begin
     s := Clipboard.AsText;
 
-    s := StringReplace(s, #13#10, #10, [rfReplaceAll]); // Windows CRLF -> LF
-    s := StringReplace(s, #13, #10, [rfReplaceAll]);   // Macintosh CR -> LF
+    // Amount column accepts a single numeric value without line breaks
+    if (AMemo = Memo) and (Grid.Col = COL_AMOUNT) then
+    begin
+      s := StringReplace(s, #13, string.Empty, [rfReplaceAll]);
+      s := StringReplace(s, #10, string.Empty, [rfReplaceAll]);
+    end
+    else
+    begin
+      s := StringReplace(s, #13#10, #10, [rfReplaceAll]); // Windows CRLF -> LF
+      s := StringReplace(s, #13, #10, [rfReplaceAll]);   // Macintosh CR -> LF
 
-    s := StringReplace(s, #10, FLineEnding.Value, [rfReplaceAll]);
-    s := StringReplace(s, #9, IndentStr, [rfReplaceAll]);
+      s := StringReplace(s, #10, FLineEnding.Value, [rfReplaceAll]);
+      s := StringReplace(s, #9, IndentStr, [rfReplaceAll]);
+    end;
 
     AMemo.SelText := s;
   end;
