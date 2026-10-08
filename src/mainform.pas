@@ -5636,6 +5636,7 @@ begin
   if (LastTab = FindGroupRealIndex(TabsGroup.TabIndex)) then
     Grid.Row := Tasks.ReverseMap(LastTask);
   ResetRowHeight;
+  CalcRowHeight(True);
   SetInfo;
   SetNote;
   SetTags;
