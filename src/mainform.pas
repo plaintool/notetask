@@ -1051,22 +1051,21 @@ end;
 procedure TformNotetask.FormShow(Sender: TObject);
 var
   FilePath: string;
-  FileOpened: boolean;
   TagsHeight: integer;
   Th: TCheckUpdateThread;
 begin
   Visible := False;
 
-  // Check if a command line argument is passed
-  FileOpened := False;
+  // Read command line parameter but defer actual file open until the form is shown
+  FilePath := string.Empty;
   if ParamCount > 0 then
   begin
     FilePath := ParamStr(1); // Get the file path
-    if (not FilePath.StartsWith('--')) then
-      FileOpened := OpenFile(FilePath, False, True); // Function to load a task from the file
+    if (FilePath.StartsWith('--')) then
+      FilePath := string.Empty;
   end;
 
-  if not FileOpened then NewFile(False);
+  NewFile(False);
 
   // Before paint form
   SetCaption;
@@ -1104,8 +1103,26 @@ begin
 
   if (ReadOnly) then ShowMessage(rfilereadonly);
 
+  // Open the command line file while the empty form is already visible
+  if (FilePath <> string.Empty) and (not Application.Terminated) then
+  begin
+    Screen.Cursor := crHourGlass;
+    Grid.BeginUpdate;
+    try
+      if FileExists(FilePath) and IsCanClose then
+        OpenFile(FilePath, False, True);
+    finally
+      Grid.EndUpdate;
+      Screen.Cursor := crDefault;
+    end;
+
+    // Restore focus to the grid after settings were applied
+    if Grid.CanFocus then
+      Grid.SetFocus;
+  end;
+
   // Check new version if needed
-  if AutoCheckUpdates then
+  if AutoCheckUpdates and (not Application.Terminated) then
   begin
     Th := TCheckUpdateThread.Create(REPO, APP_NAME, False);
     Th.FreeOnTerminate := True;
@@ -5992,6 +6009,7 @@ begin
     ShowMessage(rfilenotfound);
     exit;
   end;
+
   // Save settings for current file
   if saveSettings and FGridSettingsLoaded then
     SaveGridSettings(Self, Grid, ExtractFileName(FFileName));
