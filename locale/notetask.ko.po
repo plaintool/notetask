@@ -159,6 +159,10 @@ msgstr "비밀번호:"
 msgid "Read-only"
 msgstr "읽기 전용"
 
+#: mainform.rrecoveryfound
+msgid "The previous session ended unexpectedly. Unsaved recovery data was found. Do you want to restore it?"
+msgstr "이전 세션이 예기치 않게 종료되었습니다. 저장되지 않은 복구 데이터가 발견되었습니다. 복원하시겠습니까?"
+
 #: mainform.rremovetag
 msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"

@@ -159,6 +159,10 @@ msgstr "Contraseña:"
 msgid "Read-only"
 msgstr "Solo lectura"
 
+#: mainform.rrecoveryfound
+msgid "The previous session ended unexpectedly. Unsaved recovery data was found. Do you want to restore it?"
+msgstr "La sesión anterior finalizó inesperadamente. Se encontraron datos de recuperación sin guardar. ¿Deseas restaurarlos?"
+
 #: mainform.rremovetag
 msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"

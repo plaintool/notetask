@@ -159,6 +159,10 @@ msgstr "Kata Sandi:"
 msgid "Read-only"
 msgstr "Hanya-baca"
 
+#: mainform.rrecoveryfound
+msgid "The previous session ended unexpectedly. Unsaved recovery data was found. Do you want to restore it?"
+msgstr "Sesi sebelumnya berakhir secara tidak terduga. Data pemulihan yang belum disimpan ditemukan. Apakah Anda ingin memulihkannya?"
+
 #: mainform.rremovetag
 msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"

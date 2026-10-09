@@ -159,6 +159,10 @@ msgstr "Κωδικός Πρόσβασης:"
 msgid "Read-only"
 msgstr "Μόνο ανάγνωση"
 
+#: mainform.rrecoveryfound
+msgid "The previous session ended unexpectedly. Unsaved recovery data was found. Do you want to restore it?"
+msgstr "Η προηγούμενη συνεδρία τερματίστηκε απροσδόκητα. Βρέθηκαν μη αποθηκευμένα δεδομένα ανάκτησης. Θέλετε να τα επαναφέρετε;"
+
 #: mainform.rremovetag
 msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"

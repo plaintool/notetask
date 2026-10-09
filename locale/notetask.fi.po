@@ -159,6 +159,10 @@ msgstr "Salasana:"
 msgid "Read-only"
 msgstr "Vain luku"
 
+#: mainform.rrecoveryfound
+msgid "The previous session ended unexpectedly. Unsaved recovery data was found. Do you want to restore it?"
+msgstr "Edellinen istunto päättyi odottamatta. Tallentamattomia palautustietoja löytyi. Haluatko palauttaa ne?"
+
 #: mainform.rremovetag
 msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"

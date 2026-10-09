@@ -159,6 +159,10 @@ msgstr "Lösenord:"
 msgid "Read-only"
 msgstr "Skrivskyddad"
 
+#: mainform.rrecoveryfound
+msgid "The previous session ended unexpectedly. Unsaved recovery data was found. Do you want to restore it?"
+msgstr "Den föregående sessionen avslutades oväntat. Osparade återställningsdata hittades. Vill du återställa dem?"
+
 #: mainform.rremovetag
 msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"

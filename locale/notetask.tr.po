@@ -159,6 +159,10 @@ msgstr "Parola:"
 msgid "Read-only"
 msgstr "Salt okunur"
 
+#: mainform.rrecoveryfound
+msgid "The previous session ended unexpectedly. Unsaved recovery data was found. Do you want to restore it?"
+msgstr "Önceki oturum beklenmedik şekilde sona erdi. Kaydedilmemiş kurtarma verileri bulundu. Geri yüklemek istiyor musunuz?"
+
 #: mainform.rremovetag
 msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"

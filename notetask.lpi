@@ -203,6 +203,7 @@
       <Unit>
         <Filename Value="src\consts.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Consts"/>
       </Unit>
       <Unit>
         <Filename Value="src\task.pas"/>

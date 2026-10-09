@@ -159,6 +159,10 @@ msgstr "Parolă:"
 msgid "Read-only"
 msgstr "Doar citire"
 
+#: mainform.rrecoveryfound
+msgid "The previous session ended unexpectedly. Unsaved recovery data was found. Do you want to restore it?"
+msgstr "Sesiunea anterioară s-a încheiat în mod neașteptat. Au fost găsite date de recuperare nesalvate. Doriți să le restaurați?"
+
 #: mainform.rremovetag
 msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"

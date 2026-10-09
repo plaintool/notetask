@@ -159,6 +159,10 @@ msgstr "Heslo:"
 msgid "Read-only"
 msgstr "Pouze pro čtení"
 
+#: mainform.rrecoveryfound
+msgid "The previous session ended unexpectedly. Unsaved recovery data was found. Do you want to restore it?"
+msgstr "Předchozí relace skončila neočekávaně. Byla nalezena neuložená data pro obnovení. Chcete je obnovit?"
+
 #: mainform.rremovetag
 msgctxt "mainform.rremovetag"
 msgid "Are you sure you want to remove tag(s)"

@@ -48,6 +48,9 @@ const
   mailto = 'mailto:';
   http = 'http://';
 
+  // Debounce delay before writing a recovery snapshot
+  RecoverySaveDelayMs = 5000;
+
   // Light theme colors
   clRowHighlight_Light = TColor($FFF0DC);       // RGB(220,240,255)
   clRowFocused_Light = TColor($FFDCC8);         // RGB(200,220,255)

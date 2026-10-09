@@ -21,7 +21,9 @@ uses
   fpjson,
   mainform,
   TagEdit,
-  localize;
+  localize,
+  osutils,
+  Consts;
 
 type
   TGridSettings = record
@@ -39,36 +41,6 @@ function LoadGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string):
 
 implementation
 
-function GetSettingsDirectory(fileName: string = ''): string;
-  {$IFDEF Windows}
-var
-  baseDir: string;
-  exeDir: string;
-  {$ENDIF}
-begin
-  {$IFDEF Windows}
-  // Get directory where exe is located
-  exeDir := ExtractFilePath(ParamStr(0));
-
-  // Portable mode: settings file exists near exe
-  if FileExists(exeDir + 'form_settings.json') then
-  begin
-    Result := IncludeTrailingPathDelimiter(exeDir) + fileName;
-    Exit;
-  end;
-
-  // Default mode: use LOCALAPPDATA or APPDATA
-  baseDir := GetEnvironmentVariable('LOCALAPPDATA');
-  if baseDir = '' then
-    baseDir := GetEnvironmentVariable('APPDATA');
-
-  Result := IncludeTrailingPathDelimiter(baseDir) + 'notetask\' + fileName;
-  {$ELSE}
-  // Unix-like systems: use ~/.config/notetask
-  Result := IncludeTrailingPathDelimiter(GetUserDir) + '.config/notetask/' + fileName;
-  {$ENDIF}
-end;
-
 procedure SaveFormSettings(Form: TformNotetask; TagEdit: TTagEdit);
 var
   FileName: string;
@@ -79,8 +51,8 @@ var
   DPI: integer;
 begin
   DPI := Screen.PixelsPerInch;
-  FileName := GetSettingsDirectory('form_settings.json'); // Get settings file name
-  ForceDirectories(GetSettingsDirectory); // Ensure the directory exists
+  FileName := TOS.GetSettingsDirectory(APP_NAME, 'form_settings.json'); // Get settings file name
+  ForceDirectories(TOS.GetSettingsDirectory(APP_NAME)); // Ensure the directory exists
   JSONObj := TJSONObject.Create;
   try
     // Save form position and size
@@ -175,7 +147,7 @@ begin
   try
     DPI := Screen.PixelsPerInch;
     FileContent := string.Empty;
-    FileName := GetSettingsDirectory('form_settings.json'); // Get the settings file name
+    FileName := TOS.GetSettingsDirectory(APP_NAME, 'form_settings.json'); // Get the settings file name
     if not FileExists(FileName) then Exit(True); // Exit if the file does not exist
 
     // Read from file
@@ -318,9 +290,9 @@ var
   RectObj: TJSONObject;
   i: integer;
 begin
-  FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
+  FileName := TOS.GetSettingsDirectory(APP_NAME, 'grid_settings.json'); // Get settings file name
   Item := Item.ToLower;
-  ForceDirectories(GetSettingsDirectory); // Ensure the directory exists
+  ForceDirectories(TOS.GetSettingsDirectory(APP_NAME)); // Ensure the directory exists
 
   // Load the existing JSON file or create a new JSON object
   if FileExists(FileName) then
@@ -438,9 +410,9 @@ begin
   Result := False;
   try
     FileContent := string.Empty;
-    FileName := GetSettingsDirectory('grid_settings.json'); // Get settings file name
+    FileName := TOS.GetSettingsDirectory(APP_NAME, 'grid_settings.json'); // Get settings file name
     Item := Item.ToLower;
-    ForceDirectories(GetSettingsDirectory); // Ensure the directory exists
+    ForceDirectories(TOS.GetSettingsDirectory(APP_NAME)); // Ensure the directory exists
     if not FileExists(FileName) then Exit(True);
 
     // Read from the settings file

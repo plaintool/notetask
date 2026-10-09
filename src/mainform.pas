@@ -34,6 +34,7 @@ uses
   LCLIntf,
   LCLType,
   LConvEncoding,
+  md5,
   PrintersDlgs,
   uDateTimePicker,
   GridPrn,
@@ -658,6 +659,8 @@ type
     FStatusPanelIndex: integer;
     FAdjustingScrollBars: boolean;
     FSReserved: TFileStream;
+    FTimerRecovery: TTimer;
+    FRecoveryToken: string;
     FRepaint: boolean;
     FDuplicateHighlight: boolean;
     FFitRowHeightToFont: boolean;
@@ -756,6 +759,13 @@ type
     function SaveFile(fileName: string = string.Empty; saveAs: boolean = False; encrypt: boolean = False): boolean;
     function SaveFileAs: boolean;
     procedure ApplyGridSettings;
+    function GetRecoveryFileName: string;
+    function SaveRecovery: boolean;
+    procedure DeleteRecovery;
+    procedure RestoreRecovery(const RecoveryFileName: string);
+    procedure CheckRecovery;
+    procedure RequestRecoverySave;
+    procedure TimerRecoveryFire;
     {%EndRegion}
     {%Region -fold Private Setters}
     procedure SetChanged(Value: boolean);
@@ -868,6 +878,7 @@ resourcestring
   rarchiveconfirm = 'Are you sure you want to archive / unarchive this task?';
   rarchivesconfirm = 'Are you sure you want to archive / unarchive selected tasks?';
   rsavechanges = 'Do you want to save the changes?';
+  rrecoveryfound = 'The previous session ended unexpectedly. Unsaved recovery data was found. Do you want to restore it?';
   rclearconfirm = 'Are you sure you want to clear the data in the selected area?';
   ropendialogfilter = 'Task files (*.tsk)|*.tsk|Text files (*.txt)|*.txt|Markdown files (*.md)|*.md|All files (*.*)|*.*';
   rsavedialogfilter =
@@ -902,7 +913,7 @@ implementation
 
 uses Consts, mathparser, filemngr, settings, controlshelper, cryptoutils, stringgridhelper, forminput, formmemo, formfind,
   formreplace, formabout, formdonate, osutils, stringhelper, stringshelper, darkutils, localize, checkupdates, hotkeyhelper,
-  pascalutils;
+  pascalutils, OneShotTimer;
 
   {$R *.lfm}
 
@@ -1025,7 +1036,7 @@ begin
   // Set language
   SetLanguage(Language);
 
-  // menu access
+  // Menu access
   {$IFDEF UNIX}
   aRunPowershell.Visible := False;
   aRunPowershell.Enabled := False;
@@ -1041,6 +1052,12 @@ begin
     SaveFormSettings(Self, TagEdit);
   if FGridSettingsLoaded then
     SaveGridSettings(Self, Grid, ExtractFileName(FFileName));
+
+  // Cancel any pending recovery snapshot before the form goes away
+  ClearTimeout(FTimerRecovery);
+
+  // Normal shutdown: recovery data is no longer needed
+  DeleteRecovery;
 
   // Free allocated resources
   Tasks.Free;
@@ -1127,6 +1144,10 @@ begin
   // Check new version if needed
   if AutoCheckUpdates then
     StartUpdateCheck(REPO, APP_NAME);
+
+  // Offer to restore unsaved recovery data for an untitled document
+  if (FFileName = string.Empty) and (not Application.Terminated) then
+    CheckRecovery;
 end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -5477,6 +5498,10 @@ begin
   aUndo.Enabled := FChanged;
   aUndoAll.Enabled := FChanged;
   SetCaption;
+
+  // Schedule a recovery snapshot after a pause in edits
+  if FChanged then
+    RequestRecoverySave;
 end;
 
 procedure TformNotetask.SetReadOnly(Value: boolean);
@@ -6000,10 +6025,17 @@ begin
     if Assigned(Tasks) then Tasks.Free;
     Tasks := TTasks.Create(new);
 
+    // Drop recovery of the document being closed. On startup both FFileName
+    // and FChanged are still empty, so the snapshot of an untitled session
+    // written earlier is preserved for CheckRecovery below
+    if (FFileName <> string.Empty) or FChanged then
+      DeleteRecovery;
+
     FFileName := string.Empty;
     panelTabs.Visible := False;
 
     FEncrypted := False;
+    TCrypto.ClearStringSecure(FRecoveryToken);
     TCrypto.FreeBytesSecure(FKeyEnc);
     TCrypto.FreeBytesSecure(FKeyAuth);
     TCrypto.FreeBytesSecure(FSalt);
@@ -6101,6 +6133,9 @@ begin
         begin
           FEncrypted := True;
           Token := editText.Text;
+          // Remember the password for encrypting recovery snapshots during this session
+          TCrypto.ClearStringSecure(FRecoveryToken);
+          FRecoveryToken := Token;
         end
         else
         begin
@@ -6169,6 +6204,10 @@ begin
   FLineEndingOriginal := FLineEnding;
   FEncodingOriginal := FEncoding;
   if (ReadOnly) and (not ShowTrigger) then ShowMessage(rfilereadonly);
+
+  // Offer to restore recovery data if the snapshot is fresher than the file
+  CheckRecovery;
+
   Result := True;
 end;
 
@@ -6204,6 +6243,9 @@ begin
           begin
             FEncrypted := True;
             Token := editText.Text;
+            // Keep the password to encrypt subsequent recovery snapshots
+            TCrypto.ClearStringSecure(FRecoveryToken);
+            FRecoveryToken := Token;
             TCrypto.FreeBytesSecure(FSalt);
             TCrypto.FreeBytesSecure(FKeyEnc);
             TCrypto.FreeBytesSecure(FKeyAuth);
@@ -6221,6 +6263,8 @@ begin
       if saveAs then
       begin
         FEncrypted := False;
+        // Plain file, the password is no longer needed
+        TCrypto.ClearStringSecure(FRecoveryToken);
         TCrypto.FreeBytesSecure(FSalt);
         TCrypto.FreeBytesSecure(FKeyEnc);
         TCrypto.FreeBytesSecure(FKeyAuth);
@@ -6234,6 +6278,8 @@ begin
             EditComplete;
             FreeFile;
             TFileManager.SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, Token, FSalt, FKeyEnc, FKeyAuth);
+            // File has been written to disk, recovery snapshot is obsolete
+            DeleteRecovery;
             SetChanged(False);
             Tasks.CreateBackupInit;
             ReadOnly := not TFileManager.TryLockFile(fileName, FSReserved);
@@ -6308,6 +6354,140 @@ begin
   SetTabs;
   if Self.Visible then
     RestoreSelectedState;
+end;
+
+function TformNotetask.GetRecoveryFileName: string;
+var
+  Key: string;
+begin
+  // Use the full path as a key, or a fixed one for untitled documents
+  if (FFileName <> string.Empty) then
+    Key := FFileName
+  else
+    Key := 'notetask_untitled';
+  // Hash the key so different files never collide
+  Result := ConcatPaths([TOS.GetSettingsDirectory(APP_NAME), 'nt_' + MD5Print(MD5String(Key)) + '.bak']);
+end;
+
+function TformNotetask.SaveRecovery: boolean;
+var
+  TaskList: TStringList;
+  RecoveryFile: string;
+begin
+  Result := False;
+  // Nothing to snapshot
+  if (not FChanged) or (not Assigned(Tasks)) then exit;
+  // Encrypted file without derived keys cannot be snapshotted safely
+  if FEncrypted and ((FSalt = nil) or (FKeyEnc = nil) or (FKeyAuth = nil)) then exit;
+
+  TaskList := Tasks.ToStringList;
+  if (not Assigned(TaskList)) then exit;
+  RecoveryFile := GetRecoveryFileName;
+  try
+    try
+      // For encrypted files the snapshot is encrypted with the same session keys
+      TFileManager.SaveTextFile(RecoveryFile, TaskList, TEncoding.UTF8, FLineEnding,
+        FEncrypted, FRecoveryToken, FSalt, FKeyEnc, FKeyAuth);
+      Result := True;
+    except
+      // Recovery is best-effort, do not disturb the user on disk errors
+      Result := False;
+    end;
+  finally
+    TaskList.Free;
+  end;
+end;
+
+procedure TformNotetask.DeleteRecovery;
+var
+  RecoveryFile: string;
+begin
+  RecoveryFile := GetRecoveryFileName;
+  if FileExists(RecoveryFile) then
+    SysUtils.DeleteFile(RecoveryFile);
+end;
+
+procedure TformNotetask.RestoreRecovery(const RecoveryFileName: string);
+var
+  Content: string;
+  Bytes: TBytes;
+  Encoding: TEncoding;
+  LineEnding: TLineEnding;
+  LineCount: integer;
+begin
+  if (not FileExists(RecoveryFileName)) then exit;
+
+  if FEncrypted then
+  begin
+    // Decrypt with keys already derived when the parent file was opened
+    Bytes := TCrypto.DecryptData(TCrypto.LoadFileAsBytes(RecoveryFileName), FRecoveryToken, FSalt, FKeyEnc, FKeyAuth);
+    if (Bytes = nil) then exit;
+    Encoding := TEncoding.UTF8;
+    TFileManager.ReadTextFile(Bytes, Content, Encoding, LineEnding, LineCount);
+  end
+  else
+  begin
+    Encoding := TEncoding.UTF8;
+    TFileManager.ReadTextFile(RecoveryFileName, Content, Encoding, LineEnding, LineCount);
+  end;
+
+  EditComplete;
+  if Assigned(Tasks) then Tasks.Free;
+  Tasks := TTasks.Create(Content.ToStringList);
+  FillGrid;
+  ResetRowHeight;
+  CalcRowHeight(True);
+  SetFilter;
+  SetInfo;
+  SetNote;
+  SetTags;
+  SetTabs;
+  // Restored state is unsaved, so the document counts as modified
+  SetChanged(True);
+end;
+
+procedure TformNotetask.CheckRecovery;
+var
+  RecoveryFile: string;
+  RecoveryAge: longint;
+  OriginalAge: longint;
+begin
+  RecoveryFile := GetRecoveryFileName;
+  if (not FileExists(RecoveryFile)) then exit;
+
+  // Encrypted file: recovery needs keys, they only exist after a successful password entry
+  if FEncrypted and ((FSalt = nil) or (FKeyEnc = nil) or (FKeyAuth = nil)) then
+    exit;
+
+  // Ignore stale recovery files older than the file on disk
+  if (FFileName <> string.Empty) and FileExists(FFileName) then
+  begin
+    RecoveryAge := FileAge(RecoveryFile);
+    OriginalAge := FileAge(FFileName);
+    if (RecoveryAge <= OriginalAge) then
+    begin
+      DeleteRecovery;
+      exit;
+    end;
+  end;
+
+  if (MessageDlg(rrecoveryfound, mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
+    RestoreRecovery(RecoveryFile)
+  else
+    DeleteRecovery;
+end;
+
+procedure TformNotetask.RequestRecoverySave;
+begin
+  // Restart the countdown so only a pause in edits triggers a snapshot
+  ClearTimeout(FTimerRecovery);
+  SetTimeout(FTimerRecovery, RecoverySaveDelayMs, @TimerRecoveryFire);
+end;
+
+procedure TformNotetask.TimerRecoveryFire;
+begin
+  if FChanged then
+    SaveRecovery;
 end;
 
 procedure TformNotetask.AlignBottomControls;
