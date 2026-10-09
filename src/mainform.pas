@@ -1056,7 +1056,6 @@ procedure TformNotetask.FormShow(Sender: TObject);
 var
   FilePath: string;
   TagsHeight: integer;
-  Th: TCheckUpdateThread;
 begin
   Visible := False;
 
@@ -1126,11 +1125,8 @@ begin
   end;
 
   // Check new version if needed
-  if AutoCheckUpdates and (not Application.Terminated) then
-  begin
-    Th := TCheckUpdateThread.Create(REPO, APP_NAME, False);
-    Th.FreeOnTerminate := True;
-  end;
+  if AutoCheckUpdates then
+    StartUpdateCheck(REPO, APP_NAME);
 end;
 
 procedure TformNotetask.FormCloseQuery(Sender: TObject; var CanClose: boolean);
