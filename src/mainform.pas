@@ -1203,7 +1203,7 @@ begin
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key = VK_INSERT) then // Ctrl + Insert
+  if (ssAlt in Shift) and (Key = VK_INSERT) then // Alt + Insert
   begin
     aInsertGroup.Execute;
     Key := 0;
@@ -1260,13 +1260,13 @@ begin
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key = VK_C) then // Ctrl + C
+  if (ssCtrl in Shift) and (Key in [VK_C, VK_INSERT]) then // Ctrl + C / Insert
   begin
     aCopy.Execute;
     Key := 0;
   end
   else
-  if (ssCtrl in Shift) and (Key = VK_V) then // Ctrl + V
+  if ((ssCtrl in Shift) and (Key = VK_V)) or ((ssShift in Shift) and (Key = VK_INSERT)) then // Ctrl + V / Shift + Insert
   begin
     aPaste.Execute;
     Key := 0;
