@@ -125,6 +125,10 @@ msgstr "Ryhmittämätön"
 msgid "Incorrect password!"
 msgstr "Väärä salasana!"
 
+#: mainform.rmergenotesconfirm
+msgid "Are you sure you want to merge notes of selected tasks?"
+msgstr "Haluatko varmasti yhdistää valittujen tehtävien muistiinpanot?"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "Haluatteko varmasti yhdistää valitut tehtävät?"
@@ -611,6 +615,10 @@ msgstr "Turkish"
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
 msgstr "Ukrainian"
+
+#: tformnotetask.amergenotes.caption
+msgid "Merge notes"
+msgstr "Yhdistä muistiinpanot"
 
 #: tformnotetask.amergetasks.caption
 msgid "Merge tasks"

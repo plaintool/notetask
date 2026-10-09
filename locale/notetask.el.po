@@ -125,6 +125,10 @@ msgstr "Χωρίς ομάδα"
 msgid "Incorrect password!"
 msgstr "Εσφαλμένος κωδικός πρόσβασης!"
 
+#: mainform.rmergenotesconfirm
+msgid "Are you sure you want to merge notes of selected tasks?"
+msgstr "Είστε βέβαιοι ότι θέλετε να συγχωνεύσετε τις σημειώσεις των επιλεγμένων εργασιών;"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "Είστε σίγουροι ότι θέλετε να συγχωνεύσετε τις επιλεγμένες εργασίες;"
@@ -611,6 +615,10 @@ msgstr "Turkish"
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
 msgstr "Ukrainian"
+
+#: tformnotetask.amergenotes.caption
+msgid "Merge notes"
+msgstr "Συγχώνευση σημειώσεων"
 
 #: tformnotetask.amergetasks.caption
 msgid "Merge tasks"

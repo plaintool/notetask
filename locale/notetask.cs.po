@@ -125,6 +125,10 @@ msgstr "Neseskupeno"
 msgid "Incorrect password!"
 msgstr "Nesprávné heslo!"
 
+#: mainform.rmergenotesconfirm
+msgid "Are you sure you want to merge notes of selected tasks?"
+msgstr "Opravdu chcete sloučit poznámky vybraných úkolů?"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "Jste si jisti, že chcete sloučit vybrané úkoly?"
@@ -611,6 +615,10 @@ msgstr "Turkish"
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
 msgstr "Ukrainian"
+
+#: tformnotetask.amergenotes.caption
+msgid "Merge notes"
+msgstr "Sloučit poznámky"
 
 #: tformnotetask.amergetasks.caption
 msgid "Merge tasks"

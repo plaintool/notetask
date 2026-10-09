@@ -125,6 +125,10 @@ msgstr "未分组"
 msgid "Incorrect password!"
 msgstr "密码错误！"
 
+#: mainform.rmergenotesconfirm
+msgid "Are you sure you want to merge notes of selected tasks?"
+msgstr "确定要合并所选任务的备注吗？"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "您确定要合并选定的任务吗？"
@@ -611,6 +615,10 @@ msgstr "Turkish"
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
 msgstr "Ukrainian"
+
+#: tformnotetask.amergenotes.caption
+msgid "Merge notes"
+msgstr "合并备注"
 
 #: tformnotetask.amergetasks.caption
 msgid "Merge tasks"

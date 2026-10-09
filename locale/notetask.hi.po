@@ -125,6 +125,10 @@ msgstr "असंगठित"
 msgid "Incorrect password!"
 msgstr "गलत पासवर्ड!"
 
+#: mainform.rmergenotesconfirm
+msgid "Are you sure you want to merge notes of selected tasks?"
+msgstr "क्या आप वाकई चयनित कार्यों के नोट्स को मर्ज करना चाहते हैं?"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "क्या आप सुनिश्चित हैं कि आप चयनित कार्यों को मर्ज करना चाहते हैं?"
@@ -611,6 +615,10 @@ msgstr "Turkish"
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
 msgstr "Ukrainian"
+
+#: tformnotetask.amergenotes.caption
+msgid "Merge notes"
+msgstr "नोट्स मर्ज करें"
 
 #: tformnotetask.amergetasks.caption
 msgid "Merge tasks"

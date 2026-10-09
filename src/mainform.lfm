@@ -465,6 +465,9 @@ object formNotetask: TformNotetask
       object menuMergeTasks: TMenuItem
         Action = aMergeTasks
       end
+      object menuMergeTaskNotes: TMenuItem
+        Action = aMergeNotes
+      end
       object menuSplitTasks: TMenuItem
         Action = aSplitTasks
       end
@@ -940,84 +943,6 @@ object formNotetask: TformNotetask
       ShortCut = 16461
       OnExecute = aMergeTasksExecute
     end
-    object aSplitTasks: TAction
-      Category = 'Task'
-      Caption = 'Split tasks'
-      ShortCut = 24653
-      OnExecute = aSplitTasksExecute
-    end
-    object aDeleteTasks: TAction
-      Category = 'Task'
-      Caption = 'Delete tasks'
-      ShortCut = 16430
-      OnExecute = aDeleteTasksExecute
-    end
-    object aArchiveTasks: TAction
-      Category = 'Task'
-      Caption = 'Archive tasks ↔'
-      ShortCut = 32833
-      OnExecute = aArchiveTasksExecute
-    end
-    object aMoveTaskTop: TAction
-      Category = 'Task'
-      Caption = 'Move tasks to top'
-      ShortCut = 16417
-      OnExecute = aMoveTaskTopExecute
-    end
-    object aMoveTaskUp: TAction
-      Category = 'Task'
-      Caption = 'Move tasks up'
-      ShortCut = 16422
-      OnExecute = aMoveTaskUpExecute
-    end
-    object aMoveTaskDown: TAction
-      Category = 'Task'
-      Caption = 'Move tasks down'
-      ShortCut = 16424
-      OnExecute = aMoveTaskDownExecute
-    end
-    object aMoveTaskBottom: TAction
-      Category = 'Task'
-      Caption = 'Move tasks to bottom'
-      ShortCut = 16418
-      OnExecute = aMoveTaskBottomExecute
-    end
-    object aIndentTasks: TAction
-      Category = 'Task'
-      Caption = 'Indent tasks'
-      ShortCut = 16393
-      OnExecute = aIndentTasksExecute
-    end
-    object aOutdentTasks: TAction
-      Category = 'Task'
-      Caption = 'Outdent tasks'
-      ShortCut = 8201
-      OnExecute = aOutdentTasksExecute
-    end
-    object aChatGpt: TAction
-      Category = 'Task'
-      Caption = 'Ask ChatGPT...'
-      ShortCut = 16465
-      OnExecute = aChatGptExecute
-    end
-    object aRunTerminal: TAction
-      Category = 'Task'
-      Caption = 'Run in terminal...'
-      ShortCut = 16466
-      OnExecute = aRunTerminalExecute
-    end
-    object aRunPowershell: TAction
-      Category = 'Task'
-      Caption = 'Run in PowerShell...'
-      ShortCut = 16453
-      OnExecute = aRunPowershellExecute
-    end
-    object aSaveNotesAs: TAction
-      Category = 'Task'
-      Caption = 'Save notes as...'
-      ShortCut = 16473
-      OnExecute = aSaveNotesAsExecute
-    end
     object aEditGroupTooltip: TAction
       Category = 'Group'
       Caption = 'Edit Group Tooltip'
@@ -1310,6 +1235,90 @@ object formNotetask: TformNotetask
       Caption = 'About...'
       OnExecute = aAboutExecute
     end
+    object aMergeNotes: TAction
+      Category = 'Task'
+      Caption = 'Merge notes'
+      ShortCut = 32845
+      OnExecute = aMergeNotesExecute
+    end
+    object aSplitTasks: TAction
+      Category = 'Task'
+      Caption = 'Split tasks'
+      ShortCut = 24653
+      OnExecute = aSplitTasksExecute
+    end
+    object aDeleteTasks: TAction
+      Category = 'Task'
+      Caption = 'Delete tasks'
+      ShortCut = 16430
+      OnExecute = aDeleteTasksExecute
+    end
+    object aArchiveTasks: TAction
+      Category = 'Task'
+      Caption = 'Archive tasks ↔'
+      ShortCut = 32833
+      OnExecute = aArchiveTasksExecute
+    end
+    object aMoveTaskTop: TAction
+      Category = 'Task'
+      Caption = 'Move tasks to top'
+      ShortCut = 16417
+      OnExecute = aMoveTaskTopExecute
+    end
+    object aMoveTaskUp: TAction
+      Category = 'Task'
+      Caption = 'Move tasks up'
+      ShortCut = 16422
+      OnExecute = aMoveTaskUpExecute
+    end
+    object aMoveTaskDown: TAction
+      Category = 'Task'
+      Caption = 'Move tasks down'
+      ShortCut = 16424
+      OnExecute = aMoveTaskDownExecute
+    end
+    object aMoveTaskBottom: TAction
+      Category = 'Task'
+      Caption = 'Move tasks to bottom'
+      ShortCut = 16418
+      OnExecute = aMoveTaskBottomExecute
+    end
+    object aIndentTasks: TAction
+      Category = 'Task'
+      Caption = 'Indent tasks'
+      ShortCut = 16393
+      OnExecute = aIndentTasksExecute
+    end
+    object aOutdentTasks: TAction
+      Category = 'Task'
+      Caption = 'Outdent tasks'
+      ShortCut = 8201
+      OnExecute = aOutdentTasksExecute
+    end
+    object aChatGpt: TAction
+      Category = 'Task'
+      Caption = 'Ask ChatGPT...'
+      ShortCut = 16465
+      OnExecute = aChatGptExecute
+    end
+    object aRunTerminal: TAction
+      Category = 'Task'
+      Caption = 'Run in terminal...'
+      ShortCut = 16466
+      OnExecute = aRunTerminalExecute
+    end
+    object aRunPowershell: TAction
+      Category = 'Task'
+      Caption = 'Run in PowerShell...'
+      ShortCut = 16453
+      OnExecute = aRunPowershellExecute
+    end
+    object aSaveNotesAs: TAction
+      Category = 'Task'
+      Caption = 'Save notes as...'
+      ShortCut = 16473
+      OnExecute = aSaveNotesAsExecute
+    end
   end
   object openDialog: TOpenDialog
     Title = 'Opening'
@@ -1362,6 +1371,9 @@ object formNotetask: TformNotetask
     end
     object contextMergeTasks: TMenuItem
       Action = aMergeTasks
+    end
+    object contextMergeTaskNotes: TMenuItem
+      Action = aMergeNotes
     end
     object contextSplitTasks: TMenuItem
       Action = aSplitTasks

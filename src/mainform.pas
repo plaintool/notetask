@@ -51,6 +51,7 @@ type
     aCopy: TAction;
     aCheckforupdates: TAction;
     aAutoCheckUpdates: TAction;
+    aMergeNotes: TAction;
     aLangTurkish: TAction;
     aLangGreek: TAction;
     aLangHebrew: TAction;
@@ -121,6 +122,7 @@ type
     FilterBox: TComboBox;
     filterClear: TSpeedButton;
     fontDialog: TFontDialog;
+    menuMergeTaskNotes: TMenuItem;
     TabsGroup: TTabControl;
     contextColor: TMenuItem;
     contextResetColor: TMenuItem;
@@ -469,6 +471,7 @@ type
     procedure aLangTurkishExecute(Sender: TObject);
     procedure aShowTagsExecute(Sender: TObject);
     procedure aSplitTasksExecute(Sender: TObject);
+    procedure aMergeNotesExecute(Sender: TObject);
     procedure aZoomDefaultExecute(Sender: TObject);
     procedure aZoomInExecute(Sender: TObject);
     procedure aZoomOutExecute(Sender: TObject);
@@ -859,6 +862,7 @@ resourcestring
   rdeleteconfirm = 'Are you sure you want to delete this task?';
   rdeletesconfirm = 'Are you sure you want to delete selected tasks?';
   rmergesconfirm = 'Are you sure you want to merge selected tasks?';
+  rmergenotesconfirm = 'Are you sure you want to merge notes of selected tasks?';
   rsplitconfirm = 'Are you sure you want to split the selected tasks based on the current column?';
   rsplitwarning = 'Please select the column with line breaks to split the tasks.';
   rarchiveconfirm = 'Are you sure you want to archive / unarchive this task?';
@@ -1920,6 +1924,49 @@ begin
   if Grid.RowCount < 2 then exit;
 
   SplitTasks;
+end;
+
+procedure TformNotetask.aMergeNotesExecute(Sender: TObject);
+var
+  i: integer;
+  notes: TStringList;
+  CombinedNote: string;
+  Confirm: integer;
+begin
+  if (ReadOnly) then exit;
+  if (Grid.Selection.Height = 0) then exit;
+
+  Confirm := MessageDlg(rmergenotesconfirm, mtConfirmation, [mbYes, mbNo], 0);
+  if (Confirm <> mrYes) then exit;
+
+  if (FBackup) then
+  begin
+    GridBackupSelection;
+    Tasks.CreateBackup;
+  end;
+
+  // Collect notes from all selected tasks
+  notes := TStringList.Create;
+  try
+    notes.LineBreak := FLineEnding.Value;
+    notes.Options := notes.Options - [soTrailingLineBreak];
+    for i := Grid.Selection.Top to Grid.Selection.Bottom do
+      if (Tasks.Map(i) > -1) and (Tasks.GetTask(i).Note <> string.Empty) then
+        notes.Add(Tasks.GetTask(i).Note);
+    CombinedNote := notes.Text;
+  finally
+    notes.Free;
+  end;
+
+  // Assign the combined note to every selected task
+  for i := Grid.Selection.Top to Grid.Selection.Bottom do
+    if Tasks.Map(i) > -1 then
+      Tasks.GetTask(i).Note := CombinedNote;
+
+  FillGrid;
+  SetNote;
+  CalcRowHeight(True);
+  Changed := True;
 end;
 
 procedure TformNotetask.aZoomDefaultExecute(Sender: TObject);
@@ -5458,6 +5505,7 @@ begin
   aInsertTask.Enabled := not Value;
   aMergeTasks.Enabled := not Value;
   aSplitTasks.Enabled := not Value;
+  aMergeNotes.Enabled := not Value;
   aDuplicateTasks.Enabled := not Value;
   aDeleteTasks.Enabled := not Value;
   aArchiveTasks.Enabled := not Value;

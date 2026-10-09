@@ -125,6 +125,10 @@ msgstr "Tidak tergrup"
 msgid "Incorrect password!"
 msgstr "Kata sandi salah!"
 
+#: mainform.rmergenotesconfirm
+msgid "Are you sure you want to merge notes of selected tasks?"
+msgstr "Apakah Anda yakin ingin menggabungkan catatan dari tugas yang dipilih?"
+
 #: mainform.rmergesconfirm
 msgid "Are you sure you want to merge selected tasks?"
 msgstr "Anda yakin ingin menggabungkan tugas yang dipilih?"
@@ -611,6 +615,10 @@ msgstr "Turkish"
 #: tformnotetask.alangukrainian.caption
 msgid "Ukrainian"
 msgstr "Ukrainian"
+
+#: tformnotetask.amergenotes.caption
+msgid "Merge notes"
+msgstr "Gabungkan Catatan"
 
 #: tformnotetask.amergetasks.caption
 msgid "Merge tasks"
