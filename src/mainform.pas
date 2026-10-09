@@ -1877,6 +1877,7 @@ end;
 procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
 var
   Ind: integer;
+  NewRow: integer;
   TaskText, Oper, Value: string;
 begin
   if Screen.ActiveForm <> Self then exit;
@@ -1899,12 +1900,18 @@ begin
     end;
   end;
 
-  Ind := Tasks.InsertTask(TaskText, Grid.Row);
+  // In descending order the new task must appear visually below the anchor,
+  // which means inserting before the anchor in storage order
+  if (SortOrder = soAscending) then
+    Ind := Tasks.InsertTask(TaskText, Grid.Row)
+  else
+    Ind := Tasks.InsertTask(TaskText, Grid.Row, True, True);
   FLastText := string.Empty;
   FillGrid;
   ResetRowHeight;
-  if (Ind > 0) then
-    Grid.Row := Tasks.ReverseMap(Ind)
+  NewRow := Tasks.ReverseMap(Ind);
+  if (NewRow > 0) then
+    Grid.Row := NewRow
   else
     Grid.Row := Grid.Row + 1;
 

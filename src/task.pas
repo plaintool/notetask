@@ -128,7 +128,7 @@ type
     function GetTaskValue(ACol, ARow: integer): string; // Method to get a task value by row col
     function HasTask(Index: integer): boolean;
     procedure SetTask(Grid: TStringGrid; Memo: TMemo; Row: integer; Backup: boolean = True; DisplayTime: boolean = True);
-    function InsertTask(const TaskString: string; Index: integer; Backup: boolean = True): integer;
+    function InsertTask(const TaskString: string; Index: integer; Backup: boolean = True; InsertBefore: boolean = False): integer;
     procedure DeleteTask(Index: integer);
     procedure ArchiveTask(Index: integer);
     procedure CompleteTask(Index: integer; Backup: boolean = True);
@@ -901,14 +901,20 @@ begin
     raise Exception.Create('Invalid row or task index');
 end;
 
-function TTasks.InsertTask(const TaskString: string; Index: integer; Backup: boolean = True): integer;
+function TTasks.InsertTask(const TaskString: string; Index: integer; Backup: boolean = True;
+  InsertBefore: boolean = False): integer;
 var
   Task: TTask;
   i, Ind: integer;
   Indent: integer = 0;
 begin
   if (Index = 0) then
-    Ind := Count - 1
+  begin
+    if InsertBefore then
+      Ind := 0
+    else
+      Ind := Count - 1;
+  end
   else
     Ind := Map(Index);
 
@@ -918,7 +924,8 @@ begin
   if (Backup) then
     CreateBackup;
 
-  Inc(Ind);
+  if (not InsertBefore) then
+    Inc(Ind);
   if Ind < Count then
     Indent := FTaskList[Ind].IndentLevel;
   Task := TTask.Create(TaskString); // Create a new task
