@@ -25,6 +25,8 @@ jobs:
       - name: Process commits from push or manual dispatch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pass the commits JSON safely via environment variable
+          COMMITS_JSON_FROM_EVENT: ${{ toJSON(github.event.commits) }}
         run: |
           # Determine the source of commits: push event or manual dispatch
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
@@ -40,8 +42,8 @@ jobs:
               --arg author "$COMMIT_AUTHOR" \
               '[{id: $id, message: $msg, author: {name: $author}}]')
           else
-            # Normal push event: use the commits array from the event payload
-            COMMITS_JSON='${{ toJSON(github.event.commits) }}'
+            # Normal push event: use the commits array from the environment variable
+            COMMITS_JSON="$COMMITS_JSON_FROM_EVENT"
           fi
 
           # Exit early if there are no commits to process

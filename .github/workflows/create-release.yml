@@ -131,14 +131,14 @@ jobs:
           EOF
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           pattern: ${{ inputs.artifact_name || github.event.inputs.artifact_name }}
           path: dist
           merge-multiple: true
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ inputs.tag_name || github.event.inputs.tag_name }}
           body_path: RELEASE.md
