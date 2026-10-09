@@ -64,6 +64,7 @@ const
   clTagSuffix_Light = TColor($FEFEFE);          // RGB(254,254,254)
   clDuplicateHighlight_Light = TColor($AAFFFF); // RGB(255,255,170)
   clGridLineColor_Light = TColor($CACACA);      // RGB(202,202,202)
+  clFocusColor_Light = TColor($707070);         // RGB(112,112,112)
 
   // Dark theme colors
   clRowHighlight_Dark = TColor($463027);        // RGB(39, 48, 70)
@@ -78,6 +79,7 @@ const
   clTagSuffix_Dark = TColor($303030);           // RGB(48, 48, 48)
   clDuplicateHighlight_Dark = TColor($008C8C);  // RGB(140, 140, 0)
   clGridLineColor_Dark = TColor($8C8C8C);       // RGB(140, 140, 140)
+  clFocusColor_Dark = TColor($D0D0D0);          // RGB(208,208,208)
 
 implementation
 

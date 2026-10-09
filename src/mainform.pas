@@ -969,6 +969,7 @@ begin
   Self.Color := clWindow;
   Grid.GridLineColor := TDarkUtils.ThemeColor(clGridLineColor_Light, clGridLineColor_Dark);
   Grid.FixedHotColor := TDarkUtils.ThemeColor(clSplitHighlight_Light, clSplitHighlight_Dark);
+  Grid.FocusColor := TDarkUtils.ThemeColor(clFocusColor_Light, clFocusColor_Dark);
   panelNote.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);
   Splitter.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);
   SplitTags.Color := TDarkUtils.ThemeColor(clSpit_Light, clSplit_Dark);

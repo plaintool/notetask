@@ -72,7 +72,6 @@ object formNotetask: TformNotetask
     RowCount = 2
     TabOrder = 0
     TitleImageList = ImagesTitle
-    UseXORFeatures = True
     OnCheckboxToggled = GridCheckboxToggled
     OnColRowDeleted = GridColRowDeleted
     OnColRowInserted = GridColRowInserted
