@@ -132,6 +132,7 @@ type
     procedure InsertMap(Pos, Value: integer; Delta: integer = 1);
     function AddTask(const TaskString: string): integer; // Method to add a task
     function AddGroupTask(const GroupIndex: integer; const TaskString: string): integer;
+    function DuplicateTaskRange(StartRow, EndRow: integer; InsertBefore: boolean; out NewCount: integer): integer;
     function GetTask(Index: integer): TTask; // Method to get a task by row index
     function GetTaskByIndex(Index: integer): TTask; // Method to get a task by list index
     function FindTaskByText(const Text: string): TTask; // Search across all groups by text
@@ -828,6 +829,65 @@ begin
   SetLength(FGroupList[GroupIndex], Length(FGroupList[GroupIndex]) + 1); // Resize the array
   FGroupList[GroupIndex, High(FGroupList[GroupIndex])] := TTask.Create(TaskString); // Add the task to the list
   Result := Length(FGroupList[GroupIndex]);
+end;
+
+function TTasks.DuplicateTaskRange(StartRow, EndRow: integer; InsertBefore: boolean; out NewCount: integer): integer;
+var
+  IndStart, IndEnd, BlockLen, I, InsertAt, SubEnd, Level, OldCount: integer;
+  SrcCopy: array of TTask = nil;
+begin
+  // Duplicate the block from the first selected task down to the last
+  // descendant of the last selected task. The copy keeps its indent levels
+  Result := -1;
+  NewCount := 0;
+  IndStart := Map(StartRow);
+  if (IndStart < 0) or (IndStart >= Count) then Exit;
+
+  // Only tasks at the same level can be duplicated together, otherwise
+  // the copy would attach to a wrong branch
+  Level := FTaskList[IndStart].FIndentLevel;
+  for I := StartRow to EndRow do
+  begin
+    if Map(I) < 0 then Continue;
+    if FTaskList[Map(I)].FIndentLevel <> Level then Exit;
+  end;
+
+  IndEnd := GetSubtreeEnd(IndStart);
+  for I := StartRow to EndRow do
+  begin
+    if Map(I) < 0 then Continue;
+    SubEnd := GetSubtreeEnd(Map(I));
+    if SubEnd > IndEnd then IndEnd := SubEnd;
+  end;
+
+  BlockLen := IndEnd - IndStart + 1;
+  CreateBackup;
+
+  // Capture the source block before any shift happens
+  SetLength(SrcCopy, BlockLen);
+  for I := 0 to BlockLen - 1 do
+    SrcCopy[I] := FTaskList[IndStart + I];
+
+  if InsertBefore then
+    InsertAt := IndStart
+  else
+    InsertAt := IndEnd + 1;
+
+  OldCount := Count;
+  SetLength(FTaskList, OldCount + BlockLen);
+  for I := OldCount - 1 downto InsertAt do
+    FTaskList[I + BlockLen] := FTaskList[I];
+
+  // Deep clone so the duplicate shares no state with the original
+  for I := 0 to BlockLen - 1 do
+  begin
+    FTaskList[InsertAt + I] := TTask.Create;
+    FTaskList[InsertAt + I].Copy(SrcCopy[I]);
+  end;
+
+  SetLength(SrcCopy, 0);
+  Result := InsertAt;
+  NewCount := BlockLen;
 end;
 
 function TTasks.GetTask(Index: integer): TTask;

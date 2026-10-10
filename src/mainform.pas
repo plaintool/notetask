@@ -7483,10 +7483,16 @@ end;
 
 procedure TformNotetask.DuplicateTasks;
 var
-  Sel, Back, Original: TGridRect;
-  Value: string;
+  NewRow, NewCount, SelLeft, SelRight, SelTop, SelBottom, NewTop, NewBottom: integer;
+  InsertBefore: boolean;
 begin
   if (ReadOnly) then exit;
+  if Grid.RowCount < 2 then exit;
+
+  SelTop := Grid.Selection.Top;
+  SelBottom := Grid.Selection.Bottom;
+  if (SelTop < 1) then Exit;
+  if (not Tasks.HasTask(SelTop)) then Exit;
 
   if (FBackup) then
   begin
@@ -7494,40 +7500,26 @@ begin
     Tasks.CreateBackup;
   end;
 
-  DisableGridEvents;
-  try
-    Original := Grid.Selection;
-    Grid.Selection := TGridRect.Create(0, Grid.Selection.Top, Grid.Columns.Count, Grid.Selection.Bottom);
-    Tasks.CopyToClipboard(Grid, FShowNote, @Value);
-    Back := Grid.Selection;
-    if (SortOrder = soAscending) then
-    begin
-      Grid.Row := Grid.Selection.Bottom;
-      Grid.Selection := TGridRect.Create(0, Grid.Selection.Bottom, Grid.Columns.Count, Grid.Selection.Bottom);
-    end
-    else
-    begin
-      Grid.Row := Grid.Selection.Top;
-      Grid.Selection := TGridRect.Create(0, Grid.Selection.Top, Grid.Columns.Count, Grid.Selection.Top);
-    end;
-    Tasks.PasteFromClipboard(Grid, SortOrder, False, @Value);
-    if (SortOrder = soAscending) then
-      Sel := TGridRect.Create(Original.Left, Back.Bottom + 1, Original.Right, Back.Bottom + Back.Height + 1)
-    else
-      Sel := TGridRect.Create(Original.Left, Back.Top, Original.Right, Back.Bottom);
-  finally
-    EnableGridEvents;
-  end;
+  SelLeft := Grid.Selection.Left;
+  SelRight := Grid.Selection.Right;
+
+  // With descending sort the duplicate is placed above the source block
+  InsertBefore := (SortOrder = soDescending);
+  NewRow := Tasks.DuplicateTaskRange(SelTop, SelBottom, InsertBefore, NewCount);
+  if (NewRow < 0) or (NewCount <= 0) then Exit;
+
   FillGrid;
-  if (SortColumn = COL_NUM) then
-  begin
-    if (SortOrder = soAscending) then
-      Grid.Row := Sel.Top
-    else
-      Grid.Row := Sel.Bottom;
-    Grid.Selection := Sel;
-    FLastSelectionHeight := Sel.Height;
-  end;
+
+  NewTop := Tasks.ReverseMap(NewRow);
+  NewBottom := Tasks.ReverseMap(NewRow + NewCount - 1);
+  if (NewTop < 1) then Exit;
+
+  Grid.Row := NewTop;
+  if (NewBottom >= NewTop) then
+    Grid.Selection := TGridRect.Create(SelLeft, NewTop, SelRight, NewBottom)
+  else
+    Grid.Selection := TGridRect.Create(SelLeft, NewTop, SelRight, NewTop);
+  FLastSelectionHeight := Grid.Selection.Height;
   CalcRowHeight(True);
   AdjustMultiButton;
   SetInfo;
