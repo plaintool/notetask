@@ -1331,7 +1331,7 @@ object formNotetask: TformNotetask
     DefaultExt = '.*.tsk'
     Filter = 'Task files (*.tsk)|*.tsk|All files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    Left = 400
+    Left = 424
     Top = 112
   end
   object pageSetupDialog: TPageSetupDialog
@@ -1339,18 +1339,18 @@ object formNotetask: TformNotetask
     MarginTop = 500
     MarginRight = 500
     MarginBottom = 500
-    Left = 504
+    Left = 528
     Top = 176
   end
   object printDialog: TPrintDialog
-    Left = 504
+    Left = 528
     Top = 112
   end
   object fontDialog: TFontDialog
     Title = 'Font select'
     MinFontSize = 0
     MaxFontSize = 0
-    Left = 600
+    Left = 624
     Top = 112
   end
   object Popup: TPopupMenu
@@ -1507,7 +1507,7 @@ object formNotetask: TformNotetask
     DefaultExt = '.*.txt'
     Filter = 'Text files (*.txt)|*.txt'
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    Left = 400
+    Left = 424
     Top = 176
   end
   object PopupStatusbar: TPopupMenu
@@ -1634,7 +1634,7 @@ object formNotetask: TformNotetask
       'ColorS=F0FBFF'
       'ColorT=A4A0A0'
     )
-    Left = 600
+    Left = 624
     Top = 176
   end
   object PopupZoom: TPopupMenu
@@ -1700,6 +1700,21 @@ object formNotetask: TformNotetask
       A8E769A57FF5DCBBDF3AAF537EABBCB2F867397BF5677D6F51FB1DB0FF01CDBC
       A59EA795FED573EF7EEBBC4EF9ADF2CAE29FE5ECD59FF5BD45ED7720E10366D8
       F7E2
+    }
+  end
+  object ImagesTree: TImageList
+    Height = 13
+    Width = 13
+    Left = 320
+    Top = 176
+    Bitmap = {
+      4C7A080000000D0000000D000000AE0000000000000078DAED94410AC0200C04
+      BDF943BFE37B7C931FF196F6228860A30675D336B0D043A6B0A863CCFC38E788
+      4BBDDFFB5F4D8CB5965AD1D8678499B9073BC77B4F5C46F76B4E03F3341AFBAC
+      38D75377F49447B39F5018A947D1FAFC1E95BFEDD24F088CD4A3687DDEE4D110
+      0271A9F77BFFAB894929512B1AFB8C3033F760E7C41889CBE87ECD6960EECF66
+      34F65971AE5FF368F6130A23F5285A9FDFA3F2B75DFA0981917A14AD0F9A472F
+      12E63C42
     }
   end
 end

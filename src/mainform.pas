@@ -109,6 +109,7 @@ type
     colorDialog: TColorDialog;
     contextAskChatGPT1: TMenuItem;
     contextCopy1: TMenuItem;
+    contextMergeTaskNotes: TMenuItem;
     contextZoom100: TMenuItem;
     contextCopyTag: TMenuItem;
     contextWindowsCRLF: TMenuItem;
@@ -123,6 +124,7 @@ type
     FilterBox: TComboBox;
     filterClear: TSpeedButton;
     fontDialog: TFontDialog;
+    ImagesTree: TImageList;
     menuMergeTaskNotes: TMenuItem;
     TabsGroup: TTabControl;
     contextColor: TMenuItem;
@@ -659,6 +661,7 @@ type
     FStatusPanelIndex: integer;
     FAdjustingScrollBars: boolean;
     FSuppressEditor: boolean;
+    FCollapseHoverRow: integer;
     FSReserved: TFileStream;
     FTimerRecovery: TTimer;
     FRecoveryToken: string;
@@ -753,6 +756,7 @@ type
     procedure DelayedInvalidate(Data: PtrInt);
     procedure ResetSuppressEditor(Data: PtrInt);
     function IsMouseOverCollapseButton: boolean;
+    function GetCollapseButtonRow: integer;
     function GetTaskIndent(Row: integer): integer;
     function GetTaskButtonLeft(Row: integer): integer;
     procedure FixDatePickerFont(Data: PtrInt);
@@ -951,6 +955,7 @@ begin
   FRepaint := False;
   FDuplicateHighlight := True;
   FSuppressEditor := False;
+  FCollapseHoverRow := -1;
   FShowColumnDone := True;
   FShowColumnTask := True;
   FShowColumnNote := True;
@@ -4514,6 +4519,11 @@ end;
 procedure TformNotetask.GridMouseLeave(Sender: TObject);
 begin
   FIsSelecting := False;
+  if FCollapseHoverRow <> -1 then
+  begin
+    FCollapseHoverRow := -1;
+    Grid.Invalidate;
+  end;
 end;
 
 procedure TformNotetask.GridMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -4554,9 +4564,19 @@ begin
 end;
 
 procedure TformNotetask.GridMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+var
+  HoverRow: integer;
 begin
   // Cancel a stuck selection drag in the grid
   Grid.FixStuckSelection(Shift);
+
+  // Repaint only when the collapse button hover changes
+  HoverRow := GetCollapseButtonRow;
+  if HoverRow <> FCollapseHoverRow then
+  begin
+    FCollapseHoverRow := HoverRow;
+    Grid.Invalidate;
+  end;
 end;
 
 procedure TformNotetask.GridMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
@@ -4705,9 +4725,6 @@ var
   OriginalLeft, OriginalRight: integer;
   Indent: integer = 0;
   BtnLeft, BtnTop, BtnSize: integer;
-  SignX, SignY, SignW, SignH: integer;
-  SignText: string = '';
-  BtnRect: TRect;
 begin
   TempGrid := Sender as TStringGrid;
   bgFill := TDarkUtils.ThemeColor(clWhite, clBlack);
@@ -4828,27 +4845,27 @@ begin
         if Tasks.HasChildren(Tasks.Map(ARow)) then
         begin
           BtnLeft := GetTaskButtonLeft(ARow);
-          BtnSize := Min(11, aRect.Height - 4);
-          if BtnSize < 7 then BtnSize := 7;
+          BtnSize := ImagesTree.Width;
+          if BtnSize <= 0 then BtnSize := 13;
           BtnTop := aRect.Top + (aRect.Height - BtnSize) div 2;
-          BtnRect := Rect(BtnLeft, BtnTop, BtnLeft + BtnSize, BtnTop + BtnSize);
 
-          TempGrid.Canvas.Brush.Color := bgFill;
-          TempGrid.Canvas.Brush.Style := bsSolid;
-          TempGrid.Canvas.FillRect(BtnRect);
-          TempGrid.Canvas.Pen.Color := TDarkUtils.ThemeColor(clGray, clSilver);
-          TempGrid.Canvas.Pen.Style := psSolid;
-          TempGrid.Canvas.Rectangle(BtnRect);
-
-          // Center the sign manually by real glyph metrics so it sits
-          // in the middle of the button regardless of the active font
-          TempGrid.Canvas.Brush.Style := bsClear;
-          SignText := IfThen(Task.Collapsed, '+', '-');
-          SignW := TempGrid.Canvas.TextWidth(SignText);
-          SignH := TempGrid.Canvas.TextHeight(SignText);
-          SignX := BtnLeft + (BtnSize - SignW) div 2;
-          SignY := BtnTop + (BtnSize - SignH) div 2 - 1;
-          TempGrid.Canvas.TextOut(SignX, SignY, SignText);
+          // Pick the icon depending on state and hover. Hover highlights
+          // the icon while the cursor sits over the button
+          if Task.Collapsed then
+          begin
+            if ARow = FCollapseHoverRow then
+              ImgIndex := TDarkUtils.ThemeValue(3, 7)
+            else
+              ImgIndex := TDarkUtils.ThemeValue(2, 6);
+          end
+          else
+          begin
+            if ARow = FCollapseHoverRow then
+              ImgIndex := TDarkUtils.ThemeValue(1, 5)
+            else
+              ImgIndex := TDarkUtils.ThemeValue(0, 4);
+          end;
+          ImagesTree.Draw(TempGrid.Canvas, BtnLeft, BtnTop, ImgIndex);
         end;
 
         if Task.Tags.Count > 0 then
@@ -6072,14 +6089,14 @@ begin
   FSuppressEditor := False;
 end;
 
-function TformNotetask.IsMouseOverCollapseButton: boolean;
+function TformNotetask.GetCollapseButtonRow: integer;
 var
   Cell: TPoint;
-  Task: TTask;
   TaskIndex, BtnLeft, BtnRight: integer;
   P: TPoint;
 begin
-  Result := False;
+  // Return the grid row under the cursor when it sits on a collapse button
+  Result := -1;
   if not Assigned(Tasks) then Exit;
 
   P := Grid.ScreenToClient(Mouse.CursorPos);
@@ -6089,10 +6106,15 @@ begin
   TaskIndex := Tasks.Map(Cell.Y);
   if (TaskIndex < 0) or (not Tasks.HasChildren(TaskIndex)) then Exit;
 
-  Task := Tasks.GetTask(Cell.Y);
-  BtnLeft := Grid.CellRect(COL_TASK, Cell.Y).Left + 4 + Task.FIndentLevel * Canvas.TextWidth(' ') * 2;
+  BtnLeft := GetTaskButtonLeft(Cell.Y);
   BtnRight := BtnLeft + CollapseButtonWidth;
-  Result := (P.X >= BtnLeft) and (P.X < BtnRight);
+  if (P.X >= BtnLeft) and (P.X < BtnRight) then
+    Result := Cell.Y;
+end;
+
+function TformNotetask.IsMouseOverCollapseButton: boolean;
+begin
+  Result := GetCollapseButtonRow >= 0;
 end;
 
 function TformNotetask.GetTaskIndent(Row: integer): integer;
@@ -6108,8 +6130,9 @@ begin
 
   // Deeper levels always reserve space for the button so tasks stay aligned.
   // Level 0 reserves space only for tasks that actually have children.
+  // The gap keeps the text from touching the icon
   if (L > 0) or Tasks.HasChildren(Tasks.Map(Row)) then
-    Result := Result + CollapseButtonWidth;
+    Result := Result + CollapseButtonWidth + CollapseButtonGap;
 end;
 
 function TformNotetask.GetTaskButtonLeft(Row: integer): integer;
