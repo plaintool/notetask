@@ -2122,12 +2122,17 @@ begin
     newRow := Tasks.MoveTasksBottom(Grid.Selection.Bottom, Grid.Selection.Top, FShowArchived);
 
   FillGrid;
+
+  // MoveTasksTop returns a raw index: convert it after FillGrid rebuilt FMapGrid
+  if (newRow > -1) then
+    newRow := Tasks.ReverseMap(newRow);
+
   if (newRow > -1) then
   begin
     ResetRowHeight;
-    Grid.Row := 0;
+    Grid.Row := newRow;
     Grid.Col := selCol;
-    Grid.Selection := TGridRect.Create(selLeft, 0, selRight, selLen);
+    Grid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
   end;
   Changed := True;
   SetNote;
@@ -2154,12 +2159,17 @@ begin
     newRow := Tasks.MoveTasksTop(Grid.Selection.Bottom, Grid.Selection.Top, FShowArchived);
 
   FillGrid;
+
+  // Same as MoveTasksTop: raw index must be converted after FillGrid
+  if (newRow > -1) then
+    newRow := Tasks.ReverseMap(newRow);
+
   if (newRow > -1) then
   begin
     ResetRowHeight;
-    Grid.Row := Grid.RowCount - selLen;
+    Grid.Row := newRow;
     Grid.Col := selCol;
-    Grid.Selection := TGridRect.Create(selLeft, Grid.RowCount - selLen, selRight, Grid.RowCount);
+    Grid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
   end;
   Changed := True;
   SetNote;
@@ -2186,6 +2196,12 @@ begin
     newRow := Tasks.MoveTasksDown(Grid.Selection.Bottom, Grid.Selection.Top);
 
   FillGrid;
+
+  // Convert the raw index returned by MoveTasksUp into a grid row.
+  // FMapGrid has just been rebuilt by FillGrid, so ReverseMap is accurate here
+  if (newRow > -1) then
+    newRow := Tasks.ReverseMap(newRow);
+
   if (newRow > -1) then
   begin
     Grid.OnSelection := nil;
@@ -2224,6 +2240,11 @@ begin
     newRow := Tasks.MoveTasksUp(Grid.Selection.Bottom, Grid.Selection.Top);
 
   FillGrid;
+
+  // Same as MoveTasksUp: convert raw index into grid row after FillGrid
+  if (newRow > -1) then
+    newRow := Tasks.ReverseMap(newRow);
+
   if (newRow > -1) then
   begin
     Grid.OnSelection := nil;
@@ -2231,7 +2252,7 @@ begin
       ResetRowHeight(True, -1);
       Grid.Row := newRow;
       Grid.Col := selCol;
-      Grid.Selection := TGridRect.Create(selLeft, newRow - selLen + 1, selRight, newRow);
+      Grid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
       ResetRowHeight(True, -1);
     finally
       Grid.OnSelection := @GridSelection;
@@ -4755,9 +4776,11 @@ procedure TformNotetask.GridColRowMoved(Sender: TObject; IsColumn: boolean; sInd
 begin
   if (not IsColumn) then
   begin
-    Tasks.MoveTask(sIndex, tIndex);
+    // FillGrid is called either way: on success to show the new order,
+    // on refusal to restore the visual state after the grid's own drag
+    if Tasks.MoveTaskTree(sIndex, tIndex) then
+      Changed := True;
     FillGrid;
-    Changed := True;
   end;
 end;
 

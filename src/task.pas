@@ -105,6 +105,11 @@ type
     function GetCount: integer;
     function GetCountFilter(Archive: boolean; Filter: string; DisplayTime: boolean): integer;
     function GetTreeSortedOrder(SortOrder: TSortOrder; SortColumn: integer): TIntegerArray;
+    function GetSubtreeEnd(Index: integer): integer;
+    function GetPrevSibling(Index: integer): integer;
+    function GetNextSibling(Index: integer): integer;
+    function GetNextSiblingAtLevel(StartAfter, ALevel: integer): integer;
+    function CheckSameLevel(Index1, Index2: integer; out IndStart, IndEnd, Level: integer): boolean;
   public
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
@@ -166,6 +171,7 @@ type
     function MoveTasksDown(Index1, Index2: integer): integer;
     procedure SwapTasks(OldIndex, NewIndex: integer);
     procedure MoveTask(OldIndex, NewIndex: integer);
+    function MoveTaskTree(OldIndex, NewIndex: integer): boolean;
     procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
     function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;
     procedure FillTags;
@@ -1585,29 +1591,19 @@ end;
 
 function TTasks.MoveGroupTasks(Index1, Index2, NewGroup: integer): integer;
 var
-  i, Len, Ind, IndStart, IndEnd, LastTask: integer;
+  i, Len, Ind, IndStart, IndEnd, Level, LastTask: integer;
 begin
   Result := -1;
   if (NewGroup < 0) then exit;
+  if not CheckSameLevel(Index1, Index2, IndStart, IndEnd, Level) then exit;
+  // Only root tasks may be moved between groups
+  if Level > 0 then exit;
 
-  // Map the start and end indexes of the task range
-  IndStart := Map(Index1);
-  IndEnd := Map(Index2);
-  if (IndStart > IndEnd) then
-  begin
-    i := IndEnd;
-    IndEnd := IndStart;
-    IndStart := i;
-  end;
-
-  // Calculate the number of tasks to move
   Len := IndEnd - IndStart + 1;
-
-  // Get the last task index in the new group and resize the group array
   LastTask := Length(FGroupList[NewGroup]);
   SetLength(FGroupList[NewGroup], LastTask + Len);
 
-  // Copy tasks from the current list to the new group
+  // Copy tasks with their subtrees into the destination group
   Ind := IndStart;
   for i := LastTask to LastTask + Len - 1 do
   begin
@@ -1616,219 +1612,219 @@ begin
     Inc(Ind);
   end;
 
-  // Remove tasks from the original group in reverse order
+  // Delete source tasks together with hidden descendants
   for i := IndEnd downto IndStart do
-    DeleteTask(ReverseMap(i));
+    DeleteTaskByInd(i);
 
-  // Change the selected group to the new group
   ChangeGroup(NewGroup, True);
 
-  // Return the index of the first moved task in the new group
   Result := LastTask;
 end;
 
 function TTasks.MoveTasksTop(Index1, Index2: integer; ShowArchived: boolean): integer;
 var
-  TempTasks: array of TTask = ();
-  i, IndStart, IndEnd, Len, TargetIndex: integer;
+  TempTasks: array of TTask = nil;
+  i, IndStart, IndEnd, Len, TargetIndex, Level, ParentIdx: integer;
 begin
   Result := -1;
-  IndStart := Map(Index1);
-  IndEnd := Map(Index2);
-  Len := IndEnd - IndStart + 1;
+  if not CheckSameLevel(Index1, Index2, IndStart, IndEnd, Level) then Exit;
 
-  // Check if the Index1 is valid
-  if (IndStart >= 0) and (IndEnd < Count) then
+  // Find the parent of the first selected root task
+  ParentIdx := -1;
+  if Level > 0 then
   begin
-    CreateBackup;
+    for i := IndStart - 1 downto 0 do
+      if FTaskList[i].FIndentLevel < Level then
+      begin
+        ParentIdx := i;
+        Break;
+      end;
+  end;
 
-    // Determine target index based on ShowArchived
+  if Level = 0 then
+  begin
     if ShowArchived then
       TargetIndex := 0
     else
     begin
-      // Find the first non-archived task from the top
       TargetIndex := 0;
       while (TargetIndex < Count) and FTaskList[TargetIndex].FArchive do
         Inc(TargetIndex);
     end;
+  end
+  else
+    // Nested task: the top of the group is the first position after the parent
+    TargetIndex := ParentIdx + 1;
 
-    // Don't move if we're already at the correct position
-    if IndStart = TargetIndex then
-    begin
-      Result := 0;
-      Exit;
-    end;
-
-    // Save selected tasks to temporary array
-    SetLength(TempTasks, Len);
-    for i := IndStart to IndEnd do
-      TempTasks[i - IndStart] := FTaskList[i];
-
-    if IndStart > TargetIndex then
-    begin
-      // Moving up - shift tasks between TargetIndex and IndStart-1 down
-      for i := IndStart - 1 downto TargetIndex do
-        FTaskList[i + Len] := FTaskList[i];
-    end
-    else
-    begin
-      // Moving down - shift tasks between IndEnd+1 and TargetIndex-1 up
-      for i := IndEnd + 1 to TargetIndex - 1 do
-        FTaskList[i - Len] := FTaskList[i];
-      TargetIndex := TargetIndex - Len;
-    end;
-
-    // Place saved tasks at the target position
-    for i := 0 to High(TempTasks) do
-      FTaskList[TargetIndex + i] := TempTasks[i];
-
-    SetLength(TempTasks, 0);
-    Result := 1;
+  if IndStart = TargetIndex then
+  begin
+    Result := TargetIndex;
+    Exit;
   end;
+
+  CreateBackup;
+
+  Len := IndEnd - IndStart + 1;
+  SetLength(TempTasks, Len);
+  for i := IndStart to IndEnd do
+    TempTasks[i - IndStart] := FTaskList[i];
+
+  if IndStart > TargetIndex then
+  begin
+    // Shift tasks between TargetIndex and IndStart - 1 down by Len
+    for i := IndStart - 1 downto TargetIndex do
+      FTaskList[i + Len] := FTaskList[i];
+  end
+  else
+  begin
+    for i := IndEnd + 1 to TargetIndex - 1 do
+      FTaskList[i - Len] := FTaskList[i];
+    TargetIndex := TargetIndex - Len;
+  end;
+
+  for i := 0 to High(TempTasks) do
+    FTaskList[TargetIndex + i] := TempTasks[i];
+
+  SetLength(TempTasks, 0);
+  Result := TargetIndex;
 end;
 
 function TTasks.MoveTasksBottom(Index1, Index2: integer; ShowArchived: boolean): integer;
 var
-  TempTasks: array of TTask = ();
-  i, IndStart, IndEnd, Len, TargetIndex: integer;
+  TempTasks: array of TTask = nil;
+  i, IndStart, IndEnd, Len, TargetIndex, Level, ParentIdx, ParentEnd: integer;
 begin
   Result := -1;
-  IndStart := Map(Index1);
-  IndEnd := Map(Index2);
-  Len := IndEnd - IndStart + 1;
+  if not CheckSameLevel(Index1, Index2, IndStart, IndEnd, Level) then Exit;
 
-  // Check if the Index1 is valid
-  if (IndStart >= 0) and (IndEnd < Count) then
+  // Find the parent and the end of the parent's subtree
+  ParentIdx := -1;
+  ParentEnd := Count - 1;
+  if Level > 0 then
   begin
-    CreateBackup;
+    for i := IndStart - 1 downto 0 do
+      if FTaskList[i].FIndentLevel < Level then
+      begin
+        ParentIdx := i;
+        Break;
+      end;
+    if ParentIdx >= 0 then
+      ParentEnd := GetSubtreeEnd(ParentIdx);
+  end;
 
-    // Determine target index based on ShowArchived
+  if Level = 0 then
+  begin
     if ShowArchived then
       TargetIndex := Count - 1
     else
     begin
-      // Find the last non-archived task from the bottom
       TargetIndex := Count - 1;
       while (TargetIndex >= 0) and FTaskList[TargetIndex].FArchive do
         Dec(TargetIndex);
     end;
+  end
+  else
+    // Nested task: the bottom of the group is the end of the parent's subtree
+    TargetIndex := ParentEnd;
 
-    // Don't move if we're already at the correct position
-    if IndEnd = TargetIndex then
-    begin
-      Result := TargetIndex;
-      Exit;
-    end;
-
-    // Save selected tasks to temporary array
-    SetLength(TempTasks, Len);
-    for i := IndStart to IndEnd do
-      TempTasks[i - IndStart] := FTaskList[i];
-
-    if IndEnd < TargetIndex then
-    begin
-      // Moving down - shift tasks between IndEnd+1 and TargetIndex up
-      for i := IndEnd + 1 to TargetIndex do
-        FTaskList[i - Len] := FTaskList[i];
-
-      // Place saved tasks at the target position
-      for i := 0 to High(TempTasks) do
-        FTaskList[TargetIndex - Len + 1 + i] := TempTasks[i];
-
-      Result := TargetIndex - Len + 1;
-    end
-    else
-    begin
-      // Moving up - shift tasks between TargetIndex+1 and IndStart-1 down
-      for i := IndStart - 1 downto TargetIndex + 1 do
-        FTaskList[i + Len] := FTaskList[i];
-
-      // Place saved tasks at the target position
-      for i := 0 to High(TempTasks) do
-        FTaskList[TargetIndex + 1 + i] := TempTasks[i];
-
-      Result := TargetIndex + 1;
-    end;
-
-    SetLength(TempTasks, 0);
+  if IndEnd = TargetIndex then
+  begin
+    // The block is already at the bottom: its root sits at IndStart
+    Result := IndStart;
+    Exit;
   end;
+
+  CreateBackup;
+
+  Len := IndEnd - IndStart + 1;
+  SetLength(TempTasks, Len);
+  for i := IndStart to IndEnd do
+    TempTasks[i - IndStart] := FTaskList[i];
+
+  if IndEnd < TargetIndex then
+  begin
+    for i := IndEnd + 1 to TargetIndex do
+      FTaskList[i - Len] := FTaskList[i];
+
+    for i := 0 to High(TempTasks) do
+      FTaskList[TargetIndex - Len + 1 + i] := TempTasks[i];
+
+    Result := TargetIndex - Len + 1;
+  end
+  else
+  begin
+    for i := IndStart - 1 downto TargetIndex + 1 do
+      FTaskList[i + Len] := FTaskList[i];
+
+    for i := 0 to High(TempTasks) do
+      FTaskList[TargetIndex + 1 + i] := TempTasks[i];
+
+    Result := TargetIndex + 1;
+  end;
+
+  SetLength(TempTasks, 0);
 end;
 
 function TTasks.MoveTasksUp(Index1, Index2: integer): integer;
 var
-  TempTasks: array of TTask; // Temporary array for selected tasks
-  i, IndStart, IndEnd, Len: integer;
+  TempTasks: array of TTask = nil;
+  i, IndStart, IndEnd, Len, Level, PrevSib: integer;
 begin
   Result := -1;
-  IndStart := Map(Index1);
-  IndEnd := Map(Index2);
+  if not CheckSameLevel(Index1, Index2, IndStart, IndEnd, Level) then Exit;
+
+  PrevSib := GetPrevSibling(IndStart);
+  if PrevSib < 0 then Exit;
+
+  CreateBackup;
+
   Len := IndEnd - IndStart + 1;
+  SetLength(TempTasks, Len);
+  for i := IndStart to IndEnd do
+    TempTasks[i - IndStart] := FTaskList[i];
 
-  // Check if the selection is not at the top and valid
-  if (IndStart > 0) and (IndEnd < Count) then
-  begin
-    // Refuse the move when it would cross the parent boundary
-    if FTaskList[IndStart - 1].FIndentLevel < FTaskList[IndStart].FIndentLevel then
-      Exit;
-    CreateBackup;
+  // Shift the previous sibling's subtree down by Len
+  for i := IndStart - 1 downto PrevSib do
+    FTaskList[i + Len] := FTaskList[i];
 
-    // Save selected tasks to temporary array
-    TempTasks := [];
-    SetLength(TempTasks, Len);
-    for i := IndStart to IndEnd do
-      TempTasks[i - IndStart] := FTaskList[i];
+  // Place the block at the previous sibling position
+  for i := 0 to High(TempTasks) do
+    FTaskList[PrevSib + i] := TempTasks[i];
 
-    // Shift tasks up by one position to fill the gap
-    for i := IndEnd downto IndEnd - Len + 1 do
-      if (i - Len >= 0) then
-        FTaskList[i] := FTaskList[i - Len];
-
-    // Place saved tasks at the new position
-    for i := 0 to High(TempTasks) do
-      FTaskList[IndStart - 1 + i] := TempTasks[i];
-
-    Result := ReverseMap(IndStart - 1);
-  end;
+  SetLength(TempTasks, 0);
+  Result := PrevSib;
 end;
 
 function TTasks.MoveTasksDown(Index1, Index2: integer): integer;
 var
-  TempTasks: array of TTask; // Temporary array for selected tasks
-  i, IndStart, IndEnd, Len: integer;
+  TempTasks: array of TTask = nil;
+  i, IndStart, IndEnd, Len, Level, NextSib, NextSibEnd: integer;
 begin
   Result := -1;
-  IndStart := Map(Index1);
-  IndEnd := Map(Index2);
+  if not CheckSameLevel(Index1, Index2, IndStart, IndEnd, Level) then Exit;
+
+  // Use the block level, not the level of the last descendant
+  NextSib := GetNextSiblingAtLevel(IndEnd, Level);
+  if NextSib < 0 then Exit;
+
+  CreateBackup;
+
   Len := IndEnd - IndStart + 1;
+  NextSibEnd := GetSubtreeEnd(NextSib);
+  SetLength(TempTasks, Len);
+  for i := IndStart to IndEnd do
+    TempTasks[i - IndStart] := FTaskList[i];
 
-  // Check if the selection is not at the bottom and valid
-  if (IndEnd < Count - 1) and (IndStart >= 0) then
-  begin
-    // Refuse the move when it would cross the parent boundary
-    if FTaskList[IndEnd + 1].FIndentLevel < FTaskList[IndEnd].FIndentLevel then
-      Exit;
-    CreateBackup;
+  // Shift the next sibling's subtree up by Len
+  for i := NextSib to NextSibEnd do
+    FTaskList[i - Len] := FTaskList[i];
 
-    // Save selected tasks to temporary array
-    TempTasks := [];
-    SetLength(TempTasks, Len);
-    for i := IndStart to IndEnd do
-      TempTasks[i - IndStart] := FTaskList[i];
+  // Place the block right after the shifted sibling subtree
+  for i := 0 to High(TempTasks) do
+    FTaskList[NextSibEnd - Len + 1 + i] := TempTasks[i];
 
-    // Shift tasks down by one position to fill the gap
-    for i := IndStart to IndEnd do
-      if (i + Len < Count) then
-      begin
-        FTaskList[i] := FTaskList[i + Len];
-      end;
-
-    // Place saved tasks at the new position
-    for i := 0 to High(TempTasks) do
-      FTaskList[IndStart + 1 + i] := TempTasks[i];
-
-    Result := ReverseMap(IndEnd + 1);
-  end;
+  SetLength(TempTasks, 0);
+  Result := NextSibEnd - Len + 1;
 end;
 
 procedure TTasks.SwapTasks(OldIndex, NewIndex: integer);
@@ -1897,6 +1893,98 @@ begin
 
   // Update FMapGrid (if necessary)
   // This may require additional logic depending on how you want to track indices.
+end;
+
+function TTasks.MoveTaskTree(OldIndex, NewIndex: integer): boolean;
+var
+  IndOld, IndOldEnd, Len, I, J, InsertAt, NewInd, Level: integer;
+  OldParent, NewParent: TTask;
+  TempTasks: array of TTask = nil;
+  NewList: array of TTask = nil;
+begin
+  Result := False;
+  if (OldIndex < 1) or (NewIndex < 1) then Exit;
+  if (OldIndex = NewIndex) then Exit;
+
+  IndOld := Map(OldIndex);
+  if (IndOld < 0) then Exit;
+  IndOldEnd := GetSubtreeEnd(IndOld);
+  Len := IndOldEnd - IndOld + 1;
+  Level := FTaskList[IndOld].FIndentLevel;
+
+  NewInd := Map(NewIndex);
+  if (NewInd < 0) then Exit;
+
+  // A drop inside the moved block has no meaning
+  if (NewInd >= IndOld) and (NewInd <= IndOldEnd) then Exit;
+
+  // Remember the parent task of the moved block
+  OldParent := nil;
+  if Level > 0 then
+    for I := IndOld - 1 downto 0 do
+      if FTaskList[I].FIndentLevel < Level then
+      begin
+        OldParent := FTaskList[I];
+        Break;
+      end;
+
+  // Build the list without the block and locate the insertion point
+  SetLength(TempTasks, Len);
+  for I := 0 to Len - 1 do
+    TempTasks[I] := FTaskList[IndOld + I];
+
+  SetLength(NewList, Count - Len);
+  J := 0;
+  for I := 0 to Count - 1 do
+    if (I < IndOld) or (I > IndOldEnd) then
+    begin
+      NewList[J] := FTaskList[I];
+      Inc(J);
+    end;
+
+  if NewInd < IndOld then
+    InsertAt := NewInd
+  else
+    InsertAt := NewInd - Len + 1;
+
+  // The parent at the new position must match the original parent
+  NewParent := nil;
+  if Level > 0 then
+    for I := InsertAt - 1 downto 0 do
+      if NewList[I].FIndentLevel < Level then
+      begin
+        NewParent := NewList[I];
+        Break;
+      end;
+
+  if NewParent <> OldParent then
+  begin
+    SetLength(TempTasks, 0);
+    SetLength(NewList, 0);
+    Exit;
+  end;
+
+  // The task right after the block must not be deeper than the block level,
+  // otherwise the drop would split another subtree
+  if (InsertAt < Length(NewList)) and (NewList[InsertAt].FIndentLevel > Level) then
+  begin
+    SetLength(TempTasks, 0);
+    SetLength(NewList, 0);
+    Exit;
+  end;
+
+  CreateBackup;
+
+  for I := 0 to InsertAt - 1 do
+    FTaskList[I] := NewList[I];
+  for I := 0 to Len - 1 do
+    FTaskList[InsertAt + I] := TempTasks[I];
+  for I := InsertAt + Len to Count - 1 do
+    FTaskList[I] := NewList[I - Len];
+
+  SetLength(TempTasks, 0);
+  SetLength(NewList, 0);
+  Result := True;
 end;
 
 procedure TTasks.CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
@@ -2864,6 +2952,103 @@ begin
   OutPos := 0;
   Flatten(-1);
   Result := Out;
+end;
+
+{ TTask helpers }
+
+function TTasks.GetSubtreeEnd(Index: integer): integer;
+var
+  BaseLevel, I: integer;
+begin
+  Result := Index;
+  if (Index < 0) or (Index >= Count) then Exit;
+  BaseLevel := FTaskList[Index].FIndentLevel;
+  for I := Index + 1 to Count - 1 do
+  begin
+    if FTaskList[I].FIndentLevel > BaseLevel then
+      Result := I
+    else
+      Break;
+  end;
+end;
+
+function TTasks.GetPrevSibling(Index: integer): integer;
+var
+  I, Level: integer;
+begin
+  Result := -1;
+  if (Index <= 0) or (Index >= Count) then Exit;
+  Level := FTaskList[Index].FIndentLevel;
+  for I := Index - 1 downto 0 do
+  begin
+    if FTaskList[I].FIndentLevel < Level then Exit;
+    if FTaskList[I].FIndentLevel = Level then Exit(I);
+  end;
+end;
+
+function TTasks.GetNextSibling(Index: integer): integer;
+var
+  I, Level: integer;
+begin
+  Result := -1;
+  if (Index < 0) or (Index >= Count - 1) then Exit;
+  Level := FTaskList[Index].FIndentLevel;
+  for I := Index + 1 to Count - 1 do
+  begin
+    if FTaskList[I].FIndentLevel < Level then Exit;
+    if FTaskList[I].FIndentLevel = Level then Exit(I);
+  end;
+end;
+
+function TTasks.GetNextSiblingAtLevel(StartAfter, ALevel: integer): integer;
+var
+  I: integer;
+begin
+  // Search forward for the next task at the given level
+  Result := -1;
+  for I := StartAfter + 1 to Count - 1 do
+  begin
+    if FTaskList[I].FIndentLevel < ALevel then Exit;
+    if FTaskList[I].FIndentLevel = ALevel then Exit(I);
+  end;
+end;
+
+function TTasks.CheckSameLevel(Index1, Index2: integer; out IndStart, IndEnd, Level: integer): boolean;
+var
+  I, J, FirstInd, LastInd, PrevInd: integer;
+begin
+  Result := False;
+  IndStart := -1;
+  IndEnd := -1;
+  Level := -1;
+  FirstInd := -1;
+  LastInd := -1;
+  PrevInd := -2;
+  for I := Index1 to Index2 do
+  begin
+    if Map(I) < 0 then Continue;
+    if FirstInd < 0 then
+    begin
+      FirstInd := Map(I);
+      Level := FTaskList[FirstInd].FIndentLevel;
+      PrevInd := FirstInd;
+      LastInd := FirstInd;
+    end
+    else
+    begin
+      // Different selected levels - movement not allowed
+      if FTaskList[Map(I)].FIndentLevel <> Level then Exit;
+      // A gap between two selected rows must contain only descendants
+      for J := PrevInd + 1 to Map(I) - 1 do
+        if FTaskList[J].FIndentLevel <= Level then Exit;
+      PrevInd := Map(I);
+      LastInd := Map(I);
+    end;
+  end;
+  if FirstInd < 0 then Exit;
+  IndStart := FirstInd;
+  IndEnd := GetSubtreeEnd(LastInd);
+  Result := True;
 end;
 
 procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder;
