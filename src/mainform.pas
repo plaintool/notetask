@@ -4910,7 +4910,12 @@ begin
       DrawRect := aRect;
       DrawRect.Inflate(-4, 0);
       if (aCol = COL_TASK) then
-        DrawRect.Inflate(-Indent, 0, 0, 0);
+      begin
+        if FBiDiRightToLeft then
+          DrawRect.Inflate(0, 0, -Indent, 0)
+        else
+          DrawRect.Inflate(-Indent, 0, 0, 0);
+      end;
 
       // Save original boundaries
       OriginalLeft := DrawRect.Left;
@@ -5950,7 +5955,11 @@ var
           begin
             // Reserve space for the indent and the collapse button
             Indent := GetTaskIndent(row);
-            drawrect.Left := drawrect.Left + Indent;
+            if FBiDiRightToLeft then
+              drawrect.Right := drawrect.Right - Indent
+            else
+              drawrect.Left := drawrect.Left + Indent;
+
             if task.TagsWidth < drawrect.Width then
             begin
               if FBiDiRightToLeft then
@@ -6146,7 +6155,13 @@ begin
   Task := Tasks.GetTask(Row);
   L := Task.FIndentLevel;
   Rect := Grid.CellRect(COL_TASK, Row);
-  Result := Rect.Left + 4 + L * Grid.Canvas.TextWidth(' ') * 2;
+
+  // In RTL the button sits on the right side of the cell and the indent
+  // also grows towards the left
+  if FBiDiRightToLeft then
+    Result := Rect.Right - 4 - L * Grid.Canvas.TextWidth(' ') * 2 - CollapseButtonWidth
+  else
+    Result := Rect.Left + 4 + L * Grid.Canvas.TextWidth(' ') * 2;
 end;
 
 procedure TformNotetask.FixDatePickerFont(Data: PtrInt);
@@ -7656,8 +7671,8 @@ begin
         Tasks.CreateBackup;
       end;
 
-      // RemoveTask from collection
-      Grid.DeleteRow(RowIndex);
+      // Delete the task together with all its hidden and visible children
+      Tasks.DeleteTasksInRange(RowIndex, RowIndex);
       FillGrid;
       ResetRowHeight;
       SetTabs;
@@ -7672,7 +7687,7 @@ end;
 
 procedure TformNotetask.DeleteTasks(ShowConfirm: boolean = True);
 var
-  i, RowIndex, Confirm: integer;
+  Confirm: integer;
 begin
   if (ReadOnly) then exit;
 
@@ -7693,21 +7708,8 @@ begin
         Tasks.CreateBackup;
       end;
 
-      DisableGridEvents;
-      try
-        // Delete rows from the end to avoid index shifting
-        for i := Grid.Selection.Bottom downto Grid.Selection.Top do
-        begin
-          RowIndex := i;
-          if (RowIndex > 0) and (RowIndex <= Tasks.Count) and (Grid.RowCount > RowIndex) then
-          begin
-            // Remove the task from the collection
-            Grid.DeleteRow(RowIndex);
-          end;
-        end;
-      finally
-        EnableGridEvents;
-      end;
+      // Delete the whole selection together with all nested children
+      Tasks.DeleteTasksInRange(Grid.Selection.Top, Grid.Selection.Bottom);
 
       Grid.ClearSelections;
       FillGrid;
@@ -7750,8 +7752,8 @@ begin
         Tasks.CreateBackup;
       end;
 
-      // Archivate task
-      Tasks.ArchiveTask(RowIndex);
+      // Archive the task together with all its hidden and visible children
+      Tasks.ArchiveTasksInRange(RowIndex, RowIndex);
       FillGrid;
       ResetRowHeight;
       SetTabs;
@@ -7765,7 +7767,7 @@ end;
 
 procedure TformNotetask.ArchiveTasks;
 var
-  i, RowIndex, Confirm: integer;
+  Confirm: integer;
 begin
   if (ReadOnly) then exit;
 
@@ -7784,21 +7786,9 @@ begin
         Tasks.CreateBackup;
       end;
 
-      DisableGridEvents;
-      try
-        // Archive tasks from the end to avoid index shifting
-        for i := Grid.Selection.Bottom downto Grid.Selection.Top do
-        begin
-          RowIndex := i;
-          if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
-          begin
-            // Archive the task from the collection
-            Tasks.ArchiveTask(RowIndex);
-          end;
-        end;
-      finally
-        EnableGridEvents;
-      end;
+      // Archive the whole selection together with all nested children
+      Tasks.ArchiveTasksInRange(Grid.Selection.Top, Grid.Selection.Bottom);
+
       FillGrid;
       ResetRowHeight;
       SetTabs;

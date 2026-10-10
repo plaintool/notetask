@@ -134,7 +134,10 @@ type
     procedure SetTask(Grid: TStringGrid; Memo: TMemo; Row: integer; Backup: boolean = True; DisplayTime: boolean = True);
     function InsertTask(const TaskString: string; Index: integer; Backup: boolean = True; InsertBefore: boolean = False): integer;
     procedure DeleteTask(Index: integer);
+    procedure DeleteTaskByInd(Ind: integer);
+    procedure DeleteTasksInRange(StartRow, EndRow: integer);
     procedure ArchiveTask(Index: integer);
+    procedure ArchiveTasksInRange(StartRow, EndRow: integer);
     procedure CompleteTask(Index: integer; Backup: boolean = True);
     procedure StarTask(Index: integer; Backup: boolean = True);
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
@@ -1008,6 +1011,79 @@ begin
   SetLength(FMapGrid, Length(FMapGrid) - 1);
 end;
 
+procedure TTasks.DeleteTaskByInd(Ind: integer);
+var
+  i, GridRow: integer;
+begin
+  // Low-level removal by the raw index in FTaskList
+  if (Ind < 0) or (Ind >= Count) then Exit;
+
+  if Assigned(FTaskList[Ind]) then
+    FTaskList[Ind].Free;
+
+  for i := Ind to Count - 2 do
+    FTaskList[i] := FTaskList[i + 1];
+  SetLength(FTaskList, Count - 1);
+
+  // Drop the grid row entry if the task was visible
+  GridRow := -1;
+  for i := 0 to Length(FMapGrid) - 1 do
+    if FMapGrid[i] = Ind then
+    begin
+      GridRow := i;
+      Break;
+    end;
+
+  if GridRow >= 0 then
+  begin
+    for i := GridRow to Length(FMapGrid) - 2 do
+      FMapGrid[i] := FMapGrid[i + 1];
+    SetLength(FMapGrid, Length(FMapGrid) - 1);
+  end;
+
+  // Shift the remaining task indices that pointed past the removed task
+  for i := 0 to Length(FMapGrid) - 1 do
+    if FMapGrid[i] > Ind then
+      Dec(FMapGrid[i]);
+end;
+
+procedure TTasks.DeleteTasksInRange(StartRow, EndRow: integer);
+var
+  Flags: array of boolean = nil;
+  i, Ind, Level: integer;
+begin
+  if (StartRow < 1) or (EndRow < 1) or (StartRow > EndRow) then Exit;
+
+  SetLength(Flags, Count);
+
+  // Mark every task inside the selected grid rows
+  for i := StartRow to EndRow do
+  begin
+    Ind := Map(i);
+    if (Ind >= 0) and (Ind < Count) then
+      Flags[Ind] := True;
+  end;
+
+  // Mark every descendant of the selected tasks
+  for Ind := 0 to Count - 1 do
+    if Flags[Ind] then
+    begin
+      Level := FTaskList[Ind].FIndentLevel;
+      for i := Ind + 1 to Count - 1 do
+      begin
+        if FTaskList[i].FIndentLevel > Level then
+          Flags[i] := True
+        else
+          Break;
+      end;
+    end;
+
+  // Delete from the end so the remaining indices stay valid
+  for Ind := Count - 1 downto 0 do
+    if Flags[Ind] then
+      DeleteTaskByInd(Ind);
+end;
+
 procedure TTasks.ArchiveTask(Index: integer);
 var
   Ind: integer;
@@ -1017,6 +1093,51 @@ begin
     exit;
 
   FTaskList[Ind].Archive := not FTaskList[Ind].Archive;
+end;
+
+procedure TTasks.ArchiveTasksInRange(StartRow, EndRow: integer);
+var
+  Flags: array of boolean = nil;
+  NewState, Found: boolean;
+  i, Ind, Level: integer;
+begin
+  if (StartRow < 1) or (EndRow < 1) or (StartRow > EndRow) then Exit;
+
+  SetLength(Flags, Count);
+
+  for i := StartRow to EndRow do
+  begin
+    Ind := Map(i);
+    if (Ind >= 0) and (Ind < Count) then
+      Flags[Ind] := True;
+  end;
+
+  // Pick the target state from the first selected task: toggle it
+  NewState := False;
+  Found := False;
+  for Ind := 0 to Count - 1 do
+    if Flags[Ind] then
+    begin
+      NewState := not FTaskList[Ind].Archive;
+      Found := True;
+      Break;
+    end;
+  if not Found then Exit;
+
+  // Apply the state to the selected tasks and to all their descendants
+  for Ind := 0 to Count - 1 do
+    if Flags[Ind] then
+    begin
+      FTaskList[Ind].Archive := NewState;
+      Level := FTaskList[Ind].FIndentLevel;
+      for i := Ind + 1 to Count - 1 do
+      begin
+        if FTaskList[i].FIndentLevel > Level then
+          FTaskList[i].Archive := NewState
+        else
+          Break;
+      end;
+    end;
 end;
 
 procedure TTasks.CompleteTask(Index: integer; Backup: boolean = True);
