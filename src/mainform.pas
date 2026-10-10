@@ -8055,16 +8055,11 @@ var
   RowIndex: integer;
   TaskIndex: integer;
   SelectedTasks: TIntegerArray = nil;
+  IsDescendantFlags: array of boolean = nil;
   i, j: integer;
-  IsDescendant: boolean;
+  CanProceed: boolean;
 begin
   if (ReadOnly) then exit;
-
-  if FBackup then
-  begin
-    GridBackupSelection;
-    Tasks.CreateBackup;
-  end;
 
   // Collect the task indices of the selection
   for RowIndex := Grid.Selection.Top to Grid.Selection.Bottom do
@@ -8075,28 +8070,51 @@ begin
       SelectedTasks[High(SelectedTasks)] := TaskIndex;
     end;
 
-  // Process only the root tasks of the selection. Descendants follow their parent
+  // Flag every task that is a descendant of another selected task
+  SetLength(IsDescendantFlags, Length(SelectedTasks));
   for i := 0 to High(SelectedTasks) do
-  begin
-    IsDescendant := False;
     for j := 0 to High(SelectedTasks) do
       if (i <> j) and Tasks.IsTaskDescendant(SelectedTasks[j], SelectedTasks[i]) then
       begin
-        IsDescendant := True;
+        IsDescendantFlags[i] := True;
         Break;
       end;
-    if not IsDescendant then
-      Tasks.IndentTask(SelectedTasks[i], Outdent);
+
+  // Precheck: if any root task cannot be indented, abort the whole operation
+  // so the selection never turns into a chain
+  CanProceed := Length(SelectedTasks) > 0;
+  for i := 0 to High(SelectedTasks) do
+    if not IsDescendantFlags[i] then
+      if not Tasks.CanIndentTask(SelectedTasks[i], Outdent) then
+      begin
+        CanProceed := False;
+        Break;
+      end;
+
+  if CanProceed then
+  begin
+    if FBackup then
+    begin
+      GridBackupSelection;
+      Tasks.CreateBackup;
+    end;
+
+    // Process only the root tasks of the selection. Descendants follow their parent
+    for i := 0 to High(SelectedTasks) do
+      if not IsDescendantFlags[i] then
+        Tasks.IndentTask(SelectedTasks[i], Outdent);
+
+    FillGrid;
+    ResetRowHeight;
+    CalcRowHeight(True);
+    SetInfo;
+    SetNote;
+    SetTags;
+    Changed := True;
   end;
 
   SetLength(SelectedTasks, 0);
-  FillGrid;
-  ResetRowHeight;
-  CalcRowHeight(True);
-  SetInfo;
-  SetNote;
-  SetTags;
-  Changed := True;
+  SetLength(IsDescendantFlags, 0);
 end;
 
 procedure TformNotetask.GridBackupSelection;

@@ -172,6 +172,7 @@ type
     procedure SwapTasks(OldIndex, NewIndex: integer);
     procedure MoveTask(OldIndex, NewIndex: integer);
     function MoveTaskTree(OldIndex, NewIndex: integer): boolean;
+    function CanIndentTask(Index: integer; Outdent: boolean): boolean;
     procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
     function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;
     procedure FillTags;
@@ -1987,6 +1988,30 @@ begin
   Result := True;
 end;
 
+function TTasks.CanIndentTask(Index: integer; Outdent: boolean): boolean;
+var
+  OldLevel, NewLevel, AboveLevel: integer;
+begin
+  // Dry run of IndentTask: tells whether the task can be indented right now
+  Result := False;
+  if (Index < 0) or (Index >= Count) then Exit;
+  OldLevel := FTaskList[Index].FIndentLevel;
+  if Outdent then
+  begin
+    if OldLevel = 0 then Exit;
+    Result := True;
+  end
+  else
+  begin
+    NewLevel := OldLevel + 1;
+    if Index = 0 then
+      AboveLevel := -1
+    else
+      AboveLevel := FTaskList[Index - 1].FIndentLevel;
+    Result := NewLevel <= AboveLevel + 1;
+  end;
+end;
+
 procedure TTasks.CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
 begin
   mdformat.TasksToClipboard(Grid, NoteVisible, Value, @GetTask);
@@ -2749,6 +2774,8 @@ begin
   Result := CalcDateDiffAccuracy(0, TotalDuration).Replace('-', string.Empty);
 end;
 
+{ Private methods }
+
 function TTasks.GetGroupCount: integer;
 begin
   Result := Length(FGroupList);
@@ -2954,8 +2981,6 @@ begin
   Result := Out;
 end;
 
-{ TTask helpers }
-
 function TTasks.GetSubtreeEnd(Index: integer): integer;
 var
   BaseLevel, I: integer;
@@ -3050,6 +3075,8 @@ begin
   IndEnd := GetSubtreeEnd(LastInd);
   Result := True;
 end;
+
+{ FillGrid }
 
 procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder;
   SortColumn: integer; Filter: string);
