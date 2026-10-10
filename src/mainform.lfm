@@ -500,6 +500,9 @@ object formNotetask: TformNotetask
       object menuOutdentTasks: TMenuItem
         Action = aOutdentTasks
       end
+      object menuCollapseExpand: TMenuItem
+        Action = ACollapseExpand
+      end
       object Separator15: TMenuItem
         Caption = '-'
       end
@@ -1294,6 +1297,12 @@ object formNotetask: TformNotetask
       ShortCut = 8201
       OnExecute = aOutdentTasksExecute
     end
+    object ACollapseExpand: TAction
+      Category = 'Task'
+      Caption = 'Collapse task'
+      ShortCut = 16397
+      OnExecute = ACollapseExpandExecute
+    end
     object aChatGpt: TAction
       Category = 'Task'
       Caption = 'Ask ChatGPT...'
@@ -1391,6 +1400,9 @@ object formNotetask: TformNotetask
     end
     object contextOutdentTasks: TMenuItem
       Action = aOutdentTasks
+    end
+    object contextCollapseExpand: TMenuItem
+      Action = ACollapseExpand
     end
     object Separator11: TMenuItem
       Caption = '-'

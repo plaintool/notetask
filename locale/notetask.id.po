@@ -429,6 +429,10 @@ msgstr "Tanya ChatGPT..."
 msgid "Check for updates"
 msgstr "Periksa pembaruan"
 
+#: tformnotetask.acollapseexpand.caption
+msgid "Collapse task"
+msgstr "Ciutkan tugas"
+
 #: tformnotetask.acopy.caption
 msgctxt "tformnotetask.acopy.caption"
 msgid "Copy"

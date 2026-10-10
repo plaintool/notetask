@@ -429,6 +429,10 @@ msgstr "ChatGPTに聞く..."
 msgid "Check for updates"
 msgstr "アップデートを確認"
 
+#: tformnotetask.acollapseexpand.caption
+msgid "Collapse task"
+msgstr "タスクを折りたたむ"
+
 #: tformnotetask.acopy.caption
 msgctxt "tformnotetask.acopy.caption"
 msgid "Copy"

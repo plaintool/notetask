@@ -52,6 +52,7 @@ type
     aCopy: TAction;
     aCheckforupdates: TAction;
     aAutoCheckUpdates: TAction;
+    ACollapseExpand: TAction;
     aMergeNotes: TAction;
     aLangTurkish: TAction;
     aLangGreek: TAction;
@@ -125,6 +126,8 @@ type
     filterClear: TSpeedButton;
     fontDialog: TFontDialog;
     ImagesTree: TImageList;
+    menuCollapseExpand: TMenuItem;
+    contextCollapseExpand: TMenuItem;
     menuMergeTaskNotes: TMenuItem;
     TabsGroup: TTabControl;
     contextColor: TMenuItem;
@@ -444,6 +447,7 @@ type
     procedure aShowColumnFavoriteExecute(Sender: TObject);
     procedure aIndentTasksExecute(Sender: TObject);
     procedure aOutdentTasksExecute(Sender: TObject);
+    procedure ACollapseExpandExecute(Sender: TObject);
     procedure aRunTerminalExecute(Sender: TObject);
     procedure aMergeTasksExecute(Sender: TObject);
     procedure aShowNoteExecute(Sender: TObject);
@@ -1406,6 +1410,15 @@ begin
     Key := 0;
   end
   else
+  if (Shift = [ssCtrl]) and (Key = VK_RETURN) and (not IsEditing) then // Ctrl + Enter
+  begin
+    // Toggle collapse of the current task. Inside the memo editor the
+    // same shortcut inserts a line break, so this branch only runs
+    // when the grid is not being edited
+    aCollapseExpand.Execute;
+    Key := 0;
+  end
+  else
   if (Key = VK_RETURN) then // Enter
   begin
     if IsEditing then
@@ -2278,6 +2291,36 @@ begin
   if Grid.RowCount < 2 then exit;
   EditComplete;
   IndentTasks(True);
+end;
+
+procedure TformNotetask.ACollapseExpandExecute(Sender: TObject);
+var
+  Row, Ind: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if IsEditing then exit;
+  if Grid.RowCount < 2 then exit;
+
+  Row := Grid.Row;
+  if (Row <= 0) or (not Tasks.HasTask(Row)) then exit;
+
+  // Collapse is available only for tasks that have children
+  Ind := Tasks.Map(Row);
+  if not Tasks.HasChildren(Ind) then exit;
+
+  Tasks.ToggleCollapse(Ind);
+  FillGrid;
+  ResetRowHeight;
+
+  // The parent stays visible after collapse, so the same row still exists
+  if (Row < Grid.RowCount) then
+  begin
+    Grid.Row := Row;
+    Grid.Col := COL_TASK;
+  end;
+  SetInfo;
+  SetNote;
+  SetTags;
 end;
 
 procedure TformNotetask.aArchiveTasksExecute(Sender: TObject);

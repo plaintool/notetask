@@ -962,8 +962,12 @@ begin
 
   if (not InsertBefore) then
     Inc(Ind);
+  // Take the level from the task that will follow the new one.
+  // At the end of the list fall back to the task we insert after
   if Ind < Count then
-    Indent := FTaskList[Ind].IndentLevel;
+    Indent := FTaskList[Ind].IndentLevel
+  else if Ind > 0 then
+    Indent := FTaskList[Ind - 1].IndentLevel;
   Task := TTask.Create(TaskString); // Create a new task
   Task.IndentLevel := Indent;
   SetLength(FTaskList, Count + 1); // Resize the array

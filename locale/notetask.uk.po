@@ -429,6 +429,10 @@ msgstr "Запитати ChatGPT..."
 msgid "Check for updates"
 msgstr "Перевірити оновлення"
 
+#: tformnotetask.acollapseexpand.caption
+msgid "Collapse task"
+msgstr "Згорнути завдання"
+
 #: tformnotetask.acopy.caption
 msgctxt "tformnotetask.acopy.caption"
 msgid "Copy"
