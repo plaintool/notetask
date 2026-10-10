@@ -110,6 +110,7 @@ type
     function GetNextSibling(Index: integer): integer;
     function GetNextSiblingAtLevel(StartAfter, ALevel: integer): integer;
     function CheckSameLevel(Index1, Index2: integer; out IndStart, IndEnd, Level: integer): boolean;
+    function HasMatchingDescendant(Index: integer; const Filter: string; DisplayTime: boolean): boolean;
   public
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
@@ -2852,8 +2853,21 @@ var
 begin
   Result := 0;
   for I := 0 to Count - 1 do
-    if (not Archive and FTaskList[I].Archive) or (not FTaskList[I].MatchesFilter(Filter, DisplayTime)) or (not IsTaskVisible(I)) then
-      Result += 1;
+  begin
+    if (not Archive) and FTaskList[I].Archive then
+      Inc(Result)
+    else if (Filter = string.Empty) then
+    begin
+      if not IsTaskVisible(I) then
+        Inc(Result);
+    end
+    else
+    begin
+      // Same predicate as in FillGrid so RowCount matches the filled rows
+      if not (FTaskList[I].MatchesFilter(Filter, DisplayTime) or HasMatchingDescendant(I, Filter, DisplayTime)) then
+        Inc(Result);
+    end;
+  end;
 end;
 
 function TTasks.GetTreeSortedOrder(SortOrder: TSortOrder; SortColumn: integer): TIntegerArray;
@@ -3136,6 +3150,20 @@ begin
   Result := True;
 end;
 
+function TTasks.HasMatchingDescendant(Index: integer; const Filter: string; DisplayTime: boolean): boolean;
+var
+  I, Level: integer;
+begin
+  // Tells whether any task below Index matches the filter
+  Result := False;
+  Level := FTaskList[Index].FIndentLevel;
+  for I := Index + 1 to Count - 1 do
+  begin
+    if FTaskList[I].FIndentLevel <= Level then Exit;
+    if FTaskList[I].MatchesFilter(Filter, DisplayTime) then Exit(True);
+  end;
+end;
+
 { FillGrid }
 
 procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder;
@@ -3335,11 +3363,26 @@ begin
     for K := 0 to High(Order) do
     begin
       I := Order[K];
-      if ((ShowArchive = True) or (FTaskList[I].Archive = False)) and ((Filter = string.Empty) or
-        (FTaskList[I].MatchesFilter(Filter, DisplayTime))) and IsTaskVisible(I) then
+      if ((ShowArchive = True) or (FTaskList[I].Archive = False)) then
       begin
-        DisplayRow[I] := RowIndex;
-        Inc(RowIndex);
+        if (Filter = string.Empty) then
+        begin
+          if IsTaskVisible(I) then
+          begin
+            DisplayRow[I] := RowIndex;
+            Inc(RowIndex);
+          end;
+        end
+        else
+        begin
+          // With an active filter the collapse state is ignored, so hidden
+          // matches and their ancestors are shown for context
+          if FTaskList[I].MatchesFilter(Filter, DisplayTime) or HasMatchingDescendant(I, Filter, DisplayTime) then
+          begin
+            DisplayRow[I] := RowIndex;
+            Inc(RowIndex);
+          end;
+        end;
       end;
     end;
 
