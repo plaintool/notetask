@@ -1906,6 +1906,9 @@ var
   Ind: integer;
   NewRow: integer;
   TaskText, Oper, Value: string;
+  TaskInd, Level, LastInd: integer;
+  ForceLevel: integer;
+  ListIndex: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if TabsGroup.Tabs.Count = 0 then exit;
@@ -1927,12 +1930,53 @@ begin
     end;
   end;
 
+  // Decide the target position and level explicitly for every case:
+  // leaf -> same level as the current task, expanded parent -> first child,
+  // collapsed parent -> after the hidden subtree at the parent level
+  ForceLevel := -1;
+  ListIndex := -1;
+  TaskInd := Tasks.Map(Grid.Row);
+  if TaskInd >= 0 then
+  begin
+    Level := Tasks.GetTaskByIndex(TaskInd).IndentLevel;
+    if Tasks.HasChildren(TaskInd) then
+    begin
+      if Tasks.GetTaskByIndex(TaskInd).Collapsed then
+      begin
+        // Collapsed: insert after the hidden subtree at the parent level
+        LastInd := TaskInd;
+        while (LastInd + 1 < Tasks.Count) and (Tasks.GetTaskByIndex(LastInd + 1).IndentLevel > Level) do
+          Inc(LastInd);
+        ForceLevel := Level;
+        if SortOrder = soAscending then
+          ListIndex := LastInd
+        else
+          ListIndex := LastInd + 1;
+      end
+      else
+      begin
+        // Expanded: insert as the first child
+        ForceLevel := Level + 1;
+        if SortOrder = soAscending then
+          ListIndex := TaskInd
+        else
+          ListIndex := TaskInd + 1;
+      end;
+    end
+    else
+    begin
+      // Leaf: keep the same level as the current task
+      ForceLevel := Level;
+      ListIndex := TaskInd;
+    end;
+  end;
+
   // In descending order the new task must appear visually below the anchor,
   // which means inserting before the anchor in storage order
   if (SortOrder = soAscending) then
-    Ind := Tasks.InsertTask(TaskText, Grid.Row)
+    Ind := Tasks.InsertTask(TaskText, Grid.Row, True, False, ForceLevel, ListIndex)
   else
-    Ind := Tasks.InsertTask(TaskText, Grid.Row, True, True);
+    Ind := Tasks.InsertTask(TaskText, Grid.Row, True, True, ForceLevel, ListIndex);
   FLastText := string.Empty;
   FillGrid;
   ResetRowHeight;

@@ -132,7 +132,8 @@ type
     function GetTaskValue(ACol, ARow: integer): string; // Method to get a task value by row col
     function HasTask(Index: integer): boolean;
     procedure SetTask(Grid: TStringGrid; Memo: TMemo; Row: integer; Backup: boolean = True; DisplayTime: boolean = True);
-    function InsertTask(const TaskString: string; Index: integer; Backup: boolean = True; InsertBefore: boolean = False): integer;
+    function InsertTask(const TaskString: string; Index: integer; Backup: boolean = True; InsertBefore: boolean = False;
+      ForceLevel: integer = -1; ListIndex: integer = -1): integer;
     procedure DeleteTask(Index: integer);
     procedure DeleteTaskByInd(Ind: integer);
     procedure DeleteTasksInRange(StartRow, EndRow: integer);
@@ -938,13 +939,18 @@ begin
     raise Exception.Create('Invalid row or task index');
 end;
 
-function TTasks.InsertTask(const TaskString: string; Index: integer; Backup: boolean = True; InsertBefore: boolean = False): integer;
+function TTasks.InsertTask(const TaskString: string; Index: integer; Backup: boolean = True;
+  InsertBefore: boolean = False; ForceLevel: integer = -1; ListIndex: integer = -1): integer;
 var
   Task: TTask;
   i, Ind: integer;
   Indent: integer = 0;
 begin
-  if (Index = 0) then
+  // When ListIndex is set, use it directly instead of mapping a grid row.
+  // This is needed when the insertion point is a hidden task
+  if (ListIndex >= 0) then
+    Ind := ListIndex
+  else if (Index = 0) then
   begin
     if InsertBefore then
       Ind := 0
@@ -954,7 +960,8 @@ begin
   else
     Ind := Map(Index);
 
-  if (Ind < 0) and (Ind >= Count) then
+  // Ind = Count is allowed: it means insertion at the very end
+  if (Ind < 0) or (Ind > Count) then
     exit(-1);
 
   if (Backup) then
@@ -962,12 +969,15 @@ begin
 
   if (not InsertBefore) then
     Inc(Ind);
-  // Take the level from the task that will follow the new one.
-  // At the end of the list fall back to the task we insert after
-  if Ind < Count then
+
+  // Explicit level overrides the level of the following task
+  if (ForceLevel >= 0) then
+    Indent := ForceLevel
+  else if Ind < Count then
     Indent := FTaskList[Ind].IndentLevel
   else if Ind > 0 then
     Indent := FTaskList[Ind - 1].IndentLevel;
+
   Task := TTask.Create(TaskString); // Create a new task
   Task.IndentLevel := Indent;
   SetLength(FTaskList, Count + 1); // Resize the array
