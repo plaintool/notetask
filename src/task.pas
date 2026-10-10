@@ -47,6 +47,7 @@ type
     FTagsWidth: integer; // Tag area width in the table
     FRowHeight: integer; // Currect row height in table
     FIndentLevel: integer; // Nesting level calculated from spaces
+    FCollapsed: boolean; // Children are hidden when true
     constructor Create;
     constructor Create(const TaskString: string); // Constructor that takes a task string
     destructor Destroy; override; // Destructor
@@ -81,6 +82,7 @@ type
     property Tags: TStringList read FTags write FTags;
     property TagsWidth: integer read FTagsWidth write FTagsWidth;
     property IndentLevel: integer read FIndentLevel write FIndentLevel;
+    property Collapsed: boolean read FCollapsed write FCollapsed;
   end;
 
   // Class representing a collection of tasks
@@ -125,6 +127,8 @@ type
     function AddTask(const TaskString: string): integer; // Method to add a task
     function AddGroupTask(const GroupIndex: integer; const TaskString: string): integer;
     function GetTask(Index: integer): TTask; // Method to get a task by row index
+    function GetTaskByIndex(Index: integer): TTask; // Method to get a task by list index
+    function FindTaskByText(const Text: string): TTask; // Search across all groups by text
     function GetTaskValue(ACol, ARow: integer): string; // Method to get a task value by row col
     function HasTask(Index: integer): boolean;
     procedure SetTask(Grid: TStringGrid; Memo: TMemo; Row: integer; Backup: boolean = True; DisplayTime: boolean = True);
@@ -134,6 +138,13 @@ type
     procedure CompleteTask(Index: integer; Backup: boolean = True);
     procedure StarTask(Index: integer; Backup: boolean = True);
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
+    function HasChildren(Index: integer): boolean;
+    function HasButtonsAtLevel(Level: integer): boolean;
+    function IsTaskVisible(Index: integer): boolean;
+    function IsTaskDescendant(AncestorTask, DescendantTask: integer): boolean;
+    procedure SetCollapsed(Index: integer; Value: boolean);
+    procedure ToggleCollapse(Index: integer);
+    procedure IndentTask(Index: integer; Outdent: boolean);
     function InsertGroup(aName: string): integer;
     function RenameGroup(aIndex: integer; aName: string): boolean;
     function RehintGroup(aIndex: integer; aHint: string): boolean;
@@ -224,6 +235,7 @@ begin
   FTagsWidth := 0;
   FRowHeight := 0;
   FIndentLevel := 0;
+  FCollapsed := False;
 end;
 
 constructor TTask.Create(const TaskString: string);
@@ -275,6 +287,7 @@ begin
   FTagsWidth := Original.FTagsWidth;
   FRowHeight := Original.FRowHeight;
   FIndentLevel := Original.FIndentLevel;
+  FCollapsed := Original.FCollapsed;
 end;
 
 procedure TTask.FillTags;
@@ -815,6 +828,27 @@ begin
   Result := FTaskList[Ind]; // Return the task by index
 end;
 
+function TTasks.GetTaskByIndex(Index: integer): TTask;
+begin
+  // Returns a task by its raw index in FTaskList, ignoring the map
+  if (Index >= 0) and (Index < Count) then
+    Result := FTaskList[Index]
+  else
+    Result := nil;
+end;
+
+function TTasks.FindTaskByText(const Text: string): TTask;
+var
+  i, j: integer;
+begin
+  // Search all groups so the result does not depend on the active tab
+  Result := nil;
+  for i := 0 to CountGroup - 1 do
+    for j := 0 to GetTaskCount(i) - 1 do
+      if GetTaskInGroup(i, j).Text = Text then
+        Exit(GetTaskInGroup(i, j));
+end;
+
 function TTasks.GetTaskValue(ACol, aRow: integer): string;
 begin
   Result := string.Empty;
@@ -901,8 +935,7 @@ begin
     raise Exception.Create('Invalid row or task index');
 end;
 
-function TTasks.InsertTask(const TaskString: string; Index: integer; Backup: boolean = True;
-  InsertBefore: boolean = False): integer;
+function TTasks.InsertTask(const TaskString: string; Index: integer; Backup: boolean = True; InsertBefore: boolean = False): integer;
 var
   Task: TTask;
   i, Ind: integer;
@@ -1042,6 +1075,122 @@ begin
       else
         Grid.Cells[j, i] := string.Empty;
     end;
+  end;
+end;
+
+function TTasks.HasChildren(Index: integer): boolean;
+var
+  Level: integer;
+begin
+  Result := False;
+  if (Index < 0) or (Index >= Count - 1) then Exit;
+  Level := FTaskList[Index].FIndentLevel;
+  Result := FTaskList[Index + 1].FIndentLevel > Level;
+end;
+
+function TTasks.HasButtonsAtLevel(Level: integer): boolean;
+var
+  I: integer;
+begin
+  Result := False;
+  for I := 0 to Count - 1 do
+    if (FTaskList[I].FIndentLevel = Level) and HasChildren(I) and IsTaskVisible(I) then
+      Exit(True);
+end;
+
+function TTasks.IsTaskVisible(Index: integer): boolean;
+var
+  I: integer;
+  CurrentLevel: integer;
+begin
+  Result := True;
+  if (Index <= 0) or (Index >= Count) then Exit;
+  CurrentLevel := FTaskList[Index].FIndentLevel;
+  if CurrentLevel = 0 then Exit;
+
+  // Walk up the ancestor chain, one level at a time
+  while CurrentLevel > 0 do
+  begin
+    // Find the nearest preceding task with a strictly lower level
+    I := Index - 1;
+    while (I >= 0) and (FTaskList[I].FIndentLevel >= CurrentLevel) do
+      Dec(I);
+    if I < 0 then Break;
+
+    // Any collapsed ancestor hides the task
+    if FTaskList[I].FCollapsed then
+      Exit(False);
+
+    // Continue walking up from the found ancestor
+    CurrentLevel := FTaskList[I].FIndentLevel;
+    Index := I;
+  end;
+end;
+
+function TTasks.IsTaskDescendant(AncestorTask, DescendantTask: integer): boolean;
+var
+  I, AncestorLevel: integer;
+begin
+  Result := False;
+  if (AncestorTask < 0) or (AncestorTask >= Count) then Exit;
+  if (DescendantTask < 0) or (DescendantTask >= Count) then Exit;
+  if AncestorTask >= DescendantTask then Exit;
+  AncestorLevel := FTaskList[AncestorTask].FIndentLevel;
+  if FTaskList[DescendantTask].FIndentLevel <= AncestorLevel then Exit;
+  for I := AncestorTask + 1 to DescendantTask - 1 do
+    if FTaskList[I].FIndentLevel <= AncestorLevel then Exit;
+  Result := True;
+end;
+
+procedure TTasks.SetCollapsed(Index: integer; Value: boolean);
+begin
+  if (Index < 0) or (Index >= Count) then Exit;
+  FTaskList[Index].FCollapsed := Value;
+end;
+
+procedure TTasks.ToggleCollapse(Index: integer);
+begin
+  if (Index < 0) or (Index >= Count) then Exit;
+  FTaskList[Index].FCollapsed := not FTaskList[Index].FCollapsed;
+end;
+
+procedure TTasks.IndentTask(Index: integer; Outdent: boolean);
+var
+  Ind, I, OldLevel, NewLevel, AboveLevel: integer;
+begin
+  // Index is a task list index, not a grid row
+  Ind := Index;
+  if (Ind < 0) or (Ind >= Count) then Exit;
+  OldLevel := FTaskList[Ind].FIndentLevel;
+  if Outdent and (OldLevel = 0) then Exit;
+
+  if Outdent then
+    NewLevel := OldLevel - 1
+  else
+  begin
+    // A task may be at most one level deeper than the task above it
+    NewLevel := OldLevel + 1;
+    if Ind = 0 then
+      AboveLevel := -1
+    else
+      AboveLevel := FTaskList[Ind - 1].FIndentLevel;
+    if NewLevel > AboveLevel + 1 then Exit;
+  end;
+
+  FTaskList[Ind].FIndentLevel := NewLevel;
+
+  // Shift the whole subtree to keep children attached to the task
+  for I := Ind + 1 to Count - 1 do
+  begin
+    if FTaskList[I].FIndentLevel > OldLevel then
+    begin
+      if Outdent then
+        Dec(FTaskList[I].FIndentLevel)
+      else
+        Inc(FTaskList[I].FIndentLevel);
+    end
+    else
+      Break;
   end;
 end;
 
@@ -1483,6 +1632,9 @@ begin
   // Check if the selection is not at the top and valid
   if (IndStart > 0) and (IndEnd < Count) then
   begin
+    // Refuse the move when it would cross the parent boundary
+    if FTaskList[IndStart - 1].FIndentLevel < FTaskList[IndStart].FIndentLevel then
+      Exit;
     CreateBackup;
 
     // Save selected tasks to temporary array
@@ -1517,6 +1669,9 @@ begin
   // Check if the selection is not at the bottom and valid
   if (IndEnd < Count - 1) and (IndStart >= 0) then
   begin
+    // Refuse the move when it would cross the parent boundary
+    if FTaskList[IndEnd + 1].FIndentLevel < FTaskList[IndEnd].FIndentLevel then
+      Exit;
     CreateBackup;
 
     // Save selected tasks to temporary array
@@ -2386,7 +2541,8 @@ var
 begin
   Result := 0;
   for I := 0 to Count - 1 do
-    if (not Archive and FTaskList[I].Archive) or (not FTaskList[I].MatchesFilter(Filter, DisplayTime)) then Result += 1;
+    if (not Archive and FTaskList[I].Archive) or (not FTaskList[I].MatchesFilter(Filter, DisplayTime)) or (not IsTaskVisible(I)) then
+      Result += 1;
 end;
 
 procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder;
@@ -2579,7 +2735,7 @@ begin
     for I := 0 to Count - 1 do
     begin
       if ((ShowArchive = True) or (FTaskList[I].Archive = False)) and ((Filter = string.Empty) or
-        (FTaskList[I].MatchesFilter(Filter, DisplayTime))) then
+        (FTaskList[I].MatchesFilter(Filter, DisplayTime))) and IsTaskVisible(I) then
       begin
         if (Grid.RowCount > RowIndex) then
           Grid.Cells[0, RowIndex] := (I + 1).ToString;

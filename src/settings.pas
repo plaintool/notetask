@@ -287,6 +287,8 @@ var
   FileName: string;
   FileStream: TFileStream;
   RowsArray: TJSONArray;
+  StatesArray: TJSONArray;
+  StatesList: TStringList;
   RectObj: TJSONObject;
   i: integer;
 begin
@@ -369,6 +371,17 @@ begin
       RowsArray.Add(Form.SelectedRows[i]);
     ItemSettings.Add('SelectedRows', RowsArray);
 
+    // Save collapsed task states
+    StatesArray := TJSONArray.Create;
+    StatesList := Form.GetCollapsedStates;
+    try
+      for i := 0 to StatesList.Count - 1 do
+        StatesArray.Add(StatesList[i]);
+    finally
+      StatesList.Free;
+    end;
+    ItemSettings.Add('CollapsedTasks', StatesArray);
+
     // Save memo note scroll position
     ItemSettings.Add('MemoNoteScroll', Form.ScaleFormTo96(Form.MemoNoteScroll));
 
@@ -404,6 +417,8 @@ var
   FileStream: TFileStream;
   FileName: string;
   RowsArrayJSON: TJSONArray;
+  StatesArray: TJSONArray;
+  StatesList: TStringList;
   TempArr: array of integer;
   i: integer;
 begin
@@ -412,6 +427,7 @@ begin
     FileContent := string.Empty;
     FileName := TOS.GetSettingsDirectory(APP_NAME, 'grid_settings.json'); // Get settings file name
     Item := Item.ToLower;
+
     ForceDirectories(TOS.GetSettingsDirectory(APP_NAME)); // Ensure the directory exists
     if not FileExists(FileName) then Exit(True);
 
@@ -428,6 +444,9 @@ begin
         if JSONObj.Find(Item) = nil then Item := string.Empty;
         if JSONObj.Find(Item) = nil then exit;
         ItemSettings := JSONObj.Find(Item) as TJSONObject;
+
+        // Ensure the object exists before applying anything
+        if ItemSettings = nil then exit;
 
         // Load settings into the form and grid from the ItemSettings object
         if ItemSettings.FindPath('ShowDuration') <> nil then
@@ -523,6 +542,20 @@ begin
           for i := 0 to RowsArrayJSON.Count - 1 do
             TempArr[i] := RowsArrayJSON.Items[i].AsInteger;
           Form.SelectedRows := TempArr;
+        end;
+
+        // Load collapsed task states
+        if ItemSettings.FindPath('CollapsedTasks') <> nil then
+        begin
+          StatesArray := ItemSettings.FindPath('CollapsedTasks') as TJSONArray;
+          StatesList := TStringList.Create;
+          try
+            for i := 0 to StatesArray.Count - 1 do
+              StatesList.Add(StatesArray.Strings[i]);
+            Form.SetCollapsedStates(StatesList);
+          finally
+            StatesList.Free;
+          end;
         end;
 
         // Load memo note scroll position

@@ -658,6 +658,7 @@ type
     FMemoSelStartClicked: integer;
     FStatusPanelIndex: integer;
     FAdjustingScrollBars: boolean;
+    FSuppressEditor: boolean;
     FSReserved: TFileStream;
     FTimerRecovery: TTimer;
     FRecoveryToken: string;
@@ -750,6 +751,10 @@ type
     procedure DelayedSetMemoFocus(Data: PtrInt);
     procedure DelayedFinishTagEdit(Data: PtrInt);
     procedure DelayedInvalidate(Data: PtrInt);
+    procedure ResetSuppressEditor(Data: PtrInt);
+    function IsMouseOverCollapseButton: boolean;
+    function GetTaskIndent(Row: integer): integer;
+    function GetTaskButtonLeft(Row: integer): integer;
     procedure FixDatePickerFont(Data: PtrInt);
     procedure AlignBottomControls;
     procedure SetLanguage(aLanguage: string = string.Empty);
@@ -807,6 +812,8 @@ type
     {$ENDIF}
     {%EndRegion}
     {%Region -fold Public Methods}
+    function GetCollapsedStates: TStringList;
+    procedure SetCollapsedStates(States: TStringList);
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean; overload;
     function Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; out aRowsChanged: integer; Silent: boolean): boolean;
       overload;
@@ -943,6 +950,7 @@ begin
   FMemoNeedSelectAll := True;
   FRepaint := False;
   FDuplicateHighlight := True;
+  FSuppressEditor := False;
   FShowColumnDone := True;
   FShowColumnTask := True;
   FShowColumnNote := True;
@@ -4458,7 +4466,45 @@ begin
 end;
 
 procedure TformNotetask.GridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+var
+  Cell: TPoint;
+  TaskIndex, BtnLeft, BtnRight: integer;
 begin
+  // Handle the collapse / expand button before the grid processes the click
+  if (Button = mbLeft) and (not IsEditing) then
+  begin
+    Cell := Grid.MouseToCell(TPoint.Create(X, Y));
+    if (Cell.X = COL_TASK) and (Cell.Y > 0) and (Cell.Y < Grid.RowCount) then
+    begin
+      TaskIndex := Tasks.Map(Cell.Y);
+      if (TaskIndex >= 0) and Tasks.HasChildren(TaskIndex) then
+      begin
+        BtnLeft := GetTaskButtonLeft(Cell.Y);
+        BtnRight := BtnLeft + CollapseButtonWidth;
+        if (X >= BtnLeft) and (X < BtnRight) then
+        begin
+          EditComplete;
+          // Suppress the editor for the whole click cycle, until MouseUp
+          FSuppressEditor := True;
+          FIsSelecting := True;
+          // Collapse is a view state, it must not mark the document modified
+          Tasks.ToggleCollapse(TaskIndex);
+          FillGrid;
+          ResetRowHeight;
+          if (Cell.Y < Grid.RowCount) then
+          begin
+            Grid.Row := Cell.Y;
+            Grid.Col := COL_TASK;
+          end;
+          SetInfo;
+          SetNote;
+          SetTags;
+          Exit;
+        end;
+      end;
+    end;
+  end;
+
   FIsSelecting := False;
 
   if (Button = mbMiddle) and (ssCtrl in Shift) then // Middle button + Ctrl
@@ -4474,6 +4520,10 @@ procedure TformNotetask.GridMouseUp(Sender: TObject; Button: TMouseButton; Shift
 var
   Cell: TPoint;
 begin
+  // Release the suppression only after the grid has finished its own MouseUp
+  if FSuppressEditor then
+    Application.QueueAsyncCall(@ResetSuppressEditor, 0);
+
   if (Button = mbRight) and (not IsEditing) then
   begin
     if (Grid.Selection.Height = 0) then
@@ -4654,6 +4704,10 @@ var
   TagsWidth: integer = 0;
   OriginalLeft, OriginalRight: integer;
   Indent: integer = 0;
+  BtnLeft, BtnTop, BtnSize: integer;
+  SignX, SignY, SignW, SignH: integer;
+  SignText: string = '';
+  BtnRect: TRect;
 begin
   TempGrid := Sender as TStringGrid;
   bgFill := TDarkUtils.ThemeColor(clWhite, clBlack);
@@ -4768,7 +4822,35 @@ begin
       if (aCol = COL_TASK) then
       begin
         Task := Tasks.GetTask(ARow);
-        Indent := Task.FIndentLevel * Canvas.TextWidth(' ') * 2;
+        Indent := GetTaskIndent(ARow);
+
+        // Draw the collapse / expand button for tasks that have children
+        if Tasks.HasChildren(Tasks.Map(ARow)) then
+        begin
+          BtnLeft := GetTaskButtonLeft(ARow);
+          BtnSize := Min(11, aRect.Height - 4);
+          if BtnSize < 7 then BtnSize := 7;
+          BtnTop := aRect.Top + (aRect.Height - BtnSize) div 2;
+          BtnRect := Rect(BtnLeft, BtnTop, BtnLeft + BtnSize, BtnTop + BtnSize);
+
+          TempGrid.Canvas.Brush.Color := bgFill;
+          TempGrid.Canvas.Brush.Style := bsSolid;
+          TempGrid.Canvas.FillRect(BtnRect);
+          TempGrid.Canvas.Pen.Color := TDarkUtils.ThemeColor(clGray, clSilver);
+          TempGrid.Canvas.Pen.Style := psSolid;
+          TempGrid.Canvas.Rectangle(BtnRect);
+
+          // Center the sign manually by real glyph metrics so it sits
+          // in the middle of the button regardless of the active font
+          TempGrid.Canvas.Brush.Style := bsClear;
+          SignText := IfThen(Task.Collapsed, '+', '-');
+          SignW := TempGrid.Canvas.TextWidth(SignText);
+          SignH := TempGrid.Canvas.TextHeight(SignText);
+          SignX := BtnLeft + (BtnSize - SignW) div 2;
+          SignY := BtnTop + (BtnSize - SignH) div 2 - 1;
+          TempGrid.Canvas.TextOut(SignX, SignY, SignText);
+        end;
+
         if Task.Tags.Count > 0 then
         begin
           BitTags := TagEdit.GetTagsBitmap(Task.Tags, Round(Max(Max(Font.Size div 2, 8) * FZoom, 1)),
@@ -4897,6 +4979,13 @@ begin
   if FReadOnly then
   begin
     Editor := nil;  // disable editor — grid stays view-only
+    exit;
+  end;
+
+  // The editor must not appear when the click landed on the collapse button
+  if FSuppressEditor or IsMouseOverCollapseButton then
+  begin
+    Editor := nil;
     exit;
   end;
 
@@ -5819,7 +5908,7 @@ var
     Text: string;
     task: TTask;
     Flags: cardinal;
-    h: integer;
+    h, Indent: integer;
     OldBold: boolean;
   begin
     OldBold := Grid.Canvas.Font.Bold;
@@ -5842,6 +5931,9 @@ var
 
           if (col = COL_TASK) then
           begin
+            // Reserve space for the indent and the collapse button
+            Indent := GetTaskIndent(row);
+            drawrect.Left := drawrect.Left + Indent;
             if task.TagsWidth < drawrect.Width then
             begin
               if FBiDiRightToLeft then
@@ -5972,6 +6064,66 @@ end;
 procedure TformNotetask.DelayedInvalidate(Data: PtrInt);
 begin
   Repaint;
+end;
+
+procedure TformNotetask.ResetSuppressEditor(Data: PtrInt);
+begin
+  // Called after the grid has finished its own MouseUp handling
+  FSuppressEditor := False;
+end;
+
+function TformNotetask.IsMouseOverCollapseButton: boolean;
+var
+  Cell: TPoint;
+  Task: TTask;
+  TaskIndex, BtnLeft, BtnRight: integer;
+  P: TPoint;
+begin
+  Result := False;
+  if not Assigned(Tasks) then Exit;
+
+  P := Grid.ScreenToClient(Mouse.CursorPos);
+  Cell := Grid.MouseToCell(P);
+  if (Cell.X <> COL_TASK) or (Cell.Y <= 0) or (Cell.Y >= Grid.RowCount) then Exit;
+
+  TaskIndex := Tasks.Map(Cell.Y);
+  if (TaskIndex < 0) or (not Tasks.HasChildren(TaskIndex)) then Exit;
+
+  Task := Tasks.GetTask(Cell.Y);
+  BtnLeft := Grid.CellRect(COL_TASK, Cell.Y).Left + 4 + Task.FIndentLevel * Canvas.TextWidth(' ') * 2;
+  BtnRight := BtnLeft + CollapseButtonWidth;
+  Result := (P.X >= BtnLeft) and (P.X < BtnRight);
+end;
+
+function TformNotetask.GetTaskIndent(Row: integer): integer;
+var
+  Task: TTask;
+  L: integer;
+begin
+  Result := 0;
+  if (not Assigned(Tasks)) or (not Tasks.HasTask(Row)) then Exit;
+  Task := Tasks.GetTask(Row);
+  L := Task.FIndentLevel;
+  Result := L * Grid.Canvas.TextWidth(' ') * 2;
+
+  // Deeper levels always reserve space for the button so tasks stay aligned.
+  // Level 0 reserves space only for tasks that actually have children.
+  if (L > 0) or Tasks.HasChildren(Tasks.Map(Row)) then
+    Result := Result + CollapseButtonWidth;
+end;
+
+function TformNotetask.GetTaskButtonLeft(Row: integer): integer;
+var
+  Task: TTask;
+  L: integer;
+  Rect: TRect;
+begin
+  Result := 0;
+  if (not Assigned(Tasks)) or (not Tasks.HasTask(Row)) then Exit;
+  Task := Tasks.GetTask(Row);
+  L := Task.FIndentLevel;
+  Rect := Grid.CellRect(COL_TASK, Row);
+  Result := Rect.Left + 4 + L * Grid.Canvas.TextWidth(' ') * 2;
 end;
 
 procedure TformNotetask.FixDatePickerFont(Data: PtrInt);
@@ -7145,7 +7297,7 @@ begin
   if Assigned(Sender) then
   begin
     if (Sender is TPanel) and (aCol = COL_TASK) and (aRow > 0) and (aRow < Grid.RowCount) then
-      Indent := Tasks.GetTask(aRow).FIndentLevel * Canvas.TextWidth(' ') * 2;
+      Indent := GetTaskIndent(aRow);
 
     Rect := Grid.CellRect(aCol, aRow);
     Sender.SetBounds(Rect.Left + OffsetLeft + Indent, Max(Rect.Top, Grid.RowHeights[0]) + OffsetTop,
@@ -7775,7 +7927,10 @@ end;
 procedure TformNotetask.IndentTasks(Outdent: boolean = False);
 var
   RowIndex: integer;
-  i: integer;
+  TaskIndex: integer;
+  SelectedTasks: TIntegerArray = nil;
+  i, j: integer;
+  IsDescendant: boolean;
 begin
   if (ReadOnly) then exit;
 
@@ -7784,21 +7939,37 @@ begin
     GridBackupSelection;
     Tasks.CreateBackup;
   end;
-  // Mark tasks as completed from the end to avoid index shifting
-  for i := Grid.Selection.Bottom downto Grid.Selection.Top do
-  begin
-    RowIndex := i;
-    if (RowIndex > 0) and (RowIndex <= Tasks.Count) then
-    begin
-      with Tasks.GetTask(RowIndex) do
-        if not Outdent then
-          Inc(FIndentLevel)
-        else if FIndentLevel > 0 then
-          Dec(FIndentLevel);
 
-      CalcRowHeight;
+  // Collect the task indices of the selection
+  for RowIndex := Grid.Selection.Top to Grid.Selection.Bottom do
+    if (RowIndex > 0) and (RowIndex <= Tasks.Count) and Tasks.HasTask(RowIndex) then
+    begin
+      TaskIndex := Tasks.Map(RowIndex);
+      SetLength(SelectedTasks, Length(SelectedTasks) + 1);
+      SelectedTasks[High(SelectedTasks)] := TaskIndex;
     end;
+
+  // Process only the root tasks of the selection. Descendants follow their parent
+  for i := 0 to High(SelectedTasks) do
+  begin
+    IsDescendant := False;
+    for j := 0 to High(SelectedTasks) do
+      if (i <> j) and Tasks.IsTaskDescendant(SelectedTasks[j], SelectedTasks[i]) then
+      begin
+        IsDescendant := True;
+        Break;
+      end;
+    if not IsDescendant then
+      Tasks.IndentTask(SelectedTasks[i], Outdent);
   end;
+
+  SetLength(SelectedTasks, 0);
+  FillGrid;
+  ResetRowHeight;
+  CalcRowHeight(True);
+  SetInfo;
+  SetNote;
+  SetTags;
   Changed := True;
 end;
 
@@ -8738,6 +8909,65 @@ end;
 {%EndRegion}
 
 {%Region -fold Public Methods}
+
+function TformNotetask.GetCollapsedStates: TStringList;
+var
+  g, i: integer;
+  Task: TTask;
+begin
+  // Each line is "<group>|<index>" of a collapsed task inside its group
+  Result := TStringList.Create;
+  if not Assigned(Tasks) then Exit;
+  for g := 0 to Tasks.CountGroup - 1 do
+    for i := 0 to Tasks.GetTaskCount(g) - 1 do
+    begin
+      Task := Tasks.GetTaskInGroup(g, i);
+      if Assigned(Task) and Task.Collapsed then
+        Result.Add(Tasks.GetGroupName(g) + '|' + IntToStr(i));
+    end;
+end;
+
+procedure TformNotetask.SetCollapsedStates(States: TStringList);
+var
+  i, j, k, Idx, BarPos: integer;
+  Task: TTask;
+  GroupName: string;
+begin
+  if not Assigned(Tasks) then Exit;
+  if not Assigned(States) then Exit;
+
+  // Apply only what is listed. Freshly loaded tasks start as expanded,
+  // so no clearing is needed and repeated calls stay harmless
+  for i := 0 to States.Count - 1 do
+  begin
+    // Use the last '|' as separator so group names may contain it
+    BarPos := 0;
+    for k := Length(States[i]) downto 1 do
+      if States[i][k] = '|' then
+      begin
+        BarPos := k;
+        Break;
+      end;
+    if BarPos = 0 then Continue;
+
+    GroupName := Copy(States[i], 1, BarPos - 1);
+    Idx := StrToIntDef(Copy(States[i], BarPos + 1, MaxInt), -1);
+    if Idx < 0 then Continue;
+
+    // Find the group by its full name and pick the task by index
+    for j := 0 to Tasks.CountGroup - 1 do
+      if Tasks.GetGroupName(j) = GroupName then
+      begin
+        if Idx < Tasks.GetTaskCount(j) then
+        begin
+          Task := Tasks.GetTaskInGroup(j, Idx);
+          if Assigned(Task) then
+            Task.Collapsed := True;
+        end;
+        Break;
+      end;
+  end;
+end;
 
 function TformNotetask.Find(aText: string; aMatchCase, aWrapAround, aDirectionDown: boolean; Silent: boolean = False): boolean;
 var
