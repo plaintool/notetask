@@ -104,6 +104,7 @@ type
     function GetGroupCount: integer;
     function GetCount: integer;
     function GetCountFilter(Archive: boolean; Filter: string; DisplayTime: boolean): integer;
+    function GetTreeSortedOrder(SortOrder: TSortOrder; SortColumn: integer): TIntegerArray;
   public
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
@@ -2680,10 +2681,197 @@ begin
       Result += 1;
 end;
 
+function TTasks.GetTreeSortedOrder(SortOrder: TSortOrder; SortColumn: integer): TIntegerArray;
+var
+  Parents: array of integer = nil;
+  ChildrenArr: array of array of integer = nil;
+  Out: TIntegerArray = nil;
+  OutPos: integer;
+  I, J: integer;
+
+  function CompareIdx(Idx1, Idx2: integer): integer;
+  var
+    T1, T2: TTask;
+    Value1, Value2: string;
+    DateTime1, DateTime2: TDateTime;
+    Amount1, Amount2: double;
+  begin
+    T1 := FTaskList[Idx1];
+    T2 := FTaskList[Idx2];
+
+    case SortColumn of
+      COL_DONE: begin
+        Value1 := IntToStr(Ord(T1.Done));
+        Value2 := IntToStr(Ord(T2.Done));
+      end;
+      COL_TASK: begin
+        Value1 := T1.Text;
+        Value2 := T2.Text;
+      end;
+      COL_NOTE: begin
+        Value1 := T1.Note;
+        Value2 := T2.Note;
+      end;
+      COL_AMOUNT: begin
+        Amount1 := T1.Amount;
+        Amount2 := T2.Amount;
+        if Amount1 = Amount2 then Exit(0);
+        if SortOrder = soAscending then
+        begin
+          if Amount1 < Amount2 then Exit(-1)
+          else
+            Exit(1);
+        end
+        else
+        begin
+          if Amount1 > Amount2 then Exit(-1)
+          else
+            Exit(1);
+        end;
+      end;
+      COL_DATE: begin
+        DateTime1 := T1.Date;
+        DateTime2 := T2.Date;
+        if DateTime1 = DateTime2 then Exit(0);
+        if SortOrder = soAscending then
+        begin
+          if DateTime1 < DateTime2 then Exit(-1)
+          else
+            Exit(1);
+        end
+        else
+        begin
+          if DateTime1 > DateTime2 then Exit(-1)
+          else
+            Exit(1);
+        end;
+      end;
+      COL_STAR: begin
+        Value1 := IntToStr(Ord(T1.Star));
+        Value2 := IntToStr(Ord(T2.Star));
+      end;
+      else
+      begin
+        // Numeric column keeps the natural file order
+        if SortOrder = soAscending then
+          Exit(Idx1 - Idx2)
+        else
+          Exit(Idx2 - Idx1);
+      end;
+    end;
+
+    if SortOrder = soAscending then
+      Result := CompareStr(Value1, Value2)
+    else
+      Result := CompareStr(Value2, Value1);
+  end;
+
+  procedure SortList(var List: TIntegerArray);
+  var
+    Temp, C1, C2: integer;
+    Swapped: boolean;
+    K: integer;
+  begin
+    if Length(List) < 2 then Exit;
+    repeat
+      Swapped := False;
+      for K := 0 to Length(List) - 2 do
+      begin
+        C1 := List[K];
+        C2 := List[K + 1];
+        if CompareIdx(C1, C2) > 0 then
+        begin
+          Temp := List[K];
+          List[K] := List[K + 1];
+          List[K + 1] := Temp;
+          Swapped := True;
+        end;
+      end;
+    until not Swapped;
+  end;
+
+  procedure SortSubtree(ParentIdx: integer);
+  var
+    List: TIntegerArray;
+    K, Slot: integer;
+  begin
+    if ParentIdx < 0 then
+      Slot := Count  // root pseudo-parent lives in the last slot
+    else
+      Slot := ParentIdx;
+    List := ChildrenArr[Slot];
+    SortList(List);
+    ChildrenArr[Slot] := List;
+    for K := 0 to Length(List) - 1 do
+      SortSubtree(List[K]);
+  end;
+
+  procedure Flatten(ParentIdx: integer);
+  var
+    List: TIntegerArray;
+    K, Slot: integer;
+  begin
+    if ParentIdx < 0 then
+      Slot := Count
+    else
+      Slot := ParentIdx;
+    List := ChildrenArr[Slot];
+    for K := 0 to Length(List) - 1 do
+    begin
+      Out[OutPos] := List[K];
+      Inc(OutPos);
+      Flatten(List[K]);
+    end;
+  end;
+
+begin
+  Result := nil;
+  SetLength(Result, 0);
+  if Count = 0 then Exit;
+
+  SetLength(Parents, Count);
+  SetLength(ChildrenArr, Count + 1);  // extra slot Count for root children
+
+  // Build the parent pointer: the nearest task above with a smaller level
+  for I := 0 to Count - 1 do
+  begin
+    Parents[I] := -1;
+    if FTaskList[I].IndentLevel > 0 then
+      for J := I - 1 downto 0 do
+        if FTaskList[J].IndentLevel < FTaskList[I].IndentLevel then
+        begin
+          Parents[I] := J;
+          Break;
+        end;
+  end;
+
+  // Fill children lists
+  for I := 0 to Count - 1 do
+  begin
+    if Parents[I] < 0 then
+      J := Count
+    else
+      J := Parents[I];
+    SetLength(ChildrenArr[J], Length(ChildrenArr[J]) + 1);
+    ChildrenArr[J][High(ChildrenArr[J])] := I;
+  end;
+
+  // Sort every sibling group recursively
+  SortSubtree(-1);
+
+  // Flatten in pre-order to get the final display order
+  SetLength(Out, Count);
+  OutPos := 0;
+  Flatten(-1);
+  Result := Out;
+end;
+
 procedure TTasks.FillGrid(Grid: TStringGrid; ShowArchive, ShowDuration, DisplayTime: boolean; SortOrder: TSortOrder;
   SortColumn: integer; Filter: string);
 var
-  I, J, ArhCount, RowIndex: integer;
+  I, J, K, ArhCount, RowIndex: integer;
+  Order: TIntegerArray = nil;
+  DisplayRow: TIntegerArray = nil;
   LastDate, MinDate, MaxDate: TDateTime;
   StartDates, EndDates: array of TDateTime;
   StartDate, EndDate: TDateTime;
@@ -2858,20 +3046,33 @@ begin
     ArhCount := GetCountFilter(ShowArchive, Filter, DisplayTime);
     Grid.RowCount := Count - ArhCount + 1;
 
-    // Default row indexing based on sort order
-    if SortOrder = soAscending then
-      RowIndex := 1
-    else
-      RowIndex := Grid.RowCount - 1;
+    // Compute the display order. Sibling tasks are sorted at each level
+    // so the tree hierarchy is preserved during any sort
+    Order := GetTreeSortedOrder(SortOrder, SortColumn);
 
-    InitMap(Grid.RowCount);
-
-    // Fill the grid with tasks
+    // Assign a display row to every visible task
+    SetLength(DisplayRow, Count);
     for I := 0 to Count - 1 do
+      DisplayRow[I] := -1;
+    RowIndex := 1;
+    for K := 0 to High(Order) do
     begin
+      I := Order[K];
       if ((ShowArchive = True) or (FTaskList[I].Archive = False)) and ((Filter = string.Empty) or
         (FTaskList[I].MatchesFilter(Filter, DisplayTime))) and IsTaskVisible(I) then
       begin
+        DisplayRow[I] := RowIndex;
+        Inc(RowIndex);
+      end;
+    end;
+
+    // Fill the grid using the precomputed display rows, keeping the
+    // natural file order for duration accumulation
+    for I := 0 to Count - 1 do
+    begin
+      if DisplayRow[I] > 0 then
+      begin
+        RowIndex := DisplayRow[I];
         if (Grid.RowCount > RowIndex) then
           Grid.Cells[0, RowIndex] := (I + 1).ToString;
 
@@ -2959,11 +3160,6 @@ begin
         Grid.Cells[COL_STAR, RowIndex] := IntToStr(Ord(FTaskList[I].Star));
 
         FMapGrid[RowIndex] := I;
-
-        if SortOrder = soAscending then
-          RowIndex += 1
-        else
-          RowIndex -= 1;
       end;
     end;
 
@@ -2975,17 +3171,6 @@ begin
       if (DateDiff <> '-') and (DateDiff <> '0' + rseconds) then
         Grid.Cells[0, 0] := DateDiff;
     end;
-
-    // Perform sorting if SortColumn is between COL_DONE and COL_STAR
-    if (SortColumn >= COL_DONE) and (SortColumn <= COL_STAR) then
-    begin
-      // Bubble Sort logic to sort rows based on CompareTasks function
-      for I := 1 to Grid.RowCount - 2 do
-        for J := I + 1 to Grid.RowCount - 1 do
-          if CompareTasks(I, J) > 0 then
-            SwapRows(I, J);
-    end;
-
   finally
     if (Assigned(eventOnColRowInserted)) then
       Grid.OnColRowInserted := eventOnColRowInserted;
