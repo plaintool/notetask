@@ -7530,7 +7530,7 @@ end;
 
 procedure TformNotetask.MergeTasks;
 var
-  i, Confirm: integer;
+  i, Confirm, Level, CurLevel: integer;
   Task, Target: TTask;
   Sel: TRect;
   MaxDate: TDateTime;
@@ -7540,6 +7540,18 @@ begin
   // If multiple rows are selected
   if (Grid.Selection.Height > 0) then
   begin
+    // Only tasks at the same indent level can be merged
+    Level := -1;
+    for i := Grid.Selection.Top to Grid.Selection.Bottom do
+    begin
+      if Tasks.Map(i) < 0 then Continue;
+      CurLevel := Tasks.GetTaskByIndex(Tasks.Map(i)).IndentLevel;
+      if Level < 0 then
+        Level := CurLevel
+      else if CurLevel <> Level then
+        Exit;
+    end;
+
     Confirm := MessageDlg(rmergesconfirm, mtConfirmation, [mbYes, mbNo], 0);
 
     if (Confirm = mrYes) then
