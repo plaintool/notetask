@@ -3231,6 +3231,11 @@ begin
     ArhCount := GetCountFilter(ShowArchive, Filter, DisplayTime);
     Grid.RowCount := Count - ArhCount + 1;
 
+    // Sync the map array with the actual number of grid rows: InsertTask
+    // and friends grow FTaskList without touching FMapGrid, and the grid
+    // may hide part of the list, so the map length must follow RowCount
+    InitMap(Grid.RowCount);
+
     // Compute the display order. Sibling tasks are sorted at each level
     // so the tree hierarchy is preserved during any sort
     Order := GetTreeSortedOrder(SortOrder, SortColumn);
