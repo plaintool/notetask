@@ -6178,7 +6178,8 @@ begin
   if (not Assigned(Tasks)) or (not Tasks.HasTask(Row)) then Exit;
   Task := Tasks.GetTask(Row);
   L := Task.FIndentLevel;
-  Result := L * Grid.Canvas.TextWidth(' ') * 2;
+  // Two spaces per level plus an extra pixel offset to make nesting visible
+  Result := L * (Grid.Canvas.TextWidth(' ') * 2 + TaskIndentExtra);
 
   // Deeper levels always reserve space for the button so tasks stay aligned.
   // Level 0 reserves space only for tasks that actually have children.
@@ -6190,7 +6191,7 @@ end;
 function TformNotetask.GetTaskButtonLeft(Row: integer): integer;
 var
   Task: TTask;
-  L: integer;
+  L, LevelIndent: integer;
   Rect: TRect;
 begin
   Result := 0;
@@ -6198,13 +6199,15 @@ begin
   Task := Tasks.GetTask(Row);
   L := Task.FIndentLevel;
   Rect := Grid.CellRect(COL_TASK, Row);
+  // The same pixel formula as GetTaskIndent so the icon aligns with the text
+  LevelIndent := L * (Grid.Canvas.TextWidth(' ') * 2 + TaskIndentExtra);
 
   // In RTL the button sits on the right side of the cell and the indent
   // also grows towards the left
   if FBiDiRightToLeft then
-    Result := Rect.Right - 4 - L * Grid.Canvas.TextWidth(' ') * 2 - CollapseButtonWidth
+    Result := Rect.Right - 4 - LevelIndent - CollapseButtonWidth
   else
-    Result := Rect.Left + 4 + L * Grid.Canvas.TextWidth(' ') * 2;
+    Result := Rect.Left + 4 + LevelIndent;
 end;
 
 procedure TformNotetask.FixDatePickerFont(Data: PtrInt);

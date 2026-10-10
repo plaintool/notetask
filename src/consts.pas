@@ -52,7 +52,8 @@ const
   RecoverySaveDelayMs = 5000;
 
   CollapseButtonWidth = 14;
-  CollapseButtonGap = 4;
+  CollapseButtonGap = 3;
+  TaskIndentExtra = 7;
 
   // Light theme colors
   clRowHighlight_Light = TColor($FFF0DC);       // RGB(220,240,255)
