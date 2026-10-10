@@ -8056,8 +8056,13 @@ var
   TaskIndex: integer;
   SelectedTasks: TIntegerArray = nil;
   IsDescendantFlags: array of boolean = nil;
-  i, j: integer;
+  SimLevels: array of integer = nil;
+  i, j, k, SwapTmp: integer;
+  OldLevel, NewLevel, AboveLevel: integer;
   CanProceed: boolean;
+  RawMin, RawMax: integer;
+  AlreadySelected: boolean;
+  Task: TTask;
 begin
   if (ReadOnly) then exit;
 
@@ -8070,6 +8075,48 @@ begin
       SelectedTasks[High(SelectedTasks)] := TaskIndex;
     end;
 
+  // When archived tasks are hidden, the user's visual range still covers
+  // them. Pull in hidden tasks between the first and the last selected row
+  // so the whole block moves together instead of splitting around them
+  if (not FShowArchived) and (Length(SelectedTasks) > 0) then
+  begin
+    RawMin := SelectedTasks[0];
+    RawMax := SelectedTasks[0];
+    for i := 1 to High(SelectedTasks) do
+    begin
+      if SelectedTasks[i] < RawMin then RawMin := SelectedTasks[i];
+      if SelectedTasks[i] > RawMax then RawMax := SelectedTasks[i];
+    end;
+
+    for i := RawMin to RawMax do
+    begin
+      AlreadySelected := False;
+      for j := 0 to High(SelectedTasks) do
+        if SelectedTasks[j] = i then
+        begin
+          AlreadySelected := True;
+          Break;
+        end;
+      if not AlreadySelected then
+      begin
+        SetLength(SelectedTasks, Length(SelectedTasks) + 1);
+        SelectedTasks[High(SelectedTasks)] := i;
+      end;
+    end;
+  end;
+
+  // Sort selected tasks by raw index. IndentTask shifts descendants with
+  // level > OldLevel, so processing in raw order prevents a task bumped
+  // earlier from being treated as a descendant of a later one
+  for i := 0 to High(SelectedTasks) - 1 do
+    for j := 0 to High(SelectedTasks) - 1 - i do
+      if SelectedTasks[j] > SelectedTasks[j + 1] then
+      begin
+        SwapTmp := SelectedTasks[j];
+        SelectedTasks[j] := SelectedTasks[j + 1];
+        SelectedTasks[j + 1] := SwapTmp;
+      end;
+
   // Flag every task that is a descendant of another selected task
   SetLength(IsDescendantFlags, Length(SelectedTasks));
   for i := 0 to High(SelectedTasks) do
@@ -8080,16 +8127,66 @@ begin
         Break;
       end;
 
-  // Precheck: if any root task cannot be indented, abort the whole operation
-  // so the selection never turns into a chain
+  // Snapshot current indent levels so the precheck can emulate the
+  // sequence of IndentTask calls without touching the real data
+  SetLength(SimLevels, Tasks.Count);
+  for i := 0 to Tasks.Count - 1 do
+  begin
+    Task := Tasks.GetTaskByIndex(i);
+    if Assigned(Task) then
+      SimLevels[i] := Task.IndentLevel
+    else
+      SimLevels[i] := 0;
+  end;
+
+  // Precheck: emulate the sequence so that a chained indent
+  // (each selected task becoming a child of the previous one)
+  // is rejected as a whole
   CanProceed := Length(SelectedTasks) > 0;
   for i := 0 to High(SelectedTasks) do
     if not IsDescendantFlags[i] then
-      if not Tasks.CanIndentTask(SelectedTasks[i], Outdent) then
+    begin
+      TaskIndex := SelectedTasks[i];
+      OldLevel := SimLevels[TaskIndex];
+
+      if Outdent then
       begin
-        CanProceed := False;
-        Break;
+        if OldLevel = 0 then
+        begin
+          CanProceed := False;
+          Break;
+        end;
+        NewLevel := OldLevel - 1;
+      end
+      else
+      begin
+        if TaskIndex = 0 then
+          AboveLevel := -1
+        else
+          AboveLevel := SimLevels[TaskIndex - 1];
+        NewLevel := OldLevel + 1;
+        if NewLevel > AboveLevel + 1 then
+        begin
+          CanProceed := False;
+          Break;
+        end;
       end;
+
+      // Apply the change to the simulation to mirror IndentTask
+      SimLevels[TaskIndex] := NewLevel;
+      for k := TaskIndex + 1 to High(SimLevels) do
+      begin
+        if SimLevels[k] > OldLevel then
+        begin
+          if Outdent then
+            Dec(SimLevels[k])
+          else
+            Inc(SimLevels[k]);
+        end
+        else
+          Break;
+      end;
+    end;
 
   if CanProceed then
   begin
@@ -8115,6 +8212,7 @@ begin
 
   SetLength(SelectedTasks, 0);
   SetLength(IsDescendantFlags, 0);
+  SetLength(SimLevels, 0);
 end;
 
 procedure TformNotetask.GridBackupSelection;
