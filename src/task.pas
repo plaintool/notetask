@@ -173,7 +173,7 @@ type
     function MoveTasksDown(Index1, Index2: integer): integer;
     procedure SwapTasks(OldIndex, NewIndex: integer);
     procedure MoveTask(OldIndex, NewIndex: integer);
-    function MoveTaskTree(OldIndex, NewIndex: integer): boolean;
+    function MoveTaskTree(OldIndex, NewIndex: integer; SortOrder: TSortOrder; out NewRootIndex: integer): boolean;
     function CanIndentTask(Index: integer; Outdent: boolean): boolean;
     procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
     function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;
@@ -1961,14 +1961,14 @@ begin
   // This may require additional logic depending on how you want to track indices.
 end;
 
-function TTasks.MoveTaskTree(OldIndex, NewIndex: integer): boolean;
+function TTasks.MoveTaskTree(OldIndex, NewIndex: integer; SortOrder: TSortOrder; out NewRootIndex: integer): boolean;
 var
-  IndOld, IndOldEnd, Len, I, J, InsertAt, NewInd, Level: integer;
-  OldParent, NewParent: TTask;
+  IndOld, IndOldEnd, Len, I, J, InsertAt, NewInd, Level, NewLevel, Delta: integer;
   TempTasks: array of TTask = nil;
   NewList: array of TTask = nil;
 begin
   Result := False;
+  NewRootIndex := -1;
   if (OldIndex < 1) or (NewIndex < 1) then Exit;
   if (OldIndex = NewIndex) then Exit;
 
@@ -1983,16 +1983,6 @@ begin
 
   // A drop inside the moved block has no meaning
   if (NewInd >= IndOld) and (NewInd <= IndOldEnd) then Exit;
-
-  // Remember the parent task of the moved block
-  OldParent := nil;
-  if Level > 0 then
-    for I := IndOld - 1 downto 0 do
-      if FTaskList[I].FIndentLevel < Level then
-      begin
-        OldParent := FTaskList[I];
-        Break;
-      end;
 
   // Build the list without the block and locate the insertion point
   SetLength(TempTasks, Len);
@@ -2013,38 +2003,38 @@ begin
   else
   begin
     // Dropping below a collapsed task would place the source inside its
-    // hidden subtree. Shift the insertion point past the whole subtree
-    // so the source remains visible as a sibling below the target
+    // hidden subtree, shift past it so the source lands after the subtree
     if FTaskList[NewInd].FCollapsed and HasChildren(NewInd) then
       NewInd := GetSubtreeEnd(NewInd);
     InsertAt := NewInd - Len + 1;
   end;
 
-  // The parent at the new position must match the original parent
-  NewParent := nil;
-  if Level > 0 then
-    for I := InsertAt - 1 downto 0 do
-      if NewList[I].FIndentLevel < Level then
-      begin
-        NewParent := NewList[I];
-        Break;
-      end;
+  // The block takes the level of the task at the drop point so it becomes
+  // a sibling of the next task. At the end of the list it becomes a root,
+  // which keeps the block out of the deepest branch
+  if (InsertAt >= 0) and (InsertAt < Length(NewList)) then
+    NewLevel := NewList[InsertAt].FIndentLevel
+  else
+    NewLevel := 0;
 
-  if NewParent <> OldParent then
+  if NewLevel < 0 then
+    NewLevel := 0;
+
+  // With descending sort the visual direction is inverted, so a level
+  // change would place the block opposite to where the user dropped it.
+  // Restrict the drag to the same level in that case
+  if (SortOrder = soDescending) and (NewLevel <> Level) then
   begin
     SetLength(TempTasks, 0);
     SetLength(NewList, 0);
     Exit;
   end;
 
-  // The task right after the block must not be deeper than the block level,
-  // otherwise the drop would split another subtree
-  if (InsertAt < Length(NewList)) and (NewList[InsertAt].FIndentLevel > Level) then
-  begin
-    SetLength(TempTasks, 0);
-    SetLength(NewList, 0);
-    Exit;
-  end;
+  // Shift the whole block, including its descendants, by the level delta
+  Delta := NewLevel - Level;
+  if Delta <> 0 then
+    for I := 0 to Len - 1 do
+      TempTasks[I].FIndentLevel := TempTasks[I].FIndentLevel + Delta;
 
   CreateBackup;
 
@@ -2054,6 +2044,10 @@ begin
     FTaskList[InsertAt + I] := TempTasks[I];
   for I := InsertAt + Len to Count - 1 do
     FTaskList[I] := NewList[I - Len];
+
+  // Report the raw index of the moved block root so the caller can
+  // restore the selection on the dragged task instead of its last child
+  NewRootIndex := InsertAt;
 
   SetLength(TempTasks, 0);
   SetLength(NewList, 0);

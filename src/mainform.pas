@@ -759,6 +759,7 @@ type
     procedure DelayedFinishTagEdit(Data: PtrInt);
     procedure DelayedInvalidate(Data: PtrInt);
     procedure ResetSuppressEditor(Data: PtrInt);
+    procedure SetRowAfterMove(Data: PtrInt);
     function IsMouseOverCollapseButton: boolean;
     function GetCollapseButtonRow: integer;
     function GetTaskIndent(Row: integer): integer;
@@ -4854,14 +4855,27 @@ begin
 end;
 
 procedure TformNotetask.GridColRowMoved(Sender: TObject; IsColumn: boolean; sIndex, tIndex: integer);
+var
+  NewInd, NewRow: integer;
 begin
   if (not IsColumn) then
   begin
     // FillGrid is called either way: on success to show the new order,
     // on refusal to restore the visual state after the grid's own drag
-    if Tasks.MoveTaskTree(sIndex, tIndex) then
+    NewInd := -1;
+    if Tasks.MoveTaskTree(sIndex, tIndex, FSortOrder, NewInd) then
       Changed := True;
     FillGrid;
+
+    // Keep the selection on the dragged root task, not on the last row
+    // of its subtree that the grid tends to leave focused after a drag.
+    // Queue the assignment so the grid finishes its own drag cleanup first
+    if (NewInd >= 0) then
+    begin
+      NewRow := Tasks.ReverseMap(NewInd);
+      if (NewRow > 0) and (NewRow < Grid.RowCount) then
+        Application.QueueAsyncCall(@SetRowAfterMove, NewRow);
+    end;
   end;
 end;
 
@@ -6287,6 +6301,26 @@ procedure TformNotetask.ResetSuppressEditor(Data: PtrInt);
 begin
   // Called after the grid has finished its own MouseUp handling
   FSuppressEditor := False;
+end;
+
+procedure TformNotetask.SetRowAfterMove(Data: PtrInt);
+var
+  NewRow: integer;
+begin
+  // Restore the focus on the moved root task once the grid has settled
+  NewRow := Data;
+  if (NewRow <= 0) or (NewRow >= Grid.RowCount) then Exit;
+
+  Grid.OnSelection := nil;
+  try
+    Grid.Row := NewRow;
+    Grid.Col := COL_TASK;
+    Grid.Selection := TGridRect.Create(COL_TASK, NewRow, COL_TASK, NewRow);
+  finally
+    Grid.OnSelection := @GridSelection;
+  end;
+  SetNote;
+  SetTags;
 end;
 
 function TformNotetask.GetCollapseButtonRow: integer;
