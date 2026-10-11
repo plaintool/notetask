@@ -152,7 +152,7 @@ type
     procedure ClearTasksInRect(Grid: TStringGrid; Rect: TGridRect);
     function HasChildren(Index: integer): boolean;
     function HasButtonsAtLevel(Level: integer): boolean;
-    function IsTaskVisible(Index: integer): boolean;
+    function IsTaskVisible(Index: integer; ShowArchive: boolean = True): boolean;
     function IsTaskDescendant(AncestorTask, DescendantTask: integer): boolean;
     procedure SetCollapsed(Index: integer; Value: boolean);
     procedure ToggleCollapse(Index: integer);
@@ -1302,7 +1302,7 @@ begin
       Exit(True);
 end;
 
-function TTasks.IsTaskVisible(Index: integer): boolean;
+function TTasks.IsTaskVisible(Index: integer; ShowArchive: boolean = True): boolean;
 var
   I: integer;
   CurrentLevel: integer;
@@ -1323,6 +1323,10 @@ begin
 
     // Any collapsed ancestor hides the task
     if FTaskList[I].FCollapsed then
+      Exit(False);
+
+    // When archived tasks are hidden, an archived ancestor hides its subtree
+    if (not ShowArchive) and FTaskList[I].Archive then
       Exit(False);
 
     // Continue walking up from the found ancestor
@@ -2865,7 +2869,7 @@ begin
       Inc(Result)
     else if (Filter = string.Empty) then
     begin
-      if not IsTaskVisible(I) then
+      if not IsTaskVisible(I, Archive) then
         Inc(Result);
     end
     else
@@ -3374,7 +3378,7 @@ begin
       begin
         if (Filter = string.Empty) then
         begin
-          if IsTaskVisible(I) then
+          if IsTaskVisible(I, ShowArchive) then
           begin
             DisplayRow[I] := RowIndex;
             Inc(RowIndex);
