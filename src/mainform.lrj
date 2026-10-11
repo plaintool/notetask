@@ -112,7 +112,7 @@
 {"hash":108314013,"name":"tformnotetask.amovetaskbottom.caption","sourcebytes":[77,111,118,101,32,116,97,115,107,115,32,116,111,32,98,111,116,116,111,109],"value":"Move tasks to bottom"},
 {"hash":58599027,"name":"tformnotetask.aindenttasks.caption","sourcebytes":[73,110,100,101,110,116,32,116,97,115,107,115],"value":"Indent tasks"},
 {"hash":11544099,"name":"tformnotetask.aoutdenttasks.caption","sourcebytes":[79,117,116,100,101,110,116,32,116,97,115,107,115],"value":"Outdent tasks"},
-{"hash":51675307,"name":"tformnotetask.acollapseexpand.caption","sourcebytes":[67,111,108,108,97,112,115,101,32,116,97,115,107],"value":"Collapse task"},
+{"hash":21498643,"name":"tformnotetask.acollapseexpand.caption","sourcebytes":[67,111,108,108,97,112,115,101,32,116,97,115,107,115],"value":"Collapse tasks"},
 {"hash":17959694,"name":"tformnotetask.achatgpt.caption","sourcebytes":[65,115,107,32,67,104,97,116,71,80,84,46,46,46],"value":"Ask ChatGPT..."},
 {"hash":195117374,"name":"tformnotetask.arunterminal.caption","sourcebytes":[82,117,110,32,105,110,32,116,101,114,109,105,110,97,108,46,46,46],"value":"Run in terminal..."},
 {"hash":99103582,"name":"tformnotetask.arunpowershell.caption","sourcebytes":[82,117,110,32,105,110,32,80,111,119,101,114,83,104,101,108,108,46,46,46],"value":"Run in PowerShell..."},

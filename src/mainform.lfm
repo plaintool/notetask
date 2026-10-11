@@ -1299,7 +1299,7 @@ object formNotetask: TformNotetask
     end
     object ACollapseExpand: TAction
       Category = 'Task'
-      Caption = 'Collapse task'
+      Caption = 'Collapse tasks'
       ShortCut = 16397
       OnExecute = ACollapseExpandExecute
     end

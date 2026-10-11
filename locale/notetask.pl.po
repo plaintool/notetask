@@ -430,8 +430,8 @@ msgid "Check for updates"
 msgstr "Sprawdź aktualizacje"
 
 #: tformnotetask.acollapseexpand.caption
-msgid "Collapse task"
-msgstr "Zwiń zadanie"
+msgid "Collapse tasks"
+msgstr "Zwiń zadania"
 
 #: tformnotetask.acopy.caption
 msgctxt "tformnotetask.acopy.caption"

@@ -417,7 +417,7 @@ msgid "Check for updates"
 msgstr ""
 
 #: tformnotetask.acollapseexpand.caption
-msgid "Collapse task"
+msgid "Collapse tasks"
 msgstr ""
 
 #: tformnotetask.acopy.caption

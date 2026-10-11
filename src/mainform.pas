@@ -2360,29 +2360,93 @@ end;
 
 procedure TformNotetask.ACollapseExpandExecute(Sender: TObject);
 var
-  Row, Ind: integer;
+  Row, FirstRow, Ind, Level, CurLevel: integer;
+  RawList: TIntegerArray = nil;
+  i, SelTop, SelBottom, SelLeft, SelRight: integer;
+  HasAny: boolean;
 begin
   if Screen.ActiveForm <> Self then exit;
   if IsEditing then exit;
   if Grid.RowCount < 2 then exit;
 
-  Row := Grid.Row;
-  if (Row <= 0) or (not Tasks.HasTask(Row)) then exit;
+  // Anchor row: top of the selection, or the focused row when nothing is selected
+  if Grid.Selection.Height > 0 then
+    FirstRow := Grid.Selection.Top
+  else
+    FirstRow := Grid.Row;
 
-  // Collapse is available only for tasks that have children
-  Ind := Tasks.Map(Row);
-  if not Tasks.HasChildren(Ind) then exit;
+  if (FirstRow <= 0) or (not Tasks.HasTask(FirstRow)) then exit;
+  Ind := Tasks.Map(FirstRow);
+  if Ind < 0 then exit;
 
-  Tasks.ToggleCollapse(Ind);
+  // Level of the top selected task is the reference for the whole operation
+  Level := Tasks.GetTaskByIndex(Ind).IndentLevel;
+
+  if Grid.Selection.Height > 0 then
+  begin
+    SelTop := Grid.Selection.Top;
+    SelBottom := Grid.Selection.Bottom;
+  end
+  else
+  begin
+    SelTop := FirstRow;
+    SelBottom := FirstRow;
+  end;
+  SelLeft := Grid.Selection.Left;
+  SelRight := Grid.Selection.Right;
+
+  // Collect only selected tasks that share the reference level.
+  // Deeper or shallower rows are ignored, they follow their own parents
+  for Row := SelTop to SelBottom do
+  begin
+    if Tasks.Map(Row) < 0 then Continue;
+    CurLevel := Tasks.GetTaskByIndex(Tasks.Map(Row)).IndentLevel;
+    if CurLevel <> Level then Continue;
+    SetLength(RawList, Length(RawList) + 1);
+    RawList[High(RawList)] := Tasks.Map(Row);
+  end;
+
+  // Toggle only tasks that actually have children
+  HasAny := False;
+  for i := 0 to High(RawList) do
+    if Tasks.HasChildren(RawList[i]) then
+    begin
+      Tasks.ToggleCollapse(RawList[i]);
+      HasAny := True;
+    end;
+
+  if not HasAny then
+  begin
+    SetLength(RawList, 0);
+    exit;
+  end;
+
   FillGrid;
   ResetRowHeight;
 
-  // The parent stays visible after collapse, so the same row still exists
-  if (Row < Grid.RowCount) then
+  // Restore selection by raw indices: collapsing can hide rows,
+  // so the visible range must be rebuilt from the new map
+  SelTop := -1;
+  SelBottom := -1;
+  for i := 0 to High(RawList) do
   begin
-    Grid.Row := Row;
-    Grid.Col := COL_TASK;
+    Row := Tasks.ReverseMap(RawList[i]);
+    if Row < 1 then Continue;
+    if SelTop < 0 then SelTop := Row;
+    SelBottom := Row;
   end;
+  SetLength(RawList, 0);
+
+  if (SelTop > 0) and (SelTop < Grid.RowCount) then
+  begin
+    Grid.Row := SelTop;
+    Grid.Col := COL_TASK;
+    if (SelBottom > SelTop) and (SelBottom < Grid.RowCount) then
+      Grid.Selection := TGridRect.Create(SelLeft, SelTop, SelRight, SelBottom)
+    else
+      Grid.Selection := TGridRect.Create(SelLeft, SelTop, SelRight, SelTop);
+  end;
+
   SetInfo;
   SetNote;
   SetTags;
