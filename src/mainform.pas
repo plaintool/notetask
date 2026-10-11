@@ -1903,7 +1903,7 @@ end;
 
 procedure TformNotetask.aInsertTaskExecute(Sender: TObject);
 var
-  Ind: integer;
+  Ind, RefRow: integer;
   NewRow: integer;
   TaskText, Oper, Value: string;
   TaskInd, Level, LastInd: integer;
@@ -1979,6 +1979,23 @@ begin
     Ind := Tasks.InsertTask(TaskText, Grid.Row, True, True, ForceLevel, ListIndex);
   FLastText := string.Empty;
   FillGrid;
+
+  // Pin the new task to the height of an already laid out neighbour.
+  // DefaultRowHeight ignores the current zoom, while a neighbour row
+  // always matches the scale and the platform measurement rules
+  NewRow := Tasks.ReverseMap(Ind);
+  if (Ind >= 0) and (Ind < Tasks.Count) and (NewRow > 0) and (Grid.RowCount > 1) then
+  begin
+    RefRow := 1;
+    if RefRow = NewRow then
+      RefRow := 2;
+    if (RefRow < Grid.RowCount) and (Grid.RowHeights[RefRow] > 0) then
+    begin
+      Tasks.GetTaskByIndex(Ind).FRowHeight := Grid.RowHeights[RefRow];
+      Grid.RowHeights[NewRow] := Grid.RowHeights[RefRow];
+    end;
+  end;
+
   ResetRowHeight;
   NewRow := Tasks.ReverseMap(Ind);
   if (NewRow > 0) then
