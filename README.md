@@ -85,29 +85,29 @@ Suitable for note-taking with an optional general note field at the bottom of th
 
 ![sample3](samples/sample3.png)
 
+Supports advanced features such as executing selected comments, tasks, or the entire script from notes as console commands.
+
+![powershell](samples/powershell.png)
+
 ### Personal Information
 
 Suitable for storing personal information in encrypted files, with secure access and optional grouping for better organization. Highlights duplicate data.
 
 ![sample4](samples/sample4.png)
 
-Supports advanced features such as executing selected comments, tasks, or the entire script from notes as console commands.
-
-![powershell](samples/powershell.png)
-
 ## Task hierarchy
 
 **Notetask** supports nested tasks, so you can build a hierarchy of subtasks under any parent item. Simply add 2 leading spaces before the task text to create one level of indentation — deeper levels are added by another 2 spaces per level.
 
-Parent tasks with children get a small collapse button in the task column. Click it (or press `Ctrl+Enter`) to fold the subtree and keep large lists compact; click again to expand. The collapsed state is preserved in the file, so the same view is restored the next time you open it.
+Indent and outdent are done with the keyboard: press <kbd>Ctrl</kbd>+<kbd>Tab</kbd> to push the selected tasks one level down, and <kbd>Shift</kbd>+<kbd>Tab</kbd> to lift them one level up. Moving a parent task automatically moves its whole subtree with it.
 
-Indent and outdent are done with the keyboard: press `Ctrl+Tab` to push the selected tasks one level down, and `Shift+Tab` to lift them one level up. Moving a parent task automatically moves its whole subtree with it.
+Parent tasks with children get a small collapse button in the task column. Click it (or press <kbd>Ctrl</kbd>+<kbd>Enter</kbd>) to fold the subtree and keep large lists compact; click again to expand. The collapsed state is stored in the per-file settings, so the same view is restored the next time you open the file.
 
 ![sample5](samples/sample5.png)
 
 ### Encryption
 
-Notetask can encrypts files using AES-256 in CBC mode with a key derived via PBKDF2-HMAC-SHA256. The derived 64-byte key is split into a 32-byte encryption key and a 32-byte HMAC key. Files are compressed using zlib before encryption, and a SHA-256 HMAC over the salt, IV, and ciphertext ensures integrity and authenticity.
+**Notetask** can encrypts files using AES-256 in CBC mode with a key derived via PBKDF2-HMAC-SHA256. The derived 64-byte key is split into a 32-byte encryption key and a 32-byte HMAC key. Files are compressed using zlib before encryption, and a SHA-256 HMAC over the salt, IV, and ciphertext ensures integrity and authenticity.
 
 The user can save an encrypted binary file with password protection. If the password is left empty, the file is still encrypted but without password protection, storing only the compressed data in the encrypted format.
 
@@ -153,7 +153,7 @@ The status bar provides a concise, real-time overview of the current task list. 
 - `- [x] or - [ ]` — task completion status ([x] = done, [ ] = pending)
 - `Date` — task date and optional timestamp in ISO 8601 format `yyyy-MM-ddTHH:mm:ss`
 - `Amount` — numeric value related to the task (e.g., cost, quantity), using a dot `.` as the decimal separator
-- `2-space indent` — leading spaces before the task text define visual indentation (2 spaces = 1 level)
+- `2-space indent` — leading spaces before the task text define the task level in the hierarchy (2 spaces = 1 level)
 - `~~**Text**~~` — task description, bold if marked as favorite with a star, and crossed out if archived (inactive regardless of completion)
 - ``` `tag` ``` — tags are collected from any position in the task text when enclosed in backticks, and after saving the task they are stored immediately after the task text, separated by a space
 - `// Note` — comment or additional information about the task
@@ -248,17 +248,17 @@ sudo dnf install -y xterm
 
 ## Donate 💖
 
-If you like Notetask and want to support its development, you can send a donation:
+If you like **Notetask** and want to support its development, you can send a donation:
 
-You can support Notetask development through one of the following options:
+You can support **Notetask** development through one of the following options:
 
 💳&nbsp;[Donate with Bank Card or PayPal](https://app.lava.top/en/astverskoy?tabId=about&currency=EUR)  
 &nbsp;₿&nbsp;&nbsp; [Donate with Cryptocurrency](https://nowpayments.io/donation/astverskoy)
 
-Every contribution helps improve Notetask and keep the project active. Thank you for your support! 🙏
+Every contribution helps improve **Notetask** and keep the project active. Thank you for your support! 🙏
 
 ## Licensing
 
-Notetask is licensed under the GPL v3 license. See the LICENSE file for details.
+**Notetask** is licensed under the GPL v3 license. See the LICENSE file for details.
 
-The Notetask application uses third-party resources licensed as described in the [THIRD_PARTIES](THIRD_PARTIES) file.
+The **Notetask** application uses third-party resources licensed as described in the [THIRD_PARTIES](THIRD_PARTIES) file.
