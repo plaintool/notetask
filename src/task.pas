@@ -171,9 +171,9 @@ type
     function MoveTasksBottom(Index1, Index2: integer; ShowArchived: boolean): integer;
     function MoveTasksUp(Index1, Index2: integer): integer;
     function MoveTasksDown(Index1, Index2: integer): integer;
-    procedure SwapTasks(OldIndex, NewIndex: integer);
     procedure MoveTask(OldIndex, NewIndex: integer);
     function MoveTaskTree(OldIndex, NewIndex: integer; SortOrder: TSortOrder; out NewRootIndex: integer): boolean;
+    procedure SwapTasks(OldIndex, NewIndex: integer);
     function CanIndentTask(Index: integer; Outdent: boolean): boolean;
     procedure CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
     function PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;
@@ -1893,31 +1893,6 @@ begin
   Result := NextSibEnd - Len + 1;
 end;
 
-procedure TTasks.SwapTasks(OldIndex, NewIndex: integer);
-var
-  IndOld, IndNew: integer;
-  TempTask: TTask;
-begin
-  // Get mapped indices for old and new positions
-  IndOld := Map(OldIndex);
-  IndNew := Map(NewIndex);
-
-  // Check if both indices are valid
-  if (IndOld < 0) or (IndNew < 0) or (IndOld >= Count) or (IndNew >= Count) then
-    raise Exception.Create('Invalid index for swapping tasks');
-
-  CreateBackup; // Backup the current state before swapping
-
-  // Swap tasks in the task list
-  TempTask := FTaskList[IndOld];
-  FTaskList[IndOld] := FTaskList[IndNew];
-  FTaskList[IndNew] := TempTask;
-
-  // Swap the mapping in FMapGrid
-  FMapGrid[OldIndex] := IndNew;
-  FMapGrid[NewIndex] := IndOld;
-end;
-
 procedure TTasks.MoveTask(OldIndex, NewIndex: integer);
 var
   Ind: integer;
@@ -1964,6 +1939,7 @@ end;
 function TTasks.MoveTaskTree(OldIndex, NewIndex: integer; SortOrder: TSortOrder; out NewRootIndex: integer): boolean;
 var
   IndOld, IndOldEnd, Len, I, J, InsertAt, NewInd, Level, NewLevel, Delta: integer;
+  ParentOrig, ParentAt: integer;
   TempTasks: array of TTask = nil;
   NewList: array of TTask = nil;
 begin
@@ -2009,25 +1985,55 @@ begin
     InsertAt := NewInd - Len + 1;
   end;
 
-  // The block takes the level of the task at the drop point so it becomes
-  // a sibling of the next task. At the end of the list it becomes a root,
-  // which keeps the block out of the deepest branch
-  if (InsertAt >= 0) and (InsertAt < Length(NewList)) then
-    NewLevel := NewList[InsertAt].FIndentLevel
-  else
-    NewLevel := 0;
+  // In descending sort the visual order of siblings is the reverse of
+  // storage, so the raw insertion point may land between a parent and its
+  // child and break the tree. Advance past any deeper subtrees so the
+  // block is inserted as a sibling at its own level
+  if (SortOrder = soDescending) then
+    while (InsertAt < Length(NewList)) and (NewList[InsertAt].FIndentLevel > Level) do
+      Inc(InsertAt);
 
-  if NewLevel < 0 then
-    NewLevel := 0;
-
-  // With descending sort the visual direction is inverted, so a level
-  // change would place the block opposite to where the user dropped it.
-  // Restrict the drag to the same level in that case
-  if (SortOrder = soDescending) and (NewLevel <> Level) then
+  if (SortOrder = soDescending) then
   begin
-    SetLength(TempTasks, 0);
-    SetLength(NewList, 0);
-    Exit;
+    // Descending sort: allow only moves within the same parent so the
+    // block stays in its own branch instead of jumping to a sibling one
+    ParentOrig := -1;
+    for I := IndOld - 1 downto 0 do
+      if FTaskList[I].FIndentLevel < Level then
+      begin
+        ParentOrig := I;
+        Break;
+      end;
+
+    ParentAt := -1;
+    for I := InsertAt - 1 downto 0 do
+      if NewList[I].FIndentLevel < Level then
+      begin
+        ParentAt := I;
+        Break;
+      end;
+
+    if ParentAt <> ParentOrig then
+    begin
+      SetLength(TempTasks, 0);
+      SetLength(NewList, 0);
+      Exit;
+    end;
+
+    // The parent matched, so the block keeps its level
+    NewLevel := Level;
+  end
+  else
+  begin
+    // The block takes the level of the task at the drop point so it
+    // becomes a sibling of the next task. At the end of the list it
+    // becomes a root, which keeps the block out of the deepest branch
+    if (InsertAt >= 0) and (InsertAt < Length(NewList)) then
+      NewLevel := NewList[InsertAt].FIndentLevel
+    else
+      NewLevel := 0;
+    if NewLevel < 0 then
+      NewLevel := 0;
   end;
 
   // Shift the whole block, including its descendants, by the level delta
@@ -2052,6 +2058,31 @@ begin
   SetLength(TempTasks, 0);
   SetLength(NewList, 0);
   Result := True;
+end;
+
+procedure TTasks.SwapTasks(OldIndex, NewIndex: integer);
+var
+  IndOld, IndNew: integer;
+  TempTask: TTask;
+begin
+  // Get mapped indices for old and new positions
+  IndOld := Map(OldIndex);
+  IndNew := Map(NewIndex);
+
+  // Check if both indices are valid
+  if (IndOld < 0) or (IndNew < 0) or (IndOld >= Count) or (IndNew >= Count) then
+    raise Exception.Create('Invalid index for swapping tasks');
+
+  CreateBackup; // Backup the current state before swapping
+
+  // Swap tasks in the task list
+  TempTask := FTaskList[IndOld];
+  FTaskList[IndOld] := FTaskList[IndNew];
+  FTaskList[IndNew] := TempTask;
+
+  // Swap the mapping in FMapGrid
+  FMapGrid[OldIndex] := IndNew;
+  FMapGrid[NewIndex] := IndOld;
 end;
 
 function TTasks.CanIndentTask(Index: integer; Outdent: boolean): boolean;
