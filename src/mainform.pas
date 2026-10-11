@@ -7641,7 +7641,7 @@ end;
 procedure TformNotetask.DuplicateTasks;
 var
   NewRow, NewCount, SelLeft, SelRight, SelTop, SelBottom, NewTop, NewBottom: integer;
-  InsertBefore: boolean;
+  i, Row, MinRow, MaxRow: integer;
 begin
   if (ReadOnly) then exit;
   if Grid.RowCount < 2 then exit;
@@ -7660,22 +7660,33 @@ begin
   SelLeft := Grid.Selection.Left;
   SelRight := Grid.Selection.Right;
 
-  // With descending sort the duplicate is placed above the source block
-  InsertBefore := (SortOrder = soDescending);
-  NewRow := Tasks.DuplicateTaskRange(SelTop, SelBottom, InsertBefore, NewCount);
+  // The copy is always placed after the source block. In descending order
+  // that puts the copy visually above the source, and the source keeps its
+  // numbers so the selected rows clearly show the new tasks
+  NewRow := Tasks.DuplicateTaskRange(SelTop, SelBottom, False, NewCount);
   if (NewRow < 0) or (NewCount <= 0) then Exit;
 
   FillGrid;
 
-  NewTop := Tasks.ReverseMap(NewRow);
-  NewBottom := Tasks.ReverseMap(NewRow + NewCount - 1);
-  if (NewTop < 1) then Exit;
+  // The visual order inside the block depends on the sort direction and
+  // on the tree shape, so scan every duplicated task and take the min/max
+  // visible row instead of relying on the two storage endpoints
+  MinRow := MaxInt;
+  MaxRow := 0;
+  for i := 0 to NewCount - 1 do
+  begin
+    Row := Tasks.ReverseMap(NewRow + i);
+    if (Row < 1) then Continue;
+    if (Row < MinRow) then MinRow := Row;
+    if (Row > MaxRow) then MaxRow := Row;
+  end;
+  if (MinRow = MaxInt) then Exit;
+
+  NewTop := MinRow;
+  NewBottom := MaxRow;
 
   Grid.Row := NewTop;
-  if (NewBottom >= NewTop) then
-    Grid.Selection := TGridRect.Create(SelLeft, NewTop, SelRight, NewBottom)
-  else
-    Grid.Selection := TGridRect.Create(SelLeft, NewTop, SelRight, NewTop);
+  Grid.Selection := TGridRect.Create(SelLeft, NewTop, SelRight, NewBottom);
   FLastSelectionHeight := Grid.Selection.Height;
   CalcRowHeight(True);
   AdjustMultiButton;

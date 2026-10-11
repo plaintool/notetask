@@ -834,32 +834,53 @@ end;
 
 function TTasks.DuplicateTaskRange(StartRow, EndRow: integer; InsertBefore: boolean; out NewCount: integer): integer;
 var
-  IndStart, IndEnd, BlockLen, I, InsertAt, SubEnd, Level, OldCount: integer;
+  IndStart, IndEnd, BlockLen, I, J, InsertAt, OldCount: integer;
   SrcCopy: array of TTask = nil;
+  Flags: array of boolean = nil;
+  Roots: array of integer = nil;
+  IsRoot: boolean;
 begin
-  // Duplicate the block from the first selected task down to the last
-  // descendant of the last selected task. The copy keeps its indent levels
+  // The duplicated block starts at the first selected root task and ends
+  // with the subtree of the last selected root. Descendants of selected
+  // tasks follow their parents and are not treated as separate roots
   Result := -1;
   NewCount := 0;
-  IndStart := Map(StartRow);
-  if (IndStart < 0) or (IndStart >= Count) then Exit;
+  if (StartRow < 1) or (EndRow < StartRow) then Exit;
 
-  // Only tasks at the same level can be duplicated together, otherwise
-  // the copy would attach to a wrong branch
-  Level := FTaskList[IndStart].FIndentLevel;
+  // Mark the selected tasks
+  SetLength(Flags, Count);
   for I := StartRow to EndRow do
   begin
     if Map(I) < 0 then Continue;
-    if FTaskList[Map(I)].FIndentLevel <> Level then Exit;
+    Flags[Map(I)] := True;
   end;
 
-  IndEnd := GetSubtreeEnd(IndStart);
-  for I := StartRow to EndRow do
+  // Keep only the selected tasks that are not descendants of another
+  // selected task, so a parent with its children is duplicated once
+  SetLength(Roots, 0);
+  for I := 0 to Count - 1 do
   begin
-    if Map(I) < 0 then Continue;
-    SubEnd := GetSubtreeEnd(Map(I));
-    if SubEnd > IndEnd then IndEnd := SubEnd;
+    if not Flags[I] then Continue;
+    IsRoot := True;
+    for J := 0 to High(Roots) do
+      if IsTaskDescendant(Roots[J], I) then
+      begin
+        IsRoot := False;
+        Break;
+      end;
+    if IsRoot then
+    begin
+      SetLength(Roots, Length(Roots) + 1);
+      Roots[High(Roots)] := I;
+    end;
   end;
+
+  if Length(Roots) = 0 then Exit;
+
+  // Include every task from the first selected root to the last
+  // descendant of the last selected root
+  IndStart := Roots[0];
+  IndEnd := GetSubtreeEnd(Roots[High(Roots)]);
 
   BlockLen := IndEnd - IndStart + 1;
   CreateBackup;
@@ -887,6 +908,8 @@ begin
   end;
 
   SetLength(SrcCopy, 0);
+  SetLength(Roots, 0);
+  SetLength(Flags, 0);
   Result := InsertAt;
   NewCount := BlockLen;
 end;
