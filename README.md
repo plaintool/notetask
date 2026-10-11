@@ -95,6 +95,16 @@ Supports advanced features such as executing selected comments, tasks, or the en
 
 ![powershell](samples/powershell.png)
 
+## Task hierarchy
+
+**Notetask** supports nested tasks, so you can build a hierarchy of subtasks under any parent item. Simply add 2 leading spaces before the task text to create one level of indentation — deeper levels are added by another 2 spaces per level.
+
+Parent tasks with children get a small collapse button in the task column. Click it (or press `Ctrl+Enter`) to fold the subtree and keep large lists compact; click again to expand. The collapsed state is preserved in the file, so the same view is restored the next time you open it.
+
+Indent and outdent are done with the keyboard: press `Ctrl+Tab` to push the selected tasks one level down, and `Shift+Tab` to lift them one level up. Moving a parent task automatically moves its whole subtree with it.
+
+![sample5](samples/sample5.png)
+
 ### Encryption
 
 Notetask can encrypts files using AES-256 in CBC mode with a key derived via PBKDF2-HMAC-SHA256. The derived 64-byte key is split into a 32-byte encryption key and a 32-byte HMAC key. Files are compressed using zlib before encryption, and a SHA-256 HMAC over the salt, IV, and ciphertext ensures integrity and authenticity.
