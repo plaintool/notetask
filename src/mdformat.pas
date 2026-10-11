@@ -56,6 +56,7 @@ function TaskFromString(const TaskString: string): TTask;
 var
   PartNote, PartDate, PartSpace: TStringArray; // Use TStringArray for compatibility
   CompletedStr, CleanedText: string;
+  NoteProcessed: boolean;
   i: integer;
 
   function TestParts(Part: TStringArray; var Result1: TTask; const Separator: string = co): boolean;
@@ -131,6 +132,7 @@ begin
   Result.FSpaceAfterNote := True;
   Result.FNoteItalic := False;
   CompletedStr := string.Empty;
+  NoteProcessed := False;
 
   // Split the task string into PartNote
   PartNote := TaskString.Split([cm]);
@@ -161,10 +163,11 @@ begin
         if (i + 1 = High(PartNote)) and (Result.FNote.Trim = string.empty) then
           Result.FEmptyNote := True;
 
+        NoteProcessed := True;
         Break;
       end;
 
-  if (CompletedStr = string.Empty) then
+  if (not NoteProcessed) then
     CompletedStr := PartNote.JoinArrayText(0, cm);
 
   // Remove st in start and end of Note
