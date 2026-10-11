@@ -2007,7 +2007,14 @@ begin
   if NewInd < IndOld then
     InsertAt := NewInd
   else
+  begin
+    // Dropping below a collapsed task would place the source inside its
+    // hidden subtree. Shift the insertion point past the whole subtree
+    // so the source remains visible as a sibling below the target
+    if FTaskList[NewInd].FCollapsed and HasChildren(NewInd) then
+      NewInd := GetSubtreeEnd(NewInd);
     InsertAt := NewInd - Len + 1;
+  end;
 
   // The parent at the new position must match the original parent
   NewParent := nil;
