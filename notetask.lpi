@@ -16,39 +16,41 @@
         <TextDesc Value=""/>
       </XPManifest>
       <Icon Value="0"/>
-      <Resources Count="32">
+      <Resources Count="34">
         <Resource_0 FileName="img\check.bmp" Type="BITMAP" ResourceName="CHECK"/>
         <Resource_1 FileName="img\uncheck.bmp" Type="BITMAP" ResourceName="UNCHECK"/>
-        <Resource_2 FileName="img\taskdoc.ico" Type="ICON" ResourceName="TASKDOC"/>
-        <Resource_3 FileName="img\stargray.bmp" Type="BITMAP" ResourceName="STARGRAY"/>
-        <Resource_4 FileName="img\stargold.bmp" Type="BITMAP" ResourceName="STARGOLD"/>
-        <Resource_5 FileName="img\leftarrow.cur" Type="RCDATA" ResourceName="LEFTARROW"/>
-        <Resource_6 FileName="img\rightarrow.cur" Type="RCDATA" ResourceName="RIGHTARROW"/>
-        <Resource_7 FileName="locale\notetask.en.po" Type="RCDATA" ResourceName="NOTETASK.EN"/>
-        <Resource_8 FileName="locale\notetask.es.po" Type="RCDATA" ResourceName="NOTETASK.ES"/>
-        <Resource_9 FileName="locale\notetask.fr.po" Type="RCDATA" ResourceName="NOTETASK.FR"/>
-        <Resource_10 FileName="locale\notetask.de.po" Type="RCDATA" ResourceName="NOTETASK.DE"/>
-        <Resource_11 FileName="locale\notetask.it.po" Type="RCDATA" ResourceName="NOTETASK.IT"/>
-        <Resource_12 FileName="locale\notetask.pt.po" Type="RCDATA" ResourceName="NOTETASK.PT"/>
-        <Resource_13 FileName="locale\notetask.ru.po" Type="RCDATA" ResourceName="NOTETASK.RU"/>
-        <Resource_14 FileName="locale\notetask.ja.po" Type="RCDATA" ResourceName="NOTETASK.JA"/>
-        <Resource_15 FileName="locale\notetask.ko.po" Type="RCDATA" ResourceName="NOTETASK.KO"/>
-        <Resource_16 FileName="locale\notetask.zh.po" Type="RCDATA" ResourceName="NOTETASK.ZH"/>
-        <Resource_17 FileName="locale\notetask.ar.po" Type="RCDATA" ResourceName="NOTETASK.AR"/>
-        <Resource_18 FileName="locale\notetask.be.po" Type="RCDATA" ResourceName="NOTETASK.BE"/>
-        <Resource_19 FileName="locale\notetask.hi.po" Type="RCDATA" ResourceName="NOTETASK.HI"/>
-        <Resource_20 FileName="locale\notetask.uk.po" Type="RCDATA" ResourceName="NOTETASK.UK"/>
-        <Resource_21 FileName="locale\notetask.cs.po" Type="RCDATA" ResourceName="NOTETASK.CS"/>
-        <Resource_22 FileName="locale\notetask.da.po" Type="RCDATA" ResourceName="NOTETASK.DA"/>
-        <Resource_23 FileName="locale\notetask.el.po" Type="RCDATA" ResourceName="NOTETASK.EL"/>
-        <Resource_24 FileName="locale\notetask.fi.po" Type="RCDATA" ResourceName="NOTETASK.FI"/>
-        <Resource_25 FileName="locale\notetask.he.po" Type="RCDATA" ResourceName="NOTETASK.HE"/>
-        <Resource_26 FileName="locale\notetask.id.po" Type="RCDATA" ResourceName="NOTETASK.ID"/>
-        <Resource_27 FileName="locale\notetask.nl.po" Type="RCDATA" ResourceName="NOTETASK.NL"/>
-        <Resource_28 FileName="locale\notetask.pl.po" Type="RCDATA" ResourceName="NOTETASK.PL"/>
-        <Resource_29 FileName="locale\notetask.ro.po" Type="RCDATA" ResourceName="NOTETASK.RO"/>
-        <Resource_30 FileName="locale\notetask.sv.po" Type="RCDATA" ResourceName="NOTETASK.SV"/>
-        <Resource_31 FileName="locale\notetask.tr.po" Type="RCDATA" ResourceName="NOTETASK.TR"/>
+        <Resource_2 FileName="img\uncheck_dark.bmp" Type="BITMAP" ResourceName="UNCHECK_DARK"/>
+        <Resource_3 FileName="img\taskdoc.ico" Type="ICON" ResourceName="TASKDOC"/>
+        <Resource_4 FileName="img\stargray.bmp" Type="BITMAP" ResourceName="STARGRAY"/>
+        <Resource_5 FileName="img\stargray_dark.bmp" Type="BITMAP" ResourceName="STARGRAY_DARK"/>
+        <Resource_6 FileName="img\stargold.bmp" Type="BITMAP" ResourceName="STARGOLD"/>
+        <Resource_7 FileName="img\leftarrow.cur" Type="RCDATA" ResourceName="LEFTARROW"/>
+        <Resource_8 FileName="img\rightarrow.cur" Type="RCDATA" ResourceName="RIGHTARROW"/>
+        <Resource_9 FileName="locale\notetask.en.po" Type="RCDATA" ResourceName="NOTETASK.EN"/>
+        <Resource_10 FileName="locale\notetask.es.po" Type="RCDATA" ResourceName="NOTETASK.ES"/>
+        <Resource_11 FileName="locale\notetask.fr.po" Type="RCDATA" ResourceName="NOTETASK.FR"/>
+        <Resource_12 FileName="locale\notetask.de.po" Type="RCDATA" ResourceName="NOTETASK.DE"/>
+        <Resource_13 FileName="locale\notetask.it.po" Type="RCDATA" ResourceName="NOTETASK.IT"/>
+        <Resource_14 FileName="locale\notetask.pt.po" Type="RCDATA" ResourceName="NOTETASK.PT"/>
+        <Resource_15 FileName="locale\notetask.ru.po" Type="RCDATA" ResourceName="NOTETASK.RU"/>
+        <Resource_16 FileName="locale\notetask.ja.po" Type="RCDATA" ResourceName="NOTETASK.JA"/>
+        <Resource_17 FileName="locale\notetask.ko.po" Type="RCDATA" ResourceName="NOTETASK.KO"/>
+        <Resource_18 FileName="locale\notetask.zh.po" Type="RCDATA" ResourceName="NOTETASK.ZH"/>
+        <Resource_19 FileName="locale\notetask.ar.po" Type="RCDATA" ResourceName="NOTETASK.AR"/>
+        <Resource_20 FileName="locale\notetask.be.po" Type="RCDATA" ResourceName="NOTETASK.BE"/>
+        <Resource_21 FileName="locale\notetask.hi.po" Type="RCDATA" ResourceName="NOTETASK.HI"/>
+        <Resource_22 FileName="locale\notetask.uk.po" Type="RCDATA" ResourceName="NOTETASK.UK"/>
+        <Resource_23 FileName="locale\notetask.cs.po" Type="RCDATA" ResourceName="NOTETASK.CS"/>
+        <Resource_24 FileName="locale\notetask.da.po" Type="RCDATA" ResourceName="NOTETASK.DA"/>
+        <Resource_25 FileName="locale\notetask.el.po" Type="RCDATA" ResourceName="NOTETASK.EL"/>
+        <Resource_26 FileName="locale\notetask.fi.po" Type="RCDATA" ResourceName="NOTETASK.FI"/>
+        <Resource_27 FileName="locale\notetask.he.po" Type="RCDATA" ResourceName="NOTETASK.HE"/>
+        <Resource_28 FileName="locale\notetask.id.po" Type="RCDATA" ResourceName="NOTETASK.ID"/>
+        <Resource_29 FileName="locale\notetask.nl.po" Type="RCDATA" ResourceName="NOTETASK.NL"/>
+        <Resource_30 FileName="locale\notetask.pl.po" Type="RCDATA" ResourceName="NOTETASK.PL"/>
+        <Resource_31 FileName="locale\notetask.ro.po" Type="RCDATA" ResourceName="NOTETASK.RO"/>
+        <Resource_32 FileName="locale\notetask.sv.po" Type="RCDATA" ResourceName="NOTETASK.SV"/>
+        <Resource_33 FileName="locale\notetask.tr.po" Type="RCDATA" ResourceName="NOTETASK.TR"/>
       </Resources>
     </General>
     <i18n>

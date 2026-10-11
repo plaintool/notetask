@@ -1012,13 +1012,19 @@ begin
   ResourceBitmapCheck.LoadFromResourceName(HInstance, 'CHECK');
   ResourceBitmapCheck.TransparentColor := clFuchsia;
   ResourceBitmapCheck.Transparent := True;
-  ResourceBitmapUncheck.LoadFromResourceName(HInstance, 'UNCHECK');
+  if TDarkUtils.IsDarkMode then
+    ResourceBitmapUncheck.LoadFromResourceName(HInstance, 'UNCHECK_DARK')
+  else
+    ResourceBitmapUncheck.LoadFromResourceName(HInstance, 'UNCHECK');
   ResourceBitmapUncheck.TransparentColor := clFuchsia;
   ResourceBitmapUncheck.Transparent := True;
   ResourceBitmapStarGold.LoadFromResourceName(HInstance, 'STARGOLD');
   ResourceBitmapStarGold.TransparentColor := clFuchsia;
   ResourceBitmapStarGold.Transparent := True;
-  ResourceBitmapStarGray.LoadFromResourceName(HInstance, 'STARGRAY');
+  if TDarkUtils.IsDarkMode then
+    ResourceBitmapStarGray.LoadFromResourceName(HInstance, 'STARGRAY_DARK')
+  else
+    ResourceBitmapStarGray.LoadFromResourceName(HInstance, 'STARGRAY');
   ResourceBitmapStarGray.TransparentColor := clFuchsia;
   ResourceBitmapStarGray.Transparent := True;
 
