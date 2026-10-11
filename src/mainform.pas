@@ -2123,7 +2123,7 @@ end;
 
 procedure TformNotetask.aMoveTaskTopExecute(Sender: TObject);
 var
-  newRow, selLen, selCol, selLeft, selRight: integer;
+  newRow, newTop, newBottom, selLen, selCol, selLeft, selRight: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if Grid.RowCount < 3 then exit;
@@ -2141,16 +2141,28 @@ begin
 
   FillGrid;
 
-  // MoveTasksTop returns a raw index: convert it after FillGrid rebuilt FMapGrid
-  if (newRow > -1) then
-    newRow := Tasks.ReverseMap(newRow);
-
+  // The move methods return the raw start of the block. In ascending sort
+  // the block runs downward from that row, in descending sort it runs
+  // upward because sibling order is reversed on screen
   if (newRow > -1) then
   begin
-    ResetRowHeight;
-    Grid.Row := newRow;
-    Grid.Col := selCol;
-    Grid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
+    newTop := Tasks.ReverseMap(newRow);
+    if (SortOrder = soAscending) then
+      newBottom := newTop + selLen - 1
+    else
+    begin
+      newBottom := newTop;
+      newTop := newBottom - selLen + 1;
+    end;
+    if (newTop < 1) then newTop := 1;
+    if (newBottom >= Grid.RowCount) then newBottom := Grid.RowCount - 1;
+    if (newTop <= newBottom) then
+    begin
+      ResetRowHeight;
+      Grid.Row := newTop;
+      Grid.Col := selCol;
+      Grid.Selection := TGridRect.Create(selLeft, newTop, selRight, newBottom);
+    end;
   end;
   Changed := True;
   SetNote;
@@ -2160,7 +2172,7 @@ end;
 
 procedure TformNotetask.aMoveTaskBottomExecute(Sender: TObject);
 var
-  newRow, selLen, selCol, selLeft, selRight: integer;
+  newRow, newTop, newBottom, selLen, selCol, selLeft, selRight: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if Grid.RowCount < 3 then exit;
@@ -2178,16 +2190,27 @@ begin
 
   FillGrid;
 
-  // Same as MoveTasksTop: raw index must be converted after FillGrid
-  if (newRow > -1) then
-    newRow := Tasks.ReverseMap(newRow);
-
+  // Same as MoveTasksTop: build the visual block range from the returned
+  // raw start, taking the sort direction into account
   if (newRow > -1) then
   begin
-    ResetRowHeight;
-    Grid.Row := newRow;
-    Grid.Col := selCol;
-    Grid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
+    newTop := Tasks.ReverseMap(newRow);
+    if (SortOrder = soAscending) then
+      newBottom := newTop + selLen - 1
+    else
+    begin
+      newBottom := newTop;
+      newTop := newBottom - selLen + 1;
+    end;
+    if (newTop < 1) then newTop := 1;
+    if (newBottom >= Grid.RowCount) then newBottom := Grid.RowCount - 1;
+    if (newTop <= newBottom) then
+    begin
+      ResetRowHeight;
+      Grid.Row := newTop;
+      Grid.Col := selCol;
+      Grid.Selection := TGridRect.Create(selLeft, newTop, selRight, newBottom);
+    end;
   end;
   Changed := True;
   SetNote;
@@ -2197,7 +2220,7 @@ end;
 
 procedure TformNotetask.aMoveTaskUpExecute(Sender: TObject);
 var
-  newRow, selLen, selCol, selLeft, selRight: integer;
+  newRow, newTop, newBottom, selLen, selCol, selLeft, selRight: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if Grid.RowCount < 3 then exit;
@@ -2215,22 +2238,31 @@ begin
 
   FillGrid;
 
-  // Convert the raw index returned by MoveTasksUp into a grid row.
-  // FMapGrid has just been rebuilt by FillGrid, so ReverseMap is accurate here
-  if (newRow > -1) then
-    newRow := Tasks.ReverseMap(newRow);
-
+  // Convert the raw index returned by the move into the visual block range
   if (newRow > -1) then
   begin
-    Grid.OnSelection := nil;
-    try
-      ResetRowHeight(True, -1);
-      Grid.Row := newRow;
-      Grid.Col := selCol;
-      Grid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
-      ResetRowHeight(True, -1);
-    finally
-      Grid.OnSelection := @GridSelection;
+    newTop := Tasks.ReverseMap(newRow);
+    if (SortOrder = soAscending) then
+      newBottom := newTop + selLen - 1
+    else
+    begin
+      newBottom := newTop;
+      newTop := newBottom - selLen + 1;
+    end;
+    if (newTop < 1) then newTop := 1;
+    if (newBottom >= Grid.RowCount) then newBottom := Grid.RowCount - 1;
+    if (newTop <= newBottom) then
+    begin
+      Grid.OnSelection := nil;
+      try
+        ResetRowHeight(True, -1);
+        Grid.Row := newTop;
+        Grid.Col := selCol;
+        Grid.Selection := TGridRect.Create(selLeft, newTop, selRight, newBottom);
+        ResetRowHeight(True, -1);
+      finally
+        Grid.OnSelection := @GridSelection;
+      end;
     end;
   end;
   Changed := True;
@@ -2241,7 +2273,7 @@ end;
 
 procedure TformNotetask.aMoveTaskDownExecute(Sender: TObject);
 var
-  newRow, selLen, selCol, selLeft, selRight: integer;
+  newRow, newTop, newBottom, selLen, selCol, selLeft, selRight: integer;
 begin
   if Screen.ActiveForm <> Self then exit;
   if Grid.RowCount < 3 then exit;
@@ -2259,21 +2291,31 @@ begin
 
   FillGrid;
 
-  // Same as MoveTasksUp: convert raw index into grid row after FillGrid
-  if (newRow > -1) then
-    newRow := Tasks.ReverseMap(newRow);
-
+  // Same as MoveTasksUp: convert the raw index into the visual block range
   if (newRow > -1) then
   begin
-    Grid.OnSelection := nil;
-    try
-      ResetRowHeight(True, -1);
-      Grid.Row := newRow;
-      Grid.Col := selCol;
-      Grid.Selection := TGridRect.Create(selLeft, newRow, selRight, newRow + selLen - 1);
-      ResetRowHeight(True, -1);
-    finally
-      Grid.OnSelection := @GridSelection;
+    newTop := Tasks.ReverseMap(newRow);
+    if (SortOrder = soAscending) then
+      newBottom := newTop + selLen - 1
+    else
+    begin
+      newBottom := newTop;
+      newTop := newBottom - selLen + 1;
+    end;
+    if (newTop < 1) then newTop := 1;
+    if (newBottom >= Grid.RowCount) then newBottom := Grid.RowCount - 1;
+    if (newTop <= newBottom) then
+    begin
+      Grid.OnSelection := nil;
+      try
+        ResetRowHeight(True, -1);
+        Grid.Row := newTop;
+        Grid.Col := selCol;
+        Grid.Selection := TGridRect.Create(selLeft, newTop, selRight, newBottom);
+        ResetRowHeight(True, -1);
+      finally
+        Grid.OnSelection := @GridSelection;
+      end;
     end;
   end;
   Changed := True;

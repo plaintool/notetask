@@ -3150,39 +3150,64 @@ end;
 
 function TTasks.CheckSameLevel(Index1, Index2: integer; out IndStart, IndEnd, Level: integer): boolean;
 var
-  I, J, FirstInd, LastInd, PrevInd: integer;
+  I, J, PrevInd, RowMin, RowMax, Temp: integer;
+  RawIndices: array of integer = nil;
 begin
   Result := False;
   IndStart := -1;
   IndEnd := -1;
   Level := -1;
-  FirstInd := -1;
-  LastInd := -1;
-  PrevInd := -2;
-  for I := Index1 to Index2 do
+
+  // Normalize the row range: descending sort passes it in reverse
+  if Index1 <= Index2 then
+  begin
+    RowMin := Index1;
+    RowMax := Index2;
+  end
+  else
+  begin
+    RowMin := Index2;
+    RowMax := Index1;
+  end;
+
+  // Collect raw task indices of the selected rows
+  SetLength(RawIndices, 0);
+  for I := RowMin to RowMax do
   begin
     if Map(I) < 0 then Continue;
-    if FirstInd < 0 then
-    begin
-      FirstInd := Map(I);
-      Level := FTaskList[FirstInd].FIndentLevel;
-      PrevInd := FirstInd;
-      LastInd := FirstInd;
-    end
-    else
-    begin
-      // Different selected levels - movement not allowed
-      if FTaskList[Map(I)].FIndentLevel <> Level then Exit;
-      // A gap between two selected rows must contain only descendants
-      for J := PrevInd + 1 to Map(I) - 1 do
-        if FTaskList[J].FIndentLevel <= Level then Exit;
-      PrevInd := Map(I);
-      LastInd := Map(I);
-    end;
+    SetLength(RawIndices, Length(RawIndices) + 1);
+    RawIndices[High(RawIndices)] := Map(I);
   end;
-  if FirstInd < 0 then Exit;
-  IndStart := FirstInd;
-  IndEnd := GetSubtreeEnd(LastInd);
+  if Length(RawIndices) = 0 then Exit;
+
+  // Sort raw indices to get storage order, which may differ from the
+  // visual order when the grid is sorted descending
+  for I := 0 to High(RawIndices) - 1 do
+    for J := 0 to High(RawIndices) - 1 - I do
+      if RawIndices[J] > RawIndices[J + 1] then
+      begin
+        Temp := RawIndices[J];
+        RawIndices[J] := RawIndices[J + 1];
+        RawIndices[J + 1] := Temp;
+      end;
+
+  Level := FTaskList[RawIndices[0]].FIndentLevel;
+
+  // Every selected task must share the level, and any task in the gap
+  // between two selected tasks must be their descendant
+  PrevInd := -2;
+  for I := 0 to High(RawIndices) do
+  begin
+    if FTaskList[RawIndices[I]].FIndentLevel <> Level then Exit;
+    if PrevInd >= 0 then
+      for J := PrevInd + 1 to RawIndices[I] - 1 do
+        if FTaskList[J].FIndentLevel <= Level then Exit;
+    PrevInd := RawIndices[I];
+  end;
+
+  IndStart := RawIndices[0];
+  IndEnd := GetSubtreeEnd(RawIndices[High(RawIndices)]);
+  SetLength(RawIndices, 0);
   Result := True;
 end;
 
