@@ -2422,7 +2422,7 @@ begin
   end;
 
   FillGrid;
-  ResetRowHeight;
+  CalcRowHeight(True);
 
   // Restore selection by raw indices: collapsing can hide rows,
   // so the visible range must be rebuilt from the new map
@@ -4667,7 +4667,7 @@ begin
           // Collapse is a view state, it must not mark the document modified
           Tasks.ToggleCollapse(TaskIndex);
           FillGrid;
-          ResetRowHeight;
+          CalcRowHeight(True);
           if (Cell.Y < Grid.RowCount) then
           begin
             Grid.Row := Cell.Y;
