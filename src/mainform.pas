@@ -1192,6 +1192,10 @@ begin
   if MemoNote.Focused or FilterBox.Focused or TagEdit.Focused then
     exit;
 
+  // Do not let shortcuts steal keystrokes used by national layouts
+  if TLocalize.IsCharInputModifier(Shift) then
+    Exit;
+
   if Screen.ActiveForm <> Self then
   begin
     Key := 0;
@@ -3611,9 +3615,11 @@ var
   LinesPerPage, NewPos: integer;
   Render: string;
 begin
+  // AltGr and the right Ctrl are character input, not shortcut modifiers
   // Test for letter, number, space, back, enter, shift or delete key for backup
-  if (Shift * [ssCtrl, ssAlt] = []) and ((not THotKeyData.Create(Key).IsSystemKey) or (Key = VK_SPACE) or
-    (Key = VK_BACK) or (Key = VK_RETURN) or (ssShift in Shift) or ((Key = VK_DELETE) and (MemoNote.SelLength = 0))) then
+  if (TLocalize.IsCharInputModifier(Shift) or (Shift * [ssCtrl, ssAlt] = [])) and ((not THotKeyData.Create(Key).IsSystemKey) or
+    (Key = VK_SPACE) or (Key = VK_BACK) or (Key = VK_RETURN) or (ssShift in Shift) or ((Key = VK_DELETE) and
+    (MemoNote.SelLength = 0))) then
   begin
     if (not FMemoNoteFirstKey) then
     begin
@@ -3623,6 +3629,10 @@ begin
   end
   else
     FMemoNoteFirstKey := False;
+
+  // Do not let shortcuts steal keystrokes used by national layouts
+  if TLocalize.IsCharInputModifier(Shift) then
+    Exit;
 
   if (not (ssShift in Shift)) and (Key = VK_PRIOR) then
   begin
@@ -4275,8 +4285,12 @@ end;
 
 procedure TformNotetask.TagEditKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
-  if TagEdit.ReadOnly then exit
-  else
+  if TagEdit.ReadOnly then Exit;
+
+  // Do not let shortcuts steal keystrokes used by national layouts
+  if TLocalize.IsCharInputModifier(Shift) then
+    exit;
+
   if Key = VK_DELETE then // Delete
   begin
     {$IFDEF UNIX}
@@ -5502,8 +5516,10 @@ procedure TformNotetask.MemoKeyDown(Sender: TObject; var Key: word; Shift: TShif
 var
   nextCol: integer;
 begin
+  // AltGr and the right Ctrl are character input, not shortcut modifiers
   // Test for letter, number, space or back key for backup
-  if (Shift * [ssCtrl, ssAlt] = []) and ((not THotKeyData.Create(Key).IsSystemKey) or (Key = VK_SPACE) or (Key = VK_BACK)) then
+  if (TLocalize.IsCharInputModifier(Shift) or (Shift * [ssCtrl, ssAlt] = [])) and ((not THotKeyData.Create(Key).IsSystemKey) or
+    (Key = VK_SPACE) or (Key = VK_BACK)) then
   begin
     if (not FMemoFirstKey) then
     begin
@@ -5744,6 +5760,10 @@ var
   SelStart, SelLen: integer;
   ClipText: string;
 begin
+  // Do not let shortcuts steal keystrokes used by national layouts
+  if TLocalize.IsCharInputModifier(Shift) then
+    Exit;
+
   SelStart := FilterBox.SelStart;
   SelLen := FilterBox.SelLength;
 
