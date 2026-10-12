@@ -1042,6 +1042,9 @@ begin
   // This is needed when the insertion point is a hidden task
   if (ListIndex >= 0) then
     Ind := ListIndex
+  // An empty list always accepts the first task at position 0
+  else if (Count = 0) then
+    Ind := 0
   else if (Index = 0) then
   begin
     if InsertBefore then
@@ -1059,15 +1062,16 @@ begin
   if (Backup) then
     CreateBackup;
 
-  if (not InsertBefore) then
+  // The first task in an empty list goes straight to position 0
+  if (not InsertBefore) and (Count > 0) then
     Inc(Ind);
 
   // Explicit level overrides the level of the following task
   if (ForceLevel >= 0) then
     Indent := ForceLevel
-  else if Ind < Count then
+  else if (Ind < Count) then
     Indent := FTaskList[Ind].IndentLevel
-  else if Ind > 0 then
+  else if (Ind > 0) and (Ind <= Count) then
     Indent := FTaskList[Ind - 1].IndentLevel;
 
   Task := TTask.Create(TaskString); // Create a new task

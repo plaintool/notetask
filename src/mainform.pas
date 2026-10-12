@@ -1413,7 +1413,11 @@ begin
     if IsEditing then
       EditComplete(False, True)
     else
+    begin
       Grid.ClearSelections;
+      FLastSelectionHeight := 0;
+      AdjustMultiButton;
+    end;
     Key := 0;
   end
   else
@@ -1867,6 +1871,7 @@ begin
   begin
     Grid.Selection := TGridRect.Create(COL_NUM, 0, COL_STAR, Grid.RowCount);
     FLastSelectionHeight := Grid.Selection.Height;
+    AdjustMultiButton;
     SetInfo;
     SetNote;
     SetTags;
@@ -6238,11 +6243,12 @@ var
         DrawText(Grid.canvas.handle, PChar(Text), Length(Text), drawrect, Flags);
         Grid.Canvas.Font.Bold := OldBold;
 
-        // The greater than sign is important because values may differ across fields, need max
-        if force or (abs(drawrect.bottom - drawrect.top) > Grid.RowHeights[row]) then
+        // A freshly created task also needs the minimum height applied,
+        // otherwise the first inserted row stays shorter than the default
+        if force or (task.FRowHeight = 0) or (abs(drawrect.bottom - drawrect.top) > Grid.RowHeights[row]) then
         begin
           h := drawrect.bottom - drawrect.top + 2;
-          if (force) and (h < Grid.DefaultRowHeight) then
+          if (force or (task.FRowHeight = 0)) and (h < Grid.DefaultRowHeight) then
             h := Max(Grid.Canvas.TextHeight('Wg') + 2, integer(Round(Grid.DefaultRowHeight * FZoom)));
           FLastRowHeights[row] := h;
           Grid.RowHeights[row] := h;
@@ -7970,6 +7976,8 @@ begin
       SetInfo;
       SetNote;
       SetTags;
+      FLastSelectionHeight := 0;
+      AdjustMultiButton;
       Changed := True;
       FLastText := Grid.Cells[Grid.Col, Grid.Row];
     end;
@@ -8009,6 +8017,8 @@ begin
       SetInfo;
       SetNote;
       SetTags;
+      FLastSelectionHeight := 0;
+      AdjustMultiButton;
       Changed := True;
       FLastText := Grid.Cells[Grid.Col, Grid.Row];
     end;
