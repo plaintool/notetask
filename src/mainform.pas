@@ -3617,9 +3617,9 @@ var
 begin
   // AltGr and the right Ctrl are character input, not shortcut modifiers
   // Test for letter, number, space, back, enter, shift or delete key for backup
-  if (TLocalize.IsCharInputModifier(Shift) or (Shift * [ssCtrl, ssAlt] = [])) and ((not THotKeyData.Create(Key).IsSystemKey) or
-    (Key = VK_SPACE) or (Key = VK_BACK) or (Key = VK_RETURN) or (ssShift in Shift) or ((Key = VK_DELETE) and
-    (MemoNote.SelLength = 0))) then
+  if (TLocalize.IsCharInputModifier(Shift) or (Shift * [ssCtrl, ssAlt] = [])) and
+    ((not THotKeyData.Create(Key).IsSystemKey) or (Key = VK_SPACE) or (Key = VK_BACK) or (Key = VK_RETURN) or
+    (ssShift in Shift) or ((Key = VK_DELETE) and (MemoNote.SelLength = 0))) then
   begin
     if (not FMemoNoteFirstKey) then
     begin
@@ -5518,8 +5518,8 @@ var
 begin
   // AltGr and the right Ctrl are character input, not shortcut modifiers
   // Test for letter, number, space or back key for backup
-  if (TLocalize.IsCharInputModifier(Shift) or (Shift * [ssCtrl, ssAlt] = [])) and ((not THotKeyData.Create(Key).IsSystemKey) or
-    (Key = VK_SPACE) or (Key = VK_BACK)) then
+  if (TLocalize.IsCharInputModifier(Shift) or (Shift * [ssCtrl, ssAlt] = [])) and
+    ((not THotKeyData.Create(Key).IsSystemKey) or (Key = VK_SPACE) or (Key = VK_BACK)) then
   begin
     if (not FMemoFirstKey) then
     begin
@@ -5902,6 +5902,8 @@ begin
 end;
 
 procedure TformNotetask.SetReadOnly(Value: boolean);
+var
+  CanMove: boolean;
 begin
   FReadOnly := Value;
   aUndo.Enabled := not Value;
@@ -5918,8 +5920,12 @@ begin
   aDeleteGroup.Enabled := not Value;
   aMoveGroupLeft.Enabled := not Value;
   aMoveGroupRight.Enabled := not Value;
-  aMoveTaskLeft.Enabled := not Value;
-  aMoveTaskRight.Enabled := not Value;
+
+  // Moving tasks and changing indentation is only valid in natural order,
+  // the same rule is applied in ApplySortingActions
+  CanMove := (not Value) and (SortColumn = COL_NUM);
+  aMoveTaskLeft.Enabled := CanMove;
+  aMoveTaskRight.Enabled := CanMove;
   aInsertTask.Enabled := not Value;
   aMergeTasks.Enabled := not Value;
   aSplitTasks.Enabled := not Value;
@@ -5927,12 +5933,12 @@ begin
   aDuplicateTasks.Enabled := not Value;
   aDeleteTasks.Enabled := not Value;
   aArchiveTasks.Enabled := not Value;
-  aMoveTaskTop.Enabled := not Value;
-  aMoveTaskUp.Enabled := not Value;
-  aMoveTaskDown.Enabled := not Value;
-  aMoveTaskBottom.Enabled := not Value;
-  aIndentTasks.Enabled := not Value;
-  aOutdentTasks.Enabled := not Value;
+  aMoveTaskTop.Enabled := CanMove;
+  aMoveTaskUp.Enabled := CanMove;
+  aMoveTaskDown.Enabled := CanMove;
+  aMoveTaskBottom.Enabled := CanMove;
+  aIndentTasks.Enabled := CanMove;
+  aOutdentTasks.Enabled := CanMove;
   contextDeleteTags.Enabled := not Value;
 end;
 
@@ -8271,8 +8277,10 @@ var
   RawMin, RawMax: integer;
   AlreadySelected: boolean;
   Task: TTask;
+  NewRow, NewTop, NewBottom: integer;
 begin
   if (ReadOnly) then exit;
+  if (SortColumn <> COL_NUM) then Exit;
 
   // Collect the task indices of the selection
   for RowIndex := Grid.Selection.Top to Grid.Selection.Bottom do
@@ -8416,6 +8424,33 @@ begin
     SetNote;
     SetTags;
     Changed := True;
+
+    // Restore the selection on the same tasks. Their raw indices do not
+    // change during indent, so the new visual rows are found via the map
+    if Length(SelectedTasks) > 0 then
+    begin
+      NewTop := MaxInt;
+      NewBottom := 0;
+      for k := 0 to High(SelectedTasks) do
+      begin
+        NewRow := Tasks.ReverseMap(SelectedTasks[k]);
+        if (NewRow > 0) and (NewRow < Grid.RowCount) then
+        begin
+          if NewRow < NewTop then NewTop := NewRow;
+          if NewRow > NewBottom then NewBottom := NewRow;
+        end;
+      end;
+      if (NewTop <> MaxInt) and (NewTop <= NewBottom) then
+      begin
+        Grid.OnSelection := nil;
+        try
+          Grid.Row := NewTop;
+          Grid.Selection := TGridRect.Create(Grid.Selection.Left, NewTop, Grid.Selection.Right, NewBottom);
+        finally
+          Grid.OnSelection := @GridSelection;
+        end;
+      end;
+    end;
   end;
 
   SetLength(SelectedTasks, 0);
@@ -8783,6 +8818,9 @@ begin
   aMoveTaskDown.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
   aMoveTaskLeft.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
   aMoveTaskRight.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
+
+  aIndentTasks.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
+  aOutdentTasks.Enabled := (not ReadOnly) and (SortColumn = COL_NUM);
 
   if (SortColumn = COL_NUM) then
     Grid.Options := Grid.Options + [goRowMoving]
