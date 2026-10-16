@@ -722,7 +722,6 @@ type
     procedure MemoBackup;
     procedure MemoUndo;
     procedure MemoDelKey(aMemoNote: boolean = True);
-    function CalcDeleteCount(const S: string; SelStart: integer): integer;
     function IsExecuteValueNote(memoPriority: boolean = False): boolean;
     function GetExecuteValue(aRow: integer; memoPriority: boolean = False): string;
     procedure ExecuteChatGpt;
@@ -4295,9 +4294,7 @@ begin
   begin
     {$IFDEF UNIX}
     {$ELSE}
-    if (TagEdit.EditBox.SelLength = 0) then
-      TagEdit.EditBox.SelLength := CalcDeleteCount(TagEdit.EditBox.Text, TagEdit.EditBox.SelStart);
-    TagEdit.EditBox.ClearSelection;
+    TagEdit.EditBox.DeleteKey;
     Key := 0;
     {$ENDIF}
   end
@@ -8515,66 +8512,20 @@ begin
   FMemoSelLengthBackup := SelLength;
 end;
 
-function TformNotetask.CalcDeleteCount(const S: string; SelStart: integer): integer;
-var
-  Len, DeleteCount, Pos: integer;
-begin
-  Len := Length(S);
-  DeleteCount := 0;
-  Pos := SelStart + 1; // 1-based indexing
-
-  while Pos <= Len do
-  begin
-    if S.IsUTF8Char(Pos, ' ') then
-    begin
-      // If space, extend deletion
-      Inc(DeleteCount);
-      Inc(Pos);
-    end
-    else if (S.IsUTF8Char(Pos, #13)) or (S.IsUTF8Char(Pos, #10)) then
-    begin
-      // If CR, delete it and check for following LF
-      Inc(DeleteCount);
-      Inc(Pos);
-      if (Pos <= Len) and (S.IsUTF8Char(Pos, #10)) then
-      begin
-        Inc(DeleteCount);
-        Inc(Pos);
-      end;
-      Break; // stop loop after CR (and optional LF)
-    end
-    else
-    begin
-      DeleteCount := 1;
-      Break; // any other char, stop loop
-    end;
-  end;
-  Result := DeleteCount;
-end;
-
 procedure TformNotetask.MemoDelKey(aMemoNote: boolean = True);
-var
-  TargetMemo: Tmemo;
-  DeleteCount: integer;
 begin
   if aMemoNote then
-    TargetMemo := MemoNote
-  else
-    TargetMemo := Memo;
-
-  if TargetMemo.SelLength = 0 then
   begin
-    DeleteCount := CalcDeleteCount(TargetMemo.Text, TargetMemo.SelStart);
-    TargetMemo.SelLength := DeleteCount;
-    TargetMemo.ClearSelection;
+    // Backup only when something is actually selected
+    if MemoNote.SelLength > 0 then
+      MemoNoteBackup;
+    MemoNote.DeleteKey;
   end
   else
   begin
-    if aMemoNote then
-      MemoNoteBackup
-    else
+    if Memo.SelLength > 0 then
       MemoBackup;
-    TargetMemo.ClearSelection;
+    Memo.DeleteKey;
   end;
 end;
 
