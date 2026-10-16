@@ -1814,11 +1814,7 @@ begin
   begin
     {$IFDEF UNIX}
     if not TagEdit.ReadOnly then
-    begin
-      if TagEdit.EditBox.SelLength = 0 then
-        TagEdit.EditBox.SelLength := CalcDeleteCount(TagEdit.EditBox.Text, TagEdit.EditBox.SelStart);
-      TagEdit.EditBox.ClearSelection;
-    end;
+      TagEdit.EditBox.DeleteKey;
     {$ENDIF}
     exit;
   end;
