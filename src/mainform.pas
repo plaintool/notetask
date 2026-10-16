@@ -6585,6 +6585,7 @@ var
   KeyAuthOld: TBytes = nil;
   SaltOld: TBytes = nil;
   Token: string;
+  RecoveryFileOld: string = string.Empty;
 begin
   Result := False;
   if not FileExists(fileName) then
@@ -6607,6 +6608,8 @@ begin
   TCrypto.FreeBytesSecure(FKeyAuth);
   TCrypto.FreeBytesSecure(FSalt);
   FileNameOld := FFileName;
+  // Capture the recovery path of the document being replaced
+  RecoveryFileOld := GetRecoveryFileName;
   FFileName := fileName;
   EditComplete;
 
@@ -6709,6 +6712,11 @@ begin
 
   FLineEndingOriginal := FLineEnding;
   FEncodingOriginal := FEncoding;
+
+  // Successfully opened a file, the previous document's snapshot is stale
+  if (FileNameOld <> FFileName) and FileExists(RecoveryFileOld) then
+    SysUtils.DeleteFile(RecoveryFileOld);
+
   if (ReadOnly) and (not ShowTrigger) then ShowMessage(rfilereadonly);
 
   // Offer to restore recovery data if the snapshot is fresher than the file
@@ -6722,12 +6730,15 @@ var
   TaskList: TStringList;
   Token: string = string.Empty;
   FileNameOld: string;
+  RecoveryFileOld: string = string.Empty;
 begin
   try
     if (fileName = string.Empty) and (FFileName = string.Empty) then
       exit(SaveFileAs);
 
     FileNameOld := FFileName;
+    // Remember the recovery path of the previous document before renaming
+    RecoveryFileOld := GetRecoveryFileName;
     if (fileName = string.Empty) then
       fileName := FFileName
     else
@@ -6786,6 +6797,10 @@ begin
             TFileManager.SaveTextFile(fileName, TaskList, FEncoding, FLineEnding, FEncrypted, Token, FSalt, FKeyEnc, FKeyAuth);
             // File has been written to disk, recovery snapshot is obsolete
             DeleteRecovery;
+            // Also drop the snapshot of the previous document, for example
+            // the untitled one that just got its first real file name
+            if (FileNameOld <> FFileName) and FileExists(RecoveryFileOld) then
+              SysUtils.DeleteFile(RecoveryFileOld);
             SetChanged(False);
             Tasks.CreateBackupInit;
             ReadOnly := not TFileManager.TryLockFile(fileName, FSReserved);
