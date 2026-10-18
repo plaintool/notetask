@@ -4,7 +4,7 @@
 //  You may obtain a copy of the License at https://www.gnu.org/licenses/gpl-3.0.html
 //-----------------------------------------------------------------------------------
 
-unit task;
+unit Task;
 
 {$mode ObjFPC}{$H+}
 {$codepage utf8}
@@ -22,7 +22,7 @@ uses
   StrUtils,
   DateUtils,
   TagEdit,
-  arrayhelpers;
+  ArrayHelper;
 
 type
   // Class representing a single task
@@ -223,7 +223,7 @@ const
 
 implementation
 
-uses mdformat, mathparser, stringhelper, stringshelper;
+uses MDFormat, MathParser, StringHelper, StringsHelper;
 
   { TTask }
 
@@ -256,7 +256,7 @@ constructor TTask.Create(const TaskString: string);
 var
   Temp: TTask;
 begin
-  Temp := mdformat.TaskFromString(TaskString);
+  Temp := MDFormat.TaskFromString(TaskString);
   Self.Copy(Temp); // Copy fields to new task
   Temp.Free;
 end;
@@ -269,7 +269,7 @@ end;
 
 function TTask.ToString(Col: integer = 0; AddEmptyCompletion: boolean = True): string;
 begin
-  Result := mdformat.TaskToString(Self, Col, AddEmptyCompletion);
+  Result := MDFormat.TaskToString(Self, Col, AddEmptyCompletion);
 end;
 
 procedure TTask.Copy(Original: TTask);
@@ -548,7 +548,7 @@ begin
 
   if Assigned(TaskStrings) then
   begin
-    mdformat.TasksFromStringList(TaskStrings, @AddGroup);
+    MDFormat.TasksFromStringList(TaskStrings, @AddGroup);
     TaskStrings.Free;
   end;
 
@@ -643,7 +643,7 @@ begin
       for j := 0 to Length(FGroupList[i]) - 1 do
         if FGroupList[i, j].Done then addCompleted := True;
 
-    Result := mdformat.TasksToStringList(CountGroup, addCompleted, @GetGroupName, @GetGroupHint, @GetTaskCount, @GetTaskInGroup);
+    Result := MDFormat.TasksToStringList(CountGroup, addCompleted, @GetGroupName, @GetGroupHint, @GetTaskCount, @GetTaskInGroup);
   except
     Result.Free;
     raise;
@@ -1455,7 +1455,7 @@ begin
   // Increment the selected group index and set the name of the new group
   Inc(FSelectedGroup);
   SetLength(FGroupList[FSelectedGroup], 0);
-  FGroupNameList[FSelectedGroup] := IfThen(aName = string.Empty, aName, mdformat.gp + ' ' + aName);
+  FGroupNameList[FSelectedGroup] := IfThen(aName = string.Empty, aName, MDFormat.gp + ' ' + aName);
   FGroupHintList[FSelectedGroup] := string.Empty;
 
   // Change group to new one
@@ -1469,7 +1469,7 @@ function TTasks.RenameGroup(aIndex: integer; aName: string): boolean;
 begin
   Result := False;
   if (aIndex < 0) or (aIndex >= CountGroup) then exit;
-  FGroupNameList[aIndex] := IfThen(aName = string.Empty, aName, mdformat.gp + ' ' + aName);
+  FGroupNameList[aIndex] := IfThen(aName = string.Empty, aName, MDFormat.gp + ' ' + aName);
   Result := True;
 end;
 
@@ -1512,7 +1512,7 @@ begin
   end;
 
   // Name new group
-  FGroupNameList[aIndex + 1] := IfThen(aName = string.Empty, aName, mdformat.gp + ' ' + aName);
+  FGroupNameList[aIndex + 1] := IfThen(aName = string.Empty, aName, MDFormat.gp + ' ' + aName);
   FGroupHintList[aIndex + 1] := FGroupHintList[aIndex];
 
   Result := True;
@@ -2138,7 +2138,7 @@ end;
 
 procedure TTasks.CopyToClipboard(Grid: TStringGrid; NoteVisible: boolean = False; Value: PString = nil);
 begin
-  mdformat.TasksToClipboard(Grid, NoteVisible, Value, @GetTask);
+  MDFormat.TasksToClipboard(Grid, NoteVisible, Value, @GetTask);
 end;
 
 function TTasks.PasteFromClipboard(Grid: TStringGrid; SortOrder: TSortOrder; Backup: boolean = True; Value: PString = nil): TGridRect;

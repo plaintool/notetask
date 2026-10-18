@@ -10,11 +10,11 @@ object formFindText: TformFindText
   ClientWidth = 381
   FormStyle = fsStayOnTop
   KeyPreview = True
+  ShowInTaskBar = stNever
+  LCLVersion = '4.8.0.0'
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnShow = FormShow
-  ShowInTaskBar = stNever
-  LCLVersion = '3.6.0.0'
   object labelWhat: TLabel
     Left = 8
     Height = 15

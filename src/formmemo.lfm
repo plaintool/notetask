@@ -11,7 +11,7 @@ object formMemoText: TformMemoText
   Constraints.MinWidth = 200
   KeyPreview = True
   ShowInTaskBar = stNever
-  LCLVersion = '4.0.0.4'
+  LCLVersion = '4.8.0.0'
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnShow = FormShow

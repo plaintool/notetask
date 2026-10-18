@@ -4,7 +4,7 @@
 //  You may obtain a copy of the License at https://www.gnu.org/licenses/gpl-3.0.html
 //-----------------------------------------------------------------------------------
 
-unit formfind;
+unit FormFind;
 
 {$mode ObjFPC}{$H+}
 {$codepage utf8}
@@ -53,7 +53,7 @@ resourcestring
 
 implementation
 
-uses mainform, formreplace;
+uses MainForm, FormReplace;
 
   {$R *.lfm}
 

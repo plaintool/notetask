@@ -4,7 +4,7 @@
 //  You may obtain a copy of the License at https://www.gnu.org/licenses/gpl-3.0.html
 //-----------------------------------------------------------------------------------
 
-unit mainform;
+unit MainForm;
 
 {$mode objfpc}{$H+}
 {$codepage utf8}
@@ -39,9 +39,9 @@ uses
   uDateTimePicker,
   GridPrn,
   TagEdit,
-  task,
-  lineending,
-  arrayhelpers;
+  Task,
+  LineEnding,
+  ArrayHelper;
 
 type
   { TformNotetask }
@@ -926,9 +926,9 @@ resourcestring
 
 implementation
 
-uses Consts, mathparser, filemngr, settings, controlshelper, cryptoutils, stringgridhelper, forminput, formmemo, formfind,
-  formreplace, formabout, formdonate, osutils, stringhelper, stringshelper, darkutils, localize, checkupdates, hotkeyhelper,
-  pascalutils, OneShotTimer;
+uses Consts, MathParser, FileMngr, Settings, ControlsHelper, CryptoUtils, StringGridHelper, FormInput, FormMemo, FormFind,
+  FormReplace, FormAbout, FormDonate, OSUtils, StringHelper, StringsHelper, DarkUtils, Localize, CheckUpdates, HotkeyHelper,
+  PascalUtils, OneShotTimer;
 
   {$R *.lfm}
 
@@ -9195,7 +9195,7 @@ begin
     if not TLocalize.ApplicationTranslate(APP_NAME, Language) then
       Language := 'en';
 
-    TLocalize.UpdatePackageTranslations(APP_NAME, 'checkupdates', Language, ['checkupdates']);
+    TLocalize.UpdatePackageTranslations(APP_NAME, 'checkupdates', Language, ['CheckUpdates']);
   end;
 
   openDialog.Filter := ropendialogfilter;

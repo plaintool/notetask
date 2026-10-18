@@ -4,7 +4,7 @@
 //  You may obtain a copy of the License at https://www.gnu.org/licenses/gpl-3.0.html
 //-----------------------------------------------------------------------------------
 
-program notetask;
+program Notetask;
 
 {$mode objfpc}{$H+}
 {$codepage utf8}
@@ -18,12 +18,12 @@ uses
   SysUtils,
   uDateTimePicker,
   Consts,
-  mainform,
-  forminput,
-  formmemo,
-  formfind,
-  formreplace,
-  localize
+  MainForm,
+  FormInput,
+  FormMemo,
+  FormFind,
+  FormReplace,
+  Localize
   {$IFDEF WINDOWS}
   ,uDarkStyle
   ,uWin32WidgetSetDark
@@ -50,6 +50,6 @@ begin
   Application.CreateForm(TformInputText, formInputText);
   Application.CreateForm(TformMemoText, formMemoText);
   TLocalize.ApplicationTranslate(APP_NAME, Language);
-  TLocalize.UpdatePackageTranslations(APP_NAME, 'checkupdates', Language, ['checkupdates']);
+  TLocalize.UpdatePackageTranslations(APP_NAME, 'checkupdates', Language, ['CheckUpdates']);
   Application.Run;
 end.

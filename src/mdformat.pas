@@ -4,7 +4,7 @@
 //  You may obtain a copy of the License at https://www.gnu.org/licenses/gpl-3.0.html
 //-----------------------------------------------------------------------------------
 
-unit mdformat;
+unit MDFormat;
 
 {$mode ObjFPC}{$H+}
 
@@ -50,7 +50,7 @@ procedure TasksToClipboard(Grid: TStringGrid; NoteVisible: boolean; Value: PStri
 
 implementation
 
-uses stringhelper, stringshelper;
+uses StringHelper, StringsHelper;
 
 function TaskFromString(const TaskString: string): TTask;
 var

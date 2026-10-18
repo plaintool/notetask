@@ -10,7 +10,7 @@ object formReplaceText: TformReplaceText
   ClientWidth = 383
   FormStyle = fsStayOnTop
   ShowInTaskBar = stNever
-  LCLVersion = '4.0.0.4'
+  LCLVersion = '4.8.0.0'
   OnShow = FormShow
   object labelWhat: TLabel
     Left = 10

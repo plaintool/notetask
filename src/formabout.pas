@@ -4,7 +4,7 @@
 //  You may obtain a copy of the License at https://www.gnu.org/licenses/gpl-3.0.html
 //-----------------------------------------------------------------------------------
 
-unit formabout;
+unit FormAbout;
 
 {$mode ObjFPC}{$H+}
 
@@ -44,7 +44,7 @@ var
 
 implementation
 
-uses localize, checkupdates, darkutils;
+uses Localize, CheckUpdates, DarkUtils;
 
   {$R *.lfm}
 
