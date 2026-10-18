@@ -122,9 +122,6 @@
         <PackageName Value="darkmode"/>
       </Item>
       <Item>
-        <PackageName Value="dcpcrypt"/>
-      </Item>
-      <Item>
         <PackageName Value="filemanager"/>
       </Item>
       <Item>
@@ -159,6 +156,7 @@
         <ComponentName Value="formNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="MainForm"/>
       </Unit>
       <Unit>
         <Filename Value="src\formmemo.pas"/>
@@ -187,6 +185,7 @@
         <ComponentName Value="formAboutNotetask"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="FormAbout"/>
       </Unit>
       <Unit>
         <Filename Value="src\formdonate.pas"/>

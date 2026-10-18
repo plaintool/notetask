@@ -29,8 +29,12 @@ type
     labelName: TLabel;
     labelLic: TLabel;
     LabelLicUrl: TLabel;
-    Memo1: TMemo;
+    MemoInfo: TMemo;
     labelBy1: TLabel;
+    labelVersion: TLabel;
+    panelHeader: TPanel;
+    panelBody: TPanel;
+    panelFooter: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure LabelLicUrlClick(Sender: TObject);
   private
@@ -51,9 +55,28 @@ uses Localize, CheckUpdates, DarkUtils;
   { TformAboutNotetask }
 
 procedure TformAboutNotetask.FormCreate(Sender: TObject);
+var
+  Arch: string;
 begin
-  labelName.Caption := 'Notetask © ' + GetAppVersion;
+  {$IFDEF CPU64}
+    Arch := 'x64';
+  {$ELSE}
+  Arch := 'x86';
+  {$ENDIF}
+
+  labelName.Caption := 'Notetask © 2024';
+  labelVersion.Caption := 'Version ' + GetAppVersion + ' · ' + Arch;
+
+  // Links: color within the theme
   LabelLicUrl.Font.Color := TDarkUtils.ThemeColor(clBlue, clSkyBlue);
+  LabelLicUrl1.Font.Color := LabelLicUrl.Font.Color;
+
+  // Panels: Light/Dark Theme Adaptation
+  panelHeader.Color := TDarkUtils.ThemeColor(16315632, $002D2D2D);
+  panelBody.Color := TDarkUtils.ThemeColor(clWhite, $001E1E1E);
+  labelVersion.Font.Color:=TDarkUtils.ThemeColor(clGray, clSilver);
+  panelFooter.Color := panelBody.Color;
+  MemoInfo.Color := panelBody.Color;
 end;
 
 procedure TformAboutNotetask.LabelLicUrlClick(Sender: TObject);

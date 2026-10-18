@@ -252,7 +252,7 @@ msgid "by Alexander Tverskoy is licensed under"
 msgstr "by Alexander Tverskoy is licensed under"
 
 #: tformaboutnotetask.labelby1.caption
-msgid "the GNU General Public License, Version 3 "
+msgid "the GNU General Public License, Version 3"
 msgstr "the GNU General Public License, Version 3 "
 
 #: tformaboutnotetask.labellic.caption
@@ -270,8 +270,8 @@ msgid "mailto:astverskoy@gmail.com"
 msgstr "mailto:astverskoy@gmail.com"
 
 #: tformaboutnotetask.labellicurl1.caption
-msgid "github: plaintool/notetask"
-msgstr "github: plaintool/notetask"
+msgid "github:plaintool/notetask"
+msgstr "github:plaintool/notetask"
 
 #: tformaboutnotetask.labellicurl1.hint
 msgctxt "tformaboutnotetask.labellicurl1.hint"
@@ -281,6 +281,10 @@ msgstr "https://github.com/plaintool/notetask"
 #: tformaboutnotetask.labelname.caption
 msgid "Notetask © 2024"
 msgstr "ノートタスク © 2024"
+
+#: tformaboutnotetask.labelversion.caption
+msgid "Version"
+msgstr "Version"
 
 #: tformdonatenotetask.btnok.caption
 msgctxt "tformdonatenotetask.btnok.caption"
