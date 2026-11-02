@@ -77,4 +77,5 @@ if not "%CERTFILE%"=="" (
     echo Skipping signing: CERTFILE not set.
 )
 
+endlocal
 echo Build and signing notetask-%VERSION%-any-x86-x64.exe completed successfully!

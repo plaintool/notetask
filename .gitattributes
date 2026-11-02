@@ -1,3 +1,5 @@
 installer/linux/** text eol=lf
 installer/linux/**/*.exe -text
 installer/linux/**/*.png -text
+*.bat text eol=crlf
+*.cmd text eol=crlf

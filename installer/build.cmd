@@ -28,7 +28,7 @@ IF NOT "%PLATFORM%"=="x64" IF NOT "%PLATFORM%"=="x86" (
 
 echo.
 echo ############################################################
-echo                  Build MSI %PLATFORM% peruser               
+echo                  Build MSI %PLATFORM% peruser              
 echo ############################################################
 echo.
 
@@ -42,7 +42,7 @@ echo.
 
 echo.
 echo ############################################################
-echo                   Build MSI %PLATFORM% permachine           
+echo                   Build MSI %PLATFORM% permachine          
 echo ############################################################
 echo.
 
@@ -63,7 +63,7 @@ echo.
 
 echo.
 echo ############################################################
-echo                       Sign %PLATFORM% installers            
+echo                       Sign %PLATFORM% installers           
 echo ############################################################
 echo.
 
@@ -117,7 +117,8 @@ if not "%CERTFILE%"=="" (
 
 :: --- Portable ---
 if "%BUILD_PORTABLE%"=="1" (
-    call "%~dp0buildportable.cmd" "%VERSION%"
+    call "%~dp0buildportable.cmd" "%PLATFORM%" "%VERSION%"
 )
 
+endlocal
 echo Build and signing completed successfully!

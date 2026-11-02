@@ -75,6 +75,27 @@ if "%DEP_LPK%"=="" (
     goto :fin
 )
 
+:: Workaround for a Lazarus/fppkg bug: fppkg looks for fpc.exe only in PATH
+:: and ignores --compiler / LAZBUILD_OPTS, which causes
+:: "InitializeFppkg failed: Could not find a fpc executable in the PATH"
+:: when building .lpk packages. If fpc.exe is not already reachable, prepend
+:: the FPC bin directory that ships with Lazarus to PATH for this session.
+where fpc.exe >nul 2>&1
+if not errorlevel 1 goto :fpc_ready
+if defined LAZARUS_DIR (
+    for /d %%V in ("%LAZARUS_DIR%\fpc\*") do (
+        if exist "%%~V\bin\x86_64-win64\fpc.exe" (
+            set "PATH=%%~V\bin\x86_64-win64;%PATH%"
+            goto :fpc_ready
+        )
+        if exist "%%~V\bin\i386-win32\fpc.exe" (
+            set "PATH=%%~V\bin\i386-win32;%PATH%"
+            goto :fpc_ready
+        )
+    )
+)
+:fpc_ready
+
 echo Processing Lazarus packages
 for %%L in (%DEP_LPK%) do (
     if exist "%DEP_PATH%\%%L" (

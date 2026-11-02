@@ -24,7 +24,8 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y lazarus fpc dpkg-dev rpm binutils
+          sudo apt-get install -y lazarus fpc dpkg-dev rpm binutils \
+            libgtk2.0-dev libgdk-pixbuf-2.0-dev libpango1.0-dev libcairo2-dev libatk1.0-dev libx11-dev
 
       - name: Build binary
         run: make
