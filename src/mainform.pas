@@ -1991,20 +1991,14 @@ begin
   FLastText := string.Empty;
   FillGrid;
 
-  // Pin the new task to the height of an already laid out neighbour.
-  // DefaultRowHeight ignores the current zoom, while a neighbour row
-  // always matches the scale and the platform measurement rules
+  // A new task always starts at the single-line height for the current
+  // zoom, even if the first row of the grid has grown to several lines
   NewRow := Tasks.ReverseMap(Ind);
   if (Ind >= 0) and (Ind < Tasks.Count) and (NewRow > 0) and (Grid.RowCount > 1) then
   begin
-    RefRow := 1;
-    if RefRow = NewRow then
-      RefRow := 2;
-    if (RefRow < Grid.RowCount) and (Grid.RowHeights[RefRow] > 0) then
-    begin
-      Tasks.GetTaskByIndex(Ind).FRowHeight := Grid.RowHeights[RefRow];
-      Grid.RowHeights[NewRow] := Grid.RowHeights[RefRow];
-    end;
+    RefRow := Max(Grid.Canvas.TextHeight('Wg') + 2, integer(Round(Grid.DefaultRowHeight * FZoom)));
+    Tasks.GetTaskByIndex(Ind).FRowHeight := RefRow;
+    Grid.RowHeights[NewRow] := RefRow;
   end;
 
   ResetRowHeight;
