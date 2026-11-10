@@ -112,6 +112,7 @@ type
     function CheckSameLevel(Index1, Index2: integer; out IndStart, IndEnd, Level: integer): boolean;
     function HasMatchingDescendant(Index: integer; const Filter: string; DisplayTime: boolean): boolean;
   public
+  public
     constructor Create(const TaskStrings: TStringList = nil); // Constructor that takes a StringList
     destructor Destroy; override; // Destructor
     function ToStringList: TStringList;
@@ -156,7 +157,8 @@ type
     function IsTaskDescendant(AncestorTask, DescendantTask: integer): boolean;
     procedure SetCollapsed(Index: integer; Value: boolean);
     procedure ToggleCollapse(Index: integer);
-    procedure IndentTask(Index: integer; Outdent: boolean);
+    procedure IndentTask(Index: integer; Outdent: boolean; ShowArchived: boolean = True);
+    procedure MoveSubtree(Ind, TargetPos: integer);
     function InsertGroup(aName: string): integer;
     function RenameGroup(aIndex: integer; aName: string): boolean;
     function RehintGroup(aIndex: integer; aHint: string): boolean;
@@ -1389,9 +1391,10 @@ begin
   FTaskList[Index].FCollapsed := not FTaskList[Index].FCollapsed;
 end;
 
-procedure TTasks.IndentTask(Index: integer; Outdent: boolean);
+procedure TTasks.IndentTask(Index: integer; Outdent: boolean; ShowArchived: boolean = True);
 var
   Ind, I, OldLevel, NewLevel, AboveLevel: integer;
+  PrevSib, SibEnd: integer;
 begin
   // Index is a task list index, not a grid row
   Ind := Index;
@@ -1403,6 +1406,33 @@ begin
     NewLevel := OldLevel - 1
   else
   begin
+    // When hidden archived tasks sit right above, move the subtree up
+    // so the indent nests into the nearest visible sibling instead
+    if (not ShowArchived) and (Ind > 0) and FTaskList[Ind - 1].Archive then
+    begin
+      PrevSib := -1;
+      for I := Ind - 1 downto 0 do
+      begin
+        if FTaskList[I].FIndentLevel < OldLevel then
+          Break;
+        if (FTaskList[I].FIndentLevel = OldLevel) and (not FTaskList[I].Archive) then
+        begin
+          PrevSib := I;
+          Break;
+        end;
+      end;
+
+      // No visible sibling above means the indent cannot be shown
+      if PrevSib < 0 then Exit;
+
+      SibEnd := GetSubtreeEnd(PrevSib);
+      if SibEnd < Ind - 1 then
+      begin
+        MoveSubtree(Ind, SibEnd + 1);
+        Ind := SibEnd + 1;
+      end;
+    end;
+
     // A task may be at most one level deeper than the task above it
     NewLevel := OldLevel + 1;
     if Ind = 0 then
@@ -1427,6 +1457,38 @@ begin
     else
       Break;
   end;
+end;
+
+procedure TTasks.MoveSubtree(Ind, TargetPos: integer);
+var
+  IndEnd, Len, I, OldCount: integer;
+  TempTasks: array of TTask = nil;
+begin
+  if (Ind < 0) or (Ind >= Count) then Exit;
+  if (TargetPos < 0) or (TargetPos >= Ind) then Exit;
+
+  IndEnd := GetSubtreeEnd(Ind);
+  Len := IndEnd - Ind + 1;
+  OldCount := Count;
+
+  // Save the subtree before shifting
+  SetLength(TempTasks, Len);
+  for I := 0 to Len - 1 do
+    TempTasks[I] := FTaskList[Ind + I];
+
+  // Shift the tail down by Len to fill the gap
+  for I := Ind to OldCount - Len - 1 do
+    FTaskList[I] := FTaskList[I + Len];
+
+  // Shift the block between the target and the subtree up by Len
+  for I := OldCount - Len - 1 downto TargetPos do
+    FTaskList[I + Len] := FTaskList[I];
+
+  // Place the subtree at the target position
+  for I := 0 to Len - 1 do
+    FTaskList[TargetPos + I] := TempTasks[I];
+
+  SetLength(TempTasks, 0);
 end;
 
 function TTasks.InsertGroup(aName: string): integer;

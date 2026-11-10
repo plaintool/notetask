@@ -8417,7 +8417,7 @@ begin
     // Process only the root tasks of the selection. Descendants follow their parent
     for i := 0 to High(SelectedTasks) do
       if not IsDescendantFlags[i] then
-        Tasks.IndentTask(SelectedTasks[i], Outdent);
+        Tasks.IndentTask(SelectedTasks[i], Outdent, FShowArchived);
 
     FillGrid;
     ResetRowHeight;

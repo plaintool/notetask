@@ -209,6 +209,7 @@
       <Unit>
         <Filename Value="src\task.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Task"/>
       </Unit>
       <Unit>
         <Filename Value="src\settings.pas"/>
