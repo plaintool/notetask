@@ -2236,9 +2236,9 @@ begin
   selCol := Grid.Col;
 
   if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTasksUp(Grid.Selection.Top, Grid.Selection.Bottom)
+    newRow := Tasks.MoveTasksUp(Grid.Selection.Top, Grid.Selection.Bottom, FShowArchived)
   else
-    newRow := Tasks.MoveTasksDown(Grid.Selection.Bottom, Grid.Selection.Top);
+    newRow := Tasks.MoveTasksDown(Grid.Selection.Bottom, Grid.Selection.Top, FShowArchived);
 
   FillGrid;
 
@@ -2289,9 +2289,9 @@ begin
   selCol := Grid.Col;
 
   if (SortOrder = soAscending) then
-    newRow := Tasks.MoveTasksDown(Grid.Selection.Top, Grid.Selection.Bottom)
+    newRow := Tasks.MoveTasksDown(Grid.Selection.Top, Grid.Selection.Bottom, FShowArchived)
   else
-    newRow := Tasks.MoveTasksUp(Grid.Selection.Bottom, Grid.Selection.Top);
+    newRow := Tasks.MoveTasksUp(Grid.Selection.Bottom, Grid.Selection.Top, FShowArchived);
 
   FillGrid;
 

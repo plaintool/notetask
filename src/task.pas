@@ -106,9 +106,9 @@ type
     function GetCountFilter(Archive: boolean; Filter: string; DisplayTime: boolean): integer;
     function GetTreeSortedOrder(SortOrder: TSortOrder; SortColumn: integer): TIntegerArray;
     function GetSubtreeEnd(Index: integer): integer;
-    function GetPrevSibling(Index: integer): integer;
-    function GetNextSibling(Index: integer): integer;
-    function GetNextSiblingAtLevel(StartAfter, ALevel: integer): integer;
+    function GetPrevSibling(Index: integer; SkipArchived: boolean = False): integer;
+    function GetNextSibling(Index: integer; SkipArchived: boolean = False): integer;
+    function GetNextSiblingAtLevel(StartAfter, ALevel: integer; SkipArchived: boolean = False): integer;
     function CheckSameLevel(Index1, Index2: integer; out IndStart, IndEnd, Level: integer): boolean;
     function HasMatchingDescendant(Index: integer; const Filter: string; DisplayTime: boolean): boolean;
   public
@@ -171,8 +171,8 @@ type
     function MoveGroupTasks(Index1, Index2, NewGroup: integer): integer;
     function MoveTasksTop(Index1, Index2: integer; ShowArchived: boolean): integer;
     function MoveTasksBottom(Index1, Index2: integer; ShowArchived: boolean): integer;
-    function MoveTasksUp(Index1, Index2: integer): integer;
-    function MoveTasksDown(Index1, Index2: integer): integer;
+    function MoveTasksUp(Index1, Index2: integer; ShowArchived: boolean = True): integer;
+    function MoveTasksDown(Index1, Index2: integer; ShowArchived: boolean = True): integer;
     procedure MoveTask(OldIndex, NewIndex: integer);
     function MoveTaskTree(OldIndex, NewIndex: integer; SortOrder: TSortOrder; out NewRootIndex: integer): boolean;
     procedure SwapTasks(OldIndex, NewIndex: integer);
@@ -1920,7 +1920,7 @@ begin
   SetLength(TempTasks, 0);
 end;
 
-function TTasks.MoveTasksUp(Index1, Index2: integer): integer;
+function TTasks.MoveTasksUp(Index1, Index2: integer; ShowArchived: boolean = True): integer;
 var
   TempTasks: array of TTask = nil;
   i, IndStart, IndEnd, Len, Level, PrevSib: integer;
@@ -1928,7 +1928,8 @@ begin
   Result := -1;
   if not CheckSameLevel(Index1, Index2, IndStart, IndEnd, Level) then Exit;
 
-  PrevSib := GetPrevSibling(IndStart);
+  // Skip hidden archived siblings so the block jumps over them visually
+  PrevSib := GetPrevSibling(IndStart, not ShowArchived);
   if PrevSib < 0 then Exit;
 
   CreateBackup;
@@ -1950,7 +1951,7 @@ begin
   Result := PrevSib;
 end;
 
-function TTasks.MoveTasksDown(Index1, Index2: integer): integer;
+function TTasks.MoveTasksDown(Index1, Index2: integer; ShowArchived: boolean = True): integer;
 var
   TempTasks: array of TTask = nil;
   i, IndStart, IndEnd, Len, Level, NextSib, NextSibEnd: integer;
@@ -1958,8 +1959,8 @@ begin
   Result := -1;
   if not CheckSameLevel(Index1, Index2, IndStart, IndEnd, Level) then Exit;
 
-  // Use the block level, not the level of the last descendant
-  NextSib := GetNextSiblingAtLevel(IndEnd, Level);
+  // Skip hidden archived siblings so the block jumps over them visually
+  NextSib := GetNextSiblingAtLevel(IndEnd, Level, not ShowArchived);
   if NextSib < 0 then Exit;
 
   CreateBackup;
@@ -1970,8 +1971,9 @@ begin
   for i := IndStart to IndEnd do
     TempTasks[i - IndStart] := FTaskList[i];
 
-  // Shift the next sibling's subtree up by Len
-  for i := NextSib to NextSibEnd do
+  // Shift the gap and the next sibling's subtree up by Len. The gap may
+  // include hidden archived tasks between IndEnd and NextSib
+  for i := IndEnd + 1 to NextSibEnd do
     FTaskList[i - Len] := FTaskList[i];
 
   // Place the block right after the shifted sibling subtree
@@ -3196,7 +3198,7 @@ begin
   end;
 end;
 
-function TTasks.GetPrevSibling(Index: integer): integer;
+function TTasks.GetPrevSibling(Index: integer; SkipArchived: boolean = False): integer;
 var
   I, Level: integer;
 begin
@@ -3206,11 +3208,12 @@ begin
   for I := Index - 1 downto 0 do
   begin
     if FTaskList[I].FIndentLevel < Level then Exit;
-    if FTaskList[I].FIndentLevel = Level then Exit(I);
+    if (FTaskList[I].FIndentLevel = Level) and ((not SkipArchived) or (not FTaskList[I].Archive)) then
+      Exit(I);
   end;
 end;
 
-function TTasks.GetNextSibling(Index: integer): integer;
+function TTasks.GetNextSibling(Index: integer; SkipArchived: boolean = False): integer;
 var
   I, Level: integer;
 begin
@@ -3220,11 +3223,12 @@ begin
   for I := Index + 1 to Count - 1 do
   begin
     if FTaskList[I].FIndentLevel < Level then Exit;
-    if FTaskList[I].FIndentLevel = Level then Exit(I);
+    if (FTaskList[I].FIndentLevel = Level) and ((not SkipArchived) or (not FTaskList[I].Archive)) then
+      Exit(I);
   end;
 end;
 
-function TTasks.GetNextSiblingAtLevel(StartAfter, ALevel: integer): integer;
+function TTasks.GetNextSiblingAtLevel(StartAfter, ALevel: integer; SkipArchived: boolean = False): integer;
 var
   I: integer;
 begin
@@ -3233,7 +3237,8 @@ begin
   for I := StartAfter + 1 to Count - 1 do
   begin
     if FTaskList[I].FIndentLevel < ALevel then Exit;
-    if FTaskList[I].FIndentLevel = ALevel then Exit(I);
+    if (FTaskList[I].FIndentLevel = ALevel) and ((not SkipArchived) or (not FTaskList[I].Archive)) then
+      Exit(I);
   end;
 end;
 
