@@ -1038,7 +1038,6 @@ function TTasks.InsertTask(const TaskString: string; Index: integer; Backup: boo
 var
   Task: TTask;
   i, Ind: integer;
-  Indent: integer = 0;
 begin
   // When ListIndex is set, use it directly instead of mapping a grid row.
   // This is needed when the insertion point is a hidden task
@@ -1068,16 +1067,12 @@ begin
   if (not InsertBefore) and (Count > 0) then
     Inc(Ind);
 
-  // Explicit level overrides the level of the following task
-  if (ForceLevel >= 0) then
-    Indent := ForceLevel
-  else if (Ind < Count) then
-    Indent := FTaskList[Ind].IndentLevel
-  else if (Ind > 0) and (Ind <= Count) then
-    Indent := FTaskList[Ind - 1].IndentLevel;
-
   Task := TTask.Create(TaskString); // Create a new task
-  Task.IndentLevel := Indent;
+
+  // Explicit level overrides, otherwise keep the level parsed from the string
+  if (ForceLevel >= 0) then
+    Task.IndentLevel := ForceLevel;
+
   SetLength(FTaskList, Count + 1); // Resize the array
 
   // Shift tasks down to make space for the new task
