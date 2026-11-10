@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
+"PO-Revision-Date: 2026-11-10 21:03-0300\n"
 "Last-Translator: plaintool <astverskoy@gmail.com>\n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -253,7 +253,7 @@ msgstr "by Alexander Tverskoy is licensed under"
 
 #: tformaboutnotetask.labelby1.caption
 msgid "the GNU General Public License, Version 3"
-msgstr "the GNU General Public License, Version 3 "
+msgstr "the GNU General Public License, Version 3"
 
 #: tformaboutnotetask.labellic.caption
 msgid "For questions or feedback, contact me at"
@@ -996,6 +996,14 @@ msgstr "ヘルプ"
 #: tformnotetask.menulanguage.caption
 msgid "Language"
 msgstr "Language"
+
+#: tformnotetask.menumovetasksto.caption
+msgid "Move tasks to"
+msgstr "タスクを移動"
+
+#: tformnotetask.menuopenrecent.caption
+msgid "Open Recent"
+msgstr "最近使ったファイルを開く"
 
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"

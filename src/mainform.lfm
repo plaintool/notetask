@@ -377,6 +377,9 @@ object formNotetask: TformNotetask
       object menuOpen: TMenuItem
         Action = aOpen
       end
+      object menuOpenRecent: TMenuItem
+        Caption = 'Open Recent'
+      end
       object menuSave: TMenuItem
         Action = aSave
       end
@@ -551,6 +554,9 @@ object formNotetask: TformNotetask
       end
       object menuMoveTasksRight: TMenuItem
         Action = aMoveTaskRight
+      end
+      object menuMoveTasksTo: TMenuItem
+        Caption = 'Move tasks to'
       end
     end
     object menuFormat: TMenuItem
@@ -772,23 +778,6 @@ object formNotetask: TformNotetask
       Caption = 'Save as...'
       ShortCut = 24659
       OnExecute = aSaveAsExecute
-    end
-    object aPageProperties: TAction
-      Category = 'File'
-      Caption = 'Page properties...'
-      ShortCut = 24656
-      OnExecute = aPagePropertiesExecute
-    end
-    object aPrint: TAction
-      Category = 'File'
-      Caption = 'Print...'
-      ShortCut = 16464
-      OnExecute = aPrintExecute
-    end
-    object aExit: TAction
-      Category = 'File'
-      Caption = 'Exit'
-      OnExecute = aExitExecute
     end
     object aFont: TAction
       Category = 'Format'
@@ -1326,6 +1315,23 @@ object formNotetask: TformNotetask
       Caption = 'Save notes as...'
       ShortCut = 16473
       OnExecute = aSaveNotesAsExecute
+    end
+    object aPageProperties: TAction
+      Category = 'File'
+      Caption = 'Page properties...'
+      ShortCut = 24656
+      OnExecute = aPagePropertiesExecute
+    end
+    object aPrint: TAction
+      Category = 'File'
+      Caption = 'Print...'
+      ShortCut = 16464
+      OnExecute = aPrintExecute
+    end
+    object aExit: TAction
+      Category = 'File'
+      Caption = 'Exit'
+      OnExecute = aExitExecute
     end
   end
   object openDialog: TOpenDialog

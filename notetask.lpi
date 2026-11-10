@@ -214,10 +214,12 @@
       <Unit>
         <Filename Value="src\settings.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Settings"/>
       </Unit>
       <Unit>
         <Filename Value="src\mdformat.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="MDFormat"/>
       </Unit>
       <Unit>
         <Filename Value="src\udatetimepicker.pas"/>

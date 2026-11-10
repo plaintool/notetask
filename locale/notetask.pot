@@ -976,6 +976,14 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
+#: tformnotetask.menumovetasksto.caption
+msgid "Move tasks to"
+msgstr ""
+
+#: tformnotetask.menuopenrecent.caption
+msgid "Open Recent"
+msgstr ""
+
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"
 msgid "Task"

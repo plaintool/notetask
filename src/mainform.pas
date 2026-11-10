@@ -128,6 +128,8 @@ type
     ImagesTree: TImageList;
     menuCollapseExpand: TMenuItem;
     contextCollapseExpand: TMenuItem;
+    menuMoveTasksTo: TMenuItem;
+    menuOpenRecent: TMenuItem;
     menuMergeTaskNotes: TMenuItem;
     TabsGroup: TTabControl;
     contextColor: TMenuItem;
@@ -672,6 +674,7 @@ type
     FRepaint: boolean;
     FDuplicateHighlight: boolean;
     FFitRowHeightToFont: boolean;
+    FRecentFiles: TStringList;
     {%EndRegion}
     {%Region -fold Private Mathods}
     procedure EditControlSetBounds(Sender: TWinControl; aCol, aRow: integer; OffsetLeft: integer = 4;
@@ -779,6 +782,12 @@ type
     procedure CheckRecovery;
     procedure RequestRecoverySave;
     procedure TimerRecoveryFire;
+    procedure UpdateRecentFilesMenu;
+    procedure DoUpdateRecentFilesMenu(Data: PtrInt);
+    procedure AddRecentFile(const FileName: string);
+    procedure RecentFileClick(Sender: TObject);
+    procedure UpdateMoveTasksToMenu;
+    procedure MoveTasksToGroupClick(Sender: TObject);
     {%EndRegion}
     {%Region -fold Private Setters}
     procedure SetChanged(Value: boolean);
@@ -863,6 +872,7 @@ type
     property MemoNoteSelStart: integer read GetMemoNoteSelStart write FLoadedMemoNoteSelStart;
     property MemoNoteSelLength: integer read GetMemoNoteSelLength write FLoadedMemoNoteSelLength;
     property FitRowHeightToFont: boolean read FFitRowHeightToFont write FFitRowHeightToFont;
+    property RecentFiles: TStringList read FRecentFiles;
     {%EndRegion}
   end;
 
@@ -1030,6 +1040,10 @@ begin
   FFormSettingsLoaded := LoadFormSettings(Self, TagEdit);
   FGridSettingsLoaded := LoadGridSettings(Self, Grid, string.Empty);
 
+  // Load the recent files list and fill the recent submenu
+  FRecentFiles := LoadRecentFiles;
+  UpdateRecentFilesMenu;
+
   // After load settings
   aWordWrap.Checked := FWordWrap;
   MemoNote.WordWrap := FWordWrap;
@@ -1085,6 +1099,8 @@ begin
 
   // Free allocated resources
   Tasks.Free;
+  FRecentFiles.Free;
+
   ResourceBitmapCheck.Free;
   ResourceBitmapUncheck.Free;
   ResourceBitmapStarGold.Free;
@@ -4410,6 +4426,9 @@ begin
   SetNote;
   SetTags;
   SetInfo;
+
+  // Rebuild the "move to group" submenu now that Tasks.SelectedGroup matches the active tab
+  UpdateMoveTasksToMenu;
 end;
 
 procedure TformNotetask.TabsGroupMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -6709,6 +6728,8 @@ begin
   // Offer to restore recovery data if the snapshot is fresher than the file
   CheckRecovery;
 
+  AddRecentFile(FFileName);
+
   Result := True;
 end;
 
@@ -6791,6 +6812,7 @@ begin
             SetChanged(False);
             Tasks.CreateBackupInit;
             ReadOnly := not TFileManager.TryLockFile(fileName, FSReserved);
+            AddRecentFile(FFileName);
             Result := True;
           except
             on E: Exception do
@@ -9144,6 +9166,9 @@ begin
 
     // Set selected row memory for tabs
     SetLength(FLastRowMem, Tasks.CountGroup);
+
+    // Keep the "Move tasks to" submenu in sync with the visible tabs
+    UpdateMoveTasksToMenu;
   finally
     Clean.Free;
   end;
@@ -9349,6 +9374,148 @@ function TformNotetask.GetIsEditing: boolean;
 begin
   Result := (Grid.EditorMode) or (FIsEditing);
 end;
+
+procedure TformNotetask.UpdateRecentFilesMenu;
+begin
+  // Defer the rebuild so the sender of a recent-file click is not freed mid-handler
+  Application.QueueAsyncCall(@DoUpdateRecentFilesMenu, 0);
+end;
+
+procedure TformNotetask.DoUpdateRecentFilesMenu(Data: PtrInt);
+var
+  i: integer;
+  Item: TMenuItem;
+begin
+  if (not Assigned(menuOpenRecent)) then Exit;
+
+  menuOpenRecent.Clear;
+  for i := 0 to FRecentFiles.Count - 1 do
+  begin
+    if i >= MaxRecentFiles then Break;
+    Item := TMenuItem.Create(Self);
+    if i < 9 then
+      Item.Caption := '&' + IntToStr(i + 1) + '. ' + ExtractFileName(FRecentFiles[i])
+    else
+      Item.Caption := IntToStr(i + 1) + '. ' + ExtractFileName(FRecentFiles[i]);
+    Item.Hint := FRecentFiles[i];
+    Item.Tag := i;
+    Item.OnClick := @RecentFileClick;
+    menuOpenRecent.Add(Item);
+  end;
+  menuOpenRecent.Enabled := FRecentFiles.Count > 0;
+end;
+
+procedure TformNotetask.AddRecentFile(const FileName: string);
+var
+  Idx: integer;
+  FullPath: string;
+begin
+  if FileName = string.Empty then Exit;
+  FullPath := ExpandFileName(FileName);
+  Idx := FRecentFiles.IndexOf(FullPath);
+  if Idx >= 0 then
+    FRecentFiles.Delete(Idx);
+  FRecentFiles.Insert(0, FullPath);
+  while FRecentFiles.Count > MaxRecentFiles do
+    FRecentFiles.Delete(FRecentFiles.Count - 1);
+  SaveRecentFiles(FRecentFiles);
+  UpdateRecentFilesMenu;
+end;
+
+procedure TformNotetask.RecentFileClick(Sender: TObject);
+var
+  Idx: integer;
+  Path: string;
+begin
+  Idx := (Sender as TMenuItem).Tag;
+  if (Idx < 0) or (Idx >= FRecentFiles.Count) then Exit;
+
+  Path := FRecentFiles[Idx];
+  if not FileExists(Path) then
+  begin
+    ShowMessage(rfilenotfound);
+    FRecentFiles.Delete(Idx);
+    SaveRecentFiles(FRecentFiles);
+    UpdateRecentFilesMenu;
+    Exit;
+  end;
+
+  if IsCanClose then
+    OpenFile(Path);
+end;
+
+procedure TformNotetask.UpdateMoveTasksToMenu;
+var
+  i, RealIdx: integer;
+  Item: TMenuItem;
+  ACaption: string;
+begin
+  if (not Assigned(menuMoveTasksTo)) then Exit;
+  if (not Assigned(Tasks)) then Exit;
+
+  menuMoveTasksTo.Clear;
+  for i := 0 to TabsGroup.Tabs.Count - 1 do
+  begin
+    RealIdx := FindGroupRealIndex(i);
+    if RealIdx < 0 then Continue;
+    // Skip the currently active group, moving into it is a no-op
+    if RealIdx = Tasks.SelectedGroup then Continue;
+
+    ACaption := Tasks.GetGroupNameForTab(RealIdx, False);
+    if ACaption = string.Empty then
+      ACaption := rgroupuntitled;
+
+    Item := TMenuItem.Create(Self);
+    Item.Caption := ACaption;
+    Item.Tag := RealIdx;
+    Item.OnClick := @MoveTasksToGroupClick;
+    menuMoveTasksTo.Add(Item);
+  end;
+  menuMoveTasksTo.Enabled := menuMoveTasksTo.Count > 0;
+end;
+
+procedure TformNotetask.MoveTasksToGroupClick(Sender: TObject);
+var
+  TargetGroup, NewRow, SelLen, SelCol, SelLeft, SelRight, SelEnd: integer;
+begin
+  if Screen.ActiveForm <> Self then exit;
+  if Grid.RowCount < 2 then exit;
+
+  TargetGroup := (Sender as TMenuItem).Tag;
+  if (TargetGroup < 0) or (TargetGroup >= Tasks.CountGroup) then exit;
+  if TargetGroup = Tasks.SelectedGroup then exit;
+
+  GridBackupSelection;
+  SelLen := Grid.Selection.Bottom - Grid.Selection.Top + 1;
+  SelLeft := Grid.Selection.Left;
+  SelRight := Grid.Selection.Right;
+  SelCol := Grid.Col;
+
+  NewRow := Tasks.MoveGroupTasks(Grid.Selection.Top, Grid.Selection.Bottom, TargetGroup);
+
+  if (NewRow > -1) then
+  begin
+    ChangeGroup(FindGroupTabIndex(Tasks.SelectedGroup));
+    NewRow := Tasks.ReverseMap(NewRow);
+    Grid.Row := NewRow;
+    if (SortOrder = soAscending) then
+      SelEnd := NewRow + SelLen - 1
+    else
+      SelEnd := NewRow - SelLen - 1;
+
+    ResetRowHeight;
+    SetTabs;
+    Changed := True;
+    SetNote;
+    SetTags;
+    SetInfo;
+
+    Grid.Col := SelCol;
+    Grid.Selection := TGridRect.Create(SelLeft, NewRow, SelRight, SelEnd);
+  end;
+end;
+
+{%EndRegion}
 
 {%EndRegion}
 

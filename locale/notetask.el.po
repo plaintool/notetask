@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
+"PO-Revision-Date: 2026-11-10 21:03-0300\n"
 "Last-Translator: plaintool <astverskoy@gmail.com>\n"
 "Language-Team: \n"
 "Language: el\n"
@@ -253,7 +253,7 @@ msgstr "από τον Alexander Tverskoy έχει άδεια βάσει της"
 
 #: tformaboutnotetask.labelby1.caption
 msgid "the GNU General Public License, Version 3"
-msgstr "της Γενικής Δημόσιας Άδειας GNU, Έκδοση 3 "
+msgstr "της Γενικής Δημόσιας Άδειας GNU, Έκδοση 3"
 
 #: tformaboutnotetask.labellic.caption
 msgid "For questions or feedback, contact me at"
@@ -996,6 +996,14 @@ msgstr "Βοήθεια"
 #: tformnotetask.menulanguage.caption
 msgid "Language"
 msgstr "Γλώσσα"
+
+#: tformnotetask.menumovetasksto.caption
+msgid "Move tasks to"
+msgstr "Μετακίνηση εργασιών σε"
+
+#: tformnotetask.menuopenrecent.caption
+msgid "Open Recent"
+msgstr "Άνοιγμα πρόσφατων"
 
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"

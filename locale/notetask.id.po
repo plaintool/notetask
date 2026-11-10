@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
+"PO-Revision-Date: 2026-11-10 21:03-0300\n"
 "Last-Translator: plaintool <astverskoy@gmail.com>\n"
 "Language-Team: \n"
 "Language: id\n"
@@ -214,11 +214,11 @@ msgstr "&Ya"
 
 #: task.rdays
 msgid "d"
-msgstr "h\"  # har"
+msgstr "h"
 
 #: task.rhours
 msgid "h"
-msgstr "j\"  # ja"
+msgstr "j"
 
 #: task.rminutes
 msgctxt "task.rminutes"
@@ -228,7 +228,7 @@ msgstr "mnt"
 #: task.rmonths
 msgctxt "task.rmonths"
 msgid "m"
-msgstr "b\"  # bula"
+msgstr "b"
 
 #: task.rseconds
 msgid "sec"
@@ -236,7 +236,7 @@ msgstr "dtk"
 
 #: task.ryears
 msgid "y"
-msgstr "th\"  # tahu"
+msgstr "th"
 
 #: tformaboutnotetask.buttonok.caption
 msgctxt "tformaboutnotetask.buttonok.caption"
@@ -253,7 +253,7 @@ msgstr "by Alexander Tverskoy is licensed under"
 
 #: tformaboutnotetask.labelby1.caption
 msgid "the GNU General Public License, Version 3"
-msgstr "the GNU General Public License, Version 3 "
+msgstr "the GNU General Public License, Version 3"
 
 #: tformaboutnotetask.labellic.caption
 msgid "For questions or feedback, contact me at"
@@ -996,6 +996,14 @@ msgstr "Bantuan"
 #: tformnotetask.menulanguage.caption
 msgid "Language"
 msgstr "Language"
+
+#: tformnotetask.menumovetasksto.caption
+msgid "Move tasks to"
+msgstr "Pindahkan tugas ke"
+
+#: tformnotetask.menuopenrecent.caption
+msgid "Open Recent"
+msgstr "Buka Terbaru"
 
 #: tformnotetask.menutask.caption
 msgctxt "tformnotetask.menutask.caption"

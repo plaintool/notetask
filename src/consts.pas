@@ -51,6 +51,9 @@ const
   // Debounce delay before writing a recovery snapshot
   RecoverySaveDelayMs = 5000;
 
+  // Maximum number of files kept in the recent list
+  MaxRecentFiles = 10;
+
   CollapseButtonWidth = 14;
   CollapseButtonGap = 3;
   TaskIndentExtra = 7;

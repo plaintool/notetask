@@ -35,6 +35,10 @@ procedure SaveFormSettings(Form: TformNotetask; TagEdit: TTagEdit);
 
 function LoadFormSettings(Form: TformNotetask; TagEdit: TTagEdit): boolean;
 
+procedure SaveRecentFiles(const Files: TStringList);
+
+function LoadRecentFiles: TStringList;
+
 procedure SaveGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string);
 
 function LoadGridSettings(Form: TformNotetask; Grid: TStringGrid; Item: string): boolean;
@@ -46,6 +50,7 @@ var
   FileName: string;
   JSONObj: TJSONObject;
   TagArr: TJSONArray;
+  RecentArr: TJSONArray;
   ItemObj: TJSONObject;
   i: integer;
   DPI: integer;
@@ -113,6 +118,15 @@ begin
       TagArr.Add(ItemObj);
     end;
     JSONObj.Add('TagColors', TagArr);
+
+    // Save the recent files list so it is not lost when the whole file is rewritten
+    if Assigned(Form.RecentFiles) then
+    begin
+      RecentArr := TJSONArray.Create;
+      for i := 0 to Form.RecentFiles.Count - 1 do
+        RecentArr.Add(Form.RecentFiles[i]);
+      JSONObj.Add('RecentFiles', RecentArr);
+    end;
 
     // Write to file
     with TStringList.Create do
@@ -276,6 +290,94 @@ begin
     Result := True;
   except
     Result := False;
+  end;
+end;
+
+procedure SaveRecentFiles(const Files: TStringList);
+var
+  FileName: string;
+  JSONObj: TJSONObject;
+  FileStream: TFileStream;
+  RecentArr: TJSONArray;
+  Existing: TJSONData;
+  i: integer;
+begin
+  FileName := TOS.GetSettingsDirectory(APP_NAME, 'form_settings.json');
+  ForceDirectories(TOS.GetSettingsDirectory(APP_NAME));
+
+  // Load existing JSON so unrelated keys are preserved
+  if FileExists(FileName) then
+  begin
+    FileStream := TFileStream.Create(FileName, fmOpenRead);
+    try
+      JSONObj := TJSONObject(GetJSON(FileStream));
+    finally
+      FileStream.Free;
+    end;
+  end
+  else
+    JSONObj := TJSONObject.Create;
+
+  try
+    // Replace the previous recent list
+    Existing := JSONObj.Find('RecentFiles');
+    if Assigned(Existing) then
+      JSONObj.Remove(Existing);
+
+    RecentArr := TJSONArray.Create;
+    for i := 0 to Files.Count - 1 do
+      RecentArr.Add(Files[i]);
+    JSONObj.Add('RecentFiles', RecentArr);
+
+    with TStringList.Create do
+    try
+      Text := JSONObj.FormatJSON;
+      SaveToFile(FileName);
+    finally
+      Free;
+    end;
+  finally
+    JSONObj.Free;
+  end;
+end;
+
+function LoadRecentFiles: TStringList;
+var
+  FileName, FileContent: string;
+  JSONObj: TJSONObject;
+  FileStream: TFileStream;
+  RecentData: TJSONData;
+  RecentArr: TJSONArray;
+  i: integer;
+begin
+  Result := TStringList.Create;
+  FileName := TOS.GetSettingsDirectory(APP_NAME, 'form_settings.json');
+  if not FileExists(FileName) then Exit;
+
+  try
+    FileContent := string.Empty;
+    FileStream := TFileStream.Create(FileName, fmOpenRead);
+    try
+      SetLength(FileContent, FileStream.Size);
+      FileStream.Read(Pointer(FileContent)^, FileStream.Size);
+    finally
+      FileStream.Free;
+    end;
+
+    JSONObj := TJSONObject(GetJSON(FileContent));
+    try
+      RecentData := JSONObj.Find('RecentFiles');
+      if Assigned(RecentData) and (RecentData.JSONType = jtArray) then
+      begin
+        RecentArr := TJSONArray(RecentData);
+        for i := 0 to RecentArr.Count - 1 do
+          Result.Add(RecentArr.Items[i].AsString);
+      end;
+    finally
+      JSONObj.Free;
+    end;
+  except
+    // Ignore errors, return an empty list
   end;
 end;
 
