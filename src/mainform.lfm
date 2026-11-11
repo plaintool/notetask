@@ -21,7 +21,7 @@ object formNotetask: TformNotetask
   OnShow = FormShow
   object Grid: TStringGrid
     Left = 0
-    Height = 296
+    Height = 286
     Top = 24
     Width = 851
     Align = alClient
@@ -127,8 +127,8 @@ object formNotetask: TformNotetask
   object Splitter: TSplitter
     Cursor = crVSplit
     Left = 0
-    Height = 5
-    Top = 320
+    Height = 10
+    Top = 310
     Width = 851
     Align = alBottom
     AutoSnap = False
@@ -141,7 +141,7 @@ object formNotetask: TformNotetask
   object panelNote: TPanel
     Left = 0
     Height = 128
-    Top = 325
+    Top = 320
     Width = 851
     Align = alBottom
     BevelOuter = bvNone
@@ -194,10 +194,10 @@ object formNotetask: TformNotetask
     TabOrder = 6
     Visible = False
     object SplitFilter: TSplitter
-      Left = 639
+      Left = 634
       Height = 24
       Top = 0
-      Width = 5
+      Width = 10
       Align = alRight
       MinSize = 20
       ResizeAnchor = akRight
@@ -207,7 +207,7 @@ object formNotetask: TformNotetask
       Left = 0
       Height = 24
       Top = 0
-      Width = 639
+      Width = 634
       OnChange = TabsGroupChange
       Align = alClient
       Options = [nboHidePageListPopup, nboDoChangeOnSetIndex]
@@ -267,8 +267,8 @@ object formNotetask: TformNotetask
   object SplitTags: TSplitter
     Cursor = crVSplit
     Left = 0
-    Height = 5
-    Top = 453
+    Height = 10
+    Top = 448
     Width = 851
     Align = alBottom
     AutoSnap = False
